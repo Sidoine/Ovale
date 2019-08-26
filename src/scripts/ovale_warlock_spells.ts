@@ -448,6 +448,7 @@ Define(vile_taint_talent 12) #22046
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
 Define(writhe_in_agony_talent 4) #22044
 # Agony's damage may now ramp up to s2 stacks.
+Define(unbridled_fury_item 169299)
 Define(cascading_calamity_trait 275372)
 Define(dreadful_calling_trait 278727)
 Define(pandemic_invocation_trait 289364)
@@ -455,6 +456,9 @@ Define(baleful_invocation_trait 287059)
 Define(explosive_potential_trait 275395)
 Define(shadows_bite_trait 272944)
 Define(crashing_chaos_trait 277644)
+Define(blood_of_the_enemy_essence_id 23)
+Define(vision_of_perfection_essence_id 22)
+Define(memory_of_lucid_dreams_essence_id 27)
     `;
 // END
     code += `

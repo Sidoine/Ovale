@@ -110,10 +110,6 @@ Define(cone_of_cold 120)
 Define(counterspell 2139)
 # Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 6 seconds?s12598[ and silencing the target for 55021d][].
   SpellInfo(counterspell cd=24 duration=6 gcd=0 offgcd=1 interrupt=1)
-Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
-  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
-  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dragons_breath 31661)
 # Enemies in a cone in front of you take (58.25 of Spell Power) Fire damage and are disoriented for 4 seconds. Damage will cancel the effect.
   SpellInfo(dragons_breath cd=20 duration=4)
@@ -419,9 +415,33 @@ Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 12) #22470
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
+Define(focused_resolve_item 168506)
+Define(ancient_knot_of_wisdom_item 166793)
+Define(azsharas_font_of_power_item 169314)
+Define(azurethos_singed_plumage_item 161377)
+Define(balefire_branch_item 159630)
+Define(dread_aspirants_badge_item 162966)
+Define(dread_aspirants_medallion_item 162897)
+Define(dread_gladiators_badge_item 161902)
+Define(dread_gladiators_medallion_item 161674)
+Define(hyperthread_wristwraps_item 168989)
+Define(ignition_mages_fuse_item 159615)
+Define(neural_synapse_enhancer_item 168973)
+Define(notorious_aspirants_badge_item 167528)
+Define(notorious_aspirants_medallion_item 167525)
+Define(notorious_gladiators_badge_item 167380)
+Define(notorious_gladiators_medallion_item 167377)
+Define(shockbiters_fang_item 169318)
+Define(sinister_aspirants_badge_item 165223)
+Define(sinister_aspirants_medallion_item 165220)
+Define(sinister_gladiators_badge_item 165058)
+Define(sinister_gladiators_medallion_item 165055)
+Define(tzanes_barkspines_item 161411)
+Define(unbridled_fury_item 169299)
 Define(arcane_pummeling_trait 270669)
 Define(equipoise_trait 286027)
 Define(blaster_master_trait 274596)
+Define(memory_of_lucid_dreams_essence_id 27)
     `;
 // END
     code += `

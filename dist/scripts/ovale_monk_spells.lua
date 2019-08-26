@@ -82,6 +82,9 @@ Define(energizing_elixir 115288)
   SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=1 chi=-2 talent=energizing_elixir_talent)
   # Generating w1/5 extra Energy per sec.
   SpellAddBuff(energizing_elixir energizing_elixir=1)
+Define(expel_harm 115072)
+# Draw in the positive chi of all your Healing Spheres, and expel negative chi, damaging the nearest enemy for s2 of the amount healed.
+  SpellInfo(expel_harm energy=15 gcd=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -124,6 +127,10 @@ Define(focused_azerite_beam_3 299338)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+Define(gift_of_the_ox 124502)
+# When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
+  SpellInfo(gift_of_the_ox channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(gift_of_the_ox gift_of_the_ox=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -237,10 +244,6 @@ Define(storm_earth_and_fire 137639)
   SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=1)
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
-Define(swift_roundhouse_buff 278707)
-# Blackout Kick increases the damage of your next Rising Sun Kick by s1, stacking up to 278710u times.
-  SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(the_unbound_force_0 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force_0 cd=60 duration=2 channel=2 tick=0.33)
@@ -333,6 +336,11 @@ Define(special_delivery_talent 16) #19819
 # Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+Define(superior_battle_potion_of_agility_item 168489)
+Define(unbridled_fury_item 169299)
+Define(glory_of_the_dawn_trait 288634)
+Define(open_palm_strikes_trait 279918)
+Define(the_crucible_of_flame_essence_id 12)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
@@ -407,7 +415,7 @@ Define(essence_font 191837)
 Define(essence_font_buff 191837)
 	SpellInfo(essence_font_buff duration=8 tick=2 haste=spell)
 
-Define(expel_harm 115072)
+
 	SpellInfo(expel_harm energy=15 specialization=brewmaster unusable=1)
 	SpellRequire(expel_harm unusable 0=spellcount_min,1,debuff,!healing_immunity_debuff)
 

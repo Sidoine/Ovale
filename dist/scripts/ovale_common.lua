@@ -84,20 +84,6 @@ SpellList(trinket_stacking_proc_spell_power_buff)
 
 Define(umbral_glaive_storm 242553)
 
-# Battle for Azeroth
-Define(battle_scarred 160053)
-
-Define(item_battle_potion_of_agility 163223)
-Define(item_battle_potion_of_intellect 163222)
-Define(item_battle_potion_of_strength 163224)
-Define(item_battle_potion_of_stamina 163225)
-Define(item_bursting_blood 152560)
-Define(item_focused_resolve 168506)
-Define(item_rising_death 152559)
-Define(item_steelskin_potion 152557)
-Define(item_unbridled_fury 169299)
-Define(item_superior_battle_potion_of_strength 168500)
-
 ###
 ### Trinkets & OnUse Rings
 ###
@@ -202,16 +188,6 @@ Define(the_unbound_force_essence 298452)
 Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
-
-# Essences: TODO import from simc
-Define(anima_of_life_and_death_essence_id 7)
-Define(blood_of_the_enemy_essence_id 23)
-Define(condensed_lifeforce_essence_id 14)
-Define(conflict_and_strife_essence_id 32)
-Define(essence_of_the_focusing_iris_essence_id 5)
-Define(memory_of_lucid_dreams_essence_id 27)
-Define(the_crucible_of_flame_essence_id 12)
-Define(vision_of_perfection_essence_id 22)
 
 ###
 ### Racials

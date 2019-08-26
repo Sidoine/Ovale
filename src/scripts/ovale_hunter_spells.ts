@@ -116,6 +116,10 @@ Define(coordinated_assault 266779)
 Define(counter_shot 147362)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dance_of_death_buff 274442)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
   SpellInfo(dance_of_death_buff channel=-0.001 gcd=0 offgcd=1)
@@ -186,6 +190,9 @@ Define(guardian_of_azeroth_4 300091)
   SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
+  SpellAddBuff(guardian_of_azeroth_5 guardian_of_azeroth_buff=1)
+Define(guardian_of_azeroth_buff 303349)
+  SpellInfo(guardian_of_azeroth_buff gcd=0 offgcd=1)
 
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
@@ -271,6 +278,26 @@ Define(raptor_strike 186270)
 # A vicious slash dealing s1 Physical damage.
 # Rank 2: Raptor Strike deals s1 increased damage.
   SpellInfo(raptor_strike focus=30)
+Define(razor_coral_0 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
+Define(razor_coral_1 303565)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_1 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  SpellAddBuff(razor_coral_1 razor_coral_1=1)
+Define(razor_coral_2 303568)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_2 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  # Withdrawing the Razor Coral will grant w1 Critical Strike.
+  SpellAddTargetDebuff(razor_coral_2 razor_coral_2=1)
+Define(razor_coral_3 303570)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_3 duration=20 channel=20 max_stacks=100 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(razor_coral_3 razor_coral_3=1)
+Define(razor_coral_4 303572)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
 Define(reckless_force_buff_0 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
@@ -338,6 +365,24 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
+Define(unbridled_fury_0 300714)
+# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
+  SpellInfo(unbridled_fury_0 duration=60 gcd=0 offgcd=1)
+  # Chance to deal an extra 300717s1 Fire damage to your current target.
+  SpellAddBuff(unbridled_fury_0 unbridled_fury_0=1)
+Define(unbridled_fury_1 300751)
+# Chance to create multiple potions.
+  SpellInfo(unbridled_fury_1 gcd=0 offgcd=1)
+Define(unerring_vision_buff_0 274445)
+# While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
+  SpellInfo(unerring_vision_buff_0 channel=-0.001 gcd=0 offgcd=1)
+
+Define(unerring_vision_buff_1 274447)
+# While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
+  SpellInfo(unerring_vision_buff_1 duration=5 max_stacks=10 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(unerring_vision_buff_1 unerring_vision_buff_1=1)
+
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
@@ -360,8 +405,11 @@ SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
+SpellList(unbridled_fury unbridled_fury_0 unbridled_fury_1)
+SpellList(unerring_vision_buff unerring_vision_buff_0 unerring_vision_buff_1)
 SpellList(latent_poison latent_poison_0 latent_poison_1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
@@ -409,12 +457,22 @@ Define(vipers_venom_talent 1) #22275
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
+Define(azsharas_font_of_power_item 169314)
+Define(cyclotronic_blast_item 167672)
+Define(unbridled_fury_item 169299)
+Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
+Define(dribbling_inkpod_item 169319)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
 Define(rapid_reload_trait 278530)
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
+Define(unerring_vision_trait 274444)
+Define(condensed_life_force_essence_id 14)
+Define(essence_of_the_focusing_iris_essence_id 5)
+Define(blood_of_the_enemy_essence_id 23)
+Define(memory_of_lucid_dreams_essence_id 27)
     `;
 // END
     code += `

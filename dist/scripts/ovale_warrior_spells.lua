@@ -7,6 +7,18 @@ __exports.registerWarriorSpells = function(OvaleScripts)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
+Define(anima_of_death_0 294926)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
+  SpellInfo(anima_of_death_0 cd=150)
+Define(anima_of_death_1 294946)
+# Heal for s1 of your maximum health.
+  SpellInfo(anima_of_death_1 gcd=0 offgcd=1)
+Define(anima_of_death_2 300002)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to 294945s1 of your maximum health.
+  SpellInfo(anima_of_death_2 cd=120 gcd=1)
+Define(anima_of_death_3 300003)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1+294945s2 of your maximum health per enemy hit, up to 294945s1*2 of your maximum health.
+  SpellInfo(anima_of_death_3 cd=120 gcd=1)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 rage=-20 talent=avatar_talent)
@@ -42,6 +54,11 @@ Define(blood_of_the_enemy_5 298277)
 Define(blood_of_the_enemy_6 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_6)
+Define(bloodlust 2825)
+# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(bloodlust bloodlust=1)
 Define(bloodthirst 23881)
 # Assault the target in a bloodthirsty craze, dealing s*<mult> Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(bloodthirst cd=4.5 rage=-8)
@@ -164,6 +181,11 @@ Define(intimidating_shout 5246)
   SpellInfo(intimidating_shout cd=90 duration=8)
   # Disoriented.
   SpellAddTargetDebuff(intimidating_shout intimidating_shout=1)
+Define(last_stand 12975)
+# Increases maximum health by s1 for 15 seconds, and instantly heals you for that amount.
+  SpellInfo(last_stand cd=180 duration=15 gcd=0 offgcd=1)
+  # Maximum health increased by s1.
+  SpellAddBuff(last_stand last_stand=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -225,6 +247,26 @@ Define(ravager_protection 228920)
   SpellInfo(ravager_protection cd=60 duration=7 tick=1 talent=ravager_talent_protection)
   # ?s23922[Chance to Parry increased by s1.][Ravager is currently active.]
   SpellAddBuff(ravager_protection ravager_protection=1)
+Define(razor_coral_0 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
+Define(razor_coral_1 303565)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_1 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  SpellAddBuff(razor_coral_1 razor_coral_1=1)
+Define(razor_coral_2 303568)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_2 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  # Withdrawing the Razor Coral will grant w1 Critical Strike.
+  SpellAddTargetDebuff(razor_coral_2 razor_coral_2=1)
+Define(razor_coral_3 303570)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_3 duration=20 channel=20 max_stacks=100 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(razor_coral_3 razor_coral_3=1)
+Define(razor_coral_4 303572)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
 Define(reckless_force_buff_0 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
@@ -274,10 +316,6 @@ Define(storm_bolt 107570)
   SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
   # Stunned.
   SpellAddBuff(storm_bolt storm_bolt=1)
-Define(sudden_death 29725)
-# Your attacks have a chance to make your next Execute cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
-  SpellInfo(sudden_death channel=0 gcd=0 offgcd=1 talent=sudden_death_talent)
-  SpellAddBuff(sudden_death sudden_death=1)
 Define(sweeping_strikes 260708)
 # For 12 seconds your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellInfo(sweeping_strikes cd=30 duration=12)
@@ -353,6 +391,8 @@ SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(whirlwind_buff whirlwind_buff_0 whirlwind_buff_1 whirlwind_buff_2)
+SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 Define(anger_management_talent 19) #21204
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
@@ -375,9 +415,9 @@ Define(frothing_berserker_talent 15) #19140
 # Rampage now costs s1/10 Rage and increases your damage done by 215572s1 and Haste by 215572s2 for 6 seconds.
 Define(furious_slash_talent 9) #23372
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-Define(massacre_talent 7) #22380
-# Execute is now usable on targets below s2 health.
 Define(massacre_talent_fury 14) #22393
+# Execute is now usable on targets below s2 health.
+Define(massacre_talent 7) #22380
 # Execute is now usable on targets below s2 health.
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
@@ -391,17 +431,18 @@ Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(storm_bolt_talent_fury 6) #23093
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
-Define(sudden_death_talent 2) #22360
-# Your attacks have a chance to make your next Execute cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
 Define(unstoppable_force_talent 8) #22626
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+Define(unbridled_fury_item 169299)
+Define(superior_battle_potion_of_strength_item 168500)
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
-Define(brace_for_impact_trait 277636)
-Define(deafening_crash_trait 272824)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(blood_of_the_enemy_essence_id 23)
+Define(condensed_life_force_essence_id 14)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
@@ -491,14 +532,14 @@ Define(enraged_regeneration_buff 184364)
 	SpellRequire(execute_arms rage_percent 0=buff,execute_arms_norage)
 	SpellRequire(execute_arms target_health_pct 100=buff,execute_arms_nohp)
     SpellAddTargetDebuff(execute_arms executioners_precision_debuff=0)
-SpellList(execute_arms_norage sudden_death_arms_buff stone_heart_buff deadly_calm_buff)
-SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
+SpellList(execute_arms_norage sudden_death_buff_arms stone_heart_buff deadly_calm_buff)
+SpellList(execute_arms_nohp sudden_death_buff_arms stone_heart_buff)
 
 	SpellInfo(execute rage=-20 target_health_pct=20)
 	SpellInfo(execute target_health_pct=35 talent=massacre_talent_fury)
 	SpellRequire(execute target_health_pct 100=buff,execute_free)
 	SpellRequire(execute cd_percent 0=buff,execute_free)
-SpellList(execute_free sudden_death_fury_buff stone_heart_buff)
+SpellList(execute_free sudden_death_buff_fury stone_heart_buff)
 Define(executioners_precision_debuff 272870)
     SpellInfo(executioners_precision_debuff duration=30 max_stacks=2)
     SpellAddTargetDebuff(execute_arms executioners_precision_debuff=1 trait=executioners_precision_trait)
@@ -543,7 +584,7 @@ Define(in_for_the_kill_buff 248622)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
 	SpellRequire(intercept unusable 1=lossofcontrol,root)
 Define(into_the_fray_buff 202602)
-Define(last_stand 12975)
+
 	SpellInfo(last_stand cd=180)
 	SpellInfo(last_stand add_cd=-60 talent=bolster_talent)
 	SpellAddBuff(last_stand last_stand_buff=1)
@@ -649,10 +690,10 @@ Define(spell_reflection 23920)
 Define(spell_reflection_buff 23920)
 
 	SpellInfo(storm_bolt cd=30)
-Define(sudden_death_arms_buff 52437)
-	SpellInfo(sudden_death_arms_buff duration=10)
-Define(sudden_death_fury_buff 280776)
-	SpellInfo(sudden_death_fury_buff duration=10)
+Define(sudden_death_buff_arms 52437)
+	SpellInfo(sudden_death_buff_arms duration=10)
+Define(sudden_death_buff_fury 280776)
+	SpellInfo(sudden_death_buff_fury duration=10)
 
 	SpellInfo(sweeping_strikes cd=25)
 	SpellAddBuff(sweeping_strikes sweeping_strikes_buff=1)

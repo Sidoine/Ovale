@@ -251,6 +251,8 @@ export class Emiter {
         this.AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury");
 
         this.AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item");
+        this.AddDisambiguation("condensed_lifeforce", "condensed_life_force");
+        this.AddDisambiguation("condensed_lifeforce_essence_id", "condensed_life_force_essence_id")
     }
 
     /** Transform a ParseNode to an AstNode
@@ -788,11 +790,11 @@ export class Emiter {
             } else if (action == "potion") {
                 let name = (modifiers.name && this.unparser.Unparse(modifiers.name)) || annotation.consumables["potion"];
                 if (name) {
-                    [name] = this.Disambiguate(annotation, name, className, specialization, "item");
-                    bodyCode = format("Item(item_%s usable=1)", name);
+                    [name] = this.Disambiguate(annotation, `${name}_item`, className, specialization, "item");
+                    bodyCode = format("Item(%s usable=1)", name);
                     conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
                     annotation.opt_use_consumables = className;
-                    this.AddSymbol(annotation, format("item_%s", name));
+                    this.AddSymbol(annotation, name);
                     isSpellAction = false;
                 }
             } else if (action === "sequence") {
@@ -1451,6 +1453,7 @@ export class Emiter {
             let property = tokenIterator();
             
             let essenceId = format("%s_essence_id", name);
+            [essenceId] = this.Disambiguate(annotation, essenceId, annotation.class, annotation.specialization);
             
             if(property == "major") {
                 code = format("AzeriteEssenceIsMajor(%s)", essenceId);

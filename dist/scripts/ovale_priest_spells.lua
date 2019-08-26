@@ -86,6 +86,10 @@ Define(guardian_of_azeroth_4 300091)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
 
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
@@ -256,6 +260,7 @@ Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds.rnrnInsanity does not drain during this channel.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(unbridled_fury_item 169299)
 Define(chorus_of_insanity_trait 278661)
 Define(death_throes_trait 278659)
 Define(searing_dialogue_trait 272788)

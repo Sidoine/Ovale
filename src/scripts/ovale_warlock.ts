@@ -47,12 +47,12 @@ AddFunction AfflictionUseItemActions
 
 AddFunction AfflictionSpendersMainActions
 {
- #unstable_affliction,if=cooldown.summon_darkglare.remains<=soul_shard*(execute_time+azerite.dreadful_calling.rank)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=soul_shard*execute_time)
- if SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } Spell(unstable_affliction)
- #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(6-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
- if { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersMainActions()
+ #unstable_affliction,if=cooldown.summon_darkglare.remains<=soul_shard*(execute_time+azerite.dreadful_calling.rank)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=soul_shard*execute_time)&(talent.sow_the_seeds.enabled|dot.phantom_singularity.remains|dot.vile_taint.remains)
+ if SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and { Talent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } Spell(unstable_affliction)
+ #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+ if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersMainActions()
 
- unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+ unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
  {
   #seed_of_corruption,if=variable.use_seed
   if use_seed() Spell(seed_of_corruption)
@@ -67,35 +67,35 @@ AddFunction AfflictionSpendersMainActions
 
 AddFunction AfflictionSpendersMainPostConditions
 {
- { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+ { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
 }
 
 AddFunction AfflictionSpendersShortCdActions
 {
- unless SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and Spell(unstable_affliction)
+ unless SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and { Talent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and Spell(unstable_affliction)
  {
-  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(6-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersShortCdActions()
+  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersShortCdActions()
  }
 }
 
 AddFunction AfflictionSpendersShortCdPostConditions
 {
- SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or { SoulShards() >= 5 and Enemies() < 2 or SoulShards() >= 2 and Enemies() >= 2 } and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and { not Talent(vile_taint_talent) or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
+ SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and { Talent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or { SoulShards() >= 5 and Enemies() < 2 or SoulShards() >= 2 and Enemies() >= 2 } and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and { not Talent(vile_taint_talent) or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
 }
 
 AddFunction AfflictionSpendersCdActions
 {
- unless SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and Spell(unstable_affliction)
+ unless SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and { Talent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and Spell(unstable_affliction)
  {
-  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(6-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersCdActions()
+  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersCdActions()
  }
 }
 
 AddFunction AfflictionSpendersCdPostConditions
 {
- SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 6 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or { SoulShards() >= 5 and Enemies() < 2 or SoulShards() >= 2 and Enemies() >= 2 } and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and { not Talent(vile_taint_talent) or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
+ SpellCooldown(summon_darkglare) <= SoulShards() * { ExecuteTime(unstable_affliction) + AzeriteTraitRank(dreadful_calling_trait) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= SoulShards() * ExecuteTime(unstable_affliction) } and { Talent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or { SoulShards() >= 5 and Enemies() < 2 or SoulShards() >= 2 and Enemies() >= 2 } and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and { not Talent(vile_taint_talent) or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
 }
 
 ### actions.precombat
@@ -104,12 +104,12 @@ AddFunction AfflictionPrecombatMainActions
 {
  #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
  if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
- #seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
- if Enemies() >= 3 Spell(seed_of_corruption)
+ #seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
+ if Enemies() >= 3 and not HasEquippedItem(169314) Spell(seed_of_corruption)
  #haunt
  Spell(haunt)
- #shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3
- if not Talent(haunt_talent) and Enemies() < 3 Spell(shadow_bolt_affliction)
+ #shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3&!equipped.169314
+ if not Talent(haunt_talent) and Enemies() < 3 and not HasEquippedItem(169314) Spell(shadow_bolt_affliction)
 }
 
 AddFunction AfflictionPrecombatMainPostConditions
@@ -127,7 +127,7 @@ AddFunction AfflictionPrecombatShortCdActions
 
 AddFunction AfflictionPrecombatShortCdPostConditions
 {
- Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Enemies() >= 3 and Spell(seed_of_corruption) or Spell(haunt) or not Talent(haunt_talent) and Enemies() < 3 and Spell(shadow_bolt_affliction)
+ Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Enemies() >= 3 and not HasEquippedItem(169314) and Spell(seed_of_corruption) or Spell(haunt) or not Talent(haunt_talent) and Enemies() < 3 and not HasEquippedItem(169314) and Spell(shadow_bolt_affliction)
 }
 
 AddFunction AfflictionPrecombatCdActions
@@ -136,13 +136,15 @@ AddFunction AfflictionPrecombatCdActions
  {
   #snapshot_stats
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
+  #use_item,name=azsharas_font_of_power
+  AfflictionUseItemActions()
  }
 }
 
 AddFunction AfflictionPrecombatCdPostConditions
 {
- not pet.Present() and Spell(summon_imp) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Enemies() >= 3 and Spell(seed_of_corruption) or Spell(haunt) or not Talent(haunt_talent) and Enemies() < 3 and Spell(shadow_bolt_affliction)
+ not pet.Present() and Spell(summon_imp) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Enemies() >= 3 and not HasEquippedItem(169314) and Spell(seed_of_corruption) or Spell(haunt) or not Talent(haunt_talent) and Enemies() < 3 and not HasEquippedItem(169314) and Spell(shadow_bolt_affliction)
 }
 
 ### actions.fillers
@@ -358,22 +360,34 @@ AddFunction AfflictionCooldownsShortCdPostConditions
 
 AddFunction AfflictionCooldownsCdActions
 {
- #use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<15*spell_haste&dot.agony.remains&dot.corruption.remains&(dot.siphon_life.remains|!talent.siphon_life.enabled)
- if { not Talent(phantom_singularity_talent) or SpellCooldown(phantom_singularity) < 4 * { 100 / { 100 + SpellCastSpeedPercent() } } or not SpellCooldown(phantom_singularity) > 0 } and SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } and target.DebuffRemaining(agony_debuff) and target.DebuffRemaining(corruption_debuff) and { target.DebuffRemaining(siphon_life_debuff) or not Talent(siphon_life_talent) } AfflictionUseItemActions()
+ #use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<19*spell_haste+soul_shard*azerite.dreadful_calling.rank&dot.agony.remains&dot.corruption.remains&(dot.siphon_life.remains|!talent.siphon_life.enabled)
+ if { not Talent(phantom_singularity_talent) or SpellCooldown(phantom_singularity) < 4 * { 100 / { 100 + SpellCastSpeedPercent() } } or not SpellCooldown(phantom_singularity) > 0 } and SpellCooldown(summon_darkglare) < 19 * { 100 / { 100 + SpellCastSpeedPercent() } } + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) and target.DebuffRemaining(agony_debuff) and target.DebuffRemaining(corruption_debuff) and { target.DebuffRemaining(siphon_life_debuff) or not Talent(siphon_life_talent) } AfflictionUseItemActions()
  #potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
- if { Talent(dark_soul_misery_talent) and not SpellCooldown(summon_darkglare) > 0 and not SpellCooldown(dark_soul_misery) > 0 or not SpellCooldown(summon_darkglare) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+ if { Talent(dark_soul_misery_talent) and not SpellCooldown(summon_darkglare) > 0 and not SpellCooldown(dark_soul_misery) > 0 or not SpellCooldown(summon_darkglare) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  #use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
  if SpellCooldown(summon_darkglare) > 70 or target.TimeToDie() < 20 or { target.DebuffStacks(unstable_affliction_debuff) == 5 or SoulShards() == 0 } and { not Talent(phantom_singularity_talent) or SpellCooldown(phantom_singularity) > 0 } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= GCD() or not SpellCooldown(deathbolt) > 0 } and not SpellCooldown(summon_darkglare) > 0 AfflictionUseItemActions()
- #use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
- if SpellCooldown(summon_darkglare) >= 25 and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
  #fireblood,if=!cooldown.summon_darkglare.up
  if not { not SpellCooldown(summon_darkglare) > 0 } Spell(fireblood)
  #blood_fury,if=!cooldown.summon_darkglare.up
  if not { not SpellCooldown(summon_darkglare) > 0 } Spell(blood_fury_sp)
  #memory_of_lucid_dreams,if=time>30
  if TimeInCombat() > 30 Spell(memory_of_lucid_dreams_essence)
+ #dark_soul,if=target.time_to_die<20+gcd|talent.sow_the_seeds.enabled&cooldown.summon_darkglare.remains>=cooldown.summon_darkglare.duration-10
+ if target.TimeToDie() < 20 + GCD() or Talent(sow_the_seeds_talent) and SpellCooldown(summon_darkglare) >= SpellCooldownDuration(summon_darkglare) - 10 Spell(dark_soul_misery)
  #blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
  if DemonDuration(darkglare) or { not SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } and SpellCooldown(summon_darkglare) >= 80 and AzeriteEssenceRank(blood_of_the_enemy_essence_id) > 1 Spell(blood_of_the_enemy)
+ #use_item,name=pocketsized_computation_device,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
+ #use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
+ #use_item,name=shiver_venom_relic,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
+ #use_item,name=aquipotent_nautilus,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
+ #use_item,name=tidestorm_codex,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
+ #use_item,name=vial_of_storms,if=(cooldown.summon_darkglare.remains>=25|target.time_to_die<=30)&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+ if { SpellCooldown(summon_darkglare) >= 25 or target.TimeToDie() <= 30 } and { SpellCooldown(deathbolt) > 0 or not Talent(deathbolt_talent) } AfflictionUseItemActions()
 }
 
 AddFunction AfflictionCooldownsCdPostConditions
@@ -400,6 +414,12 @@ AddFunction AfflictionDefaultMainActions
   if Enemies() <= 2 + False(raid_events_invulnerable_up) Spell(haunt)
   #agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time&target.time_to_die>8
   if target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 Spell(agony)
+  #agony,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314
+  if TimeSincePreviousSpell(agony) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) Spell(agony)
+  #corruption,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314&!talent.absolute_corruption.enabled&(talent.siphon_life.enabled|spell_targets.seed_of_corruption_aoe>1&spell_targets.seed_of_corruption_aoe<=3)
+  if TimeSincePreviousSpell(corruption) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and not Talent(absolute_corruption_talent) and { Talent(siphon_life_talent) or Enemies() > 1 and Enemies() <= 3 } Spell(corruption)
+  #siphon_life,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314
+  if TimeSincePreviousSpell(siphon_life) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) Spell(siphon_life)
   #unstable_affliction,target_if=!contagion&target.time_to_die<=8
   if not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 Spell(unstable_affliction)
   #drain_soul,target_if=min:debuff.shadow_embrace.remains,cancel_if=ticks_remain<5,if=talent.shadow_embrace.enabled&variable.maintain_se&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=gcd*2
@@ -452,10 +472,10 @@ AddFunction AfflictionDefaultShortCdActions
   #the_unbound_force,if=buff.reckless_force.remains
   if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
 
-  unless target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction)
+  unless target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or TimeSincePreviousSpell(agony) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(agony) or TimeSincePreviousSpell(corruption) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and not Talent(absolute_corruption_talent) and { Talent(siphon_life_talent) or Enemies() > 1 and Enemies() <= 3 } and Spell(corruption) or TimeSincePreviousSpell(siphon_life) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(siphon_life) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction)
   {
-   #phantom_singularity,target_if=max:target.time_to_die,if=time>35&target.time_to_die>16*spell_haste&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>45|cooldown.summon_darkglare.remains<15*spell_haste)
-   if TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } } Spell(phantom_singularity)
+   #phantom_singularity,target_if=max:target.time_to_die,if=time>35&target.time_to_die>16*spell_haste&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>45+soul_shard*azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains<15*spell_haste+soul_shard*azerite.dreadful_calling.rank)
+   if TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) } Spell(phantom_singularity)
 
    unless not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption)
    {
@@ -486,7 +506,7 @@ AddFunction AfflictionDefaultShortCdActions
 
 AddFunction AfflictionDefaultShortCdPostConditions
 {
- AfflictionCooldownsShortCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 + False(raid_events_invulnerable_up) and Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsShortCdPostConditions() or TimeInCombat() > 15 and target.TimeToDie() >= 10 and { SpellCooldown(summon_darkglare) > 30 or SpellCooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not Talent(siphon_life_talent) } } and Spell(vile_taint) or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersShortCdPostConditions() or AfflictionFillersShortCdPostConditions()
+ AfflictionCooldownsShortCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 + False(raid_events_invulnerable_up) and Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or TimeSincePreviousSpell(agony) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(agony) or TimeSincePreviousSpell(corruption) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and not Talent(absolute_corruption_talent) and { Talent(siphon_life_talent) or Enemies() > 1 and Enemies() <= 3 } and Spell(corruption) or TimeSincePreviousSpell(siphon_life) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(siphon_life) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsShortCdPostConditions() or TimeInCombat() > 15 and target.TimeToDie() >= 10 and { SpellCooldown(summon_darkglare) > 30 or SpellCooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not Talent(siphon_life_talent) } } and Spell(vile_taint) or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersShortCdPostConditions() or AfflictionFillersShortCdPostConditions()
 }
 
 AddFunction AfflictionDefaultCdActions
@@ -500,17 +520,15 @@ AddFunction AfflictionDefaultCdActions
 
  unless AfflictionCooldownsCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 + False(raid_events_invulnerable_up) and Spell(haunt)
  {
-  #summon_darkglare,if=dot.agony.ticking&dot.corruption.ticking&(buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|dot.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up)
-  if target.DebuffPresent(agony_debuff) and target.DebuffPresent(corruption_debuff) and { target.DebuffStacks(unstable_affliction_debuff) == 5 or SoulShards() == 0 } and { not Talent(phantom_singularity_talent) or target.DebuffRemaining(phantom_singularity) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= GCD() or not SpellCooldown(deathbolt) > 0 or Enemies() > 1 + False(raid_events_invulnerable_up) } Spell(summon_darkglare)
+  #summon_darkglare,if=summon_darkglare,if=dot.agony.ticking&dot.corruption.ticking&(buff.active_uas.stack=5|soul_shard=0|dot.phantom_singularity.remains&dot.phantom_singularity.remains<=gcd)&(!talent.phantom_singularity.enabled|dot.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up)
+  if target.DebuffPresent(agony_debuff) and target.DebuffPresent(corruption_debuff) and { target.DebuffStacks(unstable_affliction_debuff) == 5 or SoulShards() == 0 or target.DebuffRemaining(phantom_singularity) and target.DebuffRemaining(phantom_singularity) <= GCD() } and { not Talent(phantom_singularity_talent) or target.DebuffRemaining(phantom_singularity) } and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) <= GCD() or not SpellCooldown(deathbolt) > 0 or Enemies() > 1 + False(raid_events_invulnerable_up) } Spell(summon_darkglare)
 
   unless SpellCooldown(summon_darkglare) > 0 and Enemies() == 1 + False(raid_events_invulnerable_up) and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 30 } and Spell(deathbolt) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony)
   {
    #memory_of_lucid_dreams,if=time<30
    if TimeInCombat() < 30 Spell(memory_of_lucid_dreams_essence)
-   #use_item,name=azsharas_font_of_power,if=cooldown.summon_darkglare.remains<10
-   if SpellCooldown(summon_darkglare) < 10 AfflictionUseItemActions()
 
-   unless not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } } and Spell(phantom_singularity) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption)
+   unless TimeSincePreviousSpell(agony) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(agony) or TimeSincePreviousSpell(corruption) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and not Talent(absolute_corruption_talent) and { Talent(siphon_life_talent) or Enemies() > 1 and Enemies() <= 3 } and Spell(corruption) or TimeSincePreviousSpell(siphon_life) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(siphon_life) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) } and Spell(phantom_singularity) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption)
    {
     #call_action_list,name=dots
     AfflictionDotsCdActions()
@@ -522,10 +540,10 @@ AddFunction AfflictionDefaultCdActions
 
      unless TimeInCombat() <= 35 and Spell(phantom_singularity) or TimeInCombat() < 15 and Spell(vile_taint)
      {
-      #guardian_of_azeroth,if=cooldown.summon_darkglare.remains<15&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
-      if SpellCooldown(summon_darkglare) < 15 and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) or not Talent(phantom_singularity_talent) and not Talent(vile_taint_talent) } or target.TimeToDie() < 30 + GCD() Spell(guardian_of_azeroth)
-      #dark_soul,if=cooldown.summon_darkglare.remains<10&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up
-      if SpellCooldown(summon_darkglare) < 10 and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) or not Talent(phantom_singularity_talent) and not Talent(vile_taint_talent) } or target.TimeToDie() < 20 + GCD() or Enemies() > 1 + False(raid_events_invulnerable_up) Spell(dark_soul_misery)
+      #guardian_of_azeroth,if=(cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled|(azerite.dreadful_calling.rank|essence.vision_of_perfection.rank)&time>30&target.time_to_die>=210)&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
+      if { SpellCooldown(summon_darkglare) < 15 + SoulShards() * HasAzeriteTrait(dreadful_calling_trait) or { AzeriteTraitRank(dreadful_calling_trait) or AzeriteEssenceRank(vision_of_perfection_essence_id) } and TimeInCombat() > 30 and target.TimeToDie() >= 210 } and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) or not Talent(phantom_singularity_talent) and not Talent(vile_taint_talent) } or target.TimeToDie() < 30 + GCD() Spell(guardian_of_azeroth)
+      #dark_soul,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled&(dot.phantom_singularity.remains|dot.vile_taint.remains)
+      if SpellCooldown(summon_darkglare) < 15 + SoulShards() * HasAzeriteTrait(dreadful_calling_trait) and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } Spell(dark_soul_misery)
       #berserking
       Spell(berserking)
       #call_action_list,name=spenders
@@ -545,7 +563,7 @@ AddFunction AfflictionDefaultCdActions
 
 AddFunction AfflictionDefaultCdPostConditions
 {
- AfflictionCooldownsCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 + False(raid_events_invulnerable_up) and Spell(haunt) or SpellCooldown(summon_darkglare) > 0 and Enemies() == 1 + False(raid_events_invulnerable_up) and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 30 } and Spell(deathbolt) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } } and Spell(phantom_singularity) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsCdPostConditions() or TimeInCombat() > 15 and target.TimeToDie() >= 10 and { SpellCooldown(summon_darkglare) > 30 or SpellCooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not Talent(siphon_life_talent) } } and Spell(vile_taint) or TimeInCombat() <= 35 and Spell(phantom_singularity) or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersCdPostConditions() or AfflictionFillersCdPostConditions()
+ AfflictionCooldownsCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 + False(raid_events_invulnerable_up) and Spell(haunt) or SpellCooldown(summon_darkglare) > 0 and Enemies() == 1 + False(raid_events_invulnerable_up) and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 30 } and Spell(deathbolt) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or TimeSincePreviousSpell(agony) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(agony) or TimeSincePreviousSpell(corruption) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and not Talent(absolute_corruption_talent) and { Talent(siphon_life_talent) or Enemies() > 1 and Enemies() <= 3 } and Spell(corruption) or TimeSincePreviousSpell(siphon_life) > 30 and TimeInCombat() > 30 and SpellCooldown(summon_darkglare) <= 15 and HasEquippedItem(169314) and Spell(siphon_life) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and maintain_se() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and { not AzeriteEssenceIsMinor(vision_of_perfection_essence_id) and not AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) > 45 + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) or SpellCooldown(summon_darkglare) < 15 * { 100 / { 100 + SpellCastSpeedPercent() } } + SoulShards() * AzeriteTraitRank(dreadful_calling_trait) } and Spell(phantom_singularity) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsCdPostConditions() or TimeInCombat() > 15 and target.TimeToDie() >= 10 and { SpellCooldown(summon_darkglare) > 30 or SpellCooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not Talent(siphon_life_talent) } } and Spell(vile_taint) or TimeInCombat() <= 35 and Spell(phantom_singularity) or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersCdPostConditions() or AfflictionFillersCdPostConditions()
 }
 
 ### Affliction icons.
@@ -607,6 +625,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 }
 
 ### Required symbols
+# 169314
 # absolute_corruption_talent
 # agony
 # agony_debuff
@@ -638,7 +657,6 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # haunt_debuff
 # haunt_talent
 # inevitable_demise_buff
-# item_focused_resolve
 # lifeblood_buff
 # memory_of_lucid_dreams_essence
 # nightfall_buff
@@ -660,6 +678,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # summon_darkglare
 # summon_imp
 # the_unbound_force
+# unbridled_fury_item
 # unstable_affliction
 # vile_taint
 # vile_taint_debuff
@@ -728,7 +747,7 @@ AddFunction DemonologyPrecombatCdActions
  {
   #snapshot_stats
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  }
 }
 
@@ -737,18 +756,109 @@ AddFunction DemonologyPrecombatCdPostConditions
  not pet.Present() and Spell(summon_felguard) or Talent(inner_demons_talent) and Spell(inner_demons) or Spell(demonbolt)
 }
 
+### actions.opener
+
+AddFunction DemonologyOpenerMainActions
+{
+ #hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
+ if TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) Spell(hand_of_guldan)
+ #implosion,if=azerite.explosive_potential.enabled&buff.wild_imps.stack>2&buff.explosive_potential.down
+ if HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) Spell(implosion)
+ #doom,line_cd=30
+ if TimeSincePreviousSpell(doom) > 30 Spell(doom)
+ #hand_of_guldan,if=prev_gcd.1.hand_of_guldan&soul_shard>0&prev_gcd.2.soul_strike
+ if PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) Spell(hand_of_guldan)
+ #soul_strike,line_cd=30,if=!buff.bloodlust.remains|time>5&prev_gcd.1.hand_of_guldan
+ if TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } Spell(soul_strike)
+ #call_dreadstalkers,if=soul_shard=5
+ if SoulShards() == 5 Spell(call_dreadstalkers)
+ #hand_of_guldan,if=soul_shard=5
+ if SoulShards() == 5 Spell(hand_of_guldan)
+ #hand_of_guldan,if=soul_shard>=3&prev_gcd.2.hand_of_guldan&time>5&(prev_gcd.1.soul_strike|!talent.soul_strike.enabled&prev_gcd.1.shadow_bolt)
+ if SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } Spell(hand_of_guldan)
+ #demonbolt,if=soul_shard<=3&buff.demonic_core.remains
+ if SoulShards() <= 3 and BuffPresent(demonic_core_buff) Spell(demonbolt)
+ #call_action_list,name=build_a_shard
+ DemonologyBuildashardMainActions()
+}
+
+AddFunction DemonologyOpenerMainPostConditions
+{
+ DemonologyBuildashardMainPostConditions()
+}
+
+AddFunction DemonologyOpenerShortCdActions
+{
+ unless TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan)
+ {
+  #demonic_strength,if=prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&(buff.wild_imps.stack>1&action.hand_of_guldan.in_flight)
+  if PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) Spell(demonic_strength)
+  #bilescourge_bombers
+  Spell(bilescourge_bombers)
+
+  unless TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike)
+  {
+   #summon_vilefiend,if=soul_shard=5
+   if SoulShards() == 5 Spell(summon_vilefiend)
+
+   unless SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan)
+   {
+    #summon_demonic_tyrant,if=prev_gcd.1.demonic_strength|prev_gcd.1.hand_of_guldan&prev_gcd.2.hand_of_guldan|!talent.demonic_strength.enabled&buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6
+    if PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 Spell(summon_demonic_tyrant)
+
+    unless SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt)
+    {
+     #call_action_list,name=build_a_shard
+     DemonologyBuildashardShortCdActions()
+    }
+   }
+  }
+ }
+}
+
+AddFunction DemonologyOpenerShortCdPostConditions
+{
+ TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
+}
+
+AddFunction DemonologyOpenerCdActions
+{
+ unless TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom)
+ {
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) and Spell(demonic_strength) or Spell(bilescourge_bombers) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(summon_vilefiend)
+  {
+   #grimoire_felguard,if=soul_shard=5
+   if SoulShards() == 5 Spell(grimoire_felguard)
+
+   unless SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or { PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 } and Spell(summon_demonic_tyrant) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt)
+   {
+    #call_action_list,name=build_a_shard
+    DemonologyBuildashardCdActions()
+   }
+  }
+ }
+}
+
+AddFunction DemonologyOpenerCdPostConditions
+{
+ TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) and Spell(demonic_strength) or Spell(bilescourge_bombers) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(summon_vilefiend) or SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or { PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 } and Spell(summon_demonic_tyrant) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardCdPostConditions()
+}
+
 ### actions.nether_portal_building
 
 AddFunction DemonologyNetherportalbuildingMainActions
 {
- #call_dreadstalkers
- Spell(call_dreadstalkers)
- #hand_of_guldan,if=cooldown.call_dreadstalkers.remains>18&soul_shard>=3
- if SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 Spell(hand_of_guldan)
- #power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
- if Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 Spell(power_siphon)
- #hand_of_guldan,if=soul_shard>=5
- if SoulShards() >= 5 Spell(hand_of_guldan)
+ #call_dreadstalkers,if=time>=30
+ if TimeInCombat() >= 30 Spell(call_dreadstalkers)
+ #hand_of_guldan,if=time>=30&cooldown.call_dreadstalkers.remains>18&soul_shard>=3
+ if TimeInCombat() >= 30 and SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 Spell(hand_of_guldan)
+ #power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
+ if TimeInCombat() >= 30 and Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 Spell(power_siphon)
+ #hand_of_guldan,if=time>=30&soul_shard>=5
+ if TimeInCombat() >= 30 and SoulShards() >= 5 Spell(hand_of_guldan)
  #call_action_list,name=build_a_shard
  DemonologyBuildashardMainActions()
 }
@@ -760,7 +870,7 @@ AddFunction DemonologyNetherportalbuildingMainPostConditions
 
 AddFunction DemonologyNetherportalbuildingShortCdActions
 {
- unless Spell(call_dreadstalkers) or SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or SoulShards() >= 5 and Spell(hand_of_guldan)
+ unless TimeInCombat() >= 30 and Spell(call_dreadstalkers) or TimeInCombat() >= 30 and SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or TimeInCombat() >= 30 and Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or TimeInCombat() >= 30 and SoulShards() >= 5 and Spell(hand_of_guldan)
  {
   #call_action_list,name=build_a_shard
   DemonologyBuildashardShortCdActions()
@@ -769,15 +879,19 @@ AddFunction DemonologyNetherportalbuildingShortCdActions
 
 AddFunction DemonologyNetherportalbuildingShortCdPostConditions
 {
- Spell(call_dreadstalkers) or SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or SoulShards() >= 5 and Spell(hand_of_guldan) or DemonologyBuildashardShortCdPostConditions()
+ TimeInCombat() >= 30 and Spell(call_dreadstalkers) or TimeInCombat() >= 30 and SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or TimeInCombat() >= 30 and Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or TimeInCombat() >= 30 and SoulShards() >= 5 and Spell(hand_of_guldan) or DemonologyBuildashardShortCdPostConditions()
 }
 
 AddFunction DemonologyNetherportalbuildingCdActions
 {
- #nether_portal,if=soul_shard>=5&(!talent.power_siphon.enabled|buff.demonic_core.up)
- if SoulShards() >= 5 and { not Talent(power_siphon_talent) or BuffPresent(demonic_core_buff) } Spell(nether_portal)
+ #use_item,name=azsharas_font_of_power,if=cooldown.nether_portal.remains<=5*spell_haste
+ if SpellCooldown(nether_portal) <= 5 * { 100 / { 100 + SpellCastSpeedPercent() } } DemonologyUseItemActions()
+ #guardian_of_azeroth,if=!cooldown.nether_portal.remains&soul_shard>=5
+ if not SpellCooldown(nether_portal) > 0 and SoulShards() >= 5 Spell(guardian_of_azeroth)
+ #nether_portal,if=soul_shard>=5
+ if SoulShards() >= 5 Spell(nether_portal)
 
- unless Spell(call_dreadstalkers) or SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or SoulShards() >= 5 and Spell(hand_of_guldan)
+ unless TimeInCombat() >= 30 and Spell(call_dreadstalkers) or TimeInCombat() >= 30 and SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or TimeInCombat() >= 30 and Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or TimeInCombat() >= 30 and SoulShards() >= 5 and Spell(hand_of_guldan)
  {
   #call_action_list,name=build_a_shard
   DemonologyBuildashardCdActions()
@@ -786,7 +900,7 @@ AddFunction DemonologyNetherportalbuildingCdActions
 
 AddFunction DemonologyNetherportalbuildingCdPostConditions
 {
- Spell(call_dreadstalkers) or SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or SoulShards() >= 5 and Spell(hand_of_guldan) or DemonologyBuildashardCdPostConditions()
+ TimeInCombat() >= 30 and Spell(call_dreadstalkers) or TimeInCombat() >= 30 and SpellCooldown(call_dreadstalkers) > 18 and SoulShards() >= 3 and Spell(hand_of_guldan) or TimeInCombat() >= 30 and Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and SoulShards() >= 3 and Spell(power_siphon) or TimeInCombat() >= 30 and SoulShards() >= 5 and Spell(hand_of_guldan) or DemonologyBuildashardCdPostConditions()
 }
 
 ### actions.nether_portal_active
@@ -1019,91 +1133,6 @@ AddFunction DemonologyImplosionCdPostConditions
  { Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 6 and { SoulShards() < 3 or PreviousGCDSpell(call_dreadstalkers) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 9 or PreviousGCDSpell(bilescourge_bombers) or not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) } and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and BuffExpires(demonic_power) or target.TimeToDie() < 3 and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 0 or PreviousGCDSpell(call_dreadstalkers count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and not Talent(demonic_calling_talent) } and Spell(implosion) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or Spell(summon_demonic_tyrant) or SoulShards() >= 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and { { PreviousGCDSpell(hand_of_guldan count=2) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 3 } and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 9 or SpellCooldown(summon_demonic_tyrant) <= GCD() * 2 or BuffRemaining(demonic_power) > GCD() * 2 } and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and SoulShards() >= 1 and { Demons(wild_imp) + Demons(wild_imp_inner_demons) <= 3 or PreviousGCDSpell(hand_of_guldan count=3) } and SoulShards() < 4 and BuffPresent(demonic_core_buff) and Spell(demonbolt) or { SpellCooldown(summon_demonic_tyrant) > 40 and Enemies() <= 2 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or SpellCooldown(summon_demonic_tyrant) > 9 and Spell(bilescourge_bombers) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Enemies() < 5 and Spell(concentrated_flame_essence) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) <= GCD() * 5.7 } and Spell(demonbolt) or DebuffCountOnAny(doom_debuff) < Enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.Refreshable(doom_debuff) and Spell(doom) or DemonologyBuildashardCdPostConditions()
 }
 
-### actions.dcon_opener
-
-AddFunction DemonologyDconopenerMainActions
-{
- #hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
- if TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) Spell(hand_of_guldan)
- #implosion,if=azerite.explosive_potential.enabled&buff.wild_imps.stack>2&buff.explosive_potential.down
- if HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) Spell(implosion)
- #doom,line_cd=30
- if TimeSincePreviousSpell(doom) > 30 Spell(doom)
- #hand_of_guldan,if=prev_gcd.1.hand_of_guldan&soul_shard>0&prev_gcd.2.soul_strike
- if PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) Spell(hand_of_guldan)
- #soul_strike,line_cd=30,if=!buff.bloodlust.remains|time>5&prev_gcd.1.hand_of_guldan
- if TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } Spell(soul_strike)
- #call_dreadstalkers,if=soul_shard=5
- if SoulShards() == 5 Spell(call_dreadstalkers)
- #hand_of_guldan,if=soul_shard=5
- if SoulShards() == 5 Spell(hand_of_guldan)
- #hand_of_guldan,if=soul_shard>=3&prev_gcd.2.hand_of_guldan&time>5&(prev_gcd.1.soul_strike|!talent.soul_strike.enabled&prev_gcd.1.shadow_bolt)
- if SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } Spell(hand_of_guldan)
- #demonbolt,if=soul_shard<=3&buff.demonic_core.remains
- if SoulShards() <= 3 and BuffPresent(demonic_core_buff) Spell(demonbolt)
- #call_action_list,name=build_a_shard
- DemonologyBuildashardMainActions()
-}
-
-AddFunction DemonologyDconopenerMainPostConditions
-{
- DemonologyBuildashardMainPostConditions()
-}
-
-AddFunction DemonologyDconopenerShortCdActions
-{
- unless TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan)
- {
-  #demonic_strength,if=prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&(buff.wild_imps.stack>1&action.hand_of_guldan.in_flight)
-  if PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) Spell(demonic_strength)
-  #bilescourge_bombers
-  Spell(bilescourge_bombers)
-
-  unless TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike)
-  {
-   #summon_vilefiend,if=soul_shard=5
-   if SoulShards() == 5 Spell(summon_vilefiend)
-
-   unless SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan)
-   {
-    #summon_demonic_tyrant,if=prev_gcd.1.demonic_strength|prev_gcd.1.hand_of_guldan&prev_gcd.2.hand_of_guldan|!talent.demonic_strength.enabled&buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6
-    if PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 Spell(summon_demonic_tyrant)
-
-    unless SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt)
-    {
-     #call_action_list,name=build_a_shard
-     DemonologyBuildashardShortCdActions()
-    }
-   }
-  }
- }
-}
-
-AddFunction DemonologyDconopenerShortCdPostConditions
-{
- TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
-}
-
-AddFunction DemonologyDconopenerCdActions
-{
- unless TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) and Spell(demonic_strength) or Spell(bilescourge_bombers) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(summon_vilefiend)
- {
-  #grimoire_felguard,if=soul_shard=5
-  if SoulShards() == 5 Spell(grimoire_felguard)
-
-  unless SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or { PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 } and Spell(summon_demonic_tyrant) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt)
-  {
-   #call_action_list,name=build_a_shard
-   DemonologyBuildashardCdActions()
-  }
- }
-}
-
-AddFunction DemonologyDconopenerCdPostConditions
-{
- TimeSincePreviousSpell(hand_of_guldan) > 30 and HasAzeriteTrait(explosive_potential_trait) and Spell(hand_of_guldan) or HasAzeriteTrait(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffExpires(explosive_potential) and Spell(implosion) or TimeSincePreviousSpell(doom) > 30 and Spell(doom) or PreviousGCDSpell(hand_of_guldan) and SoulShards() > 0 and PreviousGCDSpell(soul_strike count=2) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 1 and InFlightToTarget(hand_of_guldan) and Spell(demonic_strength) or Spell(bilescourge_bombers) or TimeSincePreviousSpell(soul_strike) > 30 and { not BuffPresent(bloodlust) or TimeInCombat() > 5 and PreviousGCDSpell(hand_of_guldan) } and Spell(soul_strike) or SoulShards() == 5 and Spell(summon_vilefiend) or SoulShards() == 5 and Spell(call_dreadstalkers) or SoulShards() == 5 and Spell(hand_of_guldan) or SoulShards() >= 3 and PreviousGCDSpell(hand_of_guldan count=2) and TimeInCombat() > 5 and { PreviousGCDSpell(soul_strike) or not Talent(soul_strike_talent) and PreviousGCDSpell(shadow_bolt) } and Spell(hand_of_guldan) or { PreviousGCDSpell(demonic_strength) or PreviousGCDSpell(hand_of_guldan) and PreviousGCDSpell(hand_of_guldan count=2) or not Talent(demonic_strength_talent) and Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 } and Spell(summon_demonic_tyrant) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardCdPostConditions()
-}
-
 ### actions.build_a_shard
 
 AddFunction DemonologyBuildashardMainActions
@@ -1142,10 +1171,10 @@ AddFunction DemonologyBuildashardCdPostConditions
 
 AddFunction DemonologyDefaultMainActions
 {
- #call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
- if Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyDconopenerMainActions()
+ #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
+ if not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyOpenerMainActions()
 
- unless Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerMainPostConditions()
+ unless not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerMainPostConditions()
  {
   #hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan
   if AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) Spell(hand_of_guldan)
@@ -1153,8 +1182,8 @@ AddFunction DemonologyDefaultMainActions
   if SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 Spell(demonbolt)
   #implosion,if=azerite.explosive_potential.rank&buff.wild_imps.stack>2&buff.explosive_potential.remains<action.shadow_bolt.execute_time&(!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>12)
   if AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } Spell(implosion)
-  #doom,if=!ticking&time_to_die>30&spell_targets.implosion<2
-  if not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 Spell(doom)
+  #doom,if=!ticking&time_to_die>30&spell_targets.implosion<2&!buff.nether_portal.remains
+  if not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and not BuffPresent(nether_portal_buff) Spell(doom)
   #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
   if Talent(nether_portal_talent) and Enemies() <= 2 DemonologyNetherportalMainActions()
 
@@ -1190,19 +1219,19 @@ AddFunction DemonologyDefaultMainActions
 
 AddFunction DemonologyDefaultMainPostConditions
 {
- Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerMainPostConditions() or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalMainPostConditions() or Enemies() > 1 and DemonologyImplosionMainPostConditions() or DemonologyBuildashardMainPostConditions()
+ not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerMainPostConditions() or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalMainPostConditions() or Enemies() > 1 and DemonologyImplosionMainPostConditions() or DemonologyBuildashardMainPostConditions()
 }
 
 AddFunction DemonologyDefaultShortCdActions
 {
- #worldvein_resonance,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 Spell(worldvein_resonance_essence)
- #ripple_in_space,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 Spell(ripple_in_space_essence)
- #call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
- if Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyDconopenerShortCdActions()
+ #worldvein_resonance,if=buff.lifeblood.stack<3&(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
+ if BuffStacks(lifeblood_buff) < 3 and { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 } Spell(worldvein_resonance_essence)
+ #ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+ if DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 Spell(ripple_in_space_essence)
+ #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
+ if not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyOpenerShortCdActions()
 
- unless Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerShortCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and Spell(doom)
+ unless not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerShortCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and not BuffPresent(nether_portal_buff) and Spell(doom)
  {
   #bilescourge_bombers,if=azerite.explosive_potential.rank>0&time<10&spell_targets.implosion<2&buff.dreadstalkers.remains&talent.nether_portal.enabled
   if AzeriteTraitRank(explosive_potential_trait) > 0 and TimeInCombat() < 10 and Enemies() < 2 and DemonDuration(dreadstalker) and Talent(nether_portal_talent) Spell(bilescourge_bombers)
@@ -1253,58 +1282,80 @@ AddFunction DemonologyDefaultShortCdActions
 
 AddFunction DemonologyDefaultShortCdPostConditions
 {
- Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerShortCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and Spell(doom) or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalShortCdPostConditions() or Enemies() > 1 and DemonologyImplosionShortCdPostConditions() or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence) or DemonologyBuildashardShortCdPostConditions()
+ not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerShortCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and not BuffPresent(nether_portal_buff) and Spell(doom) or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalShortCdPostConditions() or Enemies() > 1 and DemonologyImplosionShortCdPostConditions() or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence) or DemonologyBuildashardShortCdPostConditions()
 }
 
 AddFunction DemonologyDefaultCdActions
 {
- #potion,if=pet.demonic_tyrant.active&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
- if { DemonDuration(demonic_tyrant) > 0 and { not Talent(nether_portal_talent) or SpellCooldown(nether_portal) > 160 } or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
- #use_items,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 DemonologyUseItemActions()
- #berserking,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 Spell(berserking)
- #blood_fury,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 Spell(blood_fury_sp)
- #fireblood,if=pet.demonic_tyrant.active|target.time_to_die<=15
- if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 Spell(fireblood)
+ #potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
+ if { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } and { not Talent(nether_portal_talent) or SpellCooldown(nether_portal) > 160 } or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
+ #use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20&!talent.nether_portal.enabled
+ if SpellCooldown(summon_demonic_tyrant) <= 20 and not Talent(nether_portal_talent) DemonologyUseItemActions()
+ #use_items,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+ if DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 DemonologyUseItemActions()
+ #berserking,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+ if DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 Spell(berserking)
+ #blood_fury,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+ if DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 Spell(blood_fury_sp)
+ #fireblood,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+ if DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 Spell(fireblood)
+ #blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
+ if DemonDuration(demonic_tyrant) > 0 and DemonDuration(demonic_tyrant) <= 15 - GCD() * 3 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } Spell(blood_of_the_enemy)
 
- unless { DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 } and Spell(worldvein_resonance_essence) or { DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 } and Spell(ripple_in_space_essence)
+ unless BuffStacks(lifeblood_buff) < 3 and { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 } and Spell(worldvein_resonance_essence) or { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 } and Spell(ripple_in_space_essence)
  {
-  #call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
-  if Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyDconopenerCdActions()
+  #use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
+  if SpellCooldown(summon_demonic_tyrant) >= 20 and SpellCooldown(summon_demonic_tyrant) <= SpellCooldownDuration(summon_demonic_tyrant) - 15 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+  if SpellCooldown(summon_demonic_tyrant) >= 25 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #use_item,name=shiver_venom_relic,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+  if SpellCooldown(summon_demonic_tyrant) >= 25 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+  if SpellCooldown(summon_demonic_tyrant) >= 25 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #use_item,name=tidestorm_codex,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+  if SpellCooldown(summon_demonic_tyrant) >= 25 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #use_item,name=vial_of_storms,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+  if SpellCooldown(summon_demonic_tyrant) >= 25 or target.TimeToDie() <= 30 DemonologyUseItemActions()
+  #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
+  if not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 DemonologyOpenerCdActions()
 
-  unless Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and Spell(doom) or AzeriteTraitRank(explosive_potential_trait) > 0 and TimeInCombat() < 10 and Enemies() < 2 and DemonDuration(dreadstalker) and Talent(nether_portal_talent) and Spell(bilescourge_bombers) or { Demons(wild_imp) + Demons(wild_imp_inner_demons) < 6 or BuffPresent(demonic_power) or Enemies() < 2 } and Spell(demonic_strength)
+  unless not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerCdPostConditions()
   {
-   #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
-   if Talent(nether_portal_talent) and Enemies() <= 2 DemonologyNetherportalCdActions()
+   #use_item,name=azsharas_font_of_power,if=(time>30|!talent.nether_portal.enabled)&talent.grimoire_felguard.enabled&(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15)|target.time_to_die<=35
+   if { TimeInCombat() > 30 or not Talent(nether_portal_talent) } and Talent(grimoire_felguard_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < SpellCooldown(summon_demonic_tyrant) + 15 } or target.TimeToDie() <= 35 DemonologyUseItemActions()
 
-   unless Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalCdPostConditions()
+   unless AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and not BuffPresent(nether_portal_buff) and Spell(doom) or AzeriteTraitRank(explosive_potential_trait) > 0 and TimeInCombat() < 10 and Enemies() < 2 and DemonDuration(dreadstalker) and Talent(nether_portal_talent) and Spell(bilescourge_bombers) or { Demons(wild_imp) + Demons(wild_imp_inner_demons) < 6 or BuffPresent(demonic_power) or Enemies() < 2 } and Spell(demonic_strength)
    {
-    #call_action_list,name=implosion,if=spell_targets.implosion>1
-    if Enemies() > 1 DemonologyImplosionCdActions()
+    #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
+    if Talent(nether_portal_talent) and Enemies() <= 2 DemonologyNetherportalCdActions()
 
-    unless Enemies() > 1 and DemonologyImplosionCdPostConditions()
+    unless Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalCdPostConditions()
     {
-     #guardian_of_azeroth,if=pet.demonic_tyrant.active|target.time_to_die<=30
-     if DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 30 Spell(guardian_of_azeroth)
-     #grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
-     if target.TimeToDie() > 120 or target.TimeToDie() < SpellCooldown(summon_demonic_tyrant) + 15 or SpellCooldown(summon_demonic_tyrant) < 13 Spell(grimoire_felguard)
+     #call_action_list,name=implosion,if=spell_targets.implosion>1
+     if Enemies() > 1 DemonologyImplosionCdActions()
 
-     unless { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(bilescourge_bombers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or { SoulShards() < 3 and { not Talent(demonic_consumption_talent) or Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 and 0 < CastTime(summon_demonic_tyrant) } or target.TimeToDie() < 20 } and Spell(summon_demonic_tyrant) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt)
+     unless Enemies() > 1 and DemonologyImplosionCdPostConditions()
      {
-      #focused_azerite_beam,if=!pet.demonic_tyrant.active
-      if not DemonDuration(demonic_tyrant) > 0 Spell(focused_azerite_beam)
+      #guardian_of_azeroth,if=cooldown.summon_demonic_tyrant.remains<=15|target.time_to_die<=30
+      if SpellCooldown(summon_demonic_tyrant) <= 15 or target.TimeToDie() <= 30 Spell(guardian_of_azeroth)
+      #grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
+      if target.TimeToDie() > 120 or target.TimeToDie() < SpellCooldown(summon_demonic_tyrant) + 15 or SpellCooldown(summon_demonic_tyrant) < 13 Spell(grimoire_felguard)
 
-      unless Spell(purifying_blast)
+      unless { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(bilescourge_bombers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or { SoulShards() < 3 and { not Talent(demonic_consumption_talent) or Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 and 0 < CastTime(summon_demonic_tyrant) } or target.TimeToDie() < 20 } and Spell(summon_demonic_tyrant) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt)
       {
-       #blood_of_the_enemy
-       Spell(blood_of_the_enemy)
+       #focused_azerite_beam,if=!pet.demonic_tyrant.active
+       if not DemonDuration(demonic_tyrant) > 0 Spell(focused_azerite_beam)
 
-       unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence)
+       unless Spell(purifying_blast)
        {
-        #call_action_list,name=build_a_shard
-        DemonologyBuildashardCdActions()
+        #blood_of_the_enemy
+        Spell(blood_of_the_enemy)
+
+        unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence)
+        {
+         #call_action_list,name=build_a_shard
+         DemonologyBuildashardCdActions()
+        }
        }
       }
      }
@@ -1316,7 +1367,7 @@ AddFunction DemonologyDefaultCdActions
 
 AddFunction DemonologyDefaultCdPostConditions
 {
- { DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 } and Spell(worldvein_resonance_essence) or { DemonDuration(demonic_tyrant) > 0 or target.TimeToDie() <= 15 } and Spell(ripple_in_space_essence) or Talent(demonic_consumption_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyDconopenerCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and Spell(doom) or AzeriteTraitRank(explosive_potential_trait) > 0 and TimeInCombat() < 10 and Enemies() < 2 and DemonDuration(dreadstalker) and Talent(nether_portal_talent) and Spell(bilescourge_bombers) or { Demons(wild_imp) + Demons(wild_imp_inner_demons) < 6 or BuffPresent(demonic_power) or Enemies() < 2 } and Spell(demonic_strength) or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalCdPostConditions() or Enemies() > 1 and DemonologyImplosionCdPostConditions() or { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(bilescourge_bombers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or { SoulShards() < 3 and { not Talent(demonic_consumption_talent) or Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 and 0 < CastTime(summon_demonic_tyrant) } or target.TimeToDie() < 20 } and Spell(summon_demonic_tyrant) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence) or DemonologyBuildashardCdPostConditions()
+ BuffStacks(lifeblood_buff) < 3 and { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 } and Spell(worldvein_resonance_essence) or { DemonDuration(demonic_tyrant) > 0 and { not AzeriteEssenceIsMajor(vision_of_perfection_essence_id) or not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) >= SpellCooldownDuration(summon_demonic_tyrant) - 5 } or target.TimeToDie() <= 15 } and Spell(ripple_in_space_essence) or not Talent(nether_portal_talent) and TimeInCombat() < 30 and not SpellCooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerCdPostConditions() or AzeriteTraitRank(explosive_potential_trait) and TimeInCombat() < 5 and SoulShards() > 2 and BuffExpires(explosive_potential) and Demons(wild_imp) + Demons(wild_imp_inner_demons) < 3 and not PreviousGCDSpell(hand_of_guldan) and not PreviousGCDSpell(hand_of_guldan count=2) and Spell(hand_of_guldan) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and BuffStacks(demonic_core_buff) == 4 and Spell(demonbolt) or AzeriteTraitRank(explosive_potential_trait) and Demons(wild_imp) + Demons(wild_imp_inner_demons) > 2 and BuffRemaining(explosive_potential) < ExecuteTime(shadow_bolt) and { not Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) > 12 } and Spell(implosion) or not target.DebuffPresent(doom_debuff) and target.TimeToDie() > 30 and Enemies() < 2 and not BuffPresent(nether_portal_buff) and Spell(doom) or AzeriteTraitRank(explosive_potential_trait) > 0 and TimeInCombat() < 10 and Enemies() < 2 and DemonDuration(dreadstalker) and Talent(nether_portal_talent) and Spell(bilescourge_bombers) or { Demons(wild_imp) + Demons(wild_imp_inner_demons) < 6 or BuffPresent(demonic_power) or Enemies() < 2 } and Spell(demonic_strength) or Talent(nether_portal_talent) and Enemies() <= 2 and DemonologyNetherportalCdPostConditions() or Enemies() > 1 and DemonologyImplosionCdPostConditions() or { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(bilescourge_bombers) or { HasAzeriteTrait(baleful_invocation_trait) or Talent(demonic_consumption_talent) } and PreviousGCDSpell(hand_of_guldan) and SpellCooldown(summon_demonic_tyrant) < 2 and Spell(hand_of_guldan) or { SoulShards() < 3 and { not Talent(demonic_consumption_talent) or Demons(wild_imp) + Demons(wild_imp_inner_demons) + ImpsSpawnedDuring(2000) / { 100 / { 100 + SpellCastSpeedPercent() } } >= 6 and 0 < CastTime(summon_demonic_tyrant) } or target.TimeToDie() < 20 } and Spell(summon_demonic_tyrant) or Demons(wild_imp) + Demons(wild_imp_inner_demons) >= 2 and BuffStacks(demonic_core_buff) <= 2 and BuffExpires(demonic_power) and Enemies() < 2 and Spell(power_siphon) or Talent(doom_talent) and target.Refreshable(doom_debuff) and target.TimeToDie() > target.DebuffRemaining(doom_debuff) + 30 and Spell(doom) or { SoulShards() >= 5 or SoulShards() >= 3 and SpellCooldown(call_dreadstalkers) > 4 and { SpellCooldown(summon_demonic_tyrant) > 20 or SpellCooldown(summon_demonic_tyrant) < GCD() * 2 and Talent(demonic_consumption_talent) or SpellCooldown(summon_demonic_tyrant) < GCD() * 4 and not Talent(demonic_consumption_talent) } and { not Talent(summon_vilefiend_talent) or SpellCooldown(summon_vilefiend) > 3 } } and Spell(hand_of_guldan) or SoulShards() < 5 and BuffStacks(demonic_core_buff) <= 2 and Spell(soul_strike) or SoulShards() <= 3 and BuffPresent(demonic_core_buff) and { SpellCooldown(summon_demonic_tyrant) < 6 or SpellCooldown(summon_demonic_tyrant) > 22 and not HasAzeriteTrait(shadows_bite_trait) or BuffStacks(demonic_core_buff) >= 3 or BuffRemaining(demonic_core_buff) < 5 or target.TimeToDie() < 25 or BuffPresent(shadows_bite) } and Spell(demonbolt) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and not DemonDuration(demonic_tyrant) > 0 and Spell(concentrated_flame_essence) or DemonologyBuildashardCdPostConditions()
 }
 
 ### Demonology icons.
@@ -1406,18 +1457,18 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # fireblood
 # focused_azerite_beam
 # grimoire_felguard
+# grimoire_felguard_talent
 # guardian_of_azeroth
 # hand_of_guldan
 # implosion
 # inner_demons
 # inner_demons_talent
-# item_unbridled_fury
+# lifeblood_buff
 # memory_of_lucid_dreams_essence
 # nether_portal
 # nether_portal_buff
 # nether_portal_talent
 # power_siphon
-# power_siphon_talent
 # purifying_blast
 # reckless_force_buff
 # ripple_in_space_essence
@@ -1431,6 +1482,8 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # summon_vilefiend
 # summon_vilefiend_talent
 # the_unbound_force
+# unbridled_fury_item
+# vision_of_perfection_essence_id
 # wild_imp
 # wild_imp_inner_demons
 # worldvein_resonance_essence
@@ -1456,7 +1509,7 @@ Include(ovale_warlock_spells)
 
 AddFunction pool_soul_shards
 {
- Enemies() > 1 and SpellCooldown(havoc) <= 10 or SpellCooldown(summon_infernal) <= 20 and { Talent(grimoire_of_supremacy_talent) or Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) <= 20 } or Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) <= 20 and { SpellCooldown(summon_infernal) > target.TimeToDie() or SpellCooldown(summon_infernal) + SpellCooldownDuration(summon_infernal) > target.TimeToDie() }
+ Enemies() > 1 and SpellCooldown(havoc) <= 10 or SpellCooldown(summon_infernal) <= 15 and { Talent(grimoire_of_supremacy_talent) or Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) <= 15 } or Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) <= 15 and { SpellCooldown(summon_infernal) > target.TimeToDie() or SpellCooldown(summon_infernal) + SpellCooldownDuration(summon_infernal) > target.TimeToDie() }
 }
 
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=destruction)
@@ -1503,7 +1556,7 @@ AddFunction DestructionPrecombatCdActions
  {
   #snapshot_stats
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  }
 }
 
@@ -1552,10 +1605,66 @@ AddFunction DestructionHavocCdPostConditions
  BuffExpires(backdraft_buff) and SoulShards() >= 1 and SoulShards() <= 4 and Spell(conflagrate) or { Talent(internal_combustion_talent) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) * 0.5 or not Talent(internal_combustion_talent) and target.Refreshable(immolate_debuff) } and Spell(immolate) or CastTime(chaos_bolt) < DebuffRemainingOnAny(havoc) and Spell(chaos_bolt) or Spell(soul_fire) or { Enemies() < 3 or not Talent(fire_and_brimstone_talent) } and Spell(shadowburn) or CastTime(incinerate) < DebuffRemainingOnAny(havoc) and Spell(incinerate)
 }
 
+### actions.gosup_infernal
+
+AddFunction DestructionGosupinfernalMainActions
+{
+ #rain_of_fire,if=soul_shard=5&!buff.backdraft.up&buff.memory_of_lucid_dreams.up&buff.grimoire_of_supremacy.stack<=10
+ if SoulShards() == 5 and not BuffPresent(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and BuffStacks(grimoire_of_supremacy_buff) <= 10 Spell(rain_of_fire)
+ #chaos_bolt,if=buff.backdraft.up
+ if BuffPresent(backdraft_buff) Spell(chaos_bolt)
+ #chaos_bolt,if=soul_shard>=4.2-buff.memory_of_lucid_dreams.up
+ if SoulShards() >= 4.2 - BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(chaos_bolt)
+ #chaos_bolt,if=!cooldown.conflagrate.up
+ if not { not SpellCooldown(conflagrate) > 0 } Spell(chaos_bolt)
+ #chaos_bolt,if=cast_time<pet.infernal.remains&pet.infernal.remains<cast_time+gcd
+ if CastTime(chaos_bolt) < DemonDuration(infernal) and DemonDuration(infernal) < CastTime(chaos_bolt) + GCD() Spell(chaos_bolt)
+ #conflagrate,if=buff.backdraft.down&buff.memory_of_lucid_dreams.up&soul_shard>=1.3
+ if BuffExpires(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and SoulShards() >= 1.3 Spell(conflagrate)
+ #conflagrate,if=buff.backdraft.down&!buff.memory_of_lucid_dreams.up&(soul_shard>=2.8|charges_fractional>1.9&soul_shard>=1.3)
+ if BuffExpires(backdraft_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SoulShards() >= 2.8 or Charges(conflagrate count=0) > 1.9 and SoulShards() >= 1.3 } Spell(conflagrate)
+ #conflagrate,if=pet.infernal.remains<5
+ if DemonDuration(infernal) < 5 Spell(conflagrate)
+ #conflagrate,if=charges>1
+ if Charges(conflagrate) > 1 Spell(conflagrate)
+ #soul_fire
+ Spell(soul_fire)
+ #shadowburn
+ Spell(shadowburn)
+ #incinerate
+ Spell(incinerate)
+}
+
+AddFunction DestructionGosupinfernalMainPostConditions
+{
+}
+
+AddFunction DestructionGosupinfernalShortCdActions
+{
+}
+
+AddFunction DestructionGosupinfernalShortCdPostConditions
+{
+ SoulShards() == 5 and not BuffPresent(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and BuffStacks(grimoire_of_supremacy_buff) <= 10 and Spell(rain_of_fire) or BuffPresent(backdraft_buff) and Spell(chaos_bolt) or SoulShards() >= 4.2 - BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(chaos_bolt) or not { not SpellCooldown(conflagrate) > 0 } and Spell(chaos_bolt) or CastTime(chaos_bolt) < DemonDuration(infernal) and DemonDuration(infernal) < CastTime(chaos_bolt) + GCD() and Spell(chaos_bolt) or BuffExpires(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and SoulShards() >= 1.3 and Spell(conflagrate) or BuffExpires(backdraft_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SoulShards() >= 2.8 or Charges(conflagrate count=0) > 1.9 and SoulShards() >= 1.3 } and Spell(conflagrate) or DemonDuration(infernal) < 5 and Spell(conflagrate) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(soul_fire) or Spell(shadowburn) or Spell(incinerate)
+}
+
+AddFunction DestructionGosupinfernalCdActions
+{
+}
+
+AddFunction DestructionGosupinfernalCdPostConditions
+{
+ SoulShards() == 5 and not BuffPresent(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and BuffStacks(grimoire_of_supremacy_buff) <= 10 and Spell(rain_of_fire) or BuffPresent(backdraft_buff) and Spell(chaos_bolt) or SoulShards() >= 4.2 - BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(chaos_bolt) or not { not SpellCooldown(conflagrate) > 0 } and Spell(chaos_bolt) or CastTime(chaos_bolt) < DemonDuration(infernal) and DemonDuration(infernal) < CastTime(chaos_bolt) + GCD() and Spell(chaos_bolt) or BuffExpires(backdraft_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and SoulShards() >= 1.3 and Spell(conflagrate) or BuffExpires(backdraft_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SoulShards() >= 2.8 or Charges(conflagrate count=0) > 1.9 and SoulShards() >= 1.3 } and Spell(conflagrate) or DemonDuration(infernal) < 5 and Spell(conflagrate) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(soul_fire) or Spell(shadowburn) or Spell(incinerate)
+}
+
 ### actions.cds
 
 AddFunction DestructionCdsMainActions
 {
+ #immolate,if=talent.grimoire_of_supremacy.enabled&remains<8&cooldown.summon_infernal.remains<4.5
+ if Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and SpellCooldown(summon_infernal) < 4.5 Spell(immolate)
+ #conflagrate,if=talent.grimoire_of_supremacy.enabled&cooldown.summon_infernal.remains<4.5&!buff.backdraft.up&soul_shard<4.3
+ if Talent(grimoire_of_supremacy_talent) and SpellCooldown(summon_infernal) < 4.5 and not BuffPresent(backdraft_buff) and SoulShards() < 4.3 Spell(conflagrate)
 }
 
 AddFunction DestructionCdsMainPostConditions
@@ -1564,71 +1673,88 @@ AddFunction DestructionCdsMainPostConditions
 
 AddFunction DestructionCdsShortCdActions
 {
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
- #ripple_in_space
- Spell(ripple_in_space_essence)
+ unless Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and SpellCooldown(summon_infernal) < 4.5 and Spell(immolate) or Talent(grimoire_of_supremacy_talent) and SpellCooldown(summon_infernal) < 4.5 and not BuffPresent(backdraft_buff) and SoulShards() < 4.3 and Spell(conflagrate)
+ {
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+ }
 }
 
 AddFunction DestructionCdsShortCdPostConditions
 {
+ Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and SpellCooldown(summon_infernal) < 4.5 and Spell(immolate) or Talent(grimoire_of_supremacy_talent) and SpellCooldown(summon_infernal) < 4.5 and not BuffPresent(backdraft_buff) and SoulShards() < 4.3 and Spell(conflagrate)
 }
 
 AddFunction DestructionCdsCdActions
 {
- #use_item,name=azsharas_font_of_power,if=cooldown.summon_infernal.up|cooldown.summon_infernal.remains<5
- if not SpellCooldown(summon_infernal) > 0 or SpellCooldown(summon_infernal) < 5 DestructionUseItemActions()
- #summon_infernal,if=cooldown.dark_soul_instability.ready|cooldown.memory_of_lucid_dreams.ready|(!talent.dark_soul_instability.enabled&!essence.memory_of_lucid_dreams.major)|cooldown.dark_soul_instability.remains<=10|cooldown.memory_of_lucid_dreams.remains<=10
- if SpellCooldown(dark_soul_instability) == 0 or SpellCooldown(memory_of_lucid_dreams_essence) == 0 or not Talent(dark_soul_instability_talent) and not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or SpellCooldown(dark_soul_instability) <= 10 or SpellCooldown(memory_of_lucid_dreams_essence) <= 10 Spell(summon_infernal)
- #guardian_of_azeroth,if=pet.infernal.active
- if DemonDuration(infernal) > 0 Spell(guardian_of_azeroth)
- #dark_soul_instability,if=pet.infernal.active&pet.infernal.remains<=20
- if DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 20 Spell(dark_soul_instability)
- #memory_of_lucid_dreams,if=pet.infernal.active&pet.infernal.remains<=20
- if DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 20 Spell(memory_of_lucid_dreams_essence)
- #summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
- if target.TimeToDie() > SpellCooldownDuration(summon_infernal) + 30 Spell(summon_infernal)
- #guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
- if TimeInCombat() > 30 and target.TimeToDie() > SpellCooldownDuration(guardian_of_azeroth) + 30 Spell(guardian_of_azeroth)
- #summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
- if Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) > target.TimeToDie() Spell(summon_infernal)
- #guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
- if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(guardian_of_azeroth)
- #dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die
- if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(dark_soul_instability)
- #memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die
- if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(memory_of_lucid_dreams_essence)
- #summon_infernal,if=target.time_to_die<30
- if target.TimeToDie() < 30 Spell(summon_infernal)
- #guardian_of_azeroth,if=target.time_to_die<30
- if target.TimeToDie() < 30 Spell(guardian_of_azeroth)
- #dark_soul_instability,if=target.time_to_die<20
- if target.TimeToDie() < 20 Spell(dark_soul_instability)
- #memory_of_lucid_dreams,if=target.time_to_die<20
- if target.TimeToDie() < 20 Spell(memory_of_lucid_dreams_essence)
- #blood_of_the_enemy
- Spell(blood_of_the_enemy)
-
- unless Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
+ unless Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and SpellCooldown(summon_infernal) < 4.5 and Spell(immolate) or Talent(grimoire_of_supremacy_talent) and SpellCooldown(summon_infernal) < 4.5 and not BuffPresent(backdraft_buff) and SoulShards() < 4.3 and Spell(conflagrate)
  {
-  #potion,if=pet.infernal.active|target.time_to_die<30
-  if { DemonDuration(infernal) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
-  #berserking,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(berserking)
-  #blood_fury,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(blood_fury_sp)
-  #fireblood,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(fireblood)
-  #use_items,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 DestructionUseItemActions()
-  #use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5
-  if target.DebuffRemaining(immolate_debuff) >= 5 DestructionUseItemActions()
+  #use_item,name=azsharas_font_of_power,if=cooldown.summon_infernal.up|cooldown.summon_infernal.remains<=4
+  if not SpellCooldown(summon_infernal) > 0 or SpellCooldown(summon_infernal) <= 4 DestructionUseItemActions()
+  #summon_infernal
+  Spell(summon_infernal)
+  #guardian_of_azeroth,if=pet.infernal.active
+  if DemonDuration(infernal) > 0 Spell(guardian_of_azeroth)
+  #dark_soul_instability,if=pet.infernal.active&(pet.infernal.remains<20.5|pet.infernal.remains<22&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
+  if DemonDuration(infernal) > 0 and { DemonDuration(infernal) < 20.5 or DemonDuration(infernal) < 22 and SoulShards() >= 3.6 or not Talent(grimoire_of_supremacy_talent) } Spell(dark_soul_instability)
+  #memory_of_lucid_dreams,if=pet.infernal.active&(pet.infernal.remains<15.5|soul_shard<3.5&(buff.dark_soul_instability.up|!talent.grimoire_of_supremacy.enabled&dot.immolate.remains>12))
+  if DemonDuration(infernal) > 0 and { DemonDuration(infernal) < 15.5 or SoulShards() < 3.5 and { BuffPresent(dark_soul_instability_buff) or not Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) > 12 } } Spell(memory_of_lucid_dreams_essence)
+  #summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
+  if target.TimeToDie() > SpellCooldownDuration(summon_infernal) + 30 Spell(summon_infernal)
+  #guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
+  if TimeInCombat() > 30 and target.TimeToDie() > SpellCooldownDuration(guardian_of_azeroth) + 30 Spell(guardian_of_azeroth)
+  #summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
+  if Talent(dark_soul_instability_talent) and SpellCooldown(dark_soul_instability) > target.TimeToDie() Spell(summon_infernal)
+  #guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
+  if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(guardian_of_azeroth)
+  #dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<20.5
+  if SpellCooldown(summon_infernal) > target.TimeToDie() and DemonDuration(infernal) < 20.5 Spell(dark_soul_instability)
+  #memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die&(pet.infernal.remains<15.5|buff.dark_soul_instability.up&soul_shard<3)
+  if SpellCooldown(summon_infernal) > target.TimeToDie() and { DemonDuration(infernal) < 15.5 or BuffPresent(dark_soul_instability_buff) and SoulShards() < 3 } Spell(memory_of_lucid_dreams_essence)
+  #summon_infernal,if=target.time_to_die<30
+  if target.TimeToDie() < 30 Spell(summon_infernal)
+  #guardian_of_azeroth,if=target.time_to_die<30
+  if target.TimeToDie() < 30 Spell(guardian_of_azeroth)
+  #dark_soul_instability,if=target.time_to_die<21&target.time_to_die>4
+  if target.TimeToDie() < 21 and target.TimeToDie() > 4 Spell(dark_soul_instability)
+  #memory_of_lucid_dreams,if=target.time_to_die<16&target.time_to_die>6
+  if target.TimeToDie() < 16 and target.TimeToDie() > 6 Spell(memory_of_lucid_dreams_essence)
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+
+  unless Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
+  {
+   #potion,if=pet.infernal.active|target.time_to_die<30
+   if { DemonDuration(infernal) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
+   #berserking,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+   if DemonDuration(infernal) > 0 and { not Talent(grimoire_of_supremacy_talent) or { not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or BuffPresent(memory_of_lucid_dreams_essence_buff) } and { not Talent(dark_soul_instability_talent) or BuffPresent(dark_soul_instability_buff) } } or target.TimeToDie() <= 15 Spell(berserking)
+   #blood_fury,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+   if DemonDuration(infernal) > 0 and { not Talent(grimoire_of_supremacy_talent) or { not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or BuffPresent(memory_of_lucid_dreams_essence_buff) } and { not Talent(dark_soul_instability_talent) or BuffPresent(dark_soul_instability_buff) } } or target.TimeToDie() <= 15 Spell(blood_fury_sp)
+   #fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+   if DemonDuration(infernal) > 0 and { not Talent(grimoire_of_supremacy_talent) or { not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or BuffPresent(memory_of_lucid_dreams_essence_buff) } and { not Talent(dark_soul_instability_talent) or BuffPresent(dark_soul_instability_buff) } } or target.TimeToDie() <= 15 Spell(fireblood)
+   #use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20
+   if DemonDuration(infernal) > 0 and { not Talent(grimoire_of_supremacy_talent) or DemonDuration(infernal) <= 20 } or target.TimeToDie() <= 20 DestructionUseItemActions()
+   #use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+   #use_item,name=rotcrusted_voodoo_doll,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+   #use_item,name=shiver_venom_relic,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+   #use_item,name=aquipotent_nautilus,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+   #use_item,name=tidestorm_codex,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+   #use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+   if target.DebuffRemaining(immolate_debuff) >= 5 and { SpellCooldown(summon_infernal) >= 20 or target.TimeToDie() < 30 } DestructionUseItemActions()
+  }
  }
 }
 
 AddFunction DestructionCdsCdPostConditions
 {
- Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
+ Talent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and SpellCooldown(summon_infernal) < 4.5 and Spell(immolate) or Talent(grimoire_of_supremacy_talent) and SpellCooldown(summon_infernal) < 4.5 and not BuffPresent(backdraft_buff) and SoulShards() < 4.3 and Spell(conflagrate) or Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
 }
 
 ### actions.aoe
@@ -1745,25 +1871,31 @@ AddFunction DestructionDefaultMainActions
     if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) Spell(concentrated_flame_essence)
     #channel_demonfire
     Spell(channel_demonfire)
-    #soul_fire
-    Spell(soul_fire)
-    #conflagrate,if=buff.backdraft.down&soul_shard>=1.5-0.3*talent.flashover.enabled&!variable.pool_soul_shards
-    if BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() Spell(conflagrate)
-    #shadowburn,if=soul_shard<2&(!variable.pool_soul_shards|charges>1)
-    if SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } Spell(shadowburn)
-    #variable,name=pool_soul_shards,value=active_enemies>1&cooldown.havoc.remains<=10|cooldown.summon_infernal.remains<=20&(talent.grimoire_of_supremacy.enabled|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=20)|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=20&(cooldown.summon_infernal.remains>target.time_to_die|cooldown.summon_infernal.remains+cooldown.summon_infernal.duration>target.time_to_die)
-    #chaos_bolt,if=(talent.grimoire_of_supremacy.enabled|azerite.crashing_chaos.enabled)&pet.infernal.active|buff.dark_soul_instability.up|buff.reckless_force.react&buff.reckless_force.remains>cast_time
-    if { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
-    #chaos_bolt,if=!variable.pool_soul_shards&!talent.eradication.enabled
-    if not pool_soul_shards() and not Talent(eradication_talent) Spell(chaos_bolt)
-    #chaos_bolt,if=!variable.pool_soul_shards&talent.eradication.enabled&(debuff.eradication.remains<cast_time|buff.backdraft.up)
-    if not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } Spell(chaos_bolt)
-    #chaos_bolt,if=(soul_shard>=4.5-0.2*active_enemies)
-    if SoulShards() >= 4.5 - 0.2 * Enemies() Spell(chaos_bolt)
-    #conflagrate,if=charges>1
-    if Charges(conflagrate) > 1 Spell(conflagrate)
-    #incinerate
-    Spell(incinerate)
+    #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
+    if Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 DestructionGosupinfernalMainActions()
+
+    unless Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DestructionGosupinfernalMainPostConditions()
+    {
+     #soul_fire
+     Spell(soul_fire)
+     #variable,name=pool_soul_shards,value=active_enemies>1&cooldown.havoc.remains<=10|cooldown.summon_infernal.remains<=15&(talent.grimoire_of_supremacy.enabled|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15)|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15&(cooldown.summon_infernal.remains>target.time_to_die|cooldown.summon_infernal.remains+cooldown.summon_infernal.duration>target.time_to_die)
+     #conflagrate,if=buff.backdraft.down&soul_shard>=1.5-0.3*talent.flashover.enabled&!variable.pool_soul_shards
+     if BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() Spell(conflagrate)
+     #shadowburn,if=soul_shard<2&(!variable.pool_soul_shards|charges>1)
+     if SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } Spell(shadowburn)
+     #chaos_bolt,if=(talent.grimoire_of_supremacy.enabled|azerite.crashing_chaos.enabled)&pet.infernal.active|buff.dark_soul_instability.up|buff.reckless_force.react&buff.reckless_force.remains>cast_time
+     if { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+     #chaos_bolt,if=buff.backdraft.up&!variable.pool_soul_shards&!talent.eradication.enabled
+     if BuffPresent(backdraft_buff) and not pool_soul_shards() and not Talent(eradication_talent) Spell(chaos_bolt)
+     #chaos_bolt,if=!variable.pool_soul_shards&talent.eradication.enabled&(debuff.eradication.remains<cast_time|buff.backdraft.up)
+     if not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } Spell(chaos_bolt)
+     #chaos_bolt,if=(soul_shard>=4.5-0.2*active_enemies)&(!talent.grimoire_of_supremacy.enabled|cooldown.summon_infernal.remains>7)
+     if SoulShards() >= 4.5 - 0.2 * Enemies() and { not Talent(grimoire_of_supremacy_talent) or SpellCooldown(summon_infernal) > 7 } Spell(chaos_bolt)
+     #conflagrate,if=charges>1
+     if Charges(conflagrate) > 1 Spell(conflagrate)
+     #incinerate
+     Spell(incinerate)
+    }
    }
   }
  }
@@ -1771,7 +1903,7 @@ AddFunction DestructionDefaultMainActions
 
 AddFunction DestructionDefaultMainPostConditions
 {
- DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocMainPostConditions() or Enemies() > 2 and DestructionAoeMainPostConditions() or DestructionCdsMainPostConditions()
+ DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocMainPostConditions() or Enemies() > 2 and DestructionAoeMainPostConditions() or DestructionCdsMainPostConditions() or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DestructionGosupinfernalMainPostConditions()
 }
 
 AddFunction DestructionDefaultShortCdActions
@@ -1781,8 +1913,8 @@ AddFunction DestructionDefaultShortCdActions
 
  unless DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocShortCdPostConditions()
  {
-  #cataclysm
-  Spell(cataclysm)
+  #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1|!talent.grimoire_of_supremacy.enabled
+  if not { DemonDuration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > DemonDuration(infernal) } or Enemies() > 1 or not Talent(grimoire_of_supremacy_talent) Spell(cataclysm)
   #call_action_list,name=aoe,if=active_enemies>2
   if Enemies() > 2 DestructionAoeShortCdActions()
 
@@ -1802,6 +1934,8 @@ AddFunction DestructionDefaultShortCdActions
     {
      #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)&(!cooldown.summon_infernal.ready|!talent.grimoire_of_supremacy.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
      if not False(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not Talent(internal_combustion_talent) } and { not SpellCooldown(summon_infernal) == 0 or not Talent(grimoire_of_supremacy_talent) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) <= 10 } and Enemies() > 1 Spell(havoc)
+     #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
+     if Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 DestructionGosupinfernalShortCdActions()
     }
    }
   }
@@ -1810,7 +1944,7 @@ AddFunction DestructionDefaultShortCdActions
 
 AddFunction DestructionDefaultShortCdPostConditions
 {
- DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocShortCdPostConditions() or Enemies() > 2 and DestructionAoeShortCdPostConditions() or target.Refreshable(immolate_debuff) and { not Talent(cataclysm_talent) or SpellCooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and Spell(immolate) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) * 0.5 and Spell(immolate) or DestructionCdsShortCdPostConditions() or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Spell(concentrated_flame_essence) or Spell(channel_demonfire) or Spell(soul_fire) or BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() and Spell(conflagrate) or SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } and Spell(shadowburn) or { { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not pool_soul_shards() and not Talent(eradication_talent) and Spell(chaos_bolt) or not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or SoulShards() >= 4.5 - 0.2 * Enemies() and Spell(chaos_bolt) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(incinerate)
+ DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocShortCdPostConditions() or Enemies() > 2 and DestructionAoeShortCdPostConditions() or target.Refreshable(immolate_debuff) and { not Talent(cataclysm_talent) or SpellCooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and Spell(immolate) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) * 0.5 and Spell(immolate) or DestructionCdsShortCdPostConditions() or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Spell(concentrated_flame_essence) or Spell(channel_demonfire) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DestructionGosupinfernalShortCdPostConditions() or Spell(soul_fire) or BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() and Spell(conflagrate) or SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } and Spell(shadowburn) or { { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and not pool_soul_shards() and not Talent(eradication_talent) and Spell(chaos_bolt) or not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or SoulShards() >= 4.5 - 0.2 * Enemies() and { not Talent(grimoire_of_supremacy_talent) or SpellCooldown(summon_infernal) > 7 } and Spell(chaos_bolt) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(incinerate)
 }
 
 AddFunction DestructionDefaultCdActions
@@ -1818,7 +1952,7 @@ AddFunction DestructionDefaultCdActions
  #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
  if DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } DestructionHavocCdActions()
 
- unless DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or Spell(cataclysm)
+ unless DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or { not { DemonDuration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > DemonDuration(infernal) } or Enemies() > 1 or not Talent(grimoire_of_supremacy_talent) } and Spell(cataclysm)
  {
   #call_action_list,name=aoe,if=active_enemies>2
   if Enemies() > 2 DestructionAoeCdActions()
@@ -1832,6 +1966,12 @@ AddFunction DestructionDefaultCdActions
    {
     #focused_azerite_beam,if=!pet.infernal.active|!talent.grimoire_of_supremacy.enabled
     if not DemonDuration(infernal) > 0 or not Talent(grimoire_of_supremacy_talent) Spell(focused_azerite_beam)
+
+    unless BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Spell(concentrated_flame_essence) or Spell(channel_demonfire) or not False(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not Talent(internal_combustion_talent) } and { not SpellCooldown(summon_infernal) == 0 or not Talent(grimoire_of_supremacy_talent) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) <= 10 } and Enemies() > 1 and Spell(havoc)
+    {
+     #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
+     if Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 DestructionGosupinfernalCdActions()
+    }
    }
   }
  }
@@ -1839,7 +1979,7 @@ AddFunction DestructionDefaultCdActions
 
 AddFunction DestructionDefaultCdPostConditions
 {
- DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or Spell(cataclysm) or Enemies() > 2 and DestructionAoeCdPostConditions() or target.Refreshable(immolate_debuff) and { not Talent(cataclysm_talent) or SpellCooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and Spell(immolate) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) * 0.5 and Spell(immolate) or DestructionCdsCdPostConditions() or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Spell(concentrated_flame_essence) or Spell(channel_demonfire) or not False(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not Talent(internal_combustion_talent) } and { not SpellCooldown(summon_infernal) == 0 or not Talent(grimoire_of_supremacy_talent) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) <= 10 } and Enemies() > 1 and Spell(havoc) or Spell(soul_fire) or BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() and Spell(conflagrate) or SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } and Spell(shadowburn) or { { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not pool_soul_shards() and not Talent(eradication_talent) and Spell(chaos_bolt) or not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or SoulShards() >= 4.5 - 0.2 * Enemies() and Spell(chaos_bolt) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(incinerate)
+ DebuffCountOnAny(havoc) > 0 and Enemies() < 5 - TalentPoints(inferno_talent) + { Talent(inferno_talent) and Talent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or { not { DemonDuration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > DemonDuration(infernal) } or Enemies() > 1 or not Talent(grimoire_of_supremacy_talent) } and Spell(cataclysm) or Enemies() > 2 and DestructionAoeCdPostConditions() or target.Refreshable(immolate_debuff) and { not Talent(cataclysm_talent) or SpellCooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and Spell(immolate) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) * 0.5 and Spell(immolate) or DestructionCdsCdPostConditions() or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) and Spell(concentrated_flame_essence) or Spell(channel_demonfire) or not False(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not Talent(internal_combustion_talent) } and { not SpellCooldown(summon_infernal) == 0 or not Talent(grimoire_of_supremacy_talent) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) <= 10 } and Enemies() > 1 and Spell(havoc) or Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DestructionGosupinfernalCdPostConditions() or Spell(soul_fire) or BuffExpires(backdraft_buff) and SoulShards() >= 1.5 - 0.3 * TalentPoints(flashover_talent) and not pool_soul_shards() and Spell(conflagrate) or SoulShards() < 2 and { not pool_soul_shards() or Charges(shadowburn) > 1 } and Spell(shadowburn) or { { Talent(grimoire_of_supremacy_talent) or HasAzeriteTrait(crashing_chaos_trait) } and DemonDuration(infernal) > 0 or BuffPresent(dark_soul_instability_buff) or BuffPresent(reckless_force_buff) and BuffRemaining(reckless_force_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and not pool_soul_shards() and not Talent(eradication_talent) and Spell(chaos_bolt) or not pool_soul_shards() and Talent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < CastTime(chaos_bolt) or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or SoulShards() >= 4.5 - 0.2 * Enemies() and { not Talent(grimoire_of_supremacy_talent) or SpellCooldown(summon_infernal) > 7 } and Spell(chaos_bolt) or Charges(conflagrate) > 1 and Spell(conflagrate) or Spell(incinerate)
 }
 
 ### Destruction icons.
@@ -1925,6 +2065,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # focused_azerite_beam
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
+# grimoire_of_supremacy_buff
 # grimoire_of_supremacy_talent
 # guardian_of_azeroth
 # havoc
@@ -1933,7 +2074,6 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # incinerate
 # inferno_talent
 # internal_combustion_talent
-# item_unbridled_fury
 # memory_of_lucid_dreams_essence
 # memory_of_lucid_dreams_essence_buff
 # memory_of_lucid_dreams_essence_id
@@ -1947,6 +2087,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # summon_imp
 # summon_infernal
 # the_unbound_force
+# unbridled_fury_item
 # worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("WARLOCK", "destruction", name, desc, code, "script")

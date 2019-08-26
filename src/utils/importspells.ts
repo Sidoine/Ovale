@@ -1051,6 +1051,13 @@ export interface AzeriteTrait {
     identifier: string;
 }
 
+export interface AzeriteEssenceEntry {
+    id: number;
+    category: number;
+    name: string;
+    identifier: string;
+}
+
 export function isFriendlyTarget(targetId: number) {
     switch (targetId) {
         case 1:
@@ -1218,7 +1225,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "sc_item_data", zone, output);
     readFile(directory, "azerite", zone, output);
     readFile(directory, "sc_spell_lists", zone, output);
-
+    
     const identifierById = new Map<number, string>();
     identifierById.set(302917, "reckless_force_counter");
 
@@ -1526,6 +1533,18 @@ export function getSpellData(directory: string) {
         }
     }
 
+    const essenceById = new Map<number, AzeriteEssenceEntry>();
+    for (const row of output.azerite_essence_entry_t) {
+        const essence: AzeriteEssenceEntry = {
+            id: row[0],
+            category: row[1],
+            name: row[2],
+            identifier: getIdentifier(row[2] + "_essence_id")
+        };
+        identifiers[essence.identifier] = essence.id;
+        essenceById.set(essence.id, essence);
+    }
+
     const itemsById = new Map<number, ItemData>();
     for (const row of output.item_data_t) {
         const item: ItemData = {
@@ -1572,5 +1591,5 @@ export function getSpellData(directory: string) {
     writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), { encoding: "utf8" });
     writeFileSync("items-data.txt", JSON.stringify(Array.from(itemsById.values()), undefined, 2), { encoding: "utf8"});
 
-    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById, spellLists };
+    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById, spellLists, essenceById };
 }
