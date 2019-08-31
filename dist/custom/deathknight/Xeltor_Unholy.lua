@@ -43,9 +43,9 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
-		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+		if target.InRange(asphyxiate) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(asphyxiate)
+		if target.InRange(mind_freeze) and target.IsInterruptible() and target.RemainingCastTime() <= GCD() Spell(mind_freeze)
 	}
 }
 

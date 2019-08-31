@@ -33,11 +33,11 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
-		if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
+		if target.InRange(spear_hand_strike) and target.IsInterruptible() and target.RemainingCastTime() <= GCD() Spell(spear_hand_strike)
+		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(leg_sweep)
+		if target.InRange(paralysis) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(paralysis)
 	}
 }
 
