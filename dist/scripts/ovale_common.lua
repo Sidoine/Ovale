@@ -107,8 +107,8 @@ Define(blood_of_the_enemy 298277)
 	SpellInfo(blood_of_the_enemy cd=90)
 Define(guardian_of_azeroth 299358)
 	SpellInfo(guardian_of_azeroth cd=180)
-Define(focused_azerite_beam 299338)
-	SpellInfo(focused_azerite_beam cd=180)
+Define(focused_azerite_beam 295258)
+	SpellInfo(focused_azerite_beam cd=90)
 Define(purifying_blast 295337)
 	SpellInfo(purifying_blast cd=60)
 Define(ripple_in_space 302983)
@@ -375,7 +375,7 @@ AddFunction CanMove
 
 AddFunction Boss
 {
-	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or target.Classification(rare) or { target.IsPvP() and not target.IsFriend() } or { target.Level() >= Level() and { target.Classification(elite) and PartyMemberCount() < 5 } }
+	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or target.Classification(rare) or { target.IsPvP() and not target.IsFriend() }
 }
 
 Define(ghost_debuff 8326)

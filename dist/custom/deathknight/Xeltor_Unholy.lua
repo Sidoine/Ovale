@@ -319,7 +319,7 @@ AddFunction UnholyEssencesShortCdActions
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 11 Spell(the_unbound_force)
  #focused_azerite_beam,if=!death_and_decay.ticking
- if not BuffPresent(death_and_decay) Spell(focused_azerite_beam)
+ if not BuffPresent(death_and_decay) and Enemies(tagged=1) > 3 Spell(focused_azerite_beam)
 
  unless not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
  {
@@ -347,7 +347,7 @@ AddFunction UnholyEssencesCdActions
 
 AddFunction UnholyEssencesCdPostConditions
 {
- { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 11 } and Spell(the_unbound_force) or not BuffPresent(death_and_decay) and Spell(focused_azerite_beam) or not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or not BuffPresent(death_and_decay) and Spell(purifying_blast) or not BuffPresent(death_and_decay) and Spell(worldvein_resonance_essence) or not BuffPresent(death_and_decay) and Spell(ripple_in_space_essence)
+ { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 11 } and Spell(the_unbound_force) or not BuffPresent(death_and_decay) and Enemies(tagged=1) > 3 and Spell(focused_azerite_beam) or not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or not BuffPresent(death_and_decay) and Spell(purifying_blast) or not BuffPresent(death_and_decay) and Spell(worldvein_resonance_essence) or not BuffPresent(death_and_decay) and Spell(ripple_in_space_essence)
 }
 
 ### actions.generic
