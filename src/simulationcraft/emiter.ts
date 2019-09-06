@@ -156,6 +156,7 @@ export class Emiter {
         this.AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
         this.AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
         this.AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT");
+        this.AddDisambiguation("icy_citadel_buff", "icy_citadel_expires_buff", "DEATHKNIGHT");
     
         //Demon Hunter
         this.AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");

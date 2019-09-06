@@ -470,7 +470,7 @@ __exports.OvaleASTClass = __class(nil, {
                 if filter == "debuff" then
                     name = gsub(node.name, "^Buff", "Debuff")
                 else
-                    name = node.name
+                    name = node.lowername
                 end
                 local target = node.rawNamedParams.target
                 if target then
@@ -479,7 +479,7 @@ __exports.OvaleASTClass = __class(nil, {
                     s = format("%s(%s)", name, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
                 end
             else
-                s = format("%s()", node.name)
+                s = format("%s()", node.lowername)
             end
             return s
         end
@@ -953,17 +953,11 @@ __exports.OvaleASTClass = __class(nil, {
                                 node.precedence = precedence
                                 node.child[1] = lhsNode
                                 node.child[2] = rhsNode
-                                local rotated = false
                                 while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
                                     node.child[2] = rhsNode.child[1]
                                     rhsNode.child[1] = node
-                                    node.asString = self.UnparseExpression(node)
                                     node = rhsNode
                                     rhsNode = node.child[2]
-                                    rotated = true
-                                end
-                                if rotated then
-                                    node.asString = self.UnparseExpression(node)
                                 end
                             end
                         end
@@ -972,9 +966,6 @@ __exports.OvaleASTClass = __class(nil, {
                 if  not keepScanning then
                     break
                 end
-            end
-            if ok and node then
-                node.asString = node.asString or self:Unparse(node)
             end
             return ok, node
         end
@@ -1933,7 +1924,8 @@ __exports.OvaleASTClass = __class(nil, {
                 self.debug:Error("Unable to unparse node of type '%s'.", node.type)
                 return "Unkown_" .. node.type
             else
-                return visitor(node)
+                node.asString = visitor(node)
+                return node.asString
             end
         end
     end,
@@ -2275,39 +2267,43 @@ __exports.OvaleASTClass = __class(nil, {
         })
         local _, node = self:Parse(nodeType, tokenStream, nodeList, annotation)
         tokenStream:Release()
+        self:Unparse(node)
         return node, nodeList, annotation
     end,
-    ParseScript = function(self, name, options)
-        local code = self.ovaleScripts:GetScriptOrDefault(name)
-        local ast
-        if code then
-            options = options or {
-                optimize = true,
-                verify = true
-            }
-            local annotation = {
-                nodeList = {},
-                verify = options.verify
-            }
-            ast = self:ParseCode("script", code, annotation.nodeList, annotation)
-            if ast then
-                ast.annotation = annotation
-                self:PropagateConstants(ast)
-                self:PropagateStrings(ast)
-                self:FlattenParameters(ast)
-                self:VerifyParameterStances(ast)
-                self:VerifyFunctionCalls(ast)
-                if options.optimize then
-                    self:Optimize(ast)
-                end
-                self:InsertPostOrderTraversal(ast)
-            else
-                self:ReleaseAnnotation(annotation)
+    parseScript = function(self, code, options)
+        options = options or {
+            optimize = true,
+            verify = true
+        }
+        local annotation = {
+            nodeList = {},
+            verify = options.verify
+        }
+        local ast = self:ParseCode("script", code, annotation.nodeList, annotation)
+        if ast then
+            ast.annotation = annotation
+            self:PropagateConstants(ast)
+            self:PropagateStrings(ast)
+            self:FlattenParameters(ast)
+            self:VerifyParameterStances(ast)
+            self:VerifyFunctionCalls(ast)
+            if options.optimize then
+                self:Optimize(ast)
             end
+            self:InsertPostOrderTraversal(ast)
         else
-            self.debug:Debug("No code to parse")
+            self:ReleaseAnnotation(annotation)
         end
         return ast
+    end,
+    parseNamedScript = function(self, name, options)
+        local code = self.ovaleScripts:GetScriptOrDefault(name)
+        if code then
+            return self:parseScript(code, options)
+        else
+            self.debug:Debug("No code to parse")
+            return nil
+        end
     end,
     PropagateConstants = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_PropagateConstants")
@@ -2553,39 +2549,6 @@ __exports.OvaleASTClass = __class(nil, {
         self.profiler:StopProfiling("OvaleAST_InsertPostOrderTraversal")
     end,
     Optimize = function(self, ast)
-        self:CommonFunctionElimination(ast)
-        self:CommonSubExpressionElimination(ast)
-    end,
-    CommonFunctionElimination = function(self, ast)
-        self.profiler:StartProfiling("OvaleAST_CommonFunctionElimination")
-        if ast.annotation then
-            if ast.annotation.functionReference then
-                local functionHash = ast.annotation.functionHash or {}
-                for _, node in ipairs(ast.annotation.functionReference) do
-                    if node.positionalParams or node.namedParams then
-                        local hash = node.name .. "(" .. node.paramsAsString .. ")"
-                        node.functionHash = hash
-                        functionHash[hash] = functionHash[hash] or node
-                    end
-                end
-                ast.annotation.functionHash = functionHash
-            end
-            if ast.annotation.functionHash and ast.annotation.nodeList then
-                local functionHash = ast.annotation.functionHash
-                for _, node in ipairs(ast.annotation.nodeList) do
-                    if node.child then
-                        for k, childNode in ipairs(node.child) do
-                            if childNode.functionHash then
-                                node.child[k] = functionHash[childNode.functionHash]
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        self.profiler:StopProfiling("OvaleAST_CommonFunctionElimination")
-    end,
-    CommonSubExpressionElimination = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_CommonSubExpressionElimination")
         if ast and ast.annotation and ast.annotation.nodeList then
             local expressionHash = {}
@@ -2594,9 +2557,11 @@ __exports.OvaleASTClass = __class(nil, {
                 if hash then
                     expressionHash[hash] = expressionHash[hash] or node
                 end
+            end
+            for _, node in ipairs(ast.annotation.nodeList) do
                 if node.child then
                     for i, childNode in ipairs(node.child) do
-                        hash = childNode.asString
+                        local hash = childNode.asString
                         if hash then
                             local hashNode = expressionHash[hash]
                             if hashNode then

@@ -2443,6 +2443,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
+        self:AddDisambiguation("icy_citadel_buff", "icy_citadel_expires_buff", "DEATHKNIGHT")
         self:AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")

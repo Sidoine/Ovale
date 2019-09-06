@@ -647,7 +647,7 @@ export class OvaleCompileClass {
             this.ast = undefined;
         }
         if (this.ovaleCondition.HasAny()) {
-            this.ast = this.ovaleAst.ParseScript(name);
+            this.ast = this.ovaleAst.parseNamedScript(name);
         }
         ResetControls();
         return this.ast;

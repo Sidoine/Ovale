@@ -288,7 +288,6 @@ export interface AstNode {
     namedParams:NamedParameters;
     paramsAsString: string;
     postOrder:LuaArray<AstNode>;
-    functionHash: string;
     asString: string;
     nodeId: number;
     secure: boolean;
@@ -744,7 +743,8 @@ export class OvaleASTClass {
                 this.debug.Error("Unable to unparse node of type '%s'.", node.type);
                 return `Unkown_${node.type}`;
             } else {
-                return visitor(node as NodeTypes[typeof node.previousType]);
+                node.asString = visitor(node as NodeTypes[typeof node.previousType]);
+                return node.asString;
             }
         }
     }
@@ -862,7 +862,7 @@ export class OvaleASTClass {
             if (filter == "debuff") {
                 name = gsub(node.name, "^Buff", "Debuff");
             } else {
-                name = node.name;
+                name = node.lowername;
             }
             let target = node.rawNamedParams.target;
             if (target) {
@@ -871,7 +871,7 @@ export class OvaleASTClass {
                 s = format("%s(%s)", name, this.UnparseParameters(node.rawPositionalParams, node.rawNamedParams));
             }
         } else {
-            s = format("%s()", node.name);
+            s = format("%s()", node.lowername);
         }
         return s;
     }
@@ -1168,11 +1168,9 @@ export class OvaleASTClass {
             node.child[1] = bodyNode;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {}
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
-            annotation.postOrderReference = annotation.postOrderReference || {
-            }
+            annotation.postOrderReference = annotation.postOrderReference || {}
             annotation.postOrderReference[lualength(annotation.postOrderReference) + 1] = bodyNode;
         }
         return [ok, node];
@@ -1405,17 +1403,11 @@ export class OvaleASTClass {
 
                             node.child[1] = lhsNode;
                             node.child[2] = rhsNode;
-                            let rotated = false;
                             while (node.type == rhsNode.type && node.operator == rhsNode.operator && BINARY_OPERATOR[node.operator][3] == "associative" && rhsNode.expressionType == "binary") {
                                 node.child[2] = rhsNode.child[1];
                                 rhsNode.child[1] = node;
-                                node.asString = this.UnparseExpression(node);
                                 node = rhsNode;
                                 rhsNode = node.child[2];
-                                rotated = true;
-                            }
-                            if (rotated) {
-                                node.asString = this.UnparseExpression(node);
                             }
                         }
                     }
@@ -1424,9 +1416,6 @@ export class OvaleASTClass {
             if (!keepScanning) {
                 break;
             }
-        }
-        if (ok && node) {
-            node.asString = node.asString || this.Unparse(node);
         }
         return [ok, node];
     }
@@ -2565,40 +2554,46 @@ export class OvaleASTClass {
         let tokenStream = new OvaleLexer("Ovale", code, MATCHES, { comments:  TokenizeComment, space: TokenizeWhitespace });
         let [, node] = this.Parse(nodeType, tokenStream, nodeList, annotation);
         tokenStream.Release();
+        this.Unparse(node);
         return [node, nodeList, annotation];
     }
-    public ParseScript(name: string, options?: { optimize: boolean, verify: boolean}) {
-        let code = this.ovaleScripts.GetScriptOrDefault(name);
-        let ast: AstNode;
-        if (code) {
-            options = options || {
-                optimize: true,
-                verify: true
-            };
-            const annotation = {
-                nodeList: {},
-                verify: options.verify
-            };
-            [ast] = this.ParseCode("script", code, annotation.nodeList, annotation);
-            if (ast) {
-                ast.annotation = annotation;
-                this.PropagateConstants(ast);
-                this.PropagateStrings(ast);
-                this.FlattenParameters(ast);
-                this.VerifyParameterStances(ast);
-                this.VerifyFunctionCalls(ast);
-                if (options.optimize) {
-                    this.Optimize(ast);
-                }
-                this.InsertPostOrderTraversal(ast);
-            } else {
-                this.ReleaseAnnotation(annotation);
+
+    public parseScript(code: string, options?: { optimize: boolean, verify: boolean}) {
+        options = options || {
+            optimize: true,
+            verify: true
+        };
+        const annotation = {
+            nodeList: {},
+            verify: options.verify
+        };
+        const [ast] = this.ParseCode("script", code, annotation.nodeList, annotation);
+        if (ast) {
+            ast.annotation = annotation;
+            this.PropagateConstants(ast);
+            this.PropagateStrings(ast);
+            this.FlattenParameters(ast);
+            this.VerifyParameterStances(ast);
+            this.VerifyFunctionCalls(ast);
+            if (options.optimize) {
+                this.Optimize(ast);
             }
+            this.InsertPostOrderTraversal(ast);
+        } else {
+            this.ReleaseAnnotation(annotation);
+        }
+        return ast;
+    }
+
+    public parseNamedScript(name: string, options?: { optimize: boolean, verify: boolean}) {
+        let code = this.ovaleScripts.GetScriptOrDefault(name);
+        if (code) {
+            return this.parseScript(code, options);
         }
         else {
             this.debug.Debug("No code to parse");
+            return undefined;
         }
-        return ast;
     }
     
     public PropagateConstants(ast: AstNode) {
@@ -2850,53 +2845,25 @@ export class OvaleASTClass {
     }
 
     private Optimize(ast: AstNode) {
-        this.CommonFunctionElimination(ast);
-        this.CommonSubExpressionElimination(ast);
-    }
-
-    private CommonFunctionElimination(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_CommonFunctionElimination");
-        if (ast.annotation) {
-            if (ast.annotation.functionReference) {
-                let functionHash = ast.annotation.functionHash || {}
-                for (const [, node] of ipairs<AstNode>(ast.annotation.functionReference)) {
-                    if (node.positionalParams || node.namedParams) {
-                        let hash = `${node.name}(${node.paramsAsString})`;
-                        node.functionHash = hash;
-                        functionHash[hash] = functionHash[hash] || node;
-                    }
-                }
-                ast.annotation.functionHash = functionHash;
-            }
-            if (ast.annotation.functionHash && ast.annotation.nodeList) {
-                let functionHash = ast.annotation.functionHash;
-                for (const [, node] of ipairs<AstNode>(ast.annotation.nodeList)) {
-                    if (node.child) {
-                        for (const [k, childNode] of ipairs(node.child)) {
-                            if (childNode.functionHash) {
-                                node.child[k] = functionHash[childNode.functionHash];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        this.profiler.StopProfiling("OvaleAST_CommonFunctionElimination");
-    }
-    private CommonSubExpressionElimination(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_CommonSubExpressionElimination");
         if (ast && ast.annotation && ast.annotation.nodeList) {
             let expressionHash: LuaObj<AstNode> = {};
+            
+            // Index all nodes by their hash
             for (const [, node] of ipairs<AstNode>(ast.annotation.nodeList)) {
-                let hash = node.asString;
+                const hash = node.asString;
                 if (hash) {
                     expressionHash[hash] = expressionHash[hash] || node;
                 }
+            }
+
+            // Replace childs with the first node that has the same hash
+            for (const [, node] of ipairs(ast.annotation.nodeList)) {
                 if (node.child) {
                     for (const [i, childNode] of ipairs(node.child)) {
-                        hash = childNode.asString;
+                        const hash = childNode.asString;
                         if (hash) {
-                            let hashNode = expressionHash[hash];
+                            const hashNode = expressionHash[hash];
                             if (hashNode) {
                                 node.child[i] = hashNode;
                             } else {
@@ -2906,6 +2873,7 @@ export class OvaleASTClass {
                     }
                 }
             }
+
             ast.annotation.expressionHash = expressionHash;
         }
         this.profiler.StopProfiling("OvaleAST_CommonSubExpressionElimination");

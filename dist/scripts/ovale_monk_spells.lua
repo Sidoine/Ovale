@@ -353,7 +353,6 @@ SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free spec
 SpellAddBuff(blackout_kick_windwalker blackout_kick_buff=0 specialization=windwalker)
 SpellAddBuff(blackout_kick_windwalker teachings_of_the_monastery_buff=0 specialization=mistweaver)
 SpellAddTargetDebuff(blackout_kick_windwalker mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(blackout_kick_windwalker swift_roundhouse_buff=1)
 
 Define(blackout_kick_buff 116768)
 SpellInfo(blackout_kick_buff duration=15)
@@ -525,7 +524,6 @@ SpellInfo(rising_sun_kick cd_haste=spell cd=12 chi=0 specialization=mistweaver)
 SpellRequire(rising_sun_kick chi_percent 0=buff,serenity)
 SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
 SpellAddTargetDebuff(rising_sun_kick mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(rising_sun_kick swift_roundhouse_buff=0)
 
 Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
@@ -562,8 +560,6 @@ Define(summon_black_ox_statue 115315)
 
 Define(summon_jade_serpent_statue 115313)
     SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
-
-SpellInfo(swift_roundhouse_buff max_stacks=2)
 
 Define(teachings_of_the_monastery 116645)
 Define(teachings_of_the_monastery_buff 202090)

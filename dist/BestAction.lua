@@ -748,7 +748,7 @@ __exports.OvaleBestActionClass = __class(nil, {
     GetAction = function(self, node, atTime)
         self.profiler:StartProfiling("OvaleBestAction_GetAction")
         local groupNode = node.child[1]
-        local timeSpan, element = self:Compute(groupNode, atTime)
+        local timeSpan, element = self:PostOrderCompute(groupNode, atTime)
         if element and element.type == "state" then
             local variable, value = element.positionalParams[1], element.positionalParams[2]
             local isFuture =  not timeSpan:HasTime(atTime)

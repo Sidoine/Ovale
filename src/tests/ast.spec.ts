@@ -79,6 +79,7 @@ t("ast: parse expression with a if with SpellInfo", t => {
     t.truthy(astNode);
     t.truthy(nodeList);
     t.truthy(annotation);
+    t.is(astNode.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
     t.is(astNode.type, "icon");
     const group = astNode.child[1];
     t.is(group.type, "group");
@@ -91,4 +92,22 @@ t("ast: parse expression with a if with SpellInfo", t => {
     t.is(spellNode.type, "action");
     t.is(spellNode.func, "spell");
     t.is(spellNode.rawPositionalParams[1].value, 115);
-})
+});
+
+t("ast: dedupe nodes", t => {
+    // Act
+    const astNode = t.context.ast.parseScript("AddIcon { if BuffPresent(12) Spell(15) if BuffPresent(12) Spell(16) }");
+
+    // Assert
+    t.truthy(astNode);
+    t.is(astNode.type, "script");
+    const icon = astNode.child[1];
+    t.is(icon.type, "icon");
+    const group = icon.child[1];
+    t.is(group.type, "group");
+    const firstChild = group.child[1];
+    t.is(firstChild.type, "if");
+    const secondChild = group.child[2];
+    t.is(secondChild.type, "if");
+    t.true(firstChild.child[1] === secondChild.child[1]);
+});

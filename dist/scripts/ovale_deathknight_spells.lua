@@ -835,7 +835,11 @@ Define(wraith_walk_talent_blood 15)
 Define(wraith_walk_talent 14)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(outbreak tag=main)
+    SpellInfo(outbreak tag=main)
+    
+# Misc spells
+Define(icy_citadel_expires_buff 272723)
+# TODO the end of pillar of frost triggers this buff (if icy_citadel is there) 
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")
 end
