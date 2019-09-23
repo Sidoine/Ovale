@@ -318,7 +318,7 @@ AddFunction FeralFinishersMainActions
       unless BuffPresent(iron_jaws) and SpellUsable(maim) and SpellCooldown(maim) < TimeToEnergyFor(maim)
       {
        #ferocious_bite,max_energy=1,target_if=max:druid.rip.ticks_gained_on_refresh
-       if Energy() >= 50 Spell(ferocious_bite)
+       if Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
       }
      }
     }
