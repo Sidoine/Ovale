@@ -107,7 +107,7 @@ Define(feral_frenzy 274837)
   SpellAddBuff(feral_frenzy feral_frenzy=1)
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*(25 of Spell Power)/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
-  SpellInfo(ferocious_bite energy=50 combopoints=1 gcd=1)
+  SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
