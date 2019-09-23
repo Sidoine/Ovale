@@ -29,6 +29,7 @@
    <Script file="scripts\ovale_common.lua"/>
    <Script file="scripts\index.lua"/>
    <Include file="custom\files.xml"/>
+   <Include file="hooves\files.xml"/>
    <Include file="spellhelpers\scripts.xml" />
    <Script file="Warlock.lua"/>
    <Script file="Stagger.lua"/>
