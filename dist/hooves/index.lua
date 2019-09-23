@@ -16,15 +16,12 @@ local __ovale_warrior = LibStub:GetLibrary("ovale/scripts/ovale_warrior")
 -- For every script create a new entry here.
 -- Example:
 -- local registerDruidFeralHooves = __ovale_druid.registerDruidFeralHooves
-
-
 local registerDruidFeralToast = __ovale_druid.registerDruidFeralToast
-
-
-
--- For each created register link it here to ovaleScripts.
+local registerMonkBrewmasterHooves = __ovale_monk.registerMonkBrewmasterHooves
+__exports.registerScripts = function(ovaleScripts)
+registerMonkBrewmasterHooves(ovaleScripts)
+	registerDruidFeralToast(ovaleScripts)
+	-- For each created register link it here to ovaleScripts.
 	-- Example:
 	-- registerDruidFeralHooves(ovaleScripts)
-__exports.registerScripts = function(ovaleScripts)
-	registerDruidFeralToast(ovaleScripts)
 end
