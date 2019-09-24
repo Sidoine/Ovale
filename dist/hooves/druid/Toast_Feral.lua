@@ -205,6 +205,8 @@ AddFunction FeralCooldownsMainActions
 {
  #thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
  if enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 Spell(thorns)
+ #potion,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
+ if target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } Spell(potion)
 }
 
 AddFunction FeralCooldownsMainPostConditions
@@ -233,7 +235,7 @@ AddFunction FeralCooldownsShortCdActions
 
 AddFunction FeralCooldownsShortCdPostConditions
 {
- { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns)
+ { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
 }
 
 AddFunction FeralCooldownsCdActions
@@ -254,27 +256,29 @@ AddFunction FeralCooldownsCdActions
    if BuffPresent(tigers_fury_buff) FeralUseHeartEssence()
    #incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
    if Energy() >= 30 and { SpellCooldown(tigers_fury) > 15 or BuffPresent(tigers_fury_buff) } Spell(incarnation_king_of_the_jungle)
-   #potion,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
-   if { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
-   #shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
-   if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
-   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
-   #if target.DebuffExpires(razor_coral_debuff) or target.DebuffPresent(conductive_ink_debuff) and target.TimeToHealthPercent(30) < 1.5 or not target.DebuffPresent(conductive_ink_debuff) and { target.DebuffStacks(razor_coral_debuff) >= 25 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 40 } and BuffRemaining(tigers_fury_buff) > 10 FeralUseItemActions()
-   #use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
-   #if EnergyDeficit() >= EnergyRegenRate() * 3 and BuffExpires(tigers_fury_buff) and not HasAzeriteTrait(jungle_fury_trait) FeralUseItemActions()
-   #use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
-   #if BuffPresent(tigers_fury_buff) and HasAzeriteTrait(jungle_fury_trait) FeralUseItemActions()
-   #use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
-   #if EnergyDeficit() >= 50 FeralUseItemActions()
-   #use_items,if=buff.tigers_fury.up|target.time_to_die<20
-   #if BuffPresent(tigers_fury_buff) or target.TimeToDie() < 20 FeralUseItemActions()
+
+   unless { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
+   {
+    #shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
+    if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
+    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
+    #if target.DebuffExpires(razor_coral_debuff) or target.DebuffPresent(conductive_ink_debuff) and target.TimeToHealthPercent(30) < 1.5 or not target.DebuffPresent(conductive_ink_debuff) and { target.DebuffStacks(razor_coral_debuff) >= 25 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 40 } and BuffRemaining(tigers_fury_buff) > 10 FeralUseItemActions()
+    #use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
+    #if EnergyDeficit() >= EnergyRegenRate() * 3 and BuffExpires(tigers_fury_buff) and not HasAzeriteTrait(jungle_fury_trait) FeralUseItemActions()
+    #use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
+    #if BuffPresent(tigers_fury_buff) and HasAzeriteTrait(jungle_fury_trait) FeralUseItemActions()
+    #use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
+    #if EnergyDeficit() >= 50 FeralUseItemActions()
+    #use_items,if=buff.tigers_fury.up|target.time_to_die<20
+    #if BuffPresent(tigers_fury_buff) or target.TimeToDie() < 20 FeralUseItemActions()
+   }
   }
  }
 }
 
 AddFunction FeralCooldownsCdPostConditions
 {
- { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast)
+ { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
 }
 
 ### actions.finishers
@@ -482,6 +486,8 @@ AddFunction FeralPrecombatMainActions
  if Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } Spell(regrowth)
  #cat_form
  Spell(cat_form)
+ #potion,dynamic_prepot=1
+ Spell(potion)
 }
 
 AddFunction FeralPrecombatMainPostConditions
@@ -499,7 +505,7 @@ AddFunction FeralPrecombatShortCdActions
 
 AddFunction FeralPrecombatShortCdPostConditions
 {
- Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
+ Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form) or Spell(potion)
 }
 
 AddFunction FeralPrecombatCdActions
@@ -509,10 +515,8 @@ AddFunction FeralPrecombatCdActions
   #use_item,name=azsharas_font_of_power
   #FeralUseItemActions()
 
-  unless Spell(cat_form)
+  unless Spell(cat_form) or Spell(potion)
   {
-   #potion,dynamic_prepot=1
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
    #berserk
    Spell(berserk)
   }
@@ -521,7 +525,7 @@ AddFunction FeralPrecombatCdActions
 
 AddFunction FeralPrecombatCdPostConditions
 {
- Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
+ Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form) or Spell(potion)
 }
 ]]
 		OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")

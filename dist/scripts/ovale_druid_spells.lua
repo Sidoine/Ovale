@@ -82,7 +82,7 @@ Define(bristling_fur 155835)
   SpellAddBuff(bristling_fur bristling_fur=1)
 Define(brutal_slash 202028)
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
+  #SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)
@@ -217,7 +217,7 @@ Define(lunar_strike 194153)
   SpellInfo(lunar_strike lunarpower=-12)
 Define(maim 22570)
 # Finishing move that causes Physical damage and stuns the target. Damage and duration increased per combo point:rnrn   1 point  : s2*1 damage, 1 secrn   2 points: s2*2 damage, 2 secrn   3 points: s2*3 damage, 3 secrn   4 points: s2*4 damage, 4 secrn   5 points: s2*5 damage, 5 sec
-  SpellInfo(maim energy=30 combopoints=1 cd=20 gcd=1)
+  SpellInfo(maim energy=30 combopoints=1 cd=20 gcd=1 max_combopoints=5)
   # Stunned.
   SpellAddBuff(maim maim=1)
 Define(mangle 33917)
@@ -328,12 +328,12 @@ Define(regrowth 8936)
   SpellAddBuff(regrowth regrowth=1)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 8 secrn   2 points: o1*3 over 12 secrn   3 points: o1*4 over 16 secrn   4 points: o1*5 over 20 secrn   5 points: o1*6 over 24 sec
-  SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
+  SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2 specialization=feral)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
-  SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
+#  SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
   # Damage increased 62071s1 while in Cat Form.rnEnergy regeneration increased by 62071s3.
   SpellAddBuff(savage_roar savage_roar=1)
 Define(scent_of_blood_feral 285564)
@@ -360,7 +360,7 @@ Define(shiver_venom 301576)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
-  SpellInfo(shred energy=40 gcd=1 combopoints=0)
+  SpellInfo(shred energy=40 gcd=1 combopoints=0 specialization=balance)
 Define(skull_bash 106839)
 # You charge and bash the target's skull, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
   SpellInfo(skull_bash cd=15 gcd=0 offgcd=1)
@@ -556,7 +556,7 @@ Define(growl 6795)
 Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)
-	SpellInfo(shred physical=1)
+	#SpellInfo(shred physical=1)
 
 	SpellInfo(prowl cd=10 gcd=0 offgcd=1 to_stance=druid_cat_form)
     SpellRequire(prowl unusable 1=stealthed,1)
@@ -641,7 +641,7 @@ Define(sunfire_debuff 164815)
 	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
 	#SpellInfo(ferocious_bite physical=1)
 
-	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5)
+	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5 specialization=balance)
 	SpellAddTargetDebuff(rip rip_debuff=1)
 Define(rip_debuff 1079)
 
@@ -890,7 +890,7 @@ Define(bloodtalons_buff 145152)
 	SpellDamageBuff(thrash_cat bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 	SpellDamageBuff(thrash_cat_debuff bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 
-	SpellInfo(brutal_slash energy=30 combopoints=-1 cd=8 cd_haste=melee charges=3)
+	SpellInfo(brutal_slash energy=25 combopoints=-1 cd=8 cd_haste=melee charges=3)
 	SpellInfo(brutal_slash physical=1)
 Define(omen_of_clarity 16864)
 Define(clearcasting 135700)
@@ -906,7 +906,7 @@ Define(clearcasting_buff 135700)
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot,target_health_pct,25)
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot talent=sabertooth_talent)
 
-	SpellInfo(maim energy=35 combopoints=1 max_combopoints=5 cd=20)
+	#SpellInfo(maim energy=35 combopoints=1 max_combopoints=5 cd=20)
 Define(moonfire_cat 155625)
 	SpellInfo(moonfire_cat energy=30 combopoints=-1 unusable=1)
 	SpellInfo(moonfire_cat unusable=0 if_stance=druid_cat_form specialization=feral talent=lunar_inspiration_talent)
@@ -929,7 +929,7 @@ SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungl
 	SpellInfo(rip_debuff duration=24 haste=melee tick=2 talent=!jagged_wounds_talent)
 	SpellInfo(rip_debuff duration=19.2 haste=melee tick=1.6 talent=jagged_wounds_talent)
 
-	SpellInfo(savage_roar energy=30 combopoints=1 max_combopoints=5)
+	SpellInfo(savage_roar energy=25 combopoints=1 max_combopoints=5)
 	SpellAddBuff(savage_roar savage_roar_buff=1)
 Define(savage_roar_buff 52610)
 	SpellInfo(savage_roar_buff duration=6 add_durationcp=6)
