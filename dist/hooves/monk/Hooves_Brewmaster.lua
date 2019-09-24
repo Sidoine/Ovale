@@ -173,9 +173,9 @@ AddFunction BrewmasterDefaultCdActions
  #BrewmasterInterruptActions()
  #gift_of_the_ox,if=health<health.max*0.65
  #dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down
- if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(dampen_harm)
+ #if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(dampen_harm)
  #fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
- if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm) or BuffExpires(diffuse_magic) } Spell(fortifying_brew)
+ #if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm) or BuffExpires(diffuse_magic) } Spell(fortifying_brew)
  #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
  #if target.DebuffExpires(razor_coral_debuff) or target.DebuffPresent(conductive_ink_debuff) and target.HealthPercent() < 31 or target.TimeToDie() < 20 BrewmasterUseItemActions()
  #use_items
