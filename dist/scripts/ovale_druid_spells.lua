@@ -638,7 +638,7 @@ Define(sunfire_debuff 164815)
     SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 # Feral Affinity
-	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
+	SpellInfo(ferocious_bite energy=50 max_energy=50 combopoints=1 max_combopoints=5)
 	SpellInfo(ferocious_bite physical=1)
 
 	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5)
