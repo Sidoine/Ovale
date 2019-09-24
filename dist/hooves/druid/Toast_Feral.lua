@@ -205,8 +205,7 @@ AddFunction FeralCooldownsMainActions
 {
  #thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
  if enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 Spell(thorns)
- #potion,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
- if target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } Spell(potion)
+ 
 }
 
 AddFunction FeralCooldownsMainPostConditions
@@ -235,7 +234,7 @@ AddFunction FeralCooldownsShortCdActions
 
 AddFunction FeralCooldownsShortCdPostConditions
 {
- { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
+ 
 }
 
 AddFunction FeralCooldownsCdActions
@@ -257,7 +256,7 @@ AddFunction FeralCooldownsCdActions
    #incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
    if Energy() >= 30 and { SpellCooldown(tigers_fury) > 15 or BuffPresent(tigers_fury_buff) } Spell(incarnation_king_of_the_jungle)
 
-   unless { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
+   unless { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } }
    {
     #shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
     if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
@@ -278,7 +277,7 @@ AddFunction FeralCooldownsCdActions
 
 AddFunction FeralCooldownsCdPostConditions
 {
- { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and Spell(potion)
+ { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } 
 }
 
 ### actions.finishers
@@ -487,7 +486,7 @@ AddFunction FeralPrecombatMainActions
  #cat_form
  Spell(cat_form)
  #potion,dynamic_prepot=1
- Spell(potion)
+ 
 }
 
 AddFunction FeralPrecombatMainPostConditions
@@ -505,7 +504,7 @@ AddFunction FeralPrecombatShortCdActions
 
 AddFunction FeralPrecombatShortCdPostConditions
 {
- Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form) or Spell(potion)
+ Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
 }
 
 AddFunction FeralPrecombatCdActions
@@ -515,7 +514,7 @@ AddFunction FeralPrecombatCdActions
   #use_item,name=azsharas_font_of_power
   #FeralUseItemActions()
 
-  unless Spell(cat_form) or Spell(potion)
+  unless Spell(cat_form)
   {
    #berserk
    Spell(berserk)
@@ -525,7 +524,7 @@ AddFunction FeralPrecombatCdActions
 
 AddFunction FeralPrecombatCdPostConditions
 {
- Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form) or Spell(potion)
+ Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
 }
 ]]
 		OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
