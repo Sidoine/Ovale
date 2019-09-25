@@ -227,7 +227,7 @@ Define(conductive_ink_debuff 302565)
 ###
 ### Essences
 ###
-
+#
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
     Define(concentrated_flame_burn_debuff 295368)
