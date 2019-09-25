@@ -31,7 +31,6 @@
    <Include file="custom\files.xml"/>
    <Include file="hooves\files.xml"/>
    <Include file="spellhelpers\scripts.xml" />
-   <Include file="hooves\files.xml"/>
    <Script file="Warlock.lua"/>
    <Script file="Stagger.lua"/>
    <Script file="SpellDamage.lua"/>
