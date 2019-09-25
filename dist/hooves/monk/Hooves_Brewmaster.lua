@@ -97,7 +97,6 @@ AddFunction BrewmasterDefaultMainActions
  Spell(blackout_strike)
  #keg_smash
  Spell(keg_smash)
- #
  #concentrated_flame,if=dot.concentrated_flame.remains=0
  if not target.DebuffPresent(concentrated_flame_burn_debuff) Spell(concentrated_flame_essence)
  #expel_harm,if=buff.gift_of_the_ox.stack>=3
