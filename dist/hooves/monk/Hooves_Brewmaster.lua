@@ -98,7 +98,7 @@ AddFunction BrewmasterDefaultMainActions
  #keg_smash
  Spell(keg_smash)
  #concentrated_flame,if=dot.concentrated_flame.remains=0
- if not target.DebuffRemaining(concentrated_flame_essence) > 0 Spell(concentrated_flame_essence)
+ if not target.DebuffPresent(concentrated_flame_burn_debuff) Spell(concentrated_flame_essence)
  #expel_harm,if=buff.gift_of_the_ox.stack>=3
  if BuffStacks(gift_of_the_ox) >= 3 Spell(expel_harm)
  #rushing_jade_wind,if=buff.rushing_jade_wind.down
@@ -199,7 +199,7 @@ AddFunction BrewmasterDefaultCdActions
   unless SpellCharges(ironskin_brew count=0) < 0.5 and Spell(black_ox_brew) or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) < 40 and BuffExpires(blackout_combo_buff) and not SpellCooldown(keg_smash) > 0 and Spell(black_ox_brew) or enemies(tagged=1) >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or BuffStacks(gift_of_the_ox) > 4 and Spell(expel_harm) or Spell(blackout_strike) or Spell(keg_smash) or not target.DebuffRemaining(concentrated_flame_essence) > 0 and Spell(concentrated_flame_essence)
   {
    #heart_essence,if=!essence.the_crucible_of_flame.major
-   if not AzeriteEssenceIsMajor(the_crucible_of_flame_essence_id) BrewmasterUseHeartEssence()
+   #if not AzeriteEssenceIsMajor(the_crucible_of_flame_essence_id) BrewmasterUseHeartEssence()
 
    unless BuffStacks(gift_of_the_ox) >= 3 and Spell(expel_harm) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(bloodlust) or BuffPresent(bloodlust) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or BuffStacks(gift_of_the_ox) >= 2 and Spell(expel_harm) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm)
    {

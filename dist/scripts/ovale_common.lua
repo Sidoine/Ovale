@@ -230,7 +230,7 @@ Define(conductive_ink_debuff 302565)
 
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
-    Define(concentrated_flame_burn_debuff 295377)
+    Define(concentrated_flame_burn_debuff 295368)
 Define(memory_of_lucid_dreams_essence 298357)
     SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
     Define(memory_of_lucid_dreams_essence_buff 298357)
