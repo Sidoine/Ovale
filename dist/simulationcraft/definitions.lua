@@ -126,7 +126,7 @@ __exports.classInfos = {
     }
 }
 __exports.CHARACTER_PROPERTY = {
-    ["active_enemies"] = "Enemies()",
+    ["active_enemies"] = "Enemies(tagged=1)",
     ["astral_power"] = "AstralPower()",
     ["astral_power.deficit"] = "AstralPowerDeficit()",
     ["blade_dance_worth_using"] = "0",
@@ -151,13 +151,13 @@ __exports.CHARACTER_PROPERTY = {
     ["death_sweep_worth_using"] = "0",
     ["delay"] = "0",
     ["demonic_fury"] = "DemonicFury()",
-    ["desired_targets"] = "Enemies(tagged=1)",
+    ["desired_targets"] = "5",
     ["doomguard_no_de"] = "NotDeDemons(doomguard)",
     ["dreadstalker_no_de"] = "NotDeDemons(dreadstalker)",
     ["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
     ["eclipse_change"] = "TimeToEclipse()",
     ["eclipse_energy"] = "EclipseEnergy()",
-    ["enemies"] = "Enemies()",
+    ["enemies"] = "Enemies(tagged=1)",
     ["energy"] = "Energy()",
     ["energy.deficit"] = "EnergyDeficit()",
     ["energy.max"] = "MaxEnergy()",
