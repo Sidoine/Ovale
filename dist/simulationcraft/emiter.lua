@@ -78,7 +78,7 @@ __exports.Emiter = __class(nil, {
                 local debuffName = self:Disambiguate(annotation, action .. "_debuff", className, specialization)
                 self:AddSymbol(annotation, debuffName)
                 local expressionCode = self.ovaleAst:Unparse(self:Emit(parseNode, nodeList, annotation, action))
-                code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
+                code = format("DebuffCountOnAny(%s) < Enemies(tagged=1) and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
             elseif modifier == "max_energy" then
                 local value = tonumber(self.unparser:Unparse(parseNode))
                 if value == 1 then
@@ -485,7 +485,7 @@ __exports.Emiter = __class(nil, {
                 elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
                     conditionCode = "pet.Present()"
                 elseif className == "WARLOCK" and action == "havoc" then
-                    conditionCode = "Enemies() > 1"
+                    conditionCode = "Enemies(tagged) > 1"
                 elseif className == "WARLOCK" and action == "service_pet" then
                     if annotation.pet then
                         local spellName = "service_" .. annotation.pet
@@ -1366,7 +1366,7 @@ __exports.Emiter = __class(nil, {
                 code = format("BuffStacks(%s)", name)
                 self:AddSymbol(annotation, name)
             elseif sub(operand, 1, 22) == "active_enemies_within." then
-                code = "Enemies()"
+                code = "Enemies(tagged=1)"
             elseif find(operand, "^incoming_damage_") then
                 local _seconds, measure = match(operand, "^incoming_damage_([%d]+)(m?s?)$")
                 local seconds = tonumber(_seconds)
@@ -1399,7 +1399,7 @@ __exports.Emiter = __class(nil, {
             elseif operand == "attack_haste" or operand == "stat.attack_haste" then
                 code = "100 / { 100 + MeleeAttackSpeedPercent() }"
             elseif sub(operand, 1, 13) == "spell_targets" then
-                code = "Enemies()"
+                code = "Enemies(tagged=1)"
             elseif operand == "t18_class_trinket" then
                 code = format("HasTrinket(%s)", operand)
                 self:AddSymbol(annotation, operand)
@@ -2034,7 +2034,7 @@ __exports.Emiter = __class(nil, {
             elseif className == "ROGUE" and operand == "ss_buffed" then
                 code = "False(ss_buffed)"
             elseif className == "ROGUE" and operand == "non_ss_buffed_targets" then
-                code = "Enemies() - DebuffCountOnAny(garrote_debuff)"
+                code = "Enemies(tagged=1) - DebuffCountOnAny(garrote_debuff)"
                 self:AddSymbol(annotation, "garrote_debuff")
             elseif className == "ROGUE" and operand == "ss_buffed_targets_above_pandemic" then
                 code = "0"
@@ -2231,7 +2231,7 @@ __exports.Emiter = __class(nil, {
                 end
                 local code
                 if property == "adds" then
-                    code = "Enemies()-1"
+                    code = "Enemies(tagged=1)-1"
                 elseif property == "time_to_die" then
                     code = "target.TimeToDie()"
                 elseif property == "time_to_pct_30" then
