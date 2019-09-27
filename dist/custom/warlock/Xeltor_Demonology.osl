@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerWarlockDemonologyXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_demonology"
-	local desc = "[Xel][8.2] Warlock: Demonology"
+	local desc = "[Xel][8.2.5] Warlock: Demonology"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
