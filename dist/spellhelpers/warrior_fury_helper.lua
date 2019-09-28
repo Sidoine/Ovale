@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerWarriorFuryHelper = function(OvaleScripts)
 do
 	local name = "WARRFURYhelp"
-	local desc = "[Xel][8.0] Spellhelper: Fury"
+	local desc = "[Xel][8.x] Spellhelper: Fury"
 	local code = [[
 AddIcon
 {
@@ -17,7 +17,7 @@ AddIcon
 	Texture(ability_warrior_charge) # Charge
 	Texture(ability_warrior_devastate) # Victory Rush
 	Texture(inv_axe_66) # Heroic Throw
-	
+
 	# Interrupts
 	Texture(inv_gauntlets_04) # Pummel
 	Texture(ability_golemthunderclap) # Intimidating Shout
@@ -27,13 +27,13 @@ AddIcon
 	Texture(spell_nature_ancestralguardian) # Berserker Rage
 	Texture(warrior_talent_icon_innerrage) # Recklessness
 	Texture(ability_warrior_focusedrage) # Enraged Regeneration
-	
+
 	# Utility
 	Texture(spell_shadow_deathscream) # Piercing Howl
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -44,7 +44,7 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
-	
+
 	# Talents
 	Texture(spell_impending_victory) # Impending Victory (T2) (replaces Victory Rush)
 	Texture(warrior_talent_icon_stormbolt) # Storm Bolt (T2)
@@ -67,38 +67,39 @@ AddIcon
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
 	Texture(ability_ambush) # Shadowmeld (Night Elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarf)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
