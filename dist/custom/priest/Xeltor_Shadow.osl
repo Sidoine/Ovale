@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerPriestShadowXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_shadow"
-	local desc = "[Xel][8.2] Priest: Shadow"
+	local desc = "[Xel][8.2.5] Priest: Shadow"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
