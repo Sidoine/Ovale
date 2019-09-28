@@ -310,10 +310,13 @@ Define(mindbender_discipline 123040)
 Define(penance 47540)
 	SpellInfo(penance cd=9 channel=2)
 Define(power_word_fortitude 21562)
+  SpellAddBuff(power_word_fortitude power_word_fortitude_buff=1)
+Define(power_word_fortitude_buff 21562)
+  SpellInfo(power_word_fortitude_buff duration=3600)
 Define(power_word_shield 17)
 	SpellInfo(power_word_shield cd=6 cd_haste=spell)
 	SpellInfo(power_word_shield cd=0 specialization=discipline)
-Define(power_word_solace 129250)	
+Define(power_word_solace 129250)
 	SpellInfo(power_word_solace cd=12 cd_haste=spell)
 Define(psychic_horror 64044)
 	SpellInfo(psychic_horror cd=45)
@@ -362,7 +365,7 @@ Define(shadowfiend 34433)
 	SpellInfo(shadowfiend cd=180)
 	SpellInfo(shadowfiend replaced_by=mindbender_discipline talent=disc_mindbender_talent specialization=discipline)
     SpellInfo(shadowfiend replaced_by=mindbender_shadow talent=shadow_mindbender_talent specialization=shadow)
-    
+
     SpellRequire(shadowform unusable 1=buff,voidform_buff)
 Define(shadowform_buff 232698)
 Define(shadowy_insight_buff 124430)
@@ -403,12 +406,12 @@ Define(void_bolt 205448)
 	SpellInfo(void_torrent cd=60 tag=main unusable=1)
 	SpellRequire(void_torrent unusable 0=buff,voidform_buff)
 Define(void_torrent_buff 263165) # TODO Insanity does not drain during this buff
-	SpellInfo(void_torrent_buff duration=4) 
+	SpellInfo(void_torrent_buff duration=4)
 Define(voidform 228264)
 Define(voidform_buff 194249)
 
 AddFunction CurrentInsanityDrain {
-	if BuffPresent(dispersion_buff) 0 
+	if BuffPresent(dispersion_buff) 0
 	if BuffPresent(void_torrent_buff) 0 # for some reason, this does not work as expected
 	if BuffPresent(voidform_buff) BuffStacks(voidform_buff)/2 + 9
 	0

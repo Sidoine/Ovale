@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Script file="Xeltor_Assassination.lua" />
-	<Script file="Xeltor_Outlaw.lua" />
-	<Script file="Xeltor_Subtlety.lua" />
+	<Script file="Xeltor_Assassination.osl" />
+	<Script file="Xeltor_Outlaw.osl" />
+	<Script file="Xeltor_Subtlety.osl" />
 </Ui>

@@ -370,7 +370,7 @@ Define(chi_torpedo_buff 119085)
 # SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
 Define(dance_of_chiji_buff 286587)
     SpellInfo(dance_of_chiji_buff duration=15)
-    
+
 Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
 
@@ -472,7 +472,7 @@ Define(mana_tea 197908)
 
 Define(mark_of_the_crane_debuff 228287)
 		SpellInfo(mark_of_the_crane_debuff duration=15)
-		
+
 Define(mystic_touch 8647)
 Define(mystic_touch_debuff 113746)
 
@@ -530,7 +530,7 @@ Define(rushing_jade_wind_buff 116847)
 Define(rushing_jade_wind_windwalker_buff 261715)
     SpellInfo(rushing_jade_wind_windwalker_buff tick=0.8 haste=melee)
     SpellAddBuff(rushing_jade_wind rushing_jade_wind_windwalker_buff=1 specialization=windwalker)
-    
+
 Define(song_of_chiji 198898)
 	SpellInfo(song_of_chiji cd=30)
 	SpellAddTargetDebuff(song_of_chiji song_of_chiji_debuff=1)
@@ -592,7 +592,7 @@ Define(zen_meditation 115176)
 	SpellAddBuff(zen_meditation zen_meditation_buff=1)
 Define(zen_meditation_buff 115176)
 	SpellInfo(zen_meditation_buff duration=8)
-	
+
 ## Stagger
 Define(stagger 115069)
 Define(heavy_stagger_debuff 124273)
@@ -609,6 +609,10 @@ SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_
 ## Items
 Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
+Define(cyclotronic_blast_item 167672)
+Define(cyclotronic_blast 293491)
+  SpellInfo(cyclotronic_blast cd=120)
+Define(dribbling_inkpod_item 169319)
 # SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
 
 
@@ -653,6 +657,10 @@ SpellInfo(fist_of_the_white_tiger tag=main)
 SpellInfo(ironskin_brew tag=shortcd)
 SpellInfo(purifying_brew tag=shortcd)
 SpellInfo(storm_earth_and_fire tag=cd)
+
+# traits
+Define(glory_of_the_dawn_trait 288634)
+Define(open_palm_strikes_trait 279918)
 ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end

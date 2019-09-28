@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerWarriorFuryXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_fury"
-	local desc = "[Xel][8.2] Warrior: Fury"
+	local desc = "[Xel][8.2.5] Warrior: Fury"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -23,22 +23,22 @@ AddIcon specialization=2 help=main
 		if not target.IsFriend() or target.IsPvP() InterruptActions()
 		ControlActions()
 	}
-	
-    if target.InRange(rampage) and not IsStunned() and not IsIncapacitated() and not IsFeared()
+
+  if target.InRange(rampage) and not IsStunned() and not IsIncapacitated() and not IsFeared()
 	{
 		if Spell(victory_rush) Spell(victory_rush)
 		if not target.IsFriend() and HealthPercent() < 60 and Spell(bloodthirst) Spell(enraged_regeneration)
-		
+
 		# Cooldowns
-		FuryDefaultCdActions()
-		
+		if Boss() FuryDefaultCdActions()
+
 		# Short Cooldowns
 		FuryDefaultShortCdActions()
-		
+
 		# Default rotation
 		FuryDefaultMainActions()
 	}
-	
+
 	# On the move
 	if not target.InRange(rampage) and InCombat() and not IsStunned() and not IsIncapacitated() and not IsFeared()
 	{
@@ -51,18 +51,17 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		if target.InRange(intimidating_shout) and not target.Classification(worldboss) and target.IsPvP() Spell(intimidating_shout)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
-		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
-		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.InRange(intimidating_shout) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(intimidating_shout)
+		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(quaking_palm)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(storm_bolt)
+		if target.Distance(less 10) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(shockwave)
+		if target.InRange(pummel) and target.IsInterruptible() and target.RemainingCastTime() <= GCD() Spell(pummel)
 	}
 }
 
 AddFunction ControlActions
 {
-	if { IsIncapacitated() or IsStunned() } and SpellCooldown(every_man_for_himself) <= 0 Spell(every_man_for_himself)
 	if { IsFeared() or IsIncapacitated() or IsStunned() or IsRooted() } and SpellCooldown(berserker_rage) <= 0 Spell(berserker_rage)
 	if not target.DebuffPresent(piercing_howl_debuff) and not target.IsFriend() and target.Distance(less 15) and target.IsPvP() and not target.InRange(rampage) Spell(piercing_howl)
 }
@@ -167,7 +166,7 @@ AddFunction FuryDefaultCdActions
 
    unless Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
    {
-    #use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral.up|(target.health.pct<30.1&debuff.conductive_ink.up)|(!debuff.conductive_ink.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    #use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
     if not target.DebuffPresent(razor_coral_debuff) or target.HealthPercent() < 30.1 and target.DebuffPresent(conductive_ink_debuff) or not target.DebuffPresent(conductive_ink_debuff) and BuffPresent(memory_of_lucid_dreams_essence_buff) or PreviousGCDSpell(guardian_of_azeroth count=2) or PreviousGCDSpell(recklessness count=2) and not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) and not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) FuryUseItemActions()
     #blood_fury
     Spell(blood_fury_ap)

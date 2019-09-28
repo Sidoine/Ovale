@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerPriestShadowXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_shadow"
-	local desc = "[Xel][8.2] Priest: Shadow"
+	local desc = "[Xel][8.2.5] Priest: Shadow"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -14,13 +14,13 @@ AddIcon specialization=3 help=main
 {
 	if not mounted() and not PlayerIsResting() and not Dead() and not IsDead()
 	{
-		if BuffExpires(power_word_fortitude_buff) and { not target.Present() or not target.IsFriend() } Spell(power_word_fortitude)
+		if not BuffPresent(power_word_fortitude_buff) and { not target.Present() or not target.IsFriend() } Spell(power_word_fortitude)
 		#shadowform,if=!buff.shadowform.up
 		if not BuffPresent(shadowform_buff) Spell(shadowform)
 	}
-	
+
 	if InCombat() InterruptActions()
-	
+
 	if InCombat() and HasFullControl() and target.InRange(vampiric_touch)
 	{
 		if Speed() == 0 or CanMove() > 0
@@ -29,7 +29,7 @@ AddIcon specialization=3 help=main
 			ShadowDefaultShortCdActions()
 			ShadowDefaultMainActions()
 		}
-		
+
 		if Speed() > 0
 		{
 			#shadow_word_pain,moving=1,cycle_targets=1
