@@ -406,10 +406,10 @@ __exports.Emiter = __class(nil, {
                 elseif className == "MONK" and action == "nimble_brew" then
                     conditionCode = "IsFeared() or IsRooted() or IsStunned()"
                 elseif className == "MONK" and action == "storm_earth_and_fire" then
-                    conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
+                    conditionCode = "not BuffPresent(storm_earth_and_fire_buff)"
                     annotation[action] = className
                 elseif className == "MONK" and action == "touch_of_death" then
-                    conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+                    conditionCode = "(not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
                     annotation[action] = className
                     annotation.opt_touch_of_death_on_elite_only = "MONK"
                     self:AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")

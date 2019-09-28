@@ -462,25 +462,12 @@ __exports.OPTIONAL_SKILLS = {
     ["time_warp"] = {
         class = "MAGE"
     },
-    ["storm_earth_and_fire"] = {
-        class = "MONK",
-        default = true
-    },
-    ["chi_burst"] = {
-        class = "MONK",
-        default = true
-    },
     ["touch_of_karma"] = {
         class = "MONK",
         default = false
     },
     ["flying_serpent_kick"] = {
         class = "MONK",
-        default = true
-    },
-    ["vanish"] = {
-        class = "ROGUE",
-        specialization = "assassination",
         default = true
     },
     ["blade_flurry"] = {
