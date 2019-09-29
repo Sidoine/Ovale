@@ -240,9 +240,9 @@ AddFunction FeralCooldownsShortCdPostConditions
 AddFunction FeralCooldownsCdActions
 {
  #berserk,if=energy>=30&(cooldown.tigers_fury.remains>5|buff.tigers_fury.up)
- if Energy() >= 30 and { SpellCooldown(tigers_fury) > 5 or BuffPresent(tigers_fury_buff) } Spell(berserk)
+ if Energy() >= 30 and { SpellCooldown(tigers_fury) > 5 or BuffPresent(tigers_fury_buff) } and CheckBoxOn(UseCooldowns) Spell(berserk)
  #berserking
- Spell(berserking)
+ if CheckBoxOn(UseCooldowns) Spell(berserking)
 
  unless { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force)
  {
@@ -517,7 +517,7 @@ AddFunction FeralPrecombatCdActions
   unless Spell(cat_form)
   {
    #berserk
-   Spell(berserk)
+   if CheckBoxOn(UseCooldowns) Spell(berserk)
   }
  }
 }
@@ -526,6 +526,9 @@ AddFunction FeralPrecombatCdPostConditions
 {
  Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
 }
+
+AddCheckBox(UseCooldowns L(Cooldowns))
+
 ]]
 		OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
 	end
