@@ -100,7 +100,7 @@ AddFunction GuardianDefaultMainActions
   #pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
   if target.DebuffStacks(thrash_bear_debuff) == SpellData(thrash_bear_debuff max_stacks) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) Spell(pulverize)
   #moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
-  if target.DebuffRefreshable(moonfire_debuff) and enemies(tagged=1) < 2 Spell(moonfire)
+  if target.DebuffRefreshable(moonfire) and enemies(tagged=1) < 2 Spell(moonfire)
   #swipe_bear,if=buff.incarnation.down&active_enemies>4
   if BuffExpires(incarnation_guardian_of_ursoc_buff) and enemies(tagged=1) > 4 Spell(swipe_bear)
   #mangle,if=dot.thrash_bear.ticking
