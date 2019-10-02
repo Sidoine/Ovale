@@ -370,6 +370,22 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, "regrowth")
                 elseif className == "HUNTER" and action == "kill_command" then
                     conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+                elseif className == "HUNTER" and action == "aspect_of_the_eagle" then
+                    conditionCode = "{ not target.InRange(harpoon) or SpellCooldown(harpoon) > GCD() } and SpellCooldown(harpoon) <= 15 and Boss()"
+                elseif className == "HUNTER" and action == "carve" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "mongoose_bite" then
+                  conditionCode = "target.InRange(mongoose_bite)"
+                elseif className == "HUNTER" and action == "butchery" then
+                  conditionCode = "target.InRange(butchery)"
+                elseif className == "HUNTER" and action == "raptor_strike" then
+                  conditionCode = "target.InRange(raptor_strike)"
+                elseif className == "HUNTER" and action == "flanking_strike" then
+                  conditionCode = "target.InRange(flanking_strike)"
+                elseif className == "HUNTER" and action == "steel_trap" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "harpoon" then
+                  conditionCode = "target.InRange(harpoon)"
                 elseif className == "MAGE" and action == "arcane_brilliance" then
                     conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
                 elseif className == "MAGE" and find(action, "pet_") then
