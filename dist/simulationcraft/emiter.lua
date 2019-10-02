@@ -254,14 +254,14 @@ __exports.Emiter = __class(nil, {
         self.EmitVariableAdd = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
         self.EmitVariableSub = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
@@ -370,6 +370,22 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, "regrowth")
                 elseif className == "HUNTER" and action == "kill_command" then
                     conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+                elseif className == "HUNTER" and action == "aspect_of_the_eagle" then
+                    conditionCode = "{ not target.InRange(harpoon) or SpellCooldown(harpoon) > GCD() } and SpellCooldown(harpoon) <= 15 and Boss()"
+                elseif className == "HUNTER" and action == "carve" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "mongoose_bite" then
+                  conditionCode = "target.InRange(mongoose_bite)"
+                elseif className == "HUNTER" and action == "butchery" then
+                  conditionCode = "target.InRange(butchery)"
+                elseif className == "HUNTER" and action == "raptor_strike" then
+                  conditionCode = "target.InRange(raptor_strike)"
+                elseif className == "HUNTER" and action == "flanking_strike" then
+                  conditionCode = "target.InRange(flanking_strike)"
+                elseif className == "HUNTER" and action == "steel_trap" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "harpoon" then
+                  conditionCode = "target.InRange(harpoon)"
                 elseif className == "MAGE" and action == "arcane_brilliance" then
                     conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
                 elseif className == "MAGE" and find(action, "pet_") then
@@ -1899,6 +1915,10 @@ __exports.Emiter = __class(nil, {
                     end
                     ok, node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
                 end
+            elseif className == "DEATHKNIGHT" and operand == "death_knight.disable_aotd" then
+                code = "True(disable_aotd)"
+            elseif className == "DEATHKNIGHT" and operand == "pet.apoc_ghoul.active" then
+                code = "SpellCooldown(apocalypse) >= SpellCooldownDuration(apocalypse) - 15"
             elseif className == "DEMONHUNTER" and operand == "buff.metamorphosis.extended_by_demonic" then
                 code = "not BuffExpires(extended_by_demonic_buff)"
             elseif className == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
@@ -2426,7 +2446,7 @@ __exports.Emiter = __class(nil, {
         if info then
             return info[1], info[2]
         end
-        return 
+        return
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")

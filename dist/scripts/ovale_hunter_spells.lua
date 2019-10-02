@@ -404,6 +404,7 @@ SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_
 SpellList(unbridled_fury unbridled_fury_0 unbridled_fury_1)
 SpellList(unerring_vision_buff unerring_vision_buff_0 unerring_vision_buff_1)
 SpellList(latent_poison latent_poison_0 latent_poison_1)
+SpellList(latent_poison_debuff latent_poison_0 latent_poison_1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
 Define(alpha_predator_talent 3) #22296
@@ -453,6 +454,7 @@ Define(wildfire_infusion_talent 20) #22301
 Define(azsharas_font_of_power_item 169314)
 Define(cyclotronic_blast_item 167672)
 Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
+Define(dribbling_inkpod_item 169319)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
 Define(rapid_reload_trait 278530)
@@ -478,7 +480,7 @@ Define(a_murder_of_crows_debuff 131894)
 	SpellAddBuff(aimed_shot trick_shots_buff=-1)
 	SpellAddBuff(aimed_shot master_marksman_buff=1 talent=master_marksman_talent)
 
-	
+
 	SpellAddBuff(arcane_shot precise_shots_buff=-1)
 	SpellAddBuff(arcane_shot master_marksman_buff=-1 talent=master_marksman_talent)
 Define(aspect_of_the_cheetah 186257)
@@ -594,7 +596,7 @@ Define(intimidation 19577)
 	SpellInfo(intimidation cd=60)
 
 	SpellInfo(kill_command cd=7.5 cd_haste=ranged focus=30)
-	# Unsure of right syntax for following line.  
+	# Unsure of right syntax for following line.
 	# cobra_shot resets kill_command upon impact with the target when bestial_wrath_buff is up
 	# SpellRequire(kill_command cd_percent 0=spell,cobra_shot if_buff=bestial_wrath_buff)
 Define(kill_command_sv 259489)
@@ -715,7 +717,7 @@ Define(wing_clip_debuff 195645)
 	SpellInfo(wing_clip_debuff duration=15)
 
 	Define(reckless_force_counter 302917)
-	
+
 
 #Pet Spells
 Define(heart_of_the_phoenix 55709)
