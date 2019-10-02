@@ -254,14 +254,14 @@ __exports.Emiter = __class(nil, {
         self.EmitVariableAdd = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
         self.EmitVariableSub = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
@@ -1899,6 +1899,10 @@ __exports.Emiter = __class(nil, {
                     end
                     ok, node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
                 end
+            elseif className == "DEATHKNIGHT" and operand == "death_knight.disable_aotd" then
+                code = "True(disable_aotd)"
+            elseif className == "DEATHKNIGHT" and operand == "pet.apoc_ghoul.active" then
+                code = "SpellCooldown(apocalypse) >= SpellCooldownDuration(apocalypse) - 15"
             elseif className == "DEMONHUNTER" and operand == "buff.metamorphosis.extended_by_demonic" then
                 code = "not BuffExpires(extended_by_demonic_buff)"
             elseif className == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
@@ -2426,7 +2430,7 @@ __exports.Emiter = __class(nil, {
         if info then
             return info[1], info[2]
         end
-        return 
+        return
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
