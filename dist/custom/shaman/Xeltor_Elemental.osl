@@ -29,13 +29,13 @@ AddIcon specialization=1 help=main
 		if PreviousGCDSpell(lava_burst) and not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
 		
 		# Cooldowns
-		if Boss() and { Speed() == 0 or CanMove() > 0 } ElementalDefaultCdActions()
+		if Boss() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } ElementalDefaultCdActions()
 		
 		# Short Cooldowns
-		if Speed() == 0 or CanMove() > 0 ElementalDefaultShortCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) ElementalDefaultShortCdActions()
 		
 		# Default rotation
-		if Speed() == 0 or CanMove() > 0 ElementalDefaultMainActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) ElementalDefaultMainActions()
 
 		#lava_burst,moving=1,if=talent.ascendance.enabled
 		if Speed() > 0 and Talent(ascendance_talent) Spell(lava_burst)
@@ -63,7 +63,7 @@ AddFunction InterruptActions
 AddFunction SaveActions
 {
 	if HealthPercent() <= 50 and InCombat() Spell(astral_shift)
-	if { Speed() == 0 or CanMove() > 0 } and HealthPercent() <= 50 and ManaPercent() > 25 and CanCast(healing_surge) and { not InCombat() or target.istargetingplayer() } Spell(healing_surge)
+	if { Speed() == 0 or BuffPresent(movement_allowed_buff) } and HealthPercent() <= 50 and ManaPercent() > 25 and CanCast(healing_surge) and { not InCombat() or target.istargetingplayer() } Spell(healing_surge)
 	if not BuffPresent(earth_shield_buff) and HealthPercent() < 100 and target.istargetingplayer() Spell(earth_shield)
 	if target.istargetingplayer() and HealthPercent() < 50 Spell(earth_elemental)
 }

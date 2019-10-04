@@ -33,13 +33,13 @@ AddIcon specialization=1 help=main
 		if pet.CreatureFamily(Voidwalker) or pet.CreatureFamily(Voidlord) PetStuff()
 
 		# Cooldowns
-		if Boss() and { Speed() == 0 or CanMove() > 0 } AfflictionDefaultCdActions()
+		if Boss() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } AfflictionDefaultCdActions()
 
 		# Short Cooldowns
-		if Speed() == 0 or CanMove() > 0 AfflictionDefaultShortCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) AfflictionDefaultShortCdActions()
 
 		# Default rotation
-		if Speed() == 0 or CanMove() > 0 AfflictionDefaultMainActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) AfflictionDefaultMainActions()
 
 		#shadow_bolt,if=buff.movement.up&buff.nightfall.remains
 		if Speed() > 0 and BuffPresent(nightfall_buff) Spell(shadow_bolt_affliction)
@@ -65,7 +65,7 @@ AddFunction InterruptActions
 
 AddFunction PetStuff
 {
-	if pet.Health() < pet.HealthMissing() and pet.Present() and { Speed() == 0 or CanMove() > 0 } and SpellUsable(health_funnel) Texture(ability_deathwing_bloodcorruption_death)
+	if pet.Health() < pet.HealthMissing() and pet.Present() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } and SpellUsable(health_funnel) Texture(ability_deathwing_bloodcorruption_death)
 }
 
 AddFunction SaveActions
