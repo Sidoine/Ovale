@@ -33,7 +33,7 @@ if not BuffPresent(travel_form)
 if target.Present() and not target.IsDead() and not target.IsFriend()
 {
 #bloodtalons_talent
-#if Talent(bloodtalons_talent) and BuffRemains(bloodtalons_buff) <= CastTime(regrowth) and not InCombat() and { Speed() == 0 or CanMove() > 0 } Spell(regrowth)
+#if Talent(bloodtalons_talent) and BuffRemains(bloodtalons_buff) <= CastTime(regrowth) and not InCombat() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(regrowth)
 #cat_form
 #if not BuffPresent(cat_form) Spell(cat_form)
 #prowl

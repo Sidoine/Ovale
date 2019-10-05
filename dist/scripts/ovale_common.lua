@@ -203,7 +203,7 @@ Define(archmages_greater_incandescence_str_buff 177175)
 	SpellInfo(archmages_greater_incandescence_str_buff duration=10)
 Define(archmages_incandescence_str_buff 177160)
 	SpellInfo(archmages_incandescence_str_buff duration=10)
-	
+
 ###
 ### Legendary Shared legiondaries
 ###
@@ -212,12 +212,12 @@ Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 Define(ashvanes_razor_coral_item 169311)
-	
+
 ### Missing items (temporary)
 Define(dread_combatants_insignia_item 161813)
 Define(dread_combatants_medallion_item 161811)
 
-### Missing spells 
+### Missing spells
 Define(trinket_grongs_primal_rage_cooldown_buff 288267)
 Define(trinket_ashvanes_razor_coral_cooldown_buff 303568)
 Define(hyperthread_wristwraps_300142 300142)
@@ -321,18 +321,18 @@ Define(fireblood 265221)
 	SpellInfo(fireblood cd=120)
 Define(ancestral_call 274738)
 	SpellInfo(ancestral_call cd=120)
-Define(arcane_pulse 260364)  
+Define(arcane_pulse 260364)
 	SpellInfo(arcane_pulse cd=180)
 	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
 Define(arcane_pulse_debuff 260369)
 	SpellInfo(arcane_pulse_debuff duration=12)
-	
+
 ###
 ### Boss Spells
 ###
 Define(misery_debuff 243961)
 	SpellInfo(misery_debuff duration=7)
-	
+
 ###
 ### Healing
 ###
@@ -346,7 +346,7 @@ AddFunction UseRacialSurvivalActions
 AddFunction UseHealthPotions
 {
 	Item(healthstone usable=1)
-	if CheckBoxOn(opt_use_consumables) 
+	if CheckBoxOn(opt_use_consumables)
 	{
         Item(coastal_healing_potion usable=1)
         Item(astral_healing_potion usable=1)
@@ -358,20 +358,6 @@ AddFunction UseHealthPotions
 ###
 ### Xel's custom stuff
 ###
-
-# Movement allowing defines
-Define(stellar_drift_buff 202461)
-Define(norgannons_foresight_buff 236380)
-Define(spiritwalkers_grace_buff 79206)
-
-AddFunction CanMove
-{
-	if BuffPresent(norgannons_foresight_buff) 1
-    if BuffPresent(stellar_drift_buff) 1
-	if BuffPresent(ice_floes_buff) 1
-	if BuffPresent(spiritwalkers_grace_buff) 1
-    0
-}
 
 AddFunction Boss
 {

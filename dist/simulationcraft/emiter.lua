@@ -368,6 +368,10 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, "bloodtalons_talent")
                     self:AddSymbol(annotation, "bloodtalons_buff")
                     self:AddSymbol(annotation, "regrowth")
+                elseif className == "DRUID" and action == "solar_wrath_balance" and specialization == "balance" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "DRUID" and action == "lunar_strike" and specialization == "balance" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "HUNTER" and action == "kill_command" then
                     conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
                 elseif className == "HUNTER" and action == "aspect_of_the_eagle" then
@@ -2450,6 +2454,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("bloodlust", "burst_haste")
         self:AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
         self:AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
         self:AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
