@@ -213,7 +213,8 @@ __exports.Generator = __class(nil, {
             insert(interrupts, {
                 name = "quaking_palm",
                 stun = 1,
-                order = 98
+                order = 98,
+                extraCondition = "target.RemainingCastTime() <= CastTime(quaking_palm) + GCD()"
             })
         end
         if self.ovaleData.TAUREN_CLASSES[className] then
@@ -221,7 +222,8 @@ __exports.Generator = __class(nil, {
                 name = "war_stomp",
                 stun = 1,
                 order = 99,
-                range = "target.Distance(less 5)"
+                range = "target.Distance(less 5)",
+                extraCondition = "target.RemainingCastTime() <= CastTime(war_stomp) + GCD()"
             })
         end
         if annotation.mind_freeze == "DEATHKNIGHT" then
@@ -229,13 +231,15 @@ __exports.Generator = __class(nil, {
                 name = "mind_freeze",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(mind_freeze) + GCD()"
             })
             if annotation.specialization == "blood" or annotation.specialization == "unholy" then
                 insert(interrupts, {
                     name = "asphyxiate",
                     stun = 1,
-                    order = 20
+                    order = 20,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(asphyxiate) + GCD()"
                 })
             end
             if annotation.specialization == "frost" then
@@ -243,7 +247,8 @@ __exports.Generator = __class(nil, {
                     name = "blinding_sleet",
                     disorient = 1,
                     range = "target.Distance(less 12)",
-                    order = 20
+                    order = 20,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(blinding_sleet) + GCD()"
                 })
             end
         end
@@ -252,25 +257,29 @@ __exports.Generator = __class(nil, {
                 name = "disrupt",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(disrupt) + GCD()"
             })
             insert(interrupts, {
                 name = "imprison",
                 cc = 1,
                 extraCondition = "target.CreatureType(Demon Humanoid Beast)",
-                order = 999
+                order = 999,
+                extraCondition = "target.RemainingCastTime() <= CastTime(imprison) + GCD()"
             })
             if annotation.specialization == "havoc" then
                 insert(interrupts, {
                     name = "chaos_nova",
                     stun = 1,
                     range = "target.Distance(less 8)",
-                    order = 100
+                    order = 100,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(chaos_nova) + GCD()"
                 })
                 insert(interrupts, {
                     name = "fel_eruption",
                     stun = 1,
-                    order = 20
+                    order = 20,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(fel_eruption) + GCD()"
                 })
             end
             if annotation.specialization == "vengeance" then
@@ -279,21 +288,21 @@ __exports.Generator = __class(nil, {
                     interrupt = 1,
                     order = 110,
                     range = "",
-                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"
+                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining())) and target.RemainingCastTime() <= CastTime(sigil_of_silence) + GCD()"
                 })
                 insert(interrupts, {
                     name = "sigil_of_misery",
                     disorient = 1,
                     order = 120,
                     range = "",
-                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"
+                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining())) and target.RemainingCastTime() <= CastTime(sigil_of_misery) + GCD()"
                 })
                 insert(interrupts, {
                     name = "sigil_of_chains",
                     pull = 1,
                     order = 130,
                     range = "",
-                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"
+                    extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining())) and target.RemainingCastTime() <= CastTime(sigil_of_chains) + GCD()"
                 })
             end
         end
@@ -303,7 +312,8 @@ __exports.Generator = __class(nil, {
                     name = "skull_bash",
                     interrupt = 1,
                     worksOnBoss = 1,
-                    order = 10
+                    order = 10,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(skull_bash) + GCD()"
                 })
             end
             if annotation.specialization == "balance" then
@@ -311,33 +321,38 @@ __exports.Generator = __class(nil, {
                     name = "solar_beam",
                     interrupt = 1,
                     worksOnBoss = 1,
-                    order = 10
+                    order = 10,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(solar_beam) + GCD()"
                 })
             end
             insert(interrupts, {
                 name = "mighty_bash",
                 stun = 1,
-                order = 20
+                order = 20,
+                extraCondition = "target.RemainingCastTime() <= CastTime(mighty_bash) + GCD()"
             })
             if annotation.specialization == "guardian" then
                 insert(interrupts, {
                     name = "incapacitating_roar",
                     incapacitate = 1,
                     order = 30,
-                    range = "target.Distance(less 10)"
+                    range = "target.Distance(less 10)",
+                    extraCondition = "target.RemainingCastTime() <= CastTime(incapacitating_roar) + GCD()"
                 })
             end
             insert(interrupts, {
                 name = "typhoon",
                 knockback = 1,
                 order = 110,
-                range = "target.Distance(less 15)"
+                range = "target.Distance(less 15)",
+                extraCondition = "target.RemainingCastTime() <= CastTime(typhoon) + GCD()"
             })
             if annotation.specialization == "feral" then
                 insert(interrupts, {
                     name = "maim",
                     stun = 1,
-                    order = 40
+                    order = 40,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(maim) + GCD()"
                 })
             end
         end
@@ -346,7 +361,8 @@ __exports.Generator = __class(nil, {
                 name = "counter_shot",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(counter_shot) + GCD()"
             })
         end
         if annotation.muzzle == "HUNTER" then
@@ -354,7 +370,8 @@ __exports.Generator = __class(nil, {
                 name = "muzzle",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(muzzle) + GCD()"
             })
         end
         if annotation.counterspell == "MAGE" then
@@ -362,7 +379,8 @@ __exports.Generator = __class(nil, {
                 name = "counterspell",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(counterspell) + GCD()"
             })
         end
         if annotation.spear_hand_strike == "MONK" then
@@ -370,18 +388,21 @@ __exports.Generator = __class(nil, {
                 name = "spear_hand_strike",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(spear_hand_strike) + GCD()"
             })
             insert(interrupts, {
                 name = "paralysis",
                 cc = 1,
-                order = 999
+                order = 999,
+                extraCondition = "target.RemainingCastTime() <= CastTime(paralysis) + GCD()"
             })
             insert(interrupts, {
                 name = "leg_sweep",
                 stun = 1,
                 order = 30,
-                range = "target.Distance(less 5)"
+                range = "target.Distance(less 5)",
+                extraCondition = "target.RemainingCastTime() <= CastTime(leg_sweep) + GCD()"
             })
         end
         if annotation.rebuke == "PALADIN" then
@@ -389,25 +410,29 @@ __exports.Generator = __class(nil, {
                 name = "rebuke",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(rebuke) + GCD()"
             })
             insert(interrupts, {
                 name = "hammer_of_justice",
                 stun = 1,
-                order = 20
+                order = 20,
+                extraCondition = "target.RemainingCastTime() <= CastTime(hammer_of_justice) + GCD()"
             })
             if annotation.specialization == "protection" then
                 insert(interrupts, {
                     name = "avengers_shield",
                     interrupt = 1,
                     worksOnBoss = 1,
-                    order = 15
+                    order = 15,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(hammer_of_justice) + GCD()"
                 })
                 insert(interrupts, {
                     name = "blinding_light",
                     disorient = 1,
                     order = 50,
-                    range = "target.Distance(less 10)"
+                    range = "target.Distance(less 10)",
+                    extraCondition = "target.RemainingCastTime() <= CastTime(blinding_light) + GCD()"
                 })
             end
         end
@@ -416,13 +441,14 @@ __exports.Generator = __class(nil, {
                 name = "silence",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(silence) + GCD()"
             })
             insert(interrupts, {
                 name = "mind_bomb",
                 stun = 1,
                 order = 30,
-                extraCondition = "target.RemainingCastTime() > 2"
+                extraCondition = "target.RemainingCastTime() > 2 and target.RemainingCastTime() <= CastTime(fel_eruption) + GCD()"
             })
         end
         if annotation.kick == "ROGUE" then
@@ -430,24 +456,27 @@ __exports.Generator = __class(nil, {
                 name = "kick",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(kick) + GCD()"
             })
             insert(interrupts, {
                 name = "cheap_shot",
                 stun = 1,
-                order = 20
+                order = 20,
+                extraCondition = "target.RemainingCastTime() <= CastTime(cheap_shot) + GCD()"
             })
             if annotation.specialization == "outlaw" then
                 insert(interrupts, {
                     name = "between_the_eyes",
                     stun = 1,
                     order = 30,
-                    extraCondition = "ComboPoints() >= 1"
+                    extraCondition = "ComboPoints() >= 1 and target.RemainingCastTime() <= CastTime(between_the_eyes) + GCD()"
                 })
                 insert(interrupts, {
                     name = "gouge",
                     incapacitate = 1,
-                    order = 100
+                    order = 100,
+                    extraCondition = "target.RemainingCastTime() <= CastTime(gouge) + GCD()"
                 })
             end
             if annotation.specialization == "assassination" or annotation.specialization == "subtlety" then
@@ -455,7 +484,7 @@ __exports.Generator = __class(nil, {
                     name = "kidney_shot",
                     stun = 1,
                     order = 30,
-                    extraCondition = "ComboPoints() >= 1"
+                    extraCondition = "ComboPoints() >= 1 and target.RemainingCastTime() <= CastTime(kidney_shot) + GCD()"
                 })
             end
         end
@@ -464,14 +493,16 @@ __exports.Generator = __class(nil, {
                 name = "wind_shear",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(wind_shear) + GCD()"
             })
             if annotation.specialization == "enhancement" then
                 insert(interrupts, {
                     name = "sundering",
                     knockback = 1,
                     order = 20,
-                    range = "target.Distance(less 5)"
+                    range = "target.Distance(less 5)",
+                    extraCondition = "target.RemainingCastTime() <= CastTime(sundering) + GCD()"
                 })
             end
             insert(interrupts, {
@@ -479,13 +510,13 @@ __exports.Generator = __class(nil, {
                 stun = 1,
                 order = 30,
                 range = "",
-                extraCondition = "target.RemainingCastTime() > 2"
+                extraCondition = "target.RemainingCastTime() > 2 and target.RemainingCastTime() <= CastTime(cheap_shot) + GCD()"
             })
             insert(interrupts, {
                 name = "hex",
                 cc = 1,
                 order = 100,
-                extraCondition = "target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"
+                extraCondition = "target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) and target.RemainingCastTime() <= CastTime(hex) + GCD()"
             })
         end
         if annotation.pummel == "WARRIOR" then
@@ -493,26 +524,30 @@ __exports.Generator = __class(nil, {
                 name = "pummel",
                 interrupt = 1,
                 worksOnBoss = 1,
-                order = 10
+                order = 10,
+                extraCondition = "target.RemainingCastTime() <= CastTime(pummel) + GCD()"
             })
             insert(interrupts, {
                 name = "shockwave",
                 stun = 1,
                 worksOnBoss = 0,
                 order = 20,
-                range = "target.Distance(less 10)"
+                range = "target.Distance(less 10)",
+                extraCondition = "target.RemainingCastTime() <= CastTime(shockwave) + GCD()"
             })
             insert(interrupts, {
                 name = "storm_bolt",
                 stun = 1,
                 worksOnBoss = 0,
-                order = 20
+                order = 20,
+                extraCondition = "target.RemainingCastTime() <= CastTime(storm_bolt) + GCD()"
             })
             insert(interrupts, {
                 name = "intimidating_shout",
                 incapacitate = 1,
                 worksOnBoss = 0,
-                order = 100
+                order = 100,
+                extraCondition = "target.RemainingCastTime() <= CastTime(intimidating_shout) + GCD()"
             })
         end
         if #interrupts > 0 then
@@ -542,7 +577,7 @@ __exports.Generator = __class(nil, {
             local fmt = [[
                 AddFunction %sGetInMeleeRange
                 {
-                    if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
+                    if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike)
                     {
                         if target.InRange(felblade) Spell(felblade)
                         Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -720,7 +755,7 @@ __exports.Generator = __class(nil, {
             local fmt = [[
                 AddFunction %sGetInMeleeRange
                 {
-                    if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) 
+                    if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike)
                     {
                         if target.InRange(feral_lunge) Spell(feral_lunge)
                         Texture(misc_arrowlup help=L(not_in_melee_range))

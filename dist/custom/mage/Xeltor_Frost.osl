@@ -18,7 +18,7 @@ AddIcon specialization=3 help=main
 		if not BuffPresent(arcane_intellect_buff any=1) and not { target.IsFriend() or target.Present() } Spell(arcane_intellect)
 		if not target.BuffPresent(arcane_intellect_buff any=1) and target.IsFriend() Spell(arcane_intellect)
 		#summon_arcane_familiar
-		if not pet.Present() and { Speed() == 0 or CanMove() > 0 } and not Talent(lonely_winter_talent) Spell(summon_water_elemental)
+		if not pet.Present() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } and not Talent(lonely_winter_talent) Spell(summon_water_elemental)
 	}
 	
 	if InCombat() InterruptActions()
@@ -27,15 +27,15 @@ AddIcon specialization=3 help=main
 	
 	if InCombat() and target.InRange(frostbolt) and HasFullControl()
 	{
-		if BuffExpires(ice_floes_buff) and not { Speed() == 0 or CanMove() > 0 } Spell(ice_floes)
+		if BuffExpires(ice_floes_buff) and not { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(ice_floes)
 		
 		# Cooldowns
 		if Boss()
 		{
-			if Speed() == 0 or CanMove() > 0 FrostDefaultCdActions()
+			if Speed() == 0 or BuffPresent(movement_allowed_buff) FrostDefaultCdActions()
 		}
-		if Speed() == 0 or CanMove() > 0 FrostDefaultShortCdActions()
-		if Speed() == 0 or CanMove() > 0 FrostDefaultMainActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) FrostDefaultShortCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) FrostDefaultMainActions()
 		#ice_lance,moving=1
 		if Speed() > 0 and not BuffPresent(ice_floes_buff) and not SpellCharges(ice_floes) Spell(ice_lance)
 	}

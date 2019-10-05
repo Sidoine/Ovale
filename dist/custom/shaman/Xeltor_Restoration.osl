@@ -146,7 +146,7 @@ AddFunction Cooldowns
 	# Ancestral Guidance
 	if CheckBoxOn(hard) or Talent(cloudburst_totem_talent) and TotemPresent(cloudburst_totem) or not Talent(cloudburst_totem_talent) and { not UnitInRaid() and PartyMembersInRange(riptide) >= 3 and PartyMembersWithHealthPercent(less 60) >= 3 or UnitInRaid() and RaidMembersInRange(riptide) >= 6 and RaidMembersWithHealthPercent(less 60) >= 6 } Spell(ancestral_guidance)
 	# Gift of the Queen
-	if { Speed() == 0 or CanMove() } and { CheckBoxOn(hard) or Talent(cloudburst_totem_talent) and TotemPresent(cloudburst_totem) or not Talent(cloudburst_totem_talent) and { not UnitInRaid() and PartyMembersInRange(riptide) >= 3 and PartyMembersWithHealthPercent(less 60) >= 3 or UnitInRaid() and RaidMembersInRange(riptide) >= 6 and RaidMembersWithHealthPercent(less 60) >= 6 } } Spell(gift_of_the_queen)
+	if { Speed() == 0 or BuffPresent(movement_allowed_buff) } and { CheckBoxOn(hard) or Talent(cloudburst_totem_talent) and TotemPresent(cloudburst_totem) or not Talent(cloudburst_totem_talent) and { not UnitInRaid() and PartyMembersInRange(riptide) >= 3 and PartyMembersWithHealthPercent(less 60) >= 3 or UnitInRaid() and RaidMembersInRange(riptide) >= 6 and RaidMembersWithHealthPercent(less 60) >= 6 } } Spell(gift_of_the_queen)
 	# Healing Tide Totem
 	if not UnitInRaid() and PartyMembersWithHealthPercent(less 60) >= 3 and PartyMembersInRange(riptide) >= 3 Spell(healing_tide_totem)
 	# Healing Stream Totem
@@ -157,13 +157,13 @@ AddFunction Rotation
 {
 	# Keep up tidal wave, always.
 	if not target.BuffPresent(riptide_buff) and BuffStacks(tidal_wave_buff) < 2 and target.HealthPercent() < 100 or target.HealthPercent() <= 25 Spell(riptide)
-	if BuffStacks(tidal_wave_buff) == 0 and SpellCooldown(riptide) > CastTime(chain_heal) + GCD() and target.HealthPercent() < 100 and { Speed() == 0 or CanMove() } Spell(chain_heal)
+	if BuffStacks(tidal_wave_buff) == 0 and SpellCooldown(riptide) > CastTime(chain_heal) + GCD() and target.HealthPercent() < 100 and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(chain_heal)
 
 	# Routine
-	if Talent(high_tide_talent) and target.HealthPercent() < 80 and { PartyMembersWithHealthPercent(less 80) >= 3 or RaidMembersWithHealthPercent(less 80) >= 5 } and { Speed() == 0 or CanMove() } Spell(chain_heal)
-	if not Talent(high_tide_talent) and target.HealthPercent() < 60 and { PartyMembersWithHealthPercent(less 80) >= 3 or RaidMembersWithHealthPercent(less 80) >= 5 } and { Speed() == 0 or CanMove() } Spell(chain_heal)
-	if target.HealthPercent() < 60 and BuffStacks(tidal_wave_buff) >= 1 and { Speed() == 0 or CanMove() } Spell(healing_surge)
-	if target.HealthPercent() < 100 and { Speed() == 0 or CanMove() } Spell(healing_wave)
+	if Talent(high_tide_talent) and target.HealthPercent() < 80 and { PartyMembersWithHealthPercent(less 80) >= 3 or RaidMembersWithHealthPercent(less 80) >= 5 } and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(chain_heal)
+	if not Talent(high_tide_talent) and target.HealthPercent() < 60 and { PartyMembersWithHealthPercent(less 80) >= 3 or RaidMembersWithHealthPercent(less 80) >= 5 } and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(chain_heal)
+	if target.HealthPercent() < 60 and BuffStacks(tidal_wave_buff) >= 1 and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(healing_surge)
+	if target.HealthPercent() < 100 and { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(healing_wave)
 }
 ]]
 

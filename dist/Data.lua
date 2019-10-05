@@ -274,6 +274,12 @@ __exports.OvaleDataClass = __class(nil, {
             },
             raid_movement_buff = {
                 [106898] = true
+            },
+            movement_allowed_buff = {
+                [202461] = true,
+                [236380] = true,
+                [79206] = true,
+                [108839] = true
             }
         }
         self.DEFAULT_SPELL_LIST = {}

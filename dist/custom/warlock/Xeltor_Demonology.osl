@@ -34,7 +34,7 @@ AddIcon specialization=2 help=main
 
 		# Control stuff
 
-		if Speed() == 0 or CanMove() > 0
+		if Speed() == 0 or BuffPresent(movement_allowed_buff)
 		{
 			# Cooldowns
 			if Boss() DemonologyDefaultCdActions()
@@ -63,7 +63,7 @@ AddFunction InterruptActions
 
 AddFunction PetStuff
 {
-	if not pet.Present() and { Speed() == 0 or CanMove() > 0 } and SpellUsable(summon_felguard) Texture(spell_warlock_summonwrathguard)
+	if not pet.Present() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } and SpellUsable(summon_felguard) Texture(spell_warlock_summonwrathguard)
 	if pet.Health() < pet.HealthMissing() and pet.Present() and Speed() == 0 and SpellUsable(health_funnel) Texture(ability_deathwing_bloodcorruption_death)
 }
 

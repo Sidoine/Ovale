@@ -26,13 +26,13 @@ AddIcon specialization=3 help=main
 	if InCombat() and target.InRange(chaos_bolt) and HasFullControl()
     {
 		# Cooldowns
-		if Boss() and {Speed() == 0 or CanMove() > 0 } DestructionDefaultCdActions()
+		if Boss() and {Speed() == 0 or BuffPresent(movement_allowed_buff) } DestructionDefaultCdActions()
 		
 		# Short Cooldowns
-		if Speed() == 0 or CanMove() > 0 DestructionDefaultShortCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) DestructionDefaultShortCdActions()
 		
 		# Default rotation
-		if Speed() == 0 or CanMove() > 0 DestructionDefaultMainActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) DestructionDefaultMainActions()
 	}
 	
 	if not InCombat() and not mounted() OutOfCombatActions()

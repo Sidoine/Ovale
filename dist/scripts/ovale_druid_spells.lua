@@ -230,22 +230,14 @@ Define(maul 6807)
 Define(mighty_bash 5211)
   SpellInfo(mighty_bash cd=50 duration=5 interrupt=1 talent=mighty_bash_talent)
   SpellAddTargetDebuff(mighty_bash mighty_bash=1)
-Define(moonfire_debuff_0 8921)
+Define(moonfire_debuff 164812)
 # A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
-  SpellInfo(moonfire_debuff_0 rage=0 lunarpower=0)
-Define(moonfire_debuff_1 155625)
-# A quick beam of lunar light burns the enemy for s2 Arcane damage and then an additional o1 Arcane damage over 14 seconds.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
-  SpellInfo(moonfire_debuff_1 duration=14 tick=2)
-  # Suffering w1 Arcane damage every t1 seconds.
-  SpellAddTargetDebuff(moonfire_debuff_1 moonfire_debuff_1=1)
-Define(moonfire_debuff_2 164812)
-# A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
-  SpellInfo(moonfire_debuff_2 duration=16 specialization=!Balance)
-  SpellInfo(moonfire_debuff_2 duration=22 specialization=Balance)
+  SpellInfo(moonfire_debuff duration=16 specialization=!Balance)
+  SpellInfo(moonfire_debuff duration=22 specialization=Balance)
 Define(moonfire 8921)
   SpellInfo(moonfire duration=22 astralpower=-3 specialization=Balance)
   SpellInfo(moonfire duration=16 specialization=!Balance)
-  SpellAddTargetDebuff(moonfire moonfire_debuff_2=1)
+  SpellAddTargetDebuff(moonfire moonfire_debuff=1)
 Define(new_moon 274281)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10 talent=new_moon_talent)
@@ -471,7 +463,6 @@ Define(wild_charge 102401)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(moonfire_debuff moonfire_debuff_0 moonfire_debuff_1 moonfire_debuff_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
@@ -566,7 +557,7 @@ Define(hibernate 2637)
 	SpellAddBuff(prowl prowl_buff=1)
 Define(prowl_buff 5215)
 Define(remove_corruption 2782)
-Define(rebirth 20484) 
+Define(rebirth 20484)
 
 	SpellInfo(regrowth mana=14)
 	SpellInfo(regrowth spellpower=120)
@@ -584,7 +575,7 @@ Define(survival_instincts_buff 61336)
 	SpellInfo(survival_instincts_buff duration=6)
 Define(stampeding_roar 77761)
 	SpellInfo(stampeding_roar cd=120)
-	
+
 
 # Balance and Restoration shared
  # Also Guardian
@@ -617,7 +608,7 @@ Define(wild_charge_bear 16979)
 	SpellInfo(wild_charge_bear cd=15 stance=druid_bear_form)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
-	
+
 
 Define(mass_entanglement 102359)
 	SpellInfo(mass_entanglement cd=30)
@@ -690,14 +681,14 @@ local function registerSpec1(OvaleScripts)
 	SpellInfo(celestial_alignment cd=180 shared_cd=celestial_alignment_cd)
 	SpellInfo(celestial_alignment replaced_by=incarnation_chosen_of_elune talent=incarnation_talent specialization=balance)
 	SpellAddBuff(celestial_alignment celestial_alignment_buff=1)
-    
+
 Define(celestial_alignment_buff 194223)
 
 	SpellInfo(fury_of_elune cd=90 astralpower=6)
 	SpellAddBuff(fury_of_elune fury_of_elune_up_buff=1)
 Define(fury_of_elune_up_buff 202770)
 	#TODO 12 astralpower per s
-	
+
 	SpellInfo(full_moon cd=15 charges=3 astralpower=-40 shared_cd=new_moon)
 
 	SpellInfo(half_moon cd=15 charges=3 astralpower=-20 shared_cd=new_moon)
@@ -754,9 +745,9 @@ Define(stellar_flare_debuff 202347)
 
     SpellRequire(warrior_of_elune unusable 1=buff,warrior_of_elune_buff)
 Define(warrior_of_elune_buff 202425)
-    
+
 Define(ca_inc 194223)
-SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)	
+SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)
 
 # Balance Legendaries
 Define(oneths_intuition_buff 209406)
@@ -817,9 +808,9 @@ Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
-	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
+	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent)
 Define(swipe_bear 213771)
-	
+
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries
@@ -882,11 +873,11 @@ Define(bloodtalons_buff 145152)
 	SpellAddBuff(maim bloodtalons_buff=-1 talent=bloodtalons_talent)
 	SpellAddBuff(rip bloodtalons_buff=-1 talent=bloodtalons_talent)
 	SpellAddBuff(ferocious_bite bloodtalons_buff=-1 talent=bloodtalons_talent)
-	SpellAddBuff(rake bloodtalons_buff=-1 talent=bloodtalons_talent)	 
+	SpellAddBuff(rake bloodtalons_buff=-1 talent=bloodtalons_talent)
 	SpellDamageBuff(rip bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 	SpellDamageBuff(rip_debuff bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
-	SpellDamageBuff(rake bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)	
-	SpellDamageBuff(rake_debuff bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)	
+	SpellDamageBuff(rake bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
+	SpellDamageBuff(rake_debuff bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 	SpellDamageBuff(thrash_cat bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 	SpellDamageBuff(thrash_cat_debuff bloodtalons_buff=bloodtalons_value talent=bloodtalons_talent)
 
@@ -933,7 +924,7 @@ SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungl
 	SpellAddBuff(savage_roar savage_roar_buff=1)
 Define(savage_roar_buff 52610)
 	SpellInfo(savage_roar_buff duration=6 add_durationcp=6)
-Define(swipe_cat 106785) 
+Define(swipe_cat 106785)
 	SpellInfo(swipe_cat energy=40 combopoints=-1)
 Define(thrash_cat 106830)
 	SpellInfo(thrash_cat energy=45 combopoints=-1)

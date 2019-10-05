@@ -41,11 +41,11 @@ AddIcon specialization=2 help=main
 		if IncomingDamage(5) > 0 and target.istargetingplayer() and not BuffPresent(blazing_barrier_buff) Spell(blazing_barrier)
 		
 		# Cooldowns
-		if Speed() == 0 or CanMove() > 0 FireDefaultCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultCdActions()
 		
-		if Speed() == 0 or CanMove() > 0 FireDefaultShortCdActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultShortCdActions()
 		
-		if Speed() == 0 or CanMove() > 0 FireDefaultMainActions()
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultMainActions()
 		
 		if Speed() > 0 Spell(scorch)
 	}
