@@ -445,6 +445,22 @@ __exports.Emiter = __class(nil, {
                     end
                 elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
                     isSpellAction = false
+                elseif className == "PRIEST" and action == "mind_blast" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(shadowy_insight_buff) }"
+                elseif className == "PRIEST" and action == "shadow_word_void" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "mind_flay" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "mind_sear" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "void_torrent" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "vampiric_touch" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "void_eruption" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "dark_void" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "ROGUE" and action == "adrenaline_rush" then
                     conditionCode = "EnergyDeficit() > 1"
                 elseif className == "ROGUE" and action == "apply_poison" then

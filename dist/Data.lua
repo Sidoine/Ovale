@@ -279,7 +279,8 @@ __exports.OvaleDataClass = __class(nil, {
                 [202461] = true,
                 [236380] = true,
                 [79206] = true,
-                [108839] = true
+                [108839] = true,
+                [193223] = true
             }
         }
         self.DEFAULT_SPELL_LIST = {}
