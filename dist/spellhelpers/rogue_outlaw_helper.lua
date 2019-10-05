@@ -14,10 +14,13 @@ AddIcon
 	Texture(ability_rogue_pistolshot) # Pistol Shot
 	Texture(inv_weapon_rifle_01) # Between the Eyes
 	Texture(ability_rogue_waylay) # Dispatch
+
+	# Interrupts
 	Texture(ability_kick) # Kick
 	Texture(ability_gouge) # Gouge
 	Texture(ability_cheapshot) # Cheap Shot
-	
+	Texture(spell_shadow_mindsteal) # Blind
+
 	# Buffs
 	Texture(ability_rogue_rollthebones) # Roll the Bones
 	Texture(ability_stealth) # Stealth
@@ -25,10 +28,10 @@ AddIcon
 	Texture(spell_shadow_shadowworddominate) # Adrenaline Rush
 	Texture(ability_rogue_crimsonvial) # Crimson Vial
 	Texture(ability_warrior_punishingblow) # Blade Flurry
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -60,37 +63,37 @@ AddIcon
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
 	Texture(ability_ambush) # Shadowmeld (Night Elf)
 	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

@@ -17,23 +17,23 @@ AddIcon specialization=1 help=main
 	{
 		if TotemRemaining(totem_mastery_elemental) < 2 and not BuffPresent(ele_resonance_totem_buff) and Boss() Spell(totem_mastery_elemental)
 	}
-	
+
 	# Interrupt
 	if InCombat() InterruptActions()
-	
+
 	# Save ass
 	if not mounted() SaveActions()
-	
-	if target.InRange(lightning_bolt_elemental) and HasFullControl() and InCombat()
+
+	if target.InRange(lightning_bolt_elemental) and HasFullControl() and InCombat() and not target.BuffPresent(crowd_control_buff)
     {
 		if PreviousGCDSpell(lava_burst) and not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
-		
+
 		# Cooldowns
 		if Boss() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } ElementalDefaultCdActions()
-		
+
 		# Short Cooldowns
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) ElementalDefaultShortCdActions()
-		
+
 		# Default rotation
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) ElementalDefaultMainActions()
 

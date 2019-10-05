@@ -26,26 +26,26 @@ AddIcon specialization=1 help=main
 		# Poisons!
 		if BuffRemaining(lethal_poison_buff) < 600 and Speed() == 0 and SpellUsable(deadly_poison) Texture(spell_nature_corrosivebreath)
 		if BuffRemaining(crippling_poison_buff) < 600 and Speed() == 0 Spell(crippling_poison)
-		
+
 		#marked_for_death
 		if target.InRange(marked_for_death) and ComboPoints() < 5 and target.Present() and target.Exists() and not target.IsFriend() Spell(marked_for_death)
 	}
-	
+
 	if InCombat() InterruptActions()
 	if HealthPercent() < 50 and not Dead() and Energy() > 24 Spell(crimson_vial)
-	
-	if target.InRange(mutilate) and HasFullControl()
+
+	if target.InRange(mutilate) and HasFullControl() and not target.BuffPresent(crowd_control_buff)
 	{
 		# Cooldowns
 		if Boss() AssassinationDefaultCdActions()
-		
+
 		# Short Cooldowns
 		AssassinationDefaultShortCdActions()
-		
+
 		# Default Actions
 		AssassinationDefaultMainActions()
 	}
-	
+
 	if InCombat() and target.Present() and not target.IsDead() and not target.IsFriend() and Falling() and { target.HealthPercent() < 100 or target.istargetingplayer() } AssassinationGetInMeleeRange()
 	if InCombat() and target.Present() and not target.IsFriend() and not target.InRange(kick) and not target.DebuffPresent(deadly_poison_debuff) and not Stealthed() and target.InRange(poisoned_knife) Spell(poisoned_knife)
 }

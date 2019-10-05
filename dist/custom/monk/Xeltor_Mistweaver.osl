@@ -16,20 +16,20 @@ Include(ovale_monk_spells)
 AddIcon specialization=2 help=main
 {
 	if InCombat() InterruptActions()
-	
+
 	if target.InRange(effuse) and target.IsFriend() and HasFullControl()
-    {
-		MistweaverDefaultCdActions()
-		
-		MistweaverDefaultShortCdActions()
-		
-		MistweaverDefaultMainActions()
-    }
-	
+  {
+	MistweaverDefaultCdActions()
+
+	MistweaverDefaultShortCdActions()
+
+	MistweaverDefaultMainActions()
+  }
+
 	if target.InRange(tiger_palm) and not target.IsFriend() and HasFullControl()
 	{
 		MistweaverDefaultShortCdPunchActions()
-		
+
 		MistweaverDefaultMainPunchActions()
 	}
 }

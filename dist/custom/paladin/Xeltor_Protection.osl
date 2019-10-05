@@ -15,8 +15,8 @@ AddIcon specialization=2 help=main
 {
 	# Interrupt
 	if InCombat() InterruptActions()
-	
-	if { target.InRange(shield_of_the_righteous) or target.InRange(hammer_of_the_righteous) } and HasFullControl()
+
+	if { target.InRange(shield_of_the_righteous) or target.InRange(hammer_of_the_righteous) } and not target.BuffPresent(crowd_control_buff) and HasFullControl()
 	{
 		if not BuffPresent(consecration_buff) Spell(consecration)
 		ProtectionDefaultCdActions()

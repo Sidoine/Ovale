@@ -26,22 +26,22 @@ AddIcon specialization=3 help=main
 		#marked_for_death
 		if target.InRange(marked_for_death) and ComboPoints() < 5 Spell(marked_for_death)
 	}
-	
+
 	if InCombat() InterruptActions()
 	if { HealthPercent() <= 25 or HealthPercent() < 70 and not InCombat() and not mounted() } and not Dead() and Energy() > 24 Spell(crimson_vial)
-	
-	if target.InRange(backstab)
+
+	if target.InRange(backstab) and not target.BuffPresent(crowd_control_buff)
 	{
 		# Cooldowns
 		SubtletyDefaultCdActions()
-		
+
 		# Short Cooldowns
 		SubtletyDefaultShortCdActions()
-		
+
 		# Default Actions
 		SubtletyDefaultMainActions()
 	}
-	
+
 	if InCombat() and not target.IsDead() and not target.IsFriend() and Falling() and { target.HealthPercent() < 100 or target.istargetingplayer() } GetInMeleeRange()
 }
 

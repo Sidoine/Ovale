@@ -14,7 +14,7 @@ AddIcon specialization=1 help=main
 {
 	if InCombat() HavocInterruptActions()
 
-	if target.InRange(chaos_strike) and HasFullControl()
+	if target.InRange(chaos_strike) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
 	{
 		# Cooldowns
 		if Boss() HavocCooldownCdActions()

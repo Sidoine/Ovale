@@ -32,26 +32,26 @@ AddIcon specialization=3 help=main
 			if not BuffPresent(bear_form) Spell(bear_form)
 		}
 	}
-	
+
 	# Interrupt
 	if InCombat() InterruptActions()
-	
+
 	# Rotation
-	if target.InRange(mangle) and HasFullControl() and target.Present()
+	if target.InRange(mangle) and not target.BuffPresent(crowd_control_buff) and HasFullControl() and target.Present()
 	{
 		# AOE for threat!
 		if target.DebuffExpires(thrash_bear_debuff) Spell(thrash_bear)
-		
+
 		# Cooldowns
 		GuardianDefaultCdActions()
-		
+
 		# Short Cooldowns
 		GuardianDefaultShortCdActions()
-		
+
 		# Default Actions
 		GuardianDefaultMainActions()
 	}
-	
+
 	if InCombat() and target.Present() and not target.IsFriend() and not target.InRange(mangle) and target.InRange(wild_charge) and { TimeInCombat() < 6 or Falling() } Spell(wild_charge)
 	Travel()
 }

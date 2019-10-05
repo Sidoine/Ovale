@@ -13,20 +13,20 @@ Include(ovale_monk_spells)
 # Windwalker
 AddIcon specialization=3 help=main
 {
-    # if not mounted() and not {BuffPresent(critical_strike_buff any=1) or BuffPresent(str_agi_int_buff any=1)} Spell(legacy_of_the_white_tiger)
+  # if not mounted() and not {BuffPresent(critical_strike_buff any=1) or BuffPresent(str_agi_int_buff any=1)} Spell(legacy_of_the_white_tiger)
 
 	#spear_hand_strike
 	if InCombat() InterruptActions()
 
-	if target.InRange(tiger_palm) and HasFullControl()
-    {
-		# Cooldowns
-		if Boss() WindwalkerDefaultCdActions()
+	if target.InRange(tiger_palm) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+  {
+	# Cooldowns
+	if Boss() WindwalkerDefaultCdActions()
 
-		WindwalkerDefaultShortCdActions()
+	WindwalkerDefaultShortCdActions()
 
-		WindwalkerDefaultMainActions()
-    }
+	WindwalkerDefaultMainActions()
+  }
 }
 
 AddFunction InterruptActions

@@ -351,6 +351,14 @@ __exports.Generator = __class(nil, {
                 worksOnBoss = 1,
                 order = 10
             })
+            if annotation.specialization == "beast_mastery" then
+              insert(interrupts, {
+                  name = "intimidation",
+                  stun = 1,
+                  order = 30,
+                  range = "target.InRange(pet_bite)"
+              })
+            end
         end
         if annotation.muzzle == "HUNTER" then
             insert(interrupts, {
@@ -439,6 +447,11 @@ __exports.Generator = __class(nil, {
                 name = "cheap_shot",
                 stun = 1,
                 order = 20
+            })
+            insert(interrupts, {
+                name = "blind",
+                cc = 1,
+                order = 999
             })
             if annotation.specialization == "outlaw" then
                 insert(interrupts, {

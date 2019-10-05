@@ -35,18 +35,18 @@ AddIcon specialization=2 help=main
 	}
 
 	if InCombat() InterruptActions()
-	
-	if InCombat() and target.InRange(fireball) and HasFullControl()
+
+	if InCombat() and not target.BuffPresent(crowd_control_buff) and target.InRange(fireball) and HasFullControl()
 	{
 		if IncomingDamage(5) > 0 and target.istargetingplayer() and not BuffPresent(blazing_barrier_buff) Spell(blazing_barrier)
-		
+
 		# Cooldowns
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultCdActions()
-		
+
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultShortCdActions()
-		
+
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) FireDefaultMainActions()
-		
+
 		if Speed() > 0 Spell(scorch)
 	}
 }

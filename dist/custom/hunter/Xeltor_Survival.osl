@@ -20,7 +20,7 @@ AddIcon specialization=3 help=main
 		ControlActions()
 	}
 
-	if HasFullControl() and InCombat() and target.Present() and target.InRange(serpent_sting_sv)
+	if HasFullControl() and not target.BuffPresent(crowd_control_buff) and InCombat() and target.Present() and target.InRange(serpent_sting_sv)
 	{
 		# Pet we needs it.
 		SummonPet()

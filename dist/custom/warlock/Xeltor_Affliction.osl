@@ -19,16 +19,16 @@ AddIcon specialization=1 help=main
 {
 	# Interrupts please the RL :(
 	if InCombat() InterruptActions()
-	
+
 	# Save ass
 	if not Mounted() and InCombat() SaveActions()
-	
+
 	# I need to breath :(
 	if wet() and not mounted() and not BuffPresent(unending_breath) Spell(unending_breath)
-	
+
 	# Now we can kill things :)
-	if InCombat() and target.InRange(agony) and HasFullControl()
-    {
+	if InCombat() and target.InRange(agony) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+  {
 		# Save pet if i have one that is worth saving :3
 		if pet.CreatureFamily(Voidwalker) or pet.CreatureFamily(Voidlord) PetStuff()
 
@@ -50,7 +50,7 @@ AddIcon specialization=1 help=main
 		#corruption,if=buff.movement.up&!prev_gcd.1.corruption&!talent.absolute_corruption.enabled
 		if Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) Spell(corruption)
 	}
-	
+
 	if not InCombat() and not mounted() OutOfCombatActions()
 }
 

@@ -25,26 +25,26 @@ AddIcon specialization=2 help=main
 	{
 		if TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and not BuffPresent(enh_resonance_totem_buff) and Boss() Spell(totem_mastery_enhancement)
 	}
-	
+
 	# Interrupt
 	if InCombat() and target.RemainingCastTime() < 3 InterruptActions()
-	
+
 	# Save ass
 	if not mounted() SaveActions()
-	
-	if target.InRange(lava_lash) and HasFullControl()
+
+	if target.InRange(lava_lash) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
     {
 		# Cooldowns
 		if Boss() EnhancementDefaultCdActions()
-		
+
 		# Short Cooldowns
 		if not BuffPresent(lightning_shield) Spell(lightning_shield)
 		EnhancementDefaultShortCdActions()
-		
+
 		# Default rotation
 		EnhancementDefaultMainActions()
 	}
-	
+
 	# Go forth and murder
 	if InCombat() and HasFullControl() and target.Present() and not target.InRange(lava_lash) and { TimeInCombat() < 6 or Falling() }
 	{

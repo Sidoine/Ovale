@@ -17,13 +17,13 @@ Define(leg_sweep 119381)
 AddIcon specialization=1 help=main
 {
 	if InCombat() InterruptActions()
-	
-	if target.InRange(tiger_palm) and HasFullControl()
+
+	if target.InRange(tiger_palm) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
 	{
 		if Boss() BrewmasterDefaultCdActions()
-		
+
 		BrewmasterDefaultShortCdActions()
-		
+
 		BrewmasterDefaultMainActions()
 	}
 }

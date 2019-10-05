@@ -16,19 +16,19 @@ AddIcon specialization=2 help=main
 {
 	# Interrupt
 	if InCombat() InterruptActions()
-	
-    if target.InRange(obliterate) and HasFullControl()
+
+    if target.InRange(obliterate) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
     {
-		if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
-		
-		# Cooldown
-		if Boss() FrostDefaultCdActions()
-		
-		# Short Cooldown
-		FrostDefaultShortCdActions()
-		
-		# Main rotation
-		FrostDefaultMainActions()
+			if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
+
+			# Cooldown
+			if Boss() FrostDefaultCdActions()
+
+			# Short Cooldown
+			FrostDefaultShortCdActions()
+
+			# Main rotation
+			FrostDefaultMainActions()
     }
 }
 

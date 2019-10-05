@@ -21,7 +21,7 @@ AddIcon specialization=3 help=main
 
 	if InCombat() ShadowInterruptActions()
 
-	if InCombat() and HasFullControl() and target.InRange(vampiric_touch)
+	if InCombat() and HasFullControl() and target.InRange(vampiric_touch) and not target.BuffPresent(crowd_control_buff)
 	{
 			if Boss() ShadowDefaultCdActions()
 
