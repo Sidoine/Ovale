@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerPriestSpells = function(OvaleScripts)
     local name = "ovale_priest_spells"
     local desc = "[8.2] Ovale: Priest spells"
-    local code = [[Define(blood_of_the_enemy_0 297108)
+    local code = [[
+Define(blood_of_the_enemy_0 297108)
 # The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
   SpellInfo(blood_of_the_enemy_0 cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.

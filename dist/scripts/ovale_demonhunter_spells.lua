@@ -332,10 +332,11 @@ Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
 Define(chaotic_transformation_trait 288754)
 Define(revolving_blades_trait 279581)
+Define(eyes_of_rage_trait 278500)
     ]]
     code = code .. [[
 
-ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!metamorphosis_veng,buff,!metamorphosis_veng_buff)	
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!metamorphosis_veng,buff,!metamorphosis_veng_buff)
 
 Define(annihilation 201427)
     SpellRequire(annihilation add_fury_from_aura -1=buff,thirsting_blades_buff)
@@ -416,7 +417,7 @@ Define(frailty_debuff 247456)
     SpellAddBuff(fracture soul_fragments=2)
     SpellRequire(fracture add_pain_from_aura -20=buff,metamorphosis_veng_buff)
     SpellAddBuff(fracture soul_fragments 3=buff,metamorphosis_veng_buff)
-    
+
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
 Define(immolation_aura_buff 178740)
@@ -466,7 +467,7 @@ Define(revolving_blades_buff 279584)
     SpellAddBuff(shear soul_fragments=1)
     SpellRequire(shear add_pain_from_aura -20=buff,metamorphosis_veng_buff)
     SpellAddBuff(shear soul_fragments 2=buff,metamorphosis_veng_buff)
-    
+
 	SpellInfo(sigil_of_chains cd=90)
 
 	SpellInfo(sigil_of_flame cd=30)
@@ -493,7 +494,7 @@ Define(soul_barrier 263648)
 	SpellAddBuff(soul_barrier soul_fragments=0)
 Define(soul_barrier_buff 263648)
 	SpellInfo(soul_barrier_buff duration=12)
-	
+
 	SpellAddBuff(soul_cleave soul_fragments=-2)
 	SpellAddBuff(soul_cleave feast_of_souls_buff=1 talent=feast_of_souls_talent)
     SpellAddTargetDebuff(soul_cleave void_reaver_debuff=1 talent=void_reaver_talent)
@@ -516,14 +517,14 @@ Define(throw_glaive_havoc_debuff 213405)
 	SpellInfo(throw_glaive_havoc_debuff duration=6)
 
 	SpellInfo(vengeful_retreat cd=20)
-	
+
 	SpellAddTargetDebuff(vengeful_retreat vengeful_retreat_debuff=1)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 	SpellRequire(vengeful_retreat unusable 1=lossofcontrol,root)
 Define(void_reaver_debuff 268178)
     SpellInfo(void_reaver_debuff duration=12)
-	
+
 #items
 Define(oblivions_embrace_item 151799)
 	SpellInfo(demon_spikes charges=3 if_equipped=oblivions_embrace)
