@@ -23,18 +23,11 @@ AddIcon specialization=3 help=main
 
 	if InCombat() and HasFullControl() and target.InRange(vampiric_touch)
 	{
-		if Speed() == 0 or BuffPresent(movement_allowed_buff)
-		{
 			if Boss() ShadowDefaultCdActions()
-			ShadowDefaultShortCdActions()
-			ShadowDefaultMainActions()
-		}
 
-		if Speed() > 0
-		{
-			#shadow_word_pain,moving=1,cycle_targets=1
-			if target.DebuffExpires(shadow_word_pain_debuff) Spell(shadow_word_pain)
-		}
+			ShadowDefaultShortCdActions()
+
+			ShadowDefaultMainActions()
 	}
 }
 
