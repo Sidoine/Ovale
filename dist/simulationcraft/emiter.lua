@@ -571,6 +571,8 @@ __exports.Emiter = __class(nil, {
                     annotation.opt_meta_only_during_boss = "DEMONHUNTER"
                 elseif className == "DEMONHUNTER" and action == "consume_magic" then
                     conditionCode = "target.HasDebuffType(magic)"
+                elseif className == "DEMONHUNTER" and action == "eye_beam" and specialization == "havoc" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif checkOptionalSkill(action, className, specialization) then
                     annotation[action] = className
                     conditionCode = "CheckBoxOn(opt_" .. action .. ")"
