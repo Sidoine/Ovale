@@ -477,9 +477,9 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "ROGUE" and action == "premeditation" then
                     conditionCode = "ComboPoints() < 5"
-                elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
+                elseif className == "ROGUE" and action == "vanish" then
                     annotation.vanish = className
-                    conditionCode = format("CheckBoxOn(opt_vanish)", action)
+                    conditionCode = "VanishAllowed()"
                 elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
                     conditionCode = "target.InRange(shadowstrike)"
         				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
@@ -2223,8 +2223,7 @@ __exports.Emiter = __class(nil, {
                 local t = target or "target."
                 code = format("not %sClassification(worldboss)", t)
             elseif operand == "priority_rotation" then
-                code = "CheckBoxOn(opt_priority_rotation)"
-                annotation.opt_priority_rotation = className
+                code = "False(priority_rotation)"
             else
                 ok = false
             end
