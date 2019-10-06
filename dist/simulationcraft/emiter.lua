@@ -541,8 +541,28 @@ __exports.Emiter = __class(nil, {
                     end
                     conditionCode = "not pet.Present()"
                     isSpellAction = false
+                elseif className == "WARLOCK" and action == "demonic_strength" then
+                    conditionCode = "not pet.BuffPresent(pet_auto_spin)"
                 elseif className == "WARLOCK" and action == "wrathguard_wrathstorm" then
                     conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
+                elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "hand_of_guldan" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "demonbolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_core_buff) }"
+                elseif className == "WARLOCK" and action == "drain_life" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "health_funnel" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "call_dreadstalkers" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_calling_buff) }"
+                elseif className == "WARLOCK" and action == "summon_demonic_tyrant" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "summon_vilefiend" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "nether_portal" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "WARLOCK" and action == "drain_soul" and specialization == "affliction" then
                     conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "affliction" then
