@@ -18,7 +18,7 @@ AddIcon specialization=3 help=main
 	#spear_hand_strike
 	if InCombat() InterruptActions()
 
-	if target.InRange(tiger_palm) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if target.InRange(tiger_palm) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 	# Cooldowns
 	if Boss() WindwalkerDefaultCdActions()

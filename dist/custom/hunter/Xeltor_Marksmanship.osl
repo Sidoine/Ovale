@@ -18,7 +18,7 @@ AddIcon specialization=2 help=main
 		if Boss() Spell(hunters_mark)
 	}
 
-	if HasFullControl() and not target.BuffPresent(crowd_control_buff) and InCombat() and target.Present() and target.InRange(arcane_shot)
+	if HasFullControl() and not target.DebuffPresent(crowd_control_debuff) and InCombat() and target.Present() and target.InRange(arcane_shot)
 	{
 		InterruptActions()
 		if not IsDead() and not Dead() and HealthPercent() < 50  Spell(exhilaration)

@@ -23,7 +23,7 @@ AddIcon specialization=3 help=main
 
 	if wet() and not mounted() Spell(unending_breath)
 
-	if InCombat() and target.InRange(chaos_bolt) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if InCombat() and target.InRange(chaos_bolt) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 		# Cooldowns
 		if Boss() and {Speed() == 0 or BuffPresent(movement_allowed_buff) } DestructionDefaultCdActions()

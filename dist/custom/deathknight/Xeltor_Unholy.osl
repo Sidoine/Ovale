@@ -24,7 +24,7 @@ AddIcon specialization=3 help=main
 
 	if wet() and not BuffPresent(path_of_frost) and not InCombat() Spell(path_of_frost)
 
-  if target.InRange(festering_strike) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+  if target.InRange(festering_strike) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 		if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
 

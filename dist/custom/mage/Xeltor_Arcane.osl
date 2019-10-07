@@ -25,7 +25,7 @@ AddIcon specialization=1 help=main
 	if InCombat() and not target.IsFriend() SafetyDance()
 	if InCombat() InterruptActions()
 
-	if InCombat() and not target.BuffPresent(crowd_control_buff) and target.InRange(arcane_blast) and NotMoving() and HasFullControl()
+	if InCombat() and not target.DebuffPresent(crowd_control_debuff) and target.InRange(arcane_blast) and NotMoving() and HasFullControl()
 	{
 		ArcaneDefaultCdActions()
 

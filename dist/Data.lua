@@ -282,7 +282,7 @@ __exports.OvaleDataClass = __class(nil, {
                 [108839] = true,
                 [193223] = true
             },
-            crowd_control_buff = {
+            crowd_control_debuff = {
                 [2094] = true,
                 [6770] = true,
                 [51514] = true,

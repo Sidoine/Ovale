@@ -16,7 +16,7 @@ AddIcon specialization=1 help=main
 {
 	if InCombat() InterruptActions()
 
-	if target.InRange(heart_strike) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if target.InRange(heart_strike) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
     {
 		BloodDefaultCdActions()
 

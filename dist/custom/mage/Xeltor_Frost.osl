@@ -25,7 +25,7 @@ AddIcon specialization=3 help=main
 
 	if InCombat() and not target.IsFriend() SafetyDance()
 
-	if InCombat() and not target.BuffPresent(crowd_control_buff) and target.InRange(frostbolt) and HasFullControl()
+	if InCombat() and not target.DebuffPresent(crowd_control_debuff) and target.InRange(frostbolt) and HasFullControl()
 	{
 		if BuffExpires(ice_floes_buff) and not { Speed() == 0 or BuffPresent(movement_allowed_buff) } Spell(ice_floes)
 

@@ -27,7 +27,7 @@ AddIcon specialization=1 help=main
 	if wet() and not mounted() and not BuffPresent(unending_breath) Spell(unending_breath)
 
 	# Now we can kill things :)
-	if InCombat() and target.InRange(agony) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if InCombat() and target.InRange(agony) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 		# Save pet if i have one that is worth saving :3
 		if pet.CreatureFamily(Voidwalker) or pet.CreatureFamily(Voidlord) PetStuff()

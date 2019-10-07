@@ -15,7 +15,7 @@ AddIcon specialization=2 help=main
 	# Interrupt
 	if InCombat() InterruptActions()
 
-    if target.InRange(shear) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+    if target.InRange(shear) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
     {
 		# Cooldown
 		VengeanceDefaultCdActions()

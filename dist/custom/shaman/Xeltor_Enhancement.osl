@@ -32,7 +32,7 @@ AddIcon specialization=2 help=main
 	# Save ass
 	if not mounted() SaveActions()
 
-	if target.InRange(lava_lash) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if target.InRange(lava_lash) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
     {
 		# Cooldowns
 		if Boss() EnhancementDefaultCdActions()

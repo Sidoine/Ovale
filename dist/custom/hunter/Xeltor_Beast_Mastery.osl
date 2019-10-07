@@ -19,7 +19,7 @@ AddIcon specialization=1 help=main
 		BeastMasteryInterruptActions()
 	}
 
-	if HasFullControl() and not target.BuffPresent(crowd_control_buff) and InCombat() and target.Present() and target.InRange(cobra_shot)
+	if HasFullControl() and not target.DebuffPresent(crowd_control_debuff) and InCombat() and target.Present() and target.InRange(cobra_shot)
 	{
 		# Pet we needs it.
 		SummonPet()

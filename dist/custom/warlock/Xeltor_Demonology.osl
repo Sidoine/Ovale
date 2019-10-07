@@ -26,7 +26,7 @@ AddIcon specialization=2 help=main
 	if wet() and not mounted() and not BuffPresent(unending_breath) Spell(unending_breath)
 
 	# Rotation
-	if InCombat() and target.InRange(shadow_bolt) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if InCombat() and target.InRange(shadow_bolt) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 		PetStuff()
 

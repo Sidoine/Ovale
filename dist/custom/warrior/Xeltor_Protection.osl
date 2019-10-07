@@ -14,7 +14,7 @@ AddIcon specialization=3 help=main
 {
 	if InCombat() InterruptActions()
 
-	if target.InRange(shield_slam) and not target.BuffPresent(crowd_control_buff) and HasFullControl()
+	if target.InRange(shield_slam) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
 	{
 		if PreviousGCDSpell(intercept) Spell(thunder_clap)
 

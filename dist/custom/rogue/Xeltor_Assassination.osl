@@ -34,7 +34,7 @@ AddIcon specialization=1 help=main
 	if InCombat() AssassinationInterruptActions()
 	if HealthPercent() < 50 and not Dead() and Energy() > 24 Spell(crimson_vial)
 
-	if target.InRange(mutilate) and HasFullControl() and not target.BuffPresent(crowd_control_buff)
+	if target.InRange(mutilate) and HasFullControl() and not target.DebuffPresent(crowd_control_debuff)
 	{
 		# Cooldowns
 		if Boss() AssassinationDefaultCdActions()

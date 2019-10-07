@@ -25,7 +25,7 @@ AddIcon specialization=3 help=main
 		ControlActions()
 	}
 
-	if target.InRange(crusader_strike) and not target.BuffPresent(crowd_control_buff)
+	if target.InRange(crusader_strike) and not target.DebuffPresent(crowd_control_debuff)
     {
 		if Boss() RetributionDefaultCdActions()
 		RetributionDefaultShortCdActions()

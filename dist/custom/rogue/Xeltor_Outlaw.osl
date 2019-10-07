@@ -31,7 +31,7 @@ AddIcon specialization=outlaw help=main
 	if InCombat() and { not target.IsFriend() or target.IsPvP() } InterruptActions()
 	if { HealthPercent() <= 25 or HealthPercent() < 70 and not InCombat() and not mounted() } and not Dead() and Energy() > 30 Spell(crimson_vial)
 
-	if target.InRange(sinister_strike_outlaw) and HasFullControl() and not target.BuffPresent(crowd_control_buff)
+	if target.InRange(sinister_strike_outlaw) and HasFullControl() and not target.DebuffPresent(crowd_control_debuff)
 	{
 		# Cooldowns
 		if Boss() OutlawDefaultCdActions()

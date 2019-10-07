@@ -37,7 +37,7 @@ AddIcon specialization=3 help=main
 	if InCombat() InterruptActions()
 
 	# Rotation
-	if target.InRange(mangle) and not target.BuffPresent(crowd_control_buff) and HasFullControl() and target.Present()
+	if target.InRange(mangle) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl() and target.Present()
 	{
 		# AOE for threat!
 		if target.DebuffExpires(thrash_bear_debuff) Spell(thrash_bear)
