@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerWarriorSpells = function(OvaleScripts)
     local name = "ovale_warrior_spells"
     local desc = "[8.2] Ovale: Warrior spells"
-    local code = [[Define(ancestral_call 274738)
+    local code = [[
+Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
@@ -436,8 +437,8 @@ Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
     ]]
     code = code .. [[
-ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
-	
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)
+
 # Warrior spells and functions.
 
 # Learned spells.
@@ -462,7 +463,7 @@ Define(bladestorm_fury 46924)
 
 	SpellInfo(bloodthirst cd=4.5 rage=-8 cd_haste=melee)
 	SpellAddBuff(bloodthirst whirlwind_buff=-1)
- 
+
 	SpellInfo(charge cd=20 gcd=0 offgcd=1 rage=-25 travel_time=1 charges=1)
 	SpellInfo(charge add_cd=-3 charges=2 talent=double_time_talent)
 	SpellAddTargetDebuff(charge charge_debuff=1)
@@ -472,7 +473,7 @@ Define(charge_debuff 105771)
 	SpellInfo(cleave cd=9 cd_haste=melee rage=20)
 	SpellRequire(cleave rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 
-	
+
 	SpellInfo(colossus_smash replaced_by=warbreaker talent=warbreaker_talent)
 	SpellAddTargetDebuff(colossus_smash colossus_smash_debuff=1)
 	SpellAddBuff(colossus_smash in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
@@ -664,7 +665,7 @@ Define(shield_wall 871)
 Define(shield_wall_buff 871)
 	SpellInfo(shield_wall duration=8)
 
-	
+
 
 	SpellInfo(siegebreaker cd=30 rage=-10)
 	SpellAddTargetDebuff(siegebreaker siegebreaker_debuff=1)
@@ -673,7 +674,7 @@ Define(siegebreaker_debuff 280773)
 
 	SpellInfo(skullsplitter cd=21 rage=-20 cd_haste=melee)
 
-	
+
 	SpellRequire(slam rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 Define(spell_reflection 23920)
 	SpellInfo(spell_reflection cd=25)

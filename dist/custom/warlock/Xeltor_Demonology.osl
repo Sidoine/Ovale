@@ -47,8 +47,7 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		# Felhunter Spell Lock
-		if pet.CreatureFamily(Felhunter) and target.RemainingCastTime() <= GCD() Spell(spell_lock_fh)
+		if target.IsInterruptible() and pet.CreatureFamily(Felhunter) and target.RemainingCastTime() <= GCD() Spell(spell_lock_fh)
 		if pet.CreatureFamily(Felguard) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(pet_axe_toss)
 	}
 }
@@ -56,7 +55,7 @@ AddFunction InterruptActions
 AddFunction PetStuff
 {
 	if not pet.Present() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } and SpellUsable(summon_felguard) Texture(spell_warlock_summonwrathguard)
-	if pet.Health() < pet.HealthMissing() and pet.Present() and Speed() == 0 and SpellUsable(health_funnel) Texture(ability_deathwing_bloodcorruption_death)
+	if pet.Health() < pet.HealthMissing() and pet.Present() and { Speed() == 0 or BuffPresent(movement_allowed_buff) } and SpellUsable(health_funnel) Texture(ability_deathwing_bloodcorruption_death)
 }
 
 AddFunction SaveActions
@@ -65,7 +64,7 @@ AddFunction SaveActions
 	if HealthPercent() < 50
 	{
 		if ItemCharges(healthstone) > 0 and ItemCooldown(healthstone) <= GCD() and Item(healthstone usable=1) Texture(inv_stone_04)
-		if Speed() == 0 Spell(drain_life)
+		if Speed() == 0 or BuffPresent(movement_allowed_buff) Spell(drain_life)
 	}
 }
 

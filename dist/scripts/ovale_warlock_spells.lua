@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerWarlockSpells = function(OvaleScripts)
     local name = "ovale_warlock_spells"
     local desc = "[8.2] Ovale: Warlock spells"
-    local code = [[Define(agony 980)
+    local code = [[
+Define(agony 980)
 # Inflicts increasing agony on the target, causing up to o1*u Shadow damage over 18 seconds. Damage starts low and increases over the duration. Refreshing Agony maintains its current damage level.rnrn|cFFFFFFFFAgony damage sometimes generates 1 Soul Shard.|r
 # Rank 2: Agony may now ramp up to s1+6 stacks.
   SpellInfo(agony duration=18 max_stacks=6 tick=2)
@@ -469,7 +470,7 @@ Define(burning_rush 111400)
 	SpellAddBuff(burning_rush burning_rush_buff=1)
 Define(burning_rush_buff 111400)
 
-	
+
 	SpellRequire(call_dreadstalkers soulshards 1=buff,demonic_calling_buff)
 	SpellAddTargetDebuff(call_dreadstalkers from_the_shadows_debuff talent=from_the_shadows_talent)
 
@@ -488,7 +489,7 @@ Define(command_demon 119898)
 	SpellAddBuff(conflagrate backdraft_buff=1)
 	SpellAddBuff(conflagrate backdraft_buff=2 talent=flashover_talent)
 
-	
+
 
 	SpellInfo(corruption_debuff duration=14 haste=spell tick=2)
 	SpellInfo(corruption_debuff duration=11.9 tick=1.7 talent=creeping_death_talent)
@@ -546,7 +547,7 @@ Define(from_the_shadows_debuff 270569)
 	SpellInfo(grimoire_felguard soulshards=1 cd=120)
 
 	SpellInfo(grimoire_of_sacrifice cd=30 gcd=0)
-	
+
 Define(grimoire_of_sacrifice_buff 196099)
 	SpellInfo(grimoire_of_sacrifice_buff duration=3600)
 Define(grimoire_of_supremacy_buff 266091)
@@ -626,11 +627,11 @@ Define(soulstone 20707)
 
 	SpellInfo(summon_demonic_tyrant cd=90)
 
-	
+
 Define(summon_felhunter 691)
 	SpellInfo(summon_felhunter soulshards=1)
 
-	
+
 
 	SpellInfo(summon_infernal cd=180)
 Define(summon_succubus 712)
@@ -745,6 +746,10 @@ Define(felguard 17252)
 # Pet skills
 Define(pet_axe_toss 119914)
 	SpellInfo(pet_axe_toss cd=30 offgcd=1 gcd=0)
+Define(spell_lock_fh 19647)
+	SpellInfo(spell_lock_fh cd=24)
+Define(pet_auto_spin 89751)
+	SpellInfo(pet_auto_spin duration=5)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(dark_soul_instability tag=cd)
