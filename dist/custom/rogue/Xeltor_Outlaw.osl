@@ -30,7 +30,7 @@ AddIcon specialization=outlaw help=main
 	if InCombat() and { not target.IsFriend() or target.IsPvP() } OutlawInterruptActions()
 	if { HealthPercent() <= 25 or HealthPercent() < 70 and not InCombat() and not mounted() } and not Dead() and Energy() > 30 Spell(crimson_vial)
 
-	if { target.InRange(sinister_strike_outlaw) or { target.Health() < target.MaxHealth() or target.istargetingplayer() } } and HasFullControl() and not target.DebuffPresent(crowd_control_debuff)
+	if { target.InRange(sinister_strike_outlaw) or { target.Health() < target.MaxHealth() or target.istargetingplayer() } } and HasFullControl() and target.Health() > 0 and not target.DebuffPresent(crowd_control_debuff)
 	{
 		# Cooldowns
 		if Boss() OutlawDefaultCdActions()
@@ -42,7 +42,7 @@ AddIcon specialization=outlaw help=main
 		OutlawDefaultMainActions()
 	}
 
-	if InCombat() and not target.IsDead() and not target.IsFriend() and target.Distance(more 5) OutlawGetInMeleeRange()
+	if InCombat() and not target.IsDead() and not target.IsFriend() and target.Distance(more 5) and not Stealthed() OutlawGetInMeleeRange()
 }
 
 AddFunction OutlawInterruptActions
@@ -313,7 +313,7 @@ AddFunction OutlawCdsCdActions
  unless not Stealthed() and OutlawEssencesCdPostConditions()
  {
   #adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
-  if not BuffPresent(adrenaline_rush_buff) and TimeToMaxEnergy() > 1 and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(latent_arcana) > 20 } and EnergyDeficit() > 1 Spell(adrenaline_rush)
+  if not BuffPresent(adrenaline_rush_buff) and TimeToMaxEnergy() > 1 and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(latent_arcana) > 20 } and EnergyDeficit() > 1 and target.InRange(sinister_strike_outlaw) Spell(adrenaline_rush)
 
   unless Enemies(tagged=1) >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and target.InRange(sinister_strike_outlaw) and Spell(blade_flurry) or blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) and target.InRange(ghostly_strike) and Spell(ghostly_strike)
   {
@@ -323,25 +323,25 @@ AddFunction OutlawCdsCdActions
    unless blade_flurry_sync() and TimeToMaxEnergy() > 1 and { IsBossFight() and Falling() or not IsBossFight() } and target.InRange(blade_rush) and Spell(blade_rush)
    {
     #shadowmeld,if=!stealthed.all&variable.ambush_condition
-    if not Stealthed() and ambush_condition() Spell(shadowmeld)
+    if not Stealthed() and ambush_condition() and target.InRange(sinister_strike_outlaw) Spell(shadowmeld)
     #potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
-    if { BuffPresent(burst_haste_buff any=1) or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_potion_of_unbridled_fury usable=1)
+    # if { BuffPresent(burst_haste_buff any=1) or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_potion_of_unbridled_fury usable=1)
     #blood_fury
-    Spell(blood_fury_ap)
+    if target.InRange(sinister_strike_outlaw) Spell(blood_fury_ap)
     #berserking
-    Spell(berserking)
+    if target.InRange(sinister_strike_outlaw) Spell(berserking)
     #fireblood
-    Spell(fireblood)
+    if target.InRange(sinister_strike_outlaw) Spell(fireblood)
     #ancestral_call
-    Spell(ancestral_call)
+    if target.InRange(sinister_strike_outlaw) Spell(ancestral_call)
     #use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
-    if not Stealthed() and BuffExpires(adrenaline_rush_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and TimeToMaxEnergy() > 4 and BuffCount(roll_the_bones_buff) < 5 OutlawUseItemActions()
+    if not Stealthed() and BuffExpires(adrenaline_rush_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and TimeToMaxEnergy() > 4 and BuffCount(roll_the_bones_buff) < 5 and target.InRange(sinister_strike_outlaw) OutlawUseItemActions()
     #use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
-    if not BuffPresent(adrenaline_rush_buff) and not BuffPresent(blade_flurry_buff) and SpellCooldown(adrenaline_rush) < 15 OutlawUseItemActions()
+    if not BuffPresent(adrenaline_rush_buff) and not BuffPresent(blade_flurry_buff) and SpellCooldown(adrenaline_rush) < 15 and target.InRange(sinister_strike_outlaw) OutlawUseItemActions()
     #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
-    if target.DebuffExpires(razor_coral_debuff) or target.DebuffPresent(conductive_ink_debuff) and target.HealthPercent() < 32 and target.HealthPercent() >= 30 or not target.DebuffPresent(conductive_ink_debuff) and { target.DebuffStacks(razor_coral_debuff) >= 20 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 60 } and BuffRemaining(adrenaline_rush_buff) > 18 OutlawUseItemActions()
+    if { target.DebuffExpires(razor_coral_debuff) or target.DebuffPresent(conductive_ink_debuff) and target.HealthPercent() < 32 and target.HealthPercent() >= 30 or not target.DebuffPresent(conductive_ink_debuff) and { target.DebuffStacks(razor_coral_debuff) >= 20 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 60 } and BuffRemaining(adrenaline_rush_buff) > 18 } and target.InRange(sinister_strike_outlaw) OutlawUseItemActions()
     #use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
-    if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
+    if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 } and target.InRange(sinister_strike_outlaw) OutlawUseItemActions()
    }
   }
  }
