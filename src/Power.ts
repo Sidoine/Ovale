@@ -345,7 +345,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         const spellId = this.ovaleSpellBook.getKnownSpellId(spell);
         if (spellId) {
             const spellPowerCosts = GetSpellPowerCost(spellId);
-            let spellPowerCost = spellPowerCosts[1];
+            let spellPowerCost = spellPowerCosts && spellPowerCosts[1];
             if (spellPowerCost) {
                 let cost = spellPowerCost.cost;
                 let typeId = spellPowerCost.type;
