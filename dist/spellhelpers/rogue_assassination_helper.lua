@@ -15,24 +15,27 @@ AddIcon
 	Texture(ability_rogue_disembowel) # Envenom
 	Texture(ability_rogue_fanofknives) # Fan of Knives
 	Texture(ability_rogue_poisonedknife) # Poisoned Knife
+
+	# Interrupts
 	Texture(ability_kick) # Kick
 	Texture(ability_rogue_kidneyshot) # Kidney Shot
 	Texture(ability_cheapshot) # Cheap Shot
-	
+	Texture(spell_shadow_mindsteal) # Blind
+
 	# Poisons
 	Texture(spell_nature_corrosivebreath) # Deadly Poison
 	Texture(ability_poisonsting) # Crippling Poison
-	
+
 	# Buffs
 	Texture(ability_stealth) # Stealth
 	Texture(ability_rogue_deadliness) # Vendetta
 	Texture(ability_vanish) # Vanish
 	Texture(ability_rogue_crimsonvial) # Crimson Vial
 	Texture(ability_rogue_shadowstep) # Shadow Step
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -64,38 +67,38 @@ AddIcon
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
 	Texture(ability_ambush) # Shadowmeld (Night Elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

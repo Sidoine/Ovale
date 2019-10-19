@@ -477,33 +477,44 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "ROGUE" and action == "premeditation" then
                     conditionCode = "ComboPoints() < 5"
-                elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
+                elseif className == "ROGUE" and action == "vanish" and specialization == "subtlety" then
                     annotation.vanish = className
-                    conditionCode = format("CheckBoxOn(opt_vanish)", action)
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
+                    conditionCode = "VanishAllowed()"
+                elseif className == "ROGUE" and action == "vanish" and specialization == "assassination" then
+                    annotation.vanish = className
+                    conditionCode = "VanishAllowed()"
+                elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
                     conditionCode = "target.InRange(shadowstrike)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "eviscerate" then
+				        elseif className == "ROGUE" and specialization == "subtlety" and action == "eviscerate" then
                     conditionCode = "target.InRange(eviscerate)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "stealth" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "stealth" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "ambush" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "ambush" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_dance" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_dance" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_blades" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_blades" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "nightblade" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "nightblade" then
                     conditionCode = "target.InRange(nightblade)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_storm" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_storm" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "kidney_shot" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "kidney_shot" then
                     conditionCode = "target.InRange(kidney_shot)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "secret_technique" then
+	              elseif className == "ROGUE" and specialization == "subtlety" and action == "secret_technique" then
                     conditionCode = "target.InRange(secret_technique)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
+	              elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
                     conditionCode = "target.InRange(backstab)"
+                elseif className == "ROGUE" and (action == "sinister_strike_outlaw" or action == "pistol_shot" or action == "ambush" or action == "dispatch" or action == "between_the_eyes" or action == "cheap_shot" or action == "gouge" or action == "kick" or action == "blind" or action == "marked_for_death" or action == "ghostly_strike" or action == "killing_spree") and specialization == "outlaw" then
+                  conditionCode = format("target.InRange(%s)", action)
+                elseif className == "ROGUE" and action == "blade_rush" and specialization == "outlaw" then
+                  conditionCode = format("{ IsBossFight() and Falling() or not IsBossFight() } and target.InRange(%s)", action)
+                elseif className == "ROGUE" and (action == "adrenaline_rush" or action == "blade_flurry") and specialization == "outlaw" then
+                    conditionCode = "target.InRange(sinister_strike_outlaw)"
+                elseif className == "ROGUE" and action == "vanish" and specialization == "outlaw" then
+                    conditionCode = "target.InRange(sinister_strike_outlaw) and VanishAllowed()"
                 elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
                     local buffName = action .. "_buff"
                     self:AddSymbol(annotation, buffName)
@@ -541,8 +552,42 @@ __exports.Emiter = __class(nil, {
                     end
                     conditionCode = "not pet.Present()"
                     isSpellAction = false
+                elseif className == "WARLOCK" and action == "demonic_strength" then
+                    conditionCode = "not pet.BuffPresent(pet_auto_spin)"
                 elseif className == "WARLOCK" and action == "wrathguard_wrathstorm" then
                     conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
+                elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "hand_of_guldan" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "demonbolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_core_buff) }"
+                elseif className == "WARLOCK" and action == "drain_life" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "health_funnel" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "call_dreadstalkers" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_calling_buff) }"
+                elseif className == "WARLOCK" and action == "summon_demonic_tyrant" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "summon_vilefiend" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "nether_portal" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "drain_soul" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(nightfall_buff) }"
+                elseif className == "WARLOCK" and action == "vile_taint" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "haunt" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "drain_life" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "seed_of_corruption" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "unstable_affliction" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "WARRIOR" and action == "battle_shout" and role == "tank" then
                     conditionCode = "BuffExpires(stamina_buff)"
                 elseif className == "WARRIOR" and action == "charge" then
@@ -2209,8 +2254,7 @@ __exports.Emiter = __class(nil, {
                 local t = target or "target."
                 code = format("not %sClassification(worldboss)", t)
             elseif operand == "priority_rotation" then
-                code = "CheckBoxOn(opt_priority_rotation)"
-                annotation.opt_priority_rotation = className
+                code = "False(priority_rotation)"
             else
                 ok = false
             end
@@ -2473,6 +2517,7 @@ __exports.Emiter = __class(nil, {
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
         self:AddDisambiguation("bloodlust", "burst_haste")
+        self:AddDisambiguation("169314", "azsharas_font_of_power")
         self:AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
         self:AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
         self:AddDisambiguation("concentrated_flame", "concentrated_flame_essence")

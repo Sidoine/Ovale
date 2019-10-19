@@ -24,19 +24,19 @@ AddIcon specialization=3 help=main
 
 	if wet() and not BuffPresent(path_of_frost) and not InCombat() Spell(path_of_frost)
 
-    if target.InRange(festering_strike) and HasFullControl()
-    {
-			if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
+  if target.InRange(festering_strike) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
+  {
+		if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
 
-			# Cooldown
-			if Boss() UnholyDefaultCdActions()
+		# Cooldown
+		if Boss() UnholyDefaultCdActions()
 
-			# Short cooldown
-			UnholyDefaultShortCdActions()
+		# Short cooldown
+		UnholyDefaultShortCdActions()
 
-			# Rotation
-			UnholyDefaultMainActions()
-		}
+		# Rotation
+		UnholyDefaultMainActions()
+	}
 }
 
 AddFunction InterruptActions

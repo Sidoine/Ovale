@@ -22,22 +22,22 @@ AddIcon specialization=feral help=main
 			if Speed() > 0 and BuffPresent(cat_form_buff) Spell(prowl)
 		}
 	}
-	
+
 	# Interrupt
 	if InCombat() and not mounted() and not BuffPresent(travel_form) InterruptActions()
-	
+
 	# Rotation
-	if target.InRange(rake) and HasFullControl() and target.Present()
+	if target.InRange(rake) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl() and target.Present()
 	{
 		#cat_form
 		if not BuffPresent(cat_form_buff) Spell(cat_form)
 
 		# Cooldowns
 		if Boss() FeralDefaultCdActions()
-		
+
 		# Short Cooldowns
 		FeralDefaultShortCdActions()
-		
+
 		# Default Actions
 		FeralDefaultMainActions()
 	}

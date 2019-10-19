@@ -15,8 +15,8 @@ Include(ovale_deathknight_spells)
 AddIcon specialization=1 help=main
 {
 	if InCombat() InterruptActions()
-	
-	if target.InRange(heart_strike) and HasFullControl()
+
+	if target.InRange(heart_strike) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
     {
 		BloodDefaultCdActions()
 

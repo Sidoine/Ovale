@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerHunterBeastMasteryXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_beast_mastery"
-	local desc = "[Xel][8.2] Hunter: Beast Mastery"
+	local desc = "[Xel][8.2.5] Hunter: Beast Mastery"
 	local code = [[
 # Common functions.
 Include(ovale_common)
@@ -14,23 +14,20 @@ Include(ovale_hunter_spells)
 AddIcon specialization=1 help=main
 {
 	# Silence
-	if InCombat() and { not target.IsFriend() or target.IsPvP() }
-	{
-		InterruptActions()
-	}
-	
-	if HasFullControl() and InCombat() and target.Present() and target.InRange(cobra_shot)
+	if InCombat() BeastMasteryInterruptActions()
+
+	if HasFullControl() and not target.DebuffPresent(crowd_control_debuff) and InCombat() and target.Present() and target.InRange(cobra_shot)
 	{
 		# Pet we needs it.
 		SummonPet()
 		if { not IsDead() and not Dead() and HealthPercent() < 50 } or { not pet.IsDead() and pet.HealthPercent() < 15 } Spell(exhilaration)
-	
+
 		# Cooldowns
 		if Boss() BeastMasteryDefaultCdActions()
-		
+
 		# Short Cooldowns
 		BeastMasteryDefaultShortCdActions()
-		
+
 		# Default Actions
 		BeastMasteryDefaultMainActions()
 	}
@@ -44,24 +41,25 @@ AddFunction SummonPet
   if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
   if Spell(revive_pet) Spell(revive_pet)
  }
- if not pet.HealthPercent() <= 0 and pet.HealthPercent() < 85 and not pet.BuffStacks(mend_pet) and pet.InRange(mend_pet) Spell(mend_pet)
+ if not pet.HealthPercent() <= 0 and pet.Health() < pet.HealthMissing() and pet.Present() and not pet.BuffStacks(mend_pet) and pet.InRange(mend_pet) Spell(mend_pet)
  if not pet.Present() and not pet.Exists() and not PreviousSpell(revive_pet) Texture(icon_orangebird_toy)
 }
 
-AddFunction InterruptActions
+AddFunction BeastMasteryInterruptActions
 {
-	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
-	{
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-		if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
-	}
+ if target.HasManagedInterrupts() and target.MustBeInterrupted() or not target.HasManagedInterrupts() and target.IsInterruptible()
+ {
+  if target.InRange(counter_shot) and target.IsInterruptible() and target.RemainingCastTime() <= CastTime(counter_shot) + GCD() Spell(counter_shot)
+  if target.InRange(cobra_shot) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(intimidation) + GCD() Spell(intimidation)
+  if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(quaking_palm) + GCD() Spell(quaking_palm)
+ }
 }
 
 AddFunction BeastMasteryUseItemActions
 {
-	if Item(Trinket0Slot usable=1) Texture(inv_jewelry_talisman_12)
-	if Item(Trinket1Slot usable=1) Texture(inv_jewelry_talisman_12)
+ if Item(Trinket0Slot usable=1) Texture(inv_jewelry_talisman_12)
+ if Item(Trinket1Slot usable=1) Texture(inv_jewelry_talisman_12)
 }
 
 ### actions.default
@@ -118,6 +116,10 @@ AddFunction BeastMasteryDefaultCdActions
  #auto_shot
  #use_items
  BeastMasteryUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.up)&(target.health.pct<35|!essence.condensed_lifeforce.major)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
+ if target.DebuffPresent(razor_coral_debuff) and { PreviousGCDSpell(aspect_of_the_wild) or not HasEquippedItem(cyclotronic_blast_item) and BuffPresent(aspect_of_the_wild_buff) } and { target.HealthPercent() < 35 or not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) } or { target.DebuffExpires(razor_coral_debuff) or target.TimeToDie() < 26 } and target.TimeToDie() > 24 * { SpellCooldown(cyclotronic_blast) + 4 < target.TimeToDie() } BeastMasteryUseItemActions()
+ #use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
+ if BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 5 BeastMasteryUseItemActions()
  #call_action_list,name=cds
  BeastMasteryCdsCdActions()
 
@@ -151,10 +153,10 @@ AddFunction BeastMasteryCdsMainPostConditions
 
 AddFunction BeastMasteryCdsShortCdActions
 {
- #worldvein_resonance
- Spell(worldvein_resonance)
+ #worldvein_resonance,if=buff.lifeblood.stack<4
+ if BuffStacks(lifeblood_buff) < 4 Spell(worldvein_resonance_essence)
  #ripple_in_space
- Spell(ripple_in_space)
+ Spell(ripple_in_space_essence)
 }
 
 AddFunction BeastMasteryCdsShortCdPostConditions
@@ -173,25 +175,23 @@ AddFunction BeastMasteryCdsCdActions
  if BuffPresent(aspect_of_the_wild_buff) and { target.TimeToDie() > SpellCooldownDuration(blood_fury_ap) + BaseDuration(blood_fury_ap) or target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 16 Spell(blood_fury_ap)
  #lights_judgment,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains>gcd.max|!pet.cat.buff.frenzy.up
  if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) > GCD() or not pet.BuffPresent(pet_frenzy_buff) Spell(lights_judgment)
- #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
- # if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
- unless Spell(worldvein_resonance)
+ unless BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence)
  {
-  #guardian_of_azeroth
-  Spell(guardian_of_azeroth)
+  #guardian_of_azeroth,if=cooldown.aspect_of_the_wild.remains<10|target.time_to_die>cooldown+duration|target.time_to_die<30
+  if SpellCooldown(aspect_of_the_wild) < 10 or target.TimeToDie() > SpellCooldown(guardian_of_azeroth) + BaseDuration(guardian_of_azeroth) or target.TimeToDie() < 30 Spell(guardian_of_azeroth)
 
-  unless Spell(ripple_in_space)
+  unless Spell(ripple_in_space_essence)
   {
    #memory_of_lucid_dreams
-   Spell(memory_of_lucid_dreams)
+   Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
 
 AddFunction BeastMasteryCdsCdPostConditions
 {
- Spell(worldvein_resonance) or Spell(ripple_in_space)
+ BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
 }
 
 ### actions.cleave
@@ -210,6 +210,8 @@ AddFunction BeastMasteryCleaveMainActions
  Spell(dire_beast)
  #barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
  if pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 Spell(barbed_shot)
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
  #multishot,if=azerite.rapid_reload.enabled&active_enemies>2
  if HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 Spell(multishot_bm)
  #cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
@@ -224,8 +226,6 @@ AddFunction BeastMasteryCleaveShortCdActions
 {
  unless pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot)
  {
-  #bestial_wrath,if=cooldown.aspect_of_the_wild.remains_guess>20|talent.one_with_the_pack.enabled|target.time_to_die<15
-  if SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 Spell(bestial_wrath)
   #chimaera_shot
   Spell(chimaera_shot)
   #a_murder_of_crows
@@ -235,19 +235,23 @@ AddFunction BeastMasteryCleaveShortCdActions
 
   unless { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot)
   {
+   #focused_azerite_beam
+   Spell(focused_azerite_beam)
    #purifying_blast
    Spell(purifying_blast)
-   #concentrated_flame
-   Spell(concentrated_flame)
-   #blood_of_the_enemy
-   Spell(blood_of_the_enemy)
-   #the_unbound_force
-   Spell(the_unbound_force)
 
-   unless HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
+   unless Spell(concentrated_flame_essence)
    {
-    #spitting_cobra
-    Spell(spitting_cobra)
+    #blood_of_the_enemy
+    Spell(blood_of_the_enemy)
+    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+
+    unless HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
+    {
+     #spitting_cobra
+     Spell(spitting_cobra)
+    }
    }
   }
  }
@@ -255,7 +259,7 @@ AddFunction BeastMasteryCleaveShortCdActions
 
 AddFunction BeastMasteryCleaveShortCdPostConditions
 {
- pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
+ pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(concentrated_flame_essence) or HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
 }
 
 AddFunction BeastMasteryCleaveCdActions
@@ -266,18 +270,14 @@ AddFunction BeastMasteryCleaveCdActions
   Spell(aspect_of_the_wild)
   #stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
   if BuffPresent(aspect_of_the_wild_buff) and BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 15 Spell(stampede)
-
-  unless { SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot)
-  {
-   #focused_azerite_beam
-   Spell(focused_azerite_beam)
-  }
+  #bestial_wrath,if=cooldown.aspect_of_the_wild.remains_guess>20|talent.one_with_the_pack.enabled|target.time_to_die<15
+  if SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 Spell(bestial_wrath)
  }
 }
 
 AddFunction BeastMasteryCleaveCdPostConditions
 {
- pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(purifying_blast) or Spell(concentrated_flame) or Spell(blood_of_the_enemy) or Spell(the_unbound_force) or HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
+ pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies(tagged=1) < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or HasAzeriteTrait(rapid_reload_trait) and Enemies(tagged=1) > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies(tagged=1) < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
 }
 
 ### actions.precombat
@@ -298,9 +298,9 @@ AddFunction BeastMasteryPrecombatShortCdActions
  #summon_pet
  # BeastMasterySummonPet()
  #worldvein_resonance
- Spell(worldvein_resonance)
- #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
- if HasAzeriteTrait(primal_instincts_trait) Spell(bestial_wrath)
+ Spell(worldvein_resonance_essence)
+ #focused_azerite_beam,if=!raid_event.invulnerable.exists
+ if not 0 Spell(focused_azerite_beam)
 }
 
 AddFunction BeastMasteryPrecombatShortCdPostConditions
@@ -310,31 +310,39 @@ AddFunction BeastMasteryPrecombatShortCdPostConditions
 AddFunction BeastMasteryPrecombatCdActions
 {
  #snapshot_stats
- #potion
- # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ #use_item,name=azsharas_font_of_power
+ BeastMasteryUseItemActions()
 
- unless Spell(worldvein_resonance)
+ unless Spell(worldvein_resonance_essence)
  {
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
   #memory_of_lucid_dreams
-  Spell(memory_of_lucid_dreams)
-  #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
-  if not HasAzeriteTrait(primal_instincts_trait) Spell(aspect_of_the_wild)
+  Spell(memory_of_lucid_dreams_essence)
+
+  unless not 0 and Spell(focused_azerite_beam)
+  {
+   #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+   if not HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(cyclotronic_blast_item) } Spell(aspect_of_the_wild)
+   #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+   if HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(cyclotronic_blast_item) } Spell(bestial_wrath)
+  }
  }
 }
 
 AddFunction BeastMasteryPrecombatCdPostConditions
 {
- Spell(worldvein_resonance) or HasAzeriteTrait(primal_instincts_trait) and Spell(bestial_wrath)
+ Spell(worldvein_resonance_essence) or not 0 and Spell(focused_azerite_beam)
 }
 
 ### actions.st
 
 AddFunction BeastMasteryStMainActions
 {
- #barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max|full_recharge_time<gcd.max&cooldown.bestial_wrath.remains|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd
- if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() Spell(barbed_shot)
+ #barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<gcd|cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
+ if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) < GCD() or SpellCooldown(bestial_wrath) > 0 and { SpellFullRecharge(barbed_shot) < GCD() or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } Spell(barbed_shot)
+ #concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
+ if Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(bestial_wrath_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 Spell(concentrated_flame_essence)
  #kill_command
  if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
  #dire_beast
@@ -342,7 +350,7 @@ AddFunction BeastMasteryStMainActions
  #barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|azerite.dance_of_death.rank>1&buff.dance_of_death.down&crit_pct_current>40|target.time_to_die<9
  if pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 Spell(barbed_shot)
  #cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
- if { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or DebuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 Spell(cobra_shot)
+ if { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 Spell(cobra_shot)
  #barbed_shot,if=charges_fractional>1.4
  if Charges(barbed_shot count=0) > 1.4 Spell(barbed_shot)
 }
@@ -353,12 +361,14 @@ AddFunction BeastMasteryStMainPostConditions
 
 AddFunction BeastMasteryStShortCdActions
 {
- unless { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot)
+ unless { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) < GCD() or SpellCooldown(bestial_wrath) > 0 and { SpellFullRecharge(barbed_shot) < GCD() or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } } and Spell(barbed_shot) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(bestial_wrath_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence)
  {
-  #a_murder_of_crows
-  Spell(a_murder_of_crows)
-  #bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15
-  if SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 Spell(bestial_wrath)
+  #a_murder_of_crows,if=cooldown.bestial_wrath.remains
+  if SpellCooldown(bestial_wrath) > 0 Spell(a_murder_of_crows)
+  #focused_azerite_beam,if=buff.bestial_wrath.down|target.time_to_die<5
+  if BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 5 Spell(focused_azerite_beam)
+  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
+  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 or target.TimeToDie() < 5 Spell(the_unbound_force)
 
   unless pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
   {
@@ -367,18 +377,14 @@ AddFunction BeastMasteryStShortCdActions
 
    unless Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot)
    {
-    #purifying_blast
-    Spell(purifying_blast)
-    #concentrated_flame
-    Spell(concentrated_flame)
+    #purifying_blast,if=buff.bestial_wrath.down|target.time_to_die<8
+    if BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 8 Spell(purifying_blast)
     #blood_of_the_enemy
     Spell(blood_of_the_enemy)
-    #the_unbound_force
-    Spell(the_unbound_force)
     #barrage
     Spell(barrage)
 
-    unless { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or DebuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
+    unless { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
     {
      #spitting_cobra
      Spell(spitting_cobra)
@@ -390,33 +396,29 @@ AddFunction BeastMasteryStShortCdActions
 
 AddFunction BeastMasteryStShortCdPostConditions
 {
- { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or DebuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
+ { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) < GCD() or SpellCooldown(bestial_wrath) > 0 and { SpellFullRecharge(barbed_shot) < GCD() or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } } and Spell(barbed_shot) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(bestial_wrath_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
 }
 
 AddFunction BeastMasteryStCdActions
 {
- unless { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot)
+ unless { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) < GCD() or SpellCooldown(bestial_wrath) > 0 and { SpellFullRecharge(barbed_shot) < GCD() or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } } and Spell(barbed_shot) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(bestial_wrath_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence)
  {
-  #aspect_of_the_wild
-  Spell(aspect_of_the_wild)
+  #aspect_of_the_wild,if=cooldown.barbed_shot.charges<2|pet.cat.buff.frenzy.stack>2|!azerite.primal_instincts.enabled
+  if SpellCharges(barbed_shot) < 2 or pet.BuffStacks(pet_frenzy_buff) > 2 or not HasAzeriteTrait(primal_instincts_trait) Spell(aspect_of_the_wild)
+  #stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
+  if BuffPresent(aspect_of_the_wild_buff) and BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 15 Spell(stampede)
 
-  unless Spell(a_murder_of_crows)
+  unless SpellCooldown(bestial_wrath) > 0 and Spell(a_murder_of_crows) or { BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 5 } and Spell(focused_azerite_beam) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 or target.TimeToDie() < 5 } and Spell(the_unbound_force)
   {
-   #stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
-   if BuffPresent(aspect_of_the_wild_buff) and BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 15 Spell(stampede)
-
-   unless { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot)
-   {
-    #focused_azerite_beam
-    Spell(focused_azerite_beam)
-   }
+   #bestial_wrath
+   Spell(bestial_wrath)
   }
  }
 }
 
 AddFunction BeastMasteryStCdPostConditions
 {
- { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(purifying_blast) or Spell(concentrated_flame) or Spell(blood_of_the_enemy) or Spell(the_unbound_force) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or DebuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
+ { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) < GCD() or SpellCooldown(bestial_wrath) > 0 and { SpellFullRecharge(barbed_shot) < GCD() or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } } and Spell(barbed_shot) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(bestial_wrath_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or SpellCooldown(bestial_wrath) > 0 and Spell(a_murder_of_crows) or { BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 5 } and Spell(focused_azerite_beam) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 or target.TimeToDie() < 5 } and Spell(the_unbound_force) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or { BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 8 } and Spell(purifying_blast) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
 }
 ]]
 

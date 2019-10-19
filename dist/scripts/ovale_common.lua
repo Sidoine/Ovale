@@ -169,6 +169,7 @@ Define(hyperthread_wristwraps_300142 300142)
 Define(hyperthread_wristwraps_item 168989)
 Define(balefire_branch_item 159630)
 Define(ignition_mages_fuse_item 159615)
+Define(azsharas_font_of_power_item 169314)
 
 ###
 ### Legendary Meta Gem

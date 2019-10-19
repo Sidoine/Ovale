@@ -281,6 +281,15 @@ __exports.OvaleDataClass = __class(nil, {
                 [79206] = true,
                 [108839] = true,
                 [193223] = true
+            },
+            crowd_control_debuff = {
+                [2094] = true,
+                [6770] = true,
+                [51514] = true,
+                [118] = true,
+                [217832] = true,
+                [115078] = true,
+                [20066] = true
             }
         }
         self.DEFAULT_SPELL_LIST = {}

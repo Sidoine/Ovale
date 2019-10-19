@@ -28,7 +28,7 @@ AddIcon specialization=1 help=main
 	# Interrupt
 	if InCombat() InterruptActions()
 
-	if target.InRange(solar_wrath) and HasFullControl() and target.Present() and InCombat()
+	if target.InRange(solar_wrath) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl() and target.Present() and InCombat()
 	{
 		# Cooldowns
 		if Boss() BalanceDefaultCdActions()

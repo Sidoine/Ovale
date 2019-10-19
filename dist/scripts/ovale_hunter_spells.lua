@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerHunterSpells = function(OvaleScripts)
     local name = "ovale_hunter_spells"
     local desc = "[8.2] Ovale: Hunter spells"
-    local code = [[Define(a_murder_of_crows 131894)
+    local code = [[
+Define(a_murder_of_crows 131894)
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
   SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 tick=1 talent=a_murder_of_crows_talent_survival)
   # Under attack by a flock of crows.
@@ -50,7 +51,7 @@ Define(berserking_buff 200953)
 Define(bestial_wrath 19574)
 # Sends you and your pet into a rage, increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
 # Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
-  SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
+  # SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath=1)
 Define(blood_of_the_enemy_0 297108)
@@ -521,7 +522,7 @@ Define(barbed_shot_buff 246152)
 Define(beast_cleave_buff 268877)
 	SpellInfo(beast_cleave_buff duration=4)
 
-	SpellInfo(bestial_wrath cd=90)
+	SpellInfo(bestial_wrath cd=90 tag=cd)
 	SpellAddBuff(bestial_wrath bestial_wrath_buff=1)
 Define(bestial_wrath_buff 19574)
 	SpellInfo(bestial_wrath_buff duration=15)
@@ -593,7 +594,7 @@ Define(hunters_mark_debuff 257284)
 Define(internal_bleeding_debuff 270343)
     SpellInfo(internal_bleeding_debuff duration=8 max_stacks=3)
 Define(intimidation 19577)
-	SpellInfo(intimidation cd=60)
+	SpellInfo(intimidation cd=60 interrupt=1)
 
 	SpellInfo(kill_command cd=7.5 cd_haste=ranged focus=30)
 	# Unsure of right syntax for following line.
@@ -720,6 +721,7 @@ Define(wing_clip_debuff 195645)
 
 
 #Pet Spells
+Define(pet_bite 17253)
 Define(heart_of_the_phoenix 55709)
 	SpellInfo(heart_of_the_phoenix cd=480)
 Define(heart_of_the_phoenix_debuff 55711)

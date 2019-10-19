@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerRogueSpells = function(OvaleScripts)
     local name = "ovale_rogue_spells"
     local desc = "[8.2] Ovale: Rogue spells"
-    local code = [[Define(adrenaline_rush 13750)
+    local code = [[
+Define(adrenaline_rush 13750)
 # Increases your Energy regeneration rate by (25 of Spell Power), your maximum Energy by (25 of Spell Power), and your attack speed by s2 for 20 seconds.
   SpellInfo(adrenaline_rush cd=180 duration=20 gcd=0.8)
   # Energy regeneration increased by w1 and maximum Energy increased by w4.rnAttack speed increased by w2.
@@ -350,7 +351,7 @@ Define(shuriken_storm 197835)
 # Sprays shurikens at all targets within A1 yards, dealing s1*<CAP>/AP Physical damage.rnrnDamage increased by s3 while Stealth or Shadow Dance is active.rnrn|cFFFFFFFFAwards s2 combo lpoint:points; per target hit?a121471[ plus an additional 121471s2][].|r
   SpellInfo(shuriken_storm energy=35 gcd=1)
 Define(shuriken_tornado 277925)
-# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
+# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds.
   SpellInfo(shuriken_tornado energy=60 cd=60 duration=4 gcd=1 tick=1 talent=shuriken_tornado_talent)
   # Releasing a Shuriken Storm every sec.
   SpellAddBuff(shuriken_tornado shuriken_tornado=1)
@@ -471,7 +472,7 @@ Define(secret_technique_talent 20) #23183
 Define(shadow_focus_talent 6) #22333
 # ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
 Define(shuriken_tornado_talent 21) #21188
-# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
+# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds.
 Define(slice_and_dice_talent 18) #19250
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by (25 of Spell Power). Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
 Define(subterfuge_talent 5) #22332
@@ -541,7 +542,7 @@ Define(blade_flurry_buff 13877)
 Define(blade_rush_buff 271896)
 	SpellInfo(blade_rush_buff duration=5)
 Define(blind 2094)
-	SpellInfo(blind cd=120)
+	SpellInfo(blind cd=120 interrupt=1)
 	SpellInfo(blind add_cd=30 talent=blinding_powder_talent)
 	SpellAddTargetDebuff(blind blind_debuff=1)
 Define(blind_debuff 2094)
@@ -587,7 +588,7 @@ Define(deadly_poison_buff 2823)
 Define(deadly_poison_debuff 2818)
 	SpellInfo(deadly_poison_debuff duration=12 tick=2 haste=melee)
 Define(deadshot_buff 272940)
-	
+
 Define(elaborate_planning_buff 193640)
 	SpellInfo(elaborate_planning_buff duration=5)
 
@@ -766,7 +767,7 @@ Define(sprint_buff 2983)
 	SpellRequire(stealth unusable 1=combat,1)
 	SpellAddBuff(stealth stealth_buff=1)
 	SpellAddBuff(stealth master_of_shadows=1 talent=master_of_shadows_talent specialization=subtlety)
-	
+
 	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=assassination)
 	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=subtlety)
 Define(stealth_buff 1784)
@@ -784,7 +785,7 @@ Define(symbols_of_death_buff 212283)
 	SpellInfo(symbols_of_death_buff duration=10)
 
 	SpellInfo(toxic_blade energy=20 cd=25 combopoints=-1 tag=main)
-	
+
 
 	SpellInfo(toxic_blade_debuff duration=9)
 Define(tricks_of_the_trade 57934)
@@ -808,14 +809,14 @@ Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
 Define(wound_poison_debuff 8679)
 	SpellInfo(wound_poison_debuff duration=12)
-	
+
 
 # Roll the Bones buffs
 Define(broadside_buff 193356)
 	SpellInfo(broadside_buff duration=12 add_duration_combopoints=6)
 Define(buried_treasure_buff 199600)
 	SpellInfo(buried_treasure_buff duration=12 add_duration_combopoints=6)
-Define(grand_melee_buff 193358)	
+Define(grand_melee_buff 193358)
 	SpellInfo(grand_melee_buff duration=12 add_duration_combopoints=6)
 Define(ruthless_precision_buff 193357)
 	SpellInfo(ruthless_precision_buff duration=12 add_duration_combopoints=6)

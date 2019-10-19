@@ -24,8 +24,8 @@ AddIcon specialization=3 help=main
 		if not target.IsFriend() or target.IsPvP() InterruptActions()
 		ControlActions()
 	}
-	
-	if not IsFeared() and not IsIncapacitated() and not IsStunned() and HealthPercent() > 0 and target.Present() and not target.IsFriend() and { InCombat() or not InCombat() and target.InRange(crusader_strike) }
+
+	if target.InRange(crusader_strike) and not target.DebuffPresent(crowd_control_debuff)
     {
 		if Boss() RetributionDefaultCdActions()
 		RetributionDefaultShortCdActions()

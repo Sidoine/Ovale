@@ -17,24 +17,24 @@ AddIcon specialization=3 help=main
 {
 	# Interrupt
 	if InCombat() InterruptActions()
-	
+
 	# Save ass
 	SaveActions()
-	
+
 	if wet() and not mounted() Spell(unending_breath)
-	
-	if InCombat() and target.InRange(chaos_bolt) and HasFullControl()
-    {
+
+	if InCombat() and target.InRange(chaos_bolt) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
+  {
 		# Cooldowns
 		if Boss() and {Speed() == 0 or BuffPresent(movement_allowed_buff) } DestructionDefaultCdActions()
-		
+
 		# Short Cooldowns
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) DestructionDefaultShortCdActions()
-		
+
 		# Default rotation
 		if Speed() == 0 or BuffPresent(movement_allowed_buff) DestructionDefaultMainActions()
 	}
-	
+
 	if not InCombat() and not mounted() OutOfCombatActions()
 }
 

@@ -24,7 +24,7 @@ AddIcon specialization=2 help=main
 		ControlActions()
 	}
 
-  if target.InRange(rampage) and not IsStunned() and not IsIncapacitated() and not IsFeared()
+  if target.InRange(rampage) and not target.DebuffPresent(crowd_control_debuff)
 	{
 		if Spell(victory_rush) Spell(victory_rush)
 		if not target.IsFriend() and HealthPercent() < 60 and Spell(bloodthirst) Spell(enraged_regeneration)
