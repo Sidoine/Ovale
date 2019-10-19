@@ -51,7 +51,7 @@ Define(berserking_buff 200953)
 Define(bestial_wrath 19574)
 # Sends you and your pet into a rage, increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
 # Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
-  SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
+  # SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath=1)
 Define(blood_of_the_enemy_0 297108)
@@ -522,7 +522,7 @@ Define(barbed_shot_buff 246152)
 Define(beast_cleave_buff 268877)
 	SpellInfo(beast_cleave_buff duration=4)
 
-	SpellInfo(bestial_wrath cd=90)
+	SpellInfo(bestial_wrath cd=90 tag=cd)
 	SpellAddBuff(bestial_wrath bestial_wrath_buff=1)
 Define(bestial_wrath_buff 19574)
 	SpellInfo(bestial_wrath_buff duration=15)

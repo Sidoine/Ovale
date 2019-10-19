@@ -356,7 +356,7 @@ __exports.Generator = __class(nil, {
                   name = "intimidation",
                   stun = 1,
                   order = 30,
-                  range = "target.InRange(pet_bite)"
+                  range = "target.InRange(cobra_shot)"
               })
             end
         end
