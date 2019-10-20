@@ -20,14 +20,15 @@ AddIcon
 	Texture(spell_nature_protectionformnature) # Aspect of the Wild
 	Texture(ability_druid_ferociousbite) # Bestial Wrath
 	Texture(ability_hunter_onewithnature) # Exhilaration
+	Texture(ability_hunter_misdirection) # Misdirection
 	Texture(ability_hunter_mendpet) # Mend Pet
 	Texture(inv_misc_pheonixpet_01) # Heart of the Phoenix
 	Texture(ability_hunter_beastsoothe) # Revive Pet
 	Texture(icon_orangebird_toy) # Call Pet
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -62,33 +63,33 @@ AddIcon
 	Texture(spell_holy_holyprotection) # Gift of the Naaru (Draenei)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_ambush) # Shadowmeld (Night elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

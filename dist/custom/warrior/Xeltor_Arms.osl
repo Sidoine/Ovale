@@ -51,12 +51,12 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		if target.InRange(intimidating_shout) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(intimidating_shout)
-		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(quaking_palm)
-		if target.InRange(storm_bolt) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(storm_bolt)
-		if target.Distance(less 10) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(shockwave)
 		if target.InRange(pummel) and target.IsInterruptible() and target.RemainingCastTime() <= GCD() Spell(pummel)
+		if target.Distance(less 10) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(shockwave)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(storm_bolt)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+		# if target.InRange(intimidating_shout) and not target.Classification(worldboss) and target.RemainingCastTime() <= GCD() Spell(intimidating_shout)
 	}
 }
 
