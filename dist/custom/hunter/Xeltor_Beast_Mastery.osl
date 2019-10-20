@@ -20,7 +20,9 @@ AddIcon specialization=1 help=main
 	{
 		# Pet we needs it.
 		SummonPet()
-		if { not IsDead() and not Dead() and HealthPercent() < 50 } or { not pet.IsDead() and pet.HealthPercent() < 15 } Spell(exhilaration)
+		if { not IsDead() and not Dead() and HealthPercent() < 50 } or { not pet.IsDead() and pet.Health() < pet.MaxHealth() * 0.15 } Spell(exhilaration)
+		# Danger close.
+		if target.istargetingplayer() and target.Distance(less 15) and { pet.Present() or focus.Present() and focus.InRange(misdirection) } Spell(misdirection)
 
 		# Cooldowns
 		if Boss() BeastMasteryDefaultCdActions()
@@ -36,13 +38,13 @@ AddIcon specialization=1 help=main
 # Custom functions.
 AddFunction SummonPet
 {
- if pet.HealthPercent() <= 0 and pet.Exists()
+ if pet.IsDead()
  {
   if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
-  if Spell(revive_pet) Spell(revive_pet)
+  if Speed() == 0 Spell(revive_pet)
  }
- if not pet.HealthPercent() <= 0 and pet.Health() < pet.HealthMissing() and pet.Present() and not pet.BuffStacks(mend_pet) and pet.InRange(mend_pet) Spell(mend_pet)
- if not pet.Present() and not pet.Exists() and not PreviousSpell(revive_pet) Texture(icon_orangebird_toy)
+ if not pet.IsDead() and pet.Health() < pet.HealthMissing() and pet.Present() and not pet.BuffStacks(mend_pet) and pet.InRange(mend_pet) Spell(mend_pet)
+ if not pet.Present() and not pet.Exists() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(icon_orangebird_toy)
 }
 
 AddFunction BeastMasteryInterruptActions
