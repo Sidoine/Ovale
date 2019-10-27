@@ -22,7 +22,7 @@ AddIcon specialization=3 help=main
 	if InCombat()
 	{
 		RetributionInterruptActions()
-		ControlActions()
+		# ControlActions()
 	}
 
 	if target.InRange(crusader_strike) and not target.DebuffPresent(crowd_control_debuff)
