@@ -522,7 +522,7 @@ Define(barbed_shot_buff 246152)
 Define(beast_cleave_buff 268877)
 	SpellInfo(beast_cleave_buff duration=4)
 
-	SpellInfo(bestial_wrath cd=90 tag=cd)
+	SpellInfo(bestial_wrath cd=90)
 	SpellAddBuff(bestial_wrath bestial_wrath_buff=1)
 Define(bestial_wrath_buff 19574)
 	SpellInfo(bestial_wrath_buff duration=15)

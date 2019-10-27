@@ -328,8 +328,8 @@ Define(pillars_of_inmost_light 151812)
 Define(liadrins_fury_unleashed_buff 208410)
 Define(scarlet_inquisitors_expurgation_buff 248289)
 
-ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!guardian_of_ancient_kings,buff,!guardian_of_ancient_kings_buff)	
-	
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!guardian_of_ancient_kings,buff,!guardian_of_ancient_kings_buff)
+
 # Paladin spells and functions.
 
 # Learned spells.
@@ -481,7 +481,7 @@ Define(divine_steed 190784)
 Define(divine_steed_buff 221886)
 	SpellInfo(divine_steed_buff duration=3)
 
-	
+
 	SpellRequire(divine_storm holypower_percent 0=buff,divine_storm_no_holy_buff)
 	SpellInfo(divine_storm add_holypower -1=buff,hp_cost_reductino_buff)
 	SpellAddBuff(divine_storm divine_crusader_buff=0)
@@ -493,7 +493,7 @@ SpellList(divine_storm_no_holy_buff divine_crusader_buff divine_purpose_buff)
 	SpellInfo(execution_sentence cd=30 holypower=3 tag=main)
 	SpellInfo(execution_sentence add_holypower -1=buff,hp_cost_reductino_buff)
 	SpellAddBuff(execution_sentence selfless_healer_buff=1 talent=selfless_healer_talent)
-	
+
 	SpellAddBuff(execution_sentence divine_judgment_buff=1 talent=divine_judgment_talent)
 Define(execution_sentence_debuff 267798)
 	SpellInfo(execution_sentence_debuff duration=7)
@@ -681,7 +681,7 @@ Define(speed_of_light 85499)
 	SpellInfo(speed_of_light cd=45 gcd=0 offgcd=1)
 Define(t18_class_trinket 124518)
 
-	
+
 	SpellRequire(templars_verdict add_holypower -1=buff,hp_cost_reductino_buff)
 	SpellRequire(templars_verdict holypower_percent 0=buff,divine_purpose_buff talent=divine_purpose_talent)
 	#SpellAddBuff(templars_verdict divine_purpose_buff=0)
@@ -704,7 +704,7 @@ Define(whisper_of_the_nathrezim 137020)
 Define(whisper_of_the_nathrezim_buff 207633)
 Define(wings_of_liberty_buff 185647)
 	SpellInfo(wings_of_liberty_buff duration=10 max_stacks=10)
-Define(word_of_glory 85673)
+Define(word_of_glory 210191)
 	SpellInfo(word_of_glory cd=1 holypower=3)
 	SpellRequire(word_of_glory holypower_percent 0=buff,word_of_glory_no_holy_buff)
 	SpellAddBuff(word_of_glory divine_purpose_buff=0 if_spell=divine_purpose)
@@ -722,7 +722,7 @@ Define(zeal_debuff 269571)
 Define(sacred_judgment_item 253806)
 Define(sacred_judgment_buff 253806)
 	SpellInfo(sacred_judgment_buff duration=15)
-	
+
 
 #Azerite Traits
 Define(divine_right_trait 278519)
@@ -790,6 +790,9 @@ Define(unbreakable_spirit_talent 14)
 Define(word_of_glory_talent 18)
 Define(zeal_talent 1)
 
+# Utility
+Define(hammer_of_reckoning 247675)
+  SpellInfo(hammer_of_reckoning cd=60)
 ]]
     OvaleScripts:RegisterScript("PALADIN", nil, name, desc, code, "include")
 end
