@@ -31,10 +31,10 @@ AddIcon
 	Texture(spell_holy_sealofvalor) # Blessing of Freedom
 	Texture(ability_paladin_handofhindrance) # Hand of Hindrance
 	Texture(ability_paladin_enlightenedjudgements) # Hammer of Reckoning
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -45,7 +45,7 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
-	
+
 	# Talents
 	Texture(spell_holy_sealofblood) # Zeal (T1)
 	Texture(spell_paladin_executionsentence) # Execution Sentence (T1)
@@ -54,7 +54,7 @@ AddIcon
 	Texture(ability_paladin_blindinglight) # Blinding Light (T3)
 	Texture(spell_holy_innerfire) # Consecration (T4)
 	Texture(inv_sword_2h_artifactashbringerfire_d_03) # Wake of Ashes (T4)
-	Texture(spell_paladin_inquisition) # Eye for an Eye (T5)
+	Texture(spell_holy_weaponmastery) # Eye for an Eye (T5)
 	Texture(spell_holy_retributionaura) # Justicar's Vengeance (T6)
 	Texture(inv_helmet_96) # Word of Glory (T6)
 	Texture(ability_paladin_sanctifiedwrath) # Crusade (T7) (Replaces Avenging Wrath)
@@ -75,49 +75,49 @@ AddIcon
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
 	Texture(ability_ambush) # Shadowmeld (Night Elf)
 	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
