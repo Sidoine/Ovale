@@ -390,6 +390,8 @@ __exports.Emiter = __class(nil, {
                   conditionCode = "target.InRange(muzzle)"
                 elseif className == "HUNTER" and action == "harpoon" then
                   conditionCode = "target.InRange(harpoon)"
+                elseif className == "HUNTER" and action == "bestial_wrath" then
+                  conditionCode = "{ target.Classification(normal) and Enemies(tagged=1) >= 5 or target.Classification(elite) and Enemies(tagged=1) >= 3 or Boss() }"
                 elseif className == "MAGE" and action == "arcane_brilliance" then
                     conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
                 elseif className == "MAGE" and find(action, "pet_") then
