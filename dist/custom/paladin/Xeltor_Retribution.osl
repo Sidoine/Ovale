@@ -21,7 +21,7 @@ AddIcon specialization=3 help=main
 	}
 	if InCombat()
 	{
-		InterruptActions()
+		RetributionInterruptActions()
 		ControlActions()
 	}
 
