@@ -129,7 +129,7 @@ AddFunction ProtectionDefaultCdActions
   unless { BuffPresent(avatar_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) and Item(superior_battle_potion_of_strength usable=1) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or SpellCooldown(avatar) <= 2 and Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence) or Spell(memory_of_lucid_dreams_essence) or BuffExpires(avatar_buff) and Spell(concentrated_flame_essence)
   {
    #last_stand,if=cooldown.anima_of_death.remains<=2
-   if SpellCooldown(anima_of_death) <= 2 Spell(last_stand)
+   if BuffExpires(shield_block_buff) Spell(last_stand)
    #avatar
    Spell(avatar)
    #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
@@ -186,7 +186,7 @@ AddFunction ProtectionAoeShortCdActions
     #ravager
     Spell(ravager_prot)
     #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) Spell(shield_block)
+    if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and BuffExpires(last_stand_buff) Spell(shield_block)
    }
   }
  }
@@ -282,7 +282,7 @@ AddFunction ProtectionStShortCdActions
  unless Enemies(tagged=1) == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap)
  {
   #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-  if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) Spell(shield_block)
+  if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and BuffExpires(last_stand_buff) Spell(shield_block)
 
   unless BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap)
   {

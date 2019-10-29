@@ -16,7 +16,7 @@ AddIcon specialization=3 help=main
     # if not mounted() and not {BuffPresent(critical_strike_buff any=1) or BuffPresent(str_agi_int_buff any=1)} Spell(legacy_of_the_white_tiger)
     
 	#spear_hand_strike
-	if InCombat() InterruptActions()
+	#if InCombat() InterruptActions()
 	
 	if target.InRange(tiger_palm) and HasFullControl()
     {
@@ -239,7 +239,7 @@ AddFunction WindwalkerCdCdActions
  #invoke_xuen_the_white_tiger
  Spell(invoke_xuen_the_white_tiger)
  #use_item,name=variable_intensity_gigavolt_oscillating_reactor
- WindwalkerUseItemActions()
+ #WindwalkerUseItemActions()
  #blood_fury
  Spell(blood_fury_apsp)
  #berserking

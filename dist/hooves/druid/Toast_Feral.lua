@@ -226,7 +226,7 @@ AddFunction FeralCooldownsShortCdActions
   #feral_frenzy,if=combo_points=0
   if ComboPoints() == 0 Spell(feral_frenzy)
   #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
-  if enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 Spell(focused_azerite_beam)
+  #if enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 Spell(focused_azerite_beam)
   #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
   if enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 Spell(purifying_blast)
  }
