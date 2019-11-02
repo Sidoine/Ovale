@@ -339,7 +339,7 @@ __exports.OvalePowerClass = __class(States, {
         local spellId = self.ovaleSpellBook:getKnownSpellId(spell)
         if spellId then
             local spellPowerCosts = GetSpellPowerCost(spellId)
-            local spellPowerCost = spellPowerCosts[1]
+            local spellPowerCost = spellPowerCosts and spellPowerCosts[1]
             if spellPowerCost then
                 local cost = spellPowerCost.cost
                 local typeId = spellPowerCost.type

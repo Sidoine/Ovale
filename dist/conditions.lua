@@ -1209,7 +1209,7 @@ __exports.OvaleConditions = __class(nil, {
         self.PTR = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2]
             local version, _, _, uiVersion = GetBuildInfo()
-            local value = (version > "8.2.0" or uiVersion > 80200) and 1 or 0
+            local value = (version > "8.2.5" or uiVersion > 80205) and 1 or 0
             return Compare(value, comparator, limit)
         end
         self.PersistentMultiplier = function(positionalParams, namedParams, atTime)
