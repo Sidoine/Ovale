@@ -9,6 +9,7 @@ import { SpellInfo } from "../Data";
 import { ConditionNamedParameters } from "../AST";
 import { IoC } from "../ioc";
 import { Annotation } from "../simulationcraft/definitions";
+import { cpus } from "os";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -79,19 +80,19 @@ function truncateFile(fileName: string) {
     writeFileSync(fileName, output.join("\n"));
 }
 
-for (const simcClass of SIMC_CLASS) {
-    truncateFile(outputDirectory + "/ovale_" + simcClass + ".ts");
-}
+const modifiedFiles = new Map<string, boolean>();
 
-let files: string[] = []
-{
+let files: string[] = [];
+const profileFile = process.argv[3];
+if (profileFile) {
+    files.push(process.argv[3]);
+} else {
     let dir = readdirSync(profilesDirectory);
     for (const name of dir) {
         files.push(name);
     }
     files.sort();
 }
-
 
 const spellsByClass = new Map<string, number[]>();
 const talentsByClass = new Map<string, number[]>();
@@ -101,7 +102,6 @@ const azeriteTraitByClass = new Map<string, number[]>();
 const essenceByClass = new Map<string, number[]>();
 
 for (const filename of files) {
-    // if (filename.indexOf('Hunter') < 0) continue;
     if (!filename.startsWith("generate")) {
         let output: string[] = []
         let inputName = profilesDirectory + "/" + filename;
@@ -161,9 +161,15 @@ for (const filename of files) {
             output.push(format('	OvaleScripts.RegisterScript("%s", "%s", name, desc, code, "%s")', profile.annotation.class, profile.annotation.specialization, "script"));
             output.push("}");
             output.push("");
-            let outputFileName = "ovale_" + className.toLowerCase() + ".ts";
+
+
+            const outputFileName = "ovale_" + className.toLowerCase() + ".ts";
             console.log("Appending to " + outputFileName + ": " + name);
             let outputName = outputDirectory + "/" + outputFileName;
+            if (!modifiedFiles.get(outputName)) {
+                modifiedFiles.set(outputName, true);
+                truncateFile(outputName);
+            }
             writeFileSync(outputName, output.join("\n"), { flag: 'a' });
 
             let classSpells = spellsByClass.get(className);
@@ -305,8 +311,8 @@ function getDefinition(identifier: string, customSpellData: CustomSpellData, tal
     return output;
 }
 
-for (const simcClass of SIMC_CLASS) {
-    writeFileSync(outputDirectory + "/ovale_" + simcClass + ".ts", "\n}", { encoding: 'utf8', flag: 'a'});
+for (const file of modifiedFiles.keys()) {
+    writeFileSync(file, "\n}", { encoding: 'utf8', flag: 'a'});
 }
 
 for (const [className, spellIds] of spellsByClass) {
