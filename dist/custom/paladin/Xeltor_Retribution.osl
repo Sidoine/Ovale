@@ -65,7 +65,7 @@ AddFunction RetributionUseItemActions
 
 AddFunction wings_pool
 {
- not HasEquippedItem(azsharas_font_of_power_item) and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > GCD() * 3 or SpellCooldown(crusade) > GCD() * 3 } or HasEquippedItem(azsharas_font_of_power_item) and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > GCD() * 6 or SpellCooldown(crusade) > GCD() * 6 }
+ not HasEquippedItem(azsharas_font_of_power_item) and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > GCD() * 3 or SpellCooldown(crusade) > GCD() * 3 } or HasEquippedItem(azsharas_font_of_power_item) and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > GCD() * 6 or SpellCooldown(crusade) > GCD() * 6 } or not Boss()
 }
 
 AddFunction HoW
