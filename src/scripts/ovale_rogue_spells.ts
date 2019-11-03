@@ -129,14 +129,24 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over 18 seconds.?a231719[ Silences the target for 3 seconds when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
 # Rank 2: Garrote silences the target for 3 seconds when used from Stealth.rn
@@ -296,11 +306,6 @@ Define(reckless_force_buff_1 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -422,7 +427,7 @@ Define(vendetta 79140)
   SpellAddTargetDebuff(vendetta vendetta=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
@@ -483,6 +488,7 @@ Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
 Define(ashvanes_razor_coral_item 169311)
 Define(azsharas_font_of_power_item 169314)
+Define(unbridled_fury_item 169299)
 Define(pocket_sized_computation_device_item 167555)
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
@@ -497,6 +503,7 @@ Define(nights_vengeance_trait 273418)
 Define(perforate_trait 277673)
 Define(replicating_shadows_trait 286121)
 Define(the_first_dance_trait 278681)
+Define(blood_of_the_enemy_essence_id 23)
     `;
 // END
     code += `

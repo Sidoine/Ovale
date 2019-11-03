@@ -2,7 +2,7 @@
   "name": "ovale",
   "version": "8.2.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "tsc && ava",
     "prepare": "tstolua -p tsconfig.lua.json",
@@ -10,7 +10,8 @@
     "simc": "node dist/utils/importsimc.js ../../simc",
     "watch": "tstolua -p tsconfig.lua.json -w",
     "watch-tools": "tsc -w",
-    "watch-test": "ava --watch"
+    "watch-test": "ava --watch",
+    "coverage": "nyc --reporter=lcovonly ava"
   },
   "author": "",
   "license": "ISC",
@@ -50,15 +51,12 @@
   "devDependencies": {
     "@wowts/tstolua": "^1.6.1",
     "ava": "^2.2.0",
-    "tslint": "^5.18.0"
+    "tslint": "^5.18.0",
+    "typemoq": "^2.1.0",
+    "nyc": "^12"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Sidoine/Ovale.git"
-  },
-  "ava": {
-    "files": [
-      "dist/tests/**/*.js"
-    ]
   }
 }

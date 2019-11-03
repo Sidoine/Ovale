@@ -327,11 +327,11 @@ local SelfPool = __class(OvalePool, {
     end,
     Clean = function(self, node)
         if node.child then
-            self.ovaleAst.self_childrenPool:Release(node.child)
+            self.ovaleAst.childrenPool:Release(node.child)
             node.child = nil
         end
         if node.postOrder then
-            self.ovaleAst.self_postOrderPool:Release(node.postOrder)
+            self.ovaleAst.postOrderPool:Release(node.postOrder)
             node.postOrder = nil
         end
     end,
@@ -344,21 +344,19 @@ __exports.OvaleASTClass = __class(nil, {
         self.ovaleCondition = ovaleCondition
         self.ovaleScripts = ovaleScripts
         self.ovaleSpellBook = ovaleSpellBook
-        self.self_indent = 0
-        self.self_outputPool = OvalePool("OvaleAST_outputPool")
-        self.self_listPool = OvalePool("OvaleAST_listPool")
-        self.self_checkboxPool = OvalePool("OvaleAST_checkboxPool")
-        self.self_flattenParameterValuesPool = OvalePool("OvaleAST_FlattenParameterValues")
-        self.self_namedParametersPool = OvalePool("OvaleAST_parametersPool")
-        self.self_rawNamedParametersPool = OvalePool("OvaleAST_rawNamedParametersPool")
-        self.self_positionalParametersPool = OvalePool("OVALEAST_positionParametersPool")
-        self.self_rawPositionalParametersPool = OvalePool("OVALEAST_rawPositionParametersPool")
-        self.self_flattenParametersPool = OvalePool("OvaleAST_FlattenParametersPool")
+        self.indent = 0
+        self.outputPool = OvalePool("OvaleAST_outputPool")
+        self.listPool = OvalePool("OvaleAST_listPool")
+        self.checkboxPool = OvalePool("OvaleAST_checkboxPool")
+        self.flattenParameterValuesPool = OvalePool("OvaleAST_FlattenParameterValues")
+        self.rawNamedParametersPool = OvalePool("OvaleAST_rawNamedParametersPool")
+        self.rawPositionalParametersPool = OvalePool("OVALEAST_rawPositionParametersPool")
+        self.flattenParametersPool = OvalePool("OvaleAST_FlattenParametersPool")
         self.objectPool = OvalePool("OvalePool")
-        self.self_childrenPool = OvalePool("OvaleAST_childrenPool")
-        self.self_postOrderPool = OvalePool("OvaleAST_postOrderPool")
+        self.childrenPool = OvalePool("OvaleAST_childrenPool")
+        self.postOrderPool = OvalePool("OvaleAST_postOrderPool")
         self.postOrderVisitedPool = OvalePool("OvaleAST_postOrderVisitedPool")
-        self.self_pool = SelfPool(self)
+        self.nodesPool = SelfPool(self)
         self.UnparseAddCheckBox = function(node)
             local s
             if node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams) then
@@ -406,12 +404,12 @@ __exports.OvaleASTClass = __class(nil, {
             end
         end
         self.UnparseCommaSeparatedValues = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             for k, v in ipairs(node.csv) do
                 output[k] = self:Unparse(v)
             end
             local outputString = concat(output, ",")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseDefine = function(node)
@@ -486,22 +484,22 @@ __exports.OvaleASTClass = __class(nil, {
             return s
         end
         self.UnparseGroup = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             output[#output + 1] = ""
-            output[#output + 1] = INDENT(self.self_indent) .. "{"
-            self.self_indent = self.self_indent + 1
+            output[#output + 1] = INDENT(self.indent) .. "{"
+            self.indent = self.indent + 1
             for _, statementNode in ipairs(node.child) do
                 local s = self:Unparse(statementNode)
                 if s == "" then
                     output[#output + 1] = s
                 else
-                    output[#output + 1] = INDENT(self.self_indent) .. s
+                    output[#output + 1] = INDENT(self.indent) .. s
                 end
             end
-            self.self_indent = self.self_indent - 1
-            output[#output + 1] = INDENT(self.self_indent) .. "}"
+            self.indent = self.indent - 1
+            output[#output + 1] = INDENT(self.indent) .. "}"
             local outputString = concat(output, "\n")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseIf = function(node)
@@ -529,7 +527,7 @@ __exports.OvaleASTClass = __class(nil, {
             return format("ScoreSpells(%s)", self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseScript = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             local previousDeclarationType
             for _, declarationNode in ipairs(node.child) do
                 if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" or declarationNode.type == "spell_require" then
@@ -537,7 +535,7 @@ __exports.OvaleASTClass = __class(nil, {
                     if s == "" then
                         output[#output + 1] = s
                     else
-                        output[#output + 1] = INDENT(self.self_indent + 1) .. s
+                        output[#output + 1] = INDENT(self.indent + 1) .. s
                     end
                 else
                     local insertBlank = false
@@ -555,7 +553,7 @@ __exports.OvaleASTClass = __class(nil, {
                 end
             end
             local outputString = concat(output, "\n")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseSpellAuraList = function(node)
@@ -955,17 +953,11 @@ __exports.OvaleASTClass = __class(nil, {
                                 node.precedence = precedence
                                 node.child[1] = lhsNode
                                 node.child[2] = rhsNode
-                                local rotated = false
                                 while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
                                     node.child[2] = rhsNode.child[1]
                                     rhsNode.child[1] = node
-                                    node.asString = self.UnparseExpression(node)
                                     node = rhsNode
                                     rhsNode = node.child[2]
-                                    rotated = true
-                                end
-                                if rotated then
-                                    node.asString = self.UnparseExpression(node)
                                 end
                             end
                         end
@@ -974,9 +966,6 @@ __exports.OvaleASTClass = __class(nil, {
                 if  not keepScanning then
                     break
                 end
-            end
-            if ok and node then
-                node.asString = node.asString or self:Unparse(node)
             end
             return ok, node
         end
@@ -1100,7 +1089,7 @@ __exports.OvaleASTClass = __class(nil, {
                     ok = false
                 end
             end
-            local child = self.self_childrenPool:Get()
+            local child = self.childrenPool:Get()
             local tokenType = tokenStream:Peek()
             while ok and tokenType and tokenType ~= "}" do
                 local statementNode
@@ -1125,7 +1114,7 @@ __exports.OvaleASTClass = __class(nil, {
                 node.type = "group"
                 node.child = child
             else
-                self.self_childrenPool:Release(child)
+                self.childrenPool:Release(child)
             end
             return ok, node
         end
@@ -1463,7 +1452,7 @@ __exports.OvaleASTClass = __class(nil, {
         self.ParseScriptStream = function(tokenStream, nodeList, annotation)
             self.profiler:StartProfiling("OvaleAST_ParseScript")
             local ok = true
-            local child = self.self_childrenPool:Get()
+            local child = self.childrenPool:Get()
             while ok do
                 local tokenType = tokenStream:Peek()
                 if tokenType then
@@ -1474,7 +1463,7 @@ __exports.OvaleASTClass = __class(nil, {
                             for _, node in ipairs(declarationNode.child) do
                                 child[#child + 1] = node
                             end
-                            self.self_pool:Release(declarationNode)
+                            self.nodesPool:Release(declarationNode)
                         else
                             child[#child + 1] = declarationNode
                         end
@@ -1489,7 +1478,7 @@ __exports.OvaleASTClass = __class(nil, {
                 ast.type = "script"
                 ast.child = child
             else
-                self.self_childrenPool:Release(child)
+                self.childrenPool:Release(child)
             end
             self.profiler:StopProfiling("OvaleAST_ParseScript")
             return ok, ast
@@ -1809,8 +1798,6 @@ __exports.OvaleASTClass = __class(nil, {
         self.debug = ovaleDebug:create("OvaleAST")
         self.profiler = ovaleProfiler:create("OvaleAST")
     end,
-    OnInitialize = function(self)
-    end,
     print_r = function(self, node, indent, done, output)
         done = done or {}
         output = output or {}
@@ -1889,7 +1876,7 @@ __exports.OvaleASTClass = __class(nil, {
     end,
     FlattenParameterValue = function(self, parameterValue, annotation)
         if isAstNode(parameterValue) and isCsvNode(parameterValue) then
-            local parameters = self.self_flattenParametersPool:Get()
+            local parameters = self.flattenParametersPool:Get()
             for k, v in ipairs(parameterValue.csv) do
                 parameters[k] = self:FlattenParameterValueNotCsv(v, annotation)
             end
@@ -1937,12 +1924,13 @@ __exports.OvaleASTClass = __class(nil, {
                 self.debug:Error("Unable to unparse node of type '%s'.", node.type)
                 return "Unkown_" .. node.type
             else
-                return visitor(node)
+                node.asString = visitor(node)
+                return node.asString
             end
         end
     end,
     UnparseParameters = function(self, positionalParams, namedParams)
-        local output = self.self_outputPool:Get()
+        local output = self.outputPool:Get()
         for k, v in kpairs(namedParams) do
             if isListItemParameter(k, v) then
                 for list, item in pairs(v) do
@@ -1964,7 +1952,7 @@ __exports.OvaleASTClass = __class(nil, {
             insert(output, 1, self:Unparse(positionalParams[k]))
         end
         local outputString = concat(output, " ")
-        self.self_outputPool:Release(output)
+        self.outputPool:Release(output)
         return outputString
     end,
     SyntaxError = function(self, tokenStream, ...)
@@ -1993,8 +1981,8 @@ __exports.OvaleASTClass = __class(nil, {
     end,
     ParseParameters = function(self, tokenStream, nodeList, annotation, isList)
         local ok = true
-        local positionalParams = self.self_rawPositionalParametersPool:Get()
-        local namedParams = self.self_rawNamedParametersPool:Get()
+        local positionalParams = self.rawPositionalParametersPool:Get()
+        local namedParams = self.rawNamedParametersPool:Get()
         while ok do
             local tokenType, token = tokenStream:Peek()
             if tokenType then
@@ -2041,7 +2029,7 @@ __exports.OvaleASTClass = __class(nil, {
                         local parameterName = name
                         if parameterName == "listitem" then
                             local np = namedParams[parameterName]
-                            local control = np or self.self_listPool:Get()
+                            local control = np or self.listPool:Get()
                             tokenType, token = tokenStream:Consume()
                             local list
                             if tokenType == "name" then
@@ -2076,7 +2064,7 @@ __exports.OvaleASTClass = __class(nil, {
                             end
                         elseif name == "checkbox" then
                             local np = namedParams[name]
-                            local control = np or self.self_checkboxPool:Get()
+                            local control = np or self.checkboxPool:Get()
                             ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
                             if ok and node then
                                 if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
@@ -2209,23 +2197,15 @@ __exports.OvaleASTClass = __class(nil, {
         end
         return ok, node
     end,
-    DebugAST = function(self)
-        self.debug:Log(self.self_pool:DebuggingInfo())
-        self.debug:Log(self.self_namedParametersPool:DebuggingInfo())
-        self.debug:Log(self.self_checkboxPool:DebuggingInfo())
-        self.debug:Log(self.self_listPool:DebuggingInfo())
-        self.debug:Log(self.self_childrenPool:DebuggingInfo())
-        self.debug:Log(self.self_outputPool:DebuggingInfo())
-    end,
     NewNode = function(self, nodeList, hasChild)
-        local node = self.self_pool:Get()
+        local node = self.nodesPool:Get()
         if nodeList then
             local nodeId = #nodeList + 1
             node.nodeId = nodeId
             nodeList[nodeId] = node
         end
         if hasChild then
-            node.child = self.self_childrenPool:Get()
+            node.child = self.childrenPool:Get()
         end
         return node
     end,
@@ -2236,12 +2216,12 @@ __exports.OvaleASTClass = __class(nil, {
     ReleaseAnnotation = function(self, annotation)
         if annotation.checkBoxList then
             for _, control in ipairs(annotation.checkBoxList) do
-                self.self_checkboxPool:Release(control)
+                self.checkboxPool:Release(control)
             end
         end
         if annotation.listList then
             for _, control in ipairs(annotation.listList) do
-                self.self_listPool:Release(control)
+                self.listPool:Release(control)
             end
         end
         if annotation.objects then
@@ -2251,17 +2231,17 @@ __exports.OvaleASTClass = __class(nil, {
         end
         if annotation.rawPositionalParametersList then
             for _, parameters in ipairs(annotation.rawPositionalParametersList) do
-                self.self_rawPositionalParametersPool:Release(parameters)
+                self.rawPositionalParametersPool:Release(parameters)
             end
         end
         if annotation.rawNamedParametersList then
             for _, parameters in ipairs(annotation.rawNamedParametersList) do
-                self.self_rawNamedParametersPool:Release(parameters)
+                self.rawNamedParametersPool:Release(parameters)
             end
         end
         if annotation.nodeList then
             for _, node in ipairs(annotation.nodeList) do
-                self.self_pool:Release(node)
+                self.nodesPool:Release(node)
             end
         end
         for _, value in kpairs(annotation) do
@@ -2276,7 +2256,7 @@ __exports.OvaleASTClass = __class(nil, {
             self:ReleaseAnnotation(ast.annotation)
             ast.annotation = nil
         end
-        self.self_pool:Release(ast)
+        self.nodesPool:Release(ast)
     end,
     ParseCode = function(self, nodeType, code, nodeList, annotation)
         nodeList = nodeList or {}
@@ -2287,42 +2267,43 @@ __exports.OvaleASTClass = __class(nil, {
         })
         local _, node = self:Parse(nodeType, tokenStream, nodeList, annotation)
         tokenStream:Release()
+        self:Unparse(node)
         return node, nodeList, annotation
     end,
-    ParseScript = function(self, name, options)
-        local code = self.ovaleScripts:GetScriptOrDefault(name)
-        local ast
-        if code then
-            options = options or {
-                optimize = true,
-                verify = true
-            }
-            local annotation = {
-                nodeList = {},
-                verify = options.verify
-            }
-            ast = self:ParseCode("script", code, annotation.nodeList, annotation)
-            if ast then
-                ast.annotation = annotation
-                self:PropagateConstants(ast)
-                self:PropagateStrings(ast)
-                self:FlattenParameters(ast)
-                self:VerifyParameterStances(ast)
-                self:VerifyFunctionCalls(ast)
-                if options.optimize then
-                    self:Optimize(ast)
-                end
-                self:InsertPostOrderTraversal(ast)
-            else
-                ast = self:NewNode()
-                ast.annotation = annotation
-                self:Release(ast)
-                ast = nil
+    parseScript = function(self, code, options)
+        options = options or {
+            optimize = true,
+            verify = true
+        }
+        local annotation = {
+            nodeList = {},
+            verify = options.verify
+        }
+        local ast = self:ParseCode("script", code, annotation.nodeList, annotation)
+        if ast then
+            ast.annotation = annotation
+            self:PropagateConstants(ast)
+            self:PropagateStrings(ast)
+            self:FlattenParameters(ast)
+            self:VerifyParameterStances(ast)
+            self:VerifyFunctionCalls(ast)
+            if options.optimize then
+                self:Optimize(ast)
             end
+            self:InsertPostOrderTraversal(ast)
         else
-            self.debug:Debug("No code to parse")
+            self:ReleaseAnnotation(annotation)
         end
         return ast
+    end,
+    parseNamedScript = function(self, name, options)
+        local code = self.ovaleScripts:GetScriptOrDefault(name)
+        if code then
+            return self:parseScript(code, options)
+        else
+            self.debug:Debug("No code to parse")
+            return nil
+        end
     end,
     PropagateConstants = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_PropagateConstants")
@@ -2427,7 +2408,7 @@ __exports.OvaleASTClass = __class(nil, {
             local dictionary = annotation.definition
             for _, node in ipairs(annotation.parametersReference) do
                 if node.rawPositionalParams then
-                    local parameters = self.self_flattenParameterValuesPool:Get()
+                    local parameters = self.flattenParameterValuesPool:Get()
                     for key, value in ipairs(node.rawPositionalParams) do
                         parameters[key] = self:FlattenParameterValue(value, annotation)
                     end
@@ -2474,7 +2455,7 @@ __exports.OvaleASTClass = __class(nil, {
                     annotation.parametersList = annotation.parametersList or {}
                     annotation.parametersList[#annotation.parametersList + 1] = parameters
                 end
-                local output = self.self_outputPool:Get()
+                local output = self.outputPool:Get()
                 for k, v in kpairs(node.namedParams) do
                     if isCheckBoxFlattenParameters(k, v) then
                         for _, name in ipairs(v) do
@@ -2499,7 +2480,7 @@ __exports.OvaleASTClass = __class(nil, {
                 else
                     node.paramsAsString = ""
                 end
-                self.self_outputPool:Release(output)
+                self.outputPool:Release(output)
             end
         end
         self.profiler:StopProfiling("OvaleAST_FlattenParameters")
@@ -2558,7 +2539,7 @@ __exports.OvaleASTClass = __class(nil, {
         local annotation = ast.annotation
         if annotation and annotation.postOrderReference then
             for _, node in ipairs(annotation.postOrderReference) do
-                local array = self.self_postOrderPool:Get()
+                local array = self.postOrderPool:Get()
                 local visited = self.postOrderVisitedPool:Get()
                 self:PostOrderTraversal(node, array, visited)
                 self.postOrderVisitedPool:Release(visited)
@@ -2568,39 +2549,6 @@ __exports.OvaleASTClass = __class(nil, {
         self.profiler:StopProfiling("OvaleAST_InsertPostOrderTraversal")
     end,
     Optimize = function(self, ast)
-        self:CommonFunctionElimination(ast)
-        self:CommonSubExpressionElimination(ast)
-    end,
-    CommonFunctionElimination = function(self, ast)
-        self.profiler:StartProfiling("OvaleAST_CommonFunctionElimination")
-        if ast.annotation then
-            if ast.annotation.functionReference then
-                local functionHash = ast.annotation.functionHash or {}
-                for _, node in ipairs(ast.annotation.functionReference) do
-                    if node.positionalParams or node.namedParams then
-                        local hash = node.name .. "(" .. node.paramsAsString .. ")"
-                        node.functionHash = hash
-                        functionHash[hash] = functionHash[hash] or node
-                    end
-                end
-                ast.annotation.functionHash = functionHash
-            end
-            if ast.annotation.functionHash and ast.annotation.nodeList then
-                local functionHash = ast.annotation.functionHash
-                for _, node in ipairs(ast.annotation.nodeList) do
-                    if node.child then
-                        for k, childNode in ipairs(node.child) do
-                            if childNode.functionHash then
-                                node.child[k] = functionHash[childNode.functionHash]
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        self.profiler:StopProfiling("OvaleAST_CommonFunctionElimination")
-    end,
-    CommonSubExpressionElimination = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_CommonSubExpressionElimination")
         if ast and ast.annotation and ast.annotation.nodeList then
             local expressionHash = {}
@@ -2609,9 +2557,11 @@ __exports.OvaleASTClass = __class(nil, {
                 if hash then
                     expressionHash[hash] = expressionHash[hash] or node
                 end
+            end
+            for _, node in ipairs(ast.annotation.nodeList) do
                 if node.child then
                     for i, childNode in ipairs(node.child) do
-                        hash = childNode.asString
+                        local hash = childNode.asString
                         if hash then
                             local hashNode = expressionHash[hash]
                             if hashNode then

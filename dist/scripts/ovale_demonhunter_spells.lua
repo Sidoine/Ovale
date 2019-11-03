@@ -107,14 +107,24 @@ Define(fiery_brand 204021)
   SpellInfo(chaos_nova replaced_by=fiery_brand)
   # Dealing s1 less damage to the branding Demon Hunter.
   SpellAddBuff(fiery_brand fiery_brand=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)
@@ -222,11 +232,6 @@ Define(reckless_force_buff_1 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2/10 Pain.|r
   SpellInfo(shear pain=-10)
@@ -290,7 +295,7 @@ Define(vengeful_retreat 198793)
   SpellAddBuff(vengeful_retreat vengeful_retreat=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
@@ -330,7 +335,10 @@ Define(spirit_bomb_talent 17) #22513
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
+Define(unbridled_fury_item 169299)
+Define(steelskin_potion_item 152557)
 Define(chaotic_transformation_trait 288754)
+Define(eyes_of_rage_trait 278500)
 Define(revolving_blades_trait 279581)
 Define(eyes_of_rage_trait 278500)
     ]]

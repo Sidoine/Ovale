@@ -196,7 +196,7 @@ AddFunction ShadowPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
 
  unless not BuffPresent(shadowform_buff) and Spell(shadowform)
  {
@@ -341,8 +341,8 @@ AddFunction ShadowCleaveCdPostConditions
 
 AddFunction ShadowCdsMainActions
 {
- #concentrated_flame
- Spell(concentrated_flame_essence)
+ #concentrated_flame,line_cd=6,if=time<=10|(buff.chorus_of_insanity.stack>=15&buff.voidform.up)|full_recharge_time<gcd|target.time_to_die<5
+ if TimeSincePreviousSpell(concentrated_flame_essence) > 6 and { TimeInCombat() <= 10 or BuffStacks(chorus_of_insanity) >= 15 and BuffPresent(voidform_shadow) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } Spell(concentrated_flame_essence)
  #call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
  if BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowCritcdsMainActions()
 }
@@ -354,14 +354,12 @@ AddFunction ShadowCdsMainPostConditions
 
 AddFunction ShadowCdsShortCdActions
 {
- #focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
- if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
  #purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
  if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
  #the_unbound_force
  Spell(the_unbound_force)
 
- unless Spell(concentrated_flame_essence)
+ unless TimeSincePreviousSpell(concentrated_flame_essence) > 6 and { TimeInCombat() <= 10 or BuffStacks(chorus_of_insanity) >= 15 and BuffPresent(voidform_shadow) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence)
  {
   #ripple_in_space
   Spell(ripple_in_space_essence)
@@ -374,7 +372,7 @@ AddFunction ShadowCdsShortCdActions
 
 AddFunction ShadowCdsShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsShortCdPostConditions()
+ TimeSincePreviousSpell(concentrated_flame_essence) > 6 and { TimeInCombat() <= 10 or BuffStacks(chorus_of_insanity) >= 15 and BuffPresent(voidform_shadow) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsShortCdPostConditions()
 }
 
 AddFunction ShadowCdsCdActions
@@ -385,8 +383,10 @@ AddFunction ShadowCdsCdActions
  Spell(blood_of_the_enemy)
  #guardian_of_azeroth,if=buff.voidform.stack>15
  if BuffStacks(voidform_shadow) > 15 Spell(guardian_of_azeroth)
+ #focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+ if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
 
- unless { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and { TimeInCombat() <= 10 or BuffStacks(chorus_of_insanity) >= 15 and BuffPresent(voidform_shadow) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
  {
   #call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
   if BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowCritcdsCdActions()
@@ -401,7 +401,7 @@ AddFunction ShadowCdsCdActions
 
 AddFunction ShadowCdsCdPostConditions
 {
- { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsCdPostConditions()
+ { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and { TimeInCombat() <= 10 or BuffStacks(chorus_of_insanity) >= 15 and BuffPresent(voidform_shadow) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsCdPostConditions()
 }
 
 ### actions.default
@@ -446,7 +446,7 @@ AddFunction ShadowDefaultCdActions
 {
  ShadowInterruptActions()
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
- if { BuffPresent(bloodlust) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ if { BuffPresent(bloodlust) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  #variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
  #run_action_list,name=cleave,if=active_enemies>1
  if Enemies() > 1 ShadowCleaveCdActions()
@@ -534,7 +534,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # focused_azerite_beam
 # guardian_of_azeroth
 # harvested_thoughts_buff
-# item_unbridled_fury
 # lifeblood_buff
 # memory_of_lucid_dreams_essence
 # mind_blast
@@ -560,6 +559,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # surrender_to_madness
 # the_unbound_force
 # thought_harvester_trait
+# unbridled_fury_item
 # vampiric_touch
 # vampiric_touch_debuff
 # void_bolt

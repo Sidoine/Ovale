@@ -73,7 +73,7 @@ __exports.PRIMARY_POWER = {
     mana = true
 }
 __exports.OvalePowerClass = __class(States, {
-    constructor = function(self, ovaleDebug, ovale, ovaleProfiler, ovaleData, ovaleFuture, baseState, ovaleAura, ovalePaperDoll, requirement)
+    constructor = function(self, ovaleDebug, ovale, ovaleProfiler, ovaleData, ovaleFuture, baseState, ovaleAura, ovalePaperDoll, requirement, ovaleSpellBook)
         self.ovale = ovale
         self.ovaleData = ovaleData
         self.ovaleFuture = ovaleFuture
@@ -81,6 +81,7 @@ __exports.OvalePowerClass = __class(States, {
         self.ovaleAura = ovaleAura
         self.ovalePaperDoll = ovalePaperDoll
         self.requirement = requirement
+        self.ovaleSpellBook = ovaleSpellBook
         self.POWER_INFO = {}
         self.POWER_TYPE = {}
         self.OnInitialize = function()
@@ -334,16 +335,22 @@ __exports.OvalePowerClass = __class(States, {
         end
         self.profiler:StopProfiling("OvalePower_UpdatePowerType")
     end,
-    GetSpellCost = function(self, spellId, powerType)
-        local spellPowerCost = GetSpellPowerCost(spellId)[1]
-        if spellPowerCost then
-            local cost = spellPowerCost.cost
-            local typeId = spellPowerCost.type
-            for pt, p in pairs(self.POWER_INFO) do
-                if p.id == typeId and (powerType == nil or pt == powerType) then
-                    return cost, p.type
+    GetSpellCost = function(self, spell, powerType)
+        local spellId = self.ovaleSpellBook:getKnownSpellId(spell)
+        if spellId then
+            local spellPowerCosts = GetSpellPowerCost(spellId)
+            local spellPowerCost = spellPowerCosts and spellPowerCosts[1]
+            if spellPowerCost then
+                local cost = spellPowerCost.cost
+                local typeId = spellPowerCost.type
+                for pt, p in pairs(self.POWER_INFO) do
+                    if p.id == typeId and (powerType == nil or pt == powerType) then
+                        return cost, p.type
+                    end
                 end
             end
+        else
+            self.ovale:OneTimeMessage("No spell cost for " .. spell)
         end
         return nil, nil
     end,

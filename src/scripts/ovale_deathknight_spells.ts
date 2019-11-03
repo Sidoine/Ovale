@@ -97,6 +97,23 @@ Define(cold_heart_buff 281209)
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
   # Your next Chains of Ice will deal 281210s1 Frost damage.
   SpellAddBuff(cold_heart_buff cold_heart_buff=1)
+Define(condensed_life_force_0 295838)
+# When an Azerite spike deals damage, all damage you deal against that target is increased by 295838s1 for 6 seconds.
+  SpellInfo(condensed_life_force_0 duration=6 gcd=0 offgcd=1)
+  # Damage taken increased by s1.
+  SpellAddTargetDebuff(condensed_life_force_0 condensed_life_force_0=1)
+Define(condensed_life_force_1 299312)
+# Infuse your Heart of Azeroth with Condensed Life-Force.
+  SpellInfo(condensed_life_force_1)
+Define(condensed_life_force_2 299313)
+# Infuse your Heart of Azeroth with Condensed Life-Force.
+  SpellInfo(condensed_life_force_2)
+Define(condensed_life_force_3 299314)
+# Infuse your Heart of Azeroth with Condensed Life-Force.
+  SpellInfo(condensed_life_force_3)
+Define(condensed_life_force_4 299315)
+# Infuse your Heart of Azeroth with Condensed Life-Force.
+  SpellInfo(condensed_life_force_4)
 Define(consumption 274156)
 # Strikes all enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
   SpellInfo(consumption cd=45 talent=consumption_talent)
@@ -137,14 +154,24 @@ Define(epidemic 207317)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
   SpellInfo(festering_strike runes=2 runicpower=-20)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(frost_strike 49143)
 # Chill your weapons with icy power, and quickly strike the enemy with both weapons, dealing a total of 222026s1+66196s1 Frost damage.
   SpellInfo(frost_strike runicpower=25)
@@ -288,11 +315,6 @@ Define(reckless_force_buff_1 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
@@ -376,12 +398,13 @@ Define(war_stomp 20549)
   SpellAddTargetDebuff(war_stomp war_stomp=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(chill_streak chill_streak_0 chill_streak_1 chill_streak_2 chill_streak_3)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
-SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(condensed_life_force condensed_life_force_0 condensed_life_force_1 condensed_life_force_2 condensed_life_force_3 condensed_life_force_4)
 Define(army_of_the_damned_talent 19) #22030
 # ?s207317[Death Coil and Epidemic reduce][Death Coil reduces] the cooldown of Apocalypse by <cd1> sec and Army of the Dead by <cd2> sec.
 Define(asphyxiate_talent_unholy 9) #22520
@@ -442,6 +465,8 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
+Define(unbridled_fury_item 169299)
+Define(ashvanes_razor_coral_item 169311)
 Define(first_mates_spyglass_item 158163)
 Define(jes_howler_item 159627)
 Define(lurkers_insidious_gift_item 167866)
@@ -455,6 +480,8 @@ Define(vision_of_demise_item 169307)
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)
 Define(magus_of_the_dead_trait 288417)
+Define(condensed_life_force_essence_id 14)
+Define(vision_of_perfection_essence_id 22)
     `;
 // END
 
@@ -813,7 +840,11 @@ Define(wraith_walk_talent_blood 15)
 Define(wraith_walk_talent 14)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(outbreak tag=main)
+    SpellInfo(outbreak tag=main)
+    
+# Misc spells
+Define(icy_citadel_expires_buff 272723)
+# TODO the end of pillar of frost triggers this buff (if icy_citadel is there) 
 `;
     
     OvaleScripts.RegisterScript("DEATHKNIGHT", undefined, name, desc, code, "include");

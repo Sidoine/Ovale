@@ -20,7 +20,6 @@ local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
-local kpairs = pairs
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
 local GetItemIcon = GetItemIcon
@@ -611,7 +610,7 @@ __exports.OvaleBestActionClass = __class(nil, {
             return self:getSpellActionInfo(spell, element, atTime, target)
         elseif isString(spell) then
             local spellList = self.ovaleData.buffSpellList[spell]
-            for spellId in kpairs(spellList) do
+            for spellId in pairs(spellList) do
                 if self.OvaleSpellBook:IsKnownSpell(spellId) then
                     return self:getSpellActionInfo(spellId, element, atTime, target)
                 end
@@ -749,7 +748,7 @@ __exports.OvaleBestActionClass = __class(nil, {
     GetAction = function(self, node, atTime)
         self.profiler:StartProfiling("OvaleBestAction_GetAction")
         local groupNode = node.child[1]
-        local timeSpan, element = self:Compute(groupNode, atTime)
+        local timeSpan, element = self:PostOrderCompute(groupNode, atTime)
         if element and element.type == "state" then
             local variable, value = element.positionalParams[1], element.positionalParams[2]
             local isFuture =  not timeSpan:HasTime(atTime)

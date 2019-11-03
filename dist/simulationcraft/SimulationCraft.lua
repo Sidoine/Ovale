@@ -64,7 +64,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         end
         self:registerOptions()
         self.module = ovale:createModule("OvaleSimulationCraft", self.OnInitialize, self.handleDisable)
-        self.tracer = ovaleDebug:create("")
+        self.tracer = ovaleDebug:create("SimulationCraft")
     end,
     AddSymbol = function(self, annotation, symbol)
         local symbolTable = annotation.symbolTable or {}

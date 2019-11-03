@@ -609,7 +609,7 @@ __exports.OvaleCompileClass = __class(nil, {
             self.ast = nil
         end
         if self.ovaleCondition:HasAny() then
-            self.ast = self.ovaleAst:ParseScript(name)
+            self.ast = self.ovaleAst:parseNamedScript(name)
         end
         ResetControls()
         return self.ast

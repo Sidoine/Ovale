@@ -130,14 +130,24 @@ Define(flametongue_buff 194084)
   SpellInfo(flametongue_buff duration=16 gcd=0 offgcd=1 tick=8)
   # Each of your weapon attacks causes up to <coeff>*AP additional Fire damage.
   SpellAddBuff(flametongue_buff flametongue_buff=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds. 
   SpellInfo(frost_shock duration=6)
@@ -468,7 +478,7 @@ Define(windstrike 115356)
 
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(hex hex_0 hex_1 hex_2 hex_3 hex_4 hex_5 hex_6 hex_7)
 SpellList(lightning_lasso lightning_lasso_0 lightning_lasso_1)
@@ -531,6 +541,7 @@ Define(totem_mastery_talent_elemental 6) #23190
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
 Define(totem_mastery_talent 6) #23109
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 262417s1 Maelstrom every 262417t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the damage of Stormstrike by 262397s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Lava Lash damage by 262399s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your chance to trigger Windfury by 262400s1.
+Define(unbridled_fury_item 169299)
 Define(ancestral_resonance_trait 277666)
 Define(echo_of_the_elementals_trait 275381)
 Define(igneous_potential_trait 279829)
@@ -540,6 +551,7 @@ Define(tectonic_thunder_trait 286949)
 Define(lightning_conduit_trait 275388)
 Define(primal_primer_trait 272992)
 Define(strength_of_earth_trait 273461)
+Define(blood_of_the_enemy_essence_id 23)
     `;
 // END
     code += `

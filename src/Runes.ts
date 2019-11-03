@@ -95,7 +95,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         }
         this.profiler.StopProfiling("OvaleRunes_UpdateRune");
     }
-    UpdateAllRunes() {
+    private UpdateAllRunes = () => {
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
             this.UpdateRune(slot);
         }

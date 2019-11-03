@@ -98,6 +98,7 @@ const talentsByClass = new Map<string, number[]>();
 const itemsByClass = new Map<string, number[]>();
 const spellListsByClass = new Map<string, string[]>();
 const azeriteTraitByClass = new Map<string, number[]>();
+const essenceByClass = new Map<string, number[]>();
 
 for (const filename of files) {
     // if (filename.indexOf('Hunter') < 0) continue;
@@ -185,6 +186,11 @@ for (const filename of files) {
                 azeriteTraits = [];
                 azeriteTraitByClass.set(className, azeriteTraits);
             }
+            let essences = essenceByClass.get(className);
+            if (!essences){
+                essences = [];
+                essenceByClass.set(className, essences);
+            }
             let spellLists = spellListsByClass.get(className);
             if (!spellLists) {
                 spellLists = [];
@@ -212,6 +218,10 @@ for (const filename of files) {
                 } else if (symbol.match(/_trait$/)) {
                     if (id && azeriteTraits.indexOf(id) < 0) {
                         azeriteTraits.push(id);
+                    }
+                } else if (symbol.match(/_essence_id$/)) {
+                    if (id && essences.indexOf(id) < 0) {
+                        essences.push(id);
                     }
                 } else {
                     if (id && classSpells.indexOf(id) < 0) {
@@ -367,6 +377,14 @@ ${limitLine2}
         for (const traitId of traitsIds) {
             const trait = spellData.azeriteTraitById.get(traitId);
             output += `Define(${trait.identifier} ${trait.spellId})\n`;
+        }
+    }
+
+    const essenceIds = essenceByClass.get(className);
+    if (essenceIds) {
+        for (const essenceId of essenceIds) {
+            const essence = spellData.essenceById.get(essenceId);
+            output += `Define(${essence.identifier} ${essence.id})\n`;
         }
     }
 

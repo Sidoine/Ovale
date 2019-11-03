@@ -149,14 +149,24 @@ Define(fireblood_1 265226)
 Define(flanking_strike 259516)
 # You and your pet leap to the target and strike it as one, dealing a total of <damage> Physical damage.rnrn|cFFFFFFFFGenerates 269752s2 Focus for you and your pet.|r
   SpellInfo(flanking_strike gcd=0 offgcd=1 focus=-30)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -296,11 +306,6 @@ Define(reckless_force_buff_1 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3 channel=3)
@@ -396,7 +401,7 @@ Define(wildfire_bomb_debuff 265163)
   SpellInfo(wildfire_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
@@ -454,6 +459,7 @@ Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(azsharas_font_of_power_item 169314)
 Define(cyclotronic_blast_item 167672)
+Define(unbridled_fury_item 169299)
 Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
 Define(dribbling_inkpod_item 169319)
 Define(dance_of_death_trait 274441)
@@ -463,6 +469,10 @@ Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
 Define(unerring_vision_trait 274444)
+Define(condensed_life_force_essence_id 14)
+Define(essence_of_the_focusing_iris_essence_id 5)
+Define(blood_of_the_enemy_essence_id 23)
+Define(memory_of_lucid_dreams_essence_id 27)
     ]]
     code = code .. [[
 # Hunter spells and functions.
