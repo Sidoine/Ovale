@@ -111,14 +111,24 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(furious_slash 100130)
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(furious_slash rage=-4 talent=furious_slash_talent)
@@ -307,10 +317,6 @@ Define(storm_bolt 107570)
   SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
   # Stunned.
   SpellAddBuff(storm_bolt storm_bolt=1)
-Define(sudden_death 29725)
-# Your attacks have a chance to make your next Execute cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
-  SpellInfo(sudden_death channel=0 gcd=0 offgcd=1 talent=sudden_death_talent)
-  SpellAddBuff(sudden_death sudden_death=1)
 Define(sweeping_strikes 260708)
 # For 12 seconds your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellInfo(sweeping_strikes cd=30 duration=12)
@@ -380,7 +386,7 @@ Define(whirlwind_fury 190411)
   SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
@@ -410,9 +416,9 @@ Define(frothing_berserker_talent 15) #19140
 # Rampage now costs s1/10 Rage and increases your damage done by 215572s1 and Haste by 215572s2 for 6 seconds.
 Define(furious_slash_talent 9) #23372
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-Define(massacre_talent 7) #22380
-# Execute is now usable on targets below s2 health.
 Define(massacre_talent_fury 14) #22393
+# Execute is now usable on targets below s2 health.
+Define(massacre_talent 7) #22380
 # Execute is now usable on targets below s2 health.
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
@@ -426,15 +432,18 @@ Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(storm_bolt_talent_fury 6) #23093
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
-Define(sudden_death_talent 2) #22360
-# Your attacks have a chance to make your next Execute cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
 Define(unstoppable_force_talent 8) #22626
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+Define(unbridled_fury_item 169299)
+Define(superior_battle_potion_of_strength_item 168500)
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(blood_of_the_enemy_essence_id 23)
+Define(condensed_life_force_essence_id 14)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)
@@ -524,14 +533,14 @@ Define(enraged_regeneration_buff 184364)
 	SpellRequire(execute_arms rage_percent 0=buff,execute_arms_norage)
 	SpellRequire(execute_arms target_health_pct 100=buff,execute_arms_nohp)
     SpellAddTargetDebuff(execute_arms executioners_precision_debuff=0)
-SpellList(execute_arms_norage sudden_death_arms_buff stone_heart_buff deadly_calm_buff)
-SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
+SpellList(execute_arms_norage sudden_death_buff_arms stone_heart_buff deadly_calm_buff)
+SpellList(execute_arms_nohp sudden_death_buff_arms stone_heart_buff)
 
 	SpellInfo(execute rage=-20 target_health_pct=20)
 	SpellInfo(execute target_health_pct=35 talent=massacre_talent_fury)
 	SpellRequire(execute target_health_pct 100=buff,execute_free)
 	SpellRequire(execute cd_percent 0=buff,execute_free)
-SpellList(execute_free sudden_death_fury_buff stone_heart_buff)
+SpellList(execute_free sudden_death_buff_fury stone_heart_buff)
 Define(executioners_precision_debuff 272870)
     SpellInfo(executioners_precision_debuff duration=30 max_stacks=2)
     SpellAddTargetDebuff(execute_arms executioners_precision_debuff=1 trait=executioners_precision_trait)
@@ -682,10 +691,10 @@ Define(spell_reflection 23920)
 Define(spell_reflection_buff 23920)
 
 	SpellInfo(storm_bolt cd=30)
-Define(sudden_death_arms_buff 52437)
-	SpellInfo(sudden_death_arms_buff duration=10)
-Define(sudden_death_fury_buff 280776)
-	SpellInfo(sudden_death_fury_buff duration=10)
+Define(sudden_death_buff_arms 52437)
+	SpellInfo(sudden_death_buff_arms duration=10)
+Define(sudden_death_buff_fury 280776)
+	SpellInfo(sudden_death_buff_fury duration=10)
 
 	SpellInfo(sweeping_strikes cd=25)
 	SpellAddBuff(sweeping_strikes sweeping_strikes_buff=1)

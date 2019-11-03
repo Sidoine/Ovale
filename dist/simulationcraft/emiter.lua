@@ -658,11 +658,11 @@ __exports.Emiter = __class(nil, {
                 elseif action == "potion" then
                     local name = (modifiers.name and self.unparser:Unparse(modifiers.name)) or annotation.consumables["potion"]
                     if name then
-                        name = self:Disambiguate(annotation, name, className, specialization, "item")
-                        bodyCode = format("Item(item_%s usable=1)", name)
+                        name = self:Disambiguate(annotation, name .. "_item", className, specialization, "item")
+                        bodyCode = format("Item(%s usable=1)", name)
                         conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                         annotation.opt_use_consumables = className
-                        self:AddSymbol(annotation, format("item_%s", name))
+                        self:AddSymbol(annotation, name)
                         isSpellAction = false
                     end
                 elseif action == "sequence" then
@@ -1301,6 +1301,7 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 local property = tokenIterator()
                 local essenceId = format("%s_essence_id", name)
+                essenceId = self:Disambiguate(annotation, essenceId, annotation.class, annotation.specialization)
                 if property == "major" then
                     code = format("AzeriteEssenceIsMajor(%s)", essenceId)
                 elseif property == "minor" then
@@ -2556,6 +2557,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
+        self:AddDisambiguation("icy_citadel_buff", "icy_citadel_expires_buff", "DEATHKNIGHT")
         self:AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
@@ -2627,6 +2629,8 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
         self:AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
         self:AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
+        self:AddDisambiguation("condensed_lifeforce", "condensed_life_force")
+        self:AddDisambiguation("condensed_lifeforce_essence_id", "condensed_life_force_essence_id")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

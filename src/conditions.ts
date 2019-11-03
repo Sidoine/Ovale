@@ -10,7 +10,7 @@ import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTi
 import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
-import { lower } from "@wowts/string";
+import { lower, upper } from "@wowts/string";
 import { OvaleClass, Print } from "./Ovale";
 import { OvaleArtifactClass } from "./Artifact";
 import { OvaleAzeriteArmor } from "./AzeriteArmor";
@@ -175,7 +175,7 @@ export class OvaleConditions {
     }
     private AzeriteEssenceRank = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         const [essenceId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        const value = this.OvaleAzeriteEssence.self_essences[essenceId] && this.OvaleAzeriteEssence.self_essences[essenceId].rank;
+        const value = this.OvaleAzeriteEssence.EssenceRank(essenceId);
         return Compare(value, comparator, limit);
     }
 
@@ -898,12 +898,17 @@ export class OvaleConditions {
     private Class = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [className, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
-        let [, classToken] = UnitClass(target);
-        let boolean = (classToken == className);
+        
+        let classToken;
+        if (target == "player") {
+            classToken = this.OvalePaperDoll.class;
+        } else {
+            [, classToken] = UnitClass(target);
+        }
+        let boolean = (classToken == upper(className));
         return TestBoolean(boolean, yesno);
     }
 
-    
     /** Test whether the target's classification matches the given classification.
 	 @name Classification
 	 @paramsig boolean
@@ -2225,7 +2230,7 @@ export class OvaleConditions {
     private PTR = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [version, , , uiVersion ] = GetBuildInfo();
-        let value = (version > "8.2.0" || uiVersion > 80200) && 1 || 0;
+        let value = (version > "8.2.5" || uiVersion > 80205) && 1 || 0;
         return Compare(value, comparator, limit);
     }
  
@@ -2925,7 +2930,8 @@ l    */
     /**  Return the amount of power of the given power type required to cast the given spell.
 	 */
     private PowerCost(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
-        let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
+        let [spell, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         let maxCost = (namedParams.max == 1);
         let [value] = this.OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || [0];
@@ -3082,7 +3088,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousGCDSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let count = namedParams.count;
         let boolean;
         if (count && count > 1) {
@@ -3103,7 +3110,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousOffGCDSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let boolean = (spellId == this.OvaleFuture.next.lastOffGCDSpellcast.spellId);
         return TestBoolean(boolean, yesno);
     }
@@ -3118,7 +3126,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let boolean = (spellId == this.OvaleFuture.next.lastGCDSpellId);
         return TestBoolean(boolean, yesno);
     }
@@ -4151,7 +4160,8 @@ l    */
 	 if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
      */
     private TimeSincePreviousSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [spell, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
         return TestValue(0, INFINITY, 0, t, 1, comparator, limit);
     }
@@ -4280,7 +4290,7 @@ l    */
         let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         if (!powerType) {
-            let [, pt] = this.OvalePower.GetSpellCost(<number>spellId);
+            let [, pt] = this.OvalePower.GetSpellCost(spellId);
             powerType = pt;
         }
         let seconds = this.OvalePower.TimeToPower(spellId, atTime, this.OvaleGUID.UnitGUID(target), powerType);

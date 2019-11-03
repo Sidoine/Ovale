@@ -127,7 +127,7 @@ export class IoC {
         this.guid = new OvaleGUIDClass(this.ovale, this.debug);
         this.requirement = new OvaleRequirement(this.ovale, this.baseState, this.guid);
         this.data = new OvaleDataClass(this.baseState, this.guid, this.ovale, this.requirement);
-        this.spellBook = new OvaleSpellBookClass(this.ovale, this.debug);
+        this.spellBook = new OvaleSpellBookClass(this.ovale, this.debug, this.data);
         this.cooldown = new OvaleCooldownClass(this.paperDoll, this.data, this.lastSpell, this.ovale, this.debug, this.profiler, this.spellBook, this.requirement);
         this.cooldownState = new CooldownState(this.cooldown, this.profiler, this.debug);
         this.demonHunterSigils = new OvaleSigilClass(this.paperDoll, this.ovale, this.spellBook);
@@ -146,7 +146,7 @@ export class IoC {
         this.ast = new OvaleASTClass(this.condition, this.debug, this.profiler, this.scripts, this.spellBook);
         this.score = new OvaleScoreClass(this.ovale, this.future, this.debug, this.spellBook);
         this.compile = new OvaleCompileClass(this.azeriteArmor, this.equipment, this.ast, this.condition, this.cooldown, this.paperDoll, this.data, this.profiler, this.debug, this.options, this.ovale, this.score, this.spellBook, this.stance);
-        this.power = new OvalePowerClass(this.debug, this.ovale, this.profiler, this.data, this.future, this.baseState, this.aura, this.paperDoll, this.requirement);
+        this.power = new OvalePowerClass(this.debug, this.ovale, this.profiler, this.data, this.future, this.baseState, this.aura, this.paperDoll, this.requirement, this.spellBook);
         this.stagger = new OvaleStaggerClass(this.ovale, this.future);
         this.spellFlash = new OvaleSpellFlashClass(this.options, this.ovale, this.future, this.data, this.spellBook, this.stance);
         this.totem = new OvaleTotemClass(this.ovale, this.profiler, this.data, this.future, this.aura, this.spellBook);
@@ -191,92 +191,3 @@ export class IoC {
         this.state.RegisterState(this.runes)
     }
 }
-
-//     getActionBar() {
-//         if (!this.actionBar) this.actionBar = new OvaleActionBarClass();
-//         return this.actionBar;
-//     }
-
-//     getArtifact() {
-//         return this.artifact;
-//     }
-
-//     getAst() {
-//         return this.ast;
-//     }
-
-//     getAura() {
-//         return this.aura;
-//     }
-
-//     getAzeriteArmor() {
-//         return this.azeriteArmor;
-//     }
-
-//     getAzeriteEssence() {
-//         return this.azeriteEssence;
-//     }
-
-//     getBaseState() {
-//         return this.baseState;
-//     }
-
-//     getBestAction() {
-//         return this.bestAction;
-//     }
-
-//     getBossMod() {
-//         return this.bossMod;
-//     }
-
-//     getCompile() {
-//         return this.compile;
-//     }
-
-//     getCondition() {
-//         return this.condition;
-//     }
-
-//     getConditions() {
-//         return this.conditions;
-//     }
-
-//     getCooldown() {
-//         return this.cooldown;
-//     }
-
-//     getCooldownState() {
-//         return this.cooldownState;
-//     }
-
-//     getDamageTaken() {
-//         return this.damageTaken;
-//     }
-
-//     getData() {
-//         return this.data;
-//     }
-
-//     getDataBroker(){
-//         return this.dataBroker;
-//     }
-
-//     getOvale() {
-//         if (!this.) this. = new OvaleClass();
-//         return this.;
-//     }
-//     getOptions() {
-//         if (!this.options) this.options = new OvaleOptionsClass(this.getOvale());
-//         return this.options;
-//     }
-//     getOvaleEquipement() {
-
-//     }
-//     getPaperDoll() {
-//         if (!this.paperDoll) this.paperDoll = new OvalePaperDollClass();
-//     }
-//     getScripts() {
-//         if (!this.scripts) this.scripts = new OvaleScriptsClass(this.getOvale(), this.getOptions(), this.getPaperDoll());
-//         return this.scripts;
-//     }
-// }

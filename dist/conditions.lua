@@ -48,6 +48,7 @@ local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isNodeType = __AST.isNodeType
 local lower = string.lower
+local upper = string.upper
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Print = __Ovale.Print
 local INFINITY = huge
@@ -174,7 +175,8 @@ __exports.OvaleConditions = __class(nil, {
         return Compare(0, comparator, limit)
     end,
     PowerCost = function(self, powerType, positionalParams, namedParams, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local spell, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
         local target = self:ParseCondition(positionalParams, namedParams, "target")
         local maxCost = (namedParams.max == 1)
         local value = self.OvalePower:PowerCost(spellId, powerType, atTime, target, maxCost) or 0
@@ -314,7 +316,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.AzeriteEssenceRank = function(positionalParams, namedParams, atTime)
             local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleAzeriteEssence.self_essences[essenceId] and self.OvaleAzeriteEssence.self_essences[essenceId].rank
+            local value = self.OvaleAzeriteEssence:EssenceRank(essenceId)
             return Compare(value, comparator, limit)
         end
         self.BaseDuration = function(positionalParams, namedParams, atTime)
@@ -625,8 +627,13 @@ __exports.OvaleConditions = __class(nil, {
         self.Class = function(positionalParams, namedParams, atTime)
             local className, yesno = positionalParams[1], positionalParams[2]
             local target = self:ParseCondition(positionalParams, namedParams)
-            local _, classToken = UnitClass(target)
-            local boolean = (classToken == className)
+            local classToken
+            if target == "player" then
+                classToken = self.OvalePaperDoll.class
+            else
+                _, classToken = UnitClass(target)
+            end
+            local boolean = (classToken == upper(className))
             return TestBoolean(boolean, yesno)
         end
         self.Classification = function(positionalParams, namedParams, atTime)
@@ -1203,7 +1210,7 @@ __exports.OvaleConditions = __class(nil, {
         self.PTR = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2]
             local version, _, _, uiVersion = GetBuildInfo()
-            local value = (version > "8.2.0" or uiVersion > 80200) and 1 or 0
+            local value = (version > "8.2.5" or uiVersion > 80205) and 1 or 0
             return Compare(value, comparator, limit)
         end
         self.PersistentMultiplier = function(positionalParams, namedParams, atTime)
@@ -1376,7 +1383,8 @@ __exports.OvaleConditions = __class(nil, {
             return TestBoolean(boolean, yesno)
         end
         self.PreviousGCDSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local count = namedParams.count
             local boolean
             if count and count > 1 then
@@ -1387,12 +1395,14 @@ __exports.OvaleConditions = __class(nil, {
             return TestBoolean(boolean, yesno)
         end
         self.PreviousOffGCDSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local boolean = (spellId == self.OvaleFuture.next.lastOffGCDSpellcast.spellId)
             return TestBoolean(boolean, yesno)
         end
         self.PreviousSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local boolean = (spellId == self.OvaleFuture.next.lastGCDSpellId)
             return TestBoolean(boolean, yesno)
         end
@@ -1796,7 +1806,8 @@ __exports.OvaleConditions = __class(nil, {
             return Compare(0, comparator, limit)
         end
         self.TimeSincePreviousSpell = function(positionalParams, namedParams, atTime)
-            local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local spell, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local t = self.OvaleFuture:TimeOfLastCast(spellId, atTime)
             return TestValue(0, INFINITY, 0, t, 1, comparator, limit)
         end

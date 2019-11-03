@@ -227,7 +227,7 @@ __exports.OvaleCooldownClass = __class(States, {
                     cdEnable = enable
                 end
             else
-                cdStart, cdDuration, cdEnable = start or 0, duration, enable
+                cdStart, cdDuration, cdEnable = start or 0, duration or 0, enable
             end
         end
         return cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable

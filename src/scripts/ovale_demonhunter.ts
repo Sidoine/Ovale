@@ -113,7 +113,7 @@ AddFunction HavocPrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  #metamorphosis,if=!azerite.chaotic_transformation.enabled
  if not HasAzeriteTrait(chaotic_transformation_trait) and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
  #use_item,name=azsharas_font_of_power
@@ -207,8 +207,8 @@ AddFunction HavocNormalCdPostConditions
 
 AddFunction HavocEssencesMainActions
 {
- #concentrated_flame
- Spell(concentrated_flame_essence)
+ #concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+ if not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() Spell(concentrated_flame_essence)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -217,14 +217,12 @@ AddFunction HavocEssencesMainPostConditions
 
 AddFunction HavocEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence)
+ unless { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
-  #focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-  if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
   #purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 Spell(the_unbound_force)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance,if=buff.lifeblood.stack<3
@@ -234,19 +232,21 @@ AddFunction HavocEssencesShortCdActions
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence)
+ { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
 }
 
 AddFunction HavocEssencesCdActions
 {
- unless Spell(concentrated_flame_essence)
+ unless { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
   #blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
   if BuffPresent(metamorphosis_havoc_buff) or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
   #guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
   if BuffPresent(metamorphosis_havoc_buff) or target.TimeToDie() <= 30 Spell(guardian_of_azeroth)
+  #focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+  if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
 
-  unless { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
@@ -256,7 +256,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -387,7 +387,7 @@ AddFunction HavocCooldownCdActions
  #nemesis,if=!raid_event.adds.exists
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
- if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+ if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
  if not Talent(fel_barrage_talent) or SpellCooldown(fel_barrage) == 0 HavocUseItemActions()
  #use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
@@ -416,8 +416,8 @@ AddFunction HavocDefaultMainActions
 
  unless not GCDRemaining() > 0 and HavocCooldownMainPostConditions()
  {
-  #pick_up_fragment,if=fury.deficit>=35
-  if FuryDeficit() >= 35 Spell(pick_up_fragment)
+  #pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
+  if FuryDeficit() >= 35 and { not HasAzeriteTrait(eyes_of_rage_trait) or SpellCooldown(eye_beam) > 1.4 } Spell(pick_up_fragment)
   #call_action_list,name=dark_slash,if=talent.dark_slash.enabled&(variable.waiting_for_dark_slash|debuff.dark_slash.up)
   if Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } HavocDarkslashMainActions()
 
@@ -447,7 +447,7 @@ AddFunction HavocDefaultShortCdActions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not GCDRemaining() > 0 HavocCooldownShortCdActions()
 
- unless not GCDRemaining() > 0 and HavocCooldownShortCdPostConditions() or FuryDeficit() >= 35 and Spell(pick_up_fragment)
+ unless not GCDRemaining() > 0 and HavocCooldownShortCdPostConditions() or FuryDeficit() >= 35 and { not HasAzeriteTrait(eyes_of_rage_trait) or SpellCooldown(eye_beam) > 1.4 } and Spell(pick_up_fragment)
  {
   #call_action_list,name=dark_slash,if=talent.dark_slash.enabled&(variable.waiting_for_dark_slash|debuff.dark_slash.up)
   if Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } HavocDarkslashShortCdActions()
@@ -468,7 +468,7 @@ AddFunction HavocDefaultShortCdActions
 
 AddFunction HavocDefaultShortCdPostConditions
 {
- not GCDRemaining() > 0 and HavocCooldownShortCdPostConditions() or FuryDeficit() >= 35 and Spell(pick_up_fragment) or Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } and HavocDarkslashShortCdPostConditions() or Talent(demonic_talent) and HavocDemonicShortCdPostConditions() or HavocNormalShortCdPostConditions()
+ not GCDRemaining() > 0 and HavocCooldownShortCdPostConditions() or FuryDeficit() >= 35 and { not HasAzeriteTrait(eyes_of_rage_trait) or SpellCooldown(eye_beam) > 1.4 } and Spell(pick_up_fragment) or Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } and HavocDarkslashShortCdPostConditions() or Talent(demonic_talent) and HavocDemonicShortCdPostConditions() or HavocNormalShortCdPostConditions()
 }
 
 AddFunction HavocDefaultCdActions
@@ -485,7 +485,7 @@ AddFunction HavocDefaultCdActions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not GCDRemaining() > 0 HavocCooldownCdActions()
 
- unless not GCDRemaining() > 0 and HavocCooldownCdPostConditions() or FuryDeficit() >= 35 and Spell(pick_up_fragment)
+ unless not GCDRemaining() > 0 and HavocCooldownCdPostConditions() or FuryDeficit() >= 35 and { not HasAzeriteTrait(eyes_of_rage_trait) or SpellCooldown(eye_beam) > 1.4 } and Spell(pick_up_fragment)
  {
   #call_action_list,name=dark_slash,if=talent.dark_slash.enabled&(variable.waiting_for_dark_slash|debuff.dark_slash.up)
   if Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } HavocDarkslashCdActions()
@@ -506,7 +506,7 @@ AddFunction HavocDefaultCdActions
 
 AddFunction HavocDefaultCdPostConditions
 {
- not GCDRemaining() > 0 and HavocCooldownCdPostConditions() or FuryDeficit() >= 35 and Spell(pick_up_fragment) or Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } and HavocDarkslashCdPostConditions() or Talent(demonic_talent) and HavocDemonicCdPostConditions() or HavocNormalCdPostConditions()
+ not GCDRemaining() > 0 and HavocCooldownCdPostConditions() or FuryDeficit() >= 35 and { not HasAzeriteTrait(eyes_of_rage_trait) or SpellCooldown(eye_beam) > 1.4 } and Spell(pick_up_fragment) or Talent(dark_slash_talent) and { waiting_for_dark_slash() or target.DebuffPresent(dark_slash_debuff) } and HavocDarkslashCdPostConditions() or Talent(demonic_talent) and HavocDemonicCdPostConditions() or HavocNormalCdPostConditions()
 }
 
 ### Havoc icons.
@@ -575,6 +575,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # chaos_nova
 # chaos_strike
 # chaotic_transformation_trait
+# concentrated_flame_burn_debuff
 # concentrated_flame_essence
 # conductive_ink
 # dark_slash
@@ -586,6 +587,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # demons_bite
 # disrupt
 # eye_beam
+# eyes_of_rage_trait
 # fel_barrage
 # fel_barrage_talent
 # fel_eruption
@@ -597,7 +599,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # guardian_of_azeroth
 # immolation_aura_havoc
 # imprison
-# item_focused_resolve
 # lifeblood_buff
 # memory_of_lucid_dreams_essence
 # memory_of_lucid_dreams_essence_buff
@@ -613,12 +614,13 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # purifying_blast
 # razor_coral
 # reckless_force_buff
-# reckless_force_counter
+# reckless_force_counter_buff
 # revolving_blades_trait
 # ripple_in_space_essence
 # the_unbound_force
 # throw_glaive_havoc
 # trail_of_ruin_talent
+# unbridled_fury_item
 # vengeful_retreat
 # worldvein_resonance_essence
 `
@@ -653,6 +655,11 @@ AddFunction VengeanceInterruptActions
   if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
   if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
  }
+}
+
+AddFunction VengeanceUseHeartEssence
+{
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction VengeanceUseItemActions
@@ -691,7 +698,7 @@ AddFunction VengeancePrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_steelskin_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(steelskin_potion_item usable=1)
  #use_item,name=azsharas_font_of_power
  VengeanceUseItemActions()
 }
@@ -789,6 +796,57 @@ AddFunction VengeanceDefensivesCdPostConditions
  Spell(demon_spikes) or Spell(fiery_brand)
 }
 
+### actions.cooldowns
+
+AddFunction VengeanceCooldownsMainActions
+{
+ #concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+ if not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() Spell(concentrated_flame_essence)
+}
+
+AddFunction VengeanceCooldownsMainPostConditions
+{
+}
+
+AddFunction VengeanceCooldownsShortCdActions
+{
+ unless { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
+ {
+  #worldvein_resonance,if=buff.lifeblood.stack<3
+  if BuffStacks(lifeblood_buff) < 3 Spell(worldvein_resonance_essence)
+ }
+}
+
+AddFunction VengeanceCooldownsShortCdPostConditions
+{
+ { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
+}
+
+AddFunction VengeanceCooldownsCdActions
+{
+ #potion
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(steelskin_potion_item usable=1)
+
+ unless { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ {
+  #memory_of_lucid_dreams
+  Spell(memory_of_lucid_dreams_essence)
+  #heart_essence
+  VengeanceUseHeartEssence()
+  #use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
+  if BuffExpires(memory_of_lucid_dreams_essence_buff) VengeanceUseItemActions()
+  #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
+  if target.DebuffExpires(razor_coral) or target.DebuffPresent(conductive_ink) and target.HealthPercent() < 31 or target.TimeToDie() < 20 VengeanceUseItemActions()
+  #use_items
+  VengeanceUseItemActions()
+ }
+}
+
+AddFunction VengeanceCooldownsCdPostConditions
+{
+ { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+}
+
 ### actions.brand
 
 AddFunction VengeanceBrandMainActions
@@ -854,15 +912,21 @@ AddFunction VengeanceDefaultMainActions
 
   unless VengeanceDefensivesMainPostConditions()
   {
-   #call_action_list,name=normal
-   VengeanceNormalMainActions()
+   #call_action_list,name=cooldowns
+   VengeanceCooldownsMainActions()
+
+   unless VengeanceCooldownsMainPostConditions()
+   {
+    #call_action_list,name=normal
+    VengeanceNormalMainActions()
+   }
   }
  }
 }
 
 AddFunction VengeanceDefaultMainPostConditions
 {
- Talent(charred_flesh_talent) and VengeanceBrandMainPostConditions() or VengeanceDefensivesMainPostConditions() or VengeanceNormalMainPostConditions()
+ Talent(charred_flesh_talent) and VengeanceBrandMainPostConditions() or VengeanceDefensivesMainPostConditions() or VengeanceCooldownsMainPostConditions() or VengeanceNormalMainPostConditions()
 }
 
 AddFunction VengeanceDefaultShortCdActions
@@ -882,8 +946,14 @@ AddFunction VengeanceDefaultShortCdActions
 
    unless VengeanceDefensivesShortCdPostConditions()
    {
-    #call_action_list,name=normal
-    VengeanceNormalShortCdActions()
+    #call_action_list,name=cooldowns
+    VengeanceCooldownsShortCdActions()
+
+    unless VengeanceCooldownsShortCdPostConditions()
+    {
+     #call_action_list,name=normal
+     VengeanceNormalShortCdActions()
+    }
    }
   }
  }
@@ -891,7 +961,7 @@ AddFunction VengeanceDefaultShortCdActions
 
 AddFunction VengeanceDefaultShortCdPostConditions
 {
- target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
+ target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceCooldownsShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
 }
 
 AddFunction VengeanceDefaultCdActions
@@ -910,8 +980,14 @@ AddFunction VengeanceDefaultCdActions
 
    unless VengeanceDefensivesCdPostConditions()
    {
-    #call_action_list,name=normal
-    VengeanceNormalCdActions()
+    #call_action_list,name=cooldowns
+    VengeanceCooldownsCdActions()
+
+    unless VengeanceCooldownsCdPostConditions()
+    {
+     #call_action_list,name=normal
+     VengeanceNormalCdActions()
+    }
    }
   }
  }
@@ -919,7 +995,7 @@ AddFunction VengeanceDefaultCdActions
 
 AddFunction VengeanceDefaultCdPostConditions
 {
- target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceNormalCdPostConditions()
+ target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceCooldownsCdPostConditions() or VengeanceNormalCdPostConditions()
 }
 
 ### Vengeance icons.
@@ -982,6 +1058,9 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 
 ### Required symbols
 # charred_flesh_talent
+# concentrated_flame_burn_debuff
+# concentrated_flame_essence
+# conductive_ink
 # consume_magic
 # demon_spikes
 # disrupt
@@ -993,8 +1072,11 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # immolation_aura
 # imprison
 # infernal_strike
-# item_steelskin_potion
+# lifeblood_buff
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # metamorphosis_veng
+# razor_coral
 # shear
 # sigil_of_chains
 # sigil_of_flame
@@ -1003,7 +1085,9 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # soul_cleave
 # spirit_bomb
 # spirit_bomb_talent
+# steelskin_potion_item
 # throw_glaive_veng
+# worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
 }

@@ -18,6 +18,7 @@ import { OvaleAuraClass } from "./Aura";
 import { States, StateModule } from "./State";
 import { OvaleProfilerClass, Profiler } from "./Profiler";
 import { OvalePaperDollClass } from "./PaperDoll";
+import { OvaleSpellBookClass } from "./SpellBook";
 
 let strlower = lower;
 
@@ -91,7 +92,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     private tracer: Tracer;
     private profiler: Profiler;
 
-    constructor(ovaleDebug: OvaleDebugClass, private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, private ovaleData: OvaleDataClass, private ovaleFuture: OvaleFutureClass, private baseState: BaseState, private ovaleAura: OvaleAuraClass, private ovalePaperDoll: OvalePaperDollClass, private requirement: OvaleRequirement) {
+    constructor(ovaleDebug: OvaleDebugClass, private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, private ovaleData: OvaleDataClass, private ovaleFuture: OvaleFutureClass, private baseState: BaseState, private ovaleAura: OvaleAuraClass, private ovalePaperDoll: OvalePaperDollClass, private requirement: OvaleRequirement, private ovaleSpellBook: OvaleSpellBookClass) {
         super(PowerState);
         this.module = ovale.createModule("OvalePower", this.OnInitialize, this.OnDisable, aceEvent);
         this.tracer = ovaleDebug.create(this.module.GetName());
@@ -340,16 +341,22 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         this.profiler.StopProfiling("OvalePower_UpdatePowerType");
     }
-    GetSpellCost(spellId: number, powerType?: PowerType): [number, PowerType] {
-        let spellPowerCost = GetSpellPowerCost(spellId)[1];
-        if (spellPowerCost) {
-            let cost = spellPowerCost.cost;
-            let typeId = spellPowerCost.type;
-            for (const [pt, p] of pairs(this.POWER_INFO)) {
-                if (p.id == typeId && (powerType == undefined || pt == powerType)) {
-                    return [cost, p.type];
+    GetSpellCost(spell: number | string, powerType?: PowerType): [number, PowerType] {
+        const spellId = this.ovaleSpellBook.getKnownSpellId(spell);
+        if (spellId) {
+            const spellPowerCosts = GetSpellPowerCost(spellId);
+            let spellPowerCost = spellPowerCosts && spellPowerCosts[1];
+            if (spellPowerCost) {
+                let cost = spellPowerCost.cost;
+                let typeId = spellPowerCost.type;
+                for (const [pt, p] of pairs(this.POWER_INFO)) {
+                    if (p.id == typeId && (powerType == undefined || pt == powerType)) {
+                        return [cost, p.type];
+                    }
                 }
             }
+        } else {
+            this.ovale.OneTimeMessage(`No spell cost for ${spell}`);
         }
         return [undefined, undefined];
     }

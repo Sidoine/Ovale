@@ -108,14 +108,24 @@ Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
   SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
@@ -236,10 +246,6 @@ Define(storm_earth_and_fire 137639)
   SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=1)
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
-Define(swift_roundhouse_buff 278707)
-# Blackout Kick increases the damage of your next Rising Sun Kick by s1, stacking up to 278710u times.
-  SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(the_unbound_force_0 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force_0 cd=60 duration=2 channel=2 tick=0.33)
@@ -296,7 +302,7 @@ Define(whirling_dragon_punch 152175)
   SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
@@ -332,6 +338,11 @@ Define(special_delivery_talent 16) #19819
 # Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+Define(superior_battle_potion_of_agility_item 168489)
+Define(unbridled_fury_item 169299)
+Define(glory_of_the_dawn_trait 288634)
+Define(open_palm_strikes_trait 279918)
+Define(the_crucible_of_flame_essence_id 12)
     `;
 // END
     code += `
@@ -345,7 +356,6 @@ SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free spec
 SpellAddBuff(blackout_kick_windwalker blackout_kick_buff=0 specialization=windwalker)
 SpellAddBuff(blackout_kick_windwalker teachings_of_the_monastery_buff=0 specialization=mistweaver)
 SpellAddTargetDebuff(blackout_kick_windwalker mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(blackout_kick_windwalker swift_roundhouse_buff=1)
 
 Define(blackout_kick_buff 116768)
 SpellInfo(blackout_kick_buff duration=15)
@@ -487,7 +497,6 @@ Define(provoke 115546)
 SpellInfo(purifying_brew charges=3 cd_haste=melee)
 SpellInfo(purifying_brew add_cd=-3 charges=4 talent=light_brewing_talent)
 SpellInfo(purifying_brew unusable=1)
-SpellAddBuff(purifying_brew blackout_combo_buff=0)
 SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
 
 Define(reawaken 212051)
@@ -518,7 +527,6 @@ SpellInfo(rising_sun_kick cd_haste=spell cd=12 chi=0 specialization=mistweaver)
 SpellRequire(rising_sun_kick chi_percent 0=buff,serenity)
 SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
 SpellAddTargetDebuff(rising_sun_kick mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(rising_sun_kick swift_roundhouse_buff=0)
 
 Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
@@ -556,8 +564,6 @@ Define(summon_black_ox_statue 115315)
 Define(summon_jade_serpent_statue 115313)
     SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
 
-SpellInfo(swift_roundhouse_buff max_stacks=2)
-
 Define(teachings_of_the_monastery 116645)
 Define(teachings_of_the_monastery_buff 202090)
 	SpellInfo(teachings_of_the_monastery_buff duration=12 max_stacks=3)
@@ -570,7 +576,7 @@ Define(thunder_focus_tea 116680)
 SpellInfo(tiger_palm energy=50 specialization=windwalker)
 SpellInfo(tiger_palm energy=25 specialization=brewmaster)
 SpellAddBuff(tiger_palm teachings_of_the_monastery_buff=1 specialization=mistweaver)
-SpellAddBuff(tiger_palm blackout_combo_buff=0 specialization=windwalker)
+SpellAddBuff(tiger_palm blackout_combo_buff=0)
 SpellAddTargetDebuff(tiger_palm eye_of_the_tiger_debuff=1 specialization=!mistweaver talent=eye_of_the_tiger_talent)
 SpellAddTargetDebuff(tiger_palm mark_of_the_crane_debuff=1 specialization=windwalker)
 
