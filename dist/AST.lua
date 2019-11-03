@@ -470,7 +470,7 @@ __exports.OvaleASTClass = __class(nil, {
                 if filter == "debuff" then
                     name = gsub(node.name, "^Buff", "Debuff")
                 else
-                    name = node.lowername
+                    name = node.name
                 end
                 local target = node.rawNamedParams.target
                 if target then
@@ -479,7 +479,7 @@ __exports.OvaleASTClass = __class(nil, {
                     s = format("%s(%s)", name, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
                 end
             else
-                s = format("%s()", node.lowername)
+                s = format("%s()", node.name)
             end
             return s
         end
