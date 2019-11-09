@@ -227,10 +227,6 @@ Define(horn_of_winter 57330)
 Define(howling_blast 49184)
 # Blast the target with a frigid wind, dealing s1*<CAP>/AP ?s204088[Frost damage and applying Frost Fever to the target.][Frost damage to that foe, and 237680s1*<CAP>/AP Frost damage to all other enemies within 237680A1 yards, infecting all targets with Frost Fever.]rnrn|Tinterfaceiconsspell_deathknight_frostfever.blp:24|t |cFFFFFFFFFrost Fever|rrnA disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
   SpellInfo(howling_blast runes=1 runicpower=-10)
-Define(icy_citadel_buff 272719)
-# When Pillar of Frost expires, your Strength is increased by s1 for 6 seconds. This effect lasts s2/1000 sec longer for each Obliterate and Frostscythe critical strike during Pillar of Frost.
-  SpellInfo(icy_citadel_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(icy_talons_buff 194879)
 # Your Runic Power spending abilities increase your melee attack speed by 194879s1 for 6 seconds, stacking up to 194879u times.
   SpellInfo(icy_talons_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
@@ -332,6 +328,11 @@ Define(scourge_strike 55090)
 # An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
   SpellInfo(scourge_strike runes=1 runicpower=-10)
 
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  # Critical strike damage increased by w1.
+  SpellAddBuff(seething_rage seething_rage=1)
 Define(soul_reaper 130736)
 # Rip out an enemy's soul, dealing <dmg> Shadow damage over 8 seconds.rnrnIf the enemy that yields experience or honor dies while afflicted by Soul Reaper, you gain 215711s1 Haste for 8 seconds.rnrn|cFFFFFFFFGenerates s2 lRune:Runes;.|r
   SpellInfo(soul_reaper cd=45 duration=8 runes=-2 tick=1 talent=soul_reaper_talent)
@@ -396,12 +397,12 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(chill_streak chill_streak_0 chill_streak_1 chill_streak_2 chill_streak_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
-SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(condensed_life_force condensed_life_force_0 condensed_life_force_1 condensed_life_force_2 condensed_life_force_3 condensed_life_force_4)

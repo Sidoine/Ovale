@@ -1,6 +1,6 @@
 import test, { TestInterface } from "ava";
 import { Mock, It, IMock } from "typemoq";
-import { OvaleASTClass } from "../AST";
+import { OvaleASTClass, AstAnnotation } from "../AST";
 import { OvaleConditionClass } from "../Condition";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleProfilerClass, Profiler } from "../Profiler";
@@ -16,6 +16,7 @@ interface Context {
     ovaleSpellbookMock: IMock<OvaleSpellBookClass>;
     ast: OvaleASTClass;
     tracerMock: IMock<Tracer>;
+    annotation: AstAnnotation;
 }
 
 const t = test as TestInterface<Context>;
@@ -39,49 +40,50 @@ t.beforeEach(t => {
         t.context.ovaleProfilerMock.object,
         t.context.ovaleScriptsMock.object,
         t.context.ovaleSpellbookMock.object);
+    t.context.annotation = { definition: {}, nodeList: {} };
 });
 
 
 t("ast: parse Define", t => {
     // Act
-    const [astNode, nodeList, annotation ] = t.context.ast.ParseCode("script", `Define(test 18)`, {}, {});
+    const [astNode, nodeList, annotation ] = t.context.ast.ParseCode("script", `Define(test 18)`, {}, t.context.annotation);
 
     // Assert
     t.truthy(astNode);
     t.truthy(nodeList);
-    t.truthy(annotation.definition);
-    t.is(annotation.definition["test"], 18);
+    t.truthy(annotation!.definition);
+    t.is(annotation!.definition["test"], 18);
 });
 
 t("ast: parse SpellInfo", t => {
     // Act
-    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("script", "SpellInfo(123 cd=30 rage=10)", {}, {});
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("script", "SpellInfo(123 cd=30 rage=10)", {}, t.context.annotation);
 
     // Assert
     t.truthy(astNode);
     t.truthy(nodeList);
     t.truthy(annotation);
-    t.is(astNode.type, "script");
-    const spellInfoNode = astNode.child[1];
+    t.is(astNode!.type, "script");
+    const spellInfoNode = astNode!.child[1];
     t.is(spellInfoNode.type, "spell_info");
     t.is(spellInfoNode.spellId, 123);
-    t.is(spellInfoNode.rawNamedParams.cd.type, "value");
-    t.is(spellInfoNode.rawNamedParams.cd.value, 30);
-    t.is(spellInfoNode.rawNamedParams.rage.type, "value");
-    t.is(spellInfoNode.rawNamedParams.rage.value, 10);
+    t.is(spellInfoNode.rawNamedParams.cd!.type, "value");
+    t.is(spellInfoNode.rawNamedParams.cd!.value, 30);
+    t.is(spellInfoNode.rawNamedParams.rage!.type, "value");
+    t.is(spellInfoNode.rawNamedParams.rage!.value, 10);
 });
 
 t("ast: parse expression with a if with SpellInfo", t => {
     // Act
-    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("icon", "AddIcon { if Talent(12) Spell(115) }", {}, {});
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("icon", "AddIcon { if Talent(12) Spell(115) }", {}, t.context.annotation);
     
     // Assert
     t.truthy(astNode);
     t.truthy(nodeList);
     t.truthy(annotation);
-    t.is(astNode.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
-    t.is(astNode.type, "icon");
-    const group = astNode.child[1];
+    t.is(astNode!.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
+    t.is(astNode!.type, "icon");
+    const group = astNode!.child[1];
     t.is(group.type, "group");
     const ifNode = group.child[1];
     t.is(ifNode.type, "if");
@@ -100,8 +102,8 @@ t("ast: dedupe nodes", t => {
 
     // Assert
     t.truthy(astNode);
-    t.is(astNode.type, "script");
-    const icon = astNode.child[1];
+    t.is(astNode!.type, "script");
+    const icon = astNode!.child[1];
     t.is(icon.type, "icon");
     const group = icon.child[1];
     t.is(group.type, "group");

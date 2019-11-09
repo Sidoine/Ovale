@@ -8,8 +8,6 @@ import { convertFromSpellData, CustomAura, CustomAuras, CustomSpellData } from "
 import { SpellInfo } from "../Data";
 import { ConditionNamedParameters } from "../AST";
 import { IoC } from "../ioc";
-import { Annotation } from "../simulationcraft/definitions";
-import { cpus } from "os";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -107,29 +105,37 @@ for (const filename of files) {
         let inputName = profilesDirectory + "/" + filename;
         let simc = readFileSync(inputName, { encoding: "utf8" });
         if (simc.indexOf("optimal_raid=") < 0) {
-            let source: string, className: string, specialization: string;
-            for (const line of simc.match(/[^\r\n]+/g)) {
-                if (!source) {
-                    if (line.substring(0, 3) == "### ") {
-                        source = line.substring(4);
-                    }
-                }
-                if (!className) {
-                    for (const simcClass of SIMC_CLASS) {
-                        let length = simcClass.length;
-                        if (line.substring(0, length + 1) == simcClass + "=") {
-                            className = simcClass.toUpperCase();
+            let source: string | undefined, className: string | undefined, specialization: string | undefined;
+            const matches = simc.match(/[^\r\n]+/g);
+            if (matches) {
+                for (const line of matches) {
+                    if (!source) {
+                        if (line.substring(0, 3) == "### ") {
+                            source = line.substring(4);
                         }
                     }
-                }
-                if (!specialization) {
-                    if (line.substring(0, 5) == "spec=") {
-                        specialization = line.substring(5);
+                    if (!className) {
+                        for (const simcClass of SIMC_CLASS) {
+                            let length = simcClass.length;
+                            if (line.substring(0, length + 1) == simcClass + "=") {
+                                className = simcClass.toUpperCase();
+                            }
+                        }
+                    }
+                    if (!specialization) {
+                        if (line.substring(0, 5) == "spec=") {
+                            specialization = line.substring(5);
+                        }
+                    }
+                    if (className && specialization) {
+                        break;
                     }
                 }
-                if (className && specialization) {
-                    break;
-                }
+            }
+
+            if (!className || !specialization) {
+                console.log("className and specialization must be defined");
+                continue;
             }
             
             console.log(filename);
@@ -140,9 +146,8 @@ for (const filename of files) {
             eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
             registerScripts(ioc.scripts);
 
-            const annotation: Annotation = new Annotation(ioc.data);
-            annotation.dictionary = Object.assign({}, spellData.identifiers);
-            let profile = ioc.simulationCraft.ParseProfile(simc, annotation);
+            let profile = ioc.simulationCraft.ParseProfile(simc, Object.assign({}, spellData.identifiers));
+            if (!profile) continue;
             let profileName = profile.annotation.name.substring(1, profile.annotation.name.length - 1);
             let name: string, desc: string;
             if (source) {
@@ -158,7 +163,7 @@ for (const filename of files) {
             output.push("	const code = `");
             output.push(ioc.simulationCraft.Emit(profile, true));
             output.push("`");
-            output.push(format('	OvaleScripts.RegisterScript("%s", "%s", name, desc, code, "%s")', profile.annotation.class, profile.annotation.specialization, "script"));
+            output.push(format('	OvaleScripts.RegisterScript("%s", "%s", name, desc, code, "%s")', profile.annotation.classId, profile.annotation.specialization, "script"));
             output.push("}");
             output.push("");
 
@@ -240,11 +245,11 @@ for (const filename of files) {
 }
 
 function getTooltip(spell: CustomSpellData | SpellData) {
-    return spell.tooltip.replace(/[\$\\{}%]/g, '');
+    return spell.tooltip && spell.tooltip.replace(/[\$\\{}%]/g, '');
 }
 
 function getDesc(spell: CustomSpellData | SpellData) {
-    return spell.desc.replace(/[\$\\{}%]/g, '');
+    return spell.desc && spell.desc.replace(/[\$\\{}%]/g, '');
 }
 
 function getBuffDefinition(identifier: string, target: keyof CustomAuras, customAura: CustomAura) {
@@ -265,9 +270,13 @@ function getConditions(conditions: ConditionNamedParameters, talentIds: number[]
     for (const key in conditions) {
         if (key === "talent") {
             const talentId = conditions[key];
-            const talent = spellData.talentsById.get(talentId);
-            output += ` ${key}=${talent.identifier}`;
-            if (talentIds.indexOf(talentId) < 0) talentIds.push(talentId);
+            if (talentId) {
+                const talent = spellData.talentsById.get(talentId);
+                if (talent) {
+                    output += ` ${key}=${talent.identifier}`;
+                    if (talentIds.indexOf(talentId) < 0) talentIds.push(talentId);
+                }
+            }
         }
     }
     return output;
@@ -293,17 +302,20 @@ function getDefinition(identifier: string, customSpellData: CustomSpellData, tal
 
     if (customSpellData.replace && spellIds.indexOf(customSpellData.replace) >= 0) {
         const replaced = spellData.spellDataById.get(customSpellData.replace);
-        output += `  SpellInfo(${replaced.identifier} replaced_by=${identifier}`;
-        if (customSpellData.conditions) output += getConditions(customSpellData.conditions, talentIds);
-        output += ")\n";
+        if (replaced) {
+            output += `  SpellInfo(${replaced.identifier} replaced_by=${identifier}`;
+            if (customSpellData.conditions) output += getConditions(customSpellData.conditions, talentIds);
+            output += ")\n";
+        }
     }
 
     const auras = customSpellData.auras;
     if (auras) {
         for (const key in auras) {
             const k = key as keyof CustomAuras;
-            if (auras[k]) {
-                output += auras[k].filter(x => spellIds.indexOf(x.id) >=0).map(x => getBuffDefinition(identifier, k, x)).join("\n");
+            const aura = auras[k];
+            if (aura) {
+                output += aura.filter(x => spellIds.indexOf(x.id) >=0).map(x => getBuffDefinition(identifier, k, x)).join("\n");
                 output += "\n";
             }
         }
@@ -324,7 +336,9 @@ ${limitLine2}
     const remainingsSpellIds = spellIds.concat();
     while (remainingsSpellIds.length) {
         const spellId = remainingsSpellIds.pop();
+        if (!spellId) continue;
         const spell = spellData.spellDataById.get(spellId);
+        if (!spell) continue;
         const customSpell = convertFromSpellData(spell, spellData.spellDataById);
         spells.push(customSpell);
         // if (customSpell.auras) {
@@ -356,13 +370,16 @@ ${limitLine2}
     if (spellLists) {
         for (const spellList of spellLists) {
             const spells = spellData.spellLists.get(spellList);
-            output += `SpellList(${spellList} ${spells.map(x => x.identifier).join(' ')})\n`;
+            if (spells) {
+                output += `SpellList(${spellList} ${spells.map(x => x.identifier).join(' ')})\n`;
+            }
         }
     }
 
-    const talents = talentIds.map(x => spellData.talentsById.get(x)).filter(x => x !== undefined).sort((x,y) => x.name > y.name ? 1 : -1);
+    const talents = talentIds.map(x => spellData.talentsById.get(x)).filter(x => x !== undefined).sort((x,y) => x!.name > y!.name ? 1 : -1);
     for (let i = 0; i < talents.length; i++) {
         const talent = talents[i];
+        if (!talent) continue;
         output += `Define(${talent.identifier} ${talent.talentId}) #${talent.id}\n`;
         const spell = spellData.spellDataById.get(talent.spell_id);
         if (spell && spell.desc) {
@@ -374,6 +391,7 @@ ${limitLine2}
     if (itemIds) {
         for (const itemId of itemIds) {
             const item = spellData.itemsById.get(itemId);
+            if (!item) continue;
             output += `Define(${item.identifier} ${itemId})\n`;
         }
     }
@@ -382,6 +400,7 @@ ${limitLine2}
     if (traitsIds) {
         for (const traitId of traitsIds) {
             const trait = spellData.azeriteTraitById.get(traitId);
+            if (!trait) continue;
             output += `Define(${trait.identifier} ${trait.spellId})\n`;
         }
     }
@@ -390,7 +409,7 @@ ${limitLine2}
     if (essenceIds) {
         for (const essenceId of essenceIds) {
             const essence = spellData.essenceById.get(essenceId);
-            output += `Define(${essence.identifier} ${essence.id})\n`;
+            if (essence) output += `Define(${essence.identifier} ${essence.id})\n`;
         }
     }
 

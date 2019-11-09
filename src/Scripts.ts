@@ -24,7 +24,7 @@ export type ScriptType = "script" | "include";
 interface Script {
     type?: ScriptType;
     desc?: string;
-    className?: ClassId;
+    className: ClassId;
     specialization?: SpecializationName;
     code?: string;
 }

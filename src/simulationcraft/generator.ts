@@ -207,13 +207,15 @@ export class Generator {
         `;
         let code = format(fmt, camelSpecialization, concat(lines, "\n"));
         let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-        insert(child, 1, node);
-        annotation.functionTag[node.name] = "cd";
+        if (node) {
+            insert(child, 1, node);
+            annotation.functionTag[node.name] = "cd";
+        }
     }
     
     public InsertInterruptFunctions(child: LuaArray<AstNode>, annotation: Annotation) {
         let interrupts = {};
-        let className = annotation.class;
+        let className = annotation.classId;
         
         if (this.ovaleData.PANDAREN_CLASSES[className]) {
             insert(interrupts, {
@@ -540,10 +542,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("death_strike");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("death_strike");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "DEMONHUNTER" && annotation.specialization == "havoc") {
             let fmt = `
@@ -558,10 +562,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("chaos_strike");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("chaos_strike");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "DEMONHUNTER" && annotation.specialization == "vengeance") {
             let fmt = `
@@ -572,10 +578,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("shear");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("shear");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "DRUID") {
             let fmt = `
@@ -590,14 +598,16 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("mangle");
-            annotation.AddSymbol("shred");
-            annotation.AddSymbol("wild_charge");
-            annotation.AddSymbol("wild_charge_bear");
-            annotation.AddSymbol("wild_charge_cat");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("mangle");
+                annotation.AddSymbol("shred");
+                annotation.AddSymbol("wild_charge");
+                annotation.AddSymbol("wild_charge_bear");
+                annotation.AddSymbol("wild_charge_cat");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "HUNTER") {
             let fmt = `
@@ -611,10 +621,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("raptor_strike");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("raptor_strike");
+                count = count + 1;
+            }
         }
         if (annotation.summon_pet == "HUNTER") {
             let fmt;
@@ -626,10 +638,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("revive_pet");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("revive_pet");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "MONK") {
             let fmt = `
@@ -640,10 +654,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("tiger_palm");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("tiger_palm");
+                count = count + 1;
+            }
         }
         if (annotation.time_to_hpg_heal == "PALADIN") {
             let code = `
@@ -653,11 +669,13 @@ export class Generator {
                 }
             `;
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.AddSymbol("crusader_strike");
-            annotation.AddSymbol("holy_shock");
-            annotation.AddSymbol("judgment");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.AddSymbol("crusader_strike");
+                annotation.AddSymbol("holy_shock");
+                annotation.AddSymbol("judgment");
+                count = count + 1;
+                }
         }
         if (annotation.time_to_hpg_melee == "PALADIN") {
             let code = `
@@ -667,12 +685,14 @@ export class Generator {
                 }
             `;
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.AddSymbol("crusader_strike");
-            annotation.AddSymbol("exorcism");
-            annotation.AddSymbol("hammer_of_wrath");
-            annotation.AddSymbol("judgment");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.AddSymbol("crusader_strike");
+                annotation.AddSymbol("exorcism");
+                annotation.AddSymbol("hammer_of_wrath");
+                annotation.AddSymbol("judgment");
+                count = count + 1;
+            }
         }
         if (annotation.time_to_hpg_tank == "PALADIN") {
             let code = `
@@ -699,10 +719,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("rebuke");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("rebuke");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "ROGUE") {
             let fmt = `
@@ -717,11 +739,13 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("kick");
-            annotation.AddSymbol("shadowstep");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("kick");
+                annotation.AddSymbol("shadowstep");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "SHAMAN") {
             let fmt = `
@@ -736,11 +760,13 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol("feral_lunge");
-            annotation.AddSymbol("stormstrike");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol("feral_lunge");
+                annotation.AddSymbol("stormstrike");
+                count = count + 1;
+            }
         }
         if (annotation.bloodlust == "SHAMAN") {
             let fmt = `
@@ -755,11 +781,13 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "cd";
-            annotation.AddSymbol("bloodlust");
-            annotation.AddSymbol("heroism");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "cd";
+                annotation.AddSymbol("bloodlust");
+                annotation.AddSymbol("heroism");
+                count = count + 1;
+            }
         }
         if (annotation.melee == "WARRIOR") {
             let fmt = `
@@ -779,12 +807,14 @@ export class Generator {
             }
             let code = format(fmt, camelSpecialization, charge, charge, charge, charge);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "shortcd";
-            annotation.AddSymbol(charge);
-            annotation.AddSymbol("heroic_leap");
-            annotation.AddSymbol("pummel");
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "shortcd";
+                annotation.AddSymbol(charge);
+                annotation.AddSymbol("heroic_leap");
+                annotation.AddSymbol("pummel");
+                count = count + 1;
+            }
         }
         if (annotation.use_item) {
             let fmt = `
@@ -796,9 +826,11 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "cd";
-            count = count + 1;
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "cd";
+                count = count + 1;
+            }
         }
         if (annotation.use_heart_essence) {
             // TODO: add way more essences once we know the ID
@@ -810,10 +842,12 @@ export class Generator {
             `;
             let code = format(fmt, camelSpecialization);
             let [node] = this.ovaleAst.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            annotation.functionTag[node.name] = "cd";
-            count = count + 1;
-            annotation.AddSymbol("concentrated_flame_essence");
+            if (node) {
+                insert(child, 1, node);
+                annotation.functionTag[node.name] = "cd";
+                count = count + 1;
+                annotation.AddSymbol("concentrated_flame_essence");
+            }
         }
         return count;
     }
@@ -942,10 +976,8 @@ export class Generator {
         return count;
     }
     public InsertVariables(child: LuaArray<AstNode>, annotation: Annotation) {
-        if (annotation.variable) {
-            for (const [, v] of pairs(annotation.variable)) {
-                insert(child, 1, v);
-            }
+        for (const [, v] of pairs(annotation.variable)) {
+            insert(child, 1, v);
         }
     }
     public GenerateIconBody(tag: string, profile: Profile) {

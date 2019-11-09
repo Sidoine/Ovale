@@ -42,8 +42,8 @@ export function Print(...__args: any[]) {
 
 
 export class OvaleClass extends OvaleBase {
-    playerClass: ClassId = undefined;
-    playerGUID: string = undefined;
+    playerClass: ClassId = "WARRIOR";
+    playerGUID: string = "";
     refreshNeeded:LuaObj<boolean> = {}
     
 

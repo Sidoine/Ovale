@@ -56,11 +56,11 @@ Define(chain_lightning_elemental 188443)
 # Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
   SpellInfo(chain_lightning_elemental)
 Define(conductive_ink_0 302491)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
 
 Define(conductive_ink_1 302597)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
 
 Define(crackling_surge 224127)
@@ -232,6 +232,11 @@ Define(hex_7 277784)
   SpellInfo(hex_7 cd=30 duration=60 channel=60)
   # Incapacitated.
   SpellAddTargetDebuff(hex_7 hex_7=1)
+Define(hex_8 309328)
+# Transforms the enemy into a living honey for 60 seconds. While hexed, the victim is incapacitated, and cannot attack or cast spells. Damage may cancel the effect. Limit 1. Only works on Humanoids and Beasts.
+  SpellInfo(hex_8 cd=30 duration=60 channel=60)
+  # Incapacitated.
+  SpellAddTargetDebuff(hex_8 hex_8=1)
 Define(hot_hand_buff 215785)
 # Melee attacks with Flametongue active have a chance to make your next Lava Lash cost no Maelstrom and deal 215785s1 increased damage.
   SpellInfo(hot_hand_buff duration=15 gcd=0 offgcd=1)
@@ -480,17 +485,17 @@ SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(hex hex_0 hex_1 hex_2 hex_3 hex_4 hex_5 hex_6 hex_7)
+SpellList(hex hex_0 hex_1 hex_2 hex_3 hex_4 hex_5 hex_6 hex_7 hex_8)
 SpellList(lightning_lasso lightning_lasso_0 lightning_lasso_1)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
-Define(ascendance_talent 21) #21675
-# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(ascendance_talent_enhancement 21) #21972
 # Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
+Define(ascendance_talent 21) #21675
+# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(boulderfist_talent 1) #22354
 # Rockbiter's recharge time is reduced by s1 and it deals s2 increased damage.
 Define(call_the_thunder_talent 5) #22139
@@ -537,10 +542,10 @@ Define(sundering_talent 18) #22351
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
 Define(surge_of_power_talent 16) #22145
 # Earth Shock also enhances your next spell cast within 15 seconds:rnrn|cFFFFFFFFFlame Shock|r: The next cast also applies Flame Shock to 287185s1 additional target within 287185A1 yards of the target.rn|cFFFFFFFFLightning Bolt|r: Your next cast will cause an additional s2-s3 Elemental Overloads.rn|cFFFFFFFFLava Burst|r: Reduces the cooldown of your ?s192249[Storm][Fire] Elemental by m1/1000.1 sec.rn|cFFFFFFFFFrost Shock|r: Freezes the target in place for 6 seconds.rn
-Define(totem_mastery_talent_elemental 6) #23190
-# Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
 Define(totem_mastery_talent 6) #23109
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 262417s1 Maelstrom every 262417t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the damage of Stormstrike by 262397s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Lava Lash damage by 262399s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your chance to trigger Windfury by 262400s1.
+Define(totem_mastery_talent_elemental 6) #23190
+# Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
 Define(unbridled_fury_item 169299)
 Define(ancestral_resonance_trait 277666)
 Define(echo_of_the_elementals_trait 275381)

@@ -68,7 +68,7 @@ export function GetPoolInfo() {
     return [self_poolSize, self_poolUnused];
 }
 
-export class OvaleTimeSpan implements LuaArray<number> {
+export class OvaleTimeSpan implements LuaArray<number | undefined> {
     [key: number]: number;
     
     Release(){
@@ -91,7 +91,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
             this[i] = A[i];
         }
         for (let i = count + 1; i <= lualength(this); i += 1) {
-            this[i] = undefined;
+            delete this[i];
         }
         return this;
     }
@@ -102,7 +102,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
             this[i] = select(i, __args);
         }
         for (let i = count + 1; i <= lualength(this); i += 1) {
-            this[i] = undefined;
+            delete this[i];
         }
         return this;
     }
@@ -135,7 +135,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
         }
         return false;
     }
-    NextTime(atTime: number):number {
+    NextTime(atTime: number):number | undefined {
         let A = this;
         for (let i = 1; i <= lualength(A); i += 2) {
             if (atTime < A[i]) {
@@ -183,7 +183,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
                 countResult = k + 1;
             }
             for (let j = countResult + 1; j <= lualength(result); j += 1) {
-                result[j] = undefined;
+                delete result[j];
             }
         }
         return result;
@@ -234,7 +234,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
                 }
             }
             for (let n = countResult + 1; n <= lualength(result); n += 1) {
-                result[n] = undefined;
+                delete result[n];
             }
         }
         return result;
@@ -293,7 +293,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
             }
         }
         for (let n = countResult + 1; n <= lualength(result); n += 1) {
-            result[n] = undefined;
+            delete result[n];
         }
         return result;
     }
@@ -323,7 +323,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
             let holdingA = true;
             let scanningA = false;
             while (true) {
-                let startA, endA, startB, endB;
+                let startA, endA, startB: number | undefined, endB: number | undefined;
                 if (i > countA && j > countB) {
                     [result[k], result[k + 1]] = [startTemp, endTemp];
                     countResult = k + 1;
@@ -342,8 +342,8 @@ export class OvaleTimeSpan implements LuaArray<number> {
                 } else {
                     [startB, endB] = [B[j], B[j + 1]];
                 }
-                let startCurrent = scanningA && startA || startB;
-                let endCurrent = scanningA && endA || endB;
+                let startCurrent = scanningA && startA || startB!;
+                let endCurrent = scanningA && endA || endB!;
                 let compare = CompareIntervals(startTemp, endTemp, startCurrent, endCurrent);
                 if (compare == 0) {
                     if (scanningA) {
@@ -405,7 +405,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
                 }
             }
             for (let n = countResult + 1; n <= lualength(result); n += 1) {
-                result[n] = undefined;
+                delete result[n];
             }
         }
         return result;

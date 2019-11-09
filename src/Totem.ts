@@ -20,8 +20,8 @@ let TOTEM_CLASS: LuaObj<boolean> = {
 }
 
 interface Totem {
-    duration?: number;
-    start?: number;
+    duration: number;
+    start: number;
     serial: number;
     name?: string;
     icon?: string;
@@ -68,7 +68,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         // shamans can use the fifth slot when all of the totems are active
         // that's why we +1 it everywhere we use
         for (let slot = 1; slot <= MAX_TOTEMS+1; slot += 1) {
-            this.next.totems[slot] = {slot: slot, serial: 0};
+            this.next.totems[slot] = {slot: slot, serial: 0, start: 0, duration: 0};
         }
     }
     ResetState(){        
@@ -76,9 +76,9 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     CleanState() {
         for (const [slot, totem] of pairs(this.next.totems)) {
             for (const [k] of kpairs(totem)) {
-                totem[k] = undefined;
+                delete totem[k];
             }
-            this.next.totems[slot] = undefined;
+            delete this.next.totems[slot];
         }
     }
     
@@ -163,19 +163,20 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         this.profiler.StartProfiling("OvaleTotem_state_SummonTotem");
         
         let totemSlot = this.GetAvailableTotemSlot(spellId, atTime);
-        
-        let [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
-        let duration = this.ovaleData.GetSpellInfoProperty(spellId, atTime, "duration", undefined);
-        let totem = this.next.totems[totemSlot];
-        totem.name = name;
-        totem.start = atTime;
-        totem.duration = duration || 15;
-        totem.icon = icon;
-        totem.slot = totemSlot;
+        if (totemSlot) {
+            let [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
+            let duration = this.ovaleData.GetSpellInfoProperty(spellId, atTime, "duration", undefined);
+            let totem = this.next.totems[totemSlot];
+            totem.name = name;
+            totem.start = atTime;
+            totem.duration = duration || 15;
+            totem.icon = icon;
+            totem.slot = totemSlot;
+        }
         this.profiler.StopProfiling("OvaleTotem_state_SummonTotem");
     }
     
-    GetAvailableTotemSlot(spellId: number, atTime: number): number {
+    GetAvailableTotemSlot(spellId: number, atTime: number): number | undefined {
         this.profiler.StartProfiling("OvaleTotem_state_GetNextAvailableTotemSlot");
         let availableSlot = undefined;
         

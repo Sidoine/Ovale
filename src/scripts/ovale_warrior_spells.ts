@@ -421,10 +421,10 @@ Define(massacre_talent_fury 14) #22393
 # Execute is now usable on targets below s2 health.
 Define(massacre_talent 7) #22380
 # Execute is now usable on targets below s2 health.
-Define(ravager_talent 21) #21667
-# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
 Define(ravager_talent_protection 21) #23099
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?s23922[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][]
+Define(ravager_talent 21) #21667
+# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
 Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 12 seconds.
 Define(siegebreaker_talent 21) #16037
@@ -445,6 +445,7 @@ Define(cold_steel_hot_blood_trait 288080)
 Define(memory_of_lucid_dreams_essence_id 27)
 Define(blood_of_the_enemy_essence_id 23)
 Define(condensed_life_force_essence_id 14)
+Define(the_crucible_of_flame_essence_id 12)
     `;
 // END
     code += `

@@ -14,12 +14,12 @@ actions=/potion,if=buff.test.stack>=0.1`;
     const result = simulationcraft.ParseProfile(code);
 
     // Assert
-    t.is(result.actionList[1].type, "action_list");
-    t.is(result.actionList[1].child[1].type, "action");
-    t.is(result.actionList[1].child[1].modifiers.if.type, "compare");
-    t.is(result.actionList[1].child[1].modifiers.if.operator, ">=");
-    t.is(result.actionList[1].child[1].modifiers.if.child[2].type, "number");
-    t.is(result.actionList[1].child[1].modifiers.if.child[2].value, 0.1);
+    t.is(result!.actionList![1].type, "action_list");
+    t.is(result!.actionList![1].child![1].type, "action");
+    t.is(result!.actionList![1].child![1].modifiers!.if!.type, "compare");
+    t.is(result!.actionList![1].child![1].modifiers!.if!.operator, ">=");
+    t.is(result!.actionList![1].child![1].modifiers!.if!.child[2].type, "number");
+    t.is(result!.actionList![1].child![1].modifiers!.if!.child[2].value, 0.1);
 });
 
 test("parse sequence", t => {

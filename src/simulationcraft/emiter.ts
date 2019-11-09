@@ -12,8 +12,8 @@ import { Unparser } from "./unparser";
 
 const OPERAND_TOKEN_PATTERN = "[^.]+";
 
-type EmitVisitor = (parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string | undefined) => AstNode;
-type EmitOperandVisitor = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string, target?: string) => [boolean, AstNode];
+type EmitVisitor = (parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string | undefined) => AstNode | undefined;
+type EmitOperandVisitor = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action?: string, target?: string) => AstNode | undefined;
 
 
 function IsTotem(name: string) {
@@ -45,7 +45,7 @@ export class Emiter {
         this.AddPerClassSpecialization(this.EMIT_DISAMBIGUATION, name, info, className, specialization, _type);
     }
     
-    private Disambiguate(annotation: Annotation, name: string, className: string, specialization: string, _type?: string): [string, string] {
+    private Disambiguate(annotation: Annotation, name: string, className: string, specialization: string, _type?: string): [string, string | undefined] {
         if (className && annotation.dictionary[`${name}_${className}`]) {
             return [`${name}_${className}`, _type];
         }
@@ -71,7 +71,7 @@ export class Emiter {
         return [disname, distype];
     }
 
-    private AddPerClassSpecialization(tbl: Disambiguations, name: string, info: string, className: string, specialization: string, _type: string) {
+    private AddPerClassSpecialization(tbl: Disambiguations, name: string, info: string, className: string | undefined, specialization: string | undefined, _type: string | undefined) {
         className = className || "ALL_CLASSES";
         specialization = specialization || "ALL_SPECIALIZATIONS";
         tbl[className] = tbl[className] || {};
@@ -282,8 +282,8 @@ export class Emiter {
     }
 
     private EmitModifier = (modifier: Modifier, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string, modifiers: Modifiers) => {
-        let node: AstNode, code;
-        let className = annotation.class;
+        let node: AstNode | undefined, code;
+        let className = annotation.classId;
         let specialization = annotation.specialization;
         if (modifier == "if") {
             node = this.Emit(parseNode, nodeList, annotation, action);
@@ -299,13 +299,17 @@ export class Emiter {
         } else if (modifier == "line_cd") {
             if (!SPECIAL_ACTION[action]) {
                 this.AddSymbol(annotation, action);
-                let expressionCode = this.ovaleAst.Unparse(this.Emit(parseNode, nodeList, annotation, action));
+                const node = this.Emit(parseNode, nodeList, annotation, action);
+                if (!node) return undefined;
+                let expressionCode = this.ovaleAst.Unparse(node);
                 code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode);
             }
         } else if (modifier == "max_cycle_targets") {
             let [debuffName] = this.Disambiguate(annotation, `${action}_debuff` , className, specialization);
             this.AddSymbol(annotation, debuffName);
-            let expressionCode = this.ovaleAst.Unparse(this.Emit(parseNode, nodeList, annotation, action));
+            const node = this.Emit(parseNode, nodeList, annotation, action);
+            if (!node) return undefined;
+            let expressionCode = this.ovaleAst.Unparse(node);
             code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode);
         } else if (modifier == "max_energy") {
             let value = tonumber(this.unparser.Unparse(parseNode));
@@ -335,42 +339,45 @@ export class Emiter {
             }
         } else if (modifier == "sync") {
             let name = this.unparser.Unparse(parseNode);
+            if (!name) return undefined;
             if (name == "whirlwind_mh") {
                 name = "whirlwind";
             }
             node = annotation.astAnnotation && annotation.astAnnotation.sync && annotation.astAnnotation.sync[name];
             if (!node) {
-                let syncParseNode = annotation.sync[name];
+                let syncParseNode = annotation.sync && annotation.sync[name];
                 if (syncParseNode) {
                     let syncActionNode = this.EmitAction(syncParseNode, nodeList, annotation, action);
-                    let syncActionType = syncActionNode.type;
-                    if (syncActionType == "action") {
-                        node = syncActionNode;
-                    } else if (syncActionType == "custom_function") {
-                        node = syncActionNode;
-                    } else if (syncActionType == "if" || syncActionType == "unless") {
-                        let lhsNode = syncActionNode.child[1];
-                        if (syncActionType == "unless") {
-                            let notNode = this.ovaleAst.NewNode(nodeList, true);
-                            notNode.type = "logical";
-                            notNode.expressionType = "unary";
-                            notNode.operator = "not";
-                            notNode.child[1] = lhsNode;
-                            lhsNode = notNode;
+                    if (syncActionNode) {
+                        let syncActionType = syncActionNode.type;
+                        if (syncActionType == "action") {
+                            node = syncActionNode;
+                        } else if (syncActionType == "custom_function") {
+                            node = syncActionNode;
+                        } else if (syncActionType == "if" || syncActionType == "unless") {
+                            let lhsNode = syncActionNode.child[1];
+                            if (syncActionType == "unless") {
+                                let notNode = this.ovaleAst.NewNode(nodeList, true);
+                                notNode.type = "logical";
+                                notNode.expressionType = "unary";
+                                notNode.operator = "not";
+                                notNode.child[1] = lhsNode;
+                                lhsNode = notNode;
+                            }
+                            let rhsNode = syncActionNode.child[2];
+                            let andNode = this.ovaleAst.NewNode(nodeList, true);
+                            andNode.type = "logical";
+                            andNode.expressionType = "binary";
+                            andNode.operator = "and";
+                            andNode.child[1] = lhsNode;
+                            andNode.child[2] = rhsNode;
+                            node = andNode;
+                        } else {
+                            this.tracer.Print("Warning: Unable to emit action for 'sync=%s'.", name);
+                            [name] = this.Disambiguate(annotation, name, className, specialization);
+                            this.AddSymbol(annotation, name);
+                            code = format("Spell(%s)", name);
                         }
-                        let rhsNode = syncActionNode.child[2];
-                        let andNode = this.ovaleAst.NewNode(nodeList, true);
-                        andNode.type = "logical";
-                        andNode.expressionType = "binary";
-                        andNode.operator = "and";
-                        andNode.child[1] = lhsNode;
-                        andNode.child[2] = rhsNode;
-                        node = andNode;
-                    } else {
-                        this.tracer.Print("Warning: Unable to emit action for 'sync=%s'.", name);
-                        [name] = this.Disambiguate(annotation, name, className, specialization);
-                        this.AddSymbol(annotation, name);
-                        code = format("Spell(%s)", name);
                     }
                 }
             }
@@ -389,9 +396,8 @@ export class Emiter {
         return node;
     }
 
-    private EmitConditionNode = (nodeList: LuaArray<AstNode>, bodyNode: AstNode, conditionNode: AstNode, parseNode: ParseNode, annotation: Annotation, action: string, modifiers: Modifiers) => {
-        let extraConditionNode = conditionNode;
-        conditionNode = undefined;
+    private EmitConditionNode = (nodeList: LuaArray<AstNode>, bodyNode: AstNode, extraConditionNode: AstNode | undefined, parseNode: ParseNode, annotation: Annotation, action: string, modifiers: Modifiers) => {
+        let conditionNode = undefined;
         for (const [modifier, expressionNode] of kpairs(parseNode.modifiers)) {
             let rhsNode = this.EmitModifier(modifier, expressionNode, nodeList, annotation, action, modifiers);
             if (rhsNode) {
@@ -439,9 +445,6 @@ export class Emiter {
     }
     
     private EmitNamedVariable = (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string, conditionNode?: AstNode) => {
-        if (!annotation.variable) {
-            annotation.variable = {}
-        }
         let node = annotation.variable[name];
         let group;
         if (!node) {
@@ -456,8 +459,13 @@ export class Emiter {
             group = node.child[1];
         }
         annotation.currentVariable = node;
+        if (!modifiers.value) {
+            this.tracer.Error("'value' modifier is undefined");
+            return;
+        }
         let value = this.Emit(modifiers.value, nodeList, annotation, action);
-        let newNode = this.EmitConditionNode(nodeList, value, conditionNode || undefined, parseNode, annotation, action, modifiers);
+        if (!value) return;
+        let newNode = this.EmitConditionNode(nodeList, value, conditionNode, parseNode, annotation, action, modifiers);
         if (newNode.type == "if") {
             insert(group.child, 1, newNode);
         } else {
@@ -473,7 +481,9 @@ export class Emiter {
         annotation.variable[valueNode.name] = valueNode;
         let bodyCode = format("AddFunction %s { if %s_value() > %s_min() %s_value() %s_min() }", name, name, name, name, name);
         let [node] = this.ovaleAst.ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation);
-        annotation.variable[name] = node;
+        if (node) {
+            annotation.variable[name] = node;
+        }
     }
     
     private EmitVariableMax = (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: Modifiers, parseNode: ParseNode, action: string) => {
@@ -483,7 +493,9 @@ export class Emiter {
         annotation.variable[valueNode.name] = valueNode;
         let bodyCode = format("AddFunction %s { if %s_value() < %s_max() %s_value() %s_max() }", name, name, name, name, name);
         let [node] = this.ovaleAst.ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation);
-        annotation.variable[name] = node;
+        if (node) {
+            annotation.variable[name] = node;
+        }
     }
 
     private EmitVariableAdd = (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) => {
@@ -517,26 +529,38 @@ export class Emiter {
 
         annotation.currentVariable = node;
 
+        if (!modifiers.condition || !modifiers.value || !modifiers.value_else) {
+            this.tracer.Error("Modifier missing in if");
+            return;
+        } 
+
         const ifNode = this.ovaleAst.NewNode(nodeList, true);
         ifNode.type = "if";
-        ifNode.child[1] = this.Emit(modifiers.condition, nodeList, annotation, undefined);
-        ifNode.child[2] = this.Emit(modifiers.value, nodeList, annotation, undefined);
+        const condition = this.Emit(modifiers.condition, nodeList, annotation, undefined);
+        const value = this.Emit(modifiers.value, nodeList, annotation, undefined);
+        if (!condition || !value) return;
+        ifNode.child[1] = condition;
+        ifNode.child[2] = value;
         insert(group.child, ifNode);
         const elseNode = this.ovaleAst.NewNode(nodeList, true);
         elseNode.type = "unless";
         elseNode.child[1] = ifNode.child[1];
-        elseNode.child[2] = this.Emit(modifiers.value_else, nodeList, annotation, undefined);
+        const valueElse = this.Emit(modifiers.value_else, nodeList, annotation, undefined);
+        if (!valueElse) return;
+        elseNode.child[2] = valueElse;
         insert(group.child, elseNode);
 
         annotation.currentVariable = undefined;
     }
 
     private EmitVariable = (nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: Modifiers, parseNode: ParseNode, action: string, conditionNode?: AstNode) => {
-        if (!annotation.variable) {
-            annotation.variable = {}
-        }
         let op = (modifier.op && this.unparser.Unparse(modifier.op)) || "set";
+        if (!modifier.name) {
+            this.tracer.Error("Modifier name is missing");
+            return;
+        }
         let name = this.unparser.Unparse(modifier.name);
+        if (!name) return;
         if (truthy(match(name, "^%d"))) {
             name = "_" + name;
         }
@@ -561,15 +585,15 @@ export class Emiter {
    
     /** Takes a ParseNode of type "action" and transforms it to an AstNode. */
     private EmitAction: EmitVisitor = (parseNode: ParseNode, nodeList, annotation) => {
-        let node: AstNode;
+        let node: AstNode | undefined;
         let canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
-        let className = annotation.class;
+        let className = annotation.classId;
         let specialization = annotation.specialization;
         let camelSpecialization = CamelSpecialization(annotation);
         let role = annotation.role;
         let [action, type] = this.Disambiguate(annotation, canonicalizedName, className, specialization, "Spell");
-        let bodyNode: AstNode;
-        let conditionNode: AstNode;
+        let bodyNode: AstNode | undefined;
+        let conditionNode: AstNode | undefined;
         if (action == "auto_attack" && !annotation.melee) {
         } else if (action == "auto_shot") {
         } else if (action == "choose_target") {
@@ -757,28 +781,32 @@ export class Emiter {
                 annotation[action] = className;
                 conditionCode = `CheckBoxOn(opt_${action})`;
             } else if (action == "variable") {
-                this.EmitVariable(nodeList, annotation, modifiers, parseNode, action, conditionNode);
+                this.EmitVariable(nodeList, annotation, modifiers, parseNode, action);
                 isSpellAction = false;
             } else if (action == "call_action_list" || action == "run_action_list" || action == "swap_action_list") {
                 if (modifiers.name) {
                     let name = this.unparser.Unparse(modifiers.name);
-                    let functionName = OvaleFunctionName(name, annotation);
-                    bodyCode = `${functionName}()`;
-                    if (className == "MAGE" && specialization == "arcane" && (name == "burn" || name == "init_burn")) {
-                        conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)";
-                        annotation.opt_arcane_mage_burn_phase = className;
+                    if (name) {
+                        let functionName = OvaleFunctionName(name, annotation);
+                        bodyCode = `${functionName}()`;
+                        if (className == "MAGE" && specialization == "arcane" && (name == "burn" || name == "init_burn")) {
+                            conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)";
+                            annotation.opt_arcane_mage_burn_phase = className;
+                        }
                     }
+                    isSpellAction = false;
                 }
-                isSpellAction = false;
             } else if (action == "cancel_buff") {
                 if (modifiers.name) {
                     let spellName = this.unparser.Unparse(modifiers.name);
-                    let [buffName] = this.Disambiguate(annotation, `${spellName}_buff`, className, specialization, "spell");
-                    this.AddSymbol(annotation, spellName);
-                    this.AddSymbol(annotation, buffName);
-                    bodyCode = format("Texture(%s text=cancel)", spellName);
-                    conditionCode = format("BuffPresent(%s)", buffName);
-                    isSpellAction = false;
+                    if (spellName) {
+                        let [buffName] = this.Disambiguate(annotation, `${spellName}_buff`, className, specialization, "spell");
+                        this.AddSymbol(annotation, spellName);
+                        this.AddSymbol(annotation, buffName);
+                        bodyCode = format("Texture(%s text=cancel)", spellName);
+                        conditionCode = format("BuffPresent(%s)", buffName);
+                        isSpellAction = false;
+                    }
                 }
             } else if (action == "pool_resource") {
                 bodyNode = this.ovaleAst.NewNode(nodeList);
@@ -803,12 +831,14 @@ export class Emiter {
             } else if (action == "stance") {
                 if (modifiers.choose) {
                     let name = this.unparser.Unparse(modifiers.choose);
-                    if (className == "MONK") {
-                        action = `stance_of_the_${name}`;
-                    } else if (className == "WARRIOR") {
-                        action = `${name}_stance`;
-                    } else {
-                        action = name;
+                    if (name) {
+                        if (className == "MONK") {
+                            action = `stance_of_the_${name}`;
+                        } else if (className == "WARRIOR") {
+                            action = `${name}_stance`;
+                        } else {
+                            action = name;
+                        }
                     }
                 } else {
                     isSpellAction = false;
@@ -822,19 +852,21 @@ export class Emiter {
                 annotation["use_item"] = true;
                 isSpellAction = false;
             } else if (action == "use_item") {
-                let legendaryRing: string = undefined;
+                let legendaryRing: string | undefined = undefined;
                 // TODO use modifiers.slots
                 if (modifiers.slot) {
                     // use this slot only?
                     let slot = this.unparser.Unparse(modifiers.slot);
-                    if (truthy(match(slot, "finger"))) {
+                    if (slot && truthy(match(slot, "finger"))) {
                         [legendaryRing] = this.Disambiguate(annotation, "legendary_ring", className, specialization);
                     }
                 } else if (modifiers.name) {
                     let name = this.unparser.Unparse(modifiers.name);
-                    [name] = this.Disambiguate(annotation, name, className, specialization);
-                    if (truthy(match(name, "legendary_ring"))) {
-                        legendaryRing = name;
+                    if (name) {
+                        [name] = this.Disambiguate(annotation, name, className, specialization);
+                        if (truthy(match(name, "legendary_ring"))) {
+                            legendaryRing = name;
+                        }
                     }
                     // } else if (false) {
                     //     bodyCode = format("Item(%s usable=1)", name);
@@ -861,8 +893,10 @@ export class Emiter {
                         bodyNode = this.ovaleAst.NewNode(nodeList);
                         bodyNode.type = "simc_wait";
                         let expressionNode = this.Emit(modifiers.sec, nodeList, annotation, action);
-                        let code = this.ovaleAst.Unparse(expressionNode);
-                        conditionCode = code + " > 0";
+                        if (expressionNode) {
+                            let code = this.ovaleAst.Unparse(expressionNode);
+                            conditionCode = code + " > 0";
+                        }
                     }
                 }
                 isSpellAction = false;
@@ -913,7 +947,7 @@ export class Emiter {
                 let statementNode = this.EmitAction(actionNode, nodeList, annotation, actionNode.name);
                 if (statementNode) {
                     if (statementNode.type == "simc_pool_resource") {
-                        let powerType = POOLED_RESOURCE[annotation.class];
+                        let powerType = POOLED_RESOURCE[annotation.classId];
                         if (powerType) {
                             if (statementNode.for_next) {
                                 poolResourceNode = statementNode;
@@ -925,7 +959,7 @@ export class Emiter {
                     } else if (poolResourceNode) {
                         child[lualength(child) + 1] = statementNode;
                         let bodyNode;
-                        let poolingConditionNode: AstNode;
+                        let poolingConditionNode: AstNode | undefined;
                         if (statementNode.child) {
                             poolingConditionNode = statementNode.child[1];
                             bodyNode = statementNode.child[2];
@@ -951,26 +985,28 @@ export class Emiter {
                             }
                             let code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition);
                             let [conditionNode] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-                            if (statementNode.child) {
-                                let rhsNode = conditionNode;
-                                conditionNode = this.ovaleAst.NewNode(nodeList, true);
-                                conditionNode.type = "logical";
-                                conditionNode.expressionType = "binary";
-                                conditionNode.operator = "and";
-                                conditionNode.child[1] = poolingConditionNode;
-                                conditionNode.child[2] = rhsNode;
+                            if (conditionNode) {
+                                if (statementNode.child && poolingConditionNode) {
+                                    let rhsNode = conditionNode;
+                                    conditionNode = this.ovaleAst.NewNode(nodeList, true);
+                                    conditionNode.type = "logical";
+                                    conditionNode.expressionType = "binary";
+                                    conditionNode.operator = "and";
+                                    conditionNode.child[1] = poolingConditionNode;
+                                    conditionNode.child[2] = rhsNode;
+                                }
+                                let restNode = this.ovaleAst.NewNode(nodeList, true);
+                                child[lualength(child) + 1] = restNode;
+                                if (statementNode.type == "unless") {
+                                    restNode.type = "if";
+                                } else {
+                                    restNode.type = "unless";
+                                }
+                                restNode.child[1] = conditionNode;
+                                restNode.child[2] = this.ovaleAst.NewNode(nodeList, true);
+                                restNode.child[2].type = "group";
+                                child = restNode.child[2].child;
                             }
-                            let restNode = this.ovaleAst.NewNode(nodeList, true);
-                            child[lualength(child) + 1] = restNode;
-                            if (statementNode.type == "unless") {
-                                restNode.type = "if";
-                            } else {
-                                restNode.type = "unless";
-                            }
-                            restNode.child[1] = conditionNode;
-                            restNode.child[2] = this.ovaleAst.NewNode(nodeList, true);
-                            restNode.child[2].type = "group";
-                            child = restNode.child[2].child;
                         }
                         poolResourceNode = undefined;
                     } else if (statementNode.type == "simc_wait") {
@@ -1006,12 +1042,12 @@ export class Emiter {
     }
     
     private EmitExpression: EmitVisitor = (parseNode, nodeList, annotation, action) => {
-        let node: AstNode;
+        let node: AstNode | undefined;
         let msg;
         if (parseNode.expressionType == "unary") {
             let opInfo = UNARY_OPERATOR[parseNode.operator as SimcUnaryOperatorType];
             if (opInfo) {
-                let operator: OperatorType;
+                let operator: OperatorType | undefined;
                 if (parseNode.operator == "!") {
                     operator = "not";
                 } else if (parseNode.operator == "-") {
@@ -1037,7 +1073,7 @@ export class Emiter {
             let opInfo = BINARY_OPERATOR[parseNode.operator as SimcBinaryOperatorType];
             if (opInfo) {
                 const parseNodeOperator = parseNode.operator as SimcBinaryOperatorType;
-                let operator: OperatorType;
+                let operator: OperatorType | undefined;
                 if (parseNodeOperator == "&") {
                     operator = "and";
                 } else if (parseNodeOperator == "^") {
@@ -1141,90 +1177,89 @@ export class Emiter {
         return node;
     }
     private EmitOperand: EmitVisitor = (parseNode, nodeList, annotation, action) => {
-        let ok = false;
-        let node : AstNode;
+        let node : AstNode | undefined;
         let operand = parseNode.name;
         let [token] = match(operand, OPERAND_TOKEN_PATTERN);
-        let target:string;
+        let target:string | undefined;
         if (token == "target") {
-            [ok, node] = this.EmitOperandTarget(operand, parseNode, nodeList, annotation, action);
-            if (!ok) {
+            node = this.EmitOperandTarget(operand, parseNode, nodeList, annotation, action);
+            if (node) {
                 target = token;
                 operand = sub(operand, len(target) + 2);
                 [token] = match(operand, OPERAND_TOKEN_PATTERN);
             }
         }
 
-        if (!ok) {
-            [ok, node] = this.EmitOperandRune(operand, parseNode, nodeList, annotation, action);
+        if (!node) {
+            node = this.EmitOperandRune(operand, parseNode, nodeList, annotation, action);
         }
-        if (!ok) {
-            [ok, node] = this.EmitOperandSpecial(operand, parseNode, nodeList, annotation, action, target);
+        if (!node) {
+            node = this.EmitOperandSpecial(operand, parseNode, nodeList, annotation, action, target);
         }
-        if (!ok) {
-            [ok, node] = this.EmitOperandRaidEvent(operand, parseNode, nodeList, annotation, action);
+        if (!node) {
+            node = this.EmitOperandRaidEvent(operand, parseNode, nodeList, annotation, action);
         }
-        if (!ok) {
-            [ok, node] = this.EmitOperandRace(operand, parseNode, nodeList, annotation, action);
+        if (!node) {
+            node = this.EmitOperandRace(operand, parseNode, nodeList, annotation, action);
         }
-        if (!ok) {
-            [ok, node] = this.EmitOperandAction(operand, parseNode, nodeList, annotation, action, target);
+        if (!node) {
+            node = this.EmitOperandAction(operand, parseNode, nodeList, annotation, action, target);
         }
-        if (!ok) {
-            [ok, node] = this.EmitOperandCharacter(operand, parseNode, nodeList, annotation, action, target);
+        if (!node) {
+            node = this.EmitOperandCharacter(operand, parseNode, nodeList, annotation, action, target);
         }
-        if (!ok) {
+        if (!node) {
             if (token == "active_dot") {
                 target = target || "target";
-                [ok, node] = this.EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "aura") {
-                [ok, node] = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "artifact") {
-                [ok, node] = this.EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "azerite") {
-                [ok, node] = this.EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "buff") {
-                [ok, node] = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "consumable") {
-                [ok, node] = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "cooldown") {
-                [ok, node] = this.EmitOperandCooldown(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandCooldown(operand, parseNode, nodeList, annotation, action);
             } else if (token == "debuff") {
                 target = target || "target";
-                [ok, node] = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "disease") {
                 target = target || "target";
-                [ok, node] = this.EmitOperandDisease(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandDisease(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "dot") {
                 target = target || "target";
-                [ok, node] = this.EmitOperandDot(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandDot(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "essence") {
-                [ok, node] = this.EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target);
             } else if (token == "glyph") {
-                [ok, node] = this.EmitOperandGlyph(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandGlyph(operand, parseNode, nodeList, annotation, action);
             } else if (token == "pet") {
-                [ok, node] = this.EmitOperandPet(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandPet(operand, parseNode, nodeList, annotation, action);
             } else if (token == "prev" || token == "prev_gcd" || token == "prev_off_gcd") {
-                [ok, node] = this.EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action);
             } else if (token == "refreshable") {
-                [ok, node] = this.EmitOperandRefresh(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandRefresh(operand, parseNode, nodeList, annotation, action);
             } else if (token == "seal") {
-                [ok, node] = this.EmitOperandSeal(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandSeal(operand, parseNode, nodeList, annotation, action);
             } else if (token == "set_bonus") {
-                [ok, node] = this.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action);
             } else if (token == "talent") {
-                [ok, node] = this.EmitOperandTalent(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandTalent(operand, parseNode, nodeList, annotation, action);
             } else if (token == "totem") {
-                [ok, node] = this.EmitOperandTotem(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandTotem(operand, parseNode, nodeList, annotation, action);
             } else if (token == "trinket") {
-                [ok, node] = this.EmitOperandTrinket(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandTrinket(operand, parseNode, nodeList, annotation, action);
             } else if (token == "variable") {
-                [ok, node] = this.EmitOperandVariable(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandVariable(operand, parseNode, nodeList, annotation, action);
             } else if (token == "ground_aoe") {
-                [ok, node] = this.EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action);
+                node = this.EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action);
             }
         }
-        if (!ok) {
+        if (!node) {
             this.tracer.Print("Warning: Variable '%s' is not implemented.", parseNode.name);
             node = this.ovaleAst.NewNode(nodeList);
             node.type = "variable";
@@ -1234,8 +1269,7 @@ export class Emiter {
     }
     
     private EmitOperandAction: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
-        let node;
+        let node : AstNode | undefined;
         let name;
         let property;
         if (sub(operand, 1, 7) == "action.") {
@@ -1249,10 +1283,10 @@ export class Emiter {
         }
 
         if (!name) {
-            return [false, undefined];
+            return undefined;
         }
 
-        let [className, specialization] = [annotation.class, annotation.specialization];
+        let [className, specialization] = [annotation.classId, annotation.specialization];
         [name] = this.Disambiguate(annotation, name, className, specialization);
         target = target && (`${target}.`) || "";
         let buffName = `${name}_debuff`;
@@ -1350,10 +1384,8 @@ export class Emiter {
             code = format("SpellCooldown(%s)", name);
         } else if (property == "marks_next_gcd") {
             code = "0"; // TODO
-        } else {
-            ok = false;
-        }
-        if (ok && code) {
+        } 
+        if (code) {
             if (name == "call_action_list" && property != "gcd") {
                 this.tracer.Print("Warning: dubious use of call_action_list in %s", code);
             }
@@ -1363,98 +1395,84 @@ export class Emiter {
                 this.AddSymbol(annotation, symbol);
             }
         }
-        return [ok, node];
+        return node;
     }
     private EmitOperandActiveDot: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "active_dot") {
             let name = tokenIterator();
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let dotName = `${name}_debuff`;
-            [dotName] = this.Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
+            [dotName] = this.Disambiguate(annotation, dotName, annotation.classId, annotation.specialization);
             let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
             target = target && (`${target}.`) || "";
             let code = format("%sCountOnAny(%s)", prefix, dotName);
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
     
     private EmitOperandArtifact: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "artifact") {
-            let code:string;
+            let code;
             let name = tokenIterator();
             let property = tokenIterator();
             if (property == "rank") {
                 code = format("ArtifactTraitRank(%s)", name);
             } else if (property == "enabled") {
                 code = format("HasArtifactTrait(%s)", name);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
    
    private EmitOperandAzerite: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "azerite") {
-            let code:string;
+            let code;
             let name = tokenIterator();
             let property = tokenIterator();
             if (property == "rank") {
                 code = format("AzeriteTraitRank(%s_trait)", name);
             } else if (property == "enabled") {
                 code = format("HasAzeriteTrait(%s_trait)", name);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, `${name}_trait`);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     
     private EmitOperandEssence: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "essence") {
-            let code:string;
+            let code;
             let name = tokenIterator();
             let property = tokenIterator();
             
             let essenceId = format("%s_essence_id", name);
-            [essenceId] = this.Disambiguate(annotation, essenceId, annotation.class, annotation.specialization);
+            [essenceId] = this.Disambiguate(annotation, essenceId, annotation.classId, annotation.specialization);
             
             if(property == "major") {
                 code = format("AzeriteEssenceIsMajor(%s)", essenceId);
@@ -1464,28 +1482,23 @@ export class Emiter {
                 code = format("AzeriteEssenceIsEnabled(%s)", essenceId);
             } else if (property === "rank") {
                 code = format("AzeriteEssenceRank(%s)", essenceId);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, essenceId);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
    
    private EmitOperandRefresh: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "refreshable") {
             let buffName = `${action}_debuff`;
-            [buffName] = this.Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
+            [buffName] = this.Disambiguate(annotation, buffName, annotation.classId, annotation.specialization);
             let target;
             let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
             if (prefix == "Debuff") {
@@ -1498,11 +1511,10 @@ export class Emiter {
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             this.AddSymbol(annotation, buffName);
         }
-        return [ok, node];
+        return node;
     }
     
     private EmitOperandBuff: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
@@ -1514,9 +1526,9 @@ export class Emiter {
             }
             
             // buffname
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let buffName = (token == "debuff") && `${name}_debuff` || `${name}_buff`;
-            [buffName] = this.Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
+            [buffName] = this.Disambiguate(annotation, buffName, annotation.classId, annotation.specialization);
             let prefix
             if (!truthy(find(buffName, "_debuff$")) && !truthy(find(buffName, "_debuff$"))) {
                 prefix = target == "target" && "Debuff" || "Buff";
@@ -1565,24 +1577,19 @@ export class Emiter {
                 code = format("%sImproved(%s%s)", prefix, buffName);
             } else if (property == "value") {
                 code = format("%s%sAmount(%s%s)", target, prefix, buffName, any);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, buffName);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
 
     private EmitOperandCharacter: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
-        let className = annotation.class;
+        let className = annotation.classId;
         let specialization = annotation.specialization;
         let camelSpecialization = CamelSpecialization(annotation);
         target = target && (`${target}.`) || "";
@@ -1652,18 +1659,15 @@ export class Emiter {
         } else if (operand == "t18_class_trinket") {
             code = format("HasTrinket(%s)", operand);
             this.AddSymbol(annotation, operand);
-        } else {
-            ok = false;
-        }
-        if (ok && code) {
+        } 
+        if (code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
-        return [ok, node];
+        return node;
     }
 
     private EmitOperandCooldown: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
@@ -1672,7 +1676,7 @@ export class Emiter {
             let name = tokenIterator();
             let property = tokenIterator();
             let prefix;
-            [name, prefix] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization, "Spell");
+            [name, prefix] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization, "Spell");
             let code;
             if (property == "execute_time") {
                 code = format("ExecuteTime(%s)", name);
@@ -1700,21 +1704,16 @@ export class Emiter {
                 code = format("%sMaxCharges(%s)", prefix, name);
             } else if (property == "full_recharge_time") {
                 code = format("%sCooldown(%s)", prefix, name);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandDisease: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
@@ -1730,60 +1729,50 @@ export class Emiter {
                 code = `${target}DiseasesTicking()`;
             } else if (property == "ticking") {
                 code = `${target}DiseasesAnyTicking()`;
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
 
-    private EmitOperandGroundAoe: EmitOperandVisitor = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string): [boolean, AstNode] => {
-        let ok = true;
+    private EmitOperandGroundAoe: EmitOperandVisitor = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action?: string) => {
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "ground_aoe") {
             let name = tokenIterator();
             let property = tokenIterator();
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let dotName = `${name}_debuff`;
-            [dotName] = this.Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
+            [dotName] = this.Disambiguate(annotation, dotName, annotation.classId, annotation.specialization);
             let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
             let target = (prefix == "Debuff" && "target.") || "";
             let code;
             if (property == "remains") {
                 code = format("%s%sRemaining(%s)", target, prefix, dotName);
-            } else {
-                ok = false;
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
 
     private EmitOperandDot: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "dot") {
             let name = tokenIterator();
             let property = tokenIterator();
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let dotName = `${name}_debuff`;
-            [dotName] = this.Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
+            [dotName] = this.Disambiguate(annotation, dotName, annotation.classId, annotation.specialization);
             let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
             target = target && (`${target}.`) || "";
             let code;
@@ -1809,57 +1798,47 @@ export class Emiter {
                 code = format("%s%sRefreshable(%s)", target, prefix, dotName);
             } else if (property === "max_stacks") {
                 code = format("MaxStacks(%s)", dotName);
-            } else {
-                ok = false;
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandGlyph: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "glyph") {
             let name = tokenIterator();
             let property = tokenIterator();
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let glyphName = `glyph_of_${name}`;
-            [glyphName] = this.Disambiguate(annotation, glyphName, annotation.class, annotation.specialization);
+            [glyphName] = this.Disambiguate(annotation, glyphName, annotation.classId, annotation.specialization);
             let code;
             if (property == "disabled") {
                 code = format("not Glyph(%s)", glyphName);
             } else if (property == "enabled") {
                 code = format("Glyph(%s)", glyphName);
-            } else {
-                ok = false;
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, glyphName);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
     private EmitOperandPet: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "pet") {
             let name = tokenIterator();
             let property = tokenIterator();
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let isTotem = IsTotem(name);
             let code;
             if (isTotem && property == "active") {
@@ -1871,54 +1850,47 @@ export class Emiter {
             } else if (name == "buff") {
                 let pattern = format("^pet%%.([%%w_.]+)", operand);
                 let [petOperand] = match(operand, pattern);
-                [ok, node] = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet");
+                node = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet");
             } else {
                 let pattern = format("^pet%%.%s%%.([%%w_.]+)", name);
                 let [petOperand] = match(operand, pattern);
                 let target = "pet";
                 if (petOperand) {
-                    [ok, node] = this.EmitOperandSpecial(petOperand, parseNode, nodeList, annotation, action, target);
-                    if (!ok) {
-                        [ok, node] = this.EmitOperandAction(petOperand, parseNode, nodeList, annotation, action, target);
+                    node = this.EmitOperandSpecial(petOperand, parseNode, nodeList, annotation, action, target);
+                    if (!node) {
+                        node = this.EmitOperandAction(petOperand, parseNode, nodeList, annotation, action, target);
                     }
-                    if (!ok) {
-                        [ok, node] = this.EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target);
+                    if (!node) {
+                        node = this.EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target);
                     }
-                    if (!ok) {
+                    if (!node) {
                         let [petAbilityName] = match(petOperand, "^[%w_]+%.([^.]+)");
-                        [petAbilityName] = this.Disambiguate(annotation, petAbilityName, annotation.class, annotation.specialization);
+                        [petAbilityName] = this.Disambiguate(annotation, petAbilityName, annotation.classId, annotation.specialization);
                         if (sub(petAbilityName, 1, 4) != "pet_") {
                             petOperand = gsub(petOperand, "^([%w_]+)%.", `%1.${name}_`);
                         }
                         if (property == "buff") {
-                            [ok, node] = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target);
+                            node = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target);
                         } else if (property == "cooldown") {
-                            [ok, node] = this.EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action);
+                            node = this.EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action);
                         } else if (property == "debuff") {
-                            [ok, node] = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target);
+                            node = this.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target);
                         } else if (property == "dot") {
-                            [ok, node] = this.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target);
-                        } else {
-                            ok = false;
+                            node = this.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target);
                         }
                     }
-                } else {
-                    ok = false;
                 }
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandPreviousSpell: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "prev" || token == "prev_gcd" || token == "prev_off_gcd") {
@@ -1928,7 +1900,7 @@ export class Emiter {
                 howMany = tonumber(name);
                 name = tokenIterator();
             }
-            [name] = this.Disambiguate(annotation, name, annotation.class, annotation.specialization);
+            [name] = this.Disambiguate(annotation, name, annotation.classId, annotation.specialization);
             let code;
             if (token == "prev") {
                 code = format("PreviousSpell(%s)", name);
@@ -1941,19 +1913,16 @@ export class Emiter {
             } else {
                 code = format("PreviousOffGCDSpell(%s)", name);
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandRaidEvent: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let name;
         let property;
         if (sub(operand, 1, 11) == "raid_event.") {
@@ -1976,9 +1945,7 @@ export class Emiter {
                 code = "False(raid_event_movement_exists)";
             } else if (property == "remains") {
                 code = "0";
-            } else {
-                ok = false;
-            }
+            } 
         } else if (name == "adds") {
             if (property == "cooldown") {
                 code = "600";
@@ -1990,27 +1957,20 @@ export class Emiter {
                 code = "600";
             } else if (property == "duration") {
                 code = "10"  //TODO
-            } else {
-                ok = false;
-            }
+            } 
         } else if (name == "invulnerable") {
             if (property == "up") {
                 code = "False(raid_events_invulnerable_up)";
-            } else {
-                ok = false;
-            }
-        } else {
-            ok = false;
-        }
-        if (ok && code) {
+            } 
+        } 
+        if (code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
-        return [ok, node];
+        return node;
     }
     private EmitOperandRace: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "race") {
@@ -2028,22 +1988,17 @@ export class Emiter {
                     this.tracer.Print("Warning: Race '%s' not defined", race);
                 }
                 code = format("Race(%s)", raceId);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {
                 };
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandRune: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let code;
         if (parseNode.rune) {
             if (parseNode.asType == "boolean") {
@@ -2055,16 +2010,13 @@ export class Emiter {
             let runes = match(operand, "^rune.time_to_([%d]+)$");
             code = format("TimeToRunes(%d)", runes);
         } else {
-            ok = false;
+            return undefined;
         }
-        if (ok && code) {
-            annotation.astAnnotation = annotation.astAnnotation || {};
-            [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-        }
-        return [ok, node];
+        annotation.astAnnotation = annotation.astAnnotation || {};
+        [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+        return node;
     }
     private EmitOperandSetBonus: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
         let node;
         let [setBonus] = match(operand, "^set_bonus%.(.*)$");
         let code;
@@ -2091,20 +2043,14 @@ export class Emiter {
                     code = format("ArmorSetBonus(%s %d)", name, count);
                 }
             }
-            if (!code) {
-                ok = false;
-            }
-        } else {
-            ok = false;
-        }
-        if (ok && code) {
+        } 
+        if (code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
-        return [ok, node];
+        return node;
     }
     private EmitOperandSeal: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
         let node;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
@@ -2113,22 +2059,17 @@ export class Emiter {
             let code;
             if (name) {
                 code = format("Stance(paladin_seal_of_%s)", name);
-            } else {
-                ok = false;
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+        } 
+        return node;
     }
     private EmitOperandSpecial: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action, target) => {
-        let ok = true;
-        let node: AstNode;
-        let className = annotation.class;
+        let node: AstNode | undefined;
+        let className = annotation.classId;
         let specialization = annotation.specialization;
         target = target && (`${target}.`) || "";
         operand = lower(operand);
@@ -2151,7 +2092,7 @@ export class Emiter {
                 } else {
                     target = sub(target, 1, -2);
                 }
-                [ok, node] = this.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target);
+                node = this.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target);
             }
         } else if (className == "DEMONHUNTER" && operand == "buff.metamorphosis.extended_by_demonic") {
             code = "not BuffExpires(extended_by_demonic_buff)";
@@ -2236,9 +2177,7 @@ export class Emiter {
                 code = format("%sDebuffExpires(%s)", target, debuffName);
             } else if (property == "up") {
                 code = format("%sDebuffPresent(%s)", target, debuffName);
-            } else {
-                ok = false;
-            }
+            } 
         } else if (className == "MONK" && operand == "dot.zen_sphere.ticking") {
             let buffName = "zen_sphere_buff";
             code = format("BuffPresent(%s)", buffName);
@@ -2254,9 +2193,7 @@ export class Emiter {
             } else if (truthy(match(property, "last_tick_damage_(%d+)"))){
                 let ticks = match(property, "last_tick_damage_(%d+)");
                 code = format("StaggerTick(%d)", ticks);
-            } else {
-                ok = false;
-            }
+            } 
         } else if (className == "MONK" && operand == "spinning_crane_kick.count") {
             code = "SpellCount(spinning_crane_kick)";
             this.AddSymbol(annotation, "spinning_crane_kick");
@@ -2306,21 +2243,17 @@ export class Emiter {
             code = "BuffPresent(roll_the_bones_buff)";
             this.AddSymbol(annotation, "roll_the_bones_buff");
         } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
-            let [spell] = this.Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization);
+            let [spell] = this.Disambiguate(annotation, "totem_mastery", annotation.classId, annotation.specialization);
             code = format("TotemRemaining(%s)", spell);
-            ok = true;
             this.AddSymbol(annotation, spell);
         } else if (className == "SHAMAN" && truthy(match(operand, "pet.[a-z_]+.active"))) {
             code = "pet.Present()";
-            ok = true;
         } else if (className == "WARLOCK" && truthy(match(operand, "pet%.service_[a-z_]+%..+"))) {
             let [spellName, property] = match(operand, "pet%.(service_[a-z_]+)%.(.+)");
             if (property == "active") {
                 code = format("SpellCooldown(%s) > 100", spellName);
                 this.AddSymbol(annotation, spellName);
-            } else {
-                ok = false;
-            }
+            } 
         } else if (className == "WARLOCK" && truthy(match(operand, "dot.unstable_affliction_([1-5]).remains"))) {
             let num = match(operand, "dot.unstable_affliction_([1-5]).remains");
             code = format("target.DebuffStacks(unstable_affliction_debuff) >= %s", num);
@@ -2427,56 +2360,47 @@ export class Emiter {
         } else if (operand == "priority_rotation") {
             code = "CheckBoxOn(opt_priority_rotation)"
             annotation.opt_priority_rotation = className
-        } else {
-            ok = false;
-        }
-        if (ok && code) {
+        } 
+        if (code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
-        return [ok, node];
+        return node;
     }
     private EmitOperandTalent: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "talent") {
             let name = lower(tokenIterator());
             let property = tokenIterator();
             let talentName = `${name}_talent`;
-            [talentName] = this.Disambiguate(annotation, talentName, annotation.class, annotation.specialization);
+            [talentName] = this.Disambiguate(annotation, talentName, annotation.classId, annotation.specialization);
             let code;
             if (property == "disabled") {
                 if (parseNode.asType == "boolean") {
-                    code = format("not Talent(%s)", talentName);
+                    code = format("not HasTalent(%s)", talentName);
                 } else {
-                    code = format("Talent(%s no)", talentName);
+                    code = format("HasTalent(%s no)", talentName);
                 }
             } else if (property == "enabled") {
                 if (parseNode.asType == "boolean") {
-                    code = format("Talent(%s)", talentName);
+                    code = format("HasTalent(%s)", talentName);
                 } else {
                     code = format("TalentPoints(%s)", talentName);
                 }
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
-                annotation.astAnnotation = annotation.astAnnotation || {
-                };
+            } 
+            if (code) {
+                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, talentName);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
    
    private EmitOperandTarget: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "target") {
@@ -2497,21 +2421,17 @@ export class Emiter {
                 code = "target.TimeToDie()";
             } else if (property === "time_to_pct_30") {
                 code = "target.TimeToHealthPercent(30)";
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
+            } 
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
-        }
-        return [ok, node];
+       }
+       
+        return node;
     }
     private EmitOperandTotem: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "totem") {
@@ -2522,23 +2442,17 @@ export class Emiter {
                 code = format("TotemPresent(%s)", name);
             } else if (property == "remains") {
                 code = format("TotemRemaining(%s)", name);
-            } else {
-                ok = false;
-            }
-            if (ok && code) {
-                annotation.astAnnotation = annotation.astAnnotation || {
-                };
+            } 
+            if (code) {
+                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
     
     private EmitOperandTrinket: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
-        let ok = true;
-        let node: AstNode;
+        let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
         if (token == "trinket") {
@@ -2551,8 +2465,6 @@ export class Emiter {
             if (procType === "cooldown") {
                 if (statName == "remains") {
                     code = "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
-                } else {
-                    ok = false;
                 }
             }
             else if (sub(procType, 1, 4) == "has_") {
@@ -2560,7 +2472,7 @@ export class Emiter {
             } else {
                 let property = tokenIterator();
                 let buffName = format("trinket_%s_%s_buff", procType, statName);
-                [buffName] = this.Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
+                [buffName] = this.Disambiguate(annotation, buffName, annotation.classId, annotation.specialization);
                 if (property == "cooldown") {
                     code = format("BuffCooldownDuration(%s)", buffName);
                 } else if (property == "cooldown_remains") {
@@ -2579,28 +2491,21 @@ export class Emiter {
                     code = format("BuffStacks(%s)", buffName);
                 } else if (property == "up") {
                     code = format("BuffPresent(%s)", buffName);
-                } else {
-                    ok = false;
-                }
-                if (ok) {
-                    this.AddSymbol(annotation, buffName);
-                }
+                } 
+                this.AddSymbol(annotation, buffName);
             }
-            if (ok && code) {
+            if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
     
     private EmitOperandVariable: EmitOperandVisitor = (operand, parseNode, nodeList, annotation, action) => {
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let token = tokenIterator();
-        let node: AstNode;
-        let ok;
+        let node: AstNode | undefined;
         if (token == "variable") {
             let name = tokenIterator();
             if (annotation.currentVariable && annotation.currentVariable.name == name) {
@@ -2615,11 +2520,8 @@ export class Emiter {
                 node.type = "function";
                 node.name = name;
             }
-            ok = true;
-        } else {
-            ok = false;
         }
-        return [ok, node];
+        return node;
     }
 
     private EMIT_VISITOR = {

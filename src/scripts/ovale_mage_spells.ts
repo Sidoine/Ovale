@@ -178,6 +178,11 @@ Define(glacial_spike 199786)
   SpellInfo(glacial_spike talent=glacial_spike_talent)
   # Frozen in place.
   SpellAddBuff(glacial_spike glacial_spike=1)
+Define(gladiators_badge 277185)
+# Increases primary stat by s1 for 15 seconds.rn
+  SpellInfo(gladiators_badge cd=120 duration=15 channel=15 gcd=0 offgcd=1)
+  # Primary stat increased by s4.
+  SpellAddBuff(gladiators_badge gladiators_badge=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -415,28 +420,17 @@ Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 12) #22470
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
-Define(focused_resolve_item 168506)
 Define(ancient_knot_of_wisdom_item 166793)
 Define(azsharas_font_of_power_item 169314)
 Define(azurethos_singed_plumage_item 161377)
 Define(balefire_branch_item 159630)
-Define(dread_aspirants_badge_item 162966)
-Define(dread_aspirants_medallion_item 162897)
-Define(dread_gladiators_badge_item 161902)
-Define(dread_gladiators_medallion_item 161674)
-Define(hyperthread_wristwraps_item 168989)
+Define(focused_resolve_item 168506)
+Define(gladiators_medallion_item 111306)
 Define(ignition_mages_fuse_item 159615)
 Define(neural_synapse_enhancer_item 168973)
-Define(notorious_aspirants_badge_item 167528)
-Define(notorious_aspirants_medallion_item 167525)
-Define(notorious_gladiators_badge_item 167380)
-Define(notorious_gladiators_medallion_item 167377)
 Define(shockbiters_fang_item 169318)
-Define(sinister_aspirants_badge_item 165223)
-Define(sinister_aspirants_medallion_item 165220)
-Define(sinister_gladiators_badge_item 165058)
-Define(sinister_gladiators_medallion_item 165055)
 Define(tzanes_barkspines_item 161411)
+Define(hyperthread_wristwraps_item 168989)
 Define(unbridled_fury_item 169299)
 Define(arcane_pummeling_trait 270669)
 Define(equipoise_trait 286027)

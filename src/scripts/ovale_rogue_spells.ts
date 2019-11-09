@@ -82,11 +82,11 @@ Define(cheap_shot 1833)
   # Stunned.
   SpellAddTargetDebuff(cheap_shot cheap_shot=1)
 Define(conductive_ink_0 302491)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
 
 Define(conductive_ink_1 302597)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
 
 Define(crimson_tempest 121411)
@@ -95,8 +95,9 @@ Define(crimson_tempest 121411)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(crimson_tempest crimson_tempest=1)
 Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(deadshot_buff 272936)
 # Mutilate has a s1 chance to apply additional Deadly Poison, and does s2*2 additional damage.rnrn|C000FFF00Assassination|R

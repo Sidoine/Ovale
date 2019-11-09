@@ -73,7 +73,7 @@ export function CamelCase(s: string) {
 
 export function CamelSpecialization(annotation: Annotation) {
     let output = self_outputPool.Get();
-    let [profileName, className, specialization] = [annotation.name, annotation.class, annotation.specialization];
+    let [profileName, className, specialization] = [annotation.name, annotation.classId, annotation.specialization];
     if (specialization) {
         output[lualength(output) + 1] = specialization;
     }

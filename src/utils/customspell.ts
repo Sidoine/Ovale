@@ -10,8 +10,8 @@ export interface CustomAura {
 }
 
 export interface CustomAuras {
-    player?: CustomAura[];
-    target?: CustomAura[];
+    player: CustomAura[];
+    target: CustomAura[];
 }
 
 export interface CustomSpellDataIf {
@@ -22,7 +22,7 @@ export interface CustomSpellDataIf {
 export interface CustomSpellData {
     id: number;
     identifier: string;
-    desc: string;
+    desc?: string;
     tooltip?: string;
     spellInfo: SpellInfo;
     auras?: CustomAuras;

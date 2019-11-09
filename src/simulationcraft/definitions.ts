@@ -1,12 +1,14 @@
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../PaperDoll";
-import { LuaObj, LuaArray, pairs, lualength, ipairs } from "@wowts/lua";
-import { AstNode, NodeType } from "../AST";
+import { LuaObj, LuaArray, pairs, lualength, ipairs, kpairs } from "@wowts/lua";
+import { AstNode, NodeType, AstAnnotation } from "../AST";
 import { TypeCheck } from "../tools";
 import { OvaleDataClass } from "../Data";
 
 export type ClassRole = "tank" | "spell" | "attack";
 export type ClassType = string;
+
+export type Result<T> = T | undefined;
 
 export type Interrupts = "mind_freeze" | "pummel" | "disrupt" | "skull_bash" | "solar_beam" |
     "rebuke" | "silence" | "mind_bomb" | "kick" | "wind_shear" | "counter_shot" | "muzzle" |
@@ -309,10 +311,10 @@ export interface ProfileLists {
 }
 
 export interface Profile extends ProfileStrings, ProfileLists {
-    templates?: LuaArray<keyof Profile>;
+    templates: LuaArray<keyof Profile>;
     position?: "ranged_back";
     actionList?:LuaArray<ParseNode>;
-    annotation?: Annotation;
+    annotation: Annotation;
 }
 
 export let KEYWORD: LuaObj<boolean> = {}
@@ -419,7 +421,7 @@ export let CONSUMABLE_ITEMS: LuaObj<boolean> = {
     ["augmentation"]: true
 }
 {
-    for (const [keyword, value] of pairs(MODIFIER_KEYWORD)) {
+    for (const [keyword, value] of kpairs(MODIFIER_KEYWORD)) {
         KEYWORD[keyword] = value;
     }
     for (const [keyword, value] of pairs(FUNCTION_KEYWORD)) {
@@ -622,12 +624,9 @@ export class Annotation implements InterruptAnnotation {
     counterspell?: ClassId;
     spear_hand_strike?: ClassId;
 
-    class?: ClassId;
-    name?: string;
-    specialization?: SpecializationName;
     level?: string;
     pet?: string;
-    consumables?: LuaObj<string>;
+    consumables: LuaObj<string> = {};
     role?: ClassRole;
     melee?: ClassType;
     ranged?: ClassType;
@@ -636,7 +635,7 @@ export class Annotation implements InterruptAnnotation {
     functionTag?: any;
     nodeList?: LuaArray<ParseNode>;
     
-    astAnnotation?: any;
+    astAnnotation: AstAnnotation;
     dictionaryAST?: any;
     dictionary: LuaObj<number> = {};
     supportingFunctionCount?: number;
@@ -644,14 +643,13 @@ export class Annotation implements InterruptAnnotation {
     supportingControlCount?: number;
     supportingDefineCount?: number;
     symbolTable?: LuaObj<boolean>;
-    symbolList?: LuaArray<string>;
     operand?: LuaArray<ParseNode>;
 
     sync?: LuaObj<ParseNode>; 
 
     using_apl?: LuaObj<boolean>;
     currentVariable?: AstNode;
-    variable?: LuaObj<AstNode>;
+    variable: LuaObj<AstNode> = {};
 
     trap_launcher?: string;
     interrupt?: string;
@@ -683,14 +681,15 @@ export class Annotation implements InterruptAnnotation {
     fel_rush?: string;
     vengeful_retreat?:string;
     shield_of_vengeance?: string;
+    symbolList: LuaArray<string> = {};
 
-    constructor(private ovaleData: OvaleDataClass) {
-
+    constructor(private ovaleData: OvaleDataClass, public name: string, public classId: ClassId, public specialization: SpecializationName) {
+        this.astAnnotation = { nodeList: {}, definition: this.dictionary };
     }
 
     public AddSymbol(symbol: string) {
         let symbolTable = this.symbolTable || {}
-        let symbolList = this.symbolList || {};
+        let symbolList = this.symbolList;
         if (!symbolTable[symbol] && !this.ovaleData.DEFAULT_SPELL_LIST[symbol]) {
             symbolTable[symbol] = true;
             symbolList[lualength(symbolList) + 1] = symbol;
