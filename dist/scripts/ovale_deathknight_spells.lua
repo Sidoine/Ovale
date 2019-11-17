@@ -484,7 +484,7 @@ Define(vision_of_perfection_essence_id 22)
     code = code .. [[
 
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!icebound_fortitude,buff,!icebound_fortitude_buff)
-	
+
 # Death Knight spells and functions.
 
 # Learned spells.
@@ -536,7 +536,7 @@ Define(chains_of_ice_debuff 45524)
 
 	SpellInfo(cold_heart_buff max_stacks=20)
 
-	
+
 Define(control_undead 111673)
 	SpellInfo(control_undead runes=1 runicpower=-10)
 Define(crimson_scourge_buff 81141)
@@ -578,7 +578,7 @@ Define(death_pact 48743)
 Define(death_pact_debuff 48743)
 	SpellInfo(death_pact_debuff duration=15)
 
-	
+
 	SpellRequire(death_strike add_runicpower_from_aura -5=buff,death_strike_cost)
 	SpellAddBuff(death_strike blood_shield_buff=1 specialization=blood)
 	SpellAddBuff(death_strike voracius_buff=1 talent=voracious_talent specialization=blood)
@@ -604,7 +604,7 @@ Define(empower_rune_weapon_buff 47568)
 
 	SpellInfo(epidemic runicpower=30)
 
-	
+
 	SpellAddTargetDebuff(festering_strike festering_wound_debuff=3)
 Define(festering_wound_debuff 194310)
 	SpellInfo(festering_wound_debuff duration=30 max_stacks=6)
@@ -613,7 +613,7 @@ Define(frost_fever_debuff 55095)
 Define(frost_shield_buff 207203)
 	SpellInfo(frost_shield_buff duration=10)
 
-	
+
 	SpellAddBuff(frost_strike icy_talons_buff=1 talent=icy_talons_talent)
 	SpellAddBuff(frost_strike killing_machine_buff 1=buff,pillar_of_frost_buff talent=obliteration_talent)
 
@@ -639,7 +639,7 @@ Define(gorefiends_grasp 108199)
 
 	SpellInfo(horn_of_winter cd=45 runes=-2 runicpower=-20 tag=main)
 
-	
+
 	SpellRequire(howling_blast runes 0=buff,rime_buff)
 	SpellRequire(howling_blast runicpower_percent 0=buff,rime_buff)
 	SpellAddBuff(howling_blast rime_buff=0)
@@ -662,12 +662,12 @@ Define(mark_of_blood 206940)
 Define(mark_of_blood_debuff 206940)
 	SpellInfo(mark_of_blood_debuff duration=15)
 
-	
+
 	SpellAddBuff(marrowrend bone_shield_buff=1)
 
 	SpellInfo(mind_freeze cd=15 gcd=0 interrupt=1 offgcd=1)
 
-	
+
 	SpellAddBuff(obliterate killing_machine_buff=0)
 	SpellAddBuff(obliterate inexorable_assault=0 talent=inexorable_assault_talent)
 
@@ -704,7 +704,7 @@ Define(rune_tap_buff 194679)
 Define(runic_corruption_buff 51460)
 	SpellInfo(runic_corruption_buff duration=3) #TODO Increase rune generation rate
 
-	
+
 	SpellInfo(scourge_strike replaced_by=clawing_shadows talent=clawing_shadows_talent)
 
 	SpellInfo(soul_reaper runes=-2 cd=45)
@@ -764,11 +764,13 @@ Define(lanathels_lament_buff 212975)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
 
+Define(chill_streak)
+
 
 ## Tier Items
 # T20
 SpellAddBuff(blood_boil gravewarden_buff=1 itemset=T20 itemcount=2)
-Define(gravewarden_buff 242010) 
+Define(gravewarden_buff 242010)
 	SpellInfo(gravewarden_buff duration=10)
 Define(master_of_ghouls_buff 246995)
 
@@ -837,10 +839,10 @@ Define(wraith_walk_talent 14)
 
 # Non-default tags for OvaleSimulationCraft.
     SpellInfo(outbreak tag=main)
-    
+
 # Misc spells
 Define(icy_citadel_expires_buff 272723)
-# TODO the end of pillar of frost triggers this buff (if icy_citadel is there) 
+# TODO the end of pillar of frost triggers this buff (if icy_citadel is there)
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")
 end
