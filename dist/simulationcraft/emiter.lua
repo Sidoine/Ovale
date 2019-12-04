@@ -578,7 +578,7 @@ __exports.Emiter = __class(nil, {
                     conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "WARLOCK" and action == "drain_soul" and specialization == "affliction" then
                     conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
-                elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "affliction" then
+                elseif className == "WARLOCK" and action == "shadow_bolt_affliction" and specialization == "affliction" then
                     conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(nightfall_buff) }"
                 elseif className == "WARLOCK" and action == "vile_taint" and specialization == "affliction" then
                     conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
