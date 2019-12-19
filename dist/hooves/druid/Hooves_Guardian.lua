@@ -41,6 +41,20 @@ AddIcon specialization=3 help=main
 	# Activate cat form when this checkbox is on.
 		
 	# Rotation
+	if Stance(2) and target.InRange(rake) and HasFullControl() and target.Present()
+	{
+		#cat rotation
+		if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
+		#ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(talent.sabertooth.enabled)
+		if target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 10 Spell(ferocious_bite)
+		if ComboPoints() > 4
+		{
+			if not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 Spell(rip)
+		}
+		if not target.DebuffPresent(rake_debuff)or target.DebuffRemaining(rake_debuff) <= BaseDuration(rake_debuff) * 0.3 Spell(rake)
+		if target.DebuffRemaining(rake_debuff) > { PowerCost(shred) + PowerCost(rake) - Energy() } / EnergyRegenRate() Spell(shred)
+	}
+	
 	if Stance(1) and target.InRange(mangle) and HasFullControl() and target.Present()
 	{
 		if ( HealthPercent() < 70  and not BuffPresent(frenzied_regeneration_buff))Spell(frenzied_regeneration)
@@ -52,6 +66,7 @@ AddIcon specialization=3 help=main
 		}
 	
 		# Short Cooldowns
+		if not target.DebuffPresent(concentrated_flame_burn_debuff) Spell(concentrated_flame_essence)
 		GuardianDefaultShortCdActions()
 	
 		# Default Actions
@@ -79,7 +94,7 @@ AddFunction GuardianInterruptActions
 
 AddFunction GuardianUseHeartEssence
 {
- Spell(concentrated_flame_essence)
+ if not target.DebuffPresent(concentrated_flame_burn_debuff) Spell(concentrated_flame_essence)
 }
 
 AddFunction GuardianUseItemActions
@@ -98,6 +113,7 @@ AddFunction GuardianGetInMeleeRange
 
 ### actions.default
 
+AddCheckBox(useMaul L(MAUL))
 AddFunction GuardianDefaultMainActions
 {
  #call_action_list,name=cooldowns
@@ -105,10 +121,12 @@ AddFunction GuardianDefaultMainActions
 
  unless GuardianCooldownsMainPostConditions()
  {
-  if BuffPresent(ironfur_buff) == 0 or BuffPresent(gory_fur_buff) == 1 or Rage() >= 50 Spell(ironfur)
+   if CheckBoxOn(useMaul) and Rage() >= 40 Spell(maul)
+  if (not CheckBoxOn(useMaul) and BuffPresent(ironfur_buff) == 0) or BuffPresent(gory_fur_buff) == 1 or Rage() >= 50 Spell(ironfur)
+	
   if not(target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff)) or target.DebuffRefreshable(thrash_bear_debuff) Spell(thrash)
   #maul,if=rage.deficit<10&active_enemies<4
-  #if RageDeficit() < 10 and enemies(tagged=1) < 4 Spell(maul)
+  if RageDeficit() < 10 and enemies(tagged=1) < 4 Spell(maul)
   #maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
   #if AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) Spell(maul)
   #pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
