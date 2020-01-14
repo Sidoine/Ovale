@@ -34,6 +34,7 @@ AddIcon specialization=1 help=main
 		BeastMasteryDefaultMainActions()
 	}
 }
+AddCheckBox(singlefocus "Single Target Only")
 
 # Custom functions.
 AddFunction SummonPet
@@ -51,10 +52,13 @@ AddFunction BeastMasteryInterruptActions
 {
  if target.HasManagedInterrupts() and target.MustBeInterrupted() or not target.HasManagedInterrupts() and target.IsInterruptible()
  {
-  if target.InRange(counter_shot) and target.IsInterruptible() and target.RemainingCastTime() <= CastTime(counter_shot) + GCD() Spell(counter_shot)
-  if target.InRange(cobra_shot) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(intimidation) + GCD() Spell(intimidation)
-  if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(quaking_palm) + GCD() Spell(quaking_palm)
+	 if target.RemainingCastTime() < target.TimeToDie()
+	 {
+	  if target.InRange(counter_shot) and target.IsInterruptible() and target.RemainingCastTime() <= CastTime(counter_shot) + GCD() Spell(counter_shot)
+	  if target.InRange(cobra_shot) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(intimidation) + GCD() Spell(intimidation)
+	  if target.Distance(less 5) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(war_stomp) + GCD() Spell(war_stomp)
+	  if target.InRange(quaking_palm) and not target.Classification(worldboss) and target.RemainingCastTime() <= CastTime(quaking_palm) + GCD() Spell(quaking_palm)
+	 }
  }
 }
 
@@ -74,9 +78,9 @@ AddFunction BeastMasteryDefaultMainActions
  unless BeastMasteryCdsMainPostConditions()
  {
   #call_action_list,name=st,if=active_enemies<2
-  if Enemies(tagged=1) < 2 BeastMasteryStMainActions()
+  if Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) BeastMasteryStMainActions()
 
-  unless Enemies(tagged=1) < 2 and BeastMasteryStMainPostConditions()
+  unless { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStMainPostConditions()
   {
    #call_action_list,name=cleave,if=active_enemies>1
    if Enemies(tagged=1) > 1 BeastMasteryCleaveMainActions()
@@ -86,7 +90,7 @@ AddFunction BeastMasteryDefaultMainActions
 
 AddFunction BeastMasteryDefaultMainPostConditions
 {
- BeastMasteryCdsMainPostConditions() or Enemies(tagged=1) < 2 and BeastMasteryStMainPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveMainPostConditions()
+ BeastMasteryCdsMainPostConditions() or { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStMainPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveMainPostConditions()
 }
 
 AddFunction BeastMasteryDefaultShortCdActions
@@ -97,9 +101,9 @@ AddFunction BeastMasteryDefaultShortCdActions
  unless BeastMasteryCdsShortCdPostConditions()
  {
   #call_action_list,name=st,if=active_enemies<2
-  if Enemies(tagged=1) < 2 BeastMasteryStShortCdActions()
+  if Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) BeastMasteryStShortCdActions()
 
-  unless Enemies(tagged=1) < 2 and BeastMasteryStShortCdPostConditions()
+  unless { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStShortCdPostConditions()
   {
    #call_action_list,name=cleave,if=active_enemies>1
    if Enemies(tagged=1) > 1 BeastMasteryCleaveShortCdActions()
@@ -109,7 +113,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 AddFunction BeastMasteryDefaultShortCdPostConditions
 {
- BeastMasteryCdsShortCdPostConditions() or Enemies(tagged=1) < 2 and BeastMasteryStShortCdPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveShortCdPostConditions()
+ BeastMasteryCdsShortCdPostConditions() or { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStShortCdPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveShortCdPostConditions()
 }
 
 AddFunction BeastMasteryDefaultCdActions
@@ -128,9 +132,9 @@ AddFunction BeastMasteryDefaultCdActions
  unless BeastMasteryCdsCdPostConditions()
  {
   #call_action_list,name=st,if=active_enemies<2
-  if Enemies(tagged=1) < 2 BeastMasteryStCdActions()
+  if Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) BeastMasteryStCdActions()
 
-  unless Enemies(tagged=1) < 2 and BeastMasteryStCdPostConditions()
+  unless { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStCdPostConditions()
   {
    #call_action_list,name=cleave,if=active_enemies>1
    if Enemies(tagged=1) > 1 BeastMasteryCleaveCdActions()
@@ -140,7 +144,7 @@ AddFunction BeastMasteryDefaultCdActions
 
 AddFunction BeastMasteryDefaultCdPostConditions
 {
- BeastMasteryCdsCdPostConditions() or Enemies(tagged=1) < 2 and BeastMasteryStCdPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveCdPostConditions()
+ BeastMasteryCdsCdPostConditions() or { Enemies(tagged=1) < 2 or CheckBoxOn(singlefocus) } and BeastMasteryStCdPostConditions() or Enemies(tagged=1) > 1 and BeastMasteryCleaveCdPostConditions()
 }
 
 ### actions.cds

@@ -20,14 +20,15 @@ AddIcon
 	# Buffs
 	Texture(ability_deathknight_pillaroffrost) # Pillar of Frost
 	Texture(inv_sword_62) # Empower Rune Weapon
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
 	Texture(298277) # Blood of the Enemy
+	Texture(204160) # Chill Streak (from BotE)
 	Texture(spell_azerite_essence14) # Guardian of Azeroth
 	Texture(spell_azerite_essence12) # Focused Azerite Beam
 	Texture(spell_azerite_essence04) # Purifying Blast
@@ -57,39 +58,39 @@ AddIcon
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
 	Texture(ability_ambush) # Shadowmeld (Night elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
