@@ -764,7 +764,7 @@ Define(lanathels_lament_buff 212975)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
 
-Define(chill_streak)
+Define(chill_streak 204160)
 
 
 ## Tier Items

@@ -343,6 +343,14 @@ __exports.Emiter = __class(nil, {
                     annotation[action] = className
                     annotation.interrupt = className
                     isSpellAction = false
+                elseif className == "DEATHKNIGHT" and action == "pillar_of_frost" and specialization == "frost" then
+                    conditionCode = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss())"
+                elseif className == "DEATHKNIGHT" and action == "breath_of_sindragosa" and specialization == "frost" then
+                    conditionCode = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss())"
+                elseif className == "DEATHKNIGHT" and action == "empower_rune_weapon" and specialization == "frost" then
+                    conditionCode = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss())"
+                elseif className == "DEATHKNIGHT" and action == "frostwyrms_fury" and specialization == "frost" then
+                    conditionCode = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss())"
                 elseif className == "DRUID" and action == "pulverize" then
                     local debuffName = "thrash_bear_debuff"
                     self:AddSymbol(annotation, debuffName)
@@ -1969,6 +1977,8 @@ __exports.Emiter = __class(nil, {
                 local buffName = "breath_of_sindragosa"
                 code = format("BuffPresent(%s)", buffName)
                 self:AddSymbol(annotation, buffName)
+            elseif operand == "ovale.boss" then
+                code = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5) or Boss()"
             elseif className == "DEATHKNIGHT" and sub(operand, 1, 24) == "pet.dancing_rune_weapon." then
                 local petOperand = sub(operand, 25)
                 local tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN)

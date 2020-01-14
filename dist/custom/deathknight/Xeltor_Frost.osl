@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerDeathKnightFrostXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_frosty"
-	local desc = "[Xel][8.2.5] Death Knight: Frost"
+	local desc = "[Xel][8.3] Death Knight: Frost"
 	local code = [[
 # Common functions.
 Include(ovale_common)
@@ -24,7 +24,7 @@ AddIcon specialization=2 help=main
 		if BuffStacks(dark_succor_buff) and HealthPercent() < 100 Spell(death_strike)
 
 		# Cooldown
-		if Boss() FrostDefaultCdActions()
+		if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostDefaultCdActions()
 
 		# Short Cooldown
 		FrostDefaultShortCdActions()
@@ -64,8 +64,8 @@ AddFunction FrostDefaultMainActions
  if not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } Spell(howling_blast)
  #glacial_advance,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&spell_targets.glacial_advance>=2&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
  if BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } Spell(glacial_advance)
- #frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
- if BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } Spell(frost_strike)
+ #frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)&(!buff.breath_of_sindragosa.up|runic_power>75)
+ if BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 75 } Spell(frost_strike)
  #call_action_list,name=essences
  FrostEssencesMainActions()
 
@@ -76,10 +76,10 @@ AddFunction FrostDefaultMainActions
 
   unless FrostCooldownsMainPostConditions()
   {
-   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-   if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBosPoolingMainActions()
+   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<=gcd&cooldown.pillar_of_frost.remains<10)&ovale.boss
+   if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingMainActions()
 
-   unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingMainPostConditions()
+   unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingMainPostConditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingMainActions()
@@ -108,7 +108,7 @@ AddFunction FrostDefaultMainActions
 
 AddFunction FrostDefaultMainPostConditions
 {
- FrostEssencesMainPostConditions() or FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
+ FrostEssencesMainPostConditions() or FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
@@ -116,7 +116,7 @@ AddFunction FrostDefaultShortCdActions
  #auto_attack
  # FrostGetInMeleeRange()
 
- unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
+ unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 75 } and Spell(frost_strike)
  {
   #call_action_list,name=essences
   FrostEssencesShortCdActions()
@@ -128,10 +128,10 @@ AddFunction FrostDefaultShortCdActions
 
    unless FrostCooldownsShortCdPostConditions()
    {
-    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBosPoolingShortCdActions()
+    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<=gcd&cooldown.pillar_of_frost.remains<10)&ovale.boss
+    if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingShortCdActions()
 
-    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingShortCdPostConditions()
+    unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingShortCdPostConditions()
     {
      #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
      if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingShortCdActions()
@@ -161,14 +161,14 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostEssencesShortCdPostConditions() or FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 75 } and Spell(frost_strike) or FrostEssencesShortCdPostConditions() or FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
 {
- # FrostInterruptActions()
+ FrostInterruptActions()
 
- unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
+ unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 75 } and Spell(frost_strike)
  {
   #call_action_list,name=essences
   FrostEssencesCdActions()
@@ -180,10 +180,10 @@ AddFunction FrostDefaultCdActions
 
    unless FrostCooldownsCdPostConditions()
    {
-    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBosPoolingCdActions()
+    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<=gcd&cooldown.pillar_of_frost.remains<10)&ovale.boss
+    if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingCdActions()
 
-    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingCdPostConditions()
+    unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingCdPostConditions()
     {
      #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
      if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingCdActions()
@@ -213,7 +213,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostEssencesCdPostConditions() or FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBosPoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 75 } and Spell(frost_strike) or FrostEssencesCdPostConditions() or FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) <= GCD() and SpellCooldown(pillar_of_frost) < 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
 }
 
 ### actions.aoe
@@ -271,11 +271,6 @@ AddFunction FrostAoeShortCdPostConditions
 
 AddFunction FrostAoeCdActions
 {
- unless { Talent(gathering_storm_talent) or AzeriteTraitRank(frozen_tempest_trait) and Enemies(tagged=1) >= 3 and not BuffPresent(rime_buff) } and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(frost_strike) or Spell(frost_strike) or Spell(horn_of_winter)
- {
-  #arcane_torrent
-  Spell(arcane_torrent_runicpower)
- }
 }
 
 AddFunction FrostAoeCdPostConditions
@@ -343,8 +338,8 @@ AddFunction FrostBosTickingMainActions
 {
  #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power<=32&!talent.frostscythe.enabled
  if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) Spell(obliterate)
- #obliterate,if=runic_power<=32
- if RunicPower() <= 32 Spell(obliterate)
+ #obliterate,if=runic_power<=40
+ if RunicPower() <= 40 Spell(obliterate)
  #remorseless_winter,if=talent.gathering_storm.enabled
  if Talent(gathering_storm_talent) Spell(remorseless_winter)
  #howling_blast,if=buff.rime.up
@@ -377,12 +372,12 @@ AddFunction FrostBosTickingShortCdActions
 
 AddFunction FrostBosTickingShortCdPostConditions
 {
- { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 32 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
+ { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 40 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
 }
 
 AddFunction FrostBosTickingCdActions
 {
- unless { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 32 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
+ unless { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 40 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if RunicPowerDeficit() > 50 Spell(arcane_torrent_runicpower)
@@ -391,7 +386,7 @@ AddFunction FrostBosTickingCdActions
 
 AddFunction FrostBosTickingCdPostConditions
 {
- { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 32 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
+ { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 32 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 40 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies(tagged=1) >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 32 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies(tagged=1) >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or RuneCount() > 3 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or RuneCount() > 3 } and Spell(obliterate)
 }
 
 ### actions.cold_heart
@@ -402,14 +397,18 @@ AddFunction FrostColdHeartMainActions
  if BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() Spell(chains_of_ice)
  #chains_of_ice,if=(buff.seething_rage.remains<gcd)&buff.seething_rage.up
  if BuffRemaining(seething_rage_buff) < GCD() and BuffPresent(seething_rage_buff) Spell(chains_of_ice)
- #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)
- if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } Spell(chains_of_ice)
- #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)
- if BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } Spell(chains_of_ice)
- #chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up
- if { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) Spell(chains_of_ice)
- #chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up
- if BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) Spell(chains_of_ice)
+ #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
+ if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) Spell(chains_of_ice)
+ #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
+ if BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) Spell(chains_of_ice)
+ #chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
+ if { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) Spell(chains_of_ice)
+ #chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
+ if BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) Spell(chains_of_ice)
+ #chains_of_ice,if=buff.pillar_of_frost.remains<4&talent.icecap.enabled&buff.cold_heart.stack>=18&azerite.icy_citadel.rank<=1
+ if BuffRemaining(pillar_of_frost_buff) < 4 and Talent(icecap_talent) and BuffStacks(cold_heart_buff) >= 18 and AzeriteTraitRank(icy_citadel_trait) <= 1 Spell(chains_of_ice)
+ #chains_of_ice,if=buff.pillar_of_frost.up&talent.icecap.enabled&azerite.icy_citadel.rank>=2&(buff.cold_heart.stack>=19&buff.icy_citadel.remains<gcd|buff.unholy_strength.up&buff.cold_heart.stack>=18)
+ if BuffPresent(pillar_of_frost_buff) and Talent(icecap_talent) and AzeriteTraitRank(icy_citadel_trait) >= 2 and { BuffStacks(cold_heart_buff) >= 19 and BuffRemaining(icy_citadel_expires_buff) < GCD() or BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_buff) >= 18 } Spell(chains_of_ice)
 }
 
 AddFunction FrostColdHeartMainPostConditions
@@ -422,7 +421,7 @@ AddFunction FrostColdHeartShortCdActions
 
 AddFunction FrostColdHeartShortCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or BuffRemaining(seething_rage_buff) < GCD() and BuffPresent(seething_rage_buff) and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and Spell(chains_of_ice) or BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or BuffRemaining(seething_rage_buff) < GCD() and BuffPresent(seething_rage_buff) and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 4 and Talent(icecap_talent) and BuffStacks(cold_heart_buff) >= 18 and AzeriteTraitRank(icy_citadel_trait) <= 1 and Spell(chains_of_ice) or BuffPresent(pillar_of_frost_buff) and Talent(icecap_talent) and AzeriteTraitRank(icy_citadel_trait) >= 2 and { BuffStacks(cold_heart_buff) >= 19 and BuffRemaining(icy_citadel_expires_buff) < GCD() or BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_buff) >= 18 } and Spell(chains_of_ice)
 }
 
 AddFunction FrostColdHeartCdActions
@@ -431,7 +430,7 @@ AddFunction FrostColdHeartCdActions
 
 AddFunction FrostColdHeartCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or BuffRemaining(seething_rage_buff) < GCD() and BuffPresent(seething_rage_buff) and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and Spell(chains_of_ice) or BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or BuffRemaining(seething_rage_buff) < GCD() and BuffPresent(seething_rage_buff) and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and { AzeriteTraitRank(icy_citadel_trait) <= 1 or BuffPresent(breath_of_sindragosa_buff) } and not Talent(icecap_talent) and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_expires_buff) < 4 or BuffRemaining(icy_citadel_expires_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffPresent(icy_citadel_expires_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and not BuffPresent(breath_of_sindragosa_buff) and not Talent(icecap_talent) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 4 and Talent(icecap_talent) and BuffStacks(cold_heart_buff) >= 18 and AzeriteTraitRank(icy_citadel_trait) <= 1 and Spell(chains_of_ice) or BuffPresent(pillar_of_frost_buff) and Talent(icecap_talent) and AzeriteTraitRank(icy_citadel_trait) >= 2 and { BuffStacks(cold_heart_buff) >= 19 and BuffRemaining(icy_citadel_expires_buff) < GCD() or BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_buff) >= 18 } and Spell(chains_of_ice)
 }
 
 ### actions.cooldowns
@@ -449,8 +448,8 @@ AddFunction FrostCooldownsMainPostConditions
 
 AddFunction FrostCooldownsShortCdActions
 {
- #pillar_of_frost,if=cooldown.empower_rune_weapon.remains
- if SpellCooldown(empower_rune_weapon) > 0 Spell(pillar_of_frost)
+ #pillar_of_frost,if=runic_power.deficit<20
+ if RunicPowerDeficit() < 20 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } Spell(pillar_of_frost)
  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
  if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartShortCdActions()
 }
@@ -468,8 +467,8 @@ AddFunction FrostCooldownsCdActions
  if Talent(breath_of_sindragosa_talent) and { SpellCooldown(pillar_of_frost) <= 10 and other_on_use_equipped() or BuffPresent(pillar_of_frost_buff) and not other_on_use_equipped() } or BuffPresent(pillar_of_frost_buff) and not Talent(breath_of_sindragosa_talent) FrostUseItemActions()
  #use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
  if not BuffPresent(pillar_of_frost_buff) FrostUseItemActions()
- #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
- if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(empower_rune_weapon) > 95 } FrostUseItemActions()
+ #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
+ if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } FrostUseItemActions()
  #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
  if target.DebuffExpires(razor_coral_debuff) FrostUseItemActions()
  #use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>90&debuff.razor_coral_debuff.up&variable.other_on_use_equipped|buff.breath_of_sindragosa.up&debuff.razor_coral_debuff.up&!variable.other_on_use_equipped|buff.empower_rune_weapon.up&debuff.razor_coral_debuff.up&!talent.breath_of_sindragosa.enabled|target.1.time_to_die<21
@@ -488,43 +487,45 @@ AddFunction FrostCooldownsCdActions
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) Spell(blood_fury_ap)
  #berserking,if=buff.pillar_of_frost.up
  if BuffPresent(pillar_of_frost_buff) Spell(berserking)
+ #arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
+ if not BuffPresent(pillar_of_frost_buff) and Enemies(tagged=1) >= 2 or not BuffPresent(pillar_of_frost_buff) and RuneDeficit() >= 5 and RunicPowerDeficit() >= 60 Spell(arcane_pulse)
+ #lights_judgment,if=buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
+ if BuffPresent(pillar_of_frost_buff) and { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } Spell(lights_judgment)
+ #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) Spell(ancestral_call)
+ #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
+ if BuffRemaining(pillar_of_frost_buff) <= 8 and BuffPresent(empower_rune_weapon_buff) Spell(fireblood)
 
- unless SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost)
+ unless RunicPowerDeficit() < 20 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and Spell(pillar_of_frost)
  {
-  #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains&runic_power.deficit<=20
-  if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 and RunicPowerDeficit() <= 20 Spell(breath_of_sindragosa)
-  #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
-  if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 or target.TimeToDie() < 20 Spell(empower_rune_weapon)
-  #empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.1.time_to_die<20)&talent.breath_of_sindragosa.enabled&runic_power>60
-  if { SpellCooldown(pillar_of_frost) == 0 or target.TimeToDie() < 20 } and Talent(breath_of_sindragosa_talent) and RunicPower() > 60 Spell(empower_rune_weapon)
+  #breath_of_sindragosa,use_off_gcd=1,if=runic_power.deficit<20
+  if RunicPowerDeficit() < 20 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } Spell(breath_of_sindragosa)
+  #empower_rune_weapon,if=buff.breath_of_sindragosa.up&rune.time_to_5>gcd&runic_power.deficit>=10
+  if BuffPresent(breath_of_sindragosa_buff) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } Spell(empower_rune_weapon)
   #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
   if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartCdActions()
 
   unless Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
   {
    #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd|(buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=1
-   if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 1 Spell(frostwyrms_fury)
+   if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 1 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } Spell(frostwyrms_fury)
    #frostwyrms_fury,if=(buff.icy_citadel.remains<=gcd|(buff.icy_citadel.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.icy_citadel.up&azerite.icy_citadel.rank>=2
-   if { BuffRemaining(icy_citadel_expires_buff) <= GCD() or BuffRemaining(icy_citadel_expires_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 Spell(frostwyrms_fury)
-   #frostwyrms_fury,if=target.1.time_to_die<gcd|(target.1.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
-   if target.TimeToDie() < GCD() or target.TimeToDie() < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
+   if { BuffRemaining(icy_citadel_expires_buff) <= GCD() or BuffRemaining(icy_citadel_expires_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(icy_citadel_expires_buff) and AzeriteTraitRank(icy_citadel_trait) >= 2 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } Spell(frostwyrms_fury)
   }
  }
 }
 
 AddFunction FrostCooldownsCdPostConditions
 {
- SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost) or Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
+ RunicPowerDeficit() < 20 and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and Spell(pillar_of_frost) or Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
 }
 
 ### actions.essences
 
 AddFunction FrostEssencesMainActions
 {
- #chill_streak,if=buff.pillar_of_frost.remains<5&buff.pillar_of_frost.up|target.1.time_to_die<5
- if BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 Spell(chill_streak)
- #concentrated_flame,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&dot.concentrated_flame_burn.remains=0
- if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 Spell(concentrated_flame_essence)
+ #concentrated_flame,if=(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)&dot.concentrated_flame_burn.remains=0
+ if { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 Spell(concentrated_flame_essence)
 }
 
 AddFunction FrostEssencesMainPostConditions
@@ -533,42 +534,40 @@ AddFunction FrostEssencesMainPostConditions
 
 AddFunction FrostEssencesShortCdActions
 {
- #blood_of_the_enemy,if=buff.pillar_of_frost.remains<10&buff.breath_of_sindragosa.up|buff.pillar_of_frost.remains<10&!talent.breath_of_sindragosa.enabled
- if BuffRemaining(pillar_of_frost_buff) < 10 and BuffPresent(breath_of_sindragosa_buff) or BuffRemaining(pillar_of_frost_buff) < 10 and not Talent(breath_of_sindragosa_talent) Spell(blood_of_the_enemy)
+ #blood_of_the_enemy,if=(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)&(buff.pillar_of_frost.remains<10&buff.breath_of_sindragosa.up|buff.pillar_of_frost.remains<10&!talent.breath_of_sindragosa.enabled)
+ if { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffRemaining(pillar_of_frost_buff) < 10 and BuffPresent(breath_of_sindragosa_buff) or BuffRemaining(pillar_of_frost_buff) < 10 and not Talent(breath_of_sindragosa_talent) } Spell(blood_of_the_enemy)
+ #chill_streak,if=(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)&(buff.pillar_of_frost.remains<5&buff.pillar_of_frost.up|target.1.time_to_die<5)
+ if { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } Spell(chill_streak)
+ #the_unbound_force,if=(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)&(buff.reckless_force.up|buff.reckless_force_counter.stack<11)
+ if { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 } Spell(the_unbound_force)
 
- unless { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak)
+ unless { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
  {
-  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
-  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 Spell(the_unbound_force)
-
-  unless not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
-  {
-   #purifying_blast,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
-   if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(purifying_blast)
-   #worldvein_resonance,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
-   if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(worldvein_resonance_essence)
-   #ripple_in_space,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
-   if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(ripple_in_space_essence)
-  }
+  #purifying_blast,if=!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled
+  if not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) Spell(purifying_blast)
+  #worldvein_resonance,if=!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled
+  if not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) Spell(worldvein_resonance_essence)
+  #ripple_in_space,if=!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled
+  if not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) Spell(ripple_in_space_essence)
  }
 }
 
 AddFunction FrostEssencesShortCdPostConditions
 {
- { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+ { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
 }
 
 AddFunction FrostEssencesCdActions
 {
- #guardian_of_azeroth
- Spell(guardian_of_azeroth)
+ #guardian_of_azeroth,if=!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled
+ if not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) Spell(guardian_of_azeroth)
 
- unless { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 } and Spell(the_unbound_force)
+ unless { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 } and Spell(the_unbound_force)
  {
-  #focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
-  if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(focused_azerite_beam)
+  #focused_azerite_beam,if=!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled
+  if not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) Spell(focused_azerite_beam)
 
-  unless not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(purifying_blast) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(worldvein_resonance_essence) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(ripple_in_space_essence)
+  unless { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(purifying_blast) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(worldvein_resonance_essence) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(ripple_in_space_essence)
   {
    #memory_of_lucid_dreams,if=buff.empower_rune_weapon.remains<5&buff.breath_of_sindragosa.up|(rune.time_to_2>gcd&runic_power<50)
    if BuffRemaining(empower_rune_weapon_buff) < 5 and BuffPresent(breath_of_sindragosa_buff) or TimeToRunes(2) > GCD() and RunicPower() < 50 Spell(memory_of_lucid_dreams_essence)
@@ -578,7 +577,7 @@ AddFunction FrostEssencesCdActions
 
 AddFunction FrostEssencesCdPostConditions
 {
- { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 } and Spell(the_unbound_force) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(purifying_blast) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(worldvein_resonance_essence) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(ripple_in_space_essence)
+ { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffRemaining(pillar_of_frost_buff) < 5 and BuffPresent(pillar_of_frost_buff) or target.TimeToDie() < 5 } and Spell(chill_streak) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 11 } and Spell(the_unbound_force) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(purifying_blast) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(worldvein_resonance_essence) or { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } and Spell(ripple_in_space_essence)
 }
 
 ### actions.obliteration
@@ -659,6 +658,8 @@ AddFunction FrostPrecombatCdActions
  #food
  #augmentation
  #snapshot_stats
+ #potion
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbridled_fury_item usable=1)
  #use_item,name=azsharas_font_of_power
  FrostUseItemActions()
 }
