@@ -13,13 +13,13 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStanceClass } from "./Stance";
 
 interface SpellFlashCoreClass {
-    FlashForm: (spellId: number, color: Color, size: number, brightness: number) => void;   
-    FlashPet: (spellId: number, color: Color, size: number, brightness: number) => void;
-    FlashAction: (spellId: number, color: Color, size: number, brightness: number) => void;
-    FlashItem: (spellId: number, color: Color, size: number, brightness: number) => void;
+    FlashForm: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;   
+    FlashPet: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
+    FlashAction: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
+    FlashItem: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
 }
 
-let SpellFlashCore: SpellFlashCoreClass = undefined;
+let SpellFlashCore: SpellFlashCoreClass | undefined = undefined;
 export interface Color {
     r?: number;
     g?: number;
@@ -316,17 +316,19 @@ export class OvaleSpellFlashClass {
                     }
                 }
                 let brightness = db.brightness * 100;
-                if (element.lowername == "spell") {
-                    if (this.ovaleStance.IsStanceSpell(spellId)) {
-                        SpellFlashCore.FlashForm(spellId, color, size, brightness);
+                if (SpellFlashCore) {
+                    if (element.lowername == "spell" && spellId) {
+                        if (this.ovaleStance.IsStanceSpell(spellId)) {
+                            SpellFlashCore.FlashForm(spellId, color, size, brightness);
+                        }
+                        if (this.ovaleSpellBook.IsPetSpell(spellId)) {
+                            SpellFlashCore.FlashPet(spellId, color, size, brightness);
+                        }
+                        SpellFlashCore.FlashAction(spellId, color, size, brightness);
+                    } else if (element.lowername == "item") {
+                        let itemId = <number>element.positionalParams[1];
+                        SpellFlashCore.FlashItem(itemId, color, size, brightness);
                     }
-                    if (this.ovaleSpellBook.IsPetSpell(spellId)) {
-                        SpellFlashCore.FlashPet(spellId, color, size, brightness);
-                    }
-                    SpellFlashCore.FlashAction(spellId, color, size, brightness);
-                } else if (element.lowername == "item") {
-                    let itemId = <number>element.positionalParams[1];
-                    SpellFlashCore.FlashItem(itemId, color, size, brightness);
                 }
             }
         }

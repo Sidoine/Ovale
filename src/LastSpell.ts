@@ -43,13 +43,13 @@ export interface PaperDollSnapshot extends Powers {
     spellCrit?: number;
 
     hasteRating?: number;
-    hastePercent?: number;
-    meleeAttackSpeedPercent?: number;
-    rangedAttackSpeedPercent?: number;
-    spellCastSpeedPercent?: number;
+    hastePercent: number;
+    meleeAttackSpeedPercent: number;
+    rangedAttackSpeedPercent: number;
+    spellCastSpeedPercent: number;
 
     masteryRating?: number;
-    masteryEffect?: number;
+    masteryEffect: number;
 
     versatilityRating?: number;
     versatility?: number;
@@ -69,7 +69,7 @@ export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 export class LastSpell {
     lastSpellcast: SpellCast | undefined = undefined;
-    lastGCDSpellcast: SpellCast = { spellId: 0 }
+    lastGCDSpellcast: SpellCast = { spellId: 0, meleeAttackSpeedPercent: 0, spellCastSpeedPercent: 0, masteryEffect: 0, hastePercent: 0, rangedAttackSpeedPercent: 0 };
     queue: LuaArray<SpellCast> = {}
     modules: LuaObj<SpellCastModule> = {}
     

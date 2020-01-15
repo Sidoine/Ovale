@@ -47,8 +47,8 @@ __exports.Print = function(...)
 end
 __exports.OvaleClass = __class(OvaleBase, {
     constructor = function(self)
-        self.playerClass = nil
-        self.playerGUID = nil
+        self.playerClass = "WARRIOR"
+        self.playerGUID = ""
         self.refreshNeeded = {}
         OvaleBase.constructor(self)
         _G["BINDING_HEADER_OVALE"] = "Ovale"

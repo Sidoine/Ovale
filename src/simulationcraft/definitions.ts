@@ -631,7 +631,7 @@ export class Annotation implements InterruptAnnotation {
     melee?: ClassType;
     ranged?: ClassType;
 	position?: string;
-    taggedFunctionName?: LuaObj<boolean>;
+    taggedFunctionName: LuaObj<boolean> = {};
     functionTag?: any;
     nodeList?: LuaArray<ParseNode>;
     

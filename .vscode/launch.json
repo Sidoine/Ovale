@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/dist/utils/importsimc.js",
             "protocol": "inspector",
             "args": [
-                "../../simc/"
+                "../../simc/", "T23_Rogue_Assassination.simc"
             ],
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"

@@ -181,6 +181,7 @@ export class OvalePaperDollClass extends States<PaperDollSnapshot> implements Sp
         ovaleProfiler: OvaleProfilerClass,
         private lastSpell: LastSpell) {
         super(PaperDollData);
+        this.class = ovale.playerClass;            
         this.module = ovale.createModule("OvalePaperDoll", this.OnInitialize, this.OnDisable, aceEvent);
         this.debug = ovaleDebug.create("OvalePaperDoll");
         this.profiler = ovaleProfiler.create("OvalePaperDoll");

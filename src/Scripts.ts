@@ -24,7 +24,7 @@ export type ScriptType = "script" | "include";
 interface Script {
     type?: ScriptType;
     desc?: string;
-    className: ClassId;
+    className?: ClassId;
     specialization?: SpecializationName;
     code?: string;
 }
@@ -86,13 +86,13 @@ export class OvaleScriptsClass  {
                 if (name == DEFAULT_NAME) {
                     descriptionsTable[name] = `${script.desc} (${this.GetScriptName(name)})`;
                 } else {
-                    descriptionsTable[name] = script.desc;
+                    descriptionsTable[name] = script.desc || "No description";
                 }
             }
         }
         return descriptionsTable;
     }
-    RegisterScript(className: ClassId, specialization: SpecializationName, name: string, description: string, code: string, scriptType: ScriptType) {
+    RegisterScript(className: ClassId | undefined, specialization: SpecializationName | undefined, name: string, description: string, code: string | undefined, scriptType: ScriptType) {
         this.script[name] = this.script[name] || {};
         let script = this.script[name];
         script.type = scriptType || "script";
@@ -102,7 +102,7 @@ export class OvaleScriptsClass  {
         script.className = className;
     }
     UnregisterScript(name: string) {
-        this.script[name] = undefined;
+        delete this.script[name];
     }
     SetScript(name: string) {
         const oldSource = this.getCurrentSpecScriptName();

@@ -115,8 +115,9 @@ Define(counter_shot 147362)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dance_of_death_buff 274442)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.

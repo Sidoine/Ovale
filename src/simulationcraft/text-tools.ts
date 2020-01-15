@@ -107,8 +107,8 @@ export function OvaleFunctionName(name: string, annotation: Annotation) {
 }
 
 
-export function OvaleTaggedFunctionName(name: string, tag: string) {
-    let bodyName: string, conditionName: string;
+export function OvaleTaggedFunctionName(name: string, tag: string): [string?, string?] {
+    let bodyName, conditionName;
     let [prefix, suffix] = match(name, "([A-Z]%w+)(Actions)");
     if (prefix && suffix) {
         let camelTag;

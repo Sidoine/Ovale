@@ -3,6 +3,7 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 local ipairs = ipairs
+local kpairs = pairs
 __exports.interruptsClasses = {
     ["mind_freeze"] = "DEATHKNIGHT",
     ["pummel"] = "WARRIOR",
@@ -340,7 +341,7 @@ __exports.CONSUMABLE_ITEMS = {
     ["augmentation"] = true
 }
 do
-    for keyword, value in pairs(__exports.MODIFIER_KEYWORD) do
+    for keyword, value in kpairs(__exports.MODIFIER_KEYWORD) do
         __exports.KEYWORD[keyword] = value
     end
     for keyword, value in pairs(__exports.FUNCTION_KEYWORD) do
@@ -514,13 +515,23 @@ __exports.checkOptionalSkill = function(action, className, specialization)
     return true
 end
 __exports.Annotation = __class(nil, {
-    constructor = function(self, ovaleData)
+    constructor = function(self, ovaleData, name, classId, specialization)
         self.ovaleData = ovaleData
+        self.name = name
+        self.classId = classId
+        self.specialization = specialization
+        self.consumables = {}
         self.dictionary = {}
+        self.variable = {}
+        self.symbolList = {}
+        self.astAnnotation = {
+            nodeList = {},
+            definition = self.dictionary
+        }
     end,
     AddSymbol = function(self, symbol)
         local symbolTable = self.symbolTable or {}
-        local symbolList = self.symbolList or {}
+        local symbolList = self.symbolList
         if  not symbolTable[symbol] and  not self.ovaleData.DEFAULT_SPELL_LIST[symbol] then
             symbolTable[symbol] = true
             symbolList[#symbolList + 1] = symbol

@@ -192,9 +192,8 @@ export class OvaleSimulationCraftClass {
                     let pattern = `%$%(${variable}%)`;
                     v = gsub(<string>v, pattern, <string>profile[template]);
                 }
-                let node: ParseNode;
-                [ok, node] = this.parser.ParseActionList(name, <string>v, nodeList, annotation);
-                if (ok) {
+                const node = this.parser.ParseActionList(name, <string>v, nodeList, annotation);
+                if (node) {
                     actionList[lualength(actionList) + 1] = node;
                 } else {
                     break;
@@ -232,17 +231,18 @@ export class OvaleSimulationCraftClass {
             }
         }
 		annotation.position = profile.position;
-        let taggedFunctionName: LuaObj<boolean> = { }
+        let taggedFunctionName: LuaObj<boolean> = annotation.taggedFunctionName;
         for (const [, node] of ipairs(actionList)) {
             let fname = OvaleFunctionName(node.name, annotation);
             taggedFunctionName[fname] = true;
             for (const [, tag] of pairs(OVALE_TAGS)) {
                 let [bodyName, conditionName] = OvaleTaggedFunctionName(fname, tag);
-                taggedFunctionName[bodyName] = true;
-                taggedFunctionName[conditionName] = true;
+                if (bodyName && conditionName) {
+                    taggedFunctionName[bodyName] = true;
+                    taggedFunctionName[conditionName] = true;
+                }
             }
         }
-        annotation.taggedFunctionName = taggedFunctionName;
         annotation.functionTag = {}
         profile.actionList = actionList;
         profile.annotation = annotation;
@@ -326,8 +326,10 @@ export class OvaleSimulationCraftClass {
                     child[lualength(child) + 1] = commentNode;
                     for (const [, tag] of pairs(OVALE_TAGS)) {
                         let [bodyNode, conditionNode] = this.splitter.SplitByTag(tag, addFunctionNode, nodeList, annotation);
-                        child[lualength(child) + 1] = bodyNode;
-                        child[lualength(child) + 1] = conditionNode;
+                        if (bodyNode && conditionNode) {
+                            child[lualength(child) + 1] = bodyNode;
+                            child[lualength(child) + 1] = conditionNode;
+                        }
                     }
                 } else {
                     ok = false;

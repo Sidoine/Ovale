@@ -74,7 +74,7 @@ __exports.CamelCase = function(s)
 end
 __exports.CamelSpecialization = function(annotation)
     local output = __exports.self_outputPool:Get()
-    local profileName, className, specialization = annotation.name, annotation.class, annotation.specialization
+    local profileName, className, specialization = annotation.name, annotation.classId, annotation.specialization
     if specialization then
         output[#output + 1] = specialization
     end

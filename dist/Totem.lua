@@ -57,7 +57,9 @@ __exports.OvaleTotemClass = __class(States, {
         for slot = 1, MAX_TOTEMS + 1, 1 do
             self.next.totems[slot] = {
                 slot = slot,
-                serial = 0
+                serial = 0,
+                start = 0,
+                duration = 0
             }
         end
     end,
@@ -147,14 +149,16 @@ __exports.OvaleTotemClass = __class(States, {
     SummonTotem = function(self, spellId, atTime)
         self.profiler:StartProfiling("OvaleTotem_state_SummonTotem")
         local totemSlot = self:GetAvailableTotemSlot(spellId, atTime)
-        local name, _, icon = self.ovaleSpellBook:GetSpellInfo(spellId)
-        local duration = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
-        local totem = self.next.totems[totemSlot]
-        totem.name = name
-        totem.start = atTime
-        totem.duration = duration or 15
-        totem.icon = icon
-        totem.slot = totemSlot
+        if totemSlot then
+            local name, _, icon = self.ovaleSpellBook:GetSpellInfo(spellId)
+            local duration = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
+            local totem = self.next.totems[totemSlot]
+            totem.name = name
+            totem.start = atTime
+            totem.duration = duration or 15
+            totem.icon = icon
+            totem.slot = totemSlot
+        end
         self.profiler:StopProfiling("OvaleTotem_state_SummonTotem")
     end,
     GetAvailableTotemSlot = function(self, spellId, atTime)

@@ -10,6 +10,7 @@ registerScripts(mainIoC.scripts);
 
 for (const [name, script] of pairs(mainIoC.scripts.script)) {
     if (!script.className || script.type !== "script") continue;
+    const className = script.className;
 
     test(`Test ${name} script`, t => {
         const ioc = new IoC();
@@ -17,7 +18,7 @@ for (const [name, script] of pairs(mainIoC.scripts.script)) {
         ioc.debug.warning = undefined;
         ioc.debug.bug = undefined;
         ioc.ovale.playerGUID = "player";
-        ioc.ovale.playerClass = script.className;
+        ioc.ovale.playerClass = className;
         eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
         eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
         t.truthy(ioc.condition.HasAny());

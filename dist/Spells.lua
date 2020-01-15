@@ -127,7 +127,7 @@ __exports.OvaleSpellsClass = __class(nil, {
             if isUsable then
                 isUsable, requirement = self.ovaleData:CheckSpellInfo(spellId, atTime, targetGUID)
                 if  not isUsable then
-                    noMana = PRIMARY_POWER[requirement]
+                    noMana = PRIMARY_POWER[requirement] or false
                     if noMana then
                         self.tracer:Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
                     else

@@ -20,28 +20,28 @@ let self_register:LuaObj<OptionModule> = {  }
 
 export interface SpellFlashOptions {
     enabled: boolean,
-    colorMain?: Color,
-    colorCd?: Color,
-    colorShortCd?: Color,
-    colorInterrupt?: Color,
+    colorMain: Color,
+    colorCd: Color,
+    colorShortCd: Color,
+    colorInterrupt: Color,
     inCombat?: boolean,
     hideInVehicle?: boolean,
     hasTarget?: boolean,
     hasHostileTarget?: boolean,
-    threshold?: number,
-    size?: number,
-    brightness?: number,
+    threshold: number,
+    size: number,
+    brightness: number,
 }
 
 export interface OvaleDb {
     profile: {
-        source: LuaObj<string>;
+        source?: LuaObj<string>;
         code: string,
         check: LuaObj<boolean>,
         list: LuaObj<string>,
         standaloneOptions: boolean,
         showHiddenScripts: boolean;
-        overrideCode: string;
+        overrideCode?: string;
         apparence: {
             [k: string]: any,
             avecCible: boolean,
@@ -92,12 +92,12 @@ export interface OvaleDb {
 }
 
 export class OvaleOptionsClass {
-    db: AceDatabase & OvaleDb = undefined;
+    db!: AceDatabase & OvaleDb;
 
     defaultDB:OvaleDb = {
         profile: {
             source: undefined,
-            code: undefined,
+            code: "",
             showHiddenScripts: false,
             overrideCode: undefined,
             check: {

@@ -263,10 +263,12 @@ __exports.OvalePowerClass = __class(States, {
         self.profiler:StartProfiling("OvalePower_UpdateMaxPower")
         if powerType then
             local powerInfo = self.POWER_INFO[powerType]
-            local maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments)
-            if self.current.maxPower[powerType] ~= maxPower then
-                self.current.maxPower[powerType] = maxPower
-                self.ovale:needRefresh()
+            if powerInfo then
+                local maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+                if self.current.maxPower[powerType] ~= maxPower then
+                    self.current.maxPower[powerType] = maxPower
+                    self.ovale:needRefresh()
+                end
             end
         else
             for powerType, powerInfo in pairs(self.POWER_INFO) do

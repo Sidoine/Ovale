@@ -37,7 +37,7 @@ interface PowerInfo {
 }
 
 class PowerState {
-    powerType: PowerType = undefined;
+    powerType?: PowerType = undefined;
     activeRegen: LuaObj<number> = {};
     inactiveRegen: LuaObj<number> = {};
     maxPower: LuaObj<number> = {};
@@ -269,10 +269,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.profiler.StartProfiling("OvalePower_UpdateMaxPower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
-            let maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments);
-            if (this.current.maxPower[powerType] != maxPower) {
-                this.current.maxPower[powerType] = maxPower;
-                this.ovale.needRefresh();
+            if (powerInfo) {
+                let maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments);
+                if (this.current.maxPower[powerType] != maxPower) {
+                    this.current.maxPower[powerType] = maxPower;
+                    this.ovale.needRefresh();
+                }
             }
         } else {
             for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
