@@ -678,7 +678,7 @@ Define(outbreak_debuff 196782)
 	SpellInfo(outbreak_debuff duration=6)
 Define(ossuary_buff 219788)
 Define(path_of_frost 3714)
-
+  ItemRequire(path_of_frost unusable 1=buff,path_of_frost_buff)
 	SpellInfo(pillar_of_frost cd=45)
 	SpellAddBuff(pillar_of_frost pillar_of_frost_buff=1)
 Define(pillar_of_frost_buff 51271)

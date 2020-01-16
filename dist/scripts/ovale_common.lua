@@ -329,6 +329,8 @@ Define(arcane_pulse 260364)
 	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
 Define(arcane_pulse_debuff 260369)
 	SpellInfo(arcane_pulse_debuff duration=12)
+Define(bag_of_tricks 312411)
+  SpellInfo(bag_of_tricks cd=90)
 
 ###
 ### Boss Spells
