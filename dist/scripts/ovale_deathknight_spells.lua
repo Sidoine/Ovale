@@ -395,7 +395,7 @@ Define(war_stomp 20549)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
-SpellList(chill_streak chill_streak_0 chill_streak_1 chill_streak_2 chill_streak_3)
+SpellList(chill_streak chill_streak_0 chill_streak_1 chill_streak_2 chill_streak_3 chill_streak_4)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
@@ -764,7 +764,8 @@ Define(lanathels_lament_buff 212975)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
 
-Define(chill_streak 204160)
+Define(chill_streak_4 305392)
+  SpellInfo(chill_streak_4 cd=45)
 
 
 ## Tier Items
