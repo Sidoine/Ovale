@@ -127,7 +127,7 @@ export class Parser {
         }
         for (let i = 1; i <= 20; i += 1) {
             let [tokenType, token] = tokenStream.Peek(i);
-            if (tokenType) {
+            if (tokenType && token) {
                 context[lualength(context) + 1] = token;
             } else {
                 context[lualength(context) + 1] = "<EOS>";
@@ -191,6 +191,10 @@ export class Parser {
         let tokenStream = new OvaleLexer("SimulationCraft", stream, MATCHES);
         let name;
         let [tokenType, token] = tokenStream.Consume();
+        if (!token) {
+            this.SyntaxError(tokenStream, "Warning: end of stream when parsing Action");
+            return undefined;
+        }
         if ((tokenType == "keyword" && SPECIAL_ACTION[token]) || tokenType == "name") {
             name = token;
         } else {
@@ -362,6 +366,10 @@ export class Parser {
     private ParseFunction(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): ParseNode | undefined {
         let name;
         let [tokenType, token] = tokenStream.Consume();
+        if (!token) {
+            this.SyntaxError(tokenStream, "Warning: end of stream when parsing Function");
+            return undefined;
+        }
         if (tokenType == "keyword" && FUNCTION_KEYWORD[token]) {
             name = token;
         } else {
@@ -389,8 +397,12 @@ export class Parser {
         node.child[1] = argumentNode;
         return node;
     }
-    private ParseIdentifier(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): ParseNode {
+    private ParseIdentifier(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): ParseNode | undefined {
         let [, token] = tokenStream.Consume();
+        if (!token) {
+            this.SyntaxError(tokenStream, "Warning: end of stream when parsing Identifier");
+            return undefined;
+        }
         let node = NewNode(nodeList);
         node.type = "operand";
         node.name = token;
@@ -442,6 +454,10 @@ export class Parser {
     private ParseOperand(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): ParseNode | undefined {
         let name;
         let [tokenType, token] = tokenStream.Consume();
+        if (!token) {
+            this.SyntaxError(tokenStream, "Warning: end of stream when parsing OPERAND");
+            return undefined;
+        }
         if (tokenType == "name") {
             name = token;
         } else if (tokenType == "keyword" && (token == "target" || token == "cooldown")) {
@@ -492,6 +508,10 @@ export class Parser {
     private ParseSimpleExpression(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): ParseNode | undefined {
         let node;
         let [tokenType, token] = tokenStream.Peek();
+        if (!token) {
+            this.SyntaxError(tokenStream, "Warning: end of stream when parsing SIMPLE EXPRESSION");
+            return undefined;
+        }
         if (tokenType == "number") {
             node = this.ParseNumber(tokenStream, nodeList, annotation);
         } else if (tokenType == "keyword") {

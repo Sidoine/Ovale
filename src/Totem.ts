@@ -134,7 +134,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             let buffPresent = (this.ovaleFuture.next.lastGCDSpellId == spellId);
             if (!buffPresent && si.buff_totem) {
                 let aura = this.ovaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
-                buffPresent = this.ovaleAura.IsActiveAura(aura, atTime);
+                buffPresent = (aura && this.ovaleAura.IsActiveAura(aura, atTime)) || false;
             }
             if (!si.buff_totem || buffPresent) {
                 let texture = this.ovaleSpellBook.GetSpellTexture(spellId);

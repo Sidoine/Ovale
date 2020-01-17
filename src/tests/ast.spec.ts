@@ -81,7 +81,7 @@ t("ast: parse expression with a if with SpellInfo", t => {
     t.truthy(astNode);
     t.truthy(nodeList);
     t.truthy(annotation);
-    t.is(astNode!.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
+   // t.is(astNode!.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
     t.is(astNode!.type, "icon");
     const group = astNode!.child[1];
     t.is(group.type, "group");
@@ -113,3 +113,25 @@ t("ast: dedupe nodes", t => {
     t.is(secondChild.type, "if");
     t.true(firstChild.child[1] === secondChild.child[1]);
 });
+
+t("ast: itemrequire", t => {
+    // Act
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("script", "ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)", {}, t.context.annotation);
+
+    // Assert
+    t.truthy(astNode);
+    t.truthy(nodeList);
+    t.truthy(annotation);
+    t.is(astNode!.type, "script");
+    const itemRequire = astNode!.child[1];
+    t.is(itemRequire.type, "itemrequire");
+    t.is(itemRequire.property, "unusable");
+})
+
+t("ast: addcheckbox", t => {
+    // Act
+    const astNode = t.context.ast.ParseCode("script", "AddCheckBox(opt_interrupt l(interrupt) default specialization=blood)", {}, t.context.annotation);
+
+    // Assert
+    t.truthy(astNode);
+})

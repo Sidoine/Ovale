@@ -35,7 +35,7 @@ export interface SpellFlashOptions {
 
 export interface OvaleDb {
     profile: {
-        source?: LuaObj<string>;
+        source: LuaObj<string>;
         code: string,
         check: LuaObj<boolean>,
         list: LuaObj<string>,
@@ -88,15 +88,18 @@ export interface OvaleDb {
             }
         }
     },
-    global: any;
+    global: {
+        debug: LuaObj<string>;
+        profiler: LuaObj<string>;
+    };
 }
 
 export class OvaleOptionsClass {
-    db!: AceDatabase & OvaleDb;
+    db: AceDatabase & OvaleDb;
 
     defaultDB:OvaleDb = {
         profile: {
-            source: undefined,
+            source: {},
             code: "",
             showHiddenScripts: false,
             overrideCode: undefined,
@@ -179,7 +182,10 @@ export class OvaleOptionsClass {
                 }
             }
         },
-        global:undefined
+        global: {
+            debug: {},
+            profiler: {}
+        }
     }
 
     options: any = {
@@ -578,11 +584,12 @@ export class OvaleOptionsClass {
     
     constructor(private ovale: OvaleClass) {
         this.module = ovale.createModule("OvaleOptions", this.OnInitialize, this.handleDisable, aceConsole, aceEvent);
+        this.db = AceDB.New("OvaleDB", this.defaultDB);
     }
 
     private OnInitialize = () => {
         const ovale = this.ovale.GetName();
-        const db = AceDB.New("OvaleDB", this.defaultDB);
+        const db = this.db;
         this.options.args.profile = AceDBOptions.GetOptionsTable(db);
         // let LibDualSpec = LibStub("LibDualSpec-1.0", true);
         // if (LibDualSpec) {

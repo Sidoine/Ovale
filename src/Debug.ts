@@ -82,8 +82,11 @@ export class OvaleDebugClass {
                     return (value != undefined);
                 },
                 set: (info: LuaArray<string>, value: string) => {
-                    value = value || undefined;
-                    this.options.db.global.debug[info[lualength(info)]] = value;
+                    if (!value) {
+                        delete this.options.db.global.debug[info[lualength(info)]];
+                    } else {
+                        this.options.db.global.debug[info[lualength(info)]] = value;
+                    }
                 }
             },
             trace: {
@@ -113,7 +116,7 @@ export class OvaleDebugClass {
         }
     }
 
-    traceLog: TextDump = undefined;
+    traceLog: TextDump;
     bug?: string;
     warning?: string;
     trace = false;
@@ -121,6 +124,7 @@ export class OvaleDebugClass {
 
     constructor(private ovale: OvaleClass, private options: OvaleOptionsClass) {
         this.module = ovale.createModule("OvaleDebug", this.OnInitialize, this.OnDisable, aceTimer);
+        this.traceLog = LibTextDump.New(`${this.ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
 
         let actions = {
             debug: {
@@ -151,7 +155,6 @@ export class OvaleDebugClass {
         AceConfig.RegisterOptionsTable(appName, this.defaultOptions);
         AceConfigDialog.AddToBlizOptions(appName, L["Debug"], this.ovale.GetName());
     
-        this.traceLog = LibTextDump.New(`${this.ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
     }
     private OnDisable = () => {
     }

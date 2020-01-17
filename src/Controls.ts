@@ -2,7 +2,7 @@ import { LuaObj, wipe } from "@wowts/lua";
 
 export interface CheckBox {
     text?: string;
-    checked?: boolean;
+    checked: boolean;
     triggerEvaluation?: boolean;
 }
 export const checkBoxes: LuaObj<CheckBox> = {}

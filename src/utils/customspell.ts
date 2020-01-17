@@ -100,7 +100,7 @@ function getPowerValue(powerType: PowerType, cost: number) {
 }
 
 export function convertFromSpellData(spell: SpellData, spellDataById: Map<number, SpellData>) {
-    const spellInfo: SpellInfo = {};
+    const spellInfo: SpellInfo = { require: {} };
     if (spell.spellPowers) {
         for (const power of spell.spellPowers) {
             const powerName = getPowerName(power.power_type);

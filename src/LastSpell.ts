@@ -4,14 +4,14 @@ import { remove, insert } from "@wowts/table";
 import { Powers } from "./Power";
 
 export interface SpellCast extends PaperDollSnapshot {
-    stop?: number;
-    start?: number;
+    stop: number;
+    start: number;
     lineId?: number;
-    spellId?: number;
-    spellName?: string;
-    targetName?: string;
-    target?: string;
-    queued?: number;
+    spellId: number;
+    spellName: string;
+    targetName: string;
+    target: string;
+    queued: number;
     success?: number;
     auraId?: number | string;
     auraGUID?: string;
@@ -20,6 +20,23 @@ export interface SpellCast extends PaperDollSnapshot {
     offgcd?:boolean;
     damageMultiplier?: number;
     combopoints?: number;
+}
+
+export function createSpellCast(): SpellCast {
+    return { 
+        spellId: 0, 
+        stop: 0, 
+        start: 0,
+        queued: 0, 
+        hastePercent: 0, 
+        meleeAttackSpeedPercent: 0,
+        rangedAttackSpeedPercent: 0, 
+        spellCastSpeedPercent: 0, 
+        masteryEffect: 0,
+        target: "unknown",
+        targetName: "target",
+        spellName: "Unknown spell"
+    };
 }
 
 export interface PaperDollSnapshot extends Powers {
@@ -60,8 +77,8 @@ export interface PaperDollSnapshot extends Powers {
 }
 
 export interface SpellCastModule {
-    CopySpellcastInfo: (mod: SpellCastModule, spellcast: SpellCast, dest: SpellCast) => void;
-    SaveSpellcastInfo: (mod: SpellCastModule, spellcast: SpellCast, atTime: number, future?: PaperDollSnapshot) => void;
+    CopySpellcastInfo: (spellcast: SpellCast, dest: SpellCast) => void;
+    SaveSpellcastInfo: (spellcast: SpellCast, atTime: number, future?: PaperDollSnapshot) => void;
 }
 
 export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
@@ -69,7 +86,7 @@ export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 export class LastSpell {
     lastSpellcast: SpellCast | undefined = undefined;
-    lastGCDSpellcast: SpellCast = { spellId: 0, meleeAttackSpeedPercent: 0, spellCastSpeedPercent: 0, masteryEffect: 0, hastePercent: 0, rangedAttackSpeedPercent: 0 };
+    lastGCDSpellcast: SpellCast = createSpellCast();
     queue: LuaArray<SpellCast> = {}
     modules: LuaObj<SpellCastModule> = {}
     
@@ -96,7 +113,7 @@ export class LastSpell {
         for (const [, mod] of pairs(this.modules)) {
             let func = mod.CopySpellcastInfo;
             if (func) {
-                func(mod, spellcast, dest);
+                func(spellcast, dest);
             }
         }
     }

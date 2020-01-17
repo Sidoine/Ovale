@@ -73,7 +73,7 @@ export class OvaleDamageTakenClass {
         let event = self_pool.Get();
         event.timestamp = timestamp;
         event.damage = damage;
-        event.magic = isMagicDamage;
+        event.magic = isMagicDamage || false;
         this.damageEvent.InsertFront(event);
         this.RemoveExpiredEvents(timestamp);
         this.ovale.needRefresh();

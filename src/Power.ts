@@ -37,7 +37,7 @@ interface PowerInfo {
 }
 
 class PowerState {
-    powerType?: PowerType = undefined;
+    powerType: PowerType = "mana";
     activeRegen: LuaObj<number> = {};
     inactiveRegen: LuaObj<number> = {};
     maxPower: LuaObj<number> = {};
@@ -291,10 +291,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.profiler.StartProfiling("OvalePower_UpdatePower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
-            let power = UnitPower("player", powerInfo.id, powerInfo.segments);
-            this.tracer.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
-            if (this.current.power[powerType] != power) {
-                this.current.power[powerType] = power;
+            if (powerInfo) {
+                let power = UnitPower("player", powerInfo.id, powerInfo.segments);
+                this.tracer.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
+                if (this.current.power[powerType] != power) {
+                    this.current.power[powerType] = power;
+                }
             }
         } else {
             for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
@@ -343,7 +345,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         this.profiler.StopProfiling("OvalePower_UpdatePowerType");
     }
-    GetSpellCost(spell: number | string, powerType?: PowerType): [number, PowerType] {
+    GetSpellCost(spell: number | string, powerType?: PowerType): [number, PowerType] | [undefined, undefined] {
         const spellId = this.ovaleSpellBook.getKnownSpellId(spell);
         if (spellId) {
             const spellPowerCosts = GetSpellPowerCost(spellId);
@@ -386,7 +388,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     }
 
-    TimeToPower(spellId: number, atTime: number, targetGUID: string, powerType: PowerType, extraPower?: number) {
+    TimeToPower(spellId: number, atTime: number, targetGUID: string, powerType: PowerType | undefined, extraPower?: number) {
         return this.getTimeToPowerStateAt(this.GetState(atTime), spellId, atTime, targetGUID, powerType, extraPower);
     }
 
@@ -432,7 +434,8 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         {
             let [cost, powerType] = this.GetSpellCost(spellId);
             if (cost && powerType && this.next.power[powerType] && !(si && si[powerType])) {
-                this.next.power[powerType] = this.next.power[powerType] - cost;
+                const power = this.next.power[powerType];
+                if (power) this.next.power[powerType] = power - cost;
             }
         }
         if (si) {
@@ -513,15 +516,15 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         if (si && si[powerType]) {
             let [cost, ratio] = this.ovaleData.GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true);
             if (ratio && ratio != 0) {
-				let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
+				let addRequirements = si && si.require && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
 				if (addRequirements) {
 					for (const [v, rArray] of pairs(addRequirements)) {
                         if (isLuaArray(rArray)) {
                             for (const [, requirement] of ipairs<any>(rArray)) {
                                 let verified = this.requirement.CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                                 if (verified) {
-                                    let aura = <any>this.ovaleAura.GetAura("player", requirement[2], atTime, undefined, true);
-                                    if (this.ovaleAura.IsActiveAura(aura, atTime)) {
+                                    let aura = this.ovaleAura.GetAura("player", requirement[2], atTime, undefined, true);
+                                    if (aura && this.ovaleAura.IsActiveAura(aura, atTime)) {
                                         cost = cost + (tonumber(v) || 0) * aura.stacks;
                                     }
                                 }
@@ -534,7 +537,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 let maxCost = <number>si[maxCostParam as keyof SpellInfo];
                 if (maxCost) {
                     let power = this.getPowerAt(state, powerType, atTime);
-                    if (power > (maxCost || maximumCost)) {
+                    if ((power > maxCost) || maximumCost) {
                         cost = maxCost;
                     } else if (power > cost) {
                         cost = power;
@@ -631,7 +634,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * @param powerType 
      * @param extraPower If true, will add this to the cost
      */
-    private getTimeToPowerStateAt(state: PowerState, spellId:number, atTime:number, targetGUID:string, powerType:PowerType, extraPower?:number) {
+    private getTimeToPowerStateAt(state: PowerState, spellId:number, atTime:number, targetGUID:string, powerType:PowerType | undefined, extraPower?:number) {
         let seconds = 0;
         powerType = powerType || POOLED_RESOURCE[this.ovalePaperDoll.class];
         if (powerType) {

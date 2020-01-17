@@ -316,6 +316,6 @@ export class OvaleGUIDClass {
         if (name && this.nameGUID[name]) {
             return unpack(this.nameGUID[name]);
         }
-        return undefined;
+        return [];
     }
 }

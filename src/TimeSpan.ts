@@ -297,7 +297,7 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
         return result;
     }
-    Union(B: OvaleTimeSpan, result?: OvaleTimeSpan) {
+    Union(B: OvaleTimeSpan, result?: OvaleTimeSpan) : OvaleTimeSpan {
         let A = this;
         let countA = lualength(A);
         let countB = B && lualength(B) || 0;
@@ -308,6 +308,8 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
                 } else {
                     result = newTimeSpanFromArray(B);
                 }
+            } else {
+                result = EMPTY_SET;
             }
         } else if (countB == 0) {
             if (result) {

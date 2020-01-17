@@ -353,7 +353,7 @@ export class OvaleSimulationCraftClass {
                 insert(child, commentNode);
                 let code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization);
                 let [node] = this.ovaleAst.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -364,7 +364,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("shortcd", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -375,7 +375,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("shortcd", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -386,7 +386,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, specialization, this.generator.GenerateIconBody("main", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -397,7 +397,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("main", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -408,7 +408,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("cd", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             {
                 let fmt = `
@@ -419,7 +419,7 @@ export class OvaleSimulationCraftClass {
 			`;
                 let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("cd", profile));
                 let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
-                insert(child, node);
+                if (node) insert(child, node);
             }
             Mark(ast);
             let [changed] = Sweep(ast);

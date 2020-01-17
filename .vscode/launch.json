@@ -32,7 +32,7 @@
             "request": "launch",
             "name": "Debug tests",
             "program": "${workspaceRoot}/node_modules/ava/profile.js",
-            "args": ["${workspaceRoot}/dist/tests/ast.spec.js"],
+            "args": ["${workspaceRoot}/dist/tests/${fileBasenameNoExtension}.js"],
             "outFiles": [
                 "${workspaceRoot}/dist/**/*.js"
             ],

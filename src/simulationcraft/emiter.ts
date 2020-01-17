@@ -382,10 +382,7 @@ export class Emiter {
                 }
             }
             if (node) {
-                annotation.astAnnotation = annotation.astAnnotation || {
-                }
-                annotation.astAnnotation.sync = annotation.astAnnotation.sync || {
-                }
+                annotation.astAnnotation.sync = annotation.astAnnotation.sync || {};
                 annotation.astAnnotation.sync[name] = node;
             }
         }
@@ -918,7 +915,6 @@ export class Emiter {
                 }
                 bodyCode = bodyCode || `${type}(${action})`;
             }
-            annotation.astAnnotation = annotation.astAnnotation || {};
             if (!bodyNode && bodyCode) {
                 [bodyNode] = this.ovaleAst.ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation);
             }
@@ -1410,7 +1406,6 @@ export class Emiter {
             target = target && (`${target}.`) || "";
             let code = format("%sCountOnAny(%s)", prefix, dotName);
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
@@ -1484,7 +1479,6 @@ export class Emiter {
                 code = format("AzeriteEssenceRank(%s)", essenceId);
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, essenceId);
             }
@@ -1706,7 +1700,6 @@ export class Emiter {
                 code = format("%sCooldown(%s)", prefix, name);
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
@@ -1731,7 +1724,6 @@ export class Emiter {
                 code = `${target}DiseasesAnyTicking()`;
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         } 
@@ -1755,7 +1747,6 @@ export class Emiter {
                 code = format("%s%sRemaining(%s)", target, prefix, dotName);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
@@ -1800,7 +1791,6 @@ export class Emiter {
                 code = format("MaxStacks(%s)", dotName);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, dotName);
             }
@@ -1824,7 +1814,6 @@ export class Emiter {
                 code = format("Glyph(%s)", glyphName);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, glyphName);
             }
@@ -1882,7 +1871,6 @@ export class Emiter {
                 }
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
@@ -1914,7 +1902,6 @@ export class Emiter {
                 code = format("PreviousOffGCDSpell(%s)", name);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, name);
             }
@@ -1964,7 +1951,6 @@ export class Emiter {
             } 
         } 
         if (code) {
-            annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
         return node;
@@ -1990,8 +1976,6 @@ export class Emiter {
                 code = format("Race(%s)", raceId);
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {
-                };
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         } 
@@ -2012,7 +1996,6 @@ export class Emiter {
         } else {
             return undefined;
         }
-        annotation.astAnnotation = annotation.astAnnotation || {};
         [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         return node;
     }
@@ -2045,7 +2028,6 @@ export class Emiter {
             }
         } 
         if (code) {
-            annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
         return node;
@@ -2061,7 +2043,6 @@ export class Emiter {
                 code = format("Stance(paladin_seal_of_%s)", name);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         } 
@@ -2362,7 +2343,6 @@ export class Emiter {
             annotation.opt_priority_rotation = className
         } 
         if (code) {
-            annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
         return node;
@@ -2391,7 +2371,6 @@ export class Emiter {
                 }
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
                 this.AddSymbol(annotation, talentName);
             }
@@ -2423,7 +2402,6 @@ export class Emiter {
                 code = "target.TimeToHealthPercent(30)";
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
        }
@@ -2444,7 +2422,6 @@ export class Emiter {
                 code = format("TotemRemaining(%s)", name);
             } 
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         }
@@ -2495,7 +2472,6 @@ export class Emiter {
                 this.AddSymbol(annotation, buffName);
             }
             if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         }

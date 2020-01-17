@@ -211,9 +211,9 @@ export class Splitter {
     
     private SplitByTagGroup: SplitterFunction = (tag, node, nodeList, annotation) => {
         let index = lualength(node.child);
-        let bodyList = {};
-        let conditionList = {};
-        let remainderList = {};
+        let bodyList: LuaArray<AstNode> = {};
+        let conditionList: LuaArray<AstNode> = {};
+        let remainderList: LuaArray<AstNode> = {};
         while (index > 0) {
             let childNode = node.child[index];
             index = index - 1;

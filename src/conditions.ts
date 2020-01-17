@@ -73,7 +73,7 @@ export class OvaleConditions {
      * @param paramName The name of the parameter
      * @param atTime The time
      */
-       ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName: T, atTime: number): SpellInfo[T] {
+    ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName: T, atTime: number): SpellInfo[T] | undefined {
         let si = this.OvaleData.GetSpellInfo(spellId);
         if (si && si[paramName]) {
             let name = si[paramName];
@@ -194,7 +194,7 @@ export class OvaleConditions {
 
     private BaseDuration = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value;
+        let value = 0;
         if ((this.OvaleData.buffSpellList[auraId])) {
             let spellList = this.OvaleData.buffSpellList[auraId];
             for (const [id] of pairs(spellList)) {
@@ -243,7 +243,7 @@ export class OvaleConditions {
             statName = "value3";
         }
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let value = aura[statName] || 0;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
@@ -269,7 +269,7 @@ export class OvaleConditions {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let value = aura && aura.combopoints || 0;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
@@ -318,7 +318,7 @@ export class OvaleConditions {
         let count = 0;
         for (const [id] of pairs(spellList)) {
             const aura = this.OvaleAura.GetAura(target, id, atTime, filter, mine);
-            if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
                 count = count + 1;
             }
         }
@@ -438,7 +438,7 @@ export class OvaleConditions {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let value = ending - start;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
@@ -516,12 +516,12 @@ export class OvaleConditions {
             let [gain, , ending] = [aura.gain, aura.start, aura.ending];
             seconds = this.GetHastedTime(seconds, namedParams.haste);
             if (ending - seconds <= gain) {
-                return undefined;
+                return [];
             } else {
                 return [gain, ending - seconds];
             }
         }
-        return undefined;
+        return [];
     }
 
     /** Get the time elapsed since the aura was last gained on the target.
@@ -576,7 +576,7 @@ export class OvaleConditions {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let value = aura.damageMultiplier || 1;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
@@ -670,7 +670,7 @@ export class OvaleConditions {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let value = aura.stacks || 0;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
@@ -680,7 +680,8 @@ export class OvaleConditions {
 
     private maxStacks = (positionalParams: PositionalParameters, namedParameters: NamedParameters, atTime: number) => {
         const [auraId, comparator, limit] = [positionalParams[1] as number, positionalParams[2] as string, positionalParams[3] as number];
-        const maxStacks = this.OvaleData.GetSpellInfo(auraId).max_stacks;
+        const spellInfo = this.OvaleData.GetSpellInfo(auraId);
+        const maxStacks = (spellInfo && spellInfo.max_stacks) || 0;
         return Compare(maxStacks, comparator, limit);
     }
 
@@ -816,7 +817,7 @@ export class OvaleConditions {
                 ending = endTime / 1000;
             }
         }
-        if (castSpellId || castSpellName) {
+        if ((castSpellId || castSpellName) && start && ending) {
             if (!spellId) {
                 return [start, ending];
             } else if (this.OvaleData.buffSpellList[spellId]) {
@@ -836,7 +837,7 @@ export class OvaleConditions {
                 return [start, ending];
             }
         }
-        return undefined;
+        return [];
     }
 
     /** Test if all of the listed checkboxes are off.
@@ -854,7 +855,7 @@ export class OvaleConditions {
     private CheckBoxOff = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
             if (this.OvaleFrameModule.frame && this.OvaleFrameModule.frame.IsChecked(id)) {
-                return undefined;
+                return [];
             }
         }
         return [0, INFINITY];
@@ -874,7 +875,7 @@ export class OvaleConditions {
     private CheckBoxOn = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
             if (this.OvaleFrameModule.frame && !this.OvaleFrameModule.frame.IsChecked(id)) {
-                return undefined;
+                return [];
             }
         }
         return [0, INFINITY];
@@ -934,7 +935,7 @@ export class OvaleConditions {
             targetClassification = "worldboss";
         } else {
             let aura = this.OvaleAura.GetAura(target, IMBUED_BUFF_ID, atTime, "HARMFUL", false);
-            if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
                 targetClassification = "worldboss";
             } else {
                 targetClassification = UnitClassification(target);
@@ -1019,7 +1020,7 @@ export class OvaleConditions {
                 }
             }
         }
-        return undefined;
+        return [];
     }
 
     /** Get the current estimated damage of a spell on the target if it is a critical strike.
@@ -1046,14 +1047,14 @@ export class OvaleConditions {
         let critMultiplier = 2;
         {
             let aura = this.OvaleAura.GetAura("player", AMPLIFICATION, atTime, "HELPFUL");
-            if (this.OvaleAura.IsActiveAura(aura, atTime)) {
-                critMultiplier = critMultiplier + aura.value1;
+            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+                critMultiplier = critMultiplier + (aura.value1 || 0);
             }
         }
         {
             let aura = this.OvaleAura.GetAura("player", INCREASED_CRIT_EFFECT_3_PERCENT, atTime, "HELPFUL");
-            if (this.OvaleAura.IsActiveAura(aura, atTime)) {
-                critMultiplier = critMultiplier * aura.value1;
+            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+                critMultiplier = critMultiplier * (aura.value1 || 0);
             }
         }
         value = critMultiplier * value;
@@ -1144,7 +1145,7 @@ export class OvaleConditions {
 		let impsSpawned = 0
 		// check for hand of guldan
 		if (this.OvaleFuture.next.currentCast.spellId == HAND_OF_GULDAN_SPELL_ID) {
-			let soulshards = this.OvalePower.current.power["soulshards"]
+			let soulshards = this.OvalePower.current.power["soulshards"] || 0;
 			if (soulshards >= 3) { soulshards = 3; } 
 			impsSpawned = impsSpawned + soulshards;
 		}
@@ -1159,7 +1160,7 @@ export class OvaleConditions {
 		}
         return Compare(impsSpawned, comparator, limit);
 	}
-    GetDiseases(target: string, atTime: number): [boolean, Aura, Aura, Aura] {
+    GetDiseases(target: string, atTime: number): [boolean, Aura | undefined, Aura | undefined, Aura | undefined] {
         let npAura, bpAura, ffAura;
         let talented = (this.OvaleSpellBook.GetTalentPoints(NECROTIC_PLAGUE_TALENT) > 0);
         if (talented) {
@@ -1187,9 +1188,9 @@ export class OvaleConditions {
         let [target, ,] = this.ParseCondition(positionalParams, namedParams);
         let [talented, npAura, bpAura, ffAura] = this.GetDiseases(target, atTime);
         let aura;
-        if (talented && this.OvaleAura.IsActiveAura(npAura, atTime)) {
+        if (talented && npAura && this.OvaleAura.IsActiveAura(npAura, atTime)) {
             aura = npAura;
-        } else if (!talented && this.OvaleAura.IsActiveAura(bpAura, atTime) && this.OvaleAura.IsActiveAura(ffAura, atTime)) {
+        } else if (!talented && bpAura && this.OvaleAura.IsActiveAura(bpAura, atTime) && ffAura && this.OvaleAura.IsActiveAura(ffAura, atTime)) {
             aura = (bpAura.ending < ffAura.ending) && bpAura || ffAura;
         }
         if (aura) {
@@ -1221,7 +1222,7 @@ export class OvaleConditions {
         if (gain && ending && ending > gain) {
             return [gain, ending];
         }
-        return undefined;
+        return [];
     }
 
     /**  Test if any diseases applied by the death knight are present on the target.
@@ -1250,7 +1251,7 @@ export class OvaleConditions {
                 return [gain, ending];
             }
         }
-        return undefined;
+        return [];
     }
 
     /**  Get the distance in yards to the target.
@@ -1377,7 +1378,7 @@ export class OvaleConditions {
 	 @return A boolean value.
      */
     False:ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        return undefined;
+        return [];
     }
 
     /**  Get the amount of regenerated focus per second for hunters.
@@ -1935,7 +1936,7 @@ export class OvaleConditions {
             let [gain, , ending] = [aura.gain, aura.start, aura.ending];
             return [gain, ending];
         }
-        return undefined;
+        return [];
     }
   
     /**  Test if the player is feared.
@@ -2143,13 +2144,13 @@ export class OvaleConditions {
 	 if LastDamage(ignite) >10000 Spell(combustion)
 	 if LastDamage(ignite more 10000) Spell(combustion)
      */
-    private LastDamage = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private LastDamage = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult => {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let value = this.OvaleSpellDamage.Get(spellId);
         if (value) {
             return Compare(value, comparator, limit);
         }
-        return undefined;
+        return [];
     }
   
     /**  Get the level of the target.
@@ -2193,7 +2194,7 @@ export class OvaleConditions {
         if (name && this.OvaleFrameModule.frame && this.OvaleFrameModule.frame.GetListValue(name) == value) {
             return [0, INFINITY];
         }
-        return undefined;
+        return [];
     }
 
     /** Test whether the target's name matches the given name.
@@ -2291,7 +2292,7 @@ export class OvaleConditions {
             value = this.OvalePower.current.maxPower[powerType];
         } else {
             let powerInfo = this.OvalePower.POWER_INFO[powerType];
-            value = UnitPowerMax(target, powerInfo.id, powerInfo.segments);
+            value = (powerInfo && UnitPowerMax(target, powerInfo.id, powerInfo.segments)) || 0;
         }
         return Compare(value, comparator, limit);
     }
@@ -2306,7 +2307,7 @@ export class OvaleConditions {
             return TestValue(start, ending, value, origin, rate, comparator, limit);
         } else {
             let powerInfo = this.OvalePower.POWER_INFO[powerType];
-            let value = UnitPower(target, powerInfo.id);
+            let value = (powerInfo && UnitPower(target, powerInfo.id)) || 0;
             return Compare(value, comparator, limit);
         }
     }
@@ -2318,15 +2319,16 @@ export class OvaleConditions {
         if (target == "player") {
             let powerMax = this.OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
-                let [value, origin, rate] = [powerMax - this.OvalePower.next.power[powerType], atTime, -1 * this.OvalePower.getPowerRateAt(this.OvalePower.next, powerType, atTime)];
+                const power =  this.OvalePower.next.power[powerType] || 0;
+                let [value, origin, rate] = [powerMax - power, atTime, -1 * this.OvalePower.getPowerRateAt(this.OvalePower.next, powerType, atTime)];
                 let [start, ending] = [atTime, INFINITY];
                 return TestValue(start, ending, value, origin, rate, comparator, limit);
             }
         } else {
             let powerInfo = this.OvalePower.POWER_INFO[powerType];
-            let powerMax = UnitPowerMax(target, powerInfo.id, powerInfo.segments) || 0;
+            let powerMax = powerInfo && UnitPowerMax(target, powerInfo.id, powerInfo.segments) || 0;
             if (powerMax > 0) {
-                let power = UnitPower(target, powerInfo.id);
+                let power = powerInfo && UnitPower(target, powerInfo.id) || 0;
                 let value = powerMax - power;
                 return Compare(value, comparator, limit);
             }
@@ -2343,7 +2345,8 @@ export class OvaleConditions {
             let powerMax = this.OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
                 let conversion = 100 / powerMax;
-                let [value, origin, rate] = [this.OvalePower.next.power[powerType] * conversion, atTime, this.OvalePower.getPowerRateAt(this.OvalePower.next, powerType, atTime) * conversion];
+                const power = this.OvalePower.next.power[powerType] || 0;
+                let [value, origin, rate] = [power * conversion, atTime, this.OvalePower.getPowerRateAt(this.OvalePower.next, powerType, atTime) * conversion];
                 if (rate > 0 && value >= 100 || rate < 0 && value == 0) {
                     rate = 0;
                 }
@@ -2352,10 +2355,10 @@ export class OvaleConditions {
             }
         } else {
             let powerInfo = this.OvalePower.POWER_INFO[powerType];
-            let powerMax = UnitPowerMax(target, powerInfo.id, powerInfo.segments) || 0;
+            let powerMax = powerInfo && UnitPowerMax(target, powerInfo.id, powerInfo.segments) || 0;
             if (powerMax > 0) {
                 let conversion = 100 / powerMax;
-                let value = UnitPower(target, powerInfo.id) * conversion;
+                let value = powerInfo && UnitPower(target, powerInfo.id) * conversion || 0;
                 return Compare(value, comparator, limit);
             }
         }
@@ -2934,7 +2937,7 @@ l    */
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         let maxCost = (namedParams.max == 1);
-        let [value] = this.OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || [0];
+        let [value] = spellId && this.OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || [0];
         return Compare(value, comparator, limit);
     }
 
@@ -3195,7 +3198,7 @@ l    */
 	 if target.Casting(hour_of_twilight) and target.RemainingCastTime() <2
 	     Spell(cloak_of_shadows)
      */
-    private RemainingCastTime = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private RemainingCastTime: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let [, , , startTime, endTime] = UnitCastingInfo(target);
@@ -3204,7 +3207,7 @@ l    */
             endTime = endTime / 1000;
             return TestValue(startTime, endTime, 0, endTime, -1, comparator, limit);
         }
-        return undefined;
+        return [];
     }
  
     /**  Get the current number of active and regenerating (fractional) runes of the given type for death knights.
@@ -3567,11 +3570,11 @@ l    */
 	 if SpellCharges(savage_defense) >1
 	     Spell(savage_defense)
      */
-    private SpellCharges = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private SpellCharges: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [charges, maxCharges, start, duration] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (!charges) {
-            return undefined;
+            return [];
         }
         charges = charges || 0;
         maxCharges = maxCharges || 1;
@@ -3617,8 +3620,8 @@ l    */
 	 if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
 	     Spell(devouring_plague)
      */
-    private SpellCooldown = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let comparator: string, limit: number;
+    private SpellCooldown: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+        let comparator: string | undefined, limit: number | undefined;
         let usable = (namedParams.usable == 1);
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         let earliest = INFINITY;
@@ -3637,6 +3640,7 @@ l    */
                 }
             }
         }
+        if (!comparator || limit === undefined) return [];
         if (earliest == INFINITY) {
             return Compare(0, comparator, limit);
         } else if (earliest > 0) {
@@ -3698,7 +3702,7 @@ l    */
 	 if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	     Spell(shadow_blades)
      */
-    private SpellData = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => {
+    private SpellData: ConditionFunction = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => {
         let [spellId, key, comparator, limit] = [<number>positionalParams[1], <keyof SpellInfo>positionalParams[2], <string>positionalParams[3], <number>positionalParams[4]];
         let si = this.OvaleData.spellInfo[spellId];
         if (si) {
@@ -3707,7 +3711,7 @@ l    */
                 return Compare(<number>value, comparator, limit);
             }
         }
-        return undefined;
+        return [];
     }
   
     /** Get data for the given spell defined by SpellInfo(...) after calculations
@@ -3724,13 +3728,13 @@ l    */
 	 if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
 	     Spell(mind_blast)
      */
-    private SpellInfoProperty = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => {
+    private SpellInfoProperty: ConditionFunction = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => {
         let [spellId, key, comparator, limit] = [<number>positionalParams[1], <keyof SpellInfo>positionalParams[2], <string>positionalParams[3], <number>positionalParams[4]];
         let value = this.OvaleData.GetSpellInfoProperty(spellId, atTime, key, undefined);
         if (value) {
             return Compare(<number>value, comparator, limit);
         }
-        return undefined;
+        return [];
     }
    
     /** Returns the number of times a spell can be cast. Generally used for spells whose casting is limited by the number of item reagents in the player's possession. .
@@ -3785,11 +3789,11 @@ l    */
 	 if SpellCharges(savage_defense) >1
 	     Spell(savage_defense)
      */
-    private SpellMaxCharges = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private SpellMaxCharges: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [, maxCharges, ,] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (!maxCharges) {
-            return undefined;
+            return [];
         }
         maxCharges = maxCharges || 1;
         return Compare(maxCharges, comparator, limit);
@@ -3833,13 +3837,13 @@ l    */
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, HEAVY_STAGGER, atTime, "HARMFUL");
-        if (!this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (!aura || !this.OvaleAura.IsActiveAura(aura, atTime)) {
             aura = this.OvaleAura.GetAura(target, MODERATE_STAGGER, atTime, "HARMFUL");
         }
-        if (!this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (!aura || !this.OvaleAura.IsActiveAura(aura, atTime)) {
             aura = this.OvaleAura.GetAura(target, LIGHT_STAGGER, atTime, "HARMFUL");
         }
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             let stagger = UnitStagger(target);
             let rate = -1 * stagger / (ending - start);
@@ -4055,7 +4059,7 @@ l    */
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         let tickTime;
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             tickTime = aura.tick;
         } else {
             tickTime = this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
@@ -4071,8 +4075,8 @@ l    */
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         let tickTime;
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
-            tickTime = aura.tick;
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+            tickTime = aura.tick || 0;
         } else {
             tickTime = 0;
         }
@@ -4117,7 +4121,7 @@ l    */
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = this.ParseCondition(positionalParams, namedParams);
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const lastTickTime = aura.lastTickTime || aura.start;
             const tick = aura.tick || this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
             let remainingTime = tick - (atTime - lastTickTime);
@@ -4159,9 +4163,10 @@ l    */
 	 @usage
 	 if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
      */
-    private TimeSincePreviousSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private TimeSincePreviousSpell: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spell, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
+        if (!spellId) return [];
         let t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
         return TestValue(0, INFINITY, 0, t, 1, comparator, limit);
     }
@@ -4286,11 +4291,12 @@ l    */
         return this.TimeToPower(powerType, level, comparator, limit, atTime);
     }
    
-    private TimeToPowerFor(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
+    private TimeToPowerFor(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number): ConditionResult {
         let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         if (!powerType) {
             let [, pt] = this.OvalePower.GetSpellCost(spellId);
+            if (!pt) return [];
             powerType = pt;
         }
         let seconds = this.OvalePower.TimeToPower(spellId, atTime, this.OvaleGUID.UnitGUID(target), powerType);
@@ -4315,7 +4321,7 @@ l    */
 	 @return A boolean value for the result of the comparison.
 	 @see TimeToEnergyFor, TimeToMaxEnergy
      */
-    private TimeToEnergyFor = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private TimeToEnergyFor: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         return this.TimeToPowerFor("energy", positionalParams, namedParams, atTime);
     }
 
@@ -4400,7 +4406,7 @@ l    */
         let [id, seconds] = [positionalParams[1], positionalParams[2]];
         seconds = seconds || 0;
         let [count, , ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
-        if (count > 0) {
+        if (count !== undefined && ending !== undefined && count > 0) {
             return [ending - seconds, INFINITY];
         }
         return [0, INFINITY];
@@ -4419,10 +4425,10 @@ l    */
     private TotemPresent = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult => {
         let id = positionalParams[1];
         let [count, start, ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
-        if (count > 0) {
+        if (count !== undefined && ending !== undefined && start !== undefined && count > 0) {
             return [start, ending];
         }
-        return undefined;
+        return [];
     }
   
     /** Get the remaining time in seconds before a totem expires.
@@ -4440,7 +4446,7 @@ l    */
     private TotemRemaining = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [id, comparator, limit] = [positionalParams[1], positionalParams[2], <number>positionalParams[3]];
         let [count, start, ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
-        if (count > 0) {
+        if (count !== undefined && start !== undefined && ending !== undefined && count > 0) {
             return TestValue(start, ending, 0, ending, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
@@ -4527,13 +4533,13 @@ l    */
         let value = 0;
         if (hand == "offhand" || hand == "off") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = this.OvalePaperDoll.current.offHandWeaponDPS;
+            value = this.OvalePaperDoll.current.offHandWeaponDPS || 0;
         } else if (hand == "mainhand" || hand == "main") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = this.OvalePaperDoll.current.mainHandWeaponDPS;
+            value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
         } else {
             [comparator, limit] = [positionalParams[1], positionalParams[2]];
-            value = this.OvalePaperDoll.current.mainHandWeaponDPS;
+            value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
         }
         return Compare(value, comparator, limit);
     }
@@ -4681,7 +4687,7 @@ l    */
                 return [gain, ending];
             }
         }
-        return undefined;
+        return [];
     }
  
     private stackTimeTo = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number):ConditionResult => {
@@ -4689,22 +4695,22 @@ l    */
         const stacks = <number>positionalParams[2];
         const direction = <string>positionalParams[3];
         const incantersFlowBuff = this.OvaleData.GetSpellInfo(spellId);
-        const tickCycle = (incantersFlowBuff.max_stacks || 5) * 2;
-        let posLo;
-        let posHi;
+        const tickCycle = (incantersFlowBuff && (incantersFlowBuff.max_stacks || 5) * 2) || 0;
+        let posLo: number;
+        let posHi: number;
         if (direction === "up") {
             posLo = stacks;
             posHi = stacks;
         } else if (direction === "down") {
             posLo = tickCycle - stacks  +1;
             posHi = posLo;
-        } else if (direction === "any") {
+        } else {
             posLo = stacks;
             posHi = tickCycle - stacks + 1;
-        }
+        } 
         const aura = this.OvaleAura.GetAura("player", spellId, atTime, "HELPFUL");
-        if (!aura) {
-            return undefined;
+        if (!aura || aura.tick === undefined || aura.lastTickTime === undefined) {
+            return [];
         }
         let buffPos;
         const buffStacks = aura.stacks;

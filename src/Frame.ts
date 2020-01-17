@@ -32,18 +32,18 @@ interface Action {
     icons: LuaArray<OvaleIcon>;
     spellId?:number;
     waitStart?:number;
-    left?:number;
-    top?:number;
-    scale?: number;
-    dx?: number;
-    dy?: number;
+    left:number;
+    top:number;
+    scale: number;
+    dx: number;
+    dy: number;
 }
 
 
 class OvaleFrame extends AceGUI.WidgetContainerBase {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox> = {}
     listWidget: LuaObj<AceGUIWidgetDropDown> = {}
-    visible: boolean
+    visible: boolean = true;
 
     ToggleOptions() {
         if ((this.content.IsShown())) {
@@ -183,10 +183,10 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     start = timeSpan.NextTime(atTime);
                 }
                 if (profile.apparence.enableIcons) {
-                    this.UpdateActionIcon(node, this.actions[k], element, start);
+                    this.UpdateActionIcon(node, this.actions[k], element, start || 0);
                 }
                 if (profile.apparence.spellFlash.enabled) {
-                    this.ovaleSpellFlash.Flash(undefined, node, element, start);
+                    this.ovaleSpellFlash.Flash(node, element, start || 0);
                 }
             }
             wipe(this.ovale.refreshNeeded);
@@ -195,7 +195,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             this.timeSinceLastUpdate = 0;
         }
     }
-    UpdateActionIcon(node: AstNode, action: Action, element: Element, start: number, now?: number) {
+    UpdateActionIcon(node: AstNode, action: Action, element: Element | undefined, start: number, now?: number) {
         const profile = this.ovaleOptions.db.profile;
         let icons = action.secure && action.secureIcons || action.icons;
         now = now || GetTime();
@@ -216,10 +216,10 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         } else {
             let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = this.ovaleBestAction.GetActionInfo(element, now);
             if (actionResourceExtend && actionResourceExtend > 0) {
-                if (actionCooldownDuration > 0) {
+                if (actionCooldownDuration && actionCooldownDuration > 0) {
                     this.tracer.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
                     actionCooldownDuration = actionCooldownDuration + actionResourceExtend;
-                } else if (element.namedParams.pool_resource && element.namedParams.pool_resource == 1) {
+                } else if (element && element.namedParams.pool_resource && element.namedParams.pool_resource == 1) {
                     this.tracer.Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
                     start = start + actionResourceExtend;
                 }
@@ -259,16 +259,16 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if ((node.namedParams.size != "small" && !node.namedParams.nocd && profile.apparence.predictif)) {
                 if (start) {
                     this.tracer.Log("****Second icon %s", start);
-                    this.ovaleFuture.ApplySpell(<number>actionId, this.ovaleGuid.UnitGUID(actionTarget), start);
+                    this.ovaleFuture.ApplySpell(<number>actionId, this.ovaleGuid.UnitGUID(actionTarget || "target"), start);
                     let atTime = this.ovaleFuture.next.nextCast;
                     if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
                         atTime = this.baseState.next.currentTime;
                     }
                     let [timeSpan, nextElement] = this.ovaleBestAction.GetAction(node, atTime);
                     if (nextElement && nextElement.offgcd) {
-                        start = timeSpan.NextTime(this.baseState.next.currentTime);
+                        start = timeSpan.NextTime(this.baseState.next.currentTime) || huge;
                     } else {
-                        start = timeSpan.NextTime(atTime);
+                        start = timeSpan.NextTime(atTime) || huge;
                     }
                     const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= this.ovaleBestAction.GetActionInfo(nextElement, start);
                     icons[2].Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2);
@@ -293,7 +293,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     }
     
     GetCheckBox(name: number|string) {
-        let widget: AceGUIWidgetCheckBox;
+        let widget;
         if (type(name) == "string") {
             widget = this.checkBoxWidget[name];
         } else if (type(name) == "number") {
@@ -421,7 +421,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     icons: {
                     },
                     secureIcons: {
-                    }
+                    },
+                    dx: 0, dy: 0, left: 0, scale: 1, top: 0
                 }
             }
             let action = this.actions[k];
@@ -486,7 +487,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 icon.EnableMouse(!profile.apparence.clickThru);
                 icon.frame.SetAlpha(profile.apparence.alpha);    
                 icon.cdShown = (l == 1);
-                if (Masque) {
+                if (this.skinGroup) {
                     this.skinGroup.AddButton(icon.frame);
                 }
                 if (l == 1) {
@@ -528,7 +529,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
    // content: UIFrame;
     timeSinceLastUpdate: number;
     barre: UITexture;
-    skinGroup: MasqueSkinGroup;
+    skinGroup?: MasqueSkinGroup;
 
     private tracer: Tracer;
 
@@ -573,11 +574,14 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         });
         newFrame.SetScript("OnMouseUp", () => {
             newFrame.StopMovingOrSizing();
-            const profile = ovaleOptions.db.profile;
             let [x, y] = newFrame.GetCenter();
-            let [parentX, parentY] = newFrame.GetParent().GetCenter();
-            profile.apparence.offsetX = x - parentX;
-            profile.apparence.offsetY = y - parentY;
+            const parent = newFrame.GetParent();
+            if (parent) {
+                const profile = ovaleOptions.db.profile;
+                let [parentX, parentY] = parent.GetCenter();
+                profile.apparence.offsetX = x - parentX;
+                profile.apparence.offsetY = y - parentY;
+            }
         });
         newFrame.SetScript("OnEnter", () => {
             const profile = ovaleOptions.db.profile;
@@ -610,7 +614,6 @@ export class OvaleFrameModuleClass {
         this.module.RegisterMessage("Ovale_CombatStarted", this.Ovale_CombatStarted);
         this.module.RegisterMessage("Ovale_CombatEnded", this.Ovale_CombatEnded);
         this.module.RegisterEvent("PLAYER_TARGET_CHANGED", this.PLAYER_TARGET_CHANGED);
-        this.frame = new OvaleFrame(this.ovaleState, this, this.ovaleCompile, this.ovaleFuture, this.baseState, this.ovaleEnemies, this.ovale, this.ovaleOptions, this.ovaleDebug, this.ovaleGuid, this.ovaleSpellFlash, this.ovaleSpellBook, this.ovaleBestAction);
     }
 
     private handleDisable = () =>{
@@ -659,5 +662,6 @@ export class OvaleFrameModuleClass {
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass){
         this.module = ovale.createModule("OvaleFrame", this.OnInitialize, this.handleDisable, aceEvent);
+        this.frame = new OvaleFrame(this.ovaleState, this, this.ovaleCompile, this.ovaleFuture, this.baseState, this.ovaleEnemies, this.ovale, this.ovaleOptions, this.ovaleDebug, this.ovaleGuid, this.ovaleSpellFlash, this.ovaleSpellBook, this.ovaleBestAction);
     }
 }

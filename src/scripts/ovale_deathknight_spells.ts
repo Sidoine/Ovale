@@ -16,7 +16,7 @@ Define(army_of_the_dead 42650)
   SpellAddBuff(army_of_the_dead army_of_the_dead=1)
 Define(asphyxiate 108194)
 # Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
-  SpellInfo(asphyxiate cd=45 duration=4 talent=asphyxiate_talent_unholy)
+  SpellInfo(asphyxiate cd=45 duration=4 asphyxiate_talent_unholy)
   # Stunned.
   SpellAddTargetDebuff(asphyxiate asphyxiate=1)
 Define(berserking 26297)

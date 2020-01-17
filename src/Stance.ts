@@ -148,7 +148,7 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
         stanceId = stanceId || this.current.stance;
         return this.stanceList[stanceId];
     }
-    IsStance(name: string|number, atTime: number) {
+    IsStance(name: string|number, atTime: number | undefined) {
         const state = this.GetState(atTime);
         if (name && state.stance) {
             if (type(name) == "number") {

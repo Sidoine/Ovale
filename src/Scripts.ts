@@ -209,7 +209,8 @@ export class OvaleScriptsClass  {
                         const code = this.GetScript(this.getCurrentSpecScriptName());
                         this.RegisterScript(this.ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script");
                         this.setCurrentSpecScriptName(CUSTOM_NAME);
-                        this.ovaleOptions.db.profile.code = this.GetScript(CUSTOM_NAME);
+                        const script = this.GetScript(CUSTOM_NAME);
+                        if (script) this.ovaleOptions.db.profile.code = script;
                         this.module.SendMessage("Ovale_ScriptChanged");
                     }
                 },
@@ -238,7 +239,9 @@ export class OvaleScriptsClass  {
         }
         for(let i=1; i < countSpecializations; i += 1){
             let specName = this.ovalePaperDoll.GetSpecialization(i as SpecializationIndex)
-            this.ovaleOptions.db.profile.source[`${this.ovale.playerClass}_${specName}`] = this.ovaleOptions.db.profile.source[`${this.ovale.playerClass}_${specName}`] || this.GetDefaultScriptName(this.ovale.playerClass, specName);
+            if (specName) {
+                this.ovaleOptions.db.profile.source[`${this.ovale.playerClass}_${specName}`] = this.ovaleOptions.db.profile.source[`${this.ovale.playerClass}_${specName}`] || this.GetDefaultScriptName(this.ovale.playerClass, specName);
+            }
         }
     }
 }

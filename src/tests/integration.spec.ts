@@ -1,7 +1,7 @@
 import test from "ava";
 import { IoC } from "../ioc";
 import { pairs } from "@wowts/lua";
-import { eventDispatcher } from "@wowts/wow-mock";
+import { eventDispatcher, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { oneTimeMessages } from "../Ovale";
 import { registerScripts } from "../scripts/index";
 
@@ -23,7 +23,13 @@ for (const [name, script] of pairs(mainIoC.scripts.script)) {
         eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
         t.truthy(ioc.condition.HasAny());
         const ast = ioc.compile.CompileScript(name);
+        const messages: string[] = [];
+        for (let i = 0; i < DEFAULT_CHAT_FRAME.GetNumMessages(); i++) {
+            messages.push(DEFAULT_CHAT_FRAME.GetMessageInfo(i));
+        }
+        t.deepEqual(messages, []);
         t.is(ioc.debug.bug, undefined);
+        t.is(ioc.debug.warning, undefined);
         t.truthy(ast);
         ioc.compile.EvaluateScript(ast, true);
         t.is(ioc.debug.bug, undefined);

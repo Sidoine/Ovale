@@ -258,13 +258,11 @@ export class OvaleSpellBookClass {
         }
     }
     GetSpellName(spellId: number): string | undefined {
-        if (spellId) {
-            let spellName: string | undefined = this.spell[spellId];
-            if (!spellName) {
-                [spellName] = this.GetSpellInfo(spellId);
-            }
-            return spellName;
+        let spellName: string | undefined = this.spell[spellId];
+        if (!spellName) {
+            [spellName] = this.GetSpellInfo(spellId);
         }
+        return spellName;
     }
     GetSpellTexture(spellId: number): string {
         return this.texture[spellId];

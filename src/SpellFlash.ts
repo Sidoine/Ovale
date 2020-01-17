@@ -284,7 +284,7 @@ export class OvaleSpellFlashClass {
         }
         return enabled;
     }
-    Flash(state: {}, node: AstNode, element: Element, start: number, now?:number) {
+    Flash(node: AstNode, element: Element | undefined, start: number, now?:number) {
         const db = this.ovaleOptions.db.profile.apparence.spellFlash
         now = now || GetTime();
         if (this.IsSpellFlashEnabled() && start && start - now <= db.threshold / 1000) {

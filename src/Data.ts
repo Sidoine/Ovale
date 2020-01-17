@@ -1,6 +1,6 @@
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleRequirement } from "./Requirement";
-import { type, ipairs, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
+import { type, ipairs, pairs, tonumber, wipe, truthy, LuaArray, LuaObj, kpairs } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { BaseState } from "./BaseState";
 import { isLuaArray, isString } from "./tools";
@@ -105,7 +105,7 @@ interface Auras
  */
 export interface SpellInfo extends Powers {
     //[key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
-    require?: {[key in keyof SpellInfo]: Requirements };
+    require: {[key in keyof SpellInfo]?: Requirements };
     // Aura
     aura?: Auras;
     duration?:number;   
@@ -346,7 +346,7 @@ export class OvaleDataClass {
         for (const [k, v] of pairs(this.buffSpellList)) {
             if (!this.DEFAULT_SPELL_LIST[k]) {
                 wipe(v);
-                this.buffSpellList[k] = undefined;
+                delete this.buffSpellList[k];
             } else if (truthy(find(k, "^trinket_"))) {
                 wipe(v);
             }
@@ -374,8 +374,7 @@ export class OvaleDataClass {
                         HARMFUL: {}
                     }
                 },
-                require: {
-                }
+                require: {}
             }
             this.spellInfo[spellId] = si;
         }
@@ -396,8 +395,7 @@ export class OvaleDataClass {
         let ii = this.itemInfo[itemId];
         if (!ii) {
             ii = {
-                require: {
-                }
+                require: {}
             }
             this.itemInfo[itemId] = ii;
         }
@@ -407,7 +405,7 @@ export class OvaleDataClass {
         return ["cd", false];
     }
     GetSpellTagInfo(spellId: number): [string, boolean] {
-        let tag = "main";
+        let tag:string | undefined = "main";
         let invokesGCD = true;
         let si = this.spellInfo[spellId];
         if (si) {
@@ -475,10 +473,10 @@ export class OvaleDataClass {
         return [verified, value, data];
     }
 
-    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string): [boolean, string] {
+    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string): [boolean, string | undefined] {
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
         let verified = true;
-        let requirement;
+        let requirement: string | undefined;
         for (const [name, handler] of pairs(this.requirement.nowRequirements)) {
             let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID);
             if (value) {
@@ -532,7 +530,7 @@ export class OvaleDataClass {
         let value = si && si[property];
         let requirements = si && si.require[property];
         if (requirements) {
-            for (const [v, rArray] of pairs(requirements)) {
+            for (const [v, rArray] of kpairs(requirements)) {
                 if (isLuaArray(rArray)) {
                     for (const [, requirement] of ipairs<any>(rArray)) {
                         let verified = this.requirement.CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
@@ -617,7 +615,7 @@ export class OvaleDataClass {
         return [value * ratio];
     }
 
-    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDPS: number, offHandWeaponDPS: number, combopoints: number): number {
+    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDPS: number, offHandWeaponDPS: number, combopoints: number): number | undefined {
         let si = this.spellInfo[spellId];
         if (!si) {
             return undefined;

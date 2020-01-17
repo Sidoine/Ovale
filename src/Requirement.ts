@@ -26,10 +26,10 @@ export class OvaleRequirement {
     }
     
     UnregisterRequirement(name: string) {
-        this.nowRequirements[name] = undefined;
+        delete this.nowRequirements[name];
     }
 
-    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] {
+    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string):[boolean, string | undefined, number | undefined] {
         let requirements = this.nowRequirements;
     
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
