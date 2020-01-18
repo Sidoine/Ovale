@@ -24,13 +24,13 @@ AddIcon
 	Texture(inv_misc_gem_bloodstone_01) # Create Healthstone
 	Texture(inv_stone_04) # Healthstone
 	Texture(spell_shadow_demonictactics) # Unending Resolve
-	
+
 	# Buffs
 	Texture(spell_shadow_demonbreath) # Unending Breath
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Trinkets
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -44,7 +44,7 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
+
 	# Talents
 	Texture(spell_shadow_haunting) # Drain Soul (T1) (replaces Shadow Bolt)
 	Texture(spell_fire_twilightflamebolt) # Deathbolt (T1)
@@ -66,40 +66,49 @@ AddIcon
 	Texture(spell_shadow_charm) # Every Man for Himself (Human)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

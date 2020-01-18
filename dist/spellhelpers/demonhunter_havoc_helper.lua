@@ -52,6 +52,15 @@ AddIcon
 	# Racials
 	Texture(spell_shadow_teleport) # Arcane Torrent (Blood Elf)
 	Texture(ability_ambush) # Shadowmeld (Night elf)
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
 	
 	
 	

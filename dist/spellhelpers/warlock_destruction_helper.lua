@@ -15,7 +15,7 @@ AddIcon
 	Texture(ability_warlock_chaosbolt) # Chaos Bolt
 	Texture(spell_shadow_rainoffire) # Rain of Fire
 	Texture(spell_shadow_mindrot) # Spell Lock (command demon)
-	
+
 	# Green flame spells
 	Texture(spell_fire_burnoutgreen) # Incinerate GF
 	Texture(spell_fire_fireballgreen2) # Conflagrate GF
@@ -23,7 +23,7 @@ AddIcon
 	Texture(ability_warlock_chaosbolt) # Chaos Bolt
 	Texture(spell_fire_felrainoffire) # Rain of Fire GF
 	Texture(spell_shadow_mindrot) # Spell Lock (command demon)
-	
+
 	# Survival stuff
 	Texture(spell_shadow_lifedrain02) # Drain Life
 	Texture(ability_deathwing_bloodcorruption_death) # Health Funnel
@@ -35,10 +35,10 @@ AddIcon
 	Texture(ability_warlock_baneofhavoc) # Havoc
 	Texture(spell_shadow_summoninfernal) # Summon Infernal
 	Texture(spell_shadow_demonbreath) # Unending Breath
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Trinkets
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -52,7 +52,7 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
+
 	# Talents
 	Texture(spell_fire_firebolt) # Soul Fire (T1)
 	Texture(spell_shadow_scourgebuild) # Shadowburn (T2)
@@ -73,60 +73,69 @@ AddIcon
 	Texture(spell_shadow_charm) # Every Man for Himself (Human)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
 
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

@@ -26,10 +26,10 @@ AddIcon
 	Texture(spell_nature_earthelemental_totem) # Earth Elemental Totem
 	Texture(spell_nature_healingway) # Healing Surge
 	Texture(ability_shaman_astralshift) # Astral Shift
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Trinkets
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -65,38 +65,47 @@ AddIcon
 	Texture(pandarenracial_quiveringpain) # Quaking Palm (Pandaren)
 	Texture(spell_shadow_unholystrength) # Stoneform (Dwarf)
 	Texture(spell_holy_holyprotection) # Gift of the Naaru (Draenei)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

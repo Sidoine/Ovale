@@ -26,10 +26,10 @@ AddIcon
 	Texture(spell_holy_avenginewrath) # Avenging Wrath
 	Texture(spell_holy_sealofsacrifice) # Blessing of Sacrifice
 	Texture(spell_holy_layonhands) # Lay on Hands
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -43,7 +43,7 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
+
 	# Talents
 	Texture(paladin_retribution) # Blessed Hammer (T1)(Replaces Hammer of the Righteous)
 	Texture(paladin_protection) # Bastion of Light (T2)
@@ -57,39 +57,48 @@ AddIcon
 	# Racials
 	Texture(spell_shadow_teleport) # Arcane Torrent (Blood Elf)
 	Texture(ability_warstomp) # War Stomp (Tauren)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

@@ -15,7 +15,7 @@ AddIcon
 	Texture(inv_misc_monsterclaw_03) # Swipe
 	Texture(spell_nature_starfall) # Moonfire
 	Texture(inv_bone_skull_04) # Skull Bash
-	
+
 	# Buffs
 	Texture(ability_racial_bearform) # Bear Form
 	Texture(spell_nature_stoneclawtotem) # Barkskin
@@ -24,10 +24,10 @@ AddIcon
 	Texture(ability_druid_tigersroar) # Survival Instincts
 	Texture(ability_druid_markofursol) # Mark of Ursol
 	Texture(spell_nature_healingtouch) # Healing Touch
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -41,7 +41,7 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
+
 	# Talents
 	Texture(spell_druid_bristlingfur) # Bristling Fur (T1)
 	Texture(spell_druid_displacement) # Displacer Beast (T2)
@@ -53,48 +53,57 @@ AddIcon
 	Texture(spell_druid_incarnation) # Incarnation (T6)
 	Texture(spell_nature_moonglow) # Lunar Beam (T7)
 	Texture(spell_druid_malfurionstenacity) # Pulverize (T7)
-	
+
 	# Racials
 	Texture(racial_troll_berserk) # Berserking (Troll)
 	Texture(ability_warstomp) # War Stomp (Tauren)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
