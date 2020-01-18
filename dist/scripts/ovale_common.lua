@@ -372,6 +372,7 @@ AddFunction Boss
 Define(ghost_debuff 8326)
 AddFunction Dead
 {
+  if IsDead() 1
 	if Health() <= 0 1
 	if DebuffPresent(ghost_debuff) 1
 	0

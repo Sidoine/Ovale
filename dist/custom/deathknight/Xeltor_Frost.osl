@@ -31,7 +31,7 @@ AddIcon specialization=2 help=main
 		FrostDefaultMainActions()
   }
 
-	if not BuffPresent(path_of_frost) and not InCombat() and not Flying() and Speed() > 0 and not { UnitInRaid() or UnitInParty() } and { not PlayerIsResting() or Wet() } Spell(path_of_frost)
+	if not BuffPresent(path_of_frost) and not InCombat() and not Dead() and not Flying() and Speed() > 0 and not { UnitInRaid() or UnitInParty() } and Wet() Spell(path_of_frost)
 }
 
 # Custom functions.
@@ -68,19 +68,19 @@ AddFunction FrostDefaultMainActions
  #frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
  if BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } Spell(frost_strike)
  #call_action_list,name=essences,if=ovale.boss
- if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostEssencesMainActions()
+ if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostEssencesMainActions()
 
- unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesMainPostConditions()
+ unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesMainPostConditions()
  {
   #call_action_list,name=cooldowns,if=ovale.boss
-  if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostCooldownsMainActions()
+  if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostCooldownsMainActions()
 
-  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsMainPostConditions()
+  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsMainPostConditions()
   {
    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))&ovale.boss
-   if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingMainActions()
+   if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } FrostBosPoolingMainActions()
 
-   unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingMainPostConditions()
+   unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingMainPostConditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingMainActions()
@@ -109,7 +109,7 @@ AddFunction FrostDefaultMainActions
 
 AddFunction FrostDefaultMainPostConditions
 {
- { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesMainPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
+ { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesMainPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
@@ -120,19 +120,19 @@ AddFunction FrostDefaultShortCdActions
  unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
  {
   #call_action_list,name=essences,if=ovale.boss
-  if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostEssencesShortCdActions()
+  if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostEssencesShortCdActions()
 
-  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesShortCdPostConditions()
+  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesShortCdPostConditions()
   {
    #call_action_list,name=cooldowns,if=ovale.boss
-   if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostCooldownsShortCdActions()
+   if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostCooldownsShortCdActions()
 
-   unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsShortCdPostConditions()
+   unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsShortCdPostConditions()
    {
     #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))&ovale.boss
-    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingShortCdActions()
+    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } FrostBosPoolingShortCdActions()
 
-    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingShortCdPostConditions()
+    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingShortCdPostConditions()
     {
      #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
      if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingShortCdActions()
@@ -162,7 +162,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesShortCdPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesShortCdPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
@@ -172,19 +172,19 @@ AddFunction FrostDefaultCdActions
  unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
  {
   #call_action_list,name=essences,if=ovale.boss
-  if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostEssencesCdActions()
+  if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostEssencesCdActions()
 
-  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesCdPostConditions()
+  unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesCdPostConditions()
   {
    #call_action_list,name=cooldowns,if=ovale.boss
-   if target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() FrostCooldownsCdActions()
+   if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() FrostCooldownsCdActions()
 
-   unless { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsCdPostConditions()
+   unless { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsCdPostConditions()
    {
     #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))&ovale.boss
-    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } FrostBosPoolingCdActions()
+    if Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } FrostBosPoolingCdActions()
 
-    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingCdPostConditions()
+    unless Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingCdPostConditions()
     {
      #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
      if BuffPresent(breath_of_sindragosa_buff) FrostBosTickingCdActions()
@@ -214,7 +214,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostEssencesCdPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 or target.Classification(elite) and Enemies(tagged=1) >= 5 or Boss() } and FrostBosPoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies(tagged=1) >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostEssencesCdPostConditions() or { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and { not SpellCooldown(breath_of_sindragosa) > 0 and SpellCooldown(pillar_of_frost) < 10 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and FrostBosPoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies(tagged=1) >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
 }
 
 ### actions.aoe

@@ -1093,7 +1093,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.IsDead = function(positionalParams, namedParams, atTime)
             local yesno = positionalParams[1]
-            local target = self:ParseCondition(positionalParams, namedParams)
+            local target = self:ParseCondition(positionalParams, namedParams) or "player"
             local boolean = UnitIsDead(target)
             return TestBoolean(boolean, yesno)
         end
@@ -1986,6 +1986,18 @@ __exports.OvaleConditions = __class(nil, {
             local raidIndex = UnitInRaid(target)
             return TestBoolean(raidIndex ~= nil, "yes")
         end
+        self.IsGrouped = function(positionalParams, namedParams, atTime)
+            local target = namedParams.target or "player"
+            local inParty = UnitInParty(target)
+            local inRaid = UnitInRaid(target)
+            if raidIndex ~= nil then
+                return TestBoolean(raidIndex ~= nil, "yes")
+            elseif inParty then
+                return TestBoolean(isTrue, "yes")
+            end
+
+            return 0
+        end
         self.SoulFragments = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2]
             local value = self.OvaleDemonHunterSoulFragments:SoulFragments(atTime)
@@ -2459,6 +2471,7 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("race", false, self.Race)
         ovaleCondition:RegisterCondition("unitinparty", false, self.UnitInPartyCond)
         ovaleCondition:RegisterCondition("unitinraid", false, self.UnitInRaidCond)
+        ovaleCondition:RegisterCondition("isgrouped", false, self.IsGrouped)
         ovaleCondition:RegisterCondition("soulfragments", false, self.SoulFragments)
         ovaleCondition:RegisterCondition("timetoshard", false, self.TimeToShard)
         ovaleCondition:RegisterCondition("hasdebufftype", false, self.HasDebuffType)

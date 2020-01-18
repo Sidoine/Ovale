@@ -1970,7 +1970,7 @@ __exports.Emiter = __class(nil, {
                 code = format("BuffPresent(%s)", buffName)
                 self:AddSymbol(annotation, buffName)
             elseif operand == "ovale.boss" then
-                code = "(target.Classification(normal) and Enemies(tagged=1) >= 7) or (target.Classification(elite) and Enemies(tagged=1) >= 5) or Boss()"
+                code = "(target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped()) or (target.Classification(elite) and Enemies(tagged=1) > 5) or Boss()"
             elseif className == "DEATHKNIGHT" and sub(operand, 1, 24) == "pet.dancing_rune_weapon." then
                 local petOperand = sub(operand, 25)
                 local tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN)
