@@ -234,13 +234,11 @@ __exports.Generator = __class(nil, {
                 worksOnBoss = 1,
                 order = 10
             })
-            if annotation.specialization == "blood" or annotation.specialization == "unholy" then
-                insert(interrupts, {
-                    name = "asphyxiate",
-                    stun = 1,
-                    order = 20
-                })
-            end
+            insert(interrupts, {
+                name = "asphyxiate",
+                stun = 1,
+                order = 20
+            })
             if annotation.specialization == "frost" then
                 insert(interrupts, {
                     name = "blinding_sleet",

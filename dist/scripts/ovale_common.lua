@@ -255,6 +255,11 @@ Define(worldvein_resonance_essence 295186)
 Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
+Define(reaping_flames_essence 311195)
+  SpellInfo(reaping_flames_essence cd=90 tag=shortcd)
+Define(moment_of_glory_essence 311203)
+  SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
+Define(replica_of_knowledge_essence 312725)
 
 ###
 ### Racials
@@ -329,6 +334,8 @@ Define(arcane_pulse 260364)
 	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
 Define(arcane_pulse_debuff 260369)
 	SpellInfo(arcane_pulse_debuff duration=12)
+Define(bag_of_tricks 312411)
+  SpellInfo(bag_of_tricks cd=90)
 
 ###
 ### Boss Spells
@@ -370,6 +377,7 @@ AddFunction Boss
 Define(ghost_debuff 8326)
 AddFunction Dead
 {
+  if IsDead() 1
 	if Health() <= 0 1
 	if DebuffPresent(ghost_debuff) 1
 	0
