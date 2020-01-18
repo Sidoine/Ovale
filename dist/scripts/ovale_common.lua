@@ -255,6 +255,11 @@ Define(worldvein_resonance_essence 295186)
 Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
+Define(reaping_flames_essence 311195)
+  SpellInfo(reaping_flames_essence cd=90 tag=shortcd)
+Define(moment_of_glory_essence 311203)
+  SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
+Define(replica_of_knowledge_essence 312725)
 
 ###
 ### Racials
