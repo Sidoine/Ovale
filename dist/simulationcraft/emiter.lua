@@ -509,14 +509,8 @@ __exports.Emiter = __class(nil, {
                     conditionCode = "target.InRange(secret_technique)"
 	              elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
                     conditionCode = "target.InRange(backstab)"
-                elseif className == "ROGUE" and (action == "sinister_strike_outlaw" or action == "pistol_shot" or action == "ambush" or action == "dispatch" or action == "between_the_eyes" or action == "cheap_shot" or action == "gouge" or action == "kick" or action == "blind" or action == "marked_for_death" or action == "ghostly_strike" or action == "killing_spree") and specialization == "outlaw" then
-                  conditionCode = format("target.InRange(%s)", action)
-                elseif className == "ROGUE" and action == "blade_rush" and specialization == "outlaw" then
-                  conditionCode = format("{ IsBossFight() and Falling() or not IsBossFight() } and target.InRange(%s)", action)
-                elseif className == "ROGUE" and (action == "adrenaline_rush" or action == "blade_flurry") and specialization == "outlaw" then
-                    conditionCode = "target.InRange(sinister_strike_outlaw)"
                 elseif className == "ROGUE" and action == "vanish" and specialization == "outlaw" then
-                    conditionCode = "target.InRange(sinister_strike_outlaw) and VanishAllowed()"
+                    conditionCode = "VanishAllowed()"
                 elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
                     local buffName = action .. "_buff"
                     self:AddSymbol(annotation, buffName)

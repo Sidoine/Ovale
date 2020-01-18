@@ -371,19 +371,16 @@ Define(warbreaker 262161)
   SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
 Define(whirlwind_buff_0 199658)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
-  SpellInfo(whirlwind_buff_0 gcd=0 offgcd=1)
+  SpellInfo(whirlwind_buff_0 duration=20)
 Define(whirlwind_buff_1 199667)
 # Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
-  SpellInfo(whirlwind_buff_1 gcd=0 offgcd=1)
+  SpellInfo(whirlwind_buff_1 duration=20)
 Define(whirlwind_buff_2 199850)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
-  SpellInfo(whirlwind_buff_2 gcd=0 offgcd=1)
+  SpellInfo(whirlwind_buff_2 duration=20)
+Define(whirlwind_buff_3 85739)
+  	SpellInfo(whirlwind_buff_3 duration=20)
 Define(whirlwind_fury 190411)
-# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
-  SpellInfo(whirlwind_fury)
-  SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
-  SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
-  SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
@@ -391,7 +388,7 @@ SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardi
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
-SpellList(whirlwind_buff whirlwind_buff_0 whirlwind_buff_1 whirlwind_buff_2)
+SpellList(whirlwind_buff whirlwind_buff_0 whirlwind_buff_1 whirlwind_buff_2 whirlwind_buff_3)
 SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 Define(anger_management_talent 19) #21204
@@ -722,8 +719,6 @@ Define(victory_rush 34428)
 	SpellAddBuff(whirlwind_fury whirlwind_buff=2)
 Define(whirlwind_arms 1680)
 	SpellInfo(whirlwind_arms rage=30)
-Define(whirlwind_buff 85739)
-	SpellInfo(whirlwind_buff duration=20)
 
 # Legion legendary items
 
