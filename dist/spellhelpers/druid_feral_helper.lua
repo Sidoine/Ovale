@@ -40,6 +40,9 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
+	Texture(ability_essence_reapingflames) # Reaping Flames
+	Texture(ability_essence_momentofglory) # Moment of Glory
+	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
 	
 	# Talents
 	Texture(ability_druid_dash_orange) # Tiger Dash (T2)(Replaces Dash)
