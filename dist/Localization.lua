@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Localization", 80201)
+local __exports = LibStub:NewLibrary("ovale/Localization", 80300)
 if not __exports then return end
 local setmetatable = setmetatable
 local rawset = rawset

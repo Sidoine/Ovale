@@ -259,7 +259,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if ((node.namedParams.size != "small" && !node.namedParams.nocd && profile.apparence.predictif)) {
                 if (start) {
                     this.tracer.Log("****Second icon %s", start);
-                    this.ovaleFuture.ApplySpell(<number>actionId, this.ovaleGuid.UnitGUID(actionTarget || "target"), start);
+                    const target = this.ovaleGuid.UnitGUID(actionTarget || "target");
+                    if (target) this.ovaleFuture.ApplySpell(<number>actionId, target, start);
                     let atTime = this.ovaleFuture.next.nextCast;
                     if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
                         atTime = this.baseState.next.currentTime;

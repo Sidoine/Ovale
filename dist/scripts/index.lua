@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/index", 80201)
+local __exports = LibStub:NewLibrary("ovale/scripts/index", 80300)
 if not __exports then return end
 local __ovale_common = LibStub:GetLibrary("ovale/scripts/ovale_common")
 local registerCommon = __ovale_common.registerCommon

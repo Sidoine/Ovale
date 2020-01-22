@@ -26,6 +26,9 @@ Define(avatar 107574)
   SpellInfo(avatar cd=90 duration=20 rage=-20 talent=avatar_talent)
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar=1)
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -73,6 +76,14 @@ Define(cleave 845)
 Define(colossus_smash 167105)
 # Smashes the enemy's armor, dealing s1 Physical damage, and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(colossus_smash cd=45)
+Define(conductive_ink_0 302491)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
+
+Define(conductive_ink_1 302597)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
+
 Define(crushing_assault_buff 278824)
 # Your melee abilities have a chance to increase the damage of your next Slam by s1 and reduce its Rage cost by s2/10.
   SpellInfo(crushing_assault_buff channel=-0.001 gcd=0 offgcd=1)
@@ -141,7 +152,7 @@ Define(furious_slash_buff 202539)
   # Haste increased by s2.
   SpellAddBuff(furious_slash_buff furious_slash_buff=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -150,11 +161,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -269,13 +280,27 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(recklessness 1719)
@@ -313,6 +338,11 @@ Define(skullsplitter 260643)
 Define(slam 1464)
 # Slams an opponent, causing s1 Physical damage.
   SpellInfo(slam rage=20)
+Define(stone_heart 225947)
+# Your attacks have a chance to make your next Execute cost no ?s12712[initial ][]Rage?s12712[, consume no extra Rage,][] and be usable on any target, regardless of health level.
+  SpellInfo(stone_heart duration=10 channel=10 gcd=0 offgcd=1)
+  # Execute costs no Rage and can be used on any target.
+  SpellAddBuff(stone_heart stone_heart=1)
 Define(storm_bolt 107570)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
   SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
@@ -374,27 +404,29 @@ Define(whirlwind_buff_0 199658)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
   SpellInfo(whirlwind_buff_0 gcd=0 offgcd=1)
 Define(whirlwind_buff_1 199667)
-# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
+# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
   SpellInfo(whirlwind_buff_1 gcd=0 offgcd=1)
 Define(whirlwind_buff_2 199850)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
   SpellInfo(whirlwind_buff_2 gcd=0 offgcd=1)
 Define(whirlwind_fury 190411)
-# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
+# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
   SpellInfo(whirlwind_fury)
   SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
   SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
   SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
+SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(whirlwind_buff whirlwind_buff_0 whirlwind_buff_1 whirlwind_buff_2)
 SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
-SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 Define(anger_management_talent 19) #21204
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
@@ -421,10 +453,10 @@ Define(massacre_talent_fury 14) #22393
 # Execute is now usable on targets below s2 health.
 Define(massacre_talent 7) #22380
 # Execute is now usable on targets below s2 health.
-Define(ravager_talent_protection 21) #23099
-# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?s23922[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][]
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
+Define(ravager_talent_protection 21) #23099
+# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?s23922[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][]
 Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 12 seconds.
 Define(siegebreaker_talent 21) #16037
@@ -437,6 +469,7 @@ Define(unstoppable_force_talent 8) #22626
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+Define(focused_resolve_item 168506)
 Define(unbridled_fury_item 169299)
 Define(superior_battle_potion_of_strength_item 168500)
 Define(seismic_wave_trait 277639)
@@ -455,10 +488,6 @@ ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shie
 
 # Learned spells.
 
-	SpellInfo(avatar rage=-20 cd=90)
-	SpellAddBuff(avatar avatar_buff=1)
-Define(avatar_buff 107574)
-	SpellInfo(avatar_buff duration=20)
 Define(battle_shout 6673)
 	SpellAddBuff(battle_shout battle_shout_buff=1)
 Define(battle_shout_buff 6673)
@@ -485,12 +514,6 @@ Define(charge_debuff 105771)
 	SpellInfo(cleave cd=9 cd_haste=melee rage=20)
 	SpellRequire(cleave rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 
-	
-	SpellInfo(colossus_smash replaced_by=warbreaker talent=warbreaker_talent)
-	SpellAddTargetDebuff(colossus_smash colossus_smash_debuff=1)
-	SpellAddBuff(colossus_smash in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
-Define(colossus_smash_debuff 208086)
-	SpellInfo(colossus_smash_debuff duration=10)
 
 	SpellInfo(deadly_calm cd=60)
     SpellAddBuff(deadly_calm deadly_calm_buff=1)
@@ -505,14 +528,13 @@ Define(defensive_stance 197690)
 	SpellAddBuff(defensive_stance defensive_stance_buff=1)
 Define(defensive_stance_buff 197690)
 
+
 	SpellInfo(demoralizing_shout cd=45)
 	SpellInfo(demoralizing_shout add_rage=-40 talent=booming_voice_talent)
 	SpellAddTargetDebuff(demoralizing_shout demoralizing_shout_debuff=1)
 Define(demoralizing_shout_debuff 1160)
 	SpellInfo(demoralizing_shout_debuff duration=8)
 
-	SpellInfo(devastate unusable=1 talent=devastator_talent)
-	SpellAddTargetDebuff(devastate deep_wounds_prot_debuff=1 specialization=protection)
 Define(die_by_the_sword 118038)
 	SpellInfo(die_by_the_sword cd=180 gcd=0 offgcd=1)
 	SpellAddBuff(die_by_the_sword die_by_the_sword_buff=1)
@@ -531,22 +553,20 @@ Define(enraged_regeneration 184364)
 Define(enraged_regeneration_buff 184364)
 	SpellInfo(enraged_regeneration_buff duration=8)
 
-	SpellInfo(execute_arms rage=20 max_rage=40 target_health_pct=20)
-	SpellInfo(execute_arms target_health_pct=35 talent=arms_massacre_talent)
-	SpellRequire(execute_arms rage_percent 0=buff,execute_arms_norage)
-	SpellRequire(execute_arms target_health_pct 100=buff,execute_arms_nohp)
-    SpellAddTargetDebuff(execute_arms executioners_precision_debuff=0)
-SpellList(execute_arms_norage sudden_death_buff_arms stone_heart_buff deadly_calm_buff)
-SpellList(execute_arms_nohp sudden_death_buff_arms stone_heart_buff)
+	SpellInfo(execute target_health_pct=35 talent=arms_massacre_talent)
+	SpellRequire(execute rage_percent 0=buff,sudden_death_buff_arms)
+	SpellRequire(execute target_health_pct 100=buff,sudden_death_buff_arms)
+	SpellAddBuff(execute sudden_death_buff_arms=0)
+    SpellAddTargetDebuff(execute executioners_precision_debuff=0)
 
 	SpellInfo(execute rage=-20 target_health_pct=20)
 	SpellInfo(execute target_health_pct=35 talent=massacre_talent_fury)
 	SpellRequire(execute target_health_pct 100=buff,execute_free)
 	SpellRequire(execute cd_percent 0=buff,execute_free)
-SpellList(execute_free sudden_death_buff_fury stone_heart_buff)
+SpellList(execute_free sudden_death_buff_fury)
 Define(executioners_precision_debuff 272870)
     SpellInfo(executioners_precision_debuff duration=30 max_stacks=2)
-    SpellAddTargetDebuff(execute_arms executioners_precision_debuff=1 trait=executioners_precision_trait)
+    SpellAddTargetDebuff(execute executioners_precision_debuff=1 trait=executioners_precision_trait)
 Define(frothing_berserker_buff 215572)
 	SpellInfo(frothing_berserker_buff duration=6)
 Define(frenzy_buff 202539)
@@ -707,7 +727,6 @@ Define(taunt 355)
 	SpellInfo(taunt cd=8)
 
 	SpellInfo(thunder_clap cd=6 rage=-5 cd_haste=melee)
-	SpellRequire(thunder_clap cd_percent 50=buff,avatar_buff)
 Define(vengeance_ignore_pain_buff 202574)
 	SpellInfo(vengeance_ignore_pain_buff duration=15)
 Define(vengeance_revenge_buff 202573)
@@ -719,7 +738,6 @@ Define(victory_rush 34428)
 	SpellAddBuff(victory_rush victorious_buff=0)
 
 	SpellInfo(warbreaker cd=45 tag=main)
-	SpellAddTargetDebuff(warbreaker colossus_smash_debuff=1)
 	SpellAddBuff(warbreaker in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
 
 	SpellAddBuff(whirlwind_fury whirlwind_buff=2)
@@ -736,9 +754,6 @@ Define(archavons_heavy_hand_spell 205144)
 	SpellAddBuff(bloodthirst fujiedas_fury_buff=1 if_spell=fujiedas_fury_buff)
 
 Define(ayalas_stone_heart_item 137052)
-Define(stone_heart_buff 225947)
-	SpellAddBuff(execute_arms stone_heart_buff=0)
-	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye_item 151823)
 
 
@@ -792,9 +807,7 @@ Define(executioners_precision_trait 272866)
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(heroic_throw tag=main)
 	SpellInfo(impending_victory tag=main)
-	SpellInfo(colossus_smash tag=main)
 	SpellInfo(hamstring tag=shortcd)
-	SpellInfo(avatar tag=cd)
 	SpellInfo(intercept tag=misc)
 `;
     OvaleScripts.RegisterScript("WARRIOR", undefined, name, desc, code, "include");

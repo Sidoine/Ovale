@@ -5,7 +5,7 @@ import { Tracer, OvaleDebugClass } from "../Debug";
 import { format, gmatch, find, match, lower, gsub, sub, len, upper } from "@wowts/string";
 import { OvaleDataClass } from "../Data";
 import { insert } from "@wowts/table";
-import { CamelSpecialization, CamelCase, OvaleFunctionName } from "./text-tools";
+import { LowerSpecialization, CamelCase, OvaleFunctionName } from "./text-tools";
 import { POOLED_RESOURCE } from "../Power";
 import { MakeString } from "../Ovale";
 import { Unparser } from "./unparser";
@@ -120,6 +120,7 @@ export class Emiter {
         this.AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence");
         this.AddDisambiguation("ripple_in_space", "ripple_in_space_essence");
         this.AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence");
+        this.AddDisambiguation("concentrated_flame_missile", "concentrated_flame");
     
         //Arcane Torrent
         this.AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");
@@ -220,7 +221,6 @@ export class Emiter {
         this.AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection");
     
         //Priest
-        this.AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow");
     
         //Rogue
         this.AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination");
@@ -247,7 +247,6 @@ export class Emiter {
         this.AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
         this.AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
         this.AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection");
-        this.AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
         this.AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection");
         this.AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury");
 
@@ -557,7 +556,10 @@ export class Emiter {
             return;
         }
         let name = this.unparser.Unparse(modifier.name);
-        if (!name) return;
+        if (!name) {
+            this.tracer.Error("Unable to parse name of variable in %s", modifier.name);
+            return;
+        }
         if (truthy(match(name, "^%d"))) {
             name = "_" + name;
         }
@@ -586,7 +588,7 @@ export class Emiter {
         let canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
         let className = annotation.classId;
         let specialization = annotation.specialization;
-        let camelSpecialization = CamelSpecialization(annotation);
+        let camelSpecialization = LowerSpecialization(annotation);
         let role = annotation.role;
         let [action, type] = this.Disambiguate(annotation, canonicalizedName, className, specialization, "Spell");
         let bodyNode: AstNode | undefined;
@@ -1243,6 +1245,8 @@ export class Emiter {
                 node = this.EmitOperandSeal(operand, parseNode, nodeList, annotation, action);
             } else if (token == "set_bonus") {
                 node = this.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action);
+            } else if (token === "stack") {
+                [node] = this.ovaleAst.ParseCode("expression", `buffstacks(${action})`, nodeList, annotation.astAnnotation)
             } else if (token == "talent") {
                 node = this.EmitOperandTalent(operand, parseNode, nodeList, annotation, action);
             } else if (token == "totem") {
@@ -1585,7 +1589,7 @@ export class Emiter {
         let node;
         let className = annotation.classId;
         let specialization = annotation.specialization;
-        let camelSpecialization = CamelSpecialization(annotation);
+        let camelSpecialization = LowerSpecialization(annotation);
         target = target && (`${target}.`) || "";
         let code;
         if (CHARACTER_PROPERTY[operand]) {
@@ -1872,7 +1876,7 @@ export class Emiter {
             }
             if (code) {
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-                this.AddSymbol(annotation, name);
+                if (isTotem) this.AddSymbol(annotation, name);
             }
         } 
         return node;
@@ -2158,7 +2162,7 @@ export class Emiter {
                 code = format("%sDebuffExpires(%s)", target, debuffName);
             } else if (property == "up") {
                 code = format("%sDebuffPresent(%s)", target, debuffName);
-            } 
+            }
         } else if (className == "MONK" && operand == "dot.zen_sphere.ticking") {
             let buffName = "zen_sphere_buff";
             code = format("BuffPresent(%s)", buffName);
@@ -2171,13 +2175,21 @@ export class Emiter {
                 this.AddSymbol(annotation, buffName);
             } else if (property == "pct") {
                 code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target);
-            } else if (truthy(match(property, "last_tick_damage_(%d+)"))){
+            } else if (truthy(match(property, "last_tick_damage_(%d+)"))) {
                 let ticks = match(property, "last_tick_damage_(%d+)");
                 code = format("StaggerTick(%d)", ticks);
-            } 
+            }
         } else if (className == "MONK" && operand == "spinning_crane_kick.count") {
             code = "SpellCount(spinning_crane_kick)";
             this.AddSymbol(annotation, "spinning_crane_kick");
+        } else if (className == "MONK" && operand === "combo_strike") {
+            if (action) {
+                code = format("not PreviousSpell(%s)", action);
+            }
+        } else if (className == "MONK" && operand === "combo_break") {
+            if (action) {
+                code = format("PreviousSpell(%s)", action);
+            }
         } else if (className == "PALADIN" && operand == "dot.sacred_shield.remains") {
             let buffName = "sacred_shield_buff";
             code = format("BuffRemaining(%s)", buffName);
@@ -2398,9 +2410,19 @@ export class Emiter {
                 code = "Enemies()-1";
             } else if (property == "time_to_die") {
                 code = "target.TimeToDie()";
-            } else if (property === "time_to_pct_30") {
-                code = "target.TimeToHealthPercent(30)";
-            } 
+            } else if (property === "distance") {
+                code = "target.Distance()";
+            } else if (property === "health") {
+                const modifier = tokenIterator();
+                if (modifier === "pct") {
+                    code = "target.HealthPercent()";
+                }
+            } else {
+                const [percent] = match(property, "^time_to_pct_(%d+)");
+                if (percent) {
+                    code = `target.TimeToHealthPercent(${percent})`
+                }
+            }
             if (code) {
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
@@ -2484,7 +2506,10 @@ export class Emiter {
         let node: AstNode | undefined;
         if (token == "variable") {
             let name = tokenIterator();
-            if (annotation.currentVariable && annotation.currentVariable.name == name) {
+            if (!name) {
+                this.tracer.Error("Unable to parse variable name in EmitOperandVariable");
+            }
+            else if (annotation.currentVariable && annotation.currentVariable.name == name) {
                 let group = annotation.currentVariable.child[1];
                 if (lualength(group.child) == 0) {
                     [node] = this.ovaleAst.ParseCode("expression", "0", nodeList, annotation.astAnnotation);

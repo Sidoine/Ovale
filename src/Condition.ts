@@ -105,8 +105,8 @@ export function ReturnValue(value: number, origin: number, rate: number): Condit
     return [0, INFINITY, value, origin, rate];
 }
 
-export function TestValue(start: number, ending: number, value: number | undefined, origin: number, rate: number, comparator: string, limit: number): ConditionResult {
-    if (!value || !origin || !rate) {
+export function TestValue(start: number, ending: number, value: number | undefined, origin: number | undefined, rate: number | undefined, comparator: string | undefined, limit: number | undefined): ConditionResult {
+    if (value === undefined || origin === undefined || rate === undefined) {
         return [];
     }
     start = start || 0;
@@ -137,6 +137,6 @@ export function TestValue(start: number, ending: number, value: number | undefin
     return [];
 }
 
-export function Compare(value: number, comparator: string, limit: number): ConditionResult {
+export function Compare(value: number, comparator: string | undefined, limit: number |undefined): ConditionResult {
     return TestValue(0, INFINITY, value, 0, 0, comparator, limit);
 }

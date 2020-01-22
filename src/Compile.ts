@@ -214,8 +214,7 @@ export class OvaleCompileClass {
                 this.self_serial = this.self_serial + 1;
                 this.tracer.Debug("New checkbox '%s': advance age to %d.", name, this.self_serial);
             }
-            checkBox = checkBox || {
-            }
+            checkBox = checkBox || {}
             checkBox.text = <string>node.description.value;
             for (const [, v] of ipairs(positionalParams)) {
                 if (v == "default") {
@@ -330,6 +329,7 @@ export class OvaleCompileClass {
             if (id) {
                 list[id] = true;
             } else {
+                this.tracer.Error("%s is not a number in the '%s' list", _id, name);
                 ok = false;
                 break;
             }
@@ -677,7 +677,7 @@ export class OvaleCompileClass {
                     ok = this.EvaluateAddListItem(node);
                 } else if (nodeType == "item_info") {
                     ok = this.EvaluateItemInfo(node);
-                } else if (nodeType == "item_require") {
+                } else if (nodeType == "itemrequire") {
                     ok = this.EvaluateItemRequire(node);
                 } else if (nodeType == "list") {
                     ok = this.EvaluateList(node);
@@ -689,7 +689,9 @@ export class OvaleCompileClass {
                     ok = this.EvaluateSpellInfo(node);
                 } else if (nodeType == "spell_require") {
                     ok = this.EvaluateSpellRequire(node);
-                } else {
+                } else if (nodeType !== "define" && nodeType !== "add_function") {
+                    this.tracer.Error("Unknown node type", nodeType);
+                    ok = false;
                 }
                 if (!ok) {
                     break;

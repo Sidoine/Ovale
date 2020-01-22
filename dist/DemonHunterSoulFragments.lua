@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DemonHunterSoulFragments", 80201)
+local __exports = LibStub:NewLibrary("ovale/DemonHunterSoulFragments", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -18,6 +18,7 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
     constructor = function(self, ovaleAura, ovale)
         self.ovaleAura = ovaleAura
         self.ovale = ovale
+        self.estimatedCount = 0
         self.OnInitialize = function()
             if self.ovale.playerClass == "DEMONHUNTER" then
                 self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
@@ -64,7 +65,7 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
     end,
     GetSoulFragmentsBuffStacks = function(self, atTime)
         local aura = self.ovaleAura:GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true)
-        local stacks = self.ovaleAura:IsActiveAura(aura, atTime) and aura.stacks or 0
+        local stacks = aura and self.ovaleAura:IsActiveAura(aura, atTime) and aura.stacks or 0
         return stacks
     end,
 })

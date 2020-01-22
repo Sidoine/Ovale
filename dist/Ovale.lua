@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Ovale", 80201)
+local __exports = LibStub:NewLibrary("ovale/Ovale", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -60,9 +60,9 @@ __exports.OvaleClass = __class(OvaleBase, {
         _G["BINDING_NAME_OVALE_CHECKBOX4"] = toggleCheckBox .. "(5)"
     end,
     OnInitialize = function(self)
-        self.playerGUID = UnitGUID("player")
+        self.playerGUID = UnitGUID("player") or "error"
         local _, classId = UnitClass("player")
-        self.playerClass = classId
+        self.playerClass = classId or "WARRIOR"
         wipe(self_refreshIntervals)
         self_refreshIndex = 1
         self:ClearOneTimeMessages()

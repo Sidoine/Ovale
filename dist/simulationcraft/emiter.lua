@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
@@ -25,7 +25,7 @@ local len = string.len
 local upper = string.upper
 local insert = table.insert
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local CamelCase = __texttools.CamelCase
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local __Power = LibStub:GetLibrary("ovale/Power")
@@ -160,7 +160,6 @@ __exports.Emiter = __class(nil, {
                     end
                 end
                 if node then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     annotation.astAnnotation.sync = annotation.astAnnotation.sync or {}
                     annotation.astAnnotation.sync[name] = node
                 end
@@ -333,6 +332,7 @@ __exports.Emiter = __class(nil, {
             end
             local name = self.unparser:Unparse(modifier.name)
             if  not name then
+                self.tracer:Error("Unable to parse name of variable in %s", modifier.name)
                 return 
             end
             if match(name, "^%d") then
@@ -360,7 +360,7 @@ __exports.Emiter = __class(nil, {
             local canonicalizedName = lower(gsub(parseNode.name, ":", "_"))
             local className = annotation.classId
             local specialization = annotation.specialization
-            local camelSpecialization = CamelSpecialization(annotation)
+            local camelSpecialization = LowerSpecialization(annotation)
             local role = annotation.role
             local action, type = self:Disambiguate(annotation, canonicalizedName, className, specialization, "Spell")
             local bodyNode
@@ -682,7 +682,6 @@ __exports.Emiter = __class(nil, {
                     end
                     bodyCode = bodyCode or type .. "(" .. action .. ")"
                 end
-                annotation.astAnnotation = annotation.astAnnotation or {}
                 if  not bodyNode and bodyCode then
                     bodyNode = self.ovaleAst:ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation)
                 end
@@ -1005,6 +1004,8 @@ __exports.Emiter = __class(nil, {
                     node = self.EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
                 elseif token == "set_bonus" then
                     node = self.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action)
+                elseif token == "stack" then
+                    node = self.ovaleAst:ParseCode("expression", "buffstacks(" .. action .. ")", nodeList, annotation.astAnnotation)
                 elseif token == "talent" then
                     node = self.EmitOperandTalent(operand, parseNode, nodeList, annotation, action)
                 elseif token == "totem" then
@@ -1165,7 +1166,6 @@ __exports.Emiter = __class(nil, {
                 target = target and (target .. ".") or ""
                 local code = format("%sCountOnAny(%s)", prefix, dotName)
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
@@ -1234,7 +1234,6 @@ __exports.Emiter = __class(nil, {
                     code = format("AzeriteEssenceRank(%s)", essenceId)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, essenceId)
                 end
@@ -1332,7 +1331,7 @@ __exports.Emiter = __class(nil, {
             local node
             local className = annotation.classId
             local specialization = annotation.specialization
-            local camelSpecialization = CamelSpecialization(annotation)
+            local camelSpecialization = LowerSpecialization(annotation)
             target = target and (target .. ".") or ""
             local code
             if CHARACTER_PROPERTY[operand] then
@@ -1445,7 +1444,6 @@ __exports.Emiter = __class(nil, {
                     code = format("%sCooldown(%s)", prefix, name)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name)
                 end
@@ -1470,7 +1468,6 @@ __exports.Emiter = __class(nil, {
                     code = target .. "DiseasesAnyTicking()"
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -1493,7 +1490,6 @@ __exports.Emiter = __class(nil, {
                     code = format("%s%sRemaining(%s)", target, prefix, dotName)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
@@ -1537,7 +1533,6 @@ __exports.Emiter = __class(nil, {
                     code = format("MaxStacks(%s)", dotName)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
@@ -1561,7 +1556,6 @@ __exports.Emiter = __class(nil, {
                     code = format("Glyph(%s)", glyphName)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, glyphName)
                 end
@@ -1619,9 +1613,10 @@ __exports.Emiter = __class(nil, {
                     end
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    self:AddSymbol(annotation, name)
+                    if isTotem then
+                        self:AddSymbol(annotation, name)
+                    end
                 end
             end
             return node
@@ -1651,7 +1646,6 @@ __exports.Emiter = __class(nil, {
                     code = format("PreviousOffGCDSpell(%s)", name)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name)
                 end
@@ -1701,7 +1695,6 @@ __exports.Emiter = __class(nil, {
                 end
             end
             if code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
             return node
@@ -1727,7 +1720,6 @@ __exports.Emiter = __class(nil, {
                     code = format("Race(%s)", raceId)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -1748,7 +1740,6 @@ __exports.Emiter = __class(nil, {
             else
                 return nil
             end
-            annotation.astAnnotation = annotation.astAnnotation or {}
             node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             return node
         end
@@ -1781,7 +1772,6 @@ __exports.Emiter = __class(nil, {
                 end
             end
             if code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
             return node
@@ -1797,7 +1787,6 @@ __exports.Emiter = __class(nil, {
                     code = format("Stance(paladin_seal_of_%s)", name)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -1931,6 +1920,14 @@ __exports.Emiter = __class(nil, {
             elseif className == "MONK" and operand == "spinning_crane_kick.count" then
                 code = "SpellCount(spinning_crane_kick)"
                 self:AddSymbol(annotation, "spinning_crane_kick")
+            elseif className == "MONK" and operand == "combo_strike" then
+                if action then
+                    code = format("not PreviousSpell(%s)", action)
+                end
+            elseif className == "MONK" and operand == "combo_break" then
+                if action then
+                    code = format("PreviousSpell(%s)", action)
+                end
             elseif className == "PALADIN" and operand == "dot.sacred_shield.remains" then
                 local buffName = "sacred_shield_buff"
                 code = format("BuffRemaining(%s)", buffName)
@@ -2094,7 +2091,6 @@ __exports.Emiter = __class(nil, {
                 annotation.opt_priority_rotation = className
             end
             if code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
             return node
@@ -2123,7 +2119,6 @@ __exports.Emiter = __class(nil, {
                     end
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, talentName)
                 end
@@ -2149,11 +2144,20 @@ __exports.Emiter = __class(nil, {
                     code = "Enemies()-1"
                 elseif property == "time_to_die" then
                     code = "target.TimeToDie()"
-                elseif property == "time_to_pct_30" then
-                    code = "target.TimeToHealthPercent(30)"
+                elseif property == "distance" then
+                    code = "target.Distance()"
+                elseif property == "health" then
+                    local modifier = tokenIterator()
+                    if modifier == "pct" then
+                        code = "target.HealthPercent()"
+                    end
+                else
+                    local percent = match(property, "^time_to_pct_(%d+)")
+                    if percent then
+                        code = "target.TimeToHealthPercent(" .. percent .. ")"
+                    end
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -2173,7 +2177,6 @@ __exports.Emiter = __class(nil, {
                     code = format("TotemRemaining(%s)", name)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -2222,7 +2225,6 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, buffName)
                 end
                 if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
             end
@@ -2234,7 +2236,9 @@ __exports.Emiter = __class(nil, {
             local node
             if token == "variable" then
                 local name = tokenIterator()
-                if annotation.currentVariable and annotation.currentVariable.name == name then
+                if  not name then
+                    self.tracer:Error("Unable to parse variable name in EmitOperandVariable")
+                elseif annotation.currentVariable and annotation.currentVariable.name == name then
                     local group = annotation.currentVariable.child[1]
                     if #group.child == 0 then
                         node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
@@ -2329,6 +2333,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
         self:AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
         self:AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
+        self:AddDisambiguation("concentrated_flame_missile", "concentrated_flame")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
@@ -2408,7 +2413,6 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy")
         self:AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
         self:AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
-        self:AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow")
         self:AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination")
         self:AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
         self:AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
@@ -2427,7 +2431,6 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
         self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
         self:AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection")
-        self:AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
         self:AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
         self:AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
         self:AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/LossOfControl", 80201)
+local __exports = LibStub:NewLibrary("ovale/LossOfControl", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -12,9 +12,9 @@ __exports.OvaleLossOfControlClass = __class(nil, {
     constructor = function(self, ovale, ovaleDebug, requirement)
         self.ovale = ovale
         self.requirement = requirement
+        self.lossOfControlHistory = {}
         self.OnInitialize = function()
             self.tracer:Debug("Enabled LossOfControl module")
-            self.lossOfControlHistory = {}
             self.module:RegisterEvent("LOSS_OF_CONTROL_ADDED", self.LOSS_OF_CONTROL_ADDED)
             self.requirement:RegisterRequirement("lossofcontrol", self.RequireLossOfControlHandler)
         end
@@ -67,7 +67,6 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             end
             return lowestStartTime ~= nil and highestEndTime ~= nil
         end
-
         self.module = ovale:createModule("OvaleLossOfControl", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())
     end,

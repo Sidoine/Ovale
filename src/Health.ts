@@ -218,16 +218,20 @@ export class OvaleHealthClass {
     UnitHealAbsorb(unitId: string, guid?: string) {
         return this.UnitAmount(UnitGetTotalHealAbsorbs, this.healAbsorb, unitId, guid);
     }
-    UnitAmount(func: (_: string) => number, db: LuaObj<number>, unitId: string, guid?: string): number {
+    UnitAmount(func: (_: string) => number | undefined, db: LuaObj<number>, unitId: string, guid?: string): number {
         let amount;
         if (unitId) {
             guid = guid || this.ovaleGuid.UnitGUID(unitId);
             if (guid) {
-                if (unitId == "target" || unitId == "focus") {
-                    amount = db[guid] || 0;
+                if ((unitId === "focus" || unitId === "target") && db[guid] !== undefined) {
+                    amount = db[guid];
                 } else {
                     amount = func(unitId);
-                    db[guid] = amount;
+                    if (amount !== undefined) {
+                        db[guid] = amount;
+                    } else {
+                        amount = 0;
+                    }
                 }
             } else {
                 amount = 0;
@@ -242,7 +246,7 @@ export class OvaleHealthClass {
         let timeToDie = INFINITY;
         guid = guid || this.ovaleGuid.UnitGUID(unitId);
         if (guid) {
-            let health = this.UnitHealth(unitId, guid);
+            let health = this.UnitHealth(unitId, guid) ||0;
             if (effectiveHealth) {
                 health = health + this.UnitAbsorb(unitId, guid) - this.UnitHealAbsorb(unitId, guid);
             }

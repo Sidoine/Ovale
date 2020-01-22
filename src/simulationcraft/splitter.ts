@@ -4,7 +4,7 @@ import { Annotation, TagPriority } from "./definitions";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleDataClass } from "../Data";
 import { OvaleTaggedFunctionName } from "./text-tools";
-import { lower, find, sub } from "@wowts/string";
+import { find, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 
 type SplitterFunction = (tag: string, node: AstNode, nodeList: LuaArray<AstNode>, annotation: Annotation) => [AstNode?, AstNode?]
@@ -167,13 +167,11 @@ export class Splitter {
             if (bodyName && conditionName) {
                 bodyNode = this.ovaleAst.NewNode(nodeList);
                 bodyNode.name = bodyName;
-                bodyNode.lowername = lower(bodyName);
                 bodyNode.type = "custom_function";
                 bodyNode.func = bodyName;
                 bodyNode.asString = `${bodyName}()`;
                 conditionNode = this.ovaleAst.NewNode(nodeList);
                 conditionNode.name = conditionName;
-                conditionNode.lowername = lower(conditionName);
                 conditionNode.type = "custom_function";
                 conditionNode.func = conditionName;
                 conditionNode.asString = `${conditionName}()`;
@@ -181,19 +179,19 @@ export class Splitter {
         } else {
             let functionTag = annotation.functionTag[functionName];
             if (!functionTag) {
-                if (truthy(find(functionName, "Bloodlust"))) {
+                if (truthy(find(functionName, "bloodlust"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "GetInMeleeRange"))) {
+                } else if (truthy(find(functionName, "getinmeleerange"))) {
                     functionTag = "shortcd";
-                } else if (truthy(find(functionName, "InterruptActions"))) {
+                } else if (truthy(find(functionName, "interruptactions"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "SummonPet"))) {
+                } else if (truthy(find(functionName, "summonpet"))) {
                     functionTag = "shortcd";
-                } else if (truthy(find(functionName, "UseItemActions"))) {
+                } else if (truthy(find(functionName, "useitemactions"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "UsePotion"))) {
+                } else if (truthy(find(functionName, "usepotion"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "UseHeartEssence"))) {
+                } else if (truthy(find(functionName, "useheartessence"))) {
                     functionTag = "cd";
                 }
             }

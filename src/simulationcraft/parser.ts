@@ -100,13 +100,17 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: Tokenize
     },
     10: {
-        1: "^.",
+        1: "^<%?",
         2: Tokenize
     },
     11: {
+        1: "^.",
+        2: Tokenize
+    },
+    12: {
         1: "^$",
         2: NoToken
-    }
+    } 
 }
 
 export class Parser {

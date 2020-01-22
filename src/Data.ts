@@ -429,7 +429,7 @@ export class OvaleDataClass {
         return [tag, invokesGCD];
     }
     
-    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string): [boolean, string | number, number | undefined] {
+    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string | undefined): [boolean, string | number, number | undefined] {
         guid = guid || this.ovaleGuid.UnitGUID("player");
         let index, value: string | number, data;
         let spellDataArray: LuaArray<string | number> | undefined = undefined;
@@ -473,8 +473,9 @@ export class OvaleDataClass {
         return [verified, value, data];
     }
 
-    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string): [boolean, string | undefined] {
+    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string | undefined): [boolean, string?] {
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
+        if (!targetGUID) return [false];
         let verified = true;
         let requirement: string | undefined;
         for (const [name, handler] of pairs(this.requirement.nowRequirements)) {

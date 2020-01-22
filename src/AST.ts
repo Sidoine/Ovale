@@ -106,7 +106,7 @@ const STRING_LOOKUP_FUNCTION: LuaObj<boolean> = {
 
 export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
     "xor" | "^" | "|" | "==" | "/" | "!" | ">" |
-    ">=" | "<=" | "<" | "+" | "*" | "%" | ">?";
+    ">=" | "<=" | "<" | "+" | "*" | "%" | ">?" | "<?";
 
 const UNARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "arithmetic", 2: number}} = {
     ["not"]: {
@@ -187,6 +187,10 @@ const BINARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "compare" | "arit
     [">?"]: {
         1: "arithmetic",
         2: 25
+    },
+    ["<?"]: {
+        1: "arithmetic",
+        2: 25
     }
 }
 
@@ -233,7 +237,7 @@ interface NodeTypes {
     value: ValueNode;
     spell_aura_list: AstNode;
     item_info: AstNode;
-    item_require: AstNode;
+    itemrequire: AstNode;
     spell_info: AstNode;
     spell_require: AstNode;
     score_spells: AstNode;
@@ -315,8 +319,7 @@ export interface AstNode {
     asType: "boolean" | "value";
     left: string;
     right: string;
-    lowername: string;
-
+    
     // ---
     powerType: string;
 }
@@ -462,10 +465,14 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: Tokenize,
     },
     13: {
+        1: "^<%?",
+        2: Tokenize,
+    },
+    14: {
         1: "^.",
         2: Tokenize
     },
-    14: {
+    15: {
         1: "^$",
         2: NoToken
     }
@@ -866,7 +873,7 @@ export class OvaleASTClass {
             if (filter == "debuff") {
                 name = gsub(node.name, "^Buff", "Debuff");
             } else {
-                name = node.lowername;
+                name = node.name;
             }
             let target = node.rawNamedParams.target;
             if (target) {
@@ -875,7 +882,7 @@ export class OvaleASTClass {
                 s = format("%s(%s)", name, this.UnparseParameters(node.rawPositionalParams, node.rawNamedParams));
             }
         } else {
-            s = format("%s()", node.lowername);
+            s = format("%s()", node.name);
         }
         return s;
     }
@@ -1021,7 +1028,7 @@ export class OvaleASTClass {
         ["icon"]: this.UnparseAddIcon,
         ["if"]: this.UnparseIf,
         ["item_info"]: this.UnparseItemInfo,
-        ["item_require"]: this.UnparseItemRequire,
+        ["itemrequire"]: this.UnparseItemRequire,
         ["list"]: this.UnparseList,
         ["list_item"]: this.UnparseAddListItem,
         ["logical"]: this.UnparseExpression,
@@ -1387,12 +1394,11 @@ export class OvaleASTClass {
     }
 
     private ParseFunction: ParserFunction<FunctionNode> = (tokenStream, nodeList, annotation) => {
-        let name, lowername;
+        let name;
         {
             let [tokenType, token] = tokenStream.Consume();
             if ((tokenType === "name" || tokenType === "keyword") && token) {
                 name = token;
-                lowername = lower(name);
             } else {
                 this.SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token);
                 return undefined;
@@ -1405,7 +1411,6 @@ export class OvaleASTClass {
             [tokenType, token] = tokenStream.Consume(2);
             if (tokenType == "name" && token) {
                 name = token;
-                lowername = lower(name);
             } else {
                 this.SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token);
                 return undefined;
@@ -1418,8 +1423,8 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(tokenStream, nodeList, annotation);
         if (!positionalParams || !namedParams) return undefined;
-        if (ACTION_PARAMETER_COUNT[lowername]) {
-            let count = ACTION_PARAMETER_COUNT[lowername];
+        if (ACTION_PARAMETER_COUNT[name]) {
+            let count = ACTION_PARAMETER_COUNT[name];
             if (count > lualength(positionalParams)) {
                 this.SyntaxError(tokenStream, "Syntax error: action '%s' requires at least %d fixed parameter(s).", name, count);
                 return undefined;
@@ -1431,20 +1436,19 @@ export class OvaleASTClass {
             return undefined;
         }
         if (!namedParams.target) {
-            if (sub(lowername, 1, 6) == "target") {
+            if (sub(name, 1, 6) == "target") {
                 namedParams.target = "target";
-                lowername = sub(lowername, 7);
                 name = sub(name, 7);
             }
         }
         if (!namedParams.filter) {
-            if (sub(lowername, 1, 6) == "debuff") {
+            if (sub(name, 1, 6) == "debuff") {
                 namedParams.filter = "debuff";
-            } else if (sub(lowername, 1, 4) == "buff") {
+            } else if (sub(name, 1, 4) == "buff") {
                 namedParams.filter = "buff";
-            } else if (sub(lowername, 1, 11) == "otherdebuff") {
+            } else if (sub(name, 1, 11) == "otherdebuff") {
                 namedParams.filter = "debuff";
-            } else if (sub(lowername, 1, 9) == "otherbuff") {
+            } else if (sub(name, 1, 9) == "otherbuff") {
                 namedParams.filter = "buff";
             }
         }
@@ -1454,21 +1458,20 @@ export class OvaleASTClass {
         let node;
         node = <FunctionNode>this.NewNode(nodeList);
         node.name = name;
-        node.lowername = lowername;
-        if (STATE_ACTION[lowername]) {
+        if (STATE_ACTION[name]) {
             node.type = "state";
-            node.func = lowername;
-        } else if (ACTION_PARAMETER_COUNT[lowername]) {
+            node.func = name;
+        } else if (ACTION_PARAMETER_COUNT[name]) {
             node.type = "action";
-            node.func = lowername;
+            node.func = name;
         } else if (STRING_LOOKUP_FUNCTION[name]) {
             node.type = "function";
             node.func = name;
             annotation.stringReference = annotation.stringReference || {}
             annotation.stringReference[lualength(annotation.stringReference) + 1] = node;
-        } else if (this.ovaleCondition.IsCondition(lowername)) {
+        } else if (this.ovaleCondition.IsCondition(name)) {
             node.type = "function";
-            node.func = lowername;
+            node.func = name;
         } else {
             node.type = "custom_function";
             node.func = name;
@@ -1651,7 +1654,7 @@ export class OvaleASTClass {
         }
         let node;
         node = this.NewNode(nodeList);
-        node.type = "item_require";
+        node.type = "itemrequire";
         node.itemId = tonumber(itemId);
         if (name) node.name = name;
         node.property = property as keyof SpellInfo;
@@ -2270,7 +2273,7 @@ export class OvaleASTClass {
         ["icon"]: this.ParseAddIcon,
         ["if"]: this.ParseIf,
         ["item_info"]: this.ParseItemInfo,
-        ["item_require"]: this.ParseItemRequire,
+        ["itemrequire"]: this.ParseItemRequire,
         ["list"]: this.ParseList,
         ["list_item"]: this.ParseAddListItem,
         ["logical"]: this.ParseExpression,
@@ -2402,7 +2405,7 @@ export class OvaleASTClass {
             if (dictionary && ast.annotation.nameReference) {
                 for (const [, node] of ipairs<AstNode>(ast.annotation.nameReference)) {
                     const valueNode = <ValueNode>node;
-                    if ((node.type == "item_info" || node.type == "item_require") && node.name) {
+                    if ((node.type == "item_info" || node.type == "itemrequire") && node.name) {
                         let itemId = dictionary[node.name];
                         if (itemId) {
                             node.itemId = itemId;
@@ -2470,12 +2473,12 @@ export class OvaleASTClass {
                     if (stringKey) {
                         let value: string | undefined;
                         let name = node.name;
-                        if (name == "ItemName") {
+                        if (name == "itemname") {
                             [value] = GetItemInfo(stringKey)
                             if (!value) value = "item:" + stringKey;
-                        } else if (name == "L") {
+                        } else if (name == "l") {
                             value = L[stringKey];
-                        } else if (name == "SpellName") {
+                        } else if (name == "spellname") {
                             value = this.ovaleSpellBook.GetSpellName(tonumber(stringKey)) || "spell:" + stringKey;
                         }
                         if (value) {

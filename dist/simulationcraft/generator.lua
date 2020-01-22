@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local type = type
@@ -14,7 +14,7 @@ local concat = table.concat
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
 local OPTIONAL_SKILLS = __definitions.OPTIONAL_SKILLS
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local OvaleTaggedFunctionName = __texttools.OvaleTaggedFunctionName
 local self_outputPool = __texttools.self_outputPool
@@ -156,7 +156,7 @@ __exports.Generator = __class(nil, {
     end,
     InsertInterruptFunction = function(self, child, annotation, interrupts)
         local nodeList = annotation.astAnnotation.nodeList
-        local camelSpecialization = CamelSpecialization(annotation)
+        local camelSpecialization = LowerSpecialization(annotation)
         local spells = interrupts or {}
         sort(spells, function(a, b)
             return tonumber(a.order or 0) >= tonumber(b.order or 0)
@@ -525,7 +525,7 @@ __exports.Generator = __class(nil, {
     InsertSupportingFunctions = function(self, child, annotation)
         local count = 0
         local nodeList = annotation.astAnnotation.nodeList
-        local camelSpecialization = CamelSpecialization(annotation)
+        local camelSpecialization = LowerSpecialization(annotation)
         if annotation.melee == "DEATHKNIGHT" then
             local fmt = [[
                 AddFunction %sGetInMeleeRange

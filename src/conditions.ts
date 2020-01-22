@@ -1871,7 +1871,7 @@ export class OvaleConditions {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let boolean = this.OvaleSpells.IsSpellInRange(spellId, target);
-        return TestBoolean(boolean, yesno);
+        return TestBoolean(boolean || false, yesno);
     }
   
     /** Test if the target's primary aggro is on the player.
@@ -1913,7 +1913,7 @@ export class OvaleConditions {
         let yesno = positionalParams[1];
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let boolean = UnitIsDead(target);
-        return TestBoolean(boolean, yesno);
+        return TestBoolean(boolean || false, yesno);
     }
   
     /** Test if the target is enraged.
@@ -2251,10 +2251,12 @@ export class OvaleConditions {
 	 if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff)
 	     Spell(rake)
      */
-    private PersistentMultiplier = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private PersistentMultiplier: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
-        let value = this.OvaleFuture.GetDamageMultiplier(spellId, this.OvaleGUID.UnitGUID(target), atTime);
+        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        if (!targetGuid) return [];
+        let value = this.OvaleFuture.GetDamageMultiplier(spellId, targetGuid, atTime);
         return Compare(value, comparator, limit);
     }
  
@@ -3624,12 +3626,14 @@ l    */
         let comparator: string | undefined, limit: number | undefined;
         let usable = (namedParams.usable == 1);
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
+        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        if (!targetGuid) return [];
         let earliest = INFINITY;
         for (const [i, spellId] of ipairs(positionalParams)) {
             if (isComparator(spellId)) {
                 [comparator, limit] = [spellId, positionalParams[i + 1]];
                 break;
-            } else if (!usable || this.OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target))) {
+            } else if (!usable || this.OvaleSpells.IsUsableSpell(spellId, atTime, targetGuid)) {
                 let [start, duration] = this.OvaleCooldown.GetSpellCooldown(spellId, atTime);
                 let t = 0;
                 if (start > 0 && duration > 0) {
@@ -3811,10 +3815,12 @@ l    */
 	 @return A boolean value.
 	 @see SpellKnown
      */
-    private SpellUsable = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
+    private SpellUsable: ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
-        let [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target));
+        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        if (!targetGuid) return [];
+        let [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(spellId, atTime, targetGuid);
         let boolean = isUsable || noMana;
         return TestBoolean(boolean, yesno);
     }
@@ -4299,7 +4305,9 @@ l    */
             if (!pt) return [];
             powerType = pt;
         }
-        let seconds = this.OvalePower.TimeToPower(spellId, atTime, this.OvaleGUID.UnitGUID(target), powerType);
+        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        if (!targetGuid) return [];
+        let seconds = this.OvalePower.TimeToPower(spellId, atTime, targetGuid, powerType);
         if (seconds == 0) {
             return Compare(0, comparator, limit);
         } else if (seconds < INFINITY) {

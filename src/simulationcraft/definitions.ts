@@ -147,6 +147,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["health.percent"]: "HealthPercent()",
     ["holy_power"]: "HolyPower()",
     ["incanters_flow_time_to.5.up"]: "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.5.any"]: "StackTimeTo(incanters_flow_buff 5 any)",
     ["incanters_flow_time_to.4.down"]: "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"]: "NotDeDemons(infernal)",
     ["insanity"]: "Insanity()",
@@ -188,6 +189,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["stealthed"]: "Stealthed()",
     ["stealthed.all"]: "Stealthed()",
     ["stealthed.rogue"]: "Stealthed()",
+    ["target.debuff.casting.react"]: "target.Casting(harmful)",
     ["time"]: "TimeInCombat()",
     ["time_to_20pct"]: "TimeToHealthPercent(20)",
     ["time_to_pct_30"]: "TimeToHealthPercent(30)",
@@ -196,6 +198,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["time_to_shard"]: "TimeToShard()",
     ["time_to_sht.4"]: "100", // TODO
     ["time_to_sht.5"]: "100",
+    ["variable.disable_combustion"]: "0", // TODO: undefined variables in SimulationCraft
     ["wild_imp_count"]: "Demons(wild_imp)",
     ["wild_imp_no_de"]: "NotDeDemons(wild_imp)",
     ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)",
@@ -271,7 +274,7 @@ export type ParseNodeType = "action" | "action_list" | "arithmetic" | "compare" 
 
 export type SimcBinaryOperatorType = "|" | "^" |
     "&" | "!=" | "<" | "<=" | "=" | "==" | ">" | ">=" |
-    "~" | "!~" | "+" | "%" | "*" | "-" | ">?";
+    "~" | "!~" | "+" | "%" | "*" | "-" | ">?" | "<?";
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
@@ -516,6 +519,11 @@ export let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "com
         3: "associative"
     },
     [">?"]: {
+        1: "arithmetic",
+        2: 25,
+        3: "associative"
+    },
+    ["<?"]: {
         1: "arithmetic",
         2: 25,
         3: "associative"

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Variables", 80201)
+local __exports = LibStub:NewLibrary("ovale/Variables", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs

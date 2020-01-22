@@ -290,7 +290,7 @@ export class OvaleSpellFlashClass {
         if (this.IsSpellFlashEnabled() && start && start - now <= db.threshold / 1000) {
             if (element && element.type == "action") {
                 let spellId, spellInfo;
-                if (element.lowername == "spell") {
+                if (element.name == "spell") {
                     spellId = <number>element.positionalParams[1];
                     spellInfo = this.ovaleData.spellInfo[spellId];
                 }
@@ -317,7 +317,7 @@ export class OvaleSpellFlashClass {
                 }
                 let brightness = db.brightness * 100;
                 if (SpellFlashCore) {
-                    if (element.lowername == "spell" && spellId) {
+                    if (element.name == "spell" && spellId) {
                         if (this.ovaleStance.IsStanceSpell(spellId)) {
                             SpellFlashCore.FlashForm(spellId, color, size, brightness);
                         }
@@ -325,7 +325,7 @@ export class OvaleSpellFlashClass {
                             SpellFlashCore.FlashPet(spellId, color, size, brightness);
                         }
                         SpellFlashCore.FlashAction(spellId, color, size, brightness);
-                    } else if (element.lowername == "item") {
+                    } else if (element.name == "item") {
                         let itemId = <number>element.positionalParams[1];
                         SpellFlashCore.FlashItem(itemId, color, size, brightness);
                     }

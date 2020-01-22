@@ -2,7 +2,7 @@ import { AstNode, OvaleASTClass } from "../AST";
 import { type, LuaObj, ipairs, wipe, LuaArray, lualength, tonumber, pairs, next } from "@wowts/lua";
 import { remove, insert, sort, concat } from "@wowts/table";
 import { Annotation, OPTIONAL_SKILLS, Profile } from "./definitions";
-import { CamelSpecialization, OvaleFunctionName, OvaleTaggedFunctionName, self_outputPool } from "./text-tools";
+import { LowerSpecialization, OvaleFunctionName, OvaleTaggedFunctionName, self_outputPool } from "./text-tools";
 import { format } from "@wowts/string";
 import { OvaleDataClass } from "../Data";
 
@@ -161,7 +161,7 @@ export class Generator {
 
     private InsertInterruptFunction(child: LuaArray<AstNode>, annotation: Annotation, interrupts: LuaArray<Spell>) {
         let nodeList = annotation.astAnnotation.nodeList;
-        let camelSpecialization = CamelSpecialization(annotation);
+        let camelSpecialization = LowerSpecialization(annotation);
         let spells = interrupts || {}
         sort(spells, function (a, b) {
             return tonumber(a.order || 0) >= tonumber(b.order || 0);
@@ -532,7 +532,7 @@ export class Generator {
     public InsertSupportingFunctions(child: LuaArray<AstNode>, annotation: Annotation) {
         let count = 0;
         let nodeList = annotation.astAnnotation.nodeList;
-        let camelSpecialization = CamelSpecialization(annotation);
+        let camelSpecialization = LowerSpecialization(annotation);
         if (annotation.melee == "DEATHKNIGHT") {
             let fmt = `
                 AddFunction %sGetInMeleeRange

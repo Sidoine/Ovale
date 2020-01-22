@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Data", 80201)
+local __exports = LibStub:NewLibrary("ovale/Data", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local type = type
@@ -6,6 +6,7 @@ local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
+local kpairs = pairs
 local find = string.find
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
@@ -379,6 +380,9 @@ __exports.OvaleDataClass = __class(nil, {
     end,
     CheckSpellInfo = function(self, spellId, atTime, targetGUID)
         targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
+        if  not targetGUID then
+            return false
+        end
         local verified = true
         local requirement
         for name, handler in pairs(self.requirement.nowRequirements) do
@@ -423,7 +427,7 @@ __exports.OvaleDataClass = __class(nil, {
         local value = si and si[property]
         local requirements = si and si.require[property]
         if requirements then
-            for v, rArray in pairs(requirements) do
+            for v, rArray in kpairs(requirements) do
                 if isLuaArray(rArray) then
                     for _, requirement in ipairs(rArray) do
                         local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)

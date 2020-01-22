@@ -29,10 +29,11 @@ export class OvaleRequirement {
         delete this.nowRequirements[name];
     }
 
-    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string):[boolean, string | undefined, number | undefined] {
+    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string?, number?] {
         let requirements = this.nowRequirements;
     
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
+        if (!targetGUID) return [false];
         let name = <string>tokens[index];
         index = index + 1;
         if (name) {

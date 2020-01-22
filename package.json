@@ -1,6 +1,6 @@
 {
   "name": "ovale",
-  "version": "8.2.1",
+  "version": "8.3.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -23,8 +23,8 @@
     "@wowts/ace_console-3.0": "^1.0.0",
     "@wowts/ace_db-3.0": "^1.2.0",
     "@wowts/ace_db_options-3.0": "^1.1.0",
-    "@wowts/ace_event-3.0": "^1.0.0",
-    "@wowts/ace_gui-3.0": "^1.1.1",
+    "@wowts/ace_event-3.0": "^1.1.0",
+    "@wowts/ace_gui-3.0": "^1.2.0",
     "@wowts/ace_locale-3.0": "^1.0.0",
     "@wowts/ace_serializer-3.0": "^1.1.0",
     "@wowts/ace_timer-3.0": "^2.2.0",
@@ -38,7 +38,7 @@
     "@wowts/lib_range_check-2.0": "^1.0.0",
     "@wowts/lib_text_dump-1.0": "^1.0.1",
     "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
-    "@wowts/lua": "^1.4.0",
+    "@wowts/lua": "^1.4.1",
     "@wowts/masque": "^1.0.1",
     "@wowts/math": "^1.1.0",
     "@wowts/recount": "^1.1.0",
@@ -46,10 +46,10 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.2.1",
     "@wowts/tslib": "^1.1.0",
-    "@wowts/wow-mock": "^1.15.0"
+    "@wowts/wow-mock": "^1.17.0"
   },
   "devDependencies": {
-    "@wowts/tstolua": "^1.6.1",
+    "@wowts/tstolua": "^1.7.0",
     "ava": "^2.2.0",
     "tslint": "^5.18.0",
     "typemoq": "^2.1.0",

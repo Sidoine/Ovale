@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Totem", 80201)
+local __exports = LibStub:NewLibrary("ovale/Totem", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -122,7 +122,7 @@ __exports.OvaleTotemClass = __class(States, {
             local buffPresent = (self.ovaleFuture.next.lastGCDSpellId == spellId)
             if  not buffPresent and si.buff_totem then
                 local aura = self.ovaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
-                buffPresent = self.ovaleAura:IsActiveAura(aura, atTime)
+                buffPresent = (aura and self.ovaleAura:IsActiveAura(aura, atTime)) or false
             end
             if  not si.buff_totem or buffPresent then
                 local texture = self.ovaleSpellBook:GetSpellTexture(spellId)

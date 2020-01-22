@@ -89,7 +89,7 @@ t("ast: parse expression with a if with SpellInfo", t => {
     t.is(ifNode.type, "if");
     const talentNode = ifNode.child[1];
     t.is(talentNode.type, "custom_function");
-    t.is(talentNode.func, "Talent");
+    t.is(talentNode.func, "talent");
     const spellNode = ifNode.child[2];
     t.is(spellNode.type, "action");
     t.is(spellNode.func, "spell");

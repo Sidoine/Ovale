@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_mage_spells", 80201)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_mage_spells", 80300)
 if not __exports then return end
 __exports.registerMageSpells = function(OvaleScripts)
     local name = "ovale_mage_spells"
@@ -40,6 +40,9 @@ Define(arcane_power 12042)
   SpellInfo(arcane_power cd=90 duration=10)
   # Spell damage increased by w1.rnMana costs of your damaging spells reduced by w2.
   SpellAddBuff(arcane_power arcane_power=1)
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -182,7 +185,7 @@ Define(gladiators_badge 277185)
   # Primary stat increased by s4.
   SpellAddBuff(gladiators_badge gladiators_badge=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -191,11 +194,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -203,6 +206,9 @@ Define(guardian_of_azeroth_4 300091)
   SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
+  SpellAddBuff(guardian_of_azeroth_5 guardian_of_azeroth_buff=1)
+Define(guardian_of_azeroth_buff 303349)
+  SpellInfo(guardian_of_azeroth_buff gcd=0 offgcd=1)
 
 Define(ice_floes 108839)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
@@ -210,7 +216,7 @@ Define(ice_floes 108839)
   # Able to move while casting spells.
   SpellAddBuff(ice_floes ice_floes=1)
 Define(ice_lance 30455)
-# Quickly fling a shard of ice at the target, dealing (35 of Spell Power) Frost damage?s56377[, and (35 of Spell Power)*56377m2/100 Frost damage to a second nearby target][].rnrnIce Lance damage is tripled against frozen targets.
+# Quickly fling a shard of ice at the target, dealing (42 of Spell Power) Frost damage?s56377[, and (42 of Spell Power)*56377m2/100 Frost damage to a second nearby target][].rnrnIce Lance damage is tripled against frozen targets.
   SpellInfo(ice_lance)
   SpellInfo(fire_blast replaced_by=ice_lance)
 Define(ice_nova 157997)
@@ -232,6 +238,11 @@ Define(living_bomb 44457)
   SpellInfo(living_bomb cd=12 talent=living_bomb_talent)
   # Causes w1 Fire damage every t1 sec. After d, the target explodes, causing w2 Fire damage to the target and all other enemies within 44461A2 yards?w3>0[, and spreading Living Bomb][].
   SpellAddBuff(living_bomb living_bomb=1)
+Define(manifesto_of_madness_chapter_one 313948)
+# Increase your Critical Strike by up to s5, reduced by s5*.08 for each ally within s3 yards of you. Lasts 10 seconds. When this effect ends, your Versatility is increased by 314040s3 for each ally within s4 yards of you, up to a max of 314040s3*5. Lasts 10 seconds.rn
+  SpellInfo(manifesto_of_madness_chapter_one cd=90 duration=10 channel=10 gcd=0 offgcd=1)
+  # Critical strike increased by w2.
+  SpellAddBuff(manifesto_of_madness_chapter_one manifesto_of_madness_chapter_one=1)
 Define(meteor 117588)
 # Call down a molten meteor on your target, dealing (75 of Spell Power) damage to all enemies within A1 yards of your target.
   SpellInfo(meteor cd=60 gcd=0 offgcd=1)
@@ -244,11 +255,6 @@ Define(nether_tempest 114923)
   SpellInfo(nether_tempest duration=12 tick=1 talent=nether_tempest_talent)
   # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
   SpellAddTargetDebuff(nether_tempest nether_tempest=1)
-Define(packed_ice 272970)
-# Ice Lance deals an additional s1 damage to enemies recently damaged by your Frozen Orb.
-  SpellInfo(packed_ice duration=4 channel=4 gcd=0 offgcd=1)
-  # The Mage's Ice Lances will deal increased damage to you.
-  SpellAddTargetDebuff(packed_ice packed_ice=1)
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (75 of Spell Power) Fire damage to the target and splashes (20 of Spell Power) Fire damage to other nearby enemies. Always deals a critical strike.
   SpellInfo(phoenix_flames cd=30 talent=phoenix_flames_talent)
@@ -296,13 +302,27 @@ Define(ray_of_frost 205021)
   SpellInfo(ray_of_frost cd=75 duration=5 channel=5 tick=1 talent=ray_of_frost_talent)
   # Movement slowed by w1.rnTaking w2 Frost damage every t2 sec.
   SpellAddTargetDebuff(ray_of_frost ray_of_frost=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(rule_of_threes 264354)
@@ -356,6 +376,7 @@ SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 Define(alexstraszas_fury_talent 11) #22465
@@ -429,10 +450,12 @@ Define(neural_synapse_enhancer_item 168973)
 Define(shockbiters_fang_item 169318)
 Define(tzanes_barkspines_item 161411)
 Define(hyperthread_wristwraps_item 168989)
+Define(manifesto_of_madness_item 174103)
 Define(unbridled_fury_item 169299)
 Define(arcane_pummeling_trait 270669)
 Define(equipoise_trait 286027)
 Define(blaster_master_trait 274596)
+Define(condensed_life_force_essence_id 14)
 Define(memory_of_lucid_dreams_essence_id 27)
     ]]
     code = code .. [[

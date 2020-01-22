@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/SimulationCraft", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/SimulationCraft", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -35,7 +35,7 @@ local print_r = __texttools.print_r
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local OvaleTaggedFunctionName = __texttools.OvaleTaggedFunctionName
 local self_outputPool = __texttools.self_outputPool
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local CamelCase = __texttools.CamelCase
 local __generator = LibStub:GetLibrary("ovale/simulationcraft/generator")
 local Mark = __generator.Mark
@@ -228,17 +228,18 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
         end
         annotation.position = profile.position
-        local taggedFunctionName = {}
+        local taggedFunctionName = annotation.taggedFunctionName
         for _, node in ipairs(actionList) do
             local fname = OvaleFunctionName(node.name, annotation)
             taggedFunctionName[fname] = true
             for _, tag in pairs(OVALE_TAGS) do
                 local bodyName, conditionName = OvaleTaggedFunctionName(fname, tag)
-                taggedFunctionName[bodyName] = true
-                taggedFunctionName[conditionName] = true
+                if bodyName and conditionName then
+                    taggedFunctionName[lower(bodyName)] = true
+                    taggedFunctionName[lower(conditionName)] = true
+                end
             end
         end
-        annotation.taggedFunctionName = taggedFunctionName
         annotation.functionTag = {}
         profile.actionList = actionList
         profile.annotation = annotation
@@ -308,7 +309,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                         if defaultInterrupt and defaultInterrupt.interrupt then
                             local interruptCall = self.ovaleAst:NewNode(nodeList)
                             interruptCall.type = "custom_function"
-                            interruptCall.name = CamelSpecialization(annotation) .. "InterruptActions"
+                            interruptCall.name = lower(LowerSpecialization(annotation) .. "InterruptActions")
                             annotation.interrupt = annotation.classId
                             annotation[defaultInterrupt.interrupt] = annotation.classId
                             insert(addFunctionNode.child[1].child, 1, interruptCall)
@@ -321,8 +322,10 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                     child[#child + 1] = commentNode
                     for _, tag in pairs(OVALE_TAGS) do
                         local bodyNode, conditionNode = self.splitter.SplitByTag(tag, addFunctionNode, nodeList, annotation)
-                        child[#child + 1] = bodyNode
-                        child[#child + 1] = conditionNode
+                        if bodyNode and conditionNode then
+                            child[#child + 1] = bodyNode
+                            child[#child + 1] = conditionNode
+                        end
                     end
                 else
                     ok = false
@@ -345,7 +348,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 insert(child, commentNode)
                 local code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization)
                 local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -356,7 +361,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("shortcd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -367,7 +374,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("shortcd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -378,7 +387,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, specialization, self.generator:GenerateIconBody("main", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -389,7 +400,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("main", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -400,7 +413,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("cd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -411,7 +426,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("cd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             Mark(ast)
             local changed = Sweep(ast)

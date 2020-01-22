@@ -211,6 +211,7 @@ export class OvaleBestActionClass {
 
     private getSpellActionInfo(spellId: number, element: Element, atTime: number, target: string): ActionInfo {
         let targetGUID = this.OvaleGUID.UnitGUID(target);
+        if (!targetGUID) return [];
         let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
@@ -335,13 +336,13 @@ export class OvaleBestActionClass {
                 return [element.actionTexture, element.actionInRange, element.actionCooldownStart, element.actionCooldownDuration, element.actionUsable, element.actionShortcut, element.actionIsCurrent, element.actionEnable, element.actionType, element.actionId, element.actionTarget, element.actionResourceExtend, element.actionCharges];
             } else {
                 let target = <string>element.namedParams.target || this.baseState.next.defaultTarget;
-                if (element.lowername == "item") {
+                if (element.name == "item") {
                     return this.GetActionItemInfo(element, atTime, target);
-                } else if (element.lowername == "macro") {
+                } else if (element.name == "macro") {
                     return this.GetActionMacroInfo(element, atTime, target);
-                } else if (element.lowername == "spell") {
+                } else if (element.name == "spell") {
                     return this.GetActionSpellInfo(element, atTime, target);
-                } else if (element.lowername == "texture") {
+                } else if (element.name == "texture") {
                     return this.GetActionTextureInfo(element, atTime, target);
                 }
             }
@@ -604,7 +605,9 @@ export class OvaleBestActionClass {
                 n = A * z + B * c;
             } else if (operator == "/") {
                 if (B === 0) {
-                    this.Ovale.OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString);
+                    if (A !== 0) {
+                        this.Ovale.OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString);
+                    }
                     B = 0.00001;
                 }
                 l = A / B;
@@ -643,6 +646,14 @@ export class OvaleBestActionClass {
                     n = c;
                 } else {
                     n = z;
+                }
+            } else if (operator === "<?") {
+                l = min(A, B);
+                m = t;
+                if (l === A) {
+                    n = z;
+                } else {
+                    n = c;
                 }
             }
             this.tracer.Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n);
@@ -718,12 +729,12 @@ export class OvaleBestActionClass {
         let timeSpan = this.GetTimeSpan(element);
         let result;
         const [start, ending, value, origin, rate] = this.ovaleCondition.EvaluateCondition(element.func, element.positionalParams, element.namedParams, atTime);
-        if (start && ending) {
+        if (start !== undefined && ending !== undefined) {
             timeSpan.Copy(start, ending);
         } else {
             wipe(timeSpan);
         }
-        if (value) {
+        if (value !== undefined) {
             result = this.SetValue(element, value, origin, rate);
         }
         this.tracer.Log("[%d]    condition '%s' returns %s, %s, %s, %s, %s", element.nodeId, element.name, start, ending, value, origin, rate);

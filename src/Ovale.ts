@@ -67,9 +67,9 @@ export class OvaleClass extends OvaleBase {
     //     this.frame.Hide();
     // }
     OnInitialize() {
-        this.playerGUID = UnitGUID("player");
+        this.playerGUID = UnitGUID("player") || "error";
         const [, classId] = UnitClass("player");
-        this.playerClass = classId;
+        this.playerClass = classId || "WARRIOR";
         wipe(self_refreshIntervals);
         self_refreshIndex = 1;
         this.ClearOneTimeMessages();

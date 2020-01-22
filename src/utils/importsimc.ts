@@ -11,7 +11,7 @@ import { IoC } from "../ioc";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
-const profilesDirectory = simcDirectory + '/profiles/Tier23';
+const profilesDirectory = simcDirectory + '/profiles/Tier24';
 const SIMC_CLASS = [
     "deathknight",
     "demonhunter",
@@ -159,7 +159,7 @@ for (const filename of files) {
             output.push("");
             output.push("{");
             output.push(format('	const name = "sc_%s"', name));
-            output.push(format('	const desc = "[8.2] Simulationcraft: %s"', desc));
+            output.push(format('	const desc = "[8.3] Simulationcraft: %s"', desc));
             output.push("	const code = `");
             output.push(ioc.simulationCraft.Emit(profile, true));
             output.push("`");
@@ -293,6 +293,7 @@ function getDefinition(identifier: string, customSpellData: CustomSpellData, tal
 
     output += `  SpellInfo(${identifier}`;
     for (const key in customSpellData.spellInfo) {
+        if (key === "require") continue;
         output += ` ${key}=${customSpellData.spellInfo[key as keyof SpellInfo]}`;
     }
 

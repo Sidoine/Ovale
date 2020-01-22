@@ -9,10 +9,25 @@ function registerBase(OvaleScripts: OvaleScriptsClass) {
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
+Define(anima_of_death_0 294926)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
+  SpellInfo(anima_of_death_0 cd=150)
+Define(anima_of_death_1 294946)
+# Heal for s1 of your maximum health.
+  SpellInfo(anima_of_death_1 gcd=0 offgcd=1)
+Define(anima_of_death_2 300002)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to 294945s1 of your maximum health.
+  SpellInfo(anima_of_death_2 cd=120 gcd=1)
+Define(anima_of_death_3 300003)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1+294945s2 of your maximum health per enemy hit, up to 294945s1*2 of your maximum health.
+  SpellInfo(anima_of_death_3 cd=120 gcd=1)
 Define(arcanic_pulsar_buff 287784)
 # Starsurge's damage is increased by s2. Every s4 Starsurges, gain Celestial Alignment for s3 sec.
   SpellInfo(arcanic_pulsar_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(barkskin 22812)
 # Your skin becomes as tough as bark, reducing all damage you take by s2 and preventing damage from delaying your spellcasts. Lasts 12 seconds.rnrnUsable while stunned, frozen, incapacitated, feared, or asleep, and in all shapeshift forms.
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
@@ -99,6 +114,29 @@ Define(celestial_alignment 194223)
   SpellInfo(celestial_alignment cd=180 duration=20 lunarpower=-40)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
+Define(concentrated_flame_0 295368)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
+  SpellInfo(concentrated_flame_0 duration=6 channel=6 gcd=0 offgcd=1 tick=2)
+  # Suffering w1 damage every t1 sec.
+  SpellAddTargetDebuff(concentrated_flame_0 concentrated_flame_0=1)
+Define(concentrated_flame_1 295373)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
+  SpellInfo(concentrated_flame_1 cd=30 channel=0)
+  SpellAddTargetDebuff(concentrated_flame_1 concentrated_flame_3=1)
+Define(concentrated_flame_2 295374)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
+  SpellInfo(concentrated_flame_2 channel=0 gcd=0 offgcd=1)
+Define(concentrated_flame_3 295376)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
+  SpellInfo(concentrated_flame_3 channel=0 gcd=0 offgcd=1)
+Define(concentrated_flame_4 299349)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg), then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds.rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
+  SpellInfo(concentrated_flame_4 cd=30 channel=0 gcd=1)
+  SpellAddTargetDebuff(concentrated_flame_4 concentrated_flame_3=1)
+Define(concentrated_flame_5 299353)
+# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg), then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds.rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.rn|cFFFFFFFFMax s1 Charges.|r
+  SpellInfo(concentrated_flame_5 cd=30 channel=0 gcd=1)
+  SpellAddTargetDebuff(concentrated_flame_5 concentrated_flame_3=1)
 Define(conductive_ink_0 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
@@ -107,6 +145,11 @@ Define(conductive_ink_1 302597)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
 
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(feral_frenzy 274837)
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
   SpellInfo(feral_frenzy energy=25 cd=45 duration=1 gcd=1 tick=0.2 talent=feral_frenzy_talent)
@@ -155,7 +198,7 @@ Define(fury_of_elune 202770)
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -164,11 +207,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -330,13 +373,27 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(regrowth 8936)
@@ -403,6 +460,10 @@ Define(starlord 202345)
 # Starsurge and Starfall grant you 279709s1 Haste for 20 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
   SpellInfo(starlord channel=0 gcd=0 offgcd=1 talent=starlord_talent)
   SpellAddBuff(starlord starlord=1)
+Define(starsurge 78674)
+# Launch a surge of stellar energies at the target, dealing (229.99999999999997 of Spell Power) Astral damage.rnrnAlso grants you Lunar and Solar Empowerment.
+# Rank 2: The Lunar and Solar Empowerments granted by Starsurge now stack up to s1+1 times.
+  SpellInfo(starsurge lunarpower=40)
 Define(stellar_flare 202347)
 # Burns the target for (12.5 of Spell Power) Astral damage, and then an additional o2 damage over 24 seconds.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(stellar_flare duration=24 lunarpower=-8 tick=2 talent=stellar_flare_talent)
@@ -464,10 +525,25 @@ Define(tigers_fury 5217)
   SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
   # Attacks deal s1 additional damage for their full duration.
   SpellAddBuff(tigers_fury tigers_fury=1)
-Define(typhoon 132469)
+Define(typhoon_0 91340)
+# Increases your Strength by s1 for d1.
+  SpellInfo(typhoon_0 duration=20 channel=20 gcd=0 offgcd=1)
+  # Increases Strength by s1.
+  SpellAddBuff(typhoon_0 typhoon_0=1)
+Define(typhoon_1 91341)
+# Increases your Strength by s1 for d1.
+  SpellInfo(typhoon_1 duration=15 channel=15 gcd=0 offgcd=1)
+  # Increases Strength by s1.
+  SpellAddBuff(typhoon_1 typhoon_1=1)
+Define(typhoon_2 132469)
 # Blasts targets within 61391a1 yards in front of you with a violent Typhoon, knocking them back and dazing them for 6 seconds. Usable in all shapeshift forms.
-  SpellInfo(typhoon cd=30 talent=typhoon_talent)
+  SpellInfo(typhoon_2 cd=30 talent=typhoon_talent)
 
+Define(typhoon_3 144205)
+# Increases your Strength by s1 for d1.
+  SpellInfo(typhoon_3 duration=15 channel=15 gcd=0 offgcd=1)
+  # Increases Strength by s1.
+  SpellAddBuff(typhoon_3 typhoon_3=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -484,24 +560,32 @@ Define(wild_charge 102401)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
+SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(moonfire moonfire_0 moonfire_1 moonfire_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(thorns thorns_0 thorns_1)
+SpellList(typhoon typhoon_0 typhoon_1 typhoon_2 typhoon_3)
 SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
 SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(sharpened_claws_buff sharpened_claws_buff_0 sharpened_claws_buff_1)
+Define(balance_affinity_talent_restoration 7) #22366
+# You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628
 Define(bloodtalons_talent 20) #21649
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
 Define(bristling_fur_talent 3) #22420
 # Bristle your fur, causing you to generate Rage based on damage taken for 8 seconds.
 Define(brutal_slash_talent 17) #21711
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+Define(feral_affinity_talent_restoration 8) #22367
+# You gain:rnrn@spellicon131768 @spellname131768rnIncreases your movement speed by (25 of Spell Power).rnrnYou also learn:rnrn@spellicon1822 @spellname1822rn@spellicon1079 @spellname1079rn@spellicon22568 @spellname22568rn@spellicon106785 @spellname106785rnrnYour energy regeneration is increased by s2.
 Define(feral_frenzy_talent 21) #21653
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
 Define(force_of_nature_talent 3) #22387
@@ -546,6 +630,7 @@ Define(wild_charge_talent 6) #18571
 # Fly to a nearby ally's position.
 Define(unbridled_fury_item 169299)
 Define(focused_resolve_item 168506)
+Define(cyclotronic_blast_item 167672)
 Define(arcanic_pulsar_trait 287773)
 Define(lively_spirit_trait 279642)
 Define(streaking_stars_trait 272871)
@@ -553,7 +638,11 @@ Define(jungle_fury_trait 274424)
 Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
 Define(memory_of_lucid_dreams_essence_id 27)
+Define(anima_of_life_and_death_essence_id 7)
 Define(conflict_and_strife_essence_id 32)
+Define(ripple_in_space_essence_id 15)
+Define(the_crucible_of_flame_essence_id 12)
+Define(worldvein_resonance_essence_id 4)
     `;
 // END
     code += `

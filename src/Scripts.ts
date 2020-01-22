@@ -122,7 +122,7 @@ export class OvaleScriptsClass  {
         }
 
         if (!name && specialization) {
-            name = format("sc_t23_%s_%s", scClassName, specialization);
+            name = format("sc_t24_%s_%s", scClassName, specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;

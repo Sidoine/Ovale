@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Power", 80201)
+local __exports = LibStub:NewLibrary("ovale/Power", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -35,7 +35,7 @@ local self_SpellcastInfoPowerTypes = {
 }
 local PowerState = __class(nil, {
     constructor = function(self)
-        self.powerType = nil
+        self.powerType = "mana"
         self.activeRegen = {}
         self.inactiveRegen = {}
         self.maxPower = {}
@@ -285,10 +285,12 @@ __exports.OvalePowerClass = __class(States, {
         self.profiler:StartProfiling("OvalePower_UpdatePower")
         if powerType then
             local powerInfo = self.POWER_INFO[powerType]
-            local power = UnitPower("player", powerInfo.id, powerInfo.segments)
-            self.tracer:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
-            if self.current.power[powerType] ~= power then
-                self.current.power[powerType] = power
+            if powerInfo then
+                local power = UnitPower("player", powerInfo.id, powerInfo.segments)
+                self.tracer:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
+                if self.current.power[powerType] ~= power then
+                    self.current.power[powerType] = power
+                end
             end
         else
             for powerType, powerInfo in kpairs(self.POWER_INFO) do
@@ -411,7 +413,10 @@ __exports.OvalePowerClass = __class(States, {
         do
             local cost, powerType = self:GetSpellCost(spellId)
             if cost and powerType and self.next.power[powerType] and  not (si and si[powerType]) then
-                self.next.power[powerType] = self.next.power[powerType] - cost
+                local power = self.next.power[powerType]
+                if power then
+                    self.next.power[powerType] = power - cost
+                end
             end
         end
         if si then
@@ -472,7 +477,7 @@ __exports.OvalePowerClass = __class(States, {
         if si and si[powerType] then
             local cost, ratio = self.ovaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
             if ratio and ratio ~= 0 then
-                local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
+                local addRequirements = si and si.require and si.require["add_" .. powerType .. "_from_aura"]
                 if addRequirements then
                     for v, rArray in pairs(addRequirements) do
                         if isLuaArray(rArray) then
@@ -480,7 +485,7 @@ __exports.OvalePowerClass = __class(States, {
                                 local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                                 if verified then
                                     local aura = self.ovaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                                    if self.ovaleAura:IsActiveAura(aura, atTime) then
+                                    if aura and self.ovaleAura:IsActiveAura(aura, atTime) then
                                         cost = cost + (tonumber(v) or 0) * aura.stacks
                                     end
                                 end
@@ -492,7 +497,7 @@ __exports.OvalePowerClass = __class(States, {
                 local maxCost = si[maxCostParam]
                 if maxCost then
                     local power = self:getPowerAt(state, powerType, atTime)
-                    if power > (maxCost or maximumCost) then
+                    if (power > maxCost) or maximumCost then
                         cost = maxCost
                     elseif power > cost then
                         cost = power

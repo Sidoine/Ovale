@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DemonHunterDemonic", 80201)
+local __exports = LibStub:NewLibrary("ovale/DemonHunterDemonic", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -21,14 +21,11 @@ __exports.OvaleDemonHunterDemonicClass = __class(nil, {
     constructor = function(self, ovaleAura, ovale, ovaleDebug)
         self.ovaleAura = ovaleAura
         self.ovale = ovale
+        self.isDemonHunter = false
         self.OnInitialize = function()
-            self.playerGUID = nil
             self.isDemonHunter = self.ovale.playerClass == "DEMONHUNTER" and true or false
-            self.isHavoc = false
-            self.hasDemonic = false
             if self.isDemonHunter then
                 self.debug:Debug("playerGUID: (%s)", self.ovale.playerGUID)
-                self.playerGUID = self.ovale.playerGUID
                 self.module:RegisterMessage("Ovale_TalentsChanged", self.Ovale_TalentsChanged)
             end
         end
@@ -53,6 +50,9 @@ __exports.OvaleDemonHunterDemonicClass = __class(nil, {
         end
         self.module = ovale:createModule("OvaleDemonHunterDemonic", self.OnInitialize, self.OnDisable, aceEvent)
         self.debug = ovaleDebug:create(self.module:GetName())
+        self.playerGUID = self.ovale.playerGUID
+        self.isHavoc = false
+        self.hasDemonic = false
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
         local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, arg12, arg13 = CombatLogGetCurrentEventInfo()
@@ -73,12 +73,12 @@ __exports.OvaleDemonHunterDemonicClass = __class(nil, {
     end,
     GainAura = function(self)
         local now = GetTime()
-        local aura_meta = self.ovaleAura:GetAura("player", HAVOC_META_BUFF_ID, nil, "HELPFUL", true)
-        if self.ovaleAura:IsActiveAura(aura_meta, now) then
+        local aura_meta = self.ovaleAura:GetAura("player", HAVOC_META_BUFF_ID, now, "HELPFUL", true)
+        if aura_meta and self.ovaleAura:IsActiveAura(aura_meta, now) then
             self.debug:Debug("Adding '%s' (%d) buff to player %s.", HIDDEN_BUFF_EXTENDED_BY_DEMONIC, HIDDEN_BUFF_ID, self.playerGUID)
             local duration = HIDDEN_BUFF_DURATION
             local ending = now + HIDDEN_BUFF_DURATION
-            self.ovaleAura:GainedAuraOnGUID(self.playerGUID, now, HIDDEN_BUFF_ID, self.playerGUID, "HELPFUL", nil, nil, 1, nil, duration, ending, nil, HIDDEN_BUFF_EXTENDED_BY_DEMONIC, nil, nil, nil)
+            self.ovaleAura:GainedAuraOnGUID(self.playerGUID, now, HIDDEN_BUFF_ID, self.playerGUID, "HELPFUL", false, nil, 1, nil, duration, ending, false, HIDDEN_BUFF_EXTENDED_BY_DEMONIC, nil, nil, nil)
         else
             self.debug:Debug("Aura 'Metamorphosis' (%d) is not present.", HAVOC_META_BUFF_ID)
         end

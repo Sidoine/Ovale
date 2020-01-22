@@ -5,10 +5,10 @@ export function registerWarlock(OvaleScripts: OvaleScriptsClass) {
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_t23_warlock_affliction"
-	const desc = "[8.2] Simulationcraft: T23_Warlock_Affliction"
+	const name = "sc_t24_warlock_affliction"
+	const desc = "[8.3] Simulationcraft: T24_Warlock_Affliction"
 	const code = `
-# Based on SimulationCraft profile "T23_Warlock_Affliction".
+# Based on SimulationCraft profile "T24_Warlock_Affliction".
 #	class=warlock
 #	spec=affliction
 #	talents=3302023
@@ -37,70 +37,70 @@ AddFunction use_seed
 
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=affliction)
 
-AddFunction AfflictionUseItemActions
+AddFunction afflictionuseitemactions
 {
- item(Trinket0Slot text=13 usable=1)
- item(Trinket1Slot text=14 usable=1)
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
 }
 
 ### actions.spenders
 
-AddFunction AfflictionSpendersMainActions
+AddFunction afflictionspendersmainactions
 {
  #unstable_affliction,if=cooldown.summon_darkglare.remains<=soul_shard*(execute_time+azerite.dreadful_calling.rank)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=soul_shard*execute_time)&(talent.sow_the_seeds.enabled|dot.phantom_singularity.remains|dot.vile_taint.remains)
- if spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } spell(unstable_affliction)
+ if spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } spell(unstable_affliction)
  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
- if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) AfflictionFillersMainActions()
+ if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) afflictionfillersmainactions()
 
- unless { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+ unless { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and afflictionfillersmainpostconditions()
  {
   #seed_of_corruption,if=variable.use_seed
-  if undefined() spell(seed_of_corruption)
+  if use_seed() spell(seed_of_corruption)
   #unstable_affliction,if=!variable.use_seed&!prev_gcd.1.summon_darkglare&(talent.deathbolt.enabled&cooldown.deathbolt.remains<=execute_time&!azerite.cascading_calamity.enabled|(soul_shard>=5&spell_targets.seed_of_corruption_aoe<2|soul_shard>=2&spell_targets.seed_of_corruption_aoe>=2)&target.time_to_die>4+execute_time&spell_targets.seed_of_corruption_aoe=1|target.time_to_die<=8+execute_time*soul_shard)
-  if not undefined() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } spell(unstable_affliction)
+  if not use_seed() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } spell(unstable_affliction)
   #unstable_affliction,if=!variable.use_seed&contagion<=cast_time+variable.padding
-  if not undefined() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() spell(unstable_affliction)
+  if not use_seed() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() spell(unstable_affliction)
   #unstable_affliction,cycle_targets=1,if=!variable.use_seed&(!talent.deathbolt.enabled|cooldown.deathbolt.remains>time_to_shard|soul_shard>1)&(!talent.vile_taint.enabled|soul_shard>1)&contagion<=cast_time+variable.padding&(!azerite.cascading_calamity.enabled|buff.cascading_calamity.remains>time_to_shard)
-  if not undefined() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } spell(unstable_affliction)
+  if not use_seed() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } spell(unstable_affliction)
  }
 }
 
-AddFunction AfflictionSpendersMainPostConditions
+AddFunction afflictionspendersmainpostconditions
 {
- { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+ { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and afflictionfillersmainpostconditions()
 }
 
-AddFunction AfflictionSpendersShortCdActions
+AddFunction afflictionspendersshortcdactions
 {
- unless spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and spell(unstable_affliction)
+ unless spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } and spell(unstable_affliction)
  {
   #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-  if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) AfflictionFillersShortCdActions()
+  if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) afflictionfillersshortcdactions()
  }
 }
 
-AddFunction AfflictionSpendersShortCdPostConditions
+AddFunction afflictionspendersshortcdpostconditions
 {
- spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and spell(unstable_affliction) or { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or undefined() and spell(seed_of_corruption) or not undefined() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } and spell(unstable_affliction) or not undefined() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() and spell(unstable_affliction) or not undefined() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } and spell(unstable_affliction)
+ spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } and spell(unstable_affliction) or { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and afflictionfillersshortcdpostconditions() or use_seed() and spell(seed_of_corruption) or not use_seed() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } and spell(unstable_affliction) or not use_seed() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() and spell(unstable_affliction) or not use_seed() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } and spell(unstable_affliction)
 }
 
-AddFunction AfflictionSpendersCdActions
+AddFunction afflictionspenderscdactions
 {
- unless spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and spell(unstable_affliction)
+ unless spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } and spell(unstable_affliction)
  {
   #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-  if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) AfflictionFillersCdActions()
+  if { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) afflictionfillerscdactions()
  }
 }
 
-AddFunction AfflictionSpendersCdPostConditions
+AddFunction afflictionspenderscdpostconditions
 {
- spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } and spell(unstable_affliction) or { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or undefined() and spell(seed_of_corruption) or not undefined() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } and spell(unstable_affliction) or not undefined() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() and spell(unstable_affliction) or not undefined() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + undefined() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } and spell(unstable_affliction)
+ spellcooldown(summon_darkglare) <= soulshards() * { executetime(unstable_affliction) + azeritetraitrank(dreadful_calling_trait) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= soulshards() * executetime(unstable_affliction) } and { hastalent(sow_the_seeds_talent) or target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } and spell(unstable_affliction) or { spellcooldown(summon_darkglare) < timetoshard() * { 5 - soulshards() } or not spellcooldown(summon_darkglare) > 0 } and target.timetodie() > spellcooldown(summon_darkglare) and afflictionfillerscdpostconditions() or use_seed() and spell(seed_of_corruption) or not use_seed() and not previousgcdspell(summon_darkglare) and { hastalent(deathbolt_talent) and spellcooldown(deathbolt) <= executetime(unstable_affliction) and not hasazeritetrait(cascading_calamity_trait) or { soulshards() >= 5 and enemies() < 2 or soulshards() >= 2 and enemies() >= 2 } and target.timetodie() > 4 + executetime(unstable_affliction) and enemies() == 1 or target.timetodie() <= 8 + executetime(unstable_affliction) * soulshards() } and spell(unstable_affliction) or not use_seed() and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() and spell(unstable_affliction) or not use_seed() and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) > timetoshard() or soulshards() > 1 } and { not hastalent(vile_taint_talent) or soulshards() > 1 } and buffremaining(unstable_affliction_buff) <= casttime(unstable_affliction) + padding() and { not hasazeritetrait(cascading_calamity_trait) or buffremaining(cascading_calamity_buff) > timetoshard() } and spell(unstable_affliction)
 }
 
 ### actions.precombat
 
-AddFunction AfflictionPrecombatMainActions
+AddFunction afflictionprecombatmainactions
 {
  #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
  if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
@@ -112,11 +112,11 @@ AddFunction AfflictionPrecombatMainActions
  if not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) spell(shadow_bolt_affliction)
 }
 
-AddFunction AfflictionPrecombatMainPostConditions
+AddFunction afflictionprecombatmainpostconditions
 {
 }
 
-AddFunction AfflictionPrecombatShortCdActions
+AddFunction afflictionprecombatshortcdactions
 {
  #flask
  #food
@@ -125,12 +125,12 @@ AddFunction AfflictionPrecombatShortCdActions
  if not pet.present() spell(summon_imp)
 }
 
-AddFunction AfflictionPrecombatShortCdPostConditions
+AddFunction afflictionprecombatshortcdpostconditions
 {
  hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt_affliction)
 }
 
-AddFunction AfflictionPrecombatCdActions
+AddFunction afflictionprecombatcdactions
 {
  unless not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice)
  {
@@ -142,26 +142,26 @@ AddFunction AfflictionPrecombatCdActions
  }
 }
 
-AddFunction AfflictionPrecombatCdPostConditions
+AddFunction afflictionprecombatcdpostconditions
 {
  not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt_affliction)
 }
 
 ### actions.fillers
 
-AddFunction AfflictionFillersMainActions
+AddFunction afflictionfillersmainactions
 {
  #unstable_affliction,line_cd=15,if=cooldown.deathbolt.remains<=gcd*2&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&cooldown.summon_darkglare.remains>20
  if timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 spell(unstable_affliction)
  #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(dot.agony.remains<dot.agony.duration*0.75|dot.corruption.remains<dot.corruption.duration*0.75|dot.siphon_life.remains<dot.siphon_life.duration*0.75)&cooldown.deathbolt.remains<=action.agony.gcd*4&cooldown.summon_darkglare.remains>20
- if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 AfflictionDbrefreshMainActions()
+ if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 afflictiondb_refreshmainactions()
 
- unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshMainPostConditions()
+ unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshmainpostconditions()
  {
   #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&cooldown.summon_darkglare.remains<=soul_shard*action.agony.gcd+action.agony.gcd*3&(dot.agony.remains<dot.agony.duration*1|dot.corruption.remains<dot.corruption.duration*1|dot.siphon_life.remains<dot.siphon_life.duration*1)
-  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } AfflictionDbrefreshMainActions()
+  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } afflictiondb_refreshmainactions()
 
-  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshMainPostConditions()
+  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshmainpostconditions()
   {
    #shadow_bolt,if=buff.movement.up&buff.nightfall.remains
    if speed() > 0 and buffpresent(nightfall_buff) spell(shadow_bolt_affliction)
@@ -174,56 +174,56 @@ AddFunction AfflictionFillersMainActions
    #drain_life,if=buff.inevitable_demise.stack>10&target.time_to_die<=10
    if buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 spell(drain_life)
    #drain_life,if=talent.siphon_life.enabled&buff.inevitable_demise.stack>=50-20*(spell_targets.seed_of_corruption_aoe-raid_event.invulnerable.up>=2)&dot.agony.remains>5*spell_haste&dot.corruption.remains>gcd&(dot.siphon_life.remains>gcd|!talent.siphon_life.enabled)&(debuff.haunt.remains>5*spell_haste|!talent.haunt.enabled)&contagion>5*spell_haste
-   if hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
+   if hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
    #drain_life,if=talent.writhe_in_agony.enabled&buff.inevitable_demise.stack>=50-20*(spell_targets.seed_of_corruption_aoe-raid_event.invulnerable.up>=3)-5*(spell_targets.seed_of_corruption_aoe-raid_event.invulnerable.up=2)&dot.agony.remains>5*spell_haste&dot.corruption.remains>gcd&(debuff.haunt.remains>5*spell_haste|!talent.haunt.enabled)&contagion>5*spell_haste
-   if hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
+   if hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
    #drain_life,if=talent.absolute_corruption.enabled&buff.inevitable_demise.stack>=50-20*(spell_targets.seed_of_corruption_aoe-raid_event.invulnerable.up>=4)&dot.agony.remains>5*spell_haste&(debuff.haunt.remains>5*spell_haste|!talent.haunt.enabled)&contagion>5*spell_haste
-   if hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
+   if hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } spell(drain_life)
    #haunt
    spell(haunt)
    #concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-   if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) spell(concentrated_flame_essence)
+   if not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) spell(concentrated_flame_essence)
    #drain_soul,interrupt_global=1,chain=1,interrupt=1,cycle_targets=1,if=target.time_to_die<=gcd
    if target.timetodie() <= gcd() spell(drain_soul)
    #drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&variable.maintain_se&!debuff.shadow_embrace.remains
-   if hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) spell(drain_soul)
+   if hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) spell(drain_soul)
    #drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&variable.maintain_se
-   if hastalent(shadow_embrace_talent) and undefined() spell(drain_soul)
+   if hastalent(shadow_embrace_talent) and maintain_se() spell(drain_soul)
    #drain_soul,interrupt_global=1,chain=1,interrupt=1
    spell(drain_soul)
    #shadow_bolt,cycle_targets=1,if=talent.shadow_embrace.enabled&variable.maintain_se&!debuff.shadow_embrace.remains&!action.shadow_bolt.in_flight
-   if hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) spell(shadow_bolt_affliction)
+   if hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) spell(shadow_bolt_affliction)
    #shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&variable.maintain_se
-   if hastalent(shadow_embrace_talent) and undefined() spell(shadow_bolt_affliction)
+   if hastalent(shadow_embrace_talent) and maintain_se() spell(shadow_bolt_affliction)
    #shadow_bolt
    spell(shadow_bolt_affliction)
   }
  }
 }
 
-AddFunction AfflictionFillersMainPostConditions
+AddFunction afflictionfillersmainpostconditions
 {
- hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshMainPostConditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshMainPostConditions()
+ hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshmainpostconditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshmainpostconditions()
 }
 
-AddFunction AfflictionFillersShortCdActions
+AddFunction afflictionfillersshortcdactions
 {
  unless timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction)
  {
   #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(dot.agony.remains<dot.agony.duration*0.75|dot.corruption.remains<dot.corruption.duration*0.75|dot.siphon_life.remains<dot.siphon_life.duration*0.75)&cooldown.deathbolt.remains<=action.agony.gcd*4&cooldown.summon_darkglare.remains>20
-  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 AfflictionDbrefreshShortCdActions()
+  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 afflictiondb_refreshshortcdactions()
 
-  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshShortCdPostConditions()
+  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshshortcdpostconditions()
   {
    #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&cooldown.summon_darkglare.remains<=soul_shard*action.agony.gcd+action.agony.gcd*3&(dot.agony.remains<dot.agony.duration*1|dot.corruption.remains<dot.corruption.duration*1|dot.siphon_life.remains<dot.siphon_life.duration*1)
-   if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } AfflictionDbrefreshShortCdActions()
+   if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } afflictiondb_refreshshortcdactions()
 
-   unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshShortCdPostConditions()
+   unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshshortcdpostconditions()
    {
     #deathbolt,if=cooldown.summon_darkglare.remains>=30+gcd|cooldown.summon_darkglare.remains>140
     if spellcooldown(summon_darkglare) >= 30 + gcd() or spellcooldown(summon_darkglare) > 140 spell(deathbolt)
 
-    unless speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt)
+    unless speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt)
     {
      #purifying_blast
      spell(purifying_blast)
@@ -233,24 +233,24 @@ AddFunction AfflictionFillersShortCdActions
  }
 }
 
-AddFunction AfflictionFillersShortCdPostConditions
+AddFunction afflictionfillersshortcdpostconditions
 {
- timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction) or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshShortCdPostConditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshShortCdPostConditions() or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or target.timetodie() <= gcd() and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and spell(drain_soul) or spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or hastalent(shadow_embrace_talent) and undefined() and spell(shadow_bolt_affliction) or spell(shadow_bolt_affliction)
+ timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction) or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshshortcdpostconditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshshortcdpostconditions() or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or target.timetodie() <= gcd() and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and spell(drain_soul) or spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and spell(shadow_bolt_affliction) or spell(shadow_bolt_affliction)
 }
 
-AddFunction AfflictionFillersCdActions
+AddFunction afflictionfillerscdactions
 {
  unless timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction)
  {
   #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(dot.agony.remains<dot.agony.duration*0.75|dot.corruption.remains<dot.corruption.duration*0.75|dot.siphon_life.remains<dot.siphon_life.duration*0.75)&cooldown.deathbolt.remains<=action.agony.gcd*4&cooldown.summon_darkglare.remains>20
-  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 AfflictionDbrefreshCdActions()
+  if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 afflictiondb_refreshcdactions()
 
-  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshCdPostConditions()
+  unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshcdpostconditions()
   {
    #call_action_list,name=db_refresh,if=talent.deathbolt.enabled&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&cooldown.summon_darkglare.remains<=soul_shard*action.agony.gcd+action.agony.gcd*3&(dot.agony.remains<dot.agony.duration*1|dot.corruption.remains<dot.corruption.duration*1|dot.siphon_life.remains<dot.siphon_life.duration*1)
-   if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } AfflictionDbrefreshCdActions()
+   if hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } afflictiondb_refreshcdactions()
 
-   unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshCdPostConditions() or { spellcooldown(summon_darkglare) >= 30 + gcd() or spellcooldown(summon_darkglare) > 140 } and spell(deathbolt) or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt)
+   unless hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshcdpostconditions() or { spellcooldown(summon_darkglare) >= 30 + gcd() or spellcooldown(summon_darkglare) > 140 } and spell(deathbolt) or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt)
    {
     #focused_azerite_beam
     spell(focused_azerite_beam)
@@ -259,113 +259,113 @@ AddFunction AfflictionFillersCdActions
  }
 }
 
-AddFunction AfflictionFillersCdPostConditions
+AddFunction afflictionfillerscdpostconditions
 {
- timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction) or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 0.75 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 0.75 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and AfflictionDbrefreshCdPostConditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1 or target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1 or target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1 } and AfflictionDbrefreshCdPostConditions() or { spellcooldown(summon_darkglare) >= 30 + gcd() or spellcooldown(summon_darkglare) > 140 } and spell(deathbolt) or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.DebuffRemaining(corruption_debuff) > gcd() and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.DebuffRemaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.DebuffRemaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt) or spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or target.timetodie() <= gcd() and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and spell(drain_soul) or spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and not target.DebuffPresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or hastalent(shadow_embrace_talent) and undefined() and spell(shadow_bolt_affliction) or spell(shadow_bolt_affliction)
+ timesincepreviousspell(unstable_affliction) > 15 and spellcooldown(deathbolt) <= gcd() * 2 and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) > 20 and spell(unstable_affliction) or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 0.75 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 0.75 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 0.75 } and spellcooldown(deathbolt) <= gcd() * 4 and spellcooldown(summon_darkglare) > 20 and afflictiondb_refreshcdpostconditions() or hastalent(deathbolt_talent) and enemies() == 1 + false(raid_events_invulnerable_up) and spellcooldown(summon_darkglare) <= soulshards() * gcd() + gcd() * 3 and { target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1 or target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1 or target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1 } and afflictiondb_refreshcdpostconditions() or { spellcooldown(summon_darkglare) >= 30 + gcd() or spellcooldown(summon_darkglare) > 140 } and spell(deathbolt) or speed() > 0 and buffpresent(nightfall_buff) and spell(shadow_bolt_affliction) or speed() > 0 and not { hastalent(siphon_life_talent) and previousgcdspell(agony) and previousgcdspell(agony count=2) and previousgcdspell(agony count=3) or previousgcdspell(agony) } and spell(agony) or speed() > 0 and not { previousgcdspell(siphon_life) and previousgcdspell(siphon_life count=2) and previousgcdspell(siphon_life count=3) } and spell(siphon_life) or speed() > 0 and not previousgcdspell(corruption) and not hastalent(absolute_corruption_talent) and spell(corruption) or buffstacks(inevitable_demise_buff) > 10 and target.timetodie() <= 10 and spell(drain_life) or hastalent(siphon_life_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(siphon_life_debuff) > gcd() or not hastalent(siphon_life_talent) } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(writhe_in_agony_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 3 } - 5 * { enemies() - false(raid_events_invulnerable_up) == 2 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and target.debuffremaining(corruption_debuff) > gcd() and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or hastalent(absolute_corruption_talent) and buffstacks(inevitable_demise_buff) >= 50 - 20 * { enemies() - false(raid_events_invulnerable_up) >= 4 } and target.debuffremaining(agony_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and { target.debuffremaining(haunt_debuff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } or not hastalent(haunt_talent) } and buffremaining(unstable_affliction_buff) > 5 * { 100 / { 100 + spellcastspeedpercent() } } and spell(drain_life) or spell(haunt) or spell(purifying_blast) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or target.timetodie() <= gcd() and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and spell(drain_soul) or spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and not target.debuffpresent(shadow_embrace_debuff) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and spell(shadow_bolt_affliction) or spell(shadow_bolt_affliction)
 }
 
 ### actions.dots
 
-AddFunction AfflictionDotsMainActions
+AddFunction afflictiondotsmainactions
 {
  #seed_of_corruption,if=dot.corruption.remains<=action.seed_of_corruption.cast_time+time_to_shard+4.2*(1-talent.creeping_death.enabled*0.15)&spell_targets.seed_of_corruption_aoe>=3+raid_event.invulnerable.up+talent.writhe_in_agony.enabled&!dot.seed_of_corruption.remains&!action.seed_of_corruption.in_flight
- if target.DebuffRemaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) spell(seed_of_corruption)
+ if target.debuffremaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.debuffremaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) spell(seed_of_corruption)
  #agony,target_if=min:remains,if=talent.creeping_death.enabled&active_dot.agony<6&target.time_to_die>10&(remains<=gcd|cooldown.summon_darkglare.remains>10&(remains<5|!azerite.pandemic_invocation.rank&refreshable))
- if hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } spell(agony)
+ if hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 6 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } spell(agony)
  #agony,target_if=min:remains,if=!talent.creeping_death.enabled&active_dot.agony<8&target.time_to_die>10&(remains<=gcd|cooldown.summon_darkglare.remains>10&(remains<5|!azerite.pandemic_invocation.rank&refreshable))
- if not hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } spell(agony)
+ if not hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 8 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } spell(agony)
  #siphon_life,target_if=min:remains,if=(active_dot.siphon_life<8-talent.creeping_death.enabled-spell_targets.sow_the_seeds_aoe)&target.time_to_die>10&refreshable&(!remains&spell_targets.seed_of_corruption_aoe=1|cooldown.summon_darkglare.remains>soul_shard*action.unstable_affliction.execute_time)
- if DebuffCountOnAny(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.DebuffRemaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } spell(siphon_life)
+ if debuffcountonany(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.debuffremaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } spell(siphon_life)
  #corruption,cycle_targets=1,if=spell_targets.seed_of_corruption_aoe<3+raid_event.invulnerable.up+talent.writhe_in_agony.enabled&(remains<=gcd|cooldown.summon_darkglare.remains>10&refreshable)&target.time_to_die>10
- if enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 spell(corruption)
+ if enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.debuffremaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 spell(corruption)
 }
 
-AddFunction AfflictionDotsMainPostConditions
+AddFunction afflictiondotsmainpostconditions
 {
 }
 
-AddFunction AfflictionDotsShortCdActions
+AddFunction afflictiondotsshortcdactions
 {
 }
 
-AddFunction AfflictionDotsShortCdPostConditions
+AddFunction afflictiondotsshortcdpostconditions
 {
- target.DebuffRemaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or not hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or DebuffCountOnAny(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.DebuffRemaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } and spell(siphon_life) or enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 and spell(corruption)
+ target.debuffremaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.debuffremaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 6 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or not hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 8 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or debuffcountonany(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.debuffremaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } and spell(siphon_life) or enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.debuffremaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 and spell(corruption)
 }
 
-AddFunction AfflictionDotsCdActions
+AddFunction afflictiondotscdactions
 {
 }
 
-AddFunction AfflictionDotsCdPostConditions
+AddFunction afflictiondotscdpostconditions
 {
- target.DebuffRemaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or not hastalent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.timetodie() > 10 and { target.DebuffRemaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.DebuffRemaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or DebuffCountOnAny(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.DebuffRemaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } and spell(siphon_life) or enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 and spell(corruption)
+ target.debuffremaining(corruption_debuff) <= casttime(seed_of_corruption) + timetoshard() + 4.2 * { 1 - talentpoints(creeping_death_talent) * 0.15 } and enemies() >= 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and not target.debuffremaining(seed_of_corruption_debuff) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 6 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or not hastalent(creeping_death_talent) and debuffcountonany(agony_debuff) < 8 and target.timetodie() > 10 and { target.debuffremaining(agony_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and { target.debuffremaining(agony_debuff) < 5 or not azeritetraitrank(pandemic_invocation_trait) and target.refreshable(agony_debuff) } } and spell(agony) or debuffcountonany(siphon_life_debuff) < 8 - talentpoints(creeping_death_talent) - enemies() and target.timetodie() > 10 and target.refreshable(siphon_life_debuff) and { not target.debuffremaining(siphon_life_debuff) and enemies() == 1 or spellcooldown(summon_darkglare) > soulshards() * executetime(unstable_affliction) } and spell(siphon_life) or enemies() < 3 + false(raid_events_invulnerable_up) + talentpoints(writhe_in_agony_talent) and { target.debuffremaining(corruption_debuff) <= gcd() or spellcooldown(summon_darkglare) > 10 and target.refreshable(corruption_debuff) } and target.timetodie() > 10 and spell(corruption)
 }
 
 ### actions.db_refresh
 
-AddFunction AfflictionDbrefreshMainActions
+AddFunction afflictiondb_refreshmainactions
 {
  #siphon_life,line_cd=15,if=(dot.siphon_life.remains%dot.siphon_life.duration)<=(dot.agony.remains%dot.agony.duration)&(dot.siphon_life.remains%dot.siphon_life.duration)<=(dot.corruption.remains%dot.corruption.duration)&dot.siphon_life.remains<dot.siphon_life.duration*1.3
- if timesincepreviousspell(siphon_life) > 15 and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1.3 spell(siphon_life)
+ if timesincepreviousspell(siphon_life) > 15 and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1.3 spell(siphon_life)
  #agony,line_cd=15,if=(dot.agony.remains%dot.agony.duration)<=(dot.corruption.remains%dot.corruption.duration)&(dot.agony.remains%dot.agony.duration)<=(dot.siphon_life.remains%dot.siphon_life.duration)&dot.agony.remains<dot.agony.duration*1.3
- if timesincepreviousspell(agony) > 15 and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1.3 spell(agony)
+ if timesincepreviousspell(agony) > 15 and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1.3 spell(agony)
  #corruption,line_cd=15,if=(dot.corruption.remains%dot.corruption.duration)<=(dot.agony.remains%dot.agony.duration)&(dot.corruption.remains%dot.corruption.duration)<=(dot.siphon_life.remains%dot.siphon_life.duration)&dot.corruption.remains<dot.corruption.duration*1.3
- if timesincepreviousspell(corruption) > 15 and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1.3 spell(corruption)
+ if timesincepreviousspell(corruption) > 15 and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1.3 spell(corruption)
 }
 
-AddFunction AfflictionDbrefreshMainPostConditions
+AddFunction afflictiondb_refreshmainpostconditions
 {
 }
 
-AddFunction AfflictionDbrefreshShortCdActions
+AddFunction afflictiondb_refreshshortcdactions
 {
 }
 
-AddFunction AfflictionDbrefreshShortCdPostConditions
+AddFunction afflictiondb_refreshshortcdpostconditions
 {
- timesincepreviousspell(siphon_life) > 15 and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1.3 and spell(siphon_life) or timesincepreviousspell(agony) > 15 and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1.3 and spell(agony) or timesincepreviousspell(corruption) > 15 and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1.3 and spell(corruption)
+ timesincepreviousspell(siphon_life) > 15 and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1.3 and spell(siphon_life) or timesincepreviousspell(agony) > 15 and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1.3 and spell(agony) or timesincepreviousspell(corruption) > 15 and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1.3 and spell(corruption)
 }
 
-AddFunction AfflictionDbrefreshCdActions
+AddFunction afflictiondb_refreshcdactions
 {
 }
 
-AddFunction AfflictionDbrefreshCdPostConditions
+AddFunction afflictiondb_refreshcdpostconditions
 {
- timesincepreviousspell(siphon_life) > 15 and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(siphon_life_debuff) < target.DebuffDuration(siphon_life_debuff) * 1.3 and spell(siphon_life) or timesincepreviousspell(agony) > 15 and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) and target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(agony_debuff) < target.DebuffDuration(agony_debuff) * 1.3 and spell(agony) or timesincepreviousspell(corruption) > 15 and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(agony_debuff) / target.DebuffDuration(agony_debuff) and target.DebuffRemaining(corruption_debuff) / target.DebuffDuration(corruption_debuff) <= target.DebuffRemaining(siphon_life_debuff) / target.DebuffDuration(siphon_life_debuff) and target.DebuffRemaining(corruption_debuff) < target.DebuffDuration(corruption_debuff) * 1.3 and spell(corruption)
+ timesincepreviousspell(siphon_life) > 15 and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(siphon_life_debuff) < target.debuffduration(siphon_life_debuff) * 1.3 and spell(siphon_life) or timesincepreviousspell(agony) > 15 and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) and target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(agony_debuff) < target.debuffduration(agony_debuff) * 1.3 and spell(agony) or timesincepreviousspell(corruption) > 15 and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(agony_debuff) / target.debuffduration(agony_debuff) and target.debuffremaining(corruption_debuff) / target.debuffduration(corruption_debuff) <= target.debuffremaining(siphon_life_debuff) / target.debuffduration(siphon_life_debuff) and target.debuffremaining(corruption_debuff) < target.debuffduration(corruption_debuff) * 1.3 and spell(corruption)
 }
 
 ### actions.cooldowns
 
-AddFunction AfflictionCooldownsMainActions
+AddFunction afflictioncooldownsmainactions
 {
 }
 
-AddFunction AfflictionCooldownsMainPostConditions
+AddFunction afflictioncooldownsmainpostconditions
 {
 }
 
-AddFunction AfflictionCooldownsShortCdActions
+AddFunction afflictioncooldownsshortcdactions
 {
- #worldvein_resonance,if=buff.lifeblood.stack<3
- if buffstacks(lifeblood_buff) < 3 spell(worldvein_resonance_essence)
+ #worldvein_resonance
+ spell(worldvein_resonance_essence)
  #ripple_in_space
  spell(ripple_in_space_essence)
 }
 
-AddFunction AfflictionCooldownsShortCdPostConditions
+AddFunction afflictioncooldownsshortcdpostconditions
 {
 }
 
-AddFunction AfflictionCooldownsCdActions
+AddFunction afflictioncooldownscdactions
 {
  #use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<19*spell_haste+soul_shard*azerite.dreadful_calling.rank&dot.agony.remains&dot.corruption.remains&(dot.siphon_life.remains|!talent.siphon_life.enabled)
- if { not hastalent(phantom_singularity_talent) or spellcooldown(phantom_singularity) < 4 * { 100 / { 100 + spellcastspeedpercent() } } or not spellcooldown(phantom_singularity) > 0 } and spellcooldown(summon_darkglare) < 19 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) and target.DebuffRemaining(agony_debuff) and target.DebuffRemaining(corruption_debuff) and { target.DebuffRemaining(siphon_life_debuff) or not hastalent(siphon_life_talent) } afflictionuseitemactions()
+ if { not hastalent(phantom_singularity_talent) or spellcooldown(phantom_singularity) < 4 * { 100 / { 100 + spellcastspeedpercent() } } or not spellcooldown(phantom_singularity) > 0 } and spellcooldown(summon_darkglare) < 19 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) and target.debuffremaining(agony_debuff) and target.debuffremaining(corruption_debuff) and { target.debuffremaining(siphon_life_debuff) or not hastalent(siphon_life_talent) } afflictionuseitemactions()
  #potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
  if { hastalent(dark_soul_misery_talent) and not spellcooldown(summon_darkglare) > 0 and not spellcooldown(dark_soul_misery) > 0 or not spellcooldown(summon_darkglare) > 0 or target.timetodie() < 30 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
  #use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
- if spellcooldown(summon_darkglare) > 70 or target.timetodie() < 20 or { target.DebuffStacks(unstable_affliction_debuff) == 5 or soulshards() == 0 } and { not hastalent(phantom_singularity_talent) or spellcooldown(phantom_singularity) > 0 } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= gcd() or not spellcooldown(deathbolt) > 0 } and not spellcooldown(summon_darkglare) > 0 afflictionuseitemactions()
+ if spellcooldown(summon_darkglare) > 70 or target.timetodie() < 20 or { target.debuffstacks(unstable_affliction_debuff) == 5 or soulshards() == 0 } and { not hastalent(phantom_singularity_talent) or spellcooldown(phantom_singularity) > 0 } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= gcd() or not spellcooldown(deathbolt) > 0 } and not spellcooldown(summon_darkglare) > 0 afflictionuseitemactions()
  #fireblood,if=!cooldown.summon_darkglare.up
  if not { not spellcooldown(summon_darkglare) > 0 } spell(fireblood)
  #blood_fury,if=!cooldown.summon_darkglare.up
@@ -390,30 +390,30 @@ AddFunction AfflictionCooldownsCdActions
  if { spellcooldown(summon_darkglare) >= 25 or target.timetodie() <= 30 } and { spellcooldown(deathbolt) > 0 or not hastalent(deathbolt_talent) } afflictionuseitemactions()
 }
 
-AddFunction AfflictionCooldownsCdPostConditions
+AddFunction afflictioncooldownscdpostconditions
 {
- buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance_essence) or spell(ripple_in_space_essence)
+ spell(worldvein_resonance_essence) or spell(ripple_in_space_essence)
 }
 
 ### actions.default
 
-AddFunction AfflictionDefaultMainActions
+AddFunction affliction_defaultmainactions
 {
  #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3+raid_event.invulnerable.up|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5+raid_event.invulnerable.up|spell_targets.seed_of_corruption>=8+raid_event.invulnerable.up
  #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
  #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
  #variable,name=maintain_se,value=spell_targets.seed_of_corruption_aoe<=1+talent.writhe_in_agony.enabled+talent.absolute_corruption.enabled*2+(talent.writhe_in_agony.enabled&talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>2)+(talent.siphon_life.enabled&!talent.creeping_death.enabled&!talent.drain_soul.enabled)+raid_event.invulnerable.up
  #call_action_list,name=cooldowns
- AfflictionCooldownsMainActions()
+ afflictioncooldownsmainactions()
 
- unless AfflictionCooldownsMainPostConditions()
+ unless afflictioncooldownsmainpostconditions()
  {
   #drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd&soul_shard<5
   if target.timetodie() <= gcd() and soulshards() < 5 spell(drain_soul)
   #haunt,if=spell_targets.seed_of_corruption_aoe<=2+raid_event.invulnerable.up
   if enemies() <= 2 + false(raid_events_invulnerable_up) spell(haunt)
   #agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time&target.time_to_die>8
-  if target.DebuffRemaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 spell(agony)
+  if target.debuffremaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 spell(agony)
   #agony,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314
   if timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) spell(agony)
   #corruption,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314&!talent.absolute_corruption.enabled&(talent.siphon_life.enabled|spell_targets.seed_of_corruption_aoe>1&spell_targets.seed_of_corruption_aoe<=3)
@@ -423,66 +423,66 @@ AddFunction AfflictionDefaultMainActions
   #unstable_affliction,target_if=!contagion&target.time_to_die<=8
   if not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 spell(unstable_affliction)
   #drain_soul,target_if=min:debuff.shadow_embrace.remains,cancel_if=ticks_remain<5,if=talent.shadow_embrace.enabled&variable.maintain_se&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=gcd*2
-  if hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= gcd() * 2 spell(drain_soul)
+  if hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= gcd() * 2 spell(drain_soul)
   #shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&variable.maintain_se&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight
-  if hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) spell(shadow_bolt_affliction)
+  if hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) spell(shadow_bolt_affliction)
   #unstable_affliction,target_if=min:contagion,if=!variable.use_seed&soul_shard=5
-  if not undefined() and soulshards() == 5 spell(unstable_affliction)
+  if not use_seed() and soulshards() == 5 spell(unstable_affliction)
   #seed_of_corruption,if=variable.use_seed&soul_shard=5
-  if undefined() and soulshards() == 5 spell(seed_of_corruption)
+  if use_seed() and soulshards() == 5 spell(seed_of_corruption)
   #call_action_list,name=dots
-  AfflictionDotsMainActions()
+  afflictiondotsmainactions()
 
-  unless AfflictionDotsMainPostConditions()
+  unless afflictiondotsmainpostconditions()
   {
    #vile_taint,target_if=max:target.time_to_die,if=time>15&target.time_to_die>=10&(cooldown.summon_darkglare.remains>30|cooldown.summon_darkglare.remains<10&dot.agony.remains>=10&dot.corruption.remains>=10&(dot.siphon_life.remains>=10|!talent.siphon_life.enabled))
-   if timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } spell(vile_taint)
+   if timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.debuffremaining(agony_debuff) >= 10 and target.debuffremaining(corruption_debuff) >= 10 and { target.debuffremaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } spell(vile_taint)
    #vile_taint,if=time<15
    if timeincombat() < 15 spell(vile_taint)
    #call_action_list,name=spenders
-   AfflictionSpendersMainActions()
+   afflictionspendersmainactions()
 
-   unless AfflictionSpendersMainPostConditions()
+   unless afflictionspendersmainpostconditions()
    {
     #call_action_list,name=fillers
-    AfflictionFillersMainActions()
+    afflictionfillersmainactions()
    }
   }
  }
 }
 
-AddFunction AfflictionDefaultMainPostConditions
+AddFunction affliction_defaultmainpostconditions
 {
- AfflictionCooldownsMainPostConditions() or AfflictionDotsMainPostConditions() or AfflictionSpendersMainPostConditions() or AfflictionFillersMainPostConditions()
+ afflictioncooldownsmainpostconditions() or afflictiondotsmainpostconditions() or afflictionspendersmainpostconditions() or afflictionfillersmainpostconditions()
 }
 
-AddFunction AfflictionDefaultShortCdActions
+AddFunction affliction_defaultshortcdactions
 {
  #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3+raid_event.invulnerable.up|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5+raid_event.invulnerable.up|spell_targets.seed_of_corruption>=8+raid_event.invulnerable.up
  #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
  #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
  #variable,name=maintain_se,value=spell_targets.seed_of_corruption_aoe<=1+talent.writhe_in_agony.enabled+talent.absolute_corruption.enabled*2+(talent.writhe_in_agony.enabled&talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>2)+(talent.siphon_life.enabled&!talent.creeping_death.enabled&!talent.drain_soul.enabled)+raid_event.invulnerable.up
  #call_action_list,name=cooldowns
- AfflictionCooldownsShortCdActions()
+ afflictioncooldownsshortcdactions()
 
- unless AfflictionCooldownsShortCdPostConditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt)
+ unless afflictioncooldownsshortcdpostconditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt)
  {
   #deathbolt,if=cooldown.summon_darkglare.remains&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>30)
   if spellcooldown(summon_darkglare) > 0 and enemies() == 1 + false(raid_events_invulnerable_up) and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 30 } spell(deathbolt)
   #the_unbound_force,if=buff.reckless_force.remains
   if buffpresent(reckless_force_buff) spell(the_unbound_force)
 
-  unless target.DebuffRemaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction)
+  unless target.debuffremaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction)
   {
    #phantom_singularity,target_if=max:target.time_to_die,if=time>35&target.time_to_die>16*spell_haste&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>45+soul_shard*azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains<15*spell_haste+soul_shard*azerite.dreadful_calling.rank)
    if timeincombat() > 35 and target.timetodie() > 16 * { 100 / { 100 + spellcastspeedpercent() } } and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 45 + soulshards() * azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) < 15 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) } spell(phantom_singularity)
 
-   unless not undefined() and soulshards() == 5 and spell(unstable_affliction) or undefined() and soulshards() == 5 and spell(seed_of_corruption)
+   unless not use_seed() and soulshards() == 5 and spell(unstable_affliction) or use_seed() and soulshards() == 5 and spell(seed_of_corruption)
    {
     #call_action_list,name=dots
-    AfflictionDotsShortCdActions()
+    afflictiondotsshortcdactions()
 
-    unless AfflictionDotsShortCdPostConditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint)
+    unless afflictiondotsshortcdpostconditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.debuffremaining(agony_debuff) >= 10 and target.debuffremaining(corruption_debuff) >= 10 and { target.debuffremaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint)
     {
      #phantom_singularity,if=time<=35
      if timeincombat() <= 35 spell(phantom_singularity)
@@ -490,12 +490,12 @@ AddFunction AfflictionDefaultShortCdActions
      unless timeincombat() < 15 and spell(vile_taint)
      {
       #call_action_list,name=spenders
-      AfflictionSpendersShortCdActions()
+      afflictionspendersshortcdactions()
 
-      unless AfflictionSpendersShortCdPostConditions()
+      unless afflictionspendersshortcdpostconditions()
       {
        #call_action_list,name=fillers
-       AfflictionFillersShortCdActions()
+       afflictionfillersshortcdactions()
       }
      }
     }
@@ -504,36 +504,36 @@ AddFunction AfflictionDefaultShortCdActions
  }
 }
 
-AddFunction AfflictionDefaultShortCdPostConditions
+AddFunction affliction_defaultshortcdpostconditions
 {
- AfflictionCooldownsShortCdPostConditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt) or target.DebuffRemaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or not undefined() and soulshards() == 5 and spell(unstable_affliction) or undefined() and soulshards() == 5 and spell(seed_of_corruption) or AfflictionDotsShortCdPostConditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint) or timeincombat() < 15 and spell(vile_taint) or AfflictionSpendersShortCdPostConditions() or AfflictionFillersShortCdPostConditions()
+ afflictioncooldownsshortcdpostconditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt) or target.debuffremaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or not use_seed() and soulshards() == 5 and spell(unstable_affliction) or use_seed() and soulshards() == 5 and spell(seed_of_corruption) or afflictiondotsshortcdpostconditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.debuffremaining(agony_debuff) >= 10 and target.debuffremaining(corruption_debuff) >= 10 and { target.debuffremaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint) or timeincombat() < 15 and spell(vile_taint) or afflictionspendersshortcdpostconditions() or afflictionfillersshortcdpostconditions()
 }
 
-AddFunction AfflictionDefaultCdActions
+AddFunction affliction_defaultcdactions
 {
  #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3+raid_event.invulnerable.up|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5+raid_event.invulnerable.up|spell_targets.seed_of_corruption>=8+raid_event.invulnerable.up
  #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
  #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
  #variable,name=maintain_se,value=spell_targets.seed_of_corruption_aoe<=1+talent.writhe_in_agony.enabled+talent.absolute_corruption.enabled*2+(talent.writhe_in_agony.enabled&talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>2)+(talent.siphon_life.enabled&!talent.creeping_death.enabled&!talent.drain_soul.enabled)+raid_event.invulnerable.up
  #call_action_list,name=cooldowns
- AfflictionCooldownsCdActions()
+ afflictioncooldownscdactions()
 
- unless AfflictionCooldownsCdPostConditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt)
+ unless afflictioncooldownscdpostconditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt)
  {
   #summon_darkglare,if=summon_darkglare,if=dot.agony.ticking&dot.corruption.ticking&(buff.active_uas.stack=5|soul_shard=0|dot.phantom_singularity.remains&dot.phantom_singularity.remains<=gcd)&(!talent.phantom_singularity.enabled|dot.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up)
-  if target.DebuffPresent(agony_debuff) and target.DebuffPresent(corruption_debuff) and { target.DebuffStacks(unstable_affliction_debuff) == 5 or soulshards() == 0 or target.DebuffRemaining(phantom_singularity) and target.DebuffRemaining(phantom_singularity) <= gcd() } and { not hastalent(phantom_singularity_talent) or target.DebuffRemaining(phantom_singularity) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= gcd() or not spellcooldown(deathbolt) > 0 or enemies() > 1 + false(raid_events_invulnerable_up) } spell(summon_darkglare)
+  if target.debuffpresent(agony_debuff) and target.debuffpresent(corruption_debuff) and { target.debuffstacks(unstable_affliction_debuff) == 5 or soulshards() == 0 or target.debuffremaining(phantom_singularity) and target.debuffremaining(phantom_singularity) <= gcd() } and { not hastalent(phantom_singularity_talent) or target.debuffremaining(phantom_singularity) } and { not hastalent(deathbolt_talent) or spellcooldown(deathbolt) <= gcd() or not spellcooldown(deathbolt) > 0 or enemies() > 1 + false(raid_events_invulnerable_up) } spell(summon_darkglare)
 
-  unless spellcooldown(summon_darkglare) > 0 and enemies() == 1 + false(raid_events_invulnerable_up) and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 30 } and spell(deathbolt) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or target.DebuffRemaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony)
+  unless spellcooldown(summon_darkglare) > 0 and enemies() == 1 + false(raid_events_invulnerable_up) and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 30 } and spell(deathbolt) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or target.debuffremaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony)
   {
    #memory_of_lucid_dreams,if=time<30
    if timeincombat() < 30 spell(memory_of_lucid_dreams_essence)
 
-   unless timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or timeincombat() > 35 and target.timetodie() > 16 * { 100 / { 100 + spellcastspeedpercent() } } and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 45 + soulshards() * azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) < 15 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) } and spell(phantom_singularity) or not undefined() and soulshards() == 5 and spell(unstable_affliction) or undefined() and soulshards() == 5 and spell(seed_of_corruption)
+   unless timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or timeincombat() > 35 and target.timetodie() > 16 * { 100 / { 100 + spellcastspeedpercent() } } and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 45 + soulshards() * azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) < 15 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) } and spell(phantom_singularity) or not use_seed() and soulshards() == 5 and spell(unstable_affliction) or use_seed() and soulshards() == 5 and spell(seed_of_corruption)
    {
     #call_action_list,name=dots
-    AfflictionDotsCdActions()
+    afflictiondotscdactions()
 
-    unless AfflictionDotsCdPostConditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint)
+    unless afflictiondotscdpostconditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.debuffremaining(agony_debuff) >= 10 and target.debuffremaining(corruption_debuff) >= 10 and { target.debuffremaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint)
     {
      #use_item,name=azsharas_font_of_power,if=time<=3
      if timeincombat() <= 3 afflictionuseitemactions()
@@ -541,18 +541,18 @@ AddFunction AfflictionDefaultCdActions
      unless timeincombat() <= 35 and spell(phantom_singularity) or timeincombat() < 15 and spell(vile_taint)
      {
       #guardian_of_azeroth,if=(cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled|(azerite.dreadful_calling.rank|essence.vision_of_perfection.rank)&time>30&target.time_to_die>=210)&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
-      if { spellcooldown(summon_darkglare) < 15 + soulshards() * hasazeritetrait(dreadful_calling_trait) or { azeritetraitrank(dreadful_calling_trait) or azeriteessencerank(vision_of_perfection_essence_id) } and timeincombat() > 30 and target.timetodie() >= 210 } and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) or not hastalent(phantom_singularity_talent) and not hastalent(vile_taint_talent) } or target.timetodie() < 30 + gcd() spell(guardian_of_azeroth)
+      if { spellcooldown(summon_darkglare) < 15 + soulshards() * hasazeritetrait(dreadful_calling_trait) or { azeritetraitrank(dreadful_calling_trait) or azeriteessencerank(vision_of_perfection_essence_id) } and timeincombat() > 30 and target.timetodie() >= 210 } and { target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) or not hastalent(phantom_singularity_talent) and not hastalent(vile_taint_talent) } or target.timetodie() < 30 + gcd() spell(guardian_of_azeroth)
       #dark_soul,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled&(dot.phantom_singularity.remains|dot.vile_taint.remains)
-      if spellcooldown(summon_darkglare) < 15 + soulshards() * hasazeritetrait(dreadful_calling_trait) and { target.DebuffRemaining(phantom_singularity) or target.DebuffRemaining(vile_taint_debuff) } spell(dark_soul_misery)
+      if spellcooldown(summon_darkglare) < 15 + soulshards() * hasazeritetrait(dreadful_calling_trait) and { target.debuffremaining(phantom_singularity) or target.debuffremaining(vile_taint_debuff) } spell(dark_soul_misery)
       #berserking
       spell(berserking)
       #call_action_list,name=spenders
-      AfflictionSpendersCdActions()
+      afflictionspenderscdactions()
 
-      unless AfflictionSpendersCdPostConditions()
+      unless afflictionspenderscdpostconditions()
       {
        #call_action_list,name=fillers
-       AfflictionFillersCdActions()
+       afflictionfillerscdactions()
       }
      }
     }
@@ -561,21 +561,21 @@ AddFunction AfflictionDefaultCdActions
  }
 }
 
-AddFunction AfflictionDefaultCdPostConditions
+AddFunction affliction_defaultcdpostconditions
 {
- AfflictionCooldownsCdPostConditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt) or spellcooldown(summon_darkglare) > 0 and enemies() == 1 + false(raid_events_invulnerable_up) and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 30 } and spell(deathbolt) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or target.DebuffRemaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and undefined() and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or timeincombat() > 35 and target.timetodie() > 16 * { 100 / { 100 + spellcastspeedpercent() } } and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 45 + soulshards() * azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) < 15 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) } and spell(phantom_singularity) or not undefined() and soulshards() == 5 and spell(unstable_affliction) or undefined() and soulshards() == 5 and spell(seed_of_corruption) or AfflictionDotsCdPostConditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.DebuffRemaining(agony_debuff) >= 10 and target.DebuffRemaining(corruption_debuff) >= 10 and { target.DebuffRemaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint) or timeincombat() <= 35 and spell(phantom_singularity) or timeincombat() < 15 and spell(vile_taint) or AfflictionSpendersCdPostConditions() or AfflictionFillersCdPostConditions()
+ afflictioncooldownscdpostconditions() or target.timetodie() <= gcd() and soulshards() < 5 and spell(drain_soul) or enemies() <= 2 + false(raid_events_invulnerable_up) and spell(haunt) or spellcooldown(summon_darkglare) > 0 and enemies() == 1 + false(raid_events_invulnerable_up) and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 30 } and spell(deathbolt) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or target.debuffremaining(agony_debuff) <= gcd() + executetime(shadow_bolt_affliction) and target.timetodie() > 8 and spell(agony) or timesincepreviousspell(agony) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(agony) or timesincepreviousspell(corruption) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and not hastalent(absolute_corruption_talent) and { hastalent(siphon_life_talent) or enemies() > 1 and enemies() <= 3 } and spell(corruption) or timesincepreviousspell(siphon_life) > 30 and timeincombat() > 30 and spellcooldown(summon_darkglare) <= 15 and hasequippeditem(169314) and spell(siphon_life) or not buffremaining(unstable_affliction_buff) and target.timetodie() <= 8 and spell(unstable_affliction) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= gcd() * 2 and spell(drain_soul) or hastalent(shadow_embrace_talent) and maintain_se() and target.debuffpresent(shadow_embrace_debuff) and target.debuffremaining(shadow_embrace_debuff) <= executetime(shadow_bolt_affliction) * 2 + traveltime(shadow_bolt_affliction) and not inflighttotarget(shadow_bolt_affliction) and spell(shadow_bolt_affliction) or timeincombat() > 35 and target.timetodie() > 16 * { 100 / { 100 + spellcastspeedpercent() } } and { not azeriteessenceisminor(vision_of_perfection_essence_id) and not azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) > 45 + soulshards() * azeritetraitrank(dreadful_calling_trait) or spellcooldown(summon_darkglare) < 15 * { 100 / { 100 + spellcastspeedpercent() } } + soulshards() * azeritetraitrank(dreadful_calling_trait) } and spell(phantom_singularity) or not use_seed() and soulshards() == 5 and spell(unstable_affliction) or use_seed() and soulshards() == 5 and spell(seed_of_corruption) or afflictiondotscdpostconditions() or timeincombat() > 15 and target.timetodie() >= 10 and { spellcooldown(summon_darkglare) > 30 or spellcooldown(summon_darkglare) < 10 and target.debuffremaining(agony_debuff) >= 10 and target.debuffremaining(corruption_debuff) >= 10 and { target.debuffremaining(siphon_life_debuff) >= 10 or not hastalent(siphon_life_talent) } } and spell(vile_taint) or timeincombat() <= 35 and spell(phantom_singularity) or timeincombat() < 15 and spell(vile_taint) or afflictionspenderscdpostconditions() or afflictionfillerscdpostconditions()
 }
 
 ### Affliction icons.
 
-AddCheckBox(opt_warlock_affliction_aoe l(AOE) default specialization=affliction)
+AddCheckBox(opt_warlock_affliction_aoe l(aoe) default specialization=affliction)
 
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
 {
  if not incombat() afflictionprecombatshortcdactions()
  unless not incombat() and afflictionprecombatshortcdpostconditions()
  {
-  afflictiondefaultshortcdactions()
+  affliction_defaultshortcdactions()
  }
 }
 
@@ -584,7 +584,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=afflicti
  if not incombat() afflictionprecombatshortcdactions()
  unless not incombat() and afflictionprecombatshortcdpostconditions()
  {
-  afflictiondefaultshortcdactions()
+  affliction_defaultshortcdactions()
  }
 }
 
@@ -593,7 +593,7 @@ AddIcon enemies=1 help=main specialization=affliction
  if not incombat() afflictionprecombatmainactions()
  unless not incombat() and afflictionprecombatmainpostconditions()
  {
-  afflictiondefaultmainactions()
+  affliction_defaultmainactions()
  }
 }
 
@@ -602,7 +602,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
  if not incombat() afflictionprecombatmainactions()
  unless not incombat() and afflictionprecombatmainpostconditions()
  {
-  afflictiondefaultmainactions()
+  affliction_defaultmainactions()
  }
 }
 
@@ -611,7 +611,7 @@ AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=af
  if not incombat() afflictionprecombatcdactions()
  unless not incombat() and afflictionprecombatcdpostconditions()
  {
-  afflictiondefaultcdactions()
+  affliction_defaultcdactions()
  }
 }
 
@@ -620,7 +620,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
  if not incombat() afflictionprecombatcdactions()
  unless not incombat() and afflictionprecombatcdpostconditions()
  {
-  afflictiondefaultcdactions()
+  affliction_defaultcdactions()
  }
 }
 
@@ -657,7 +657,6 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # haunt_debuff
 # haunt_talent
 # inevitable_demise_buff
-# lifeblood_buff
 # memory_of_lucid_dreams_essence
 # nightfall_buff
 # pandemic_invocation_trait
@@ -691,13 +690,13 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 }
 
 {
-	const name = "sc_t23_warlock_demonology"
-	const desc = "[8.2] Simulationcraft: T23_Warlock_Demonology"
+	const name = "sc_t24_warlock_demonology"
+	const desc = "[8.3] Simulationcraft: T24_Warlock_Demonology"
 	const code = `
-# Based on SimulationCraft profile "T23_Warlock_Demonology".
+# Based on SimulationCraft profile "T24_Warlock_Demonology".
 #	class=warlock
 #	spec=demonology
-#	talents=2103032
+#	talents=2303032
 #	pet=felguard
 
 Include(ovale_common)
@@ -707,15 +706,15 @@ Include(ovale_warlock_spells)
 
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=demonology)
 
-AddFunction DemonologyUseItemActions
+AddFunction demonologyuseitemactions
 {
- item(Trinket0Slot text=13 usable=1)
- item(Trinket1Slot text=14 usable=1)
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
 }
 
 ### actions.precombat
 
-AddFunction DemonologyPrecombatMainActions
+AddFunction demonologyprecombatmainactions
 {
  #inner_demons,if=talent.inner_demons.enabled
  if hastalent(inner_demons_talent) spell(inner_demons)
@@ -723,11 +722,11 @@ AddFunction DemonologyPrecombatMainActions
  spell(demonbolt)
 }
 
-AddFunction DemonologyPrecombatMainPostConditions
+AddFunction demonologyprecombatmainpostconditions
 {
 }
 
-AddFunction DemonologyPrecombatShortCdActions
+AddFunction demonologyprecombatshortcdactions
 {
  #flask
  #food
@@ -736,12 +735,12 @@ AddFunction DemonologyPrecombatShortCdActions
  if not pet.present() spell(summon_felguard)
 }
 
-AddFunction DemonologyPrecombatShortCdPostConditions
+AddFunction demonologyprecombatshortcdpostconditions
 {
  hastalent(inner_demons_talent) and spell(inner_demons) or spell(demonbolt)
 }
 
-AddFunction DemonologyPrecombatCdActions
+AddFunction demonologyprecombatcdactions
 {
  unless not pet.present() and spell(summon_felguard) or hastalent(inner_demons_talent) and spell(inner_demons)
  {
@@ -751,14 +750,14 @@ AddFunction DemonologyPrecombatCdActions
  }
 }
 
-AddFunction DemonologyPrecombatCdPostConditions
+AddFunction demonologyprecombatcdpostconditions
 {
  not pet.present() and spell(summon_felguard) or hastalent(inner_demons_talent) and spell(inner_demons) or spell(demonbolt)
 }
 
 ### actions.opener
 
-AddFunction DemonologyOpenerMainActions
+AddFunction demonologyopenermainactions
 {
  #hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
  if timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) spell(hand_of_guldan)
@@ -779,15 +778,15 @@ AddFunction DemonologyOpenerMainActions
  #demonbolt,if=soul_shard<=3&buff.demonic_core.remains
  if soulshards() <= 3 and buffpresent(demonic_core_buff) spell(demonbolt)
  #call_action_list,name=build_a_shard
- DemonologyBuildashardMainActions()
+ demonologybuild_a_shardmainactions()
 }
 
-AddFunction DemonologyOpenerMainPostConditions
+AddFunction demonologyopenermainpostconditions
 {
- DemonologyBuildashardMainPostConditions()
+ demonologybuild_a_shardmainpostconditions()
 }
 
-AddFunction DemonologyOpenerShortCdActions
+AddFunction demonologyopenershortcdactions
 {
  unless timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom) or previousgcdspell(hand_of_guldan) and soulshards() > 0 and previousgcdspell(soul_strike count=2) and spell(hand_of_guldan)
  {
@@ -809,19 +808,19 @@ AddFunction DemonologyOpenerShortCdActions
     unless soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt)
     {
      #call_action_list,name=build_a_shard
-     DemonologyBuildashardShortCdActions()
+     demonologybuild_a_shardshortcdactions()
     }
    }
   }
  }
 }
 
-AddFunction DemonologyOpenerShortCdPostConditions
+AddFunction demonologyopenershortcdpostconditions
 {
- timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom) or previousgcdspell(hand_of_guldan) and soulshards() > 0 and previousgcdspell(soul_strike count=2) and spell(hand_of_guldan) or timesincepreviousspell(soul_strike) > 30 and { not buffpresent(bloodlust) or timeincombat() > 5 and previousgcdspell(hand_of_guldan) } and spell(soul_strike) or soulshards() == 5 and spell(call_dreadstalkers) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and previousgcdspell(hand_of_guldan count=2) and timeincombat() > 5 and { previousgcdspell(soul_strike) or not hastalent(soul_strike_talent) and previousgcdspell(shadow_bolt) } and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
+ timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom) or previousgcdspell(hand_of_guldan) and soulshards() > 0 and previousgcdspell(soul_strike count=2) and spell(hand_of_guldan) or timesincepreviousspell(soul_strike) > 30 and { not buffpresent(bloodlust) or timeincombat() > 5 and previousgcdspell(hand_of_guldan) } and spell(soul_strike) or soulshards() == 5 and spell(call_dreadstalkers) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and previousgcdspell(hand_of_guldan count=2) and timeincombat() > 5 and { previousgcdspell(soul_strike) or not hastalent(soul_strike_talent) and previousgcdspell(shadow_bolt) } and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt) or demonologybuild_a_shardshortcdpostconditions()
 }
 
-AddFunction DemonologyOpenerCdActions
+AddFunction demonologyopenercdactions
 {
  unless timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom)
  {
@@ -836,53 +835,57 @@ AddFunction DemonologyOpenerCdActions
    unless soulshards() == 5 and spell(call_dreadstalkers) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and previousgcdspell(hand_of_guldan count=2) and timeincombat() > 5 and { previousgcdspell(soul_strike) or not hastalent(soul_strike_talent) and previousgcdspell(shadow_bolt) } and spell(hand_of_guldan) or { previousgcdspell(demonic_strength) or previousgcdspell(hand_of_guldan) and previousgcdspell(hand_of_guldan count=2) or not hastalent(demonic_strength_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 } and spell(summon_demonic_tyrant) or soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt)
    {
     #call_action_list,name=build_a_shard
-    DemonologyBuildashardCdActions()
+    demonologybuild_a_shardcdactions()
    }
   }
  }
 }
 
-AddFunction DemonologyOpenerCdPostConditions
+AddFunction demonologyopenercdpostconditions
 {
- timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom) or previousgcdspell(hand_of_guldan) and soulshards() > 0 and previousgcdspell(soul_strike count=2) and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and inflighttotarget(hand_of_guldan) and spell(demonic_strength) or spell(bilescourge_bombers) or timesincepreviousspell(soul_strike) > 30 and { not buffpresent(bloodlust) or timeincombat() > 5 and previousgcdspell(hand_of_guldan) } and spell(soul_strike) or soulshards() == 5 and spell(summon_vilefiend) or soulshards() == 5 and spell(call_dreadstalkers) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and previousgcdspell(hand_of_guldan count=2) and timeincombat() > 5 and { previousgcdspell(soul_strike) or not hastalent(soul_strike_talent) and previousgcdspell(shadow_bolt) } and spell(hand_of_guldan) or { previousgcdspell(demonic_strength) or previousgcdspell(hand_of_guldan) and previousgcdspell(hand_of_guldan count=2) or not hastalent(demonic_strength_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 } and spell(summon_demonic_tyrant) or soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt) or DemonologyBuildashardCdPostConditions()
+ timesincepreviousspell(hand_of_guldan) > 30 and hasazeritetrait(explosive_potential_trait) and spell(hand_of_guldan) or hasazeritetrait(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffexpires(explosive_potential) and spell(implosion) or timesincepreviousspell(doom) > 30 and spell(doom) or previousgcdspell(hand_of_guldan) and soulshards() > 0 and previousgcdspell(soul_strike count=2) and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and inflighttotarget(hand_of_guldan) and spell(demonic_strength) or spell(bilescourge_bombers) or timesincepreviousspell(soul_strike) > 30 and { not buffpresent(bloodlust) or timeincombat() > 5 and previousgcdspell(hand_of_guldan) } and spell(soul_strike) or soulshards() == 5 and spell(summon_vilefiend) or soulshards() == 5 and spell(call_dreadstalkers) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and previousgcdspell(hand_of_guldan count=2) and timeincombat() > 5 and { previousgcdspell(soul_strike) or not hastalent(soul_strike_talent) and previousgcdspell(shadow_bolt) } and spell(hand_of_guldan) or { previousgcdspell(demonic_strength) or previousgcdspell(hand_of_guldan) and previousgcdspell(hand_of_guldan count=2) or not hastalent(demonic_strength_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 } and spell(summon_demonic_tyrant) or soulshards() <= 3 and buffpresent(demonic_core_buff) and spell(demonbolt) or demonologybuild_a_shardcdpostconditions()
 }
 
 ### actions.nether_portal_building
 
-AddFunction DemonologyNetherportalbuildingMainActions
+AddFunction demonologynether_portal_buildingmainactions
 {
  #call_dreadstalkers,if=time>=30
  if timeincombat() >= 30 spell(call_dreadstalkers)
  #hand_of_guldan,if=time>=30&cooldown.call_dreadstalkers.remains>18&soul_shard>=3
  if timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 spell(hand_of_guldan)
- #power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
- if timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 spell(power_siphon)
  #hand_of_guldan,if=time>=30&soul_shard>=5
  if timeincombat() >= 30 and soulshards() >= 5 spell(hand_of_guldan)
  #call_action_list,name=build_a_shard
- DemonologyBuildashardMainActions()
+ demonologybuild_a_shardmainactions()
 }
 
-AddFunction DemonologyNetherportalbuildingMainPostConditions
+AddFunction demonologynether_portal_buildingmainpostconditions
 {
- DemonologyBuildashardMainPostConditions()
+ demonologybuild_a_shardmainpostconditions()
 }
 
-AddFunction DemonologyNetherportalbuildingShortCdActions
+AddFunction demonologynether_portal_buildingshortcdactions
 {
- unless timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan)
+ unless timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan)
  {
-  #call_action_list,name=build_a_shard
-  DemonologyBuildashardShortCdActions()
+  #power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
+  if timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 spell(power_siphon)
+
+  unless timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan)
+  {
+   #call_action_list,name=build_a_shard
+   demonologybuild_a_shardshortcdactions()
+  }
  }
 }
 
-AddFunction DemonologyNetherportalbuildingShortCdPostConditions
+AddFunction demonologynether_portal_buildingshortcdpostconditions
 {
- timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or DemonologyBuildashardShortCdPostConditions()
+ timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or demonologybuild_a_shardshortcdpostconditions()
 }
 
-AddFunction DemonologyNetherportalbuildingCdActions
+AddFunction demonologynether_portal_buildingcdactions
 {
  #use_item,name=azsharas_font_of_power,if=cooldown.nether_portal.remains<=5*spell_haste
  if spellcooldown(nether_portal) <= 5 * { 100 / { 100 + spellcastspeedpercent() } } demonologyuseitemactions()
@@ -894,41 +897,41 @@ AddFunction DemonologyNetherportalbuildingCdActions
  unless timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan)
  {
   #call_action_list,name=build_a_shard
-  DemonologyBuildashardCdActions()
+  demonologybuild_a_shardcdactions()
  }
 }
 
-AddFunction DemonologyNetherportalbuildingCdPostConditions
+AddFunction demonologynether_portal_buildingcdpostconditions
 {
- timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or DemonologyBuildashardCdPostConditions()
+ timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or demonologybuild_a_shardcdpostconditions()
 }
 
 ### actions.nether_portal_active
 
-AddFunction DemonologyNetherportalactiveMainActions
+AddFunction demonologynether_portal_activemainactions
 {
  #call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
  if spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 spell(call_dreadstalkers)
  #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
- if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } DemonologyBuildashardMainActions()
+ if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } demonologybuild_a_shardmainactions()
 
- unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardMainPostConditions()
+ unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardmainpostconditions()
  {
   #hand_of_guldan,if=((cooldown.call_dreadstalkers.remains>action.demonbolt.cast_time)&(cooldown.call_dreadstalkers.remains>action.shadow_bolt.cast_time))&cooldown.nether_portal.remains>(165+action.hand_of_guldan.cast_time)
   if spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) spell(hand_of_guldan)
   #demonbolt,if=buff.demonic_core.up&soul_shard<=3
   if buffpresent(demonic_core_buff) and soulshards() <= 3 spell(demonbolt)
   #call_action_list,name=build_a_shard
-  DemonologyBuildashardMainActions()
+  demonologybuild_a_shardmainactions()
  }
 }
 
-AddFunction DemonologyNetherportalactiveMainPostConditions
+AddFunction demonologynether_portal_activemainpostconditions
 {
- soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardMainPostConditions() or DemonologyBuildashardMainPostConditions()
+ soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardmainpostconditions() or demonologybuild_a_shardmainpostconditions()
 }
 
-AddFunction DemonologyNetherportalactiveShortCdActions
+AddFunction demonologynether_portal_activeshortcdactions
 {
  #bilescourge_bombers
  spell(bilescourge_bombers)
@@ -938,9 +941,9 @@ AddFunction DemonologyNetherportalactiveShortCdActions
  unless { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers)
  {
   #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
-  if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } DemonologyBuildashardShortCdActions()
+  if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } demonologybuild_a_shardshortcdactions()
 
-  unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan)
+  unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardshortcdpostconditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan)
   {
    #summon_demonic_tyrant,if=buff.nether_portal.remains<5&soul_shard=0
    if buffremaining(nether_portal_buff) < 5 and soulshards() == 0 spell(summon_demonic_tyrant)
@@ -950,18 +953,18 @@ AddFunction DemonologyNetherportalactiveShortCdActions
    unless buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt)
    {
     #call_action_list,name=build_a_shard
-    DemonologyBuildashardShortCdActions()
+    demonologybuild_a_shardshortcdactions()
    }
   }
  }
 }
 
-AddFunction DemonologyNetherportalactiveShortCdPostConditions
+AddFunction demonologynether_portal_activeshortcdpostconditions
 {
- { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
+ { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardshortcdpostconditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt) or demonologybuild_a_shardshortcdpostconditions()
 }
 
-AddFunction DemonologyNetherportalactiveCdActions
+AddFunction demonologynether_portal_activecdactions
 {
  unless spell(bilescourge_bombers)
  {
@@ -971,78 +974,78 @@ AddFunction DemonologyNetherportalactiveCdActions
   unless { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers)
   {
    #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
-   if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } DemonologyBuildashardCdActions()
+   if soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } demonologybuild_a_shardcdactions()
 
-   unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffremaining(nether_portal_buff) < 5 and soulshards() == 0 and spell(summon_demonic_tyrant) or buffremaining(nether_portal_buff) < casttime(summon_demonic_tyrant) + 0.5 and spell(summon_demonic_tyrant) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt)
+   unless soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardcdpostconditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffremaining(nether_portal_buff) < 5 and soulshards() == 0 and spell(summon_demonic_tyrant) or buffremaining(nether_portal_buff) < casttime(summon_demonic_tyrant) + 0.5 and spell(summon_demonic_tyrant) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt)
    {
     #call_action_list,name=build_a_shard
-    DemonologyBuildashardCdActions()
+    demonologybuild_a_shardcdactions()
    }
   }
  }
 }
 
-AddFunction DemonologyNetherportalactiveCdPostConditions
+AddFunction demonologynether_portal_activecdpostconditions
 {
- spell(bilescourge_bombers) or { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffremaining(nether_portal_buff) < 5 and soulshards() == 0 and spell(summon_demonic_tyrant) or buffremaining(nether_portal_buff) < casttime(summon_demonic_tyrant) + 0.5 and spell(summon_demonic_tyrant) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt) or DemonologyBuildashardCdPostConditions()
+ spell(bilescourge_bombers) or { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() == 1 and { spellcooldown(call_dreadstalkers) < casttime(shadow_bolt) or hastalent(bilescourge_bombers_talent) and spellcooldown(bilescourge_bombers) < casttime(shadow_bolt) } and demonologybuild_a_shardcdpostconditions() or spellcooldown(call_dreadstalkers) > casttime(demonbolt) and spellcooldown(call_dreadstalkers) > casttime(shadow_bolt) and spellcooldown(nether_portal) > 165 + casttime(hand_of_guldan) and spell(hand_of_guldan) or buffremaining(nether_portal_buff) < 5 and soulshards() == 0 and spell(summon_demonic_tyrant) or buffremaining(nether_portal_buff) < casttime(summon_demonic_tyrant) + 0.5 and spell(summon_demonic_tyrant) or buffpresent(demonic_core_buff) and soulshards() <= 3 and spell(demonbolt) or demonologybuild_a_shardcdpostconditions()
 }
 
 ### actions.nether_portal
 
-AddFunction DemonologyNetherportalMainActions
+AddFunction demonologynether_portalmainactions
 {
  #call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
- if spellcooldown(nether_portal) < 20 DemonologyNetherportalbuildingMainActions()
+ if spellcooldown(nether_portal) < 20 demonologynether_portal_buildingmainactions()
 
- unless spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingMainPostConditions()
+ unless spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingmainpostconditions()
  {
   #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
-  if spellcooldown(nether_portal) > 165 DemonologyNetherportalactiveMainActions()
+  if spellcooldown(nether_portal) > 165 demonologynether_portal_activemainactions()
  }
 }
 
-AddFunction DemonologyNetherportalMainPostConditions
+AddFunction demonologynether_portalmainpostconditions
 {
- spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingMainPostConditions() or spellcooldown(nether_portal) > 165 and DemonologyNetherportalactiveMainPostConditions()
+ spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingmainpostconditions() or spellcooldown(nether_portal) > 165 and demonologynether_portal_activemainpostconditions()
 }
 
-AddFunction DemonologyNetherportalShortCdActions
+AddFunction demonologynether_portalshortcdactions
 {
  #call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
- if spellcooldown(nether_portal) < 20 DemonologyNetherportalbuildingShortCdActions()
+ if spellcooldown(nether_portal) < 20 demonologynether_portal_buildingshortcdactions()
 
- unless spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingShortCdPostConditions()
+ unless spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingshortcdpostconditions()
  {
   #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
-  if spellcooldown(nether_portal) > 165 DemonologyNetherportalactiveShortCdActions()
+  if spellcooldown(nether_portal) > 165 demonologynether_portal_activeshortcdactions()
  }
 }
 
-AddFunction DemonologyNetherportalShortCdPostConditions
+AddFunction demonologynether_portalshortcdpostconditions
 {
- spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingShortCdPostConditions() or spellcooldown(nether_portal) > 165 and DemonologyNetherportalactiveShortCdPostConditions()
+ spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingshortcdpostconditions() or spellcooldown(nether_portal) > 165 and demonologynether_portal_activeshortcdpostconditions()
 }
 
-AddFunction DemonologyNetherportalCdActions
+AddFunction demonologynether_portalcdactions
 {
  #call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
- if spellcooldown(nether_portal) < 20 DemonologyNetherportalbuildingCdActions()
+ if spellcooldown(nether_portal) < 20 demonologynether_portal_buildingcdactions()
 
- unless spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingCdPostConditions()
+ unless spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingcdpostconditions()
  {
   #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
-  if spellcooldown(nether_portal) > 165 DemonologyNetherportalactiveCdActions()
+  if spellcooldown(nether_portal) > 165 demonologynether_portal_activecdactions()
  }
 }
 
-AddFunction DemonologyNetherportalCdPostConditions
+AddFunction demonologynether_portalcdpostconditions
 {
- spellcooldown(nether_portal) < 20 and DemonologyNetherportalbuildingCdPostConditions() or spellcooldown(nether_portal) > 165 and DemonologyNetherportalactiveCdPostConditions()
+ spellcooldown(nether_portal) < 20 and demonologynether_portal_buildingcdpostconditions() or spellcooldown(nether_portal) > 165 and demonologynether_portal_activecdpostconditions()
 }
 
 ### actions.implosion
 
-AddFunction DemonologyImplosionMainActions
+AddFunction demonologyimplosionmainactions
 {
  #implosion,if=(buff.wild_imps.stack>=6&(soul_shard<3|prev_gcd.1.call_dreadstalkers|buff.wild_imps.stack>=9|prev_gcd.1.bilescourge_bombers|(!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan))&!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&buff.demonic_power.down)|(time_to_die<3&buff.wild_imps.stack>0)|(prev_gcd.2.call_dreadstalkers&buff.wild_imps.stack>2&!talent.demonic_calling.enabled)
  if demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) spell(implosion)
@@ -1055,23 +1058,23 @@ AddFunction DemonologyImplosionMainActions
  #demonbolt,if=prev_gcd.1.hand_of_guldan&soul_shard>=1&(buff.wild_imps.stack<=3|prev_gcd.3.hand_of_guldan)&soul_shard<4&buff.demonic_core.up
  if previousgcdspell(hand_of_guldan) and soulshards() >= 1 and { demons(wild_imp) + demons(wild_imp_inner_demons) <= 3 or previousgcdspell(hand_of_guldan count=3) } and soulshards() < 4 and buffpresent(demonic_core_buff) spell(demonbolt)
  #concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&spell_targets.implosion<5
- if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 spell(concentrated_flame_essence)
+ if not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 spell(concentrated_flame_essence)
  #soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
  if soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 spell(soul_strike)
  #demonbolt,if=soul_shard<=3&buff.demonic_core.up&(buff.demonic_core.stack>=3|buff.demonic_core.remains<=gcd*5.7)
  if soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } spell(demonbolt)
  #doom,cycle_targets=1,max_cycle_targets=7,if=refreshable
- if DebuffCountOnAny(doom_debuff) < enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.refreshable(doom_debuff) spell(doom)
+ if debuffcountonany(doom_debuff) < enemies() and debuffcountonany(doom_debuff) <= 7 and target.refreshable(doom_debuff) spell(doom)
  #call_action_list,name=build_a_shard
- DemonologyBuildashardMainActions()
+ demonologybuild_a_shardmainactions()
 }
 
-AddFunction DemonologyImplosionMainPostConditions
+AddFunction demonologyimplosionmainpostconditions
 {
- DemonologyBuildashardMainPostConditions()
+ demonologybuild_a_shardmainpostconditions()
 }
 
-AddFunction DemonologyImplosionShortCdActions
+AddFunction demonologyimplosionshortcdactions
 {
  unless { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers)
  {
@@ -1087,21 +1090,21 @@ AddFunction DemonologyImplosionShortCdActions
    #purifying_blast
    spell(purifying_blast)
 
-   unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or DebuffCountOnAny(doom_debuff) < enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom)
+   unless not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or debuffcountonany(doom_debuff) < enemies() and debuffcountonany(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom)
    {
     #call_action_list,name=build_a_shard
-    DemonologyBuildashardShortCdActions()
+    demonologybuild_a_shardshortcdactions()
    }
   }
  }
 }
 
-AddFunction DemonologyImplosionShortCdPostConditions
+AddFunction demonologyimplosionshortcdpostconditions
 {
- { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() >= 5 and spell(hand_of_guldan) or soulshards() >= 3 and { { previousgcdspell(hand_of_guldan count=2) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 } and demons(wild_imp) + demons(wild_imp_inner_demons) < 9 or spellcooldown(summon_demonic_tyrant) <= gcd() * 2 or buffremaining(demonic_power) > gcd() * 2 } and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and soulshards() >= 1 and { demons(wild_imp) + demons(wild_imp_inner_demons) <= 3 or previousgcdspell(hand_of_guldan count=3) } and soulshards() < 4 and buffpresent(demonic_core_buff) and spell(demonbolt) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or DebuffCountOnAny(doom_debuff) < enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom) or DemonologyBuildashardShortCdPostConditions()
+ { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or soulshards() >= 5 and spell(hand_of_guldan) or soulshards() >= 3 and { { previousgcdspell(hand_of_guldan count=2) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 } and demons(wild_imp) + demons(wild_imp_inner_demons) < 9 or spellcooldown(summon_demonic_tyrant) <= gcd() * 2 or buffremaining(demonic_power) > gcd() * 2 } and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and soulshards() >= 1 and { demons(wild_imp) + demons(wild_imp_inner_demons) <= 3 or previousgcdspell(hand_of_guldan count=3) } and soulshards() < 4 and buffpresent(demonic_core_buff) and spell(demonbolt) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or debuffcountonany(doom_debuff) < enemies() and debuffcountonany(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom) or demonologybuild_a_shardshortcdpostconditions()
 }
 
-AddFunction DemonologyImplosionCdActions
+AddFunction demonologyimplosioncdactions
 {
  unless { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion)
  {
@@ -1118,24 +1121,24 @@ AddFunction DemonologyImplosionCdActions
     #blood_of_the_enemy
     spell(blood_of_the_enemy)
 
-    unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or DebuffCountOnAny(doom_debuff) < enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom)
+    unless not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or debuffcountonany(doom_debuff) < enemies() and debuffcountonany(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom)
     {
      #call_action_list,name=build_a_shard
-     DemonologyBuildashardCdActions()
+     demonologybuild_a_shardcdactions()
     }
    }
   }
  }
 }
 
-AddFunction DemonologyImplosionCdPostConditions
+AddFunction demonologyimplosioncdpostconditions
 {
- { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or spell(summon_demonic_tyrant) or soulshards() >= 5 and spell(hand_of_guldan) or soulshards() >= 3 and { { previousgcdspell(hand_of_guldan count=2) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 } and demons(wild_imp) + demons(wild_imp_inner_demons) < 9 or spellcooldown(summon_demonic_tyrant) <= gcd() * 2 or buffremaining(demonic_power) > gcd() * 2 } and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and soulshards() >= 1 and { demons(wild_imp) + demons(wild_imp_inner_demons) <= 3 or previousgcdspell(hand_of_guldan count=3) } and soulshards() < 4 and buffpresent(demonic_core_buff) and spell(demonbolt) or { spellcooldown(summon_demonic_tyrant) > 40 and enemies() <= 2 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) > 9 and spell(bilescourge_bombers) or spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or DebuffCountOnAny(doom_debuff) < enemies() and DebuffCountOnAny(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom) or DemonologyBuildashardCdPostConditions()
+ { demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and { soulshards() < 3 or previousgcdspell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 9 or previousgcdspell(bilescourge_bombers) or not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) } and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and buffexpires(demonic_power) or target.timetodie() < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) > 0 or previousgcdspell(call_dreadstalkers count=2) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and not hastalent(demonic_calling_talent) } and spell(implosion) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or spell(summon_demonic_tyrant) or soulshards() >= 5 and spell(hand_of_guldan) or soulshards() >= 3 and { { previousgcdspell(hand_of_guldan count=2) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 } and demons(wild_imp) + demons(wild_imp_inner_demons) < 9 or spellcooldown(summon_demonic_tyrant) <= gcd() * 2 or buffremaining(demonic_power) > gcd() * 2 } and spell(hand_of_guldan) or previousgcdspell(hand_of_guldan) and soulshards() >= 1 and { demons(wild_imp) + demons(wild_imp_inner_demons) <= 3 or previousgcdspell(hand_of_guldan count=3) } and soulshards() < 4 and buffpresent(demonic_core_buff) and spell(demonbolt) or { spellcooldown(summon_demonic_tyrant) > 40 and enemies() <= 2 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) > 9 and spell(bilescourge_bombers) or spell(purifying_blast) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) <= gcd() * 5.7 } and spell(demonbolt) or debuffcountonany(doom_debuff) < enemies() and debuffcountonany(doom_debuff) <= 7 and target.refreshable(doom_debuff) and spell(doom) or demonologybuild_a_shardcdpostconditions()
 }
 
 ### actions.build_a_shard
 
-AddFunction DemonologyBuildashardMainActions
+AddFunction demonologybuild_a_shardmainactions
 {
  #soul_strike,if=!talent.demonic_consumption.enabled|time>15|prev_gcd.1.hand_of_guldan&!buff.bloodlust.remains
  if not hastalent(demonic_consumption_talent) or timeincombat() > 15 or previousgcdspell(hand_of_guldan) and not buffpresent(bloodlust) spell(soul_strike)
@@ -1143,38 +1146,38 @@ AddFunction DemonologyBuildashardMainActions
  spell(shadow_bolt)
 }
 
-AddFunction DemonologyBuildashardMainPostConditions
+AddFunction demonologybuild_a_shardmainpostconditions
 {
 }
 
-AddFunction DemonologyBuildashardShortCdActions
+AddFunction demonologybuild_a_shardshortcdactions
 {
 }
 
-AddFunction DemonologyBuildashardShortCdPostConditions
+AddFunction demonologybuild_a_shardshortcdpostconditions
 {
  { not hastalent(demonic_consumption_talent) or timeincombat() > 15 or previousgcdspell(hand_of_guldan) and not buffpresent(bloodlust) } and spell(soul_strike) or spell(shadow_bolt)
 }
 
-AddFunction DemonologyBuildashardCdActions
+AddFunction demonologybuild_a_shardcdactions
 {
  #memory_of_lucid_dreams,if=soul_shard<2
  if soulshards() < 2 spell(memory_of_lucid_dreams_essence)
 }
 
-AddFunction DemonologyBuildashardCdPostConditions
+AddFunction demonologybuild_a_shardcdpostconditions
 {
  { not hastalent(demonic_consumption_talent) or timeincombat() > 15 or previousgcdspell(hand_of_guldan) and not buffpresent(bloodlust) } and spell(soul_strike) or spell(shadow_bolt)
 }
 
 ### actions.default
 
-AddFunction DemonologyDefaultMainActions
+AddFunction demonology_defaultmainactions
 {
  #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
- if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 DemonologyOpenerMainActions()
+ if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 demonologyopenermainactions()
 
- unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerMainPostConditions()
+ unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenermainpostconditions()
  {
   #hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan
   if azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) spell(hand_of_guldan)
@@ -1183,25 +1186,23 @@ AddFunction DemonologyDefaultMainActions
   #implosion,if=azerite.explosive_potential.rank&buff.wild_imps.stack>2&buff.explosive_potential.remains<action.shadow_bolt.execute_time&(!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>12)
   if azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } spell(implosion)
   #doom,if=!ticking&time_to_die>30&spell_targets.implosion<2&!buff.nether_portal.remains
-  if not target.DebuffPresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) spell(doom)
+  if not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) spell(doom)
   #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
-  if hastalent(nether_portal_talent) and enemies() <= 2 DemonologyNetherportalMainActions()
+  if hastalent(nether_portal_talent) and enemies() <= 2 demonologynether_portalmainactions()
 
-  unless hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalMainPostConditions()
+  unless hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalmainpostconditions()
   {
    #call_action_list,name=implosion,if=spell_targets.implosion>1
-   if enemies() > 1 DemonologyImplosionMainActions()
+   if enemies() > 1 demonologyimplosionmainactions()
 
-   unless enemies() > 1 and DemonologyImplosionMainPostConditions()
+   unless enemies() > 1 and demonologyimplosionmainpostconditions()
    {
     #call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 spell(call_dreadstalkers)
     #hand_of_guldan,if=(azerite.baleful_invocation.enabled|talent.demonic_consumption.enabled)&prev_gcd.1.hand_of_guldan&cooldown.summon_demonic_tyrant.remains<2
     if { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 spell(hand_of_guldan)
-    #power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
-    if demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 spell(power_siphon)
     #doom,if=talent.doom.enabled&refreshable&time_to_die>(dot.doom.remains+30)
-    if hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.DebuffRemaining(doom_debuff) + 30 spell(doom)
+    if hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 spell(doom)
     #hand_of_guldan,if=soul_shard>=5|(soul_shard>=3&cooldown.call_dreadstalkers.remains>4&(cooldown.summon_demonic_tyrant.remains>20|(cooldown.summon_demonic_tyrant.remains<gcd*2&talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains<gcd*4&!talent.demonic_consumption.enabled))&(!talent.summon_vilefiend.enabled|cooldown.summon_vilefiend.remains>3))
     if soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } spell(hand_of_guldan)
     #soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
@@ -1209,43 +1210,43 @@ AddFunction DemonologyDefaultMainActions
     #demonbolt,if=soul_shard<=3&buff.demonic_core.up&((cooldown.summon_demonic_tyrant.remains<6|cooldown.summon_demonic_tyrant.remains>22&!azerite.shadows_bite.enabled)|buff.demonic_core.stack>=3|buff.demonic_core.remains<5|time_to_die<25|buff.shadows_bite.remains)
     if soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } spell(demonbolt)
     #concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
-    if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 spell(concentrated_flame_essence)
+    if not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 spell(concentrated_flame_essence)
     #call_action_list,name=build_a_shard
-    DemonologyBuildashardMainActions()
+    demonologybuild_a_shardmainactions()
    }
   }
  }
 }
 
-AddFunction DemonologyDefaultMainPostConditions
+AddFunction demonology_defaultmainpostconditions
 {
- not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerMainPostConditions() or hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalMainPostConditions() or enemies() > 1 and DemonologyImplosionMainPostConditions() or DemonologyBuildashardMainPostConditions()
+ not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenermainpostconditions() or hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalmainpostconditions() or enemies() > 1 and demonologyimplosionmainpostconditions() or demonologybuild_a_shardmainpostconditions()
 }
 
-AddFunction DemonologyDefaultShortCdActions
+AddFunction demonology_defaultshortcdactions
 {
- #worldvein_resonance,if=buff.lifeblood.stack<3&(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
- if buffstacks(lifeblood_buff) < 3 and { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } spell(worldvein_resonance_essence)
+ #worldvein_resonance,if=(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
+ if demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 spell(worldvein_resonance_essence)
  #ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
  if demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 spell(ripple_in_space_essence)
  #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
- if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 DemonologyOpenerShortCdActions()
+ if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 demonologyopenershortcdactions()
 
- unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerShortCdPostConditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.DebuffPresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom)
+ unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenershortcdpostconditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom)
  {
   #bilescourge_bombers,if=azerite.explosive_potential.rank>0&time<10&spell_targets.implosion<2&buff.dreadstalkers.remains&talent.nether_portal.enabled
   if azeritetraitrank(explosive_potential_trait) > 0 and timeincombat() < 10 and enemies() < 2 and demonduration(dreadstalker) and hastalent(nether_portal_talent) spell(bilescourge_bombers)
   #demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
   if demons(wild_imp) + demons(wild_imp_inner_demons) < 6 or buffpresent(demonic_power) or enemies() < 2 spell(demonic_strength)
   #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
-  if hastalent(nether_portal_talent) and enemies() <= 2 DemonologyNetherportalShortCdActions()
+  if hastalent(nether_portal_talent) and enemies() <= 2 demonologynether_portalshortcdactions()
 
-  unless hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalShortCdPostConditions()
+  unless hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalshortcdpostconditions()
   {
    #call_action_list,name=implosion,if=spell_targets.implosion>1
-   if enemies() > 1 DemonologyImplosionShortCdActions()
+   if enemies() > 1 demonologyimplosionshortcdactions()
 
-   unless enemies() > 1 and DemonologyImplosionShortCdPostConditions()
+   unless enemies() > 1 and demonologyimplosionshortcdpostconditions()
    {
     #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
     if spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 spell(summon_vilefiend)
@@ -1261,16 +1262,18 @@ AddFunction DemonologyDefaultShortCdActions
      {
       #summon_demonic_tyrant,if=soul_shard<3&(!talent.demonic_consumption.enabled|buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6&time_to_imps.all.remains<cast_time)|target.time_to_die<20
       if soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 spell(summon_demonic_tyrant)
+      #power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
+      if demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 spell(power_siphon)
 
-      unless demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.DebuffRemaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
+      unless hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
       {
        #purifying_blast
        spell(purifying_blast)
 
-       unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence)
+       unless not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence)
        {
         #call_action_list,name=build_a_shard
-        DemonologyBuildashardShortCdActions()
+        demonologybuild_a_shardshortcdactions()
        }
       }
      }
@@ -1280,12 +1283,12 @@ AddFunction DemonologyDefaultShortCdActions
  }
 }
 
-AddFunction DemonologyDefaultShortCdPostConditions
+AddFunction demonology_defaultshortcdpostconditions
 {
- not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerShortCdPostConditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.DebuffPresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalShortCdPostConditions() or enemies() > 1 and DemonologyImplosionShortCdPostConditions() or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.DebuffRemaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or DemonologyBuildashardShortCdPostConditions()
+ not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenershortcdpostconditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalshortcdpostconditions() or enemies() > 1 and demonologyimplosionshortcdpostconditions() or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or demonologybuild_a_shardshortcdpostconditions()
 }
 
-AddFunction DemonologyDefaultCdActions
+AddFunction demonology_defaultcdactions
 {
  #potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
  if { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } and { not hastalent(nether_portal_talent) or spellcooldown(nether_portal) > 160 } or target.timetodie() < 30 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
@@ -1302,7 +1305,7 @@ AddFunction DemonologyDefaultCdActions
  #blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
  if demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) <= 15 - gcd() * 3 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } spell(blood_of_the_enemy)
 
- unless buffstacks(lifeblood_buff) < 3 and { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(worldvein_resonance_essence) or { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(ripple_in_space_essence)
+ unless { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(worldvein_resonance_essence) or { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(ripple_in_space_essence)
  {
   #use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
   if spellcooldown(summon_demonic_tyrant) >= 20 and spellcooldown(summon_demonic_tyrant) <= spellcooldownduration(summon_demonic_tyrant) - 15 or target.timetodie() <= 30 demonologyuseitemactions()
@@ -1317,31 +1320,31 @@ AddFunction DemonologyDefaultCdActions
   #use_item,name=vial_of_storms,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
   if spellcooldown(summon_demonic_tyrant) >= 25 or target.timetodie() <= 30 demonologyuseitemactions()
   #call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
-  if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 DemonologyOpenerCdActions()
+  if not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 demonologyopenercdactions()
 
-  unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerCdPostConditions()
+  unless not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenercdpostconditions()
   {
    #use_item,name=azsharas_font_of_power,if=(time>30|!talent.nether_portal.enabled)&talent.grimoire_felguard.enabled&(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15)|target.time_to_die<=35
    if { timeincombat() > 30 or not hastalent(nether_portal_talent) } and hastalent(grimoire_felguard_talent) and { target.timetodie() > 120 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 15 } or target.timetodie() <= 35 demonologyuseitemactions()
 
-   unless azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.DebuffPresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or azeritetraitrank(explosive_potential_trait) > 0 and timeincombat() < 10 and enemies() < 2 and demonduration(dreadstalker) and hastalent(nether_portal_talent) and spell(bilescourge_bombers) or { demons(wild_imp) + demons(wild_imp_inner_demons) < 6 or buffpresent(demonic_power) or enemies() < 2 } and spell(demonic_strength)
+   unless azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or azeritetraitrank(explosive_potential_trait) > 0 and timeincombat() < 10 and enemies() < 2 and demonduration(dreadstalker) and hastalent(nether_portal_talent) and spell(bilescourge_bombers) or { demons(wild_imp) + demons(wild_imp_inner_demons) < 6 or buffpresent(demonic_power) or enemies() < 2 } and spell(demonic_strength)
    {
     #call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
-    if hastalent(nether_portal_talent) and enemies() <= 2 DemonologyNetherportalCdActions()
+    if hastalent(nether_portal_talent) and enemies() <= 2 demonologynether_portalcdactions()
 
-    unless hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalCdPostConditions()
+    unless hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalcdpostconditions()
     {
      #call_action_list,name=implosion,if=spell_targets.implosion>1
-     if enemies() > 1 DemonologyImplosionCdActions()
+     if enemies() > 1 demonologyimplosioncdactions()
 
-     unless enemies() > 1 and DemonologyImplosionCdPostConditions()
+     unless enemies() > 1 and demonologyimplosioncdpostconditions()
      {
       #guardian_of_azeroth,if=cooldown.summon_demonic_tyrant.remains<=15|target.time_to_die<=30
       if spellcooldown(summon_demonic_tyrant) <= 15 or target.timetodie() <= 30 spell(guardian_of_azeroth)
       #grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
       if target.timetodie() > 120 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 15 or spellcooldown(summon_demonic_tyrant) < 13 spell(grimoire_felguard)
 
-      unless { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(bilescourge_bombers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or { soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 } and spell(summon_demonic_tyrant) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.DebuffRemaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
+      unless { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(bilescourge_bombers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or { soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 } and spell(summon_demonic_tyrant) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
       {
        #focused_azerite_beam,if=!pet.demonic_tyrant.active
        if not demonduration(demonic_tyrant) > 0 spell(focused_azerite_beam)
@@ -1351,10 +1354,10 @@ AddFunction DemonologyDefaultCdActions
         #blood_of_the_enemy
         spell(blood_of_the_enemy)
 
-        unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence)
+        unless not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence)
         {
          #call_action_list,name=build_a_shard
-         DemonologyBuildashardCdActions()
+         demonologybuild_a_shardcdactions()
         }
        }
       }
@@ -1365,21 +1368,21 @@ AddFunction DemonologyDefaultCdActions
  }
 }
 
-AddFunction DemonologyDefaultCdPostConditions
+AddFunction demonology_defaultcdpostconditions
 {
- buffstacks(lifeblood_buff) < 3 and { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(worldvein_resonance_essence) or { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(ripple_in_space_essence) or not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and DemonologyOpenerCdPostConditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.DebuffPresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or azeritetraitrank(explosive_potential_trait) > 0 and timeincombat() < 10 and enemies() < 2 and demonduration(dreadstalker) and hastalent(nether_portal_talent) and spell(bilescourge_bombers) or { demons(wild_imp) + demons(wild_imp_inner_demons) < 6 or buffpresent(demonic_power) or enemies() < 2 } and spell(demonic_strength) or hastalent(nether_portal_talent) and enemies() <= 2 and DemonologyNetherportalCdPostConditions() or enemies() > 1 and DemonologyImplosionCdPostConditions() or { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(bilescourge_bombers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or { soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 } and spell(summon_demonic_tyrant) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.DebuffRemaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or DemonologyBuildashardCdPostConditions()
+ { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(worldvein_resonance_essence) or { demonduration(demonic_tyrant) > 0 and { not azeriteessenceismajor(vision_of_perfection_essence_id) or not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) >= spellcooldownduration(summon_demonic_tyrant) - 5 } or target.timetodie() <= 15 } and spell(ripple_in_space_essence) or not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenercdpostconditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or azeritetraitrank(explosive_potential_trait) > 0 and timeincombat() < 10 and enemies() < 2 and demonduration(dreadstalker) and hastalent(nether_portal_talent) and spell(bilescourge_bombers) or { demons(wild_imp) + demons(wild_imp_inner_demons) < 6 or buffpresent(demonic_power) or enemies() < 2 } and spell(demonic_strength) or hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalcdpostconditions() or enemies() > 1 and demonologyimplosioncdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or spellcooldown(summon_demonic_tyrant) < 12 } and spell(summon_vilefiend) or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(bilescourge_bombers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or { soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 } and spell(summon_demonic_tyrant) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or spell(purifying_blast) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or demonologybuild_a_shardcdpostconditions()
 }
 
 ### Demonology icons.
 
-AddCheckBox(opt_warlock_demonology_aoe l(AOE) default specialization=demonology)
+AddCheckBox(opt_warlock_demonology_aoe l(aoe) default specialization=demonology)
 
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
 {
  if not incombat() demonologyprecombatshortcdactions()
  unless not incombat() and demonologyprecombatshortcdpostconditions()
  {
-  demonologydefaultshortcdactions()
+  demonology_defaultshortcdactions()
  }
 }
 
@@ -1388,7 +1391,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonolo
  if not incombat() demonologyprecombatshortcdactions()
  unless not incombat() and demonologyprecombatshortcdpostconditions()
  {
-  demonologydefaultshortcdactions()
+  demonology_defaultshortcdactions()
  }
 }
 
@@ -1397,7 +1400,7 @@ AddIcon enemies=1 help=main specialization=demonology
  if not incombat() demonologyprecombatmainactions()
  unless not incombat() and demonologyprecombatmainpostconditions()
  {
-  demonologydefaultmainactions()
+  demonology_defaultmainactions()
  }
 }
 
@@ -1406,7 +1409,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
  if not incombat() demonologyprecombatmainactions()
  unless not incombat() and demonologyprecombatmainpostconditions()
  {
-  demonologydefaultmainactions()
+  demonology_defaultmainactions()
  }
 }
 
@@ -1415,7 +1418,7 @@ AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=de
  if not incombat() demonologyprecombatcdactions()
  unless not incombat() and demonologyprecombatcdpostconditions()
  {
-  demonologydefaultcdactions()
+  demonology_defaultcdactions()
  }
 }
 
@@ -1424,7 +1427,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
  if not incombat() demonologyprecombatcdactions()
  unless not incombat() and demonologyprecombatcdpostconditions()
  {
-  demonologydefaultcdactions()
+  demonology_defaultcdactions()
  }
 }
 
@@ -1463,7 +1466,6 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # implosion
 # inner_demons
 # inner_demons_talent
-# lifeblood_buff
 # memory_of_lucid_dreams_essence
 # nether_portal
 # nether_portal_buff
@@ -1492,13 +1494,13 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 }
 
 {
-	const name = "sc_t23_warlock_destruction"
-	const desc = "[8.2] Simulationcraft: T23_Warlock_Destruction"
+	const name = "sc_t24_warlock_destruction"
+	const desc = "[8.3] Simulationcraft: T24_Warlock_Destruction"
 	const code = `
-# Based on SimulationCraft profile "T23_Warlock_Destruction".
+# Based on SimulationCraft profile "T24_Warlock_Destruction".
 #	class=warlock
 #	spec=destruction
-#	talents=2203023
+#	talents=2103023
 #	pet=imp
 
 Include(ovale_common)
@@ -1514,15 +1516,15 @@ AddFunction pool_soul_shards
 
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=destruction)
 
-AddFunction DestructionUseItemActions
+AddFunction destructionuseitemactions
 {
- item(Trinket0Slot text=13 usable=1)
- item(Trinket1Slot text=14 usable=1)
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
 }
 
 ### actions.precombat
 
-AddFunction DestructionPrecombatMainActions
+AddFunction destructionprecombatmainactions
 {
  #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
  if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
@@ -1532,11 +1534,11 @@ AddFunction DestructionPrecombatMainActions
  if not hastalent(soul_fire_talent) spell(incinerate)
 }
 
-AddFunction DestructionPrecombatMainPostConditions
+AddFunction destructionprecombatmainpostconditions
 {
 }
 
-AddFunction DestructionPrecombatShortCdActions
+AddFunction destructionprecombatshortcdactions
 {
  #flask
  #food
@@ -1545,12 +1547,12 @@ AddFunction DestructionPrecombatShortCdActions
  if not pet.present() spell(summon_imp)
 }
 
-AddFunction DestructionPrecombatShortCdPostConditions
+AddFunction destructionprecombatshortcdpostconditions
 {
  hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or spell(soul_fire) or not hastalent(soul_fire_talent) and spell(incinerate)
 }
 
-AddFunction DestructionPrecombatCdActions
+AddFunction destructionprecombatcdactions
 {
  unless not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice)
  {
@@ -1560,54 +1562,54 @@ AddFunction DestructionPrecombatCdActions
  }
 }
 
-AddFunction DestructionPrecombatCdPostConditions
+AddFunction destructionprecombatcdpostconditions
 {
  not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or spell(soul_fire) or not hastalent(soul_fire_talent) and spell(incinerate)
 }
 
 ### actions.havoc
 
-AddFunction DestructionHavocMainActions
+AddFunction destructionhavocmainactions
 {
  #conflagrate,if=buff.backdraft.down&soul_shard>=1&soul_shard<=4
  if buffexpires(backdraft_buff) and soulshards() >= 1 and soulshards() <= 4 spell(conflagrate)
  #immolate,if=talent.internal_combustion.enabled&remains<duration*0.5|!talent.internal_combustion.enabled&refreshable
- if hastalent(internal_combustion_talent) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) spell(immolate)
+ if hastalent(internal_combustion_talent) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) spell(immolate)
  #chaos_bolt,if=cast_time<havoc_remains
- if casttime(chaos_bolt) < DebuffRemainingOnAny(havoc) spell(chaos_bolt)
+ if casttime(chaos_bolt) < debuffremainingonany(havoc) spell(chaos_bolt)
  #soul_fire
  spell(soul_fire)
  #shadowburn,if=active_enemies<3|!talent.fire_and_brimstone.enabled
  if enemies() < 3 or not hastalent(fire_and_brimstone_talent) spell(shadowburn)
  #incinerate,if=cast_time<havoc_remains
- if casttime(incinerate) < DebuffRemainingOnAny(havoc) spell(incinerate)
+ if casttime(incinerate) < debuffremainingonany(havoc) spell(incinerate)
 }
 
-AddFunction DestructionHavocMainPostConditions
+AddFunction destructionhavocmainpostconditions
 {
 }
 
-AddFunction DestructionHavocShortCdActions
+AddFunction destructionhavocshortcdactions
 {
 }
 
-AddFunction DestructionHavocShortCdPostConditions
+AddFunction destructionhavocshortcdpostconditions
 {
- buffexpires(backdraft_buff) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or { hastalent(internal_combustion_talent) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < DebuffRemainingOnAny(havoc) and spell(chaos_bolt) or spell(soul_fire) or { enemies() < 3 or not hastalent(fire_and_brimstone_talent) } and spell(shadowburn) or casttime(incinerate) < DebuffRemainingOnAny(havoc) and spell(incinerate)
+ buffexpires(backdraft_buff) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or { hastalent(internal_combustion_talent) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(soul_fire) or { enemies() < 3 or not hastalent(fire_and_brimstone_talent) } and spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
 }
 
-AddFunction DestructionHavocCdActions
+AddFunction destructionhavoccdactions
 {
 }
 
-AddFunction DestructionHavocCdPostConditions
+AddFunction destructionhavoccdpostconditions
 {
- buffexpires(backdraft_buff) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or { hastalent(internal_combustion_talent) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < DebuffRemainingOnAny(havoc) and spell(chaos_bolt) or spell(soul_fire) or { enemies() < 3 or not hastalent(fire_and_brimstone_talent) } and spell(shadowburn) or casttime(incinerate) < DebuffRemainingOnAny(havoc) and spell(incinerate)
+ buffexpires(backdraft_buff) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or { hastalent(internal_combustion_talent) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(soul_fire) or { enemies() < 3 or not hastalent(fire_and_brimstone_talent) } and spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
 }
 
 ### actions.gosup_infernal
 
-AddFunction DestructionGosupinfernalMainActions
+AddFunction destructiongosup_infernalmainactions
 {
  #rain_of_fire,if=soul_shard=5&!buff.backdraft.up&buff.memory_of_lucid_dreams.up&buff.grimoire_of_supremacy.stack<=10
  if soulshards() == 5 and not buffpresent(backdraft_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and buffstacks(grimoire_of_supremacy_buff) <= 10 spell(rain_of_fire)
@@ -1635,45 +1637,45 @@ AddFunction DestructionGosupinfernalMainActions
  spell(incinerate)
 }
 
-AddFunction DestructionGosupinfernalMainPostConditions
+AddFunction destructiongosup_infernalmainpostconditions
 {
 }
 
-AddFunction DestructionGosupinfernalShortCdActions
+AddFunction destructiongosup_infernalshortcdactions
 {
 }
 
-AddFunction DestructionGosupinfernalShortCdPostConditions
+AddFunction destructiongosup_infernalshortcdpostconditions
 {
  soulshards() == 5 and not buffpresent(backdraft_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and buffstacks(grimoire_of_supremacy_buff) <= 10 and spell(rain_of_fire) or buffpresent(backdraft_buff) and spell(chaos_bolt) or soulshards() >= 4.2 - buffpresent(memory_of_lucid_dreams_essence_buff) and spell(chaos_bolt) or not { not spellcooldown(conflagrate) > 0 } and spell(chaos_bolt) or casttime(chaos_bolt) < demonduration(infernal) and demonduration(infernal) < casttime(chaos_bolt) + gcd() and spell(chaos_bolt) or buffexpires(backdraft_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and soulshards() >= 1.3 and spell(conflagrate) or buffexpires(backdraft_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) and { soulshards() >= 2.8 or charges(conflagrate count=0) > 1.9 and soulshards() >= 1.3 } and spell(conflagrate) or demonduration(infernal) < 5 and spell(conflagrate) or charges(conflagrate) > 1 and spell(conflagrate) or spell(soul_fire) or spell(shadowburn) or spell(incinerate)
 }
 
-AddFunction DestructionGosupinfernalCdActions
+AddFunction destructiongosup_infernalcdactions
 {
 }
 
-AddFunction DestructionGosupinfernalCdPostConditions
+AddFunction destructiongosup_infernalcdpostconditions
 {
  soulshards() == 5 and not buffpresent(backdraft_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and buffstacks(grimoire_of_supremacy_buff) <= 10 and spell(rain_of_fire) or buffpresent(backdraft_buff) and spell(chaos_bolt) or soulshards() >= 4.2 - buffpresent(memory_of_lucid_dreams_essence_buff) and spell(chaos_bolt) or not { not spellcooldown(conflagrate) > 0 } and spell(chaos_bolt) or casttime(chaos_bolt) < demonduration(infernal) and demonduration(infernal) < casttime(chaos_bolt) + gcd() and spell(chaos_bolt) or buffexpires(backdraft_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and soulshards() >= 1.3 and spell(conflagrate) or buffexpires(backdraft_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) and { soulshards() >= 2.8 or charges(conflagrate count=0) > 1.9 and soulshards() >= 1.3 } and spell(conflagrate) or demonduration(infernal) < 5 and spell(conflagrate) or charges(conflagrate) > 1 and spell(conflagrate) or spell(soul_fire) or spell(shadowburn) or spell(incinerate)
 }
 
 ### actions.cds
 
-AddFunction DestructionCdsMainActions
+AddFunction destructioncdsmainactions
 {
  #immolate,if=talent.grimoire_of_supremacy.enabled&remains<8&cooldown.summon_infernal.remains<4.5
- if hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 spell(immolate)
+ if hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 spell(immolate)
  #conflagrate,if=talent.grimoire_of_supremacy.enabled&cooldown.summon_infernal.remains<4.5&!buff.backdraft.up&soul_shard<4.3
  if hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 spell(conflagrate)
 }
 
-AddFunction DestructionCdsMainPostConditions
+AddFunction destructioncdsmainpostconditions
 {
 }
 
-AddFunction DestructionCdsShortCdActions
+AddFunction destructioncdsshortcdactions
 {
- unless hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
+ unless hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
  {
   #worldvein_resonance
   spell(worldvein_resonance_essence)
@@ -1682,14 +1684,14 @@ AddFunction DestructionCdsShortCdActions
  }
 }
 
-AddFunction DestructionCdsShortCdPostConditions
+AddFunction destructioncdsshortcdpostconditions
 {
- hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
+ hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
 }
 
-AddFunction DestructionCdsCdActions
+AddFunction destructioncdscdactions
 {
- unless hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
+ unless hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate)
  {
   #use_item,name=azsharas_font_of_power,if=cooldown.summon_infernal.up|cooldown.summon_infernal.remains<=4
   if not spellcooldown(summon_infernal) > 0 or spellcooldown(summon_infernal) <= 4 destructionuseitemactions()
@@ -1700,7 +1702,7 @@ AddFunction DestructionCdsCdActions
   #dark_soul_instability,if=pet.infernal.active&(pet.infernal.remains<20.5|pet.infernal.remains<22&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
   if demonduration(infernal) > 0 and { demonduration(infernal) < 20.5 or demonduration(infernal) < 22 and soulshards() >= 3.6 or not hastalent(grimoire_of_supremacy_talent) } spell(dark_soul_instability)
   #memory_of_lucid_dreams,if=pet.infernal.active&(pet.infernal.remains<15.5|soul_shard<3.5&(buff.dark_soul_instability.up|!talent.grimoire_of_supremacy.enabled&dot.immolate.remains>12))
-  if demonduration(infernal) > 0 and { demonduration(infernal) < 15.5 or soulshards() < 3.5 and { buffpresent(dark_soul_instability_buff) or not hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) > 12 } } spell(memory_of_lucid_dreams_essence)
+  if demonduration(infernal) > 0 and { demonduration(infernal) < 15.5 or soulshards() < 3.5 and { buffpresent(dark_soul_instability_buff) or not hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) > 12 } } spell(memory_of_lucid_dreams_essence)
   #summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
   if target.timetodie() > spellcooldownduration(summon_infernal) + 30 spell(summon_infernal)
   #guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
@@ -1737,43 +1739,43 @@ AddFunction DestructionCdsCdActions
    #use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20
    if demonduration(infernal) > 0 and { not hastalent(grimoire_of_supremacy_talent) or demonduration(infernal) <= 20 } or target.timetodie() <= 20 destructionuseitemactions()
    #use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
    #use_item,name=rotcrusted_voodoo_doll,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
    #use_item,name=shiver_venom_relic,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
    #use_item,name=aquipotent_nautilus,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
    #use_item,name=tidestorm_codex,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
    #use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-   if target.DebuffRemaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
+   if target.debuffremaining(immolate_debuff) >= 5 and { spellcooldown(summon_infernal) >= 20 or target.timetodie() < 30 } destructionuseitemactions()
   }
  }
 }
 
-AddFunction DestructionCdsCdPostConditions
+AddFunction destructioncdscdpostconditions
 {
- hastalent(grimoire_of_supremacy_talent) and target.DebuffRemaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate) or spell(worldvein_resonance_essence) or spell(ripple_in_space_essence)
+ hastalent(grimoire_of_supremacy_talent) and target.debuffremaining(immolate_debuff) < 8 and spellcooldown(summon_infernal) < 4.5 and spell(immolate) or hastalent(grimoire_of_supremacy_talent) and spellcooldown(summon_infernal) < 4.5 and not buffpresent(backdraft_buff) and soulshards() < 4.3 and spell(conflagrate) or spell(worldvein_resonance_essence) or spell(ripple_in_space_essence)
 }
 
 ### actions.aoe
 
-AddFunction DestructionAoeMainActions
+AddFunction destructionaoemainactions
 {
  #rain_of_fire,if=pet.infernal.active&(buff.crashing_chaos.down|!talent.grimoire_of_supremacy.enabled)&(!cooldown.havoc.ready|active_enemies>3)
  if demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } spell(rain_of_fire)
  #channel_demonfire,if=dot.immolate.remains>cast_time
- if target.DebuffRemaining(immolate_debuff) > casttime(channel_demonfire) spell(channel_demonfire)
+ if target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) spell(channel_demonfire)
  #immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
- if target.DebuffRemaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } spell(immolate)
+ if target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } spell(immolate)
  #call_action_list,name=cds
- DestructionCdsMainActions()
+ destructioncdsmainactions()
 
- unless DestructionCdsMainPostConditions()
+ unless destructioncdsmainpostconditions()
  {
   #chaos_bolt,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active&(havoc_active|talent.cataclysm.enabled|talent.inferno.enabled&active_enemies<4)
-  if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { DebuffCountOnAny(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } spell(chaos_bolt)
+  if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { debuffcountonany(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } spell(chaos_bolt)
   #rain_of_fire
   spell(rain_of_fire)
   #incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
@@ -1785,30 +1787,30 @@ AddFunction DestructionAoeMainActions
   #shadowburn,if=!talent.fire_and_brimstone.enabled
   if not hastalent(fire_and_brimstone_talent) spell(shadowburn)
   #concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
-  if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 spell(concentrated_flame_essence)
+  if not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 spell(concentrated_flame_essence)
   #incinerate
   spell(incinerate)
  }
 }
 
-AddFunction DestructionAoeMainPostConditions
+AddFunction destructionaoemainpostconditions
 {
- DestructionCdsMainPostConditions()
+ destructioncdsmainpostconditions()
 }
 
-AddFunction DestructionAoeShortCdActions
+AddFunction destructionaoeshortcdactions
 {
- unless demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.DebuffRemaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.DebuffRemaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate)
+ unless demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
  {
   #call_action_list,name=cds
-  DestructionCdsShortCdActions()
+  destructioncdsshortcdactions()
 
-  unless DestructionCdsShortCdPostConditions()
+  unless destructioncdsshortcdpostconditions()
   {
    #havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
    if not false(target_is_target) and enemies() < 4 and enemies() > 1 spell(havoc)
 
-   unless hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { DebuffCountOnAny(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire)
+   unless hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { debuffcountonany(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire)
    {
     #purifying_blast
     spell(purifying_blast)
@@ -1819,19 +1821,19 @@ AddFunction DestructionAoeShortCdActions
  }
 }
 
-AddFunction DestructionAoeShortCdPostConditions
+AddFunction destructionaoeshortcdpostconditions
 {
- demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.DebuffRemaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.DebuffRemaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or DestructionCdsShortCdPostConditions() or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { DebuffCountOnAny(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or not hastalent(fire_and_brimstone_talent) and spell(shadowburn) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or spell(incinerate)
+ demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdsshortcdpostconditions() or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { debuffcountonany(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or not hastalent(fire_and_brimstone_talent) and spell(shadowburn) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or spell(incinerate)
 }
 
-AddFunction DestructionAoeCdActions
+AddFunction destructionaoecdactions
 {
- unless demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.DebuffRemaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.DebuffRemaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate)
+ unless demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
  {
   #call_action_list,name=cds
-  DestructionCdsCdActions()
+  destructioncdscdactions()
 
-  unless DestructionCdsCdPostConditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { DebuffCountOnAny(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire)
+  unless destructioncdscdpostconditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { debuffcountonany(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire)
   {
    #focused_azerite_beam
    spell(focused_azerite_beam)
@@ -1839,56 +1841,56 @@ AddFunction DestructionAoeCdActions
  }
 }
 
-AddFunction DestructionAoeCdPostConditions
+AddFunction destructionaoecdpostconditions
 {
- demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.DebuffRemaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.DebuffRemaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or DestructionCdsCdPostConditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { DebuffCountOnAny(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire) or spell(purifying_blast) or not false(target_is_target) and { not hastalent(grimoire_of_supremacy_talent) or not hastalent(inferno_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or not hastalent(fire_and_brimstone_talent) and spell(shadowburn) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or spell(incinerate)
+ demonduration(infernal) > 0 and { buffexpires(crashing_chaos_buff) or not hastalent(grimoire_of_supremacy_talent) } and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdscdpostconditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and { debuffcountonany(havoc) > 0 or hastalent(cataclysm_talent) or hastalent(inferno_talent) and enemies() < 4 } and spell(chaos_bolt) or spell(rain_of_fire) or spell(purifying_blast) or not false(target_is_target) and { not hastalent(grimoire_of_supremacy_talent) or not hastalent(inferno_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or not hastalent(fire_and_brimstone_talent) and spell(shadowburn) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and enemies() < 5 and spell(concentrated_flame_essence) or spell(incinerate)
 }
 
 ### actions.default
 
-AddFunction DestructionDefaultMainActions
+AddFunction destruction_defaultmainactions
 {
  #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } DestructionHavocMainActions()
+ if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocmainactions()
 
- unless DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocMainPostConditions()
+ unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions()
  {
   #call_action_list,name=aoe,if=active_enemies>2
-  if enemies() > 2 DestructionAoeMainActions()
+  if enemies() > 2 destructionaoemainactions()
 
-  unless enemies() > 2 and DestructionAoeMainPostConditions()
+  unless enemies() > 2 and destructionaoemainpostconditions()
   {
    #immolate,cycle_targets=1,if=refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
-   if target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } spell(immolate)
+   if target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } spell(immolate)
    #immolate,if=talent.internal_combustion.enabled&action.chaos_bolt.in_flight&remains<duration*0.5
-   if hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 spell(immolate)
+   if hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 spell(immolate)
    #call_action_list,name=cds
-   DestructionCdsMainActions()
+   destructioncdsmainactions()
 
-   unless DestructionCdsMainPostConditions()
+   unless destructioncdsmainpostconditions()
    {
     #concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-    if not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) spell(concentrated_flame_essence)
+    if not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) spell(concentrated_flame_essence)
     #channel_demonfire
     spell(channel_demonfire)
     #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
-    if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 DestructionGosupinfernalMainActions()
+    if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 destructiongosup_infernalmainactions()
 
-    unless hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and DestructionGosupinfernalMainPostConditions()
+    unless hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and destructiongosup_infernalmainpostconditions()
     {
      #soul_fire
      spell(soul_fire)
      #variable,name=pool_soul_shards,value=active_enemies>1&cooldown.havoc.remains<=10|cooldown.summon_infernal.remains<=15&(talent.grimoire_of_supremacy.enabled|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15)|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15&(cooldown.summon_infernal.remains>target.time_to_die|cooldown.summon_infernal.remains+cooldown.summon_infernal.duration>target.time_to_die)
      #conflagrate,if=buff.backdraft.down&soul_shard>=1.5-0.3*talent.flashover.enabled&!variable.pool_soul_shards
-     if buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not undefined() spell(conflagrate)
+     if buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() spell(conflagrate)
      #shadowburn,if=soul_shard<2&(!variable.pool_soul_shards|charges>1)
-     if soulshards() < 2 and { not undefined() or charges(shadowburn) > 1 } spell(shadowburn)
+     if soulshards() < 2 and { not pool_soul_shards() or charges(shadowburn) > 1 } spell(shadowburn)
      #chaos_bolt,if=(talent.grimoire_of_supremacy.enabled|azerite.crashing_chaos.enabled)&pet.infernal.active|buff.dark_soul_instability.up|buff.reckless_force.react&buff.reckless_force.remains>cast_time
      if { hastalent(grimoire_of_supremacy_talent) or hasazeritetrait(crashing_chaos_trait) } and demonduration(infernal) > 0 or buffpresent(dark_soul_instability_buff) or buffpresent(reckless_force_buff) and buffremaining(reckless_force_buff) > casttime(chaos_bolt) spell(chaos_bolt)
      #chaos_bolt,if=buff.backdraft.up&!variable.pool_soul_shards&!talent.eradication.enabled
-     if buffpresent(backdraft_buff) and not undefined() and not hastalent(eradication_talent) spell(chaos_bolt)
+     if buffpresent(backdraft_buff) and not pool_soul_shards() and not hastalent(eradication_talent) spell(chaos_bolt)
      #chaos_bolt,if=!variable.pool_soul_shards&talent.eradication.enabled&(debuff.eradication.remains<cast_time|buff.backdraft.up)
-     if not undefined() and hastalent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } spell(chaos_bolt)
+     if not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } spell(chaos_bolt)
      #chaos_bolt,if=(soul_shard>=4.5-0.2*active_enemies)&(!talent.grimoire_of_supremacy.enabled|cooldown.summon_infernal.remains>7)
      if soulshards() >= 4.5 - 0.2 * enemies() and { not hastalent(grimoire_of_supremacy_talent) or spellcooldown(summon_infernal) > 7 } spell(chaos_bolt)
      #conflagrate,if=charges>1
@@ -1901,97 +1903,97 @@ AddFunction DestructionDefaultMainActions
  }
 }
 
-AddFunction DestructionDefaultMainPostConditions
+AddFunction destruction_defaultmainpostconditions
 {
- DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocMainPostConditions() or enemies() > 2 and DestructionAoeMainPostConditions() or DestructionCdsMainPostConditions() or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and DestructionGosupinfernalMainPostConditions()
+ debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions() or enemies() > 2 and destructionaoemainpostconditions() or destructioncdsmainpostconditions() or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and destructiongosup_infernalmainpostconditions()
 }
 
-AddFunction DestructionDefaultShortCdActions
+AddFunction destruction_defaultshortcdactions
 {
  #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } DestructionHavocShortCdActions()
+ if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocshortcdactions()
 
- unless DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocShortCdPostConditions()
+ unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions()
  {
   #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1|!talent.grimoire_of_supremacy.enabled
-  if not { demonduration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) spell(cataclysm)
+  if not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) spell(cataclysm)
   #call_action_list,name=aoe,if=active_enemies>2
-  if enemies() > 2 DestructionAoeShortCdActions()
+  if enemies() > 2 destructionaoeshortcdactions()
 
-  unless enemies() > 2 and DestructionAoeShortCdPostConditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate)
+  unless enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate)
   {
    #call_action_list,name=cds
-   DestructionCdsShortCdActions()
+   destructioncdsshortcdactions()
 
-   unless DestructionCdsShortCdPostConditions()
+   unless destructioncdsshortcdpostconditions()
    {
     #the_unbound_force,if=buff.reckless_force.react
     if buffpresent(reckless_force_buff) spell(the_unbound_force)
     #purifying_blast
     spell(purifying_blast)
 
-    unless not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire)
+    unless not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire)
     {
      #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)&(!cooldown.summon_infernal.ready|!talent.grimoire_of_supremacy.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
-     if not false(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 spell(havoc)
+     if not false(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 spell(havoc)
      #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
-     if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 DestructionGosupinfernalShortCdActions()
+     if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 destructiongosup_infernalshortcdactions()
     }
    }
   }
  }
 }
 
-AddFunction DestructionDefaultShortCdPostConditions
+AddFunction destruction_defaultshortcdpostconditions
 {
- DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocShortCdPostConditions() or enemies() > 2 and DestructionAoeShortCdPostConditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or DestructionCdsShortCdPostConditions() or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and DestructionGosupinfernalShortCdPostConditions() or spell(soul_fire) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not undefined() and spell(conflagrate) or soulshards() < 2 and { not undefined() or charges(shadowburn) > 1 } and spell(shadowburn) or { { hastalent(grimoire_of_supremacy_talent) or hasazeritetrait(crashing_chaos_trait) } and demonduration(infernal) > 0 or buffpresent(dark_soul_instability_buff) or buffpresent(reckless_force_buff) and buffremaining(reckless_force_buff) > casttime(chaos_bolt) } and spell(chaos_bolt) or buffpresent(backdraft_buff) and not undefined() and not hastalent(eradication_talent) and spell(chaos_bolt) or not undefined() and hastalent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or soulshards() >= 4.5 - 0.2 * enemies() and { not hastalent(grimoire_of_supremacy_talent) or spellcooldown(summon_infernal) > 7 } and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdsshortcdpostconditions() or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and destructiongosup_infernalshortcdpostconditions() or spell(soul_fire) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or soulshards() < 2 and { not pool_soul_shards() or charges(shadowburn) > 1 } and spell(shadowburn) or { { hastalent(grimoire_of_supremacy_talent) or hasazeritetrait(crashing_chaos_trait) } and demonduration(infernal) > 0 or buffpresent(dark_soul_instability_buff) or buffpresent(reckless_force_buff) and buffremaining(reckless_force_buff) > casttime(chaos_bolt) } and spell(chaos_bolt) or buffpresent(backdraft_buff) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or soulshards() >= 4.5 - 0.2 * enemies() and { not hastalent(grimoire_of_supremacy_talent) or spellcooldown(summon_infernal) > 7 } and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
-AddFunction DestructionDefaultCdActions
+AddFunction destruction_defaultcdactions
 {
  #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } DestructionHavocCdActions()
+ if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavoccdactions()
 
- unless DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or { not { demonduration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) } and spell(cataclysm)
+ unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) } and spell(cataclysm)
  {
   #call_action_list,name=aoe,if=active_enemies>2
-  if enemies() > 2 DestructionAoeCdActions()
+  if enemies() > 2 destructionaoecdactions()
 
-  unless enemies() > 2 and DestructionAoeCdPostConditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate)
+  unless enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate)
   {
    #call_action_list,name=cds
-   DestructionCdsCdActions()
+   destructioncdscdactions()
 
-   unless DestructionCdsCdPostConditions()
+   unless destructioncdscdpostconditions()
    {
     #focused_azerite_beam,if=!pet.infernal.active|!talent.grimoire_of_supremacy.enabled
     if not demonduration(infernal) > 0 or not hastalent(grimoire_of_supremacy_talent) spell(focused_azerite_beam)
 
-    unless buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or not false(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc)
+    unless buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(purifying_blast) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or not false(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc)
     {
      #call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
-     if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 DestructionGosupinfernalCdActions()
+     if hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 destructiongosup_infernalcdactions()
     }
    }
   }
  }
 }
 
-AddFunction DestructionDefaultCdPostConditions
+AddFunction destruction_defaultcdpostconditions
 {
- DebuffCountOnAny(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and DestructionHavocCdPostConditions() or { not { demonduration(infernal) > 0 and target.DebuffRemaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) } and spell(cataclysm) or enemies() > 2 and DestructionAoeCdPostConditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.DebuffRemaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or DestructionCdsCdPostConditions() or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(purifying_blast) or not target.DebuffRemaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or not false(target_is_target) and { target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and DestructionGosupinfernalCdPostConditions() or spell(soul_fire) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not undefined() and spell(conflagrate) or soulshards() < 2 and { not undefined() or charges(shadowburn) > 1 } and spell(shadowburn) or { { hastalent(grimoire_of_supremacy_talent) or hasazeritetrait(crashing_chaos_trait) } and demonduration(infernal) > 0 or buffpresent(dark_soul_instability_buff) or buffpresent(reckless_force_buff) and buffremaining(reckless_force_buff) > casttime(chaos_bolt) } and spell(chaos_bolt) or buffpresent(backdraft_buff) and not undefined() and not hastalent(eradication_talent) and spell(chaos_bolt) or not undefined() and hastalent(eradication_talent) and { target.DebuffRemaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or soulshards() >= 4.5 - 0.2 * enemies() and { not hastalent(grimoire_of_supremacy_talent) or spellcooldown(summon_infernal) > 7 } and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 or not hastalent(grimoire_of_supremacy_talent) } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(purifying_blast) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and spell(concentrated_flame_essence) or spell(channel_demonfire) or not false(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and { not spellcooldown(summon_infernal) == 0 or not hastalent(grimoire_of_supremacy_talent) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) <= 10 } and enemies() > 1 and spell(havoc) or hastalent(grimoire_of_supremacy_talent) and demonduration(infernal) > 0 and destructiongosup_infernalcdpostconditions() or spell(soul_fire) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or soulshards() < 2 and { not pool_soul_shards() or charges(shadowburn) > 1 } and spell(shadowburn) or { { hastalent(grimoire_of_supremacy_talent) or hasazeritetrait(crashing_chaos_trait) } and demonduration(infernal) > 0 or buffpresent(dark_soul_instability_buff) or buffpresent(reckless_force_buff) and buffremaining(reckless_force_buff) > casttime(chaos_bolt) } and spell(chaos_bolt) or buffpresent(backdraft_buff) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication_debuff) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or soulshards() >= 4.5 - 0.2 * enemies() and { not hastalent(grimoire_of_supremacy_talent) or spellcooldown(summon_infernal) > 7 } and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 ### Destruction icons.
 
-AddCheckBox(opt_warlock_destruction_aoe l(AOE) default specialization=destruction)
+AddCheckBox(opt_warlock_destruction_aoe l(aoe) default specialization=destruction)
 
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
 {
  if not incombat() destructionprecombatshortcdactions()
  unless not incombat() and destructionprecombatshortcdpostconditions()
  {
-  destructiondefaultshortcdactions()
+  destruction_defaultshortcdactions()
  }
 }
 
@@ -2000,7 +2002,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruc
  if not incombat() destructionprecombatshortcdactions()
  unless not incombat() and destructionprecombatshortcdpostconditions()
  {
-  destructiondefaultshortcdactions()
+  destruction_defaultshortcdactions()
  }
 }
 
@@ -2009,7 +2011,7 @@ AddIcon enemies=1 help=main specialization=destruction
  if not incombat() destructionprecombatmainactions()
  unless not incombat() and destructionprecombatmainpostconditions()
  {
-  destructiondefaultmainactions()
+  destruction_defaultmainactions()
  }
 }
 
@@ -2018,7 +2020,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
  if not incombat() destructionprecombatmainactions()
  unless not incombat() and destructionprecombatmainpostconditions()
  {
-  destructiondefaultmainactions()
+  destruction_defaultmainactions()
  }
 }
 
@@ -2027,7 +2029,7 @@ AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=d
  if not incombat() destructionprecombatcdactions()
  unless not incombat() and destructionprecombatcdpostconditions()
  {
-  destructiondefaultcdactions()
+  destruction_defaultcdactions()
  }
 }
 
@@ -2036,7 +2038,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
  if not incombat() destructionprecombatcdactions()
  unless not incombat() and destructionprecombatcdpostconditions()
  {
-  destructiondefaultcdactions()
+  destruction_defaultcdactions()
  }
 }
 

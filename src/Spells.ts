@@ -66,7 +66,7 @@ export class OvaleSpellsClass implements StateModule {
         }
     }
 
-    IsSpellInRange(spellId: number, unitId: string): boolean {
+    IsSpellInRange(spellId: number, unitId: string): boolean | undefined {
         let [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(spellId);
         let returnValue;
         if (index && bookType) {
@@ -78,7 +78,9 @@ export class OvaleSpellsClass implements StateModule {
         if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
             return (UnitIsFriend("player", unitId) || this.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
         }
-        return (returnValue == 1 && true) || (returnValue == 0 && false) || (returnValue === undefined && undefined) || false;
+        if (returnValue === 1) return true;
+        if (returnValue === 0) return false;
+        return undefined;
     }
     
     private RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
@@ -120,7 +122,7 @@ export class OvaleSpellsClass implements StateModule {
         this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableItem");
         return isUsable;
     }
-    IsUsableSpell(spellId: number, atTime: number, targetGUID: string): [boolean, boolean] {
+    IsUsableSpell(spellId: number, atTime: number, targetGUID: string | undefined): [boolean, boolean] {
         this.profiler.StartProfiling("OvaleSpellBook_state_IsUsableSpell");
         let isUsable = this.OvaleSpellBook.IsKnownSpell(spellId);
         let noMana = false;

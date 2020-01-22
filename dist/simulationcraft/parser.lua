@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
@@ -115,10 +115,14 @@ local MATCHES = {
         [2] = Tokenize
     },
     [10] = {
-        [1] = "^.",
+        [1] = "^<%?",
         [2] = Tokenize
     },
     [11] = {
+        [1] = "^.",
+        [2] = Tokenize
+    },
+    [12] = {
         [1] = "^$",
         [2] = NoToken
     }
@@ -139,7 +143,7 @@ __exports.Parser = __class(nil, {
         }
         for i = 1, 20, 1 do
             local tokenType, token = tokenStream:Peek(i)
-            if tokenType then
+            if tokenType and token then
                 context[#context + 1] = token
             else
                 context[#context + 1] = "<EOS>"
@@ -188,6 +192,10 @@ __exports.Parser = __class(nil, {
         local tokenStream = OvaleLexer("SimulationCraft", stream, MATCHES)
         local name
         local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Action")
+            return nil
+        end
         if (tokenType == "keyword" and SPECIAL_ACTION[token]) or tokenType == "name" then
             name = token
         else
@@ -328,6 +336,10 @@ __exports.Parser = __class(nil, {
     ParseFunction = function(self, tokenStream, nodeList, annotation)
         local name
         local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Function")
+            return nil
+        end
         if tokenType == "keyword" and FUNCTION_KEYWORD[token] then
             name = token
         else
@@ -357,6 +369,10 @@ __exports.Parser = __class(nil, {
     end,
     ParseIdentifier = function(self, tokenStream, nodeList, annotation)
         local _, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Identifier")
+            return nil
+        end
         local node = NewNode(nodeList)
         node.type = "operand"
         node.name = token
@@ -407,6 +423,10 @@ __exports.Parser = __class(nil, {
     ParseOperand = function(self, tokenStream, nodeList, annotation)
         local name
         local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing OPERAND")
+            return nil
+        end
         if tokenType == "name" then
             name = token
         elseif tokenType == "keyword" and (token == "target" or token == "cooldown") then
@@ -455,6 +475,10 @@ __exports.Parser = __class(nil, {
     ParseSimpleExpression = function(self, tokenStream, nodeList, annotation)
         local node
         local tokenType, token = tokenStream:Peek()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing SIMPLE EXPRESSION")
+            return nil
+        end
         if tokenType == "number" then
             node = self:ParseNumber(tokenStream, nodeList, annotation)
         elseif tokenType == "keyword" then

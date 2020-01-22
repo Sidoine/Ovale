@@ -13,7 +13,7 @@ import { OvaleOptionsClass } from "../Options";
 import { Annotation, Profile, ParseNode, CONSUMABLE_ITEMS, OVALE_TAGS, classInfos } from "./definitions";
 import { OvaleDataClass } from "../Data";
 import { Emiter } from "./emiter";
-import { print_r, OvaleFunctionName, OvaleTaggedFunctionName, self_outputPool, CamelSpecialization, CamelCase } from "./text-tools";
+import { print_r, OvaleFunctionName, OvaleTaggedFunctionName, self_outputPool, LowerSpecialization, CamelCase } from "./text-tools";
 import { Parser } from "./parser";
 import { Unparser } from "./unparser";
 import { OvaleDebugClass, Tracer } from "../Debug";
@@ -238,8 +238,8 @@ export class OvaleSimulationCraftClass {
             for (const [, tag] of pairs(OVALE_TAGS)) {
                 let [bodyName, conditionName] = OvaleTaggedFunctionName(fname, tag);
                 if (bodyName && conditionName) {
-                    taggedFunctionName[bodyName] = true;
-                    taggedFunctionName[conditionName] = true;
+                    taggedFunctionName[lower(bodyName)] = true;
+                    taggedFunctionName[lower(conditionName)] = true;
                 }
             }
         }
@@ -312,7 +312,7 @@ export class OvaleSimulationCraftClass {
                         if (defaultInterrupt && defaultInterrupt.interrupt) {
                             const interruptCall = this.ovaleAst.NewNode(nodeList);
                             interruptCall.type = "custom_function";
-                            interruptCall.name = CamelSpecialization(annotation) + "InterruptActions";
+                            interruptCall.name = lower(LowerSpecialization(annotation) + "InterruptActions");
                             annotation.interrupt = annotation.classId;
                             annotation[defaultInterrupt.interrupt] = annotation.classId;
                             insert(addFunctionNode.child[1].child, 1, interruptCall);
