@@ -499,13 +499,13 @@ __exports.OvaleOptionsClass = __class(nil, {
         }
         self.OnInitialize = function()
             local ovale = self.ovale:GetName()
+            self.db = AceDB:New("OvaleDB", self.defaultDB)
             local db = self.db
             self.options.args.profile = AceDBOptions:GetOptionsTable(db)
             db.RegisterCallback(self, "OnNewProfile", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileReset", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileChanged", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileCopied", self.HandleProfileChanges)
-            self.db = db
             self:UpgradeSavedVariables()
             AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
             AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)
@@ -523,7 +523,6 @@ __exports.OvaleOptionsClass = __class(nil, {
             self.module:SendMessage("Ovale_OptionChanged", "visibility")
         end
         self.module = ovale:createModule("OvaleOptions", self.OnInitialize, self.handleDisable, aceConsole, aceEvent)
-        self.db = AceDB:New("OvaleDB", self.defaultDB)
     end,
     RegisterOptions = function(self, addon)
     end,

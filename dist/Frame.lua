@@ -568,7 +568,6 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         content:SetHeight(100)
         content:Hide()
         AceGUIRegisterAsContainer(self)
-        self:UpdateFrame()
     end,
 })
 __exports.OvaleFrameModuleClass = __class(nil, {
@@ -590,6 +589,7 @@ __exports.OvaleFrameModuleClass = __class(nil, {
             self.module:RegisterMessage("Ovale_CombatStarted", self.Ovale_CombatStarted)
             self.module:RegisterMessage("Ovale_CombatEnded", self.Ovale_CombatEnded)
             self.module:RegisterEvent("PLAYER_TARGET_CHANGED", self.PLAYER_TARGET_CHANGED)
+            self.frame:UpdateFrame()
         end
         self.handleDisable = function()
             self.module:UnregisterMessage("Ovale_OptionChanged")

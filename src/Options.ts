@@ -95,7 +95,7 @@ export interface OvaleDb {
 }
 
 export class OvaleOptionsClass {
-    db: AceDatabase & OvaleDb;
+    db!: AceDatabase & OvaleDb;
 
     defaultDB:OvaleDb = {
         profile: {
@@ -584,11 +584,11 @@ export class OvaleOptionsClass {
     
     constructor(private ovale: OvaleClass) {
         this.module = ovale.createModule("OvaleOptions", this.OnInitialize, this.handleDisable, aceConsole, aceEvent);
-        this.db = AceDB.New("OvaleDB", this.defaultDB);
     }
 
     private OnInitialize = () => {
         const ovale = this.ovale.GetName();
+        this.db = AceDB.New("OvaleDB", this.defaultDB);
         const db = this.db;
         this.options.args.profile = AceDBOptions.GetOptionsTable(db);
         // let LibDualSpec = LibStub("LibDualSpec-1.0", true);
@@ -600,7 +600,6 @@ export class OvaleOptionsClass {
         db.RegisterCallback(this, "OnProfileReset", this.HandleProfileChanges);
         db.RegisterCallback(this, "OnProfileChanged", this.HandleProfileChanges);
         db.RegisterCallback(this, "OnProfileCopied", this.HandleProfileChanges);
-        this.db = db;
         this.UpgradeSavedVariables();
         AceConfig.RegisterOptionsTable(ovale, this.options.args.apparence);
         AceConfig.RegisterOptionsTable(`${ovale} Profiles`, this.options.args.profile);

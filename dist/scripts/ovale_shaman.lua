@@ -548,55 +548,37 @@ AddCheckBox(opt_shaman_elemental_aoe l(aoe) default specialization=elemental)
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
 {
  if not incombat() elementalprecombatshortcdactions()
- unless not incombat() and elementalprecombatshortcdpostconditions()
- {
-  elemental_defaultshortcdactions()
- }
+ elemental_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
 {
  if not incombat() elementalprecombatshortcdactions()
- unless not incombat() and elementalprecombatshortcdpostconditions()
- {
-  elemental_defaultshortcdactions()
- }
+ elemental_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=elemental
 {
  if not incombat() elementalprecombatmainactions()
- unless not incombat() and elementalprecombatmainpostconditions()
- {
-  elemental_defaultmainactions()
- }
+ elemental_defaultmainactions()
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
 {
  if not incombat() elementalprecombatmainactions()
- unless not incombat() and elementalprecombatmainpostconditions()
- {
-  elemental_defaultmainactions()
- }
+ elemental_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
 {
  if not incombat() elementalprecombatcdactions()
- unless not incombat() and elementalprecombatcdpostconditions()
- {
-  elemental_defaultcdactions()
- }
+ elemental_defaultcdactions()
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 {
  if not incombat() elementalprecombatcdactions()
- unless not incombat() and elementalprecombatcdpostconditions()
- {
-  elemental_defaultcdactions()
- }
+ elemental_defaultcdactions()
 }
 
 ### Required symbols
@@ -1455,55 +1437,37 @@ AddCheckBox(opt_shaman_enhancement_aoe l(aoe) default specialization=enhancement
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 ### Required symbols
@@ -2370,55 +2334,37 @@ AddCheckBox(opt_shaman_enhancement_aoe l(aoe) default specialization=enhancement
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 ### Required symbols
@@ -3285,55 +3231,37 @@ AddCheckBox(opt_shaman_enhancement_aoe l(aoe) default specialization=enhancement
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
  if not incombat() enhancementprecombatshortcdactions()
- unless not incombat() and enhancementprecombatshortcdpostconditions()
- {
-  enhancement_defaultshortcdactions()
- }
+ enhancement_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
  if not incombat() enhancementprecombatmainactions()
- unless not incombat() and enhancementprecombatmainpostconditions()
- {
-  enhancement_defaultmainactions()
- }
+ enhancement_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
  if not incombat() enhancementprecombatcdactions()
- unless not incombat() and enhancementprecombatcdpostconditions()
- {
-  enhancement_defaultcdactions()
- }
+ enhancement_defaultcdactions()
 }
 
 ### Required symbols
@@ -3567,55 +3495,37 @@ AddCheckBox(opt_shaman_restoration_aoe l(aoe) default specialization=restoration
 AddIcon checkbox=!opt_shaman_restoration_aoe enemies=1 help=shortcd specialization=restoration
 {
  if not incombat() restorationprecombatshortcdactions()
- unless not incombat() and restorationprecombatshortcdpostconditions()
- {
-  restoration_defaultshortcdactions()
- }
+ restoration_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_shaman_restoration_aoe help=shortcd specialization=restoration
 {
  if not incombat() restorationprecombatshortcdactions()
- unless not incombat() and restorationprecombatshortcdpostconditions()
- {
-  restoration_defaultshortcdactions()
- }
+ restoration_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=restoration
 {
  if not incombat() restorationprecombatmainactions()
- unless not incombat() and restorationprecombatmainpostconditions()
- {
-  restoration_defaultmainactions()
- }
+ restoration_defaultmainactions()
 }
 
 AddIcon checkbox=opt_shaman_restoration_aoe help=aoe specialization=restoration
 {
  if not incombat() restorationprecombatmainactions()
- unless not incombat() and restorationprecombatmainpostconditions()
- {
-  restoration_defaultmainactions()
- }
+ restoration_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_shaman_restoration_aoe enemies=1 help=cd specialization=restoration
 {
  if not incombat() restorationprecombatcdactions()
- unless not incombat() and restorationprecombatcdpostconditions()
- {
-  restoration_defaultcdactions()
- }
+ restoration_defaultcdactions()
 }
 
 AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
 {
  if not incombat() restorationprecombatcdactions()
- unless not incombat() and restorationprecombatcdpostconditions()
- {
-  restoration_defaultcdactions()
- }
+ restoration_defaultcdactions()
 }
 
 ### Required symbols

@@ -607,55 +607,37 @@ AddCheckBox(opt_rogue_assassination_aoe l(aoe) default specialization=assassinat
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=shortcd specialization=assassination
 {
  if not incombat() assassinationprecombatshortcdactions()
- unless not incombat() and assassinationprecombatshortcdpostconditions()
- {
-  assassination_defaultshortcdactions()
- }
+ assassination_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=shortcd specialization=assassination
 {
  if not incombat() assassinationprecombatshortcdactions()
- unless not incombat() and assassinationprecombatshortcdpostconditions()
- {
-  assassination_defaultshortcdactions()
- }
+ assassination_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=assassination
 {
  if not incombat() assassinationprecombatmainactions()
- unless not incombat() and assassinationprecombatmainpostconditions()
- {
-  assassination_defaultmainactions()
- }
+ assassination_defaultmainactions()
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=aoe specialization=assassination
 {
  if not incombat() assassinationprecombatmainactions()
- unless not incombat() and assassinationprecombatmainpostconditions()
- {
-  assassination_defaultmainactions()
- }
+ assassination_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=cd specialization=assassination
 {
  if not incombat() assassinationprecombatcdactions()
- unless not incombat() and assassinationprecombatcdpostconditions()
- {
-  assassination_defaultcdactions()
- }
+ assassination_defaultcdactions()
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassination
 {
  if not incombat() assassinationprecombatcdactions()
- unless not incombat() and assassinationprecombatcdpostconditions()
- {
-  assassination_defaultcdactions()
- }
+ assassination_defaultcdactions()
 }
 
 ### Required symbols
@@ -994,6 +976,8 @@ AddFunction outlawcdsmainactions
  {
   #blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up&(!raid_event.adds.exists|raid_event.adds.remains>8|raid_event.adds.in>(2-cooldown.blade_flurry.charges_fractional)*25)
   if enemies() >= 2 and not buffpresent(blade_flurry_buff) and { not false(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) spell(blade_flurry)
+  #ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
+  if blade_flurry_sync() and combopointsdeficit() >= 1 + buffpresent(broadside_buff) spell(ghostly_strike)
  }
 }
 
@@ -1014,10 +998,8 @@ AddFunction outlawcdsshortcdactions
   #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1
   if 600 > 30 - 10 and not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 spell(marked_for_death)
 
-  unless enemies() >= 2 and not buffpresent(blade_flurry_buff) and { not false(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry)
+  unless enemies() >= 2 and not buffpresent(blade_flurry_buff) and { not false(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry) or blade_flurry_sync() and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(ghostly_strike)
   {
-   #ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
-   if blade_flurry_sync() and combopointsdeficit() >= 1 + buffpresent(broadside_buff) spell(ghostly_strike)
    #blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
    if blade_flurry_sync() and timetomaxenergy() > 1 spell(blade_rush)
    #vanish,if=!stealthed.all&variable.ambush_condition
@@ -1028,7 +1010,7 @@ AddFunction outlawcdsshortcdactions
 
 AddFunction outlawcdsshortcdpostconditions
 {
- not stealthed() and outlawessencesshortcdpostconditions() or enemies() >= 2 and not buffpresent(blade_flurry_buff) and { not false(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry)
+ not stealthed() and outlawessencesshortcdpostconditions() or enemies() >= 2 and not buffpresent(blade_flurry_buff) and { not false(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry) or blade_flurry_sync() and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(ghostly_strike)
 }
 
 AddFunction outlawcdscdactions
@@ -1256,55 +1238,37 @@ AddCheckBox(opt_rogue_outlaw_aoe l(aoe) default specialization=outlaw)
 AddIcon checkbox=!opt_rogue_outlaw_aoe enemies=1 help=shortcd specialization=outlaw
 {
  if not incombat() outlawprecombatshortcdactions()
- unless not incombat() and outlawprecombatshortcdpostconditions()
- {
-  outlaw_defaultshortcdactions()
- }
+ outlaw_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_rogue_outlaw_aoe help=shortcd specialization=outlaw
 {
  if not incombat() outlawprecombatshortcdactions()
- unless not incombat() and outlawprecombatshortcdpostconditions()
- {
-  outlaw_defaultshortcdactions()
- }
+ outlaw_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=outlaw
 {
  if not incombat() outlawprecombatmainactions()
- unless not incombat() and outlawprecombatmainpostconditions()
- {
-  outlaw_defaultmainactions()
- }
+ outlaw_defaultmainactions()
 }
 
 AddIcon checkbox=opt_rogue_outlaw_aoe help=aoe specialization=outlaw
 {
  if not incombat() outlawprecombatmainactions()
- unless not incombat() and outlawprecombatmainpostconditions()
- {
-  outlaw_defaultmainactions()
- }
+ outlaw_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_rogue_outlaw_aoe enemies=1 help=cd specialization=outlaw
 {
  if not incombat() outlawprecombatcdactions()
- unless not incombat() and outlawprecombatcdpostconditions()
- {
-  outlaw_defaultcdactions()
- }
+ outlaw_defaultcdactions()
 }
 
 AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 {
  if not incombat() outlawprecombatcdactions()
- unless not incombat() and outlawprecombatcdpostconditions()
- {
-  outlaw_defaultcdactions()
- }
+ outlaw_defaultcdactions()
 }
 
 ### Required symbols
@@ -2065,55 +2029,37 @@ AddCheckBox(opt_rogue_subtlety_aoe l(aoe) default specialization=subtlety)
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=shortcd specialization=subtlety
 {
  if not incombat() subtletyprecombatshortcdactions()
- unless not incombat() and subtletyprecombatshortcdpostconditions()
- {
-  subtlety_defaultshortcdactions()
- }
+ subtlety_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=shortcd specialization=subtlety
 {
  if not incombat() subtletyprecombatshortcdactions()
- unless not incombat() and subtletyprecombatshortcdpostconditions()
- {
-  subtlety_defaultshortcdactions()
- }
+ subtlety_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=subtlety
 {
  if not incombat() subtletyprecombatmainactions()
- unless not incombat() and subtletyprecombatmainpostconditions()
- {
-  subtlety_defaultmainactions()
- }
+ subtlety_defaultmainactions()
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=aoe specialization=subtlety
 {
  if not incombat() subtletyprecombatmainactions()
- unless not incombat() and subtletyprecombatmainpostconditions()
- {
-  subtlety_defaultmainactions()
- }
+ subtlety_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=cd specialization=subtlety
 {
  if not incombat() subtletyprecombatcdactions()
- unless not incombat() and subtletyprecombatcdpostconditions()
- {
-  subtlety_defaultcdactions()
- }
+ subtlety_defaultcdactions()
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 {
  if not incombat() subtletyprecombatcdactions()
- unless not incombat() and subtletyprecombatcdpostconditions()
- {
-  subtlety_defaultcdactions()
- }
+ subtlety_defaultcdactions()
 }
 
 ### Required symbols

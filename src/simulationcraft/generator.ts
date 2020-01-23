@@ -984,7 +984,7 @@ export class Generator {
         let annotation = profile.annotation;
         let precombatName = OvaleFunctionName("precombat", annotation);
         let defaultName = OvaleFunctionName("_default", annotation);
-        let [precombatBodyName, precombatConditionName] = OvaleTaggedFunctionName(precombatName, tag);
+        let [precombatBodyName] = OvaleTaggedFunctionName(precombatName, tag);
         let [defaultBodyName, ] = OvaleTaggedFunctionName(defaultName, tag);
         let mainBodyCode;
         if (annotation.using_apl && next(annotation.using_apl)) {
@@ -1004,12 +1004,9 @@ export class Generator {
         if (profile["actions.precombat"]) {
             let fmt = `
                 if not InCombat() %s()
-                unless not InCombat() and %s()
-                {
-                    %s
-                }
+                %s
             `;
-            code = format(fmt, precombatBodyName, precombatConditionName, mainBodyCode);
+            code = format(fmt, precombatBodyName, mainBodyCode);
         } else {
             code = mainBodyCode;
         }

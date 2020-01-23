@@ -87,6 +87,8 @@ AddFunction shadowsinglemainactions
   if buffpresent(harvested_thoughts_buff) and spellcooldown(void_bolt) >= 1.5 and azeritetraitrank(searing_dialogue_trait) >= 1 spell(mind_sear)
   #shadow_word_death,if=target.time_to_die<3|cooldown.shadow_word_death.charges=2|(cooldown.shadow_word_death.charges=1&cooldown.shadow_word_death.remains<gcd.max)
   if target.timetodie() < 3 or spellcharges(shadow_word_death) == 2 or spellcharges(shadow_word_death) == 1 and spellcooldown(shadow_word_death) < gcd() spell(shadow_word_death)
+  #mindbender,if=talent.mindbender.enabled|(buff.voidform.stack>18|target.time_to_die<15)
+  if hastalent(mindbender_talent) or buffstacks(voidform_shadow) > 18 or target.timetodie() < 15 spell(mindbender)
   #shadow_word_death,if=!buff.voidform.up|(cooldown.shadow_word_death.charges=2&buff.voidform.stack<15)
   if not buffpresent(voidform_shadow) or spellcharges(shadow_word_death) == 2 and buffstacks(voidform_shadow) < 15 spell(shadow_word_death)
   #mind_blast,if=variable.dots_up&((raid_event.movement.in>cast_time+0.5&raid_event.movement.in<4)|!talent.shadow_word_void.enabled|buff.voidform.down|buff.voidform.stack>14&(insanity<70|charges_fractional>1.33)|buff.voidform.stack<=14&(insanity<60|charges_fractional>1.33))
@@ -125,10 +127,8 @@ AddFunction shadowsingleshortcdactions
    {
     #dark_void,if=raid_event.adds.in>10
     if 600 > 10 spell(dark_void)
-    #mindbender,if=talent.mindbender.enabled|(buff.voidform.stack>18|target.time_to_die<15)
-    if hastalent(mindbender_talent) or buffstacks(voidform_shadow) > 18 or target.timetodie() < 15 spell(mindbender)
 
-    unless { not buffpresent(voidform_shadow) or spellcharges(shadow_word_death) == 2 and buffstacks(voidform_shadow) < 15 } and spell(shadow_word_death)
+    unless { hastalent(mindbender_talent) or buffstacks(voidform_shadow) > 18 or target.timetodie() < 15 } and spell(mindbender) or { not buffpresent(voidform_shadow) or spellcharges(shadow_word_death) == 2 and buffstacks(voidform_shadow) < 15 } and spell(shadow_word_death)
     {
      #shadow_crash,if=raid_event.adds.in>5&raid_event.adds.duration<20
      if 600 > 5 and 10 < 20 spell(shadow_crash)
@@ -140,7 +140,7 @@ AddFunction shadowsingleshortcdactions
 
 AddFunction shadowsingleshortcdpostconditions
 {
- spell(void_eruption) or spell(void_bolt) or shadowcdsshortcdpostconditions() or buffpresent(harvested_thoughts_buff) and spellcooldown(void_bolt) >= 1.5 and azeritetraitrank(searing_dialogue_trait) >= 1 and spell(mind_sear) or { target.timetodie() < 3 or spellcharges(shadow_word_death) == 2 or spellcharges(shadow_word_death) == 1 and spellcooldown(shadow_word_death) < gcd() } and spell(shadow_word_death) or { not buffpresent(voidform_shadow) or spellcharges(shadow_word_death) == 2 and buffstacks(voidform_shadow) < 15 } and spell(shadow_word_death) or dots_up() and { 600 > casttime(mind_blast) + 0.5 and 600 < 4 or not hastalent(shadow_word_void_talent) or buffexpires(voidform_shadow) or buffstacks(voidform_shadow) > 14 and { insanity() < 70 or charges(mind_blast count=0) > 1.33 } or buffstacks(voidform_shadow) <= 14 and { insanity() < 60 or charges(mind_blast count=0) > 1.33 } } and spell(mind_blast) or target.debuffremaining(shadow_word_pain_debuff) > 4 and target.debuffremaining(vampiric_touch_debuff) > 4 and buffpresent(voidform_shadow) and spell(void_torrent) or target.refreshable(shadow_word_pain_debuff) and target.timetodie() > 4 and not hastalent(misery_talent) and not hastalent(dark_void_talent) and spell(shadow_word_pain) or { target.refreshable(vampiric_touch_debuff) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain_debuff) } and spell(vampiric_touch) or spell(mind_flay) or spell(shadow_word_pain)
+ spell(void_eruption) or spell(void_bolt) or shadowcdsshortcdpostconditions() or buffpresent(harvested_thoughts_buff) and spellcooldown(void_bolt) >= 1.5 and azeritetraitrank(searing_dialogue_trait) >= 1 and spell(mind_sear) or { target.timetodie() < 3 or spellcharges(shadow_word_death) == 2 or spellcharges(shadow_word_death) == 1 and spellcooldown(shadow_word_death) < gcd() } and spell(shadow_word_death) or { hastalent(mindbender_talent) or buffstacks(voidform_shadow) > 18 or target.timetodie() < 15 } and spell(mindbender) or { not buffpresent(voidform_shadow) or spellcharges(shadow_word_death) == 2 and buffstacks(voidform_shadow) < 15 } and spell(shadow_word_death) or dots_up() and { 600 > casttime(mind_blast) + 0.5 and 600 < 4 or not hastalent(shadow_word_void_talent) or buffexpires(voidform_shadow) or buffstacks(voidform_shadow) > 14 and { insanity() < 70 or charges(mind_blast count=0) > 1.33 } or buffstacks(voidform_shadow) <= 14 and { insanity() < 60 or charges(mind_blast count=0) > 1.33 } } and spell(mind_blast) or target.debuffremaining(shadow_word_pain_debuff) > 4 and target.debuffremaining(vampiric_touch_debuff) > 4 and buffpresent(voidform_shadow) and spell(void_torrent) or target.refreshable(shadow_word_pain_debuff) and target.timetodie() > 4 and not hastalent(misery_talent) and not hastalent(dark_void_talent) and spell(shadow_word_pain) or { target.refreshable(vampiric_touch_debuff) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain_debuff) } and spell(vampiric_touch) or spell(mind_flay) or spell(shadow_word_pain)
 }
 
 AddFunction shadowsinglecdactions
@@ -266,6 +266,8 @@ AddFunction shadowcleavemainactions
  {
   #shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
   if target.timetodie() < 3 or buffexpires(voidform_shadow) spell(shadow_word_death)
+  #mindbender
+  spell(mindbender)
   #mind_blast,target_if=spell_targets.mind_sear<variable.mind_blast_targets
   if enemies() < mind_blast_targets() spell(mind_blast)
   #shadow_word_pain,target_if=refreshable&target.time_to_die>((-1.2+3.3*spell_targets.mind_sear)*variable.swp_trait_ranks_check*(1-0.012*azerite.searing_dialogue.rank*spell_targets.mind_sear)),if=!talent.misery.enabled
@@ -306,10 +308,8 @@ AddFunction shadowcleaveshortcdactions
    {
     #dark_void,if=raid_event.adds.in>10&(dot.shadow_word_pain.refreshable|target.time_to_die>30)
     if 600 > 10 and { target.debuffrefreshable(shadow_word_pain_debuff) or target.timetodie() > 30 } spell(dark_void)
-    #mindbender
-    spell(mindbender)
 
-    unless enemies() < mind_blast_targets() and spell(mind_blast)
+    unless spell(mindbender) or enemies() < mind_blast_targets() and spell(mind_blast)
     {
      #shadow_crash,if=(raid_event.adds.in>5&raid_event.adds.duration<2)|raid_event.adds.duration>2
      if 600 > 5 and 10 < 2 or 10 > 2 spell(shadow_crash)
@@ -321,7 +321,7 @@ AddFunction shadowcleaveshortcdactions
 
 AddFunction shadowcleaveshortcdpostconditions
 {
- spell(void_eruption) or not target.debuffpresent(vampiric_touch_debuff) and azeritetraitrank(thought_harvester_trait) >= 1 and spell(vampiric_touch) or buffpresent(harvested_thoughts_buff) and spell(mind_sear) or spell(void_bolt) or shadowcdsshortcdpostconditions() or { target.timetodie() < 3 or buffexpires(voidform_shadow) } and spell(shadow_word_death) or enemies() < mind_blast_targets() and spell(mind_blast) or target.refreshable(shadow_word_pain_debuff) and target.timetodie() > { -1.2 + 3.3 * enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * azeritetraitrank(searing_dialogue_trait) * enemies() } and not hastalent(misery_talent) and spell(shadow_word_pain) or target.refreshable(vampiric_touch_debuff) and target.timetodie() > { 1 + 3.3 * enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * azeritetraitrank(searing_dialogue_trait) * enemies() } and spell(vampiric_touch) or target.debuffrefreshable(shadow_word_pain_debuff) and hastalent(misery_talent) and target.timetodie() > { 1 + 2 * enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * enemies() and spell(vampiric_touch) or buffpresent(voidform_shadow) and spell(void_torrent) or enemies() > 1 and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
+ spell(void_eruption) or not target.debuffpresent(vampiric_touch_debuff) and azeritetraitrank(thought_harvester_trait) >= 1 and spell(vampiric_touch) or buffpresent(harvested_thoughts_buff) and spell(mind_sear) or spell(void_bolt) or shadowcdsshortcdpostconditions() or { target.timetodie() < 3 or buffexpires(voidform_shadow) } and spell(shadow_word_death) or spell(mindbender) or enemies() < mind_blast_targets() and spell(mind_blast) or target.refreshable(shadow_word_pain_debuff) and target.timetodie() > { -1.2 + 3.3 * enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * azeritetraitrank(searing_dialogue_trait) * enemies() } and not hastalent(misery_talent) and spell(shadow_word_pain) or target.refreshable(vampiric_touch_debuff) and target.timetodie() > { 1 + 3.3 * enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * azeritetraitrank(searing_dialogue_trait) * enemies() } and spell(vampiric_touch) or target.debuffrefreshable(shadow_word_pain_debuff) and hastalent(misery_talent) and target.timetodie() > { 1 + 2 * enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * enemies() and spell(vampiric_touch) or buffpresent(voidform_shadow) and spell(void_torrent) or enemies() > 1 and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
 }
 
 AddFunction shadowcleavecdactions
@@ -477,55 +477,37 @@ AddCheckBox(opt_priest_shadow_aoe l(aoe) default specialization=shadow)
 AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=shortcd specialization=shadow
 {
  if not incombat() shadowprecombatshortcdactions()
- unless not incombat() and shadowprecombatshortcdpostconditions()
- {
-  shadow_defaultshortcdactions()
- }
+ shadow_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_priest_shadow_aoe help=shortcd specialization=shadow
 {
  if not incombat() shadowprecombatshortcdactions()
- unless not incombat() and shadowprecombatshortcdpostconditions()
- {
-  shadow_defaultshortcdactions()
- }
+ shadow_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=shadow
 {
  if not incombat() shadowprecombatmainactions()
- unless not incombat() and shadowprecombatmainpostconditions()
- {
-  shadow_defaultmainactions()
- }
+ shadow_defaultmainactions()
 }
 
 AddIcon checkbox=opt_priest_shadow_aoe help=aoe specialization=shadow
 {
  if not incombat() shadowprecombatmainactions()
- unless not incombat() and shadowprecombatmainpostconditions()
- {
-  shadow_defaultmainactions()
- }
+ shadow_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=cd specialization=shadow
 {
  if not incombat() shadowprecombatcdactions()
- unless not incombat() and shadowprecombatcdpostconditions()
- {
-  shadow_defaultcdactions()
- }
+ shadow_defaultcdactions()
 }
 
 AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 {
  if not incombat() shadowprecombatcdactions()
- unless not incombat() and shadowprecombatcdpostconditions()
- {
-  shadow_defaultcdactions()
- }
+ shadow_defaultcdactions()
 }
 
 ### Required symbols

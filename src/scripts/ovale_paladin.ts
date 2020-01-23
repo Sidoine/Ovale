@@ -247,55 +247,37 @@ AddCheckBox(opt_paladin_protection_aoe l(aoe) default specialization=protection)
 AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
 {
  if not incombat() protectionprecombatshortcdactions()
- unless not incombat() and protectionprecombatshortcdpostconditions()
- {
-  protection_defaultshortcdactions()
- }
+ protection_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
 {
  if not incombat() protectionprecombatshortcdactions()
- unless not incombat() and protectionprecombatshortcdpostconditions()
- {
-  protection_defaultshortcdactions()
- }
+ protection_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=protection
 {
  if not incombat() protectionprecombatmainactions()
- unless not incombat() and protectionprecombatmainpostconditions()
- {
-  protection_defaultmainactions()
- }
+ protection_defaultmainactions()
 }
 
 AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
 {
  if not incombat() protectionprecombatmainactions()
- unless not incombat() and protectionprecombatmainpostconditions()
- {
-  protection_defaultmainactions()
- }
+ protection_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=cd specialization=protection
 {
  if not incombat() protectionprecombatcdactions()
- unless not incombat() and protectionprecombatcdpostconditions()
- {
-  protection_defaultcdactions()
- }
+ protection_defaultcdactions()
 }
 
 AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 {
  if not incombat() protectionprecombatcdactions()
- unless not incombat() and protectionprecombatcdpostconditions()
- {
-  protection_defaultcdactions()
- }
+ protection_defaultcdactions()
 }
 
 ### Required symbols
@@ -710,55 +692,37 @@ AddCheckBox(opt_paladin_retribution_aoe l(aoe) default specialization=retributio
 AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=shortcd specialization=retribution
 {
  if not incombat() retributionprecombatshortcdactions()
- unless not incombat() and retributionprecombatshortcdpostconditions()
- {
-  retribution_defaultshortcdactions()
- }
+ retribution_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_paladin_retribution_aoe help=shortcd specialization=retribution
 {
  if not incombat() retributionprecombatshortcdactions()
- unless not incombat() and retributionprecombatshortcdpostconditions()
- {
-  retribution_defaultshortcdactions()
- }
+ retribution_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=retribution
 {
  if not incombat() retributionprecombatmainactions()
- unless not incombat() and retributionprecombatmainpostconditions()
- {
-  retribution_defaultmainactions()
- }
+ retribution_defaultmainactions()
 }
 
 AddIcon checkbox=opt_paladin_retribution_aoe help=aoe specialization=retribution
 {
  if not incombat() retributionprecombatmainactions()
- unless not incombat() and retributionprecombatmainpostconditions()
- {
-  retribution_defaultmainactions()
- }
+ retribution_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=cd specialization=retribution
 {
  if not incombat() retributionprecombatcdactions()
- unless not incombat() and retributionprecombatcdpostconditions()
- {
-  retribution_defaultcdactions()
- }
+ retribution_defaultcdactions()
 }
 
 AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 {
  if not incombat() retributionprecombatcdactions()
- unless not incombat() and retributionprecombatcdpostconditions()
- {
-  retribution_defaultcdactions()
- }
+ retribution_defaultcdactions()
 }
 
 ### Required symbols

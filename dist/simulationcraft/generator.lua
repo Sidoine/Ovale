@@ -974,7 +974,7 @@ __exports.Generator = __class(nil, {
         local annotation = profile.annotation
         local precombatName = OvaleFunctionName("precombat", annotation)
         local defaultName = OvaleFunctionName("_default", annotation)
-        local precombatBodyName, precombatConditionName = OvaleTaggedFunctionName(precombatName, tag)
+        local precombatBodyName = OvaleTaggedFunctionName(precombatName, tag)
         local defaultBodyName = OvaleTaggedFunctionName(defaultName, tag)
         local mainBodyCode
         if annotation.using_apl and next(annotation.using_apl) then
@@ -994,12 +994,9 @@ __exports.Generator = __class(nil, {
         if profile["actions.precombat"] then
             local fmt = [[
                 if not InCombat() %s()
-                unless not InCombat() and %s()
-                {
-                    %s
-                }
+                %s
             ]]
-            code = format(fmt, precombatBodyName, precombatConditionName, mainBodyCode)
+            code = format(fmt, precombatBodyName, mainBodyCode)
         else
             code = mainBodyCode
         end

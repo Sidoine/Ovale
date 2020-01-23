@@ -13,7 +13,7 @@ for (const [name, script] of pairs(mainIoC.scripts.script)) {
     if (!script.className || script.type !== "script") continue;
     const className = script.className;
     const specialization = script.specialization;
-    if (name !== "sc_t24_warrior_fury") continue;
+    //if (name !== "sc_t24_warrior_fury") continue;
 
     test(`Test ${name} script`, t => {
         const ioc = new IoC();

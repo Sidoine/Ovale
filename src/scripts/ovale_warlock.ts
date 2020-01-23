@@ -573,55 +573,37 @@ AddCheckBox(opt_warlock_affliction_aoe l(aoe) default specialization=affliction)
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
 {
  if not incombat() afflictionprecombatshortcdactions()
- unless not incombat() and afflictionprecombatshortcdpostconditions()
- {
-  affliction_defaultshortcdactions()
- }
+ affliction_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=affliction
 {
  if not incombat() afflictionprecombatshortcdactions()
- unless not incombat() and afflictionprecombatshortcdpostconditions()
- {
-  affliction_defaultshortcdactions()
- }
+ affliction_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=affliction
 {
  if not incombat() afflictionprecombatmainactions()
- unless not incombat() and afflictionprecombatmainpostconditions()
- {
-  affliction_defaultmainactions()
- }
+ affliction_defaultmainactions()
 }
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
 {
  if not incombat() afflictionprecombatmainactions()
- unless not incombat() and afflictionprecombatmainpostconditions()
- {
-  affliction_defaultmainactions()
- }
+ affliction_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
 {
  if not incombat() afflictionprecombatcdactions()
- unless not incombat() and afflictionprecombatcdpostconditions()
- {
-  affliction_defaultcdactions()
- }
+ affliction_defaultcdactions()
 }
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 {
  if not incombat() afflictionprecombatcdactions()
- unless not incombat() and afflictionprecombatcdpostconditions()
- {
-  affliction_defaultcdactions()
- }
+ affliction_defaultcdactions()
 }
 
 ### Required symbols
@@ -854,6 +836,8 @@ AddFunction demonologynether_portal_buildingmainactions
  if timeincombat() >= 30 spell(call_dreadstalkers)
  #hand_of_guldan,if=time>=30&cooldown.call_dreadstalkers.remains>18&soul_shard>=3
  if timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 spell(hand_of_guldan)
+ #power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
+ if timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 spell(power_siphon)
  #hand_of_guldan,if=time>=30&soul_shard>=5
  if timeincombat() >= 30 and soulshards() >= 5 spell(hand_of_guldan)
  #call_action_list,name=build_a_shard
@@ -867,22 +851,16 @@ AddFunction demonologynether_portal_buildingmainpostconditions
 
 AddFunction demonologynether_portal_buildingshortcdactions
 {
- unless timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan)
+ unless timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan)
  {
-  #power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
-  if timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 spell(power_siphon)
-
-  unless timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan)
-  {
-   #call_action_list,name=build_a_shard
-   demonologybuild_a_shardshortcdactions()
-  }
+  #call_action_list,name=build_a_shard
+  demonologybuild_a_shardshortcdactions()
  }
 }
 
 AddFunction demonologynether_portal_buildingshortcdpostconditions
 {
- timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or demonologybuild_a_shardshortcdpostconditions()
+ timeincombat() >= 30 and spell(call_dreadstalkers) or timeincombat() >= 30 and spellcooldown(call_dreadstalkers) > 18 and soulshards() >= 3 and spell(hand_of_guldan) or timeincombat() >= 30 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and soulshards() >= 3 and spell(power_siphon) or timeincombat() >= 30 and soulshards() >= 5 and spell(hand_of_guldan) or demonologybuild_a_shardshortcdpostconditions()
 }
 
 AddFunction demonologynether_portal_buildingcdactions
@@ -1201,6 +1179,8 @@ AddFunction demonology_defaultmainactions
     if spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 spell(call_dreadstalkers)
     #hand_of_guldan,if=(azerite.baleful_invocation.enabled|talent.demonic_consumption.enabled)&prev_gcd.1.hand_of_guldan&cooldown.summon_demonic_tyrant.remains<2
     if { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 spell(hand_of_guldan)
+    #power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
+    if demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 spell(power_siphon)
     #doom,if=talent.doom.enabled&refreshable&time_to_die>(dot.doom.remains+30)
     if hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 spell(doom)
     #hand_of_guldan,if=soul_shard>=5|(soul_shard>=3&cooldown.call_dreadstalkers.remains>4&(cooldown.summon_demonic_tyrant.remains>20|(cooldown.summon_demonic_tyrant.remains<gcd*2&talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains<gcd*4&!talent.demonic_consumption.enabled))&(!talent.summon_vilefiend.enabled|cooldown.summon_vilefiend.remains>3))
@@ -1262,10 +1242,8 @@ AddFunction demonology_defaultshortcdactions
      {
       #summon_demonic_tyrant,if=soul_shard<3&(!talent.demonic_consumption.enabled|buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6&time_to_imps.all.remains<cast_time)|target.time_to_die<20
       if soulshards() < 3 and { not hastalent(demonic_consumption_talent) or demons(wild_imp) + demons(wild_imp_inner_demons) + impsspawnedduring(2000) / { 100 / { 100 + spellcastspeedpercent() } } >= 6 and 0 < casttime(summon_demonic_tyrant) } or target.timetodie() < 20 spell(summon_demonic_tyrant)
-      #power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
-      if demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 spell(power_siphon)
 
-      unless hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
+      unless demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt)
       {
        #purifying_blast
        spell(purifying_blast)
@@ -1285,7 +1263,7 @@ AddFunction demonology_defaultshortcdactions
 
 AddFunction demonology_defaultshortcdpostconditions
 {
- not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenershortcdpostconditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalshortcdpostconditions() or enemies() > 1 and demonologyimplosionshortcdpostconditions() or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or demonologybuild_a_shardshortcdpostconditions()
+ not hastalent(nether_portal_talent) and timeincombat() < 30 and not spellcooldown(summon_demonic_tyrant) > 0 and demonologyopenershortcdpostconditions() or azeritetraitrank(explosive_potential_trait) and timeincombat() < 5 and soulshards() > 2 and buffexpires(explosive_potential) and demons(wild_imp) + demons(wild_imp_inner_demons) < 3 and not previousgcdspell(hand_of_guldan) and not previousgcdspell(hand_of_guldan count=2) and spell(hand_of_guldan) or soulshards() <= 3 and buffpresent(demonic_core_buff) and buffstacks(demonic_core_buff) == 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) and demons(wild_imp) + demons(wild_imp_inner_demons) > 2 and buffremaining(explosive_potential) < executetime(shadow_bolt) and { not hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) > 12 } and spell(implosion) or not target.debuffpresent(doom_debuff) and target.timetodie() > 30 and enemies() < 2 and not buffpresent(nether_portal_buff) and spell(doom) or hastalent(nether_portal_talent) and enemies() <= 2 and demonologynether_portalshortcdpostconditions() or enemies() > 1 and demonologyimplosionshortcdpostconditions() or { spellcooldown(summon_demonic_tyrant) < 9 and buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) < 11 and not buffpresent(demonic_calling_buff) or spellcooldown(summon_demonic_tyrant) > 14 } and spell(call_dreadstalkers) or { hasazeritetrait(baleful_invocation_trait) or hastalent(demonic_consumption_talent) } and previousgcdspell(hand_of_guldan) and spellcooldown(summon_demonic_tyrant) < 2 and spell(hand_of_guldan) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 2 and buffstacks(demonic_core_buff) <= 2 and buffexpires(demonic_power) and enemies() < 2 and spell(power_siphon) or hastalent(doom_talent) and target.refreshable(doom_debuff) and target.timetodie() > target.debuffremaining(doom_debuff) + 30 and spell(doom) or { soulshards() >= 5 or soulshards() >= 3 and spellcooldown(call_dreadstalkers) > 4 and { spellcooldown(summon_demonic_tyrant) > 20 or spellcooldown(summon_demonic_tyrant) < gcd() * 2 and hastalent(demonic_consumption_talent) or spellcooldown(summon_demonic_tyrant) < gcd() * 4 and not hastalent(demonic_consumption_talent) } and { not hastalent(summon_vilefiend_talent) or spellcooldown(summon_vilefiend) > 3 } } and spell(hand_of_guldan) or soulshards() < 5 and buffstacks(demonic_core_buff) <= 2 and spell(soul_strike) or soulshards() <= 3 and buffpresent(demonic_core_buff) and { spellcooldown(summon_demonic_tyrant) < 6 or spellcooldown(summon_demonic_tyrant) > 22 and not hasazeritetrait(shadows_bite_trait) or buffstacks(demonic_core_buff) >= 3 or buffremaining(demonic_core_buff) < 5 or target.timetodie() < 25 or buffpresent(shadows_bite) } and spell(demonbolt) or not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) and not demonduration(demonic_tyrant) > 0 and spell(concentrated_flame_essence) or demonologybuild_a_shardshortcdpostconditions()
 }
 
 AddFunction demonology_defaultcdactions
@@ -1380,55 +1358,37 @@ AddCheckBox(opt_warlock_demonology_aoe l(aoe) default specialization=demonology)
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
 {
  if not incombat() demonologyprecombatshortcdactions()
- unless not incombat() and demonologyprecombatshortcdpostconditions()
- {
-  demonology_defaultshortcdactions()
- }
+ demonology_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonology
 {
  if not incombat() demonologyprecombatshortcdactions()
- unless not incombat() and demonologyprecombatshortcdpostconditions()
- {
-  demonology_defaultshortcdactions()
- }
+ demonology_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=demonology
 {
  if not incombat() demonologyprecombatmainactions()
- unless not incombat() and demonologyprecombatmainpostconditions()
- {
-  demonology_defaultmainactions()
- }
+ demonology_defaultmainactions()
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
 {
  if not incombat() demonologyprecombatmainactions()
- unless not incombat() and demonologyprecombatmainpostconditions()
- {
-  demonology_defaultmainactions()
- }
+ demonology_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
 {
  if not incombat() demonologyprecombatcdactions()
- unless not incombat() and demonologyprecombatcdpostconditions()
- {
-  demonology_defaultcdactions()
- }
+ demonology_defaultcdactions()
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 {
  if not incombat() demonologyprecombatcdactions()
- unless not incombat() and demonologyprecombatcdpostconditions()
- {
-  demonology_defaultcdactions()
- }
+ demonology_defaultcdactions()
 }
 
 ### Required symbols
@@ -1991,55 +1951,37 @@ AddCheckBox(opt_warlock_destruction_aoe l(aoe) default specialization=destructio
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
 {
  if not incombat() destructionprecombatshortcdactions()
- unless not incombat() and destructionprecombatshortcdpostconditions()
- {
-  destruction_defaultshortcdactions()
- }
+ destruction_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruction
 {
  if not incombat() destructionprecombatshortcdactions()
- unless not incombat() and destructionprecombatshortcdpostconditions()
- {
-  destruction_defaultshortcdactions()
- }
+ destruction_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=destruction
 {
  if not incombat() destructionprecombatmainactions()
- unless not incombat() and destructionprecombatmainpostconditions()
- {
-  destruction_defaultmainactions()
- }
+ destruction_defaultmainactions()
 }
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
 {
  if not incombat() destructionprecombatmainactions()
- unless not incombat() and destructionprecombatmainpostconditions()
- {
-  destruction_defaultmainactions()
- }
+ destruction_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
 {
  if not incombat() destructionprecombatcdactions()
- unless not incombat() and destructionprecombatcdpostconditions()
- {
-  destruction_defaultcdactions()
- }
+ destruction_defaultcdactions()
 }
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 {
  if not incombat() destructionprecombatcdactions()
- unless not incombat() and destructionprecombatcdpostconditions()
- {
-  destruction_defaultcdactions()
- }
+ destruction_defaultcdactions()
 }
 
 ### Required symbols

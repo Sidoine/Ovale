@@ -114,6 +114,10 @@ AddFunction balance_defaultmainactions
 {
  #concentrated_flame,if=(!buff.ca_inc.up|stack=2)&!action.concentrated_flame_missile.in_flight,target_if=!dot.concentrated_flame_burn.ticking
  if { not buffpresent(ca_inc) or buffstacks(concentrated_flame_essence) == 2 } and not inflighttotarget(concentrated_flame) and not target.debuffpresent(concentrated_flame_burn_debuff) spell(concentrated_flame_essence)
+ #warrior_of_elune
+ spell(warrior_of_elune)
+ #force_of_nature,if=(variable.az_ss&!buff.ca_inc.up|!variable.az_ss&(buff.ca_inc.up|cooldown.ca_inc.remains>30))&ap_check
+ if { az_ss() and not buffpresent(ca_inc) or not az_ss() and { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } } and astralpower() >= astralpowercost(force_of_nature) spell(force_of_nature)
  #cancel_buff,name=starlord,if=buff.starlord.remains<3&!solar_wrath.ap_check
  if buffremaining(starlord_buff) < 3 and not astralpower() >= astralpowercost(solar_wrath) and buffpresent(starlord_buff) texture(starlord text=cancel)
  #starfall,if=(buff.starlord.stack<3|buff.starlord.remains>=8)&spell_targets>=variable.sf_targets&(target.time_to_die+1)*spell_targets>cost%2.5
@@ -165,18 +169,18 @@ AddFunction balance_defaultshortcdactions
   if not buffpresent(ca_inc) spell(reaping_flames)
   #thorns
   spell(thorns)
-  #warrior_of_elune
-  spell(warrior_of_elune)
-  #force_of_nature,if=(variable.az_ss&!buff.ca_inc.up|!variable.az_ss&(buff.ca_inc.up|cooldown.ca_inc.remains>30))&ap_check
-  if { az_ss() and not buffpresent(ca_inc) or not az_ss() and { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } } and astralpower() >= astralpowercost(force_of_nature) spell(force_of_nature)
-  #fury_of_elune,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&solar_wrath.ap_check
-  if { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } and astralpower() >= astralpowercost(solar_wrath) spell(fury_of_elune)
+
+  unless spell(warrior_of_elune) or { az_ss() and not buffpresent(ca_inc) or not az_ss() and { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } } and astralpower() >= astralpowercost(force_of_nature) and spell(force_of_nature)
+  {
+   #fury_of_elune,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&solar_wrath.ap_check
+   if { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } and astralpower() >= astralpowercost(solar_wrath) spell(fury_of_elune)
+  }
  }
 }
 
 AddFunction balance_defaultshortcdpostconditions
 {
- { not buffpresent(ca_inc) or buffstacks(concentrated_flame_essence) == 2 } and not inflighttotarget(concentrated_flame) and not target.debuffpresent(concentrated_flame_burn_debuff) and spell(concentrated_flame_essence) or buffremaining(starlord_buff) < 3 and not astralpower() >= astralpowercost(solar_wrath) and buffpresent(starlord_buff) and texture(starlord text=cancel) or { buffstacks(starlord_buff) < 3 or buffremaining(starlord_buff) >= 8 } and enemies() >= sf_targets() and { target.timetodie() + 1 } * enemies() > powercost(starfall) / 2.5 and spell(starfall) or { { hastalent(starlord_talent) and { buffstacks(starlord_buff) < 3 or buffremaining(starlord_buff) >= 5 and buffstacks(arcanic_pulsar_buff) < 8 } or not hastalent(starlord_talent) and { buffstacks(arcanic_pulsar_buff) < 8 or buffpresent(ca_inc) } } and enemies() < sf_targets() and buffstacks(lunar_empowerment_buff) + buffstacks(solar_empowerment_buff) < 4 and buffstacks(solar_empowerment_buff) < 3 and buffstacks(lunar_empowerment_buff) < 3 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(starsurge_balance) } or target.timetodie() <= executetime(starsurge_balance) * astralpower() / 40 or not astralpower() >= astralpowercost(solar_wrath) } and spell(starsurge_balance) or buffpresent(ca_inc) and buffremaining(ca_inc) < gcd() and az_ss() and target.debuffremaining(moonfire) > target.debuffremaining(sunfire_debuff) and spell(sunfire) or buffpresent(ca_inc) and buffremaining(ca_inc) < gcd() and az_ss() and spell(moonfire) or target.refreshable(sunfire_debuff) and astralpower() >= astralpowercost(sunfire) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } * enemies() >= 2 / enemies() * 1.5 + 2 * enemies() and { enemies() > 1 + talentpoints(twin_moons_talent) or target.debuffpresent(moonfire) } and { not az_ss() or not buffpresent(ca_inc) or not previousspell(sunfire) } and { buffremaining(ca_inc) > target.debuffremaining(sunfire_debuff) or not buffpresent(ca_inc) } and spell(sunfire) or target.refreshable(moonfire) and astralpower() >= astralpowercost(moonfire) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } * enemies() >= 6 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(moonfire) } and { buffremaining(ca_inc) > buffremaining(moonfire) or not buffpresent(ca_inc) } and spell(moonfire) or target.refreshable(stellar_flare_debuff) and astralpower() >= astralpowercost(stellar_flare) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } >= 5 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(stellar_flare) } and spell(stellar_flare) or astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon) or buffstacks(solar_empowerment_buff) < 3 and { astralpower() >= astralpowercost(lunar_strike) or buffstacks(lunar_empowerment_buff) == 3 } and { { buffpresent(warrior_of_elune_buff) or buffpresent(lunar_empowerment_buff) or enemies() >= 2 and not buffpresent(solar_empowerment_buff) } and { not az_ss() or not buffpresent(ca_inc) } or az_ss() and buffpresent(ca_inc) and previousspell(solar_wrath_balance) } and spell(lunar_strike) or { az_ss() < 3 or not buffpresent(ca_inc) or not previousspell(solar_wrath_balance) } and spell(solar_wrath_balance) or spell(sunfire)
+ { not buffpresent(ca_inc) or buffstacks(concentrated_flame_essence) == 2 } and not inflighttotarget(concentrated_flame) and not target.debuffpresent(concentrated_flame_burn_debuff) and spell(concentrated_flame_essence) or spell(warrior_of_elune) or { az_ss() and not buffpresent(ca_inc) or not az_ss() and { buffpresent(ca_inc) or spellcooldown(ca_inc) > 30 } } and astralpower() >= astralpowercost(force_of_nature) and spell(force_of_nature) or buffremaining(starlord_buff) < 3 and not astralpower() >= astralpowercost(solar_wrath) and buffpresent(starlord_buff) and texture(starlord text=cancel) or { buffstacks(starlord_buff) < 3 or buffremaining(starlord_buff) >= 8 } and enemies() >= sf_targets() and { target.timetodie() + 1 } * enemies() > powercost(starfall) / 2.5 and spell(starfall) or { { hastalent(starlord_talent) and { buffstacks(starlord_buff) < 3 or buffremaining(starlord_buff) >= 5 and buffstacks(arcanic_pulsar_buff) < 8 } or not hastalent(starlord_talent) and { buffstacks(arcanic_pulsar_buff) < 8 or buffpresent(ca_inc) } } and enemies() < sf_targets() and buffstacks(lunar_empowerment_buff) + buffstacks(solar_empowerment_buff) < 4 and buffstacks(solar_empowerment_buff) < 3 and buffstacks(lunar_empowerment_buff) < 3 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(starsurge_balance) } or target.timetodie() <= executetime(starsurge_balance) * astralpower() / 40 or not astralpower() >= astralpowercost(solar_wrath) } and spell(starsurge_balance) or buffpresent(ca_inc) and buffremaining(ca_inc) < gcd() and az_ss() and target.debuffremaining(moonfire) > target.debuffremaining(sunfire_debuff) and spell(sunfire) or buffpresent(ca_inc) and buffremaining(ca_inc) < gcd() and az_ss() and spell(moonfire) or target.refreshable(sunfire_debuff) and astralpower() >= astralpowercost(sunfire) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } * enemies() >= 2 / enemies() * 1.5 + 2 * enemies() and { enemies() > 1 + talentpoints(twin_moons_talent) or target.debuffpresent(moonfire) } and { not az_ss() or not buffpresent(ca_inc) or not previousspell(sunfire) } and { buffremaining(ca_inc) > target.debuffremaining(sunfire_debuff) or not buffpresent(ca_inc) } and spell(sunfire) or target.refreshable(moonfire) and astralpower() >= astralpowercost(moonfire) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } * enemies() >= 6 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(moonfire) } and { buffremaining(ca_inc) > buffremaining(moonfire) or not buffpresent(ca_inc) } and spell(moonfire) or target.refreshable(stellar_flare_debuff) and astralpower() >= astralpowercost(stellar_flare) and target.timetodie() / { 2 * { 100 / { 100 + spellcastspeedpercent() } } } >= 5 and { not az_ss() or not buffpresent(ca_inc) or not previousspell(stellar_flare) } and spell(stellar_flare) or astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon) or buffstacks(solar_empowerment_buff) < 3 and { astralpower() >= astralpowercost(lunar_strike) or buffstacks(lunar_empowerment_buff) == 3 } and { { buffpresent(warrior_of_elune_buff) or buffpresent(lunar_empowerment_buff) or enemies() >= 2 and not buffpresent(solar_empowerment_buff) } and { not az_ss() or not buffpresent(ca_inc) } or az_ss() and buffpresent(ca_inc) and previousspell(solar_wrath_balance) } and spell(lunar_strike) or { az_ss() < 3 or not buffpresent(ca_inc) or not previousspell(solar_wrath_balance) } and spell(solar_wrath_balance) or spell(sunfire)
 }
 
 AddFunction balance_defaultcdactions
@@ -242,55 +246,37 @@ AddCheckBox(opt_druid_balance_aoe l(aoe) default specialization=balance)
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=shortcd specialization=balance
 {
  if not incombat() balanceprecombatshortcdactions()
- unless not incombat() and balanceprecombatshortcdpostconditions()
- {
-  balance_defaultshortcdactions()
- }
+ balance_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=shortcd specialization=balance
 {
  if not incombat() balanceprecombatshortcdactions()
- unless not incombat() and balanceprecombatshortcdpostconditions()
- {
-  balance_defaultshortcdactions()
- }
+ balance_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=balance
 {
  if not incombat() balanceprecombatmainactions()
- unless not incombat() and balanceprecombatmainpostconditions()
- {
-  balance_defaultmainactions()
- }
+ balance_defaultmainactions()
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=aoe specialization=balance
 {
  if not incombat() balanceprecombatmainactions()
- unless not incombat() and balanceprecombatmainpostconditions()
- {
-  balance_defaultmainactions()
- }
+ balance_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=cd specialization=balance
 {
  if not incombat() balanceprecombatcdactions()
- unless not incombat() and balanceprecombatcdpostconditions()
- {
-  balance_defaultcdactions()
- }
+ balance_defaultcdactions()
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 {
  if not incombat() balanceprecombatcdactions()
- unless not incombat() and balanceprecombatcdpostconditions()
- {
-  balance_defaultcdactions()
- }
+ balance_defaultcdactions()
 }
 
 ### Required symbols
@@ -852,55 +838,37 @@ AddCheckBox(opt_druid_feral_aoe l(aoe) default specialization=feral)
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=shortcd specialization=feral
 {
  if not incombat() feralprecombatshortcdactions()
- unless not incombat() and feralprecombatshortcdpostconditions()
- {
-  feral_defaultshortcdactions()
- }
+ feral_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=shortcd specialization=feral
 {
  if not incombat() feralprecombatshortcdactions()
- unless not incombat() and feralprecombatshortcdpostconditions()
- {
-  feral_defaultshortcdactions()
- }
+ feral_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=feral
 {
  if not incombat() feralprecombatmainactions()
- unless not incombat() and feralprecombatmainpostconditions()
- {
-  feral_defaultmainactions()
- }
+ feral_defaultmainactions()
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=aoe specialization=feral
 {
  if not incombat() feralprecombatmainactions()
- unless not incombat() and feralprecombatmainpostconditions()
- {
-  feral_defaultmainactions()
- }
+ feral_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=cd specialization=feral
 {
  if not incombat() feralprecombatcdactions()
- unless not incombat() and feralprecombatcdpostconditions()
- {
-  feral_defaultcdactions()
- }
+ feral_defaultcdactions()
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 {
  if not incombat() feralprecombatcdactions()
- unless not incombat() and feralprecombatcdpostconditions()
- {
-  feral_defaultcdactions()
- }
+ feral_defaultcdactions()
 }
 
 ### Required symbols
@@ -1347,55 +1315,37 @@ AddCheckBox(opt_druid_guardian_aoe l(aoe) default specialization=guardian)
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=guardian
 {
  if not incombat() guardianprecombatshortcdactions()
- unless not incombat() and guardianprecombatshortcdpostconditions()
- {
-  guardian_defaultshortcdactions()
- }
+ guardian_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 {
  if not incombat() guardianprecombatshortcdactions()
- unless not incombat() and guardianprecombatshortcdpostconditions()
- {
-  guardian_defaultshortcdactions()
- }
+ guardian_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=guardian
 {
  if not incombat() guardianprecombatmainactions()
- unless not incombat() and guardianprecombatmainpostconditions()
- {
-  guardian_defaultmainactions()
- }
+ guardian_defaultmainactions()
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=aoe specialization=guardian
 {
  if not incombat() guardianprecombatmainactions()
- unless not incombat() and guardianprecombatmainpostconditions()
- {
-  guardian_defaultmainactions()
- }
+ guardian_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=cd specialization=guardian
 {
  if not incombat() guardianprecombatcdactions()
- unless not incombat() and guardianprecombatcdpostconditions()
- {
-  guardian_defaultcdactions()
- }
+ guardian_defaultcdactions()
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 {
  if not incombat() guardianprecombatcdactions()
- unless not incombat() and guardianprecombatcdpostconditions()
- {
-  guardian_defaultcdactions()
- }
+ guardian_defaultcdactions()
 }
 
 ### Required symbols
@@ -1727,55 +1677,37 @@ AddCheckBox(opt_druid_restoration_aoe l(aoe) default specialization=restoration)
 AddIcon checkbox=!opt_druid_restoration_aoe enemies=1 help=shortcd specialization=restoration
 {
  if not incombat() restorationprecombatshortcdactions()
- unless not incombat() and restorationprecombatshortcdpostconditions()
- {
-  restoration_defaultshortcdactions()
- }
+ restoration_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_druid_restoration_aoe help=shortcd specialization=restoration
 {
  if not incombat() restorationprecombatshortcdactions()
- unless not incombat() and restorationprecombatshortcdpostconditions()
- {
-  restoration_defaultshortcdactions()
- }
+ restoration_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=restoration
 {
  if not incombat() restorationprecombatmainactions()
- unless not incombat() and restorationprecombatmainpostconditions()
- {
-  restoration_defaultmainactions()
- }
+ restoration_defaultmainactions()
 }
 
 AddIcon checkbox=opt_druid_restoration_aoe help=aoe specialization=restoration
 {
  if not incombat() restorationprecombatmainactions()
- unless not incombat() and restorationprecombatmainpostconditions()
- {
-  restoration_defaultmainactions()
- }
+ restoration_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_druid_restoration_aoe enemies=1 help=cd specialization=restoration
 {
  if not incombat() restorationprecombatcdactions()
- unless not incombat() and restorationprecombatcdpostconditions()
- {
-  restoration_defaultcdactions()
- }
+ restoration_defaultcdactions()
 }
 
 AddIcon checkbox=opt_druid_restoration_aoe help=cd specialization=restoration
 {
  if not incombat() restorationprecombatcdactions()
- unless not incombat() and restorationprecombatcdpostconditions()
- {
-  restoration_defaultcdactions()
- }
+ restoration_defaultcdactions()
 }
 
 ### Required symbols

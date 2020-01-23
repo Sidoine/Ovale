@@ -603,7 +603,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         content.SetHeight(100);
         content.Hide();
         AceGUIRegisterAsContainer(this);
-        this.UpdateFrame();        
     }
 }
 
@@ -615,6 +614,7 @@ export class OvaleFrameModuleClass {
         this.module.RegisterMessage("Ovale_CombatStarted", this.Ovale_CombatStarted);
         this.module.RegisterMessage("Ovale_CombatEnded", this.Ovale_CombatEnded);
         this.module.RegisterEvent("PLAYER_TARGET_CHANGED", this.PLAYER_TARGET_CHANGED);
+        this.frame.UpdateFrame();
     }
 
     private handleDisable = () =>{

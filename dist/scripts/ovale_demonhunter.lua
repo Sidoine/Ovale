@@ -514,55 +514,37 @@ AddCheckBox(opt_demonhunter_havoc_aoe l(aoe) default specialization=havoc)
 AddIcon checkbox=!opt_demonhunter_havoc_aoe enemies=1 help=shortcd specialization=havoc
 {
  if not incombat() havocprecombatshortcdactions()
- unless not incombat() and havocprecombatshortcdpostconditions()
- {
-  havoc_defaultshortcdactions()
- }
+ havoc_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_demonhunter_havoc_aoe help=shortcd specialization=havoc
 {
  if not incombat() havocprecombatshortcdactions()
- unless not incombat() and havocprecombatshortcdpostconditions()
- {
-  havoc_defaultshortcdactions()
- }
+ havoc_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=havoc
 {
  if not incombat() havocprecombatmainactions()
- unless not incombat() and havocprecombatmainpostconditions()
- {
-  havoc_defaultmainactions()
- }
+ havoc_defaultmainactions()
 }
 
 AddIcon checkbox=opt_demonhunter_havoc_aoe help=aoe specialization=havoc
 {
  if not incombat() havocprecombatmainactions()
- unless not incombat() and havocprecombatmainpostconditions()
- {
-  havoc_defaultmainactions()
- }
+ havoc_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_demonhunter_havoc_aoe enemies=1 help=cd specialization=havoc
 {
  if not incombat() havocprecombatcdactions()
- unless not incombat() and havocprecombatcdpostconditions()
- {
-  havoc_defaultcdactions()
- }
+ havoc_defaultcdactions()
 }
 
 AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 {
  if not incombat() havocprecombatcdactions()
- unless not incombat() and havocprecombatcdpostconditions()
- {
-  havoc_defaultcdactions()
- }
+ havoc_defaultcdactions()
 }
 
 ### Required symbols
@@ -1006,55 +988,37 @@ AddCheckBox(opt_demonhunter_vengeance_aoe l(aoe) default specialization=vengeanc
 AddIcon checkbox=!opt_demonhunter_vengeance_aoe enemies=1 help=shortcd specialization=vengeance
 {
  if not incombat() vengeanceprecombatshortcdactions()
- unless not incombat() and vengeanceprecombatshortcdpostconditions()
- {
-  vengeance_defaultshortcdactions()
- }
+ vengeance_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_demonhunter_vengeance_aoe help=shortcd specialization=vengeance
 {
  if not incombat() vengeanceprecombatshortcdactions()
- unless not incombat() and vengeanceprecombatshortcdpostconditions()
- {
-  vengeance_defaultshortcdactions()
- }
+ vengeance_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=vengeance
 {
  if not incombat() vengeanceprecombatmainactions()
- unless not incombat() and vengeanceprecombatmainpostconditions()
- {
-  vengeance_defaultmainactions()
- }
+ vengeance_defaultmainactions()
 }
 
 AddIcon checkbox=opt_demonhunter_vengeance_aoe help=aoe specialization=vengeance
 {
  if not incombat() vengeanceprecombatmainactions()
- unless not incombat() and vengeanceprecombatmainpostconditions()
- {
-  vengeance_defaultmainactions()
- }
+ vengeance_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_demonhunter_vengeance_aoe enemies=1 help=cd specialization=vengeance
 {
  if not incombat() vengeanceprecombatcdactions()
- unless not incombat() and vengeanceprecombatcdpostconditions()
- {
-  vengeance_defaultcdactions()
- }
+ vengeance_defaultcdactions()
 }
 
 AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 {
  if not incombat() vengeanceprecombatcdactions()
- unless not incombat() and vengeanceprecombatcdpostconditions()
- {
-  vengeance_defaultcdactions()
- }
+ vengeance_defaultcdactions()
 }
 
 ### Required symbols

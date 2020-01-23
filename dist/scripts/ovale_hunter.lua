@@ -431,55 +431,37 @@ AddCheckBox(opt_hunter_beast_mastery_aoe l(aoe) default specialization=beast_mas
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=shortcd specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatshortcdactions()
- unless not incombat() and beast_masteryprecombatshortcdpostconditions()
- {
-  beast_mastery_defaultshortcdactions()
- }
+ beast_mastery_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=shortcd specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatshortcdactions()
- unless not incombat() and beast_masteryprecombatshortcdpostconditions()
- {
-  beast_mastery_defaultshortcdactions()
- }
+ beast_mastery_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatmainactions()
- unless not incombat() and beast_masteryprecombatmainpostconditions()
- {
-  beast_mastery_defaultmainactions()
- }
+ beast_mastery_defaultmainactions()
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=aoe specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatmainactions()
- unless not incombat() and beast_masteryprecombatmainpostconditions()
- {
-  beast_mastery_defaultmainactions()
- }
+ beast_mastery_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=cd specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatcdactions()
- unless not incombat() and beast_masteryprecombatcdpostconditions()
- {
-  beast_mastery_defaultcdactions()
- }
+ beast_mastery_defaultcdactions()
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_mastery
 {
  if not incombat() beast_masteryprecombatcdactions()
- unless not incombat() and beast_masteryprecombatcdpostconditions()
- {
-  beast_mastery_defaultcdactions()
- }
+ beast_mastery_defaultcdactions()
 }
 
 ### Required symbols
@@ -936,55 +918,37 @@ AddCheckBox(opt_hunter_marksmanship_aoe l(aoe) default specialization=marksmansh
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=shortcd specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatshortcdactions()
- unless not incombat() and marksmanshipprecombatshortcdpostconditions()
- {
-  marksmanship_defaultshortcdactions()
- }
+ marksmanship_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=shortcd specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatshortcdactions()
- unless not incombat() and marksmanshipprecombatshortcdpostconditions()
- {
-  marksmanship_defaultshortcdactions()
- }
+ marksmanship_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatmainactions()
- unless not incombat() and marksmanshipprecombatmainpostconditions()
- {
-  marksmanship_defaultmainactions()
- }
+ marksmanship_defaultmainactions()
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=aoe specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatmainactions()
- unless not incombat() and marksmanshipprecombatmainpostconditions()
- {
-  marksmanship_defaultmainactions()
- }
+ marksmanship_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=cd specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatcdactions()
- unless not incombat() and marksmanshipprecombatcdpostconditions()
- {
-  marksmanship_defaultcdactions()
- }
+ marksmanship_defaultcdactions()
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 {
  if not incombat() marksmanshipprecombatcdactions()
- unless not incombat() and marksmanshipprecombatcdpostconditions()
- {
-  marksmanship_defaultcdactions()
- }
+ marksmanship_defaultcdactions()
 }
 
 ### Required symbols
@@ -1796,55 +1760,37 @@ AddCheckBox(opt_hunter_survival_aoe l(aoe) default specialization=survival)
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
  if not incombat() survivalprecombatshortcdactions()
- unless not incombat() and survivalprecombatshortcdpostconditions()
- {
-  survival_defaultshortcdactions()
- }
+ survival_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
  if not incombat() survivalprecombatshortcdactions()
- unless not incombat() and survivalprecombatshortcdpostconditions()
- {
-  survival_defaultshortcdactions()
- }
+ survival_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=survival
 {
  if not incombat() survivalprecombatmainactions()
- unless not incombat() and survivalprecombatmainpostconditions()
- {
-  survival_defaultmainactions()
- }
+ survival_defaultmainactions()
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=aoe specialization=survival
 {
  if not incombat() survivalprecombatmainactions()
- unless not incombat() and survivalprecombatmainpostconditions()
- {
-  survival_defaultmainactions()
- }
+ survival_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=cd specialization=survival
 {
  if not incombat() survivalprecombatcdactions()
- unless not incombat() and survivalprecombatcdpostconditions()
- {
-  survival_defaultcdactions()
- }
+ survival_defaultcdactions()
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 {
  if not incombat() survivalprecombatcdactions()
- unless not incombat() and survivalprecombatcdpostconditions()
- {
-  survival_defaultcdactions()
- }
+ survival_defaultcdactions()
 }
 
 ### Required symbols

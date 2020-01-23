@@ -51,6 +51,8 @@ AddFunction bloodstandardmainactions
 {
  #death_strike,if=runic_power.deficit<=10
  if runicpowerdeficit() <= 10 spell(death_strike)
+ #blooddrinker,if=!buff.dancing_rune_weapon.up
+ if not buffpresent(dancing_rune_weapon_buff) spell(blooddrinker)
  #marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
  if { buffremaining(bone_shield_buff) <= timetorunes(3) or buffremaining(bone_shield_buff) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield_buff) < 3 } and runicpowerdeficit() >= 20 spell(marrowrend)
  #blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
@@ -63,6 +65,8 @@ AddFunction bloodstandardmainactions
  if buffpresent(dancing_rune_weapon_buff) or timetorunes(4) < gcd() spell(heart_strike)
  #blood_boil,if=buff.dancing_rune_weapon.up
  if buffpresent(dancing_rune_weapon_buff) spell(blood_boil)
+ #consumption
+ spell(consumption)
  #blood_boil
  spell(blood_boil)
  #heart_strike,if=rune.time_to_3<gcd|buff.bone_shield.stack>6
@@ -75,35 +79,27 @@ AddFunction bloodstandardmainpostconditions
 
 AddFunction bloodstandardshortcdactions
 {
- unless runicpowerdeficit() <= 10 and spell(death_strike)
+ unless runicpowerdeficit() <= 10 and spell(death_strike) or not buffpresent(dancing_rune_weapon_buff) and spell(blooddrinker) or { buffremaining(bone_shield_buff) <= timetorunes(3) or buffremaining(bone_shield_buff) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield_buff) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield_buff) < 5 and hastalent(ossuary_talent) and runicpowerdeficit() >= 15 and spell(marrowrend)
  {
-  #blooddrinker,if=!buff.dancing_rune_weapon.up
-  if not buffpresent(dancing_rune_weapon_buff) spell(blooddrinker)
+  #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
+  if runicpower() >= 100 and not buffpresent(dancing_rune_weapon_buff) spell(bonestorm)
 
-  unless { buffremaining(bone_shield_buff) <= timetorunes(3) or buffremaining(bone_shield_buff) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield_buff) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield_buff) < 5 and hastalent(ossuary_talent) and runicpowerdeficit() >= 15 and spell(marrowrend)
+  unless { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon_buff) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike)
   {
-   #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
-   if runicpower() >= 100 and not buffpresent(dancing_rune_weapon_buff) spell(bonestorm)
+   #death_and_decay,if=spell_targets.death_and_decay>=3
+   if enemies() >= 3 spell(death_and_decay)
+   #rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
+   if { charges(rune_strike count=0) >= 1.8 or buffpresent(dancing_rune_weapon_buff) } and timetorunes(3) >= gcd() spell(rune_strike)
 
-   unless { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon_buff) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike)
+   unless { buffpresent(dancing_rune_weapon_buff) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon_buff) and spell(blood_boil)
    {
-    #death_and_decay,if=spell_targets.death_and_decay>=3
-    if enemies() >= 3 spell(death_and_decay)
-    #rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
-    if { charges(rune_strike count=0) >= 1.8 or buffpresent(dancing_rune_weapon_buff) } and timetorunes(3) >= gcd() spell(rune_strike)
+    #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
+    if buffpresent(crimson_scourge_buff) or hastalent(rapid_decomposition_talent) or enemies() >= 2 spell(death_and_decay)
 
-    unless { buffpresent(dancing_rune_weapon_buff) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon_buff) and spell(blood_boil)
+    unless spell(consumption) or spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield_buff) > 6 } and spell(heart_strike)
     {
-     #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
-     if buffpresent(crimson_scourge_buff) or hastalent(rapid_decomposition_talent) or enemies() >= 2 spell(death_and_decay)
-     #consumption
-     spell(consumption)
-
-     unless spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield_buff) > 6 } and spell(heart_strike)
-     {
-      #rune_strike
-      spell(rune_strike)
-     }
+     #rune_strike
+     spell(rune_strike)
     }
    }
   }
@@ -112,7 +108,7 @@ AddFunction bloodstandardshortcdactions
 
 AddFunction bloodstandardshortcdpostconditions
 {
- runicpowerdeficit() <= 10 and spell(death_strike) or { buffremaining(bone_shield_buff) <= timetorunes(3) or buffremaining(bone_shield_buff) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield_buff) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield_buff) < 5 and hastalent(ossuary_talent) and runicpowerdeficit() >= 15 and spell(marrowrend) or { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon_buff) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike) or { buffpresent(dancing_rune_weapon_buff) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon_buff) and spell(blood_boil) or spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield_buff) > 6 } and spell(heart_strike)
+ runicpowerdeficit() <= 10 and spell(death_strike) or not buffpresent(dancing_rune_weapon_buff) and spell(blooddrinker) or { buffremaining(bone_shield_buff) <= timetorunes(3) or buffremaining(bone_shield_buff) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield_buff) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield_buff) < 5 and hastalent(ossuary_talent) and runicpowerdeficit() >= 15 and spell(marrowrend) or { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon_buff) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike) or { buffpresent(dancing_rune_weapon_buff) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon_buff) and spell(blood_boil) or spell(consumption) or spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield_buff) > 6 } and spell(heart_strike)
 }
 
 AddFunction bloodstandardcdactions
@@ -258,55 +254,37 @@ AddCheckBox(opt_deathknight_blood_aoe l(aoe) default specialization=blood)
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=shortcd specialization=blood
 {
  if not incombat() bloodprecombatshortcdactions()
- unless not incombat() and bloodprecombatshortcdpostconditions()
- {
-  blood_defaultshortcdactions()
- }
+ blood_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=shortcd specialization=blood
 {
  if not incombat() bloodprecombatshortcdactions()
- unless not incombat() and bloodprecombatshortcdpostconditions()
- {
-  blood_defaultshortcdactions()
- }
+ blood_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=blood
 {
  if not incombat() bloodprecombatmainactions()
- unless not incombat() and bloodprecombatmainpostconditions()
- {
-  blood_defaultmainactions()
- }
+ blood_defaultmainactions()
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 {
  if not incombat() bloodprecombatmainactions()
- unless not incombat() and bloodprecombatmainpostconditions()
- {
-  blood_defaultmainactions()
- }
+ blood_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=cd specialization=blood
 {
  if not incombat() bloodprecombatcdactions()
- unless not incombat() and bloodprecombatcdpostconditions()
- {
-  blood_defaultcdactions()
- }
+ blood_defaultcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 {
  if not incombat() bloodprecombatcdactions()
- unless not incombat() and bloodprecombatcdpostconditions()
- {
-  blood_defaultcdactions()
- }
+ blood_defaultcdactions()
 }
 
 ### Required symbols
@@ -1082,55 +1060,37 @@ AddCheckBox(opt_deathknight_frost_aoe l(aoe) default specialization=frost)
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
 {
  if not incombat() frostprecombatshortcdactions()
- unless not incombat() and frostprecombatshortcdpostconditions()
- {
-  frost_defaultshortcdactions()
- }
+ frost_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 {
  if not incombat() frostprecombatshortcdactions()
- unless not incombat() and frostprecombatshortcdpostconditions()
- {
-  frost_defaultshortcdactions()
- }
+ frost_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=frost
 {
  if not incombat() frostprecombatmainactions()
- unless not incombat() and frostprecombatmainpostconditions()
- {
-  frost_defaultmainactions()
- }
+ frost_defaultmainactions()
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
 {
  if not incombat() frostprecombatmainactions()
- unless not incombat() and frostprecombatmainpostconditions()
- {
-  frost_defaultmainactions()
- }
+ frost_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
 {
  if not incombat() frostprecombatcdactions()
- unless not incombat() and frostprecombatcdpostconditions()
- {
-  frost_defaultcdactions()
- }
+ frost_defaultcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 {
  if not incombat() frostprecombatcdactions()
- unless not incombat() and frostprecombatcdpostconditions()
- {
-  frost_defaultcdactions()
- }
+ frost_defaultcdactions()
 }
 
 ### Required symbols
@@ -1675,55 +1635,37 @@ AddCheckBox(opt_deathknight_unholy_aoe l(aoe) default specialization=unholy)
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
 {
  if not incombat() unholyprecombatshortcdactions()
- unless not incombat() and unholyprecombatshortcdpostconditions()
- {
-  unholy_defaultshortcdactions()
- }
+ unholy_defaultshortcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
 {
  if not incombat() unholyprecombatshortcdactions()
- unless not incombat() and unholyprecombatshortcdpostconditions()
- {
-  unholy_defaultshortcdactions()
- }
+ unholy_defaultshortcdactions()
 }
 
 AddIcon enemies=1 help=main specialization=unholy
 {
  if not incombat() unholyprecombatmainactions()
- unless not incombat() and unholyprecombatmainpostconditions()
- {
-  unholy_defaultmainactions()
- }
+ unholy_defaultmainactions()
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
 {
  if not incombat() unholyprecombatmainactions()
- unless not incombat() and unholyprecombatmainpostconditions()
- {
-  unholy_defaultmainactions()
- }
+ unholy_defaultmainactions()
 }
 
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy
 {
  if not incombat() unholyprecombatcdactions()
- unless not incombat() and unholyprecombatcdpostconditions()
- {
-  unholy_defaultcdactions()
- }
+ unholy_defaultcdactions()
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 {
  if not incombat() unholyprecombatcdactions()
- unless not incombat() and unholyprecombatcdpostconditions()
- {
-  unholy_defaultcdactions()
- }
+ unholy_defaultcdactions()
 }
 
 ### Required symbols
