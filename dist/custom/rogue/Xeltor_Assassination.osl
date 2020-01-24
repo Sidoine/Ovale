@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerRogueAssassinationXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_stabby"
-	local desc = "[Xel][8.2.5] Blush: Stabby"
+	local desc = "[Xel][8.3] Blush: Stabby"
 	local code = [[
 
 Include(ovale_common)
@@ -32,12 +32,12 @@ AddIcon specialization=1 help=main
 	}
 
 	if InCombat() AssassinationInterruptActions()
-	if HealthPercent() < 50 and not Dead() and Energy() > 24 Spell(crimson_vial)
+	if { HealthPercent() <= 25 or HealthPercent() < 50 and not IsGrouped() or HealthPercent() < 90 and not InCombat() } and not mounted() and not Dead() and Energy() > 30 Spell(crimson_vial)
 
 	if target.InRange(mutilate) and HasFullControl() and not target.DebuffPresent(crowd_control_debuff)
 	{
 		# Cooldowns
-		if Boss() AssassinationDefaultCdActions()
+		AssassinationDefaultCdActions()
 
 		# Short Cooldowns
 		AssassinationDefaultShortCdActions()
@@ -82,9 +82,9 @@ AddFunction AssassinationGetInMeleeRange
 	}
 }
 
-AddFunction skip_rupture
+AddFunction ss_vanish_condition
 {
- target.DebuffPresent(vendetta_debuff) and { target.DebuffPresent(toxic_blade_debuff) or BuffRemaining(master_assassin_buff) > 0 } and target.DebuffRemaining(rupture_debuff) > 2
+ HasAzeriteTrait(shrouded_suffocation_trait) and { Enemies(tagged=1) - DebuffCountOnAny(garrote_debuff) >= 1 or Enemies(tagged=1) == 3 } and { 0 == 0 or Enemies(tagged=1) >= 6 }
 }
 
 AddFunction use_filler
@@ -92,19 +92,34 @@ AddFunction use_filler
  ComboPointsDeficit() > 1 or EnergyDeficit() <= 25 + energy_regen_combined() or not single_target()
 }
 
-AddFunction ss_vanish_condition
+AddFunction vendetta_font_condition
 {
- HasAzeriteTrait(shrouded_suffocation_trait) and { Enemies(tagged=1) - DebuffCountOnAny(garrote_debuff) >= 1 or Enemies(tagged=1) == 3 } and { 0 == 0 or Enemies(tagged=1) >= 6 }
+ not HasEquippedItem(azsharas_font_of_power_item) or HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffExpires(razor_coral_debuff) or BuffRemaining(trinket_ashvanes_razor_coral_cooldown_buff) < 10 and { SpellCooldown(toxic_blade) < 1 or target.DebuffPresent(toxic_blade_debuff) }
 }
 
-AddFunction energy_regen_combined
+AddFunction vendetta_nightstalker_condition
 {
- EnergyRegenRate() + { DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff) } * 7 / { 2 * { 100 / { 100 + SpellCastSpeedPercent() } } }
+ not Talent(nightstalker_talent) or not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 5 - 2 * TalentPoints(deeper_stratagem_talent)
+}
+
+AddFunction skip_rupture
+{
+ target.DebuffPresent(vendetta_debuff) and { target.DebuffPresent(toxic_blade_debuff) or BuffRemaining(master_assassin_buff) > 0 } and target.DebuffRemaining(rupture_debuff) > 2
 }
 
 AddFunction skip_cycle_rupture
 {
  False(priority_rotation) and Enemies(tagged=1) > 3 and { target.DebuffPresent(toxic_blade_debuff) or DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff) > 5 and not HasAzeriteTrait(scent_of_blood_trait) }
+}
+
+AddFunction vendetta_subterfuge_condition
+{
+ not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) > 1 and { Enemies(tagged=1) < 6 or not { not SpellCooldown(vanish) > 0 } }
+}
+
+AddFunction energy_regen_combined
+{
+ EnergyRegenRate() + { DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff) } * 7 / { 2 * { 100 / { 100 + SpellCastSpeedPercent() } } }
 }
 
 AddFunction skip_cycle_garrote
@@ -121,15 +136,17 @@ AddFunction single_target
 
 AddFunction AssassinationDefaultMainActions
 {
+ #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
+ #variable,name=single_target,value=spell_targets.fan_of_knives<2
  #call_action_list,name=stealthed,if=stealthed.rogue
  if Stealthed() AssassinationStealthedMainActions()
 
  unless Stealthed() and AssassinationStealthedMainPostConditions()
  {
-  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!cooldown.latent_arcana.up)
-  if { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } AssassinationCdsMainActions()
+  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)
+  if not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) AssassinationCdsMainActions()
 
-  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsMainPostConditions()
+  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsMainPostConditions()
   {
    #call_action_list,name=dot
    AssassinationDotMainActions()
@@ -145,22 +162,24 @@ AddFunction AssassinationDefaultMainActions
 
 AddFunction AssassinationDefaultMainPostConditions
 {
- Stealthed() and AssassinationStealthedMainPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsMainPostConditions() or AssassinationDotMainPostConditions() or AssassinationDirectMainPostConditions()
+ Stealthed() and AssassinationStealthedMainPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsMainPostConditions() or AssassinationDotMainPostConditions() or AssassinationDirectMainPostConditions()
 }
 
 AddFunction AssassinationDefaultShortCdActions
 {
  #stealth
- # Spell(stealth)
+ Spell(stealth)
+ #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
+ #variable,name=single_target,value=spell_targets.fan_of_knives<2
  #call_action_list,name=stealthed,if=stealthed.rogue
  if Stealthed() AssassinationStealthedShortCdActions()
 
  unless Stealthed() and AssassinationStealthedShortCdPostConditions()
  {
-  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!cooldown.latent_arcana.up)
-  if { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } AssassinationCdsShortCdActions()
+  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)
+  if not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) AssassinationCdsShortCdActions()
 
-  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsShortCdPostConditions()
+  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsShortCdPostConditions()
   {
    #call_action_list,name=dot
    AssassinationDotShortCdActions()
@@ -169,6 +188,12 @@ AddFunction AssassinationDefaultShortCdActions
    {
     #call_action_list,name=direct
     AssassinationDirectShortCdActions()
+
+    unless AssassinationDirectShortCdPostConditions()
+    {
+     #bag_of_tricks
+     Spell(bag_of_tricks)
+    }
    }
   }
  }
@@ -176,25 +201,23 @@ AddFunction AssassinationDefaultShortCdActions
 
 AddFunction AssassinationDefaultShortCdPostConditions
 {
- Stealthed() and AssassinationStealthedShortCdPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsShortCdPostConditions() or AssassinationDotShortCdPostConditions() or AssassinationDirectShortCdPostConditions()
+ Stealthed() and AssassinationStealthedShortCdPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsShortCdPostConditions() or AssassinationDotShortCdPostConditions() or AssassinationDirectShortCdPostConditions()
 }
 
 AddFunction AssassinationDefaultCdActions
 {
- # AssassinationInterruptActions()
+ AssassinationInterruptActions()
  #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
  #variable,name=single_target,value=spell_targets.fan_of_knives<2
- #use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10+10*equipped.ashvanes_razor_coral&!debuff.vendetta.up&!debuff.toxic_blade.up
- if not Stealthed() and BuffRemaining(master_assassin_buff) == 0 and SpellCooldown(vendetta) < 10 + 10 * HasEquippedItem(ashvanes_razor_coral_item) and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) AssassinationUseItemActions()
  #call_action_list,name=stealthed,if=stealthed.rogue
  if Stealthed() AssassinationStealthedCdActions()
 
  unless Stealthed() and AssassinationStealthedCdPostConditions()
  {
-  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!cooldown.latent_arcana.up)
-  if { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } AssassinationCdsCdActions()
+  #call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)
+  if not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) AssassinationCdsCdActions()
 
-  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsCdPostConditions()
+  unless { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsCdPostConditions()
   {
    #call_action_list,name=dot
    AssassinationDotCdActions()
@@ -220,56 +243,56 @@ AddFunction AssassinationDefaultCdActions
 
 AddFunction AssassinationDefaultCdPostConditions
 {
- Stealthed() and AssassinationStealthedCdPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and { not HasEquippedItem(azsharas_font_of_power_item) or not { not SpellCooldown(latent_arcana) > 0 } } and AssassinationCdsCdPostConditions() or AssassinationDotCdPostConditions() or AssassinationDirectCdPostConditions()
+ Stealthed() and AssassinationStealthedCdPostConditions() or { not Talent(master_assassin_talent) or target.DebuffPresent(garrote_debuff) } and AssassinationCdsCdPostConditions() or AssassinationDotCdPostConditions() or AssassinationDirectCdPostConditions() or Spell(bag_of_tricks)
 }
 
 ### actions.cds
 
 AddFunction AssassinationCdsMainActions
 {
- #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
- if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 AssassinationEssencesMainActions()
+ #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0&ovale.boss
+ if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationEssencesMainActions()
 
- unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesMainPostConditions()
+ unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesMainPostConditions()
  {
   #variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
   #pool_resource,for_next=1,extra_amount=45
-  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
-  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
+  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>=4&ovale.boss
+  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
   {
    #exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
    if target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) Spell(exsanguinate)
-   #toxic_blade,if=dot.rupture.ticking
-   if target.DebuffPresent(rupture_debuff) Spell(toxic_blade)
+   #toxic_blade,if=dot.rupture.ticking&(!equipped.azsharas_font_of_power|cooldown.vendetta.remains>10)
+   if target.DebuffPresent(rupture_debuff) and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(vendetta) > 10 } Spell(toxic_blade)
   }
  }
 }
 
 AddFunction AssassinationCdsMainPostConditions
 {
- not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesMainPostConditions()
+ not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesMainPostConditions()
 }
 
 AddFunction AssassinationCdsShortCdActions
 {
- #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
- if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 AssassinationEssencesShortCdActions()
+ #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0&ovale.boss
+ if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationEssencesShortCdActions()
 
- unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesShortCdPostConditions()
+ unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesShortCdPostConditions()
  {
-  #marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
-  if False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() * 1.5 or ComboPointsDeficit() >= MaxComboPoints() } Spell(marked_for_death)
-  #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
-  if 600 > 30 - 10 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
-  #vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
-  if Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and single_target() } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) <= 1 } and VanishAllowed() Spell(vanish)
-  #vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
-  if Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and VanishAllowed() Spell(vanish)
+  #marked_for_death,target_if=min:target.time_to_die,if=spell_targets.fan_of_knives>1&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
+  if Enemies(tagged=1) > 1 and { target.TimeToDie() < ComboPointsDeficit() * 1.5 or ComboPointsDeficit() >= MaxComboPoints() } Spell(marked_for_death)
+  #marked_for_death,if=spell_targets.fan_of_knives<2&combo_points.deficit>=cp_max_spend
+  if Enemies(tagged=1) < 2 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
+  #vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)&ovale.boss
+  if Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and single_target() } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) <= 1 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() Spell(vanish)
+  #vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up&ovale.boss
+  if Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() Spell(vanish)
   #variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
   #pool_resource,for_next=1,extra_amount=45
-  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
-  if Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() Spell(vanish)
-  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
+  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>=4&ovale.boss
+  if Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() Spell(vanish)
+  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
   {
    #vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up)&(!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up)
    if Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and VanishAllowed() Spell(vanish)
@@ -279,54 +302,57 @@ AddFunction AssassinationCdsShortCdActions
 
 AddFunction AssassinationCdsShortCdPostConditions
 {
- not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesShortCdPostConditions() or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade) }
+ not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesShortCdPostConditions() or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(vendetta) > 10 } and Spell(toxic_blade) }
 }
 
 AddFunction AssassinationCdsCdActions
 {
- #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
- if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 AssassinationEssencesCdActions()
+ #use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&(cooldown.vendetta.remains<=cooldown.toxic_blade.remains)<10+10*equipped.ashvanes_razor_coral&!debuff.vendetta.up&!debuff.toxic_blade.up&ovale.boss
+ if not Stealthed() and BuffRemaining(master_assassin_buff) == 0 and SpellCooldown(vendetta) <= SpellCooldown(toxic_blade) < 10 + 10 * HasEquippedItem(ashvanes_razor_coral_item) and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+ #call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0&ovale.boss
+ if not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationEssencesCdActions()
 
- unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesCdPostConditions()
+ unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesCdPostConditions()
  {
-  #vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)&(!equipped.azsharas_font_of_power|azerite.shrouded_suffocation.enabled|debuff.razor_coral_debuff.down|trinket.ashvanes_razor_coral.cooldown.remains<10&cooldown.toxic_blade.remains<1)
-  if not Stealthed() and target.DebuffPresent(rupture_debuff) and not target.DebuffPresent(vendetta_debuff) and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) > 1 and { Enemies(tagged=1) < 6 or not { not SpellCooldown(vanish) > 0 } } } and { not Talent(nightstalker_talent) or not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 5 - 2 * TalentPoints(deeper_stratagem_talent) } and { not HasEquippedItem(azsharas_font_of_power_item) or HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffExpires(razor_coral_debuff) or BuffRemaining(trinket_ashvanes_razor_coral_cooldown_buff) < 10 and SpellCooldown(toxic_blade) < 1 } Spell(vendetta)
+  #variable,name=vendetta_subterfuge_condition,value=(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))
+  #variable,name=vendetta_nightstalker_condition,value=(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
+  #variable,name=variable,name=vendetta_font_condition,value=(!equipped.azsharas_font_of_power|azerite.shrouded_suffocation.enabled|debuff.razor_coral_debuff.down|trinket.ashvanes_razor_coral.cooldown.remains<10&(cooldown.toxic_blade.remains<1|debuff.toxic_blade.up))
+  #vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&variable.vendetta_subterfuge_condition&variable.vendetta_nightstalker_condition&variable.vendetta_font_condition&ovale.boss
+  if not Stealthed() and target.DebuffPresent(rupture_debuff) and not target.DebuffPresent(vendetta_debuff) and vendetta_subterfuge_condition() and vendetta_nightstalker_condition() and vendetta_font_condition() and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(vendetta)
   #variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
   #pool_resource,for_next=1,extra_amount=45
-  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
-  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
+  #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>=4&ovale.boss
+  unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
   {
-   #shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
-   if not Stealthed() and HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) and target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and ComboPointsDeficit() >= 1 Spell(shadowmeld)
+   #shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1&ovale.boss
+   if not Stealthed() and HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) and target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and ComboPointsDeficit() >= 1 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(shadowmeld)
 
-   unless target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade)
+   unless target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(vendetta) > 10 } and Spell(toxic_blade)
    {
-    #potion,if=buff.bloodlust.react|debuff.vendetta.up
-    # if { BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_potion_of_unbridled_fury usable=1)
-    #blood_fury,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) Spell(blood_fury_ap)
-    #berserking,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) Spell(berserking)
-    #fireblood,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) Spell(fireblood)
-    #ancestral_call,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) Spell(ancestral_call)
-    #use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
-    if SpellCooldown(vendetta) > 45 AssassinationUseItemActions()
-    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
-    if target.DebuffExpires(razor_coral_debuff) or target.DebuffRemaining(vendetta_debuff) > 10 - 4 * HasEquippedItem(azsharas_font_of_power_item) or target.TimeToDie() < 20 AssassinationUseItemActions()
-    #use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
-    #use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
-    #use_item,effect_name=gladiators_medallion,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
-    #use_item,effect_name=gladiators_badge,if=debuff.vendetta.up
-    if target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
-    #use_item,effect_name=cyclotronic_blast,if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
-    if BuffRemaining(master_assassin_buff) == 0 and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Energy() < 80 and target.DebuffRemaining(rupture_debuff) > 4 AssassinationUseItemActions()
-    #use_items
-    AssassinationUseItemActions()
+    #blood_fury,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(blood_fury_ap)
+    #berserking,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(berserking)
+    #fireblood,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(fireblood)
+    #ancestral_call,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } Spell(ancestral_call)
+    #use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45&ovale.boss
+    if SpellCooldown(vendetta) > 45 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,name=ashvanes_razor_coral,if=(debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20)&ovale.boss
+    if { target.DebuffExpires(razor_coral_debuff) or target.DebuffRemaining(vendetta_debuff) > 10 - 4 * HasEquippedItem(azsharas_font_of_power_item) or target.TimeToDie() < 20 } and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,effect_name=cyclotronic_blast,if=(master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4)&ovale.boss
+    if BuffRemaining(master_assassin_buff) == 0 and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Energy() < 80 and target.DebuffRemaining(rupture_debuff) > 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,effect_name=gladiators_medallion,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_item,effect_name=gladiators_badge,if=debuff.vendetta.up&ovale.boss
+    if target.DebuffPresent(vendetta_debuff) and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } AssassinationUseItemActions()
+    #use_items,if=ovale.boss
+    if target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() AssassinationUseItemActions()
    }
   }
  }
@@ -334,7 +360,7 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationCdsCdPostConditions
 {
- not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesCdPostConditions() or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >? 4 and 600 > 12 and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade) }
+ not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and AssassinationEssencesCdPostConditions() or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies(tagged=1) >= 4 and { target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped() or target.Classification(elite) and Enemies(tagged=1) > 5 or Boss() } and VanishAllowed() and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(vendetta) > 10 } and Spell(toxic_blade) }
 }
 
 ### actions.direct
@@ -449,16 +475,16 @@ AddFunction AssassinationEssencesShortCdActions
  {
   #blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
   if target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) and ComboPointsDeficit() <= 1 or target.DebuffRemaining(vendetta_debuff) <= 10 } or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
-  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
-  if Enemies(tagged=1) >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam)
-  #purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
-  if Enemies(tagged=1) >= 2 or 600 > 60 Spell(purifying_blast)
+  #purifying_blast,if=spell_targets.fan_of_knives>=2
+  if Enemies(tagged=1) >= 2 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 Spell(the_unbound_force)
   #ripple_in_space
   Spell(ripple_in_space_essence)
-  #worldvein_resonance,if=buff.lifeblood.stack<3
-  if BuffStacks(lifeblood_buff) < 3 Spell(worldvein_resonance_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+  #reaping_flames,if=target.health.pct>80|target.health.pct<=20
+  if target.HealthPercent() > 80 or target.HealthPercent() <= 20 Spell(reaping_flames_essence)
  }
 }
 
@@ -475,8 +501,10 @@ AddFunction AssassinationEssencesCdActions
   if SpellCooldown(vendetta) < 3 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() < 30 Spell(guardian_of_azeroth)
   #guardian_of_azeroth,if=floor((target.time_to_die-30)%cooldown)>floor((target.time_to_die-30-cooldown.vendetta.remains)%cooldown)
   if { target.TimeToDie() - 30 } / SpellCooldown(guardian_of_azeroth) > { target.TimeToDie() - 30 - SpellCooldown(vendetta) } / SpellCooldown(guardian_of_azeroth) Spell(guardian_of_azeroth)
+  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2
+  if Enemies(tagged=1) >= 2 Spell(focused_azerite_beam)
 
-  unless { Enemies(tagged=1) >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies(tagged=1) >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless Enemies(tagged=1) >= 2 and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
    if Energy() < 50 and not { not SpellCooldown(vendetta) > 0 } Spell(memory_of_lucid_dreams_essence)
@@ -486,13 +514,19 @@ AddFunction AssassinationEssencesCdActions
 
 AddFunction AssassinationEssencesCdPostConditions
 {
- TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or { Enemies(tagged=1) >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies(tagged=1) >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or Enemies(tagged=1) >= 2 and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter_buff) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or { target.HealthPercent() > 80 or target.HealthPercent() <= 20 } and Spell(reaping_flames_essence)
 }
 
 ### actions.precombat
 
 AddFunction AssassinationPrecombatMainActions
 {
+ #flask
+ #augmentation
+ #food
+ #snapshot_stats
+ #potion
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(potion_of_focused_resolve_item usable=1)
 }
 
 AddFunction AssassinationPrecombatMainPostConditions
@@ -501,29 +535,33 @@ AddFunction AssassinationPrecombatMainPostConditions
 
 AddFunction AssassinationPrecombatShortCdActions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
- if 600 > 15 Spell(marked_for_death)
- #apply_poison
- #stealth
- Spell(stealth)
+ unless CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) and Item(potion_of_focused_resolve_item usable=1)
+ {
+  #marked_for_death,precombat_seconds=5
+  Spell(marked_for_death)
+  #apply_poison
+  #stealth
+  Spell(stealth)
+ }
 }
 
 AddFunction AssassinationPrecombatShortCdPostConditions
 {
+ CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) and Item(potion_of_focused_resolve_item usable=1)
 }
 
 AddFunction AssassinationPrecombatCdActions
 {
- #use_item,name=azsharas_font_of_power
- AssassinationUseItemActions()
+ unless CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) and Item(potion_of_focused_resolve_item usable=1)
+ {
+  #use_item,name=azsharas_font_of_power
+  AssassinationUseItemActions()
+ }
 }
 
 AddFunction AssassinationPrecombatCdPostConditions
 {
+ CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) and Item(potion_of_focused_resolve_item usable=1)
 }
 
 ### actions.stealthed
