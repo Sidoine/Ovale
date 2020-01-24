@@ -703,8 +703,8 @@ export class OvaleAuraClass extends States<AuraInterface> {
                         }
                         const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
                         this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
-                        i = i + 1;
                     }
+                    i = i + 1;
                 }
             }
             if (this.current.aura[guid]) {

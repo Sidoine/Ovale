@@ -715,8 +715,8 @@ __exports.OvaleAuraClass = __class(States, {
                         end
                         local auraType = (filter == harmfulFilter and "HARMFUL") or "HELPFUL"
                         self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
-                        i = i + 1
                     end
+                    i = i + 1
                 end
             end
             if self.current.aura[guid] then
