@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Debug", 80201)
+local __exports = LibStub:NewLibrary("ovale/Debug", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -86,8 +86,11 @@ __exports.OvaleDebugClass = __class(nil, {
                         return (value ~= nil)
                     end,
                     set = function(info, value)
-                        value = value or nil
-                        self.options.db.global.debug[info[#info]] = value
+                        if  not value then
+                            self.options.db.global.debug[info[#info]] = nil
+                        else
+                            self.options.db.global.debug[info[#info]] = value
+                        end
                     end
                 },
                 trace = {
@@ -116,17 +119,16 @@ __exports.OvaleDebugClass = __class(nil, {
                 }
             }
         }
-        self.traceLog = nil
         self.trace = false
         self.OnInitialize = function()
             local appName = self.module:GetName()
             AceConfig:RegisterOptionsTable(appName, self.defaultOptions)
             AceConfigDialog:AddToBlizOptions(appName, L["Debug"], self.ovale:GetName())
-            self.traceLog = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Trace Log"], 750, 500)
         end
         self.OnDisable = function()
         end
         self.module = ovale:createModule("OvaleDebug", self.OnInitialize, self.OnDisable, aceTimer)
+        self.traceLog = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Trace Log"], 750, 500)
         local actions = {
             debug = {
                 name = L["Debug"],

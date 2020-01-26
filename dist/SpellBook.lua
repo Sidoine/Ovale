@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/SpellBook", 80201)
+local __exports = LibStub:NewLibrary("ovale/SpellBook", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -186,25 +186,29 @@ __exports.OvaleSpellBookClass = __class(nil, {
                     local _, _, linkData, spellName = ParseHyperlink(spellLink)
                     local id = tonumber(linkData)
                     local name = GetSpellInfo(id)
-                    self.spell[id] = name
-                    self.isHarmful[id] = IsHarmfulSpell(index, bookType)
-                    self.isHelpful[id] = IsHelpfulSpell(index, bookType)
-                    self.texture[id] = GetSpellTexture(index, bookType)
-                    self.spellbookId[bookType][id] = index
-                    self.tracer:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
-                    if spellId and id ~= spellId then
-                        local name
-                        if skillType == "PETACTION" and spellName then
-                            name = spellName
-                        else
-                            name = GetSpellInfo(spellId)
+                    if name then
+                        self.spell[id] = name
+                        self.isHarmful[id] = IsHarmfulSpell(index, bookType)
+                        self.isHelpful[id] = IsHelpfulSpell(index, bookType)
+                        self.texture[id] = GetSpellTexture(index, bookType)
+                        self.spellbookId[bookType][id] = index
+                        self.tracer:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
+                        if spellId and id ~= spellId then
+                            local name
+                            if skillType == "PETACTION" and spellName then
+                                name = spellName
+                            else
+                                name = GetSpellInfo(spellId)
+                            end
+                            if name then
+                                self.spell[spellId] = name
+                                self.isHarmful[spellId] = self.isHarmful[id]
+                                self.isHelpful[spellId] = self.isHelpful[id]
+                                self.texture[spellId] = self.texture[id]
+                                self.spellbookId[bookType][spellId] = index
+                                self.tracer:Debug("    %s (%d) is at offset %d.", name, spellId, index)
+                            end
                         end
-                        self.spell[spellId] = name
-                        self.isHarmful[spellId] = self.isHarmful[id]
-                        self.isHelpful[spellId] = self.isHelpful[id]
-                        self.texture[spellId] = self.texture[id]
-                        self.spellbookId[bookType][spellId] = index
-                        self.tracer:Debug("    %s (%d) is at offset %d.", name, spellId, index)
                     end
                 end
             elseif skillType == "FLYOUT" then
@@ -215,20 +219,24 @@ __exports.OvaleSpellBookClass = __class(nil, {
                         local id, overrideId, isKnown, spellName = GetFlyoutSlotInfo(flyoutId, flyoutIndex)
                         if isKnown then
                             local name = GetSpellInfo(id)
-                            self.spell[id] = name
-                            self.isHarmful[id] = IsHarmfulSpell(spellName)
-                            self.isHelpful[id] = IsHelpfulSpell(spellName)
-                            self.texture[id] = GetSpellTexture(index, bookType)
-                            self.spellbookId[bookType][id] = nil
-                            self.tracer:Debug("    %s (%d) is at offset %d.", name, id, index)
+                            if name then
+                                self.spell[id] = name
+                                self.isHarmful[id] = IsHarmfulSpell(spellName)
+                                self.isHelpful[id] = IsHelpfulSpell(spellName)
+                                self.texture[id] = GetSpellTexture(index, bookType)
+                                self.spellbookId[bookType][id] = nil
+                                self.tracer:Debug("    %s (%d) is at offset %d.", name, id, index)
+                            end
                             if id ~= overrideId then
                                 local name = GetSpellInfo(overrideId)
-                                self.spell[overrideId] = name
-                                self.isHarmful[overrideId] = self.isHarmful[id]
-                                self.isHelpful[overrideId] = self.isHelpful[id]
-                                self.texture[overrideId] = self.texture[id]
-                                self.spellbookId[bookType][overrideId] = nil
-                                self.tracer:Debug("    %s (%d) is at offset %d.", name, overrideId, index)
+                                if name then
+                                    self.spell[overrideId] = name
+                                    self.isHarmful[overrideId] = self.isHarmful[id]
+                                    self.isHelpful[overrideId] = self.isHelpful[id]
+                                    self.texture[overrideId] = self.texture[id]
+                                    self.spellbookId[bookType][overrideId] = nil
+                                    self.tracer:Debug("    %s (%d) is at offset %d.", name, overrideId, index)
+                                end
                             end
                         end
                     end
@@ -249,7 +257,7 @@ __exports.OvaleSpellBookClass = __class(nil, {
                     castTime = 0
                 end
             else
-                castTime = nil
+                return nil
             end
             return castTime
         end
@@ -263,13 +271,11 @@ __exports.OvaleSpellBookClass = __class(nil, {
         end
     end,
     GetSpellName = function(self, spellId)
-        if spellId then
-            local spellName = self.spell[spellId]
-            if  not spellName then
-                spellName = self:GetSpellInfo(spellId)
-            end
-            return spellName
+        local spellName = self.spell[spellId]
+        if  not spellName then
+            spellName = self:GetSpellInfo(spellId)
         end
+        return spellName
     end,
     GetSpellTexture = function(self, spellId)
         return self.texture[spellId]

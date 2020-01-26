@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local type = type
@@ -14,7 +14,7 @@ local concat = table.concat
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
 local OPTIONAL_SKILLS = __definitions.OPTIONAL_SKILLS
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local OvaleTaggedFunctionName = __texttools.OvaleTaggedFunctionName
 local self_outputPool = __texttools.self_outputPool
@@ -156,7 +156,7 @@ __exports.Generator = __class(nil, {
     end,
     InsertInterruptFunction = function(self, child, annotation, interrupts)
         local nodeList = annotation.astAnnotation.nodeList
-        local camelSpecialization = CamelSpecialization(annotation)
+        local camelSpecialization = LowerSpecialization(annotation)
         local spells = interrupts or {}
         sort(spells, function(a, b)
             return tonumber(a.order or 0) <= tonumber(b.order or 0)
@@ -206,12 +206,14 @@ __exports.Generator = __class(nil, {
         ]]
         local code = format(fmt, camelSpecialization, concat(lines, "\n"))
         local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-        insert(child, 1, node)
-        annotation.functionTag[node.name] = "cd"
+        if node then
+            insert(child, 1, node)
+            annotation.functionTag[node.name] = "cd"
+        end
     end,
     InsertInterruptFunctions = function(self, child, annotation)
         local interrupts = {}
-        local className = annotation.class
+        local className = annotation.classId
         if self.ovaleData.PANDAREN_CLASSES[className] then
             insert(interrupts, {
                 name = "quaking_palm",
@@ -537,7 +539,7 @@ __exports.Generator = __class(nil, {
     InsertSupportingFunctions = function(self, child, annotation)
         local count = 0
         local nodeList = annotation.astAnnotation.nodeList
-        local camelSpecialization = CamelSpecialization(annotation)
+        local camelSpecialization = LowerSpecialization(annotation)
         if annotation.melee == "DEATHKNIGHT" then
             local fmt = [[
                 AddFunction %sGetInMeleeRange
@@ -547,10 +549,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("death_strike")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("death_strike")
+                count = count + 1
+            end
         end
         if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
             local fmt = [[
@@ -565,10 +569,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("chaos_strike")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("chaos_strike")
+                count = count + 1
+            end
         end
         if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
             local fmt = [[
@@ -579,10 +585,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("shear")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("shear")
+                count = count + 1
+            end
         end
         if annotation.melee == "DRUID" then
             local fmt = [[
@@ -597,14 +605,16 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("mangle")
-            annotation:AddSymbol("shred")
-            annotation:AddSymbol("wild_charge")
-            annotation:AddSymbol("wild_charge_bear")
-            annotation:AddSymbol("wild_charge_cat")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("mangle")
+                annotation:AddSymbol("shred")
+                annotation:AddSymbol("wild_charge")
+                annotation:AddSymbol("wild_charge_bear")
+                annotation:AddSymbol("wild_charge_cat")
+                count = count + 1
+            end
         end
         if annotation.melee == "HUNTER" then
             local fmt = [[
@@ -618,10 +628,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("raptor_strike")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("raptor_strike")
+                count = count + 1
+            end
         end
         if annotation.summon_pet == "HUNTER" then
             local fmt
@@ -633,10 +645,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("revive_pet")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("revive_pet")
+                count = count + 1
+            end
         end
         if annotation.melee == "MONK" then
             local fmt = [[
@@ -647,10 +661,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("tiger_palm")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("tiger_palm")
+                count = count + 1
+            end
         end
         if annotation.time_to_hpg_heal == "PALADIN" then
             local code = [[
@@ -660,11 +676,13 @@ __exports.Generator = __class(nil, {
                 }
             ]]
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation:AddSymbol("crusader_strike")
-            annotation:AddSymbol("holy_shock")
-            annotation:AddSymbol("judgment")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation:AddSymbol("crusader_strike")
+                annotation:AddSymbol("holy_shock")
+                annotation:AddSymbol("judgment")
+                count = count + 1
+            end
         end
         if annotation.time_to_hpg_melee == "PALADIN" then
             local code = [[
@@ -674,12 +692,14 @@ __exports.Generator = __class(nil, {
                 }
             ]]
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation:AddSymbol("crusader_strike")
-            annotation:AddSymbol("exorcism")
-            annotation:AddSymbol("hammer_of_wrath")
-            annotation:AddSymbol("judgment")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation:AddSymbol("crusader_strike")
+                annotation:AddSymbol("exorcism")
+                annotation:AddSymbol("hammer_of_wrath")
+                annotation:AddSymbol("judgment")
+                count = count + 1
+            end
         end
         if annotation.time_to_hpg_tank == "PALADIN" then
             local code = [[
@@ -706,10 +726,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("rebuke")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("rebuke")
+                count = count + 1
+            end
         end
         if annotation.melee == "ROGUE" then
             local fmt = [[
@@ -724,11 +746,13 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("kick")
-            annotation:AddSymbol("shadowstep")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("kick")
+                annotation:AddSymbol("shadowstep")
+                count = count + 1
+            end
         end
         if annotation.melee == "SHAMAN" then
             local fmt = [[
@@ -743,11 +767,13 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol("feral_lunge")
-            annotation:AddSymbol("stormstrike")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol("feral_lunge")
+                annotation:AddSymbol("stormstrike")
+                count = count + 1
+            end
         end
         if annotation.bloodlust == "SHAMAN" then
             local fmt = [[
@@ -762,11 +788,13 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "cd"
-            annotation:AddSymbol("bloodlust")
-            annotation:AddSymbol("heroism")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "cd"
+                annotation:AddSymbol("bloodlust")
+                annotation:AddSymbol("heroism")
+                count = count + 1
+            end
         end
         if annotation.melee == "WARRIOR" then
             local fmt = [[
@@ -786,12 +814,14 @@ __exports.Generator = __class(nil, {
             end
             local code = format(fmt, camelSpecialization, charge, charge, charge, charge)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "shortcd"
-            annotation:AddSymbol(charge)
-            annotation:AddSymbol("heroic_leap")
-            annotation:AddSymbol("pummel")
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "shortcd"
+                annotation:AddSymbol(charge)
+                annotation:AddSymbol("heroic_leap")
+                annotation:AddSymbol("pummel")
+                count = count + 1
+            end
         end
         if annotation.use_item then
             local fmt = [[
@@ -803,9 +833,11 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "cd"
-            count = count + 1
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "cd"
+                count = count + 1
+            end
         end
         if annotation.use_heart_essence then
             local fmt = [[
@@ -816,10 +848,12 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            annotation.functionTag[node.name] = "cd"
-            count = count + 1
-            annotation:AddSymbol("concentrated_flame_essence")
+            if node then
+                insert(child, 1, node)
+                annotation.functionTag[node.name] = "cd"
+                count = count + 1
+                annotation:AddSymbol("concentrated_flame_essence")
+            end
         end
         return count
     end,
@@ -946,17 +980,15 @@ __exports.Generator = __class(nil, {
         return count
     end,
     InsertVariables = function(self, child, annotation)
-        if annotation.variable then
-            for _, v in pairs(annotation.variable) do
-                insert(child, 1, v)
-            end
+        for _, v in pairs(annotation.variable) do
+            insert(child, 1, v)
         end
     end,
     GenerateIconBody = function(self, tag, profile)
         local annotation = profile.annotation
         local precombatName = OvaleFunctionName("precombat", annotation)
         local defaultName = OvaleFunctionName("_default", annotation)
-        local precombatBodyName, precombatConditionName = OvaleTaggedFunctionName(precombatName, tag)
+        local precombatBodyName = OvaleTaggedFunctionName(precombatName, tag)
         local defaultBodyName = OvaleTaggedFunctionName(defaultName, tag)
         local mainBodyCode
         if annotation.using_apl and next(annotation.using_apl) then
@@ -976,12 +1008,9 @@ __exports.Generator = __class(nil, {
         if profile["actions.precombat"] then
             local fmt = [[
                 if not InCombat() %s()
-                unless not InCombat() and %s()
-                {
-                    %s
-                }
+                %s
             ]]
-            code = format(fmt, precombatBodyName, precombatConditionName, mainBodyCode)
+            code = format(fmt, precombatBodyName, mainBodyCode)
         else
             code = mainBodyCode
         end

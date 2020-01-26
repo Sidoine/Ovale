@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Runes", 80201)
+local __exports = LibStub:NewLibrary("ovale/Runes", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __State = LibStub:GetLibrary("ovale/State")
@@ -31,7 +31,10 @@ __exports.OvaleRunesClass = __class(States, {
         self.OnInitialize = function()
             if self.ovale.playerClass == "DEATHKNIGHT" then
                 for slot = 1, RUNE_SLOTS, 1 do
-                    self.current.rune[slot] = {}
+                    self.current.rune[slot] = {
+                        endCooldown = 0,
+                        startCooldown = 0
+                    }
                 end
                 -- self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.UpdateAllRunes)
                 self.module:RegisterEvent("RUNE_POWER_UPDATE", self.RUNE_POWER_UPDATE)
@@ -103,7 +106,10 @@ __exports.OvaleRunesClass = __class(States, {
     InitializeState = function(self)
         self.next.rune = {}
         for slot in ipairs(self.current.rune) do
-            self.next.rune[slot] = {}
+            self.next.rune[slot] = {
+                endCooldown = 0,
+                startCooldown = 0
+            }
         end
     end,
     ResetState = function(self)

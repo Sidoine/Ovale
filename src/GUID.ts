@@ -285,7 +285,7 @@ export class OvaleGUIDClass {
         let atTime = this.petGUID[guid];
         return [(!!atTime), atTime];
     }
-    UnitGUID(unitId: string): string {
+    UnitGUID(unitId: string): string | undefined {
         return this.unitGUID[unitId] || UnitGUID(unitId);
     }
     GUIDUnit(guid: string) {
@@ -316,6 +316,6 @@ export class OvaleGUIDClass {
         if (name && this.nameGUID[name]) {
             return unpack(this.nameGUID[name]);
         }
-        return undefined;
+        return [];
     }
 }

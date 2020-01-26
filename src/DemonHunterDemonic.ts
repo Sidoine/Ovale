@@ -18,7 +18,7 @@ const HIDDEN_BUFF_EXTENDED_BY_DEMONIC = "Extended by Demonic";
 
 export class OvaleDemonHunterDemonicClass {
     playerGUID:string;
-    isDemonHunter:boolean;
+    isDemonHunter:boolean = false;
     isHavoc:boolean;
     hasDemonic: boolean;
     
@@ -28,16 +28,15 @@ export class OvaleDemonHunterDemonicClass {
     constructor(private ovaleAura: OvaleAuraClass, private ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
         this.module = ovale.createModule("OvaleDemonHunterDemonic", this.OnInitialize, this.OnDisable, aceEvent);
         this.debug = ovaleDebug.create(this.module.GetName());
+        this.playerGUID = this.ovale.playerGUID;
+        this.isHavoc = false;
+        this.hasDemonic = false;
     }
 
     private OnInitialize = () => {
-        this.playerGUID = undefined;
         this.isDemonHunter = this.ovale.playerClass == "DEMONHUNTER" && true || false;
-        this.isHavoc = false;
-        this.hasDemonic = false;
         if (this.isDemonHunter) {
             this.debug.Debug("playerGUID: (%s)", this.ovale.playerGUID);
-            this.playerGUID = this.ovale.playerGUID;
             this.module.RegisterMessage("Ovale_TalentsChanged", this.Ovale_TalentsChanged);
         }
     }
@@ -79,12 +78,12 @@ export class OvaleDemonHunterDemonicClass {
     }
     GainAura() {
         let now = GetTime();
-        let aura_meta = this.ovaleAura.GetAura("player", HAVOC_META_BUFF_ID, undefined, "HELPFUL", true);
-        if (this.ovaleAura.IsActiveAura(aura_meta, now)) {
+        let aura_meta = this.ovaleAura.GetAura("player", HAVOC_META_BUFF_ID, now, "HELPFUL", true);
+        if (aura_meta && this.ovaleAura.IsActiveAura(aura_meta, now)) {
             this.debug.Debug("Adding '%s' (%d) buff to player %s.", HIDDEN_BUFF_EXTENDED_BY_DEMONIC, HIDDEN_BUFF_ID, this.playerGUID);
             let duration = HIDDEN_BUFF_DURATION;
             let ending = now + HIDDEN_BUFF_DURATION;
-            this.ovaleAura.GainedAuraOnGUID(this.playerGUID, now, HIDDEN_BUFF_ID, this.playerGUID, "HELPFUL", undefined, undefined, 1, undefined, duration, ending, undefined, HIDDEN_BUFF_EXTENDED_BY_DEMONIC, undefined, undefined, undefined);
+            this.ovaleAura.GainedAuraOnGUID(this.playerGUID, now, HIDDEN_BUFF_ID, this.playerGUID, "HELPFUL", false, undefined, 1, undefined, duration, ending, false, HIDDEN_BUFF_EXTENDED_BY_DEMONIC, undefined, undefined, undefined);
         } else {
             this.debug.Debug("Aura 'Metamorphosis' (%d) is not present.", HAVOC_META_BUFF_ID);
         }

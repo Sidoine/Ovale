@@ -1,8 +1,9 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/definitions", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/definitions", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 local ipairs = ipairs
+local kpairs = pairs
 __exports.interruptsClasses = {
     ["mind_freeze"] = "DEATHKNIGHT",
     ["pummel"] = "WARRIOR",
@@ -182,6 +183,7 @@ __exports.CHARACTER_PROPERTY = {
     ["health.percent"] = "HealthPercent()",
     ["holy_power"] = "HolyPower()",
     ["incanters_flow_time_to.5.up"] = "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.5.any"] = "StackTimeTo(incanters_flow_buff 5 any)",
     ["incanters_flow_time_to.4.down"] = "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"] = "NotDeDemons(infernal)",
     ["insanity"] = "Insanity()",
@@ -223,6 +225,7 @@ __exports.CHARACTER_PROPERTY = {
     ["stealthed"] = "Stealthed()",
     ["stealthed.all"] = "Stealthed()",
     ["stealthed.rogue"] = "Stealthed()",
+    ["target.debuff.casting.react"] = "target.Casting(harmful)",
     ["time"] = "TimeInCombat()",
     ["time_to_20pct"] = "TimeToHealthPercent(20)",
     ["time_to_pct_30"] = "TimeToHealthPercent(30)",
@@ -231,6 +234,7 @@ __exports.CHARACTER_PROPERTY = {
     ["time_to_shard"] = "TimeToShard()",
     ["time_to_sht.4"] = "100",
     ["time_to_sht.5"] = "100",
+    ["variable.disable_combustion"] = "0",
     ["wild_imp_count"] = "Demons(wild_imp)",
     ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
     ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)",
@@ -340,7 +344,7 @@ __exports.CONSUMABLE_ITEMS = {
     ["augmentation"] = true
 }
 do
-    for keyword, value in pairs(__exports.MODIFIER_KEYWORD) do
+    for keyword, value in kpairs(__exports.MODIFIER_KEYWORD) do
         __exports.KEYWORD[keyword] = value
     end
     for keyword, value in pairs(__exports.FUNCTION_KEYWORD) do
@@ -438,6 +442,11 @@ __exports.BINARY_OPERATOR = {
         [1] = "arithmetic",
         [2] = 25,
         [3] = "associative"
+    },
+    ["<?"] = {
+        [1] = "arithmetic",
+        [2] = 25,
+        [3] = "associative"
     }
 }
 __exports.OPTIONAL_SKILLS = {
@@ -501,13 +510,24 @@ __exports.checkOptionalSkill = function(action, className, specialization)
     return true
 end
 __exports.Annotation = __class(nil, {
-    constructor = function(self, ovaleData)
+    constructor = function(self, ovaleData, name, classId, specialization)
         self.ovaleData = ovaleData
+        self.name = name
+        self.classId = classId
+        self.specialization = specialization
+        self.consumables = {}
+        self.taggedFunctionName = {}
         self.dictionary = {}
+        self.variable = {}
+        self.symbolList = {}
+        self.astAnnotation = {
+            nodeList = {},
+            definition = self.dictionary
+        }
     end,
     AddSymbol = function(self, symbol)
         local symbolTable = self.symbolTable or {}
-        local symbolList = self.symbolList or {}
+        local symbolList = self.symbolList
         if  not symbolTable[symbol] and  not self.ovaleData.DEFAULT_SPELL_LIST[symbol] then
             symbolTable[symbol] = true
             symbolList[#symbolList + 1] = symbol

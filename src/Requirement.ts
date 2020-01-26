@@ -26,13 +26,14 @@ export class OvaleRequirement {
     }
     
     UnregisterRequirement(name: string) {
-        this.nowRequirements[name] = undefined;
+        delete this.nowRequirements[name];
     }
 
-    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] {
+    public CheckRequirements(spellId: number, atTime: number, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string?, number?] {
         let requirements = this.nowRequirements;
     
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
+        if (!targetGUID) return [false];
         let name = <string>tokens[index];
         index = index + 1;
         if (name) {

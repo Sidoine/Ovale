@@ -20,17 +20,17 @@ let self_register:LuaObj<OptionModule> = {  }
 
 export interface SpellFlashOptions {
     enabled: boolean,
-    colorMain?: Color,
-    colorCd?: Color,
-    colorShortCd?: Color,
-    colorInterrupt?: Color,
+    colorMain: Color,
+    colorCd: Color,
+    colorShortCd: Color,
+    colorInterrupt: Color,
     inCombat?: boolean,
     hideInVehicle?: boolean,
     hasTarget?: boolean,
     hasHostileTarget?: boolean,
-    threshold?: number,
-    size?: number,
-    brightness?: number,
+    threshold: number,
+    size: number,
+    brightness: number,
 }
 
 export interface OvaleDb {
@@ -41,7 +41,7 @@ export interface OvaleDb {
         list: LuaObj<string>,
         standaloneOptions: boolean,
         showHiddenScripts: boolean;
-        overrideCode: string;
+        overrideCode?: string;
         apparence: {
             [k: string]: any,
             avecCible: boolean,
@@ -88,16 +88,19 @@ export interface OvaleDb {
             }
         }
     },
-    global: any;
+    global: {
+        debug: LuaObj<string>;
+        profiler: LuaObj<string>;
+    };
 }
 
 export class OvaleOptionsClass {
-    db: AceDatabase & OvaleDb = undefined;
+    db!: AceDatabase & OvaleDb;
 
     defaultDB:OvaleDb = {
         profile: {
-            source: undefined,
-            code: undefined,
+            source: {},
+            code: "",
             showHiddenScripts: false,
             overrideCode: undefined,
             check: {
@@ -179,7 +182,10 @@ export class OvaleOptionsClass {
                 }
             }
         },
-        global:undefined
+        global: {
+            debug: {},
+            profiler: {}
+        }
     }
 
     options: any = {
@@ -582,7 +588,8 @@ export class OvaleOptionsClass {
 
     private OnInitialize = () => {
         const ovale = this.ovale.GetName();
-        const db = AceDB.New("OvaleDB", this.defaultDB);
+        this.db = AceDB.New("OvaleDB", this.defaultDB);
+        const db = this.db;
         this.options.args.profile = AceDBOptions.GetOptionsTable(db);
         // let LibDualSpec = LibStub("LibDualSpec-1.0", true);
         // if (LibDualSpec) {
@@ -593,7 +600,6 @@ export class OvaleOptionsClass {
         db.RegisterCallback(this, "OnProfileReset", this.HandleProfileChanges);
         db.RegisterCallback(this, "OnProfileChanged", this.HandleProfileChanges);
         db.RegisterCallback(this, "OnProfileCopied", this.HandleProfileChanges);
-        this.db = db;
         this.UpgradeSavedVariables();
         AceConfig.RegisterOptionsTable(ovale, this.options.args.apparence);
         AceConfig.RegisterOptionsTable(`${ovale} Profiles`, this.options.args.profile);

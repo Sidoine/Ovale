@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Icon", 80201)
+local __exports = LibStub:NewLibrary("ovale/Icon", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -22,16 +22,62 @@ __exports.OvaleIcon = __class(nil, {
         return (next(self.parent.checkBoxWidget) ~= nil or next(self.parent.listWidget) ~= nil)
     end,
     constructor = function(self, name, parent, secure, ovaleOptions, ovaleSpellBook)
-        self.name = name
         self.parent = parent
         self.ovaleOptions = ovaleOptions
         self.ovaleSpellBook = ovaleSpellBook
+        self.actionButton = false
+        self.shouldClick = false
+        self.cdShown = false
         if  not secure then
             self.frame = CreateFrame("CheckButton", name, parent.frame, "ActionButtonTemplate")
         else
             self.frame = CreateFrame("CheckButton", name, parent.frame, "SecureActionButtonTemplate, ActionButtonTemplate")
         end
-        self:OvaleIcon_OnLoad()
+        local profile = self.ovaleOptions.db.profile
+        self.icone = _G[name .. "Icon"]
+        self.shortcut = _G[name .. "HotKey"]
+        self.remains = _G[name .. "Name"]
+        self.rangeIndicator = _G[name .. "Count"]
+        self.rangeIndicator:SetText(profile.apparence.targetText)
+        self.cd = _G[name .. "Cooldown"]
+        self.normalTexture = _G[name .. "NormalTexture"]
+        local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
+        self.fontName = fontName
+        self.fontHeight = fontHeight
+        self.fontFlags = fontFlags
+        self.focusText = self.frame:CreateFontString(nil, "OVERLAY")
+        self.cdShown = true
+        self.shouldClick = false
+        self.help = nil
+        self.value = nil
+        self.fontScale = nil
+        self.lastSound = nil
+        self.cooldownEnd = nil
+        self.cooldownStart = nil
+        self.texture = nil
+        self.positionalParams = nil
+        self.namedParams = nil
+        self.actionButton = false
+        self.actionType = nil
+        self.actionId = nil
+        self.actionHelp = nil
+        self.frame:SetScript("OnMouseUp", function()
+            return self:OvaleIcon_OnMouseUp()
+        end)
+        self.frame:SetScript("OnEnter", function()
+            return self:OvaleIcon_OnEnter()
+        end)
+        self.frame:SetScript("OnLeave", function()
+            return self:OvaleIcon_OnLeave()
+        end)
+        self.focusText:SetFontObject("GameFontNormalSmall")
+        self.focusText:SetAllPoints(self.frame)
+        self.focusText:SetTextColor(1, 1, 1)
+        self.focusText:SetText(L["Focus"])
+        self.frame:RegisterForClicks("AnyUp")
+        if profile.apparence.clickThru then
+            self.frame:EnableMouse(false)
+        end
     end,
     SetValue = function(self, value, actionTexture)
         self.icone:Show()
@@ -110,20 +156,22 @@ __exports.OvaleIcon = __class(nil, {
             else
                 self.icone:SetAlpha(0.5)
             end
-            if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
-                self.icone:SetVertexColor(0.75, 0.2, 0.2)
-            else
-                self.icone:SetVertexColor(1, 1, 1)
-            end
-            self.actionHelp = element.namedParams.help
-            if  not (self.cooldownStart and self.cooldownEnd) then
-                self.lastSound = nil
-            end
-            if element.namedParams.sound and  not self.lastSound then
-                local delay = element.namedParams.soundtime or 0.5
-                if now >= startTime - delay then
-                    self.lastSound = element.namedParams.sound
-                    PlaySoundFile(self.lastSound)
+            if element then
+                if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
+                    self.icone:SetVertexColor(0.75, 0.2, 0.2)
+                else
+                    self.icone:SetVertexColor(1, 1, 1)
+                end
+                self.actionHelp = element.namedParams.help
+                if  not (self.cooldownStart and self.cooldownEnd) then
+                    self.lastSound = nil
+                end
+                if element.namedParams.sound and  not self.lastSound then
+                    local delay = element.namedParams.soundtime or 0.5
+                    if now >= startTime - delay then
+                        self.lastSound = element.namedParams.sound
+                        PlaySoundFile(self.lastSound)
+                    end
                 end
             end
             local red = false
@@ -163,7 +211,7 @@ __exports.OvaleIcon = __class(nil, {
                 self.rangeIndicator:SetVertexColor(1, 0.1, 0.1)
                 self.rangeIndicator:Show()
             end
-            if element.namedParams.text then
+            if element and element.namedParams.text then
                 self.focusText:SetText(tostring(element.namedParams.text))
                 self.focusText:Show()
             elseif actionTarget and actionTarget ~= "target" then
@@ -206,7 +254,7 @@ __exports.OvaleIcon = __class(nil, {
                     local suffix = sub(k, index + 5)
                     self.frame:SetAttribute(prefix .. "type" .. suffix, "spell")
                     self.frame:SetAttribute("unit", self.namedParams.target or "target")
-                    self.frame:SetAttribute(k, self.ovaleSpellBook:GetSpellName(v))
+                    self.frame:SetAttribute(k, self.ovaleSpellBook:GetSpellName(v) or "Unknown spell")
                     self.actionButton = true
                 end
             end
@@ -240,10 +288,12 @@ __exports.OvaleIcon = __class(nil, {
                 GameTooltip:SetText(L[self.help])
             end
             if self.actionType then
-                local actionHelp = self.actionHelp
-                if  not actionHelp then
+                local actionHelp
+                if self.actionHelp then
+                    actionHelp = self.actionHelp
+                else
                     if self.actionType == "spell" then
-                        actionHelp = self.ovaleSpellBook:GetSpellName(self.actionId)
+                        actionHelp = self.ovaleSpellBook:GetSpellName(self.actionId) or "Unknown spell"
                     elseif self.actionType == "value" then
                         actionHelp = (self.value < INFINITY) and tostring(self.value) or "infinity"
                     else
@@ -261,54 +311,6 @@ __exports.OvaleIcon = __class(nil, {
     OvaleIcon_OnLeave = function(self)
         if self.help or self:HasScriptControls() then
             GameTooltip:Hide()
-        end
-    end,
-    OvaleIcon_OnLoad = function(self)
-        local name = self.name
-        local profile = self.ovaleOptions.db.profile
-        self.icone = _G[name .. "Icon"]
-        self.shortcut = _G[name .. "HotKey"]
-        self.remains = _G[name .. "Name"]
-        self.rangeIndicator = _G[name .. "Count"]
-        self.rangeIndicator:SetText(profile.apparence.targetText)
-        self.cd = _G[name .. "Cooldown"]
-        self.normalTexture = _G[name .. "NormalTexture"]
-        local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
-        self.fontName = fontName
-        self.fontHeight = fontHeight
-        self.fontFlags = fontFlags
-        self.focusText = self.frame:CreateFontString(nil, "OVERLAY")
-        self.cdShown = true
-        self.shouldClick = false
-        self.help = nil
-        self.value = nil
-        self.fontScale = nil
-        self.lastSound = nil
-        self.cooldownEnd = nil
-        self.cooldownStart = nil
-        self.texture = nil
-        self.positionalParams = nil
-        self.namedParams = nil
-        self.actionButton = false
-        self.actionType = nil
-        self.actionId = nil
-        self.actionHelp = nil
-        self.frame:SetScript("OnMouseUp", function()
-            return self:OvaleIcon_OnMouseUp()
-        end)
-        self.frame:SetScript("OnEnter", function()
-            return self:OvaleIcon_OnEnter()
-        end)
-        self.frame:SetScript("OnLeave", function()
-            return self:OvaleIcon_OnLeave()
-        end)
-        self.focusText:SetFontObject("GameFontNormalSmall")
-        self.focusText:SetAllPoints(self.frame)
-        self.focusText:SetTextColor(1, 1, 1)
-        self.focusText:SetText(L["Focus"])
-        self.frame:RegisterForClicks("AnyUp")
-        if profile.apparence.clickThru then
-            self.frame:EnableMouse(false)
         end
     end,
     SetPoint = function(self, anchor, reference, refAnchor, x, y)

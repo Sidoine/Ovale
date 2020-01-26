@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/SpellFlash", 80201)
+local __exports = LibStub:NewLibrary("ovale/SpellFlash", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -285,13 +285,13 @@ __exports.OvaleSpellFlashClass = __class(nil, {
         end
         return enabled
     end,
-    Flash = function(self, state, node, element, start, now)
+    Flash = function(self, node, element, start, now)
         local db = self.ovaleOptions.db.profile.apparence.spellFlash
         now = now or GetTime()
         if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
             if element and element.type == "action" then
                 local spellId, spellInfo
-                if element.lowername == "spell" then
+                if element.name == "spell" then
                     spellId = element.positionalParams[1]
                     spellInfo = self.ovaleData.spellInfo[spellId]
                 end
@@ -317,17 +317,19 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     end
                 end
                 local brightness = db.brightness * 100
-                if element.lowername == "spell" then
-                    if self.ovaleStance:IsStanceSpell(spellId) then
-                        SpellFlashCore.FlashForm(spellId, color, size, brightness)
+                if SpellFlashCore then
+                    if element.name == "spell" and spellId then
+                        if self.ovaleStance:IsStanceSpell(spellId) then
+                            SpellFlashCore.FlashForm(spellId, color, size, brightness)
+                        end
+                        if self.ovaleSpellBook:IsPetSpell(spellId) then
+                            SpellFlashCore.FlashPet(spellId, color, size, brightness)
+                        end
+                        SpellFlashCore.FlashAction(spellId, color, size, brightness)
+                    elseif element.name == "item" then
+                        local itemId = element.positionalParams[1]
+                        SpellFlashCore.FlashItem(itemId, color, size, brightness)
                     end
-                    if self.ovaleSpellBook:IsPetSpell(spellId) then
-                        SpellFlashCore.FlashPet(spellId, color, size, brightness)
-                    end
-                    SpellFlashCore.FlashAction(spellId, color, size, brightness)
-                elseif element.lowername == "item" then
-                    local itemId = element.positionalParams[1]
-                    SpellFlashCore.FlashItem(itemId, color, size, brightness)
                 end
             end
         end

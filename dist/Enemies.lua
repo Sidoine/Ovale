@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Enemies", 80201)
+local __exports = LibStub:NewLibrary("ovale/Enemies", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -86,7 +86,7 @@ __exports.OvaleEnemiesClass = __class(States, {
             self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.PLAYER_REGEN_DISABLED)
         end
         self.OnDisable = function()
-            if  not self_reaperTimer then
+            if self_reaperTimer then
                 self.module:CancelTimer(self_reaperTimer)
                 self_reaperTimer = nil
             end
@@ -235,8 +235,8 @@ __exports.OvaleEnemiesClass = __class(States, {
         self.profiler:StopProfiling("OvaleEnemies_ResetState")
     end,
     CleanState = function(self)
-        self.next.activeEnemies = nil
-        self.next.taggedEnemies = nil
+        self.next.activeEnemies = 0
+        self.next.taggedEnemies = 0
         self.next.enemies = nil
     end,
 })
