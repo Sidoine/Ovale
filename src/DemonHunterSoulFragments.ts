@@ -17,9 +17,9 @@ let SOUL_FRAGMENT_FINISHERS:LuaArray<boolean> = {
 }
 
 export class OvaleDemonHunterSoulFragmentsClass {
-    estimatedCount: number;
-    atTime: number;
-    estimated: boolean;
+    estimatedCount: number = 0;
+    atTime?: number;
+    estimated?: boolean;
     private module: AceModule & AceEvent;
 
     constructor(private ovaleAura: OvaleAuraClass, private ovale: OvaleClass) {
@@ -72,7 +72,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
     }
     GetSoulFragmentsBuffStacks(atTime: number) {
         let aura = this.ovaleAura.GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true);
-        let stacks = this.ovaleAura.IsActiveAura(aura, atTime) && aura.stacks || 0;
+        let stacks = aura && this.ovaleAura.IsActiveAura(aura, atTime) && aura.stacks || 0;
         return stacks;
     }
 }

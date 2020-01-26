@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Aura", 80201)
+local __exports = LibStub:NewLibrary("ovale/Aura", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -362,7 +362,7 @@ __exports.OvaleAuraClass = __class(States, {
                     if targetGUID then
                         guid = targetGUID
                         local unitIdForGuid = self.ovaleGuid:GUIDUnit(guid)
-                        unitId = unitIdForGuid
+                        unitId = unitIdForGuid or "target"
                     else
                         unitId = self.baseState.next.defaultTarget or "target"
                     end
@@ -378,16 +378,18 @@ __exports.OvaleAuraClass = __class(States, {
                     mine =  not (strsub(requirement, -4) == "_any")
                 end
                 guid = guid or self.ovaleGuid:UnitGUID(unitId)
-                local aura = self:GetAuraByGUID(guid, buffId, filter, mine, atTime)
-                local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
-                if  not isBang and isActiveAura or isBang and  not isActiveAura then
-                    verified = true
-                end
-                local result = verified and "passed" or "FAILED"
-                if isBang then
-                    self.debug:Log("    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
-                else
-                    self.debug:Log("    Require aura %s with at least %d stack(s) on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
+                if guid then
+                    local aura = self:GetAuraByGUID(guid, buffId, filter, mine, atTime)
+                    local isActiveAura = aura and self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
+                    if  not isBang and isActiveAura or isBang and  not isActiveAura then
+                        verified = true
+                    end
+                    local result = verified and "passed" or "FAILED"
+                    if isBang then
+                        self.debug:Log("    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
+                    else
+                        self.debug:Log("    Require aura %s with at least %d stack(s) on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
+                    end
                 end
             else
                 self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
@@ -401,7 +403,7 @@ __exports.OvaleAuraClass = __class(States, {
             if stealthed then
                 stealthed = tonumber(stealthed)
                 local aura = self:GetAura("player", "stealthed_buff", atTime, "HELPFUL", true)
-                local isActiveAura = self:IsActiveAura(aura, atTime)
+                local isActiveAura = aura and self:IsActiveAura(aura, atTime)
                 if stealthed == 1 and isActiveAura or stealthed ~= 1 and  not isActiveAura then
                     verified = true
                 end
@@ -523,19 +525,17 @@ __exports.OvaleAuraClass = __class(States, {
     IsActiveAura = function(self, aura, atTime)
         local boolean = false
         atTime = atTime or self.baseState.next.currentTime
-        if aura then
-            if aura.state then
-                if aura.serial == self.next.auraSerial and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
-                    boolean = true
-                elseif aura.consumed and self:IsWithinAuraLag(aura.ending, atTime) then
-                    boolean = true
-                end
-            else
-                if aura.serial == self.current.serial[aura.guid] and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
-                    boolean = true
-                elseif aura.consumed and self:IsWithinAuraLag(aura.ending, atTime) then
-                    boolean = true
-                end
+        if aura.state then
+            if aura.serial == self.next.auraSerial and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
+                boolean = true
+            elseif aura.consumed and self:IsWithinAuraLag(aura.ending, atTime) then
+                boolean = true
+            end
+        else
+            if aura.serial == self.current.serial[aura.guid] and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
+                boolean = true
+            elseif aura.consumed and self:IsWithinAuraLag(aura.ending, atTime) then
+                boolean = true
             end
         end
         return boolean
@@ -709,11 +709,13 @@ __exports.OvaleAuraClass = __class(States, {
                     end
                 else
                     local casterGUID = unitCaster and self.ovaleGuid:UnitGUID(unitCaster)
-                    if debuffType == "" then
-                        debuffType = "enrage"
+                    if casterGUID then
+                        if debuffType == "" then
+                            debuffType = "enrage"
+                        end
+                        local auraType = (filter == harmfulFilter and "HARMFUL") or "HELPFUL"
+                        self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
                     end
-                    local auraType = (filter == harmfulFilter and "HARMFUL") or "HELPFUL"
-                    self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
                     i = i + 1
                 end
             end
@@ -747,7 +749,7 @@ __exports.OvaleAuraClass = __class(States, {
     DebugUnitAuras = function(self, unitId, filter, atTime)
         wipe(array)
         local guid = self.ovaleGuid:UnitGUID(unitId)
-        if atTime and self.next.aura[guid] then
+        if atTime and guid and self.next.aura[guid] then
             for auraId, whoseTable in pairs(self.next.aura[guid]) do
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter and  not aura.state then
@@ -757,7 +759,7 @@ __exports.OvaleAuraClass = __class(States, {
                 end
             end
         end
-        if self.current.aura[guid] then
+        if guid and self.current.aura[guid] then
             for auraId, whoseTable in pairs(self.current.aura[guid]) do
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter then
@@ -914,11 +916,17 @@ __exports.OvaleAuraClass = __class(States, {
     end,
     GetAura = function(self, unitId, auraId, atTime, filter, mine)
         local guid = self.ovaleGuid:UnitGUID(unitId)
+        if  not guid then
+            return 
+        end
         return self:GetAuraByGUID(guid, auraId, filter, mine, atTime)
     end,
     GetAuraWithProperty = function(self, unitId, propertyName, filter, atTime)
         local count = 0
         local guid = self.ovaleGuid:UnitGUID(unitId)
+        if  not guid then
+            return 
+        end
         local start = huge
         local ending = 0
         if self.current.aura[guid] then
@@ -951,8 +959,7 @@ __exports.OvaleAuraClass = __class(States, {
             self.debug:Log("Aura with '%s' property found on %s (count=%s, minStart=%s, maxEnding=%s).", propertyName, unitId, count, start, ending)
         else
             self.debug:Log("Aura with '%s' property is missing on %s.", propertyName, unitId)
-            start = nil
-            ending = nil
+            return 
         end
         return start, ending
     end,
@@ -968,19 +975,19 @@ __exports.OvaleAuraClass = __class(States, {
             if guid ~= excludeGUID and auraTable[auraId] then
                 if mine and self_playerGUID then
                     local aura = self:GetStateAura(guid, auraId, self_playerGUID, atTime)
-                    if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
+                    if aura and self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
                         self:CountMatchingActiveAura(aura)
                     end
                     for petGUID in pairs(self_petGUID) do
                         aura = self:GetStateAura(guid, auraId, petGUID, atTime)
-                        if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
+                        if aura and self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
                             self:CountMatchingActiveAura(aura)
                         end
                     end
                 else
                     for casterGUID in pairs(auraTable[auraId]) do
                         local aura = self:GetStateAura(guid, auraId, casterGUID, atTime)
-                        if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
+                        if aura and self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
                             self:CountMatchingActiveAura(aura)
                         end
                     end
@@ -1139,16 +1146,14 @@ __exports.OvaleAuraClass = __class(States, {
                 if verified then
                     local si = self.ovaleData.spellInfo[auraId]
                     local auraFound = self:GetAuraByGUID(guid, auraId, filter, true, atTime)
-                    local isActiveAura = self:IsActiveAura(auraFound, atTime)
-                    self.debug:Log("Aura found, checking if it is Active at %f => IsActiveAura=%s", atTime, isActiveAura and "true" or "FALSE")
-                    if isActiveAura then
+                    if auraFound and self:IsActiveAura(auraFound, atTime) then
                         local aura
                         if auraFound.state then
                             aura = auraFound
                         else
                             aura = self:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, huge, atTime)
                             for k, v in kpairs(auraFound) do
-                                aura[k] = v
+                                (aura)[k] = v
                             end
                             aura.serial = self.next.auraSerial
                             self.debug:Log("Aura %d is copied into simulator.", auraId)
@@ -1273,14 +1278,14 @@ __exports.OvaleAuraClass = __class(States, {
     end,
     RemoveAuraOnGUID = function(self, guid, auraId, filter, mine, atTime)
         local auraFound = self:GetAuraByGUID(guid, auraId, filter, mine, atTime)
-        if self:IsActiveAura(auraFound, atTime) then
+        if auraFound and self:IsActiveAura(auraFound, atTime) then
             local aura
             if auraFound.state then
                 aura = auraFound
             else
                 aura = self:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, huge, atTime)
                 for k, v in kpairs(auraFound) do
-                    aura[k] = v
+                    (aura)[k] = v
                 end
                 aura.serial = self.next.auraSerial
             end
@@ -1309,6 +1314,7 @@ __exports.OvaleAuraClass = __class(States, {
         return duration
     end,
     GetTickLength = function(self, auraId, snapshot)
+        snapshot = snapshot or self.ovalePaperDoll.current
         local tick = 3
         local si = self.ovaleData.spellInfo[auraId]
         if si then

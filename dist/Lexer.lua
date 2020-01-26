@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Lexer", 80201)
+local __exports = LibStub:NewLibrary("ovale/Lexer", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Queue = LibStub:GetLibrary("ovale/Queue")
@@ -14,6 +14,7 @@ __exports.OvaleLexer = __class(nil, {
         self.typeQueue = OvaleQueue("typeQueue")
         self.tokenQueue = OvaleQueue("tokenQueue")
         self.endOfStream = nil
+        self.finished = false
         self.iterator = self:scan(stream, matches, filter)
     end,
     scan = function(self, s, matches, filter)
@@ -78,7 +79,7 @@ __exports.OvaleLexer = __class(nil, {
                 break
             else
                 tokenType, token = self.iterator()
-                if  not tokenType then
+                if  not tokenType or  not token then
                     self.endOfStream = true
                     break
                 end

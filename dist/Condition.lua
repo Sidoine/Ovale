@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Condition", 80201)
+local __exports = LibStub:NewLibrary("ovale/Condition", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local next = next
@@ -78,14 +78,14 @@ __exports.TestBoolean = function(a, yesno)
             return 0, INFINITY
         end
     end
-    return nil
+    return 
 end
 __exports.ReturnValue = function(value, origin, rate)
     return 0, INFINITY, value, origin, rate
 end
 __exports.TestValue = function(start, ending, value, origin, rate, comparator, limit)
-    if  not value or  not origin or  not rate then
-        return nil
+    if value == nil or origin == nil or rate == nil then
+        return 
     end
     start = start or 0
     ending = ending or INFINITY
@@ -96,9 +96,9 @@ __exports.TestValue = function(start, ending, value, origin, rate, comparator, l
             return 0, INFINITY, 0, 0, 0
         end
     elseif  not __exports.isComparator(comparator) then
-        return nil
+        return 
     elseif  not limit then
-        return nil
+        return 
     elseif rate == 0 then
         if (comparator == "less" and value < limit) or (comparator == "atMost" and value <= limit) or (comparator == "equal" and value == limit) or (comparator == "atLeast" and value >= limit) or (comparator == "more" and value > limit) then
             return start, ending
@@ -112,7 +112,7 @@ __exports.TestValue = function(start, ending, value, origin, rate, comparator, l
         start = (start > t) and start or t
         return start, INFINITY
     end
-    return nil
+    return 
 end
 __exports.Compare = function(value, comparator, limit)
     return __exports.TestValue(0, INFINITY, value, 0, 0, comparator, limit)

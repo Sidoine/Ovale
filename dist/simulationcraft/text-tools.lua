@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/text-tools", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/text-tools", 80300)
 if not __exports then return end
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -13,7 +13,6 @@ local lower = string.lower
 local match = string.match
 local __Pool = LibStub:GetLibrary("ovale/Pool")
 local OvalePool = __Pool.OvalePool
-local concat = table.concat
 __exports.INDENT = {}
 do
     __exports.INDENT[0] = ""
@@ -72,50 +71,22 @@ __exports.CamelCase = function(s)
     local tc = gsub(s, "(%a)(%w*)", CamelCaseHelper)
     return gsub(tc, "[%s_]", "")
 end
-__exports.CamelSpecialization = function(annotation)
-    local output = __exports.self_outputPool:Get()
-    local profileName, className, specialization = annotation.name, annotation.class, annotation.specialization
-    if specialization then
-        output[#output + 1] = specialization
-    end
-    if match(profileName, "_1[hH]_") then
-        if className == "DEATHKNIGHT" and specialization == "frost" then
-            output[#output + 1] = "dual wield"
-        elseif className == "WARRIOR" and specialization == "fury" then
-            output[#output + 1] = "single minded fury"
-        end
-    elseif match(profileName, "_2[hH]_") then
-        if className == "DEATHKNIGHT" and specialization == "frost" then
-            output[#output + 1] = "two hander"
-        elseif className == "WARRIOR" and specialization == "fury" then
-            output[#output + 1] = "titans grip"
-        end
-    elseif match(profileName, "_[gG]ladiator_") then
-        output[#output + 1] = "gladiator"
-    end
-    local outputString = __exports.CamelCase(concat(output, " "))
-    __exports.self_outputPool:Release(output)
-    return outputString
+__exports.LowerSpecialization = function(annotation)
+    return lower(annotation.specialization)
 end
 __exports.OvaleFunctionName = function(name, annotation)
-    local functionName = __exports.CamelCase(name .. " actions")
+    local functionName = lower(name .. "actions")
     if annotation.specialization then
-        functionName = __exports.CamelSpecialization(annotation) .. functionName
+        functionName = __exports.LowerSpecialization(annotation) .. functionName
     end
     return functionName
 end
 __exports.OvaleTaggedFunctionName = function(name, tag)
     local bodyName, conditionName
-    local prefix, suffix = match(name, "([A-Z]%w+)(Actions)")
+    local prefix, suffix = match(name, "([a-z]%w+)(actions)$")
     if prefix and suffix then
-        local camelTag
-        if tag == "shortcd" then
-            camelTag = "ShortCd"
-        else
-            camelTag = __exports.CamelCase(tag)
-        end
-        bodyName = prefix .. camelTag .. suffix
-        conditionName = prefix .. camelTag .. "PostConditions"
+        bodyName = lower(prefix .. tag .. suffix)
+        conditionName = lower(prefix .. tag .. "postconditions")
     end
     return bodyName, conditionName
 end

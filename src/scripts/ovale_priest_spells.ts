@@ -66,7 +66,7 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -75,11 +75,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -87,10 +87,6 @@ Define(guardian_of_azeroth_4 300091)
   SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
-
-Define(lifeblood_buff 274419)
-# When you use a Healthstone, gain s1 Leech for 20 seconds.
-  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
@@ -113,9 +109,9 @@ Define(mind_sear 48045)
   # Causing Shadow damage to all targets within 49821a2 yards every t1 sec.
   SpellAddBuff(mind_sear mind_sear=1)
 
-Define(mindbender_shadow 200174)
+Define(mindbender 200174)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
-  SpellInfo(mindbender_shadow cd=60 duration=15 talent=mindbender_talent)
+  SpellInfo(mindbender cd=60 duration=15 talent=mindbender_talent)
 
 Define(purifying_blast_0 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
@@ -144,6 +140,20 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(shadow_crash 205385)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=20 insanity=-2000 talent=shadow_crash_talent)
@@ -152,7 +162,7 @@ Define(shadow_word_death 32379)
 # A word of dark binding that inflicts (187.5 of Spell Power) Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates s3 Insanity, or s4 Insanity if the target dies.|r
   SpellInfo(shadow_word_death cd=9 talent=shadow_word_death_talent)
 Define(shadow_word_pain 589)
-# A word of darkness that causes (18 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 16 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
+# A word of darkness that causes (16.5 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 16 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
   SpellInfo(shadow_word_pain duration=16 insanity=-400 tick=2)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain=1)
@@ -240,6 +250,7 @@ SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(void_bolt void_bolt_0 void_bolt_1)
 Define(dark_ascension_talent 20) #21978

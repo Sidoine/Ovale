@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Compile", 80201)
+local __exports = LibStub:NewLibrary("ovale/Compile", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __AST = LibStub:GetLibrary("ovale/AST")
@@ -176,6 +176,9 @@ __exports.OvaleCompileClass = __class(nil, {
         return value, required
     end,
     RequireNumber = function(self, value)
+        if isNumber(value) then
+            return value, true
+        end
         local required = (sub(tostring(value), 1, 1) ~= "!")
         if  not required then
             value = sub(value, 2)
@@ -272,7 +275,7 @@ __exports.OvaleCompileClass = __class(nil, {
     EvaluateAddListItem = function(self, node)
         local ok = true
         local name, item, positionalParams, namedParams = node.name, node.item, node.positionalParams, node.namedParams
-        if self:TestConditions(positionalParams, namedParams) then
+        if self:TestConditions(positionalParams, namedParams) and item then
             local list = lists[name]
             if  not (list and list.items and list.items[item]) then
                 self.self_serial = self.self_serial + 1
@@ -282,7 +285,9 @@ __exports.OvaleCompileClass = __class(nil, {
                 items = {},
                 default = nil
             }
-            list.items[item] = node.description.value
+            if node.description.value then
+                list.items[item] = node.description.value
+            end
             for _, v in ipairs(positionalParams) do
                 if v == "default" then
                     list.default = item
@@ -358,6 +363,7 @@ __exports.OvaleCompileClass = __class(nil, {
             if id then
                 list[id] = true
             else
+                self.tracer:Error("%s is not a number in the '%s' list", _id, name)
                 ok = false
                 break
             end
@@ -389,37 +395,39 @@ __exports.OvaleCompileClass = __class(nil, {
         if self:TestConditions(positionalParams, namedParams) then
             local keyword = node.keyword
             local si = self.ovaleData:SpellInfo(spellId)
-            local auraTable
-            if find(keyword, "^SpellDamage") then
-                auraTable = si.aura.damage
-            elseif find(keyword, "^SpellAddPet") then
-                auraTable = si.aura.pet
-            elseif find(keyword, "^SpellAddTarget") then
-                auraTable = si.aura.target
-            else
-                auraTable = si.aura.player
-            end
-            local filter = find(node.keyword, "Debuff") and "HARMFUL" or "HELPFUL"
-            local tbl = auraTable[filter] or {}
-            local count = 0
-            for k, v in kpairs(namedParams) do
-                if  not checkToken(PARAMETER_KEYWORD, k) then
-                    if self.ovaleData.buffSpellList[k] then
-                        tbl[k] = v
-                        count = count + 1
-                    else
-                        local id = tonumber(k)
-                        if  not id then
-                            self.tracer:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
-                        else
-                            tbl[id] = v
+            if si.aura then
+                local auraTable
+                if find(keyword, "^SpellDamage") then
+                    auraTable = si.aura.damage
+                elseif find(keyword, "^SpellAddPet") then
+                    auraTable = si.aura.pet
+                elseif find(keyword, "^SpellAddTarget") then
+                    auraTable = si.aura.target
+                else
+                    auraTable = si.aura.player
+                end
+                local filter = find(node.keyword, "Debuff") and "HARMFUL" or "HELPFUL"
+                local tbl = auraTable[filter] or {}
+                local count = 0
+                for k, v in kpairs(namedParams) do
+                    if  not checkToken(PARAMETER_KEYWORD, k) then
+                        if self.ovaleData.buffSpellList[k] then
+                            tbl[k] = v
                             count = count + 1
+                        else
+                            local id = tonumber(k)
+                            if  not id then
+                                self.tracer:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
+                            else
+                                tbl[id] = v
+                                count = count + 1
+                            end
                         end
                     end
                 end
-            end
-            if count > 0 then
-                auraTable[filter] = tbl
+                if count > 0 then
+                    auraTable[filter] = tbl
+                end
             end
         end
         return ok
@@ -469,7 +477,9 @@ __exports.OvaleCompileClass = __class(nil, {
                     self.ovaleSpellBook:AddSpell(spellId, spellName)
                 elseif k == "learn" and v == 1 then
                     local spellName = GetSpellInfo(spellId)
-                    self.ovaleSpellBook:AddSpell(spellId, spellName)
+                    if spellName then
+                        self.ovaleSpellBook:AddSpell(spellId, spellName)
+                    end
                 elseif k == "shared_cd" then
                     si[k] = v
                     self.ovaleCooldown:AddSharedCooldown(v, spellId)
@@ -637,7 +647,7 @@ __exports.OvaleCompileClass = __class(nil, {
                     ok = self:EvaluateAddListItem(node)
                 elseif nodeType == "item_info" then
                     ok = self:EvaluateItemInfo(node)
-                elseif nodeType == "item_require" then
+                elseif nodeType == "itemrequire" then
                     ok = self:EvaluateItemRequire(node)
                 elseif nodeType == "list" then
                     ok = self:EvaluateList(node)
@@ -649,7 +659,9 @@ __exports.OvaleCompileClass = __class(nil, {
                     ok = self:EvaluateSpellInfo(node)
                 elseif nodeType == "spell_require" then
                     ok = self:EvaluateSpellRequire(node)
-                else
+                elseif nodeType ~= "define" and nodeType ~= "add_function" then
+                    self.tracer:Error("Unknown node type", nodeType)
+                    ok = false
                 end
                 if  not ok then
                     break

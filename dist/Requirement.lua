@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Requirement", 80201)
+local __exports = LibStub:NewLibrary("ovale/Requirement", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __tools = LibStub:GetLibrary("ovale/tools")
@@ -26,6 +26,9 @@ __exports.OvaleRequirement = __class(nil, {
     CheckRequirements = function(self, spellId, atTime, tokens, index, targetGUID)
         local requirements = self.nowRequirements
         targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
+        if  not targetGUID then
+            return false
+        end
         local name = tokens[index]
         index = index + 1
         if name then

@@ -30,6 +30,9 @@ Define(aspect_of_the_wild 193530)
   SpellInfo(aspect_of_the_wild cd=120 duration=20 channel=20 gcd=1.3 tick=1)
   # Gaining s2 Focus per sec.rnCritical Strike chance increased by s1.
   SpellAddBuff(aspect_of_the_wild aspect_of_the_wild=1)
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(barbed_shot 217200)
 # Fire a shot that tears through your enemy, causing them to bleed for s1*s2 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
   SpellInfo(barbed_shot cd=12 duration=8 tick=2)
@@ -117,8 +120,9 @@ Define(counter_shot 147362)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dance_of_death_buff 274442)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
@@ -169,7 +173,7 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -178,11 +182,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -220,10 +224,6 @@ Define(latent_poison_0 273286)
 Define(latent_poison_1 273289)
 # Serpent Sting damage applies Latent Poison, stacking up to 273286u times. Your ?s259387[Mongoose Bite][Raptor Strike] consumes all applications of Latent Poison to deal s1 Nature damage per stack.
   SpellInfo(latent_poison_1 gcd=0 offgcd=1)
-Define(lifeblood_buff 274419)
-# When you use a Healthstone, gain s1 Leech for 20 seconds.
-  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -298,13 +298,27 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(revive_pet 982)
@@ -406,6 +420,7 @@ SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 foc
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(unbridled_fury unbridled_fury_0 unbridled_fury_1)
@@ -417,6 +432,8 @@ Define(alpha_predator_talent 3) #22296
 # Kill Command now has s1+1 charges, and deals s2 increased damage.
 Define(barrage_talent_marksmanship 17) #23104
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
+Define(birds_of_prey_talent 19) #22272
+# Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(butchery_talent 6) #22297
 # Attack all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.][]
 Define(calling_the_shots_talent 19) #22274
@@ -472,11 +489,16 @@ Define(unerring_vision_trait 274444)
 Define(condensed_life_force_essence_id 14)
 Define(essence_of_the_focusing_iris_essence_id 5)
 Define(blood_of_the_enemy_essence_id 23)
+Define(spark_of_inspiration_essence_id 36)
 Define(memory_of_lucid_dreams_essence_id 27)
     `;
 // END
     code += `
 # Hunter spells and functions.
+
+Define(turtle_beast_cleave_buff 118459)
+Define(turtle_frenzy_buff 19623)
+Define(trinket_azsharas_font_of_power_cooldown_buff 296962)
 
 Define(a_murder_of_crows 131894)
 	SpellInfo(a_murder_of_crows cd=60 focus=20)

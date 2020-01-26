@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-   <Script file="simulationcraft\definitions.lua"/>
    <Script file="scripts\ovale_trinkets_mop.lua"/>
    <Script file="scripts\ovale_warrior_spells.lua"/>
    <Script file="scripts\ovale_warlock_spells.lua"/>
@@ -44,6 +43,7 @@
    <Script file="CooldownState.lua"/>
    <Script file="BossMod.lua"/>
    <Script file="AzeriteEssence.lua"/>
+   <Script file="simulationcraft\definitions.lua"/>
    <Script file="Variables.lua"/>
    <Script file="Controls.lua"/>
    <Script file="AzeriteArmor.lua"/>

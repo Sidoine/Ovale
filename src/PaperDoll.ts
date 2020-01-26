@@ -181,6 +181,7 @@ export class OvalePaperDollClass extends States<PaperDollSnapshot> implements Sp
         ovaleProfiler: OvaleProfilerClass,
         private lastSpell: LastSpell) {
         super(PaperDollData);
+        this.class = ovale.playerClass;            
         this.module = ovale.createModule("OvalePaperDoll", this.OnInitialize, this.OnDisable, aceEvent);
         this.debug = ovaleDebug.create("OvalePaperDoll");
         this.profiler = ovaleProfiler.create("OvalePaperDoll");
@@ -375,7 +376,7 @@ export class OvalePaperDollClass extends States<PaperDollSnapshot> implements Sp
     }
     GetSpecialization(specialization?: SpecializationIndex) {
         specialization = specialization || this.specialization || 1;
-        return OVALE_SPECIALIZATION_NAME[this.class][specialization];
+        return OVALE_SPECIALIZATION_NAME[this.class][specialization] || "arms";
     }
     IsSpecialization(name: number | string) {
         if (name && this.specialization) {
@@ -423,13 +424,14 @@ export class OvalePaperDollClass extends States<PaperDollSnapshot> implements Sp
         snapshot = snapshot || this.current;
         let nameTable = (updateAllStats && STAT_NAME) || SNAPSHOT_STAT_NAME;
         for (const [,k] of ipairs(nameTable)) {
-            target[k] = snapshot[k];
+            const value = snapshot[k];
+            if (value) target[k] = value;
         }
     }
-    CopySpellcastInfo = (module: OvalePaperDollClass, spellcast: SpellCast, dest: SpellCast) => {
+    CopySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
         this.UpdateSnapshot(dest, spellcast, true);
     }
-    SaveSpellcastInfo = (module: OvalePaperDollClass, spellcast: SpellCast, atTime: number, state: PaperDollSnapshot) => {
+    SaveSpellcastInfo = (spellcast: SpellCast, atTime: number, state?: PaperDollSnapshot) => {
         let paperDollModule = state || this.current;
         this.UpdateSnapshot(spellcast, paperDollModule, true);
     }

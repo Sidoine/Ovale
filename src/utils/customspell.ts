@@ -10,8 +10,8 @@ export interface CustomAura {
 }
 
 export interface CustomAuras {
-    player?: CustomAura[];
-    target?: CustomAura[];
+    player: CustomAura[];
+    target: CustomAura[];
 }
 
 export interface CustomSpellDataIf {
@@ -22,7 +22,7 @@ export interface CustomSpellDataIf {
 export interface CustomSpellData {
     id: number;
     identifier: string;
-    desc: string;
+    desc?: string;
     tooltip?: string;
     spellInfo: SpellInfo;
     auras?: CustomAuras;
@@ -100,7 +100,7 @@ function getPowerValue(powerType: PowerType, cost: number) {
 }
 
 export function convertFromSpellData(spell: SpellData, spellDataById: Map<number, SpellData>) {
-    const spellInfo: SpellInfo = {};
+    const spellInfo: SpellInfo = { require: {} };
     if (spell.spellPowers) {
         for (const power of spell.spellPowers) {
             const powerName = getPowerName(power.power_type);

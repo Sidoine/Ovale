@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Score", 80201)
+local __exports = LibStub:NewLibrary("ovale/Score", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -13,7 +13,6 @@ local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local GetTime = GetTime
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
-local self_playerGUID = nil
 __exports.OvaleScoreClass = __class(nil, {
     constructor = function(self, ovale, ovaleFuture, ovaleDebug, ovaleSpellBook)
         self.ovale = ovale
@@ -25,7 +24,6 @@ __exports.OvaleScoreClass = __class(nil, {
         self.maxScore = 0
         self.scoredSpell = {}
         self.OnInitialize = function()
-            self_playerGUID = self.ovale.playerGUID
             self.module:RegisterEvent("CHAT_MSG_ADDON", self.CHAT_MSG_ADDON)
             self.module:RegisterEvent("PLAYER_REGEN_ENABLED", self.PLAYER_REGEN_ENABLED)
             self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.PLAYER_REGEN_DISABLED)
@@ -49,7 +47,7 @@ __exports.OvaleScoreClass = __class(nil, {
         end
         self.PLAYER_REGEN_ENABLED = function()
             if self.maxScore > 0 and IsInGroup() then
-                local message = self.module:Serialize("score", self.score, self.maxScore, self_playerGUID)
+                local message = self.module:Serialize("score", self.score, self.maxScore, self.ovale.playerGUID)
                 local channel = IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
                 SendAddonMessage(MSG_PREFIX, message, channel)
             end
@@ -62,38 +60,44 @@ __exports.OvaleScoreClass = __class(nil, {
             if unitId == "player" or unitId == "pet" then
                 local now = GetTime()
                 local spell = self.ovaleSpellBook:GetSpellName(spellId)
-                local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, nil, now)
-                if spellcast then
-                    local name = UnitChannelInfo(unitId)
-                    if name == spell then
-                        self:ScoreSpell(spellId)
+                if spell then
+                    local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, nil, now)
+                    if spellcast then
+                        local name = UnitChannelInfo(unitId)
+                        if name == spell then
+                            self:ScoreSpell(spellId)
+                        end
                     end
                 end
             end
         end
         self.UNIT_SPELLCAST_START = function(event, unitId, lineId, spellId)
             if unitId == "player" or unitId == "pet" then
-                local now = GetTime()
                 local spell = self.ovaleSpellBook:GetSpellName(spellId)
-                local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, lineId, now)
-                if spellcast then
-                    local name, _, _, _, _, _, castId = UnitCastingInfo(unitId)
-                    if lineId == castId and name == spell then
-                        self:ScoreSpell(spellId)
+                if spell then
+                    local now = GetTime()
+                    local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, lineId, now)
+                    if spellcast then
+                        local name, _, _, _, _, _, castId = UnitCastingInfo(unitId)
+                        if lineId == castId and name == spell then
+                            self:ScoreSpell(spellId)
+                        end
                     end
                 end
             end
         end
         self.UNIT_SPELLCAST_SUCCEEDED = function(event, unitId, lineId, spellId)
             if unitId == "player" or unitId == "pet" then
-                local now = GetTime()
                 local spell = self.ovaleSpellBook:GetSpellName(spellId)
-                local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, lineId, now)
-                if spellcast then
-                    if spellcast.success or ( not spellcast.start) or ( not spellcast.stop) or spellcast.channel then
-                        local name = UnitChannelInfo(unitId)
-                        if  not name then
-                            self:ScoreSpell(spellId)
+                if spell then
+                    local now = GetTime()
+                    local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, lineId, now)
+                    if spellcast then
+                        if spellcast.success or ( not spellcast.start) or ( not spellcast.stop) or spellcast.channel then
+                            local name = UnitChannelInfo(unitId)
+                            if  not name then
+                                self:ScoreSpell(spellId)
+                            end
                         end
                     end
                 end
@@ -124,7 +128,7 @@ __exports.OvaleScoreClass = __class(nil, {
             if scored then
                 self.score = self.score + scored
                 self.maxScore = self.maxScore + 1
-                self:SendScore(self.module:GetName(), self_playerGUID, scored, 1)
+                self:SendScore(self.module:GetName(), self.ovale.playerGUID, scored, 1)
             end
         end
     end,

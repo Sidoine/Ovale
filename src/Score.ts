@@ -8,8 +8,6 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "./Future";
 import { Tracer, OvaleDebugClass } from "./Debug";
 
-let self_playerGUID: string = undefined;
-
 export type ScoreCallback = (name: string, guid: string, scored: number, scoreMax: number) => void;
 
 export class OvaleScoreClass {
@@ -27,7 +25,6 @@ export class OvaleScoreClass {
     }
 
     private OnInitialize = () => {
-        self_playerGUID = this.ovale.playerGUID;
         this.module.RegisterEvent("CHAT_MSG_ADDON", this.CHAT_MSG_ADDON);
         this.module.RegisterEvent("PLAYER_REGEN_ENABLED", this.PLAYER_REGEN_ENABLED);
         this.module.RegisterEvent("PLAYER_REGEN_DISABLED", this.PLAYER_REGEN_DISABLED);
@@ -51,7 +48,7 @@ export class OvaleScoreClass {
     }
     private PLAYER_REGEN_ENABLED = () => {
         if (this.maxScore > 0 && IsInGroup()) {
-            let message = this.module.Serialize("score", this.score, this.maxScore, self_playerGUID);
+            let message = this.module.Serialize("score", this.score, this.maxScore, this.ovale.playerGUID);
             let channel = IsInGroup(LE_PARTY_CATEGORY_INSTANCE) && "INSTANCE_CHAT" || "RAID";
             SendAddonMessage(MSG_PREFIX, message, channel);
         }
@@ -69,8 +66,8 @@ export class OvaleScoreClass {
         this.damageMeterMethod[moduleName] = func;
     }
     UnregisterDamageMeter(moduleName: string) {
-        this.damageMeter[moduleName] = undefined;
-        this.damageMeterMethod[moduleName] = undefined;
+        delete this.damageMeter[moduleName];
+        delete this.damageMeterMethod[moduleName];
     }
     AddSpell(spellId: number) {
         this.scoredSpell[spellId] = true;
@@ -82,7 +79,7 @@ export class OvaleScoreClass {
             if (scored) {
                 this.score = this.score + scored;
                 this.maxScore = this.maxScore + 1;
-                this.SendScore(this.module.GetName(), self_playerGUID, scored, 1);
+                this.SendScore(this.module.GetName(), this.ovale.playerGUID, scored, 1);
             }
         }
     }
@@ -101,43 +98,49 @@ export class OvaleScoreClass {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
-            let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, undefined, now);
-            if (spellcast) {
-                let [name] = UnitChannelInfo(unitId);
-                if (name == spell) {
-                    this.ScoreSpell(spellId);
+            if (spell) {
+                let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, undefined, now);
+                if (spellcast) {
+                    let [name] = UnitChannelInfo(unitId);
+                    if (name == spell) {
+                        this.ScoreSpell(spellId);
+                    }
                 }
             }
         }
     }
 
-    UNIT_SPELLCAST_START = (event: string, unitId: string, lineId: number, spellId: number) => {
+    UNIT_SPELLCAST_START = (event: string, unitId: string, lineId: string, spellId: number) => {
         if (unitId == "player" || unitId == "pet") {
-            let now = GetTime();
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
-            let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, lineId, now);
-            if (spellcast) {
-                let [name, , , , , , castId] = UnitCastingInfo(unitId);
-                if (lineId == castId && name == spell) {
-                    this.ScoreSpell(spellId);
+            if (spell) {
+                let now = GetTime();
+                let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, lineId, now);
+                if (spellcast) {
+                    let [name, , , , , , castId] = UnitCastingInfo(unitId);
+                    if (lineId == castId && name == spell) {
+                        this.ScoreSpell(spellId);
+                    } 
                 } 
-            } 
+            }
         }
     }
 
     UNIT_SPELLCAST_SUCCEEDED = (event: string, unitId: string, lineId: number, spellId: number) => {
         if (unitId == "player" || unitId == "pet") {
-            let now = GetTime();
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
-            let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, lineId, now);
-            if (spellcast) {
-                if (spellcast.success || (!spellcast.start) || (!spellcast.stop) || spellcast.channel) {
-                    let name = UnitChannelInfo(unitId);
-                    if (!name) {
-                        this.ScoreSpell(spellId);
+            if (spell) {
+                let now = GetTime();
+                let [spellcast] = this.ovaleFuture.GetSpellcast(spell, spellId, lineId, now);
+                if (spellcast) {
+                    if (spellcast.success || (!spellcast.start) || (!spellcast.stop) || spellcast.channel) {
+                        let name = UnitChannelInfo(unitId);
+                        if (!name) {
+                            this.ScoreSpell(spellId);
+                        }
                     }
-                }
-            } 
+                } 
+            }
         }
     }
 }

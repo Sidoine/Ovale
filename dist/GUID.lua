@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/GUID", 80201)
+local __exports = LibStub:NewLibrary("ovale/GUID", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -313,6 +313,6 @@ __exports.OvaleGUIDClass = __class(nil, {
         if name and self.nameGUID[name] then
             return unpack(self.nameGUID[name])
         end
-        return nil
+        return 
     end,
 })

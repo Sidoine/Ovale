@@ -1,12 +1,14 @@
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../PaperDoll";
-import { LuaObj, LuaArray, pairs, lualength, ipairs } from "@wowts/lua";
-import { AstNode, NodeType } from "../AST";
+import { LuaObj, LuaArray, pairs, lualength, ipairs, kpairs } from "@wowts/lua";
+import { AstNode, NodeType, AstAnnotation } from "../AST";
 import { TypeCheck } from "../tools";
 import { OvaleDataClass } from "../Data";
 
 export type ClassRole = "tank" | "spell" | "attack";
 export type ClassType = string;
+
+export type Result<T> = T | undefined;
 
 export type Interrupts = "mind_freeze" | "pummel" | "disrupt" | "skull_bash" | "solar_beam" |
     "rebuke" | "silence" | "mind_bomb" | "kick" | "wind_shear" | "counter_shot" | "muzzle" |
@@ -145,6 +147,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["health.percent"]: "HealthPercent()",
     ["holy_power"]: "HolyPower()",
     ["incanters_flow_time_to.5.up"]: "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.5.any"]: "StackTimeTo(incanters_flow_buff 5 any)",
     ["incanters_flow_time_to.4.down"]: "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"]: "NotDeDemons(infernal)",
     ["insanity"]: "Insanity()",
@@ -186,6 +189,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["stealthed"]: "Stealthed()",
     ["stealthed.all"]: "Stealthed()",
     ["stealthed.rogue"]: "Stealthed()",
+    ["target.debuff.casting.react"]: "target.Casting(harmful)",
     ["time"]: "TimeInCombat()",
     ["time_to_20pct"]: "TimeToHealthPercent(20)",
     ["time_to_pct_30"]: "TimeToHealthPercent(30)",
@@ -194,6 +198,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["time_to_shard"]: "TimeToShard()",
     ["time_to_sht.4"]: "100", // TODO
     ["time_to_sht.5"]: "100",
+    ["variable.disable_combustion"]: "0", // TODO: undefined variables in SimulationCraft
     ["wild_imp_count"]: "Demons(wild_imp)",
     ["wild_imp_no_de"]: "NotDeDemons(wild_imp)",
     ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)",
@@ -269,7 +274,7 @@ export type ParseNodeType = "action" | "action_list" | "arithmetic" | "compare" 
 
 export type SimcBinaryOperatorType = "|" | "^" |
     "&" | "!=" | "<" | "<=" | "=" | "==" | ">" | ">=" |
-    "~" | "!~" | "+" | "%" | "*" | "-" | ">?";
+    "~" | "!~" | "+" | "%" | "*" | "-" | ">?" | "<?";
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
@@ -309,10 +314,10 @@ export interface ProfileLists {
 }
 
 export interface Profile extends ProfileStrings, ProfileLists {
-    templates?: LuaArray<keyof Profile>;
+    templates: LuaArray<keyof Profile>;
     position?: "ranged_back";
     actionList?:LuaArray<ParseNode>;
-    annotation?: Annotation;
+    annotation: Annotation;
 }
 
 export let KEYWORD: LuaObj<boolean> = {}
@@ -419,7 +424,7 @@ export let CONSUMABLE_ITEMS: LuaObj<boolean> = {
     ["augmentation"]: true
 }
 {
-    for (const [keyword, value] of pairs(MODIFIER_KEYWORD)) {
+    for (const [keyword, value] of kpairs(MODIFIER_KEYWORD)) {
         KEYWORD[keyword] = value;
     }
     for (const [keyword, value] of pairs(FUNCTION_KEYWORD)) {
@@ -514,6 +519,11 @@ export let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "com
         3: "associative"
     },
     [">?"]: {
+        1: "arithmetic",
+        2: 25,
+        3: "associative"
+    },
+    ["<?"]: {
         1: "arithmetic",
         2: 25,
         3: "associative"
@@ -622,21 +632,18 @@ export class Annotation implements InterruptAnnotation {
     counterspell?: ClassId;
     spear_hand_strike?: ClassId;
 
-    class?: ClassId;
-    name?: string;
-    specialization?: SpecializationName;
     level?: string;
     pet?: string;
-    consumables?: LuaObj<string>;
+    consumables: LuaObj<string> = {};
     role?: ClassRole;
     melee?: ClassType;
     ranged?: ClassType;
 	position?: string;
-    taggedFunctionName?: LuaObj<boolean>;
+    taggedFunctionName: LuaObj<boolean> = {};
     functionTag?: any;
     nodeList?: LuaArray<ParseNode>;
     
-    astAnnotation?: any;
+    astAnnotation: AstAnnotation;
     dictionaryAST?: any;
     dictionary: LuaObj<number> = {};
     supportingFunctionCount?: number;
@@ -644,14 +651,13 @@ export class Annotation implements InterruptAnnotation {
     supportingControlCount?: number;
     supportingDefineCount?: number;
     symbolTable?: LuaObj<boolean>;
-    symbolList?: LuaArray<string>;
     operand?: LuaArray<ParseNode>;
 
     sync?: LuaObj<ParseNode>; 
 
     using_apl?: LuaObj<boolean>;
     currentVariable?: AstNode;
-    variable?: LuaObj<AstNode>;
+    variable: LuaObj<AstNode> = {};
 
     trap_launcher?: string;
     interrupt?: string;
@@ -683,14 +689,15 @@ export class Annotation implements InterruptAnnotation {
     fel_rush?: string;
     vengeful_retreat?:string;
     shield_of_vengeance?: string;
+    symbolList: LuaArray<string> = {};
 
-    constructor(private ovaleData: OvaleDataClass) {
-
+    constructor(private ovaleData: OvaleDataClass, public name: string, public classId: ClassId, public specialization: SpecializationName) {
+        this.astAnnotation = { nodeList: {}, definition: this.dictionary };
     }
 
     public AddSymbol(symbol: string) {
         let symbolTable = this.symbolTable || {}
-        let symbolList = this.symbolList || {};
+        let symbolList = this.symbolList;
         if (!symbolTable[symbol] && !this.ovaleData.DEFAULT_SPELL_LIST[symbol]) {
             symbolTable[symbol] = true;
             symbolList[lualength(symbolList) + 1] = symbol;

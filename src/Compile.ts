@@ -83,7 +83,8 @@ export class OvaleCompileClass {
         return [value, required];
     }
 
-    private RequireNumber(value: string): [number, boolean] {
+    private RequireNumber(value: string | number): [number, boolean] {
+        if (isNumber(value)) return [value, true];
         let required = (sub(tostring(value), 1, 1) != "!");
         if (!required) {
             value = sub(value, 2);
@@ -92,46 +93,46 @@ export class OvaleCompileClass {
         return [tonumber(value), required];
     }
 
-    private TestConditionLevel = (value: number) => {
+    private TestConditionLevel = (value: number | string) => {
         return this.ovalePaperDoll.level >= value;
     }
 
-    private TestConditionMaxLevel = (value: number) => {
+    private TestConditionMaxLevel = (value: number | string) => {
         return this.ovalePaperDoll.level <= value;
     }
 
-    private TestConditionSpecialization = (value: string) => {
+    private TestConditionSpecialization = (value: string | number) => {
         let [spec, required] = this.RequireValue(value);
         let isSpec = this.ovalePaperDoll.IsSpecialization(spec);
         return (required && isSpec) || (!required && !isSpec);
     }
 
-    private TestConditionStance = (value: string) => {
+    private TestConditionStance = (value: string | number) => {
         this.compileOnStances = true;
         let [stance, required] = this.RequireValue(value);
         let isStance = this.ovaleStance.IsStance(stance, undefined);
         return (required && isStance) || (!required && !isStance);
     }
 
-    private TestConditionSpell = (value: string) => {
+    private TestConditionSpell = (value: string | number) => {
         let [spell, required] = this.RequireValue(value);
         let hasSpell = this.ovaleSpellBook.IsKnownSpell(<number>spell);
         return (required && hasSpell) || (!required && !hasSpell);
     }
 
-    private TestConditionTalent = (value: string) => {
+    private TestConditionTalent = (value: string | number) => {
         let [talent, required] = this.RequireNumber(value);
         let hasTalent = this.HasTalent(talent);
         return (required && hasTalent) || (!required && !hasTalent);
     }
 
-    private TestConditionEquipped = (value: string) => {
+    private TestConditionEquipped = (value: string | number) => {
         let [item, required] = this.RequireValue(value);
         let hasItemEquipped = this.ovaleEquipment.HasEquippedItem(item as number);
         return (required && hasItemEquipped && true) || (!required && !hasItemEquipped);
     }
     
-    private TestConditionTrait = (value: string) => {
+    private TestConditionTrait = (value: string | number) => {
         let [trait, required] = this.RequireNumber(value);
         let hasTrait = this.ovaleAzerite.HasTrait(trait);
         return (required && hasTrait) || (!required && !hasTrait);
@@ -213,8 +214,7 @@ export class OvaleCompileClass {
                 this.self_serial = this.self_serial + 1;
                 this.tracer.Debug("New checkbox '%s': advance age to %d.", name, this.self_serial);
             }
-            checkBox = checkBox || {
-            }
+            checkBox = checkBox || {}
             checkBox.text = <string>node.description.value;
             for (const [, v] of ipairs(positionalParams)) {
                 if (v == "default") {
@@ -239,18 +239,17 @@ export class OvaleCompileClass {
     private EvaluateAddListItem(node: AstNode) {
         let ok = true;
         let [name, item, positionalParams, namedParams] = [node.name, node.item, node.positionalParams, node.namedParams];
-        if (this.TestConditions(positionalParams, namedParams)) {
+        if (this.TestConditions(positionalParams, namedParams) && item) {
             let list = lists[name]
             if (!(list && list.items && list.items[item])) {
                 this.self_serial = this.self_serial + 1;
                 this.tracer.Debug("New list '%s': advance age to %d.", name, this.self_serial);
             }
             list = list || {
-                items: {
-                },
+                items: {},
                 default: undefined
             }
-            list.items[item] = node.description.value;
+            if (node.description.value) list.items[item] = node.description.value;
             for (const [, v] of ipairs(positionalParams)) {
                 if (v == "default") {
                     list.default = item;
@@ -330,6 +329,7 @@ export class OvaleCompileClass {
             if (id) {
                 list[id] = true;
             } else {
+                this.tracer.Error("%s is not a number in the '%s' list", _id, name);
                 ok = false;
                 break;
             }
@@ -364,37 +364,39 @@ export class OvaleCompileClass {
         if (this.TestConditions(positionalParams, namedParams)) {
             let keyword = node.keyword;
             let si = this.ovaleData.SpellInfo(spellId);
-            let auraTable;
-            if (truthy(find(keyword, "^SpellDamage"))) {
-                auraTable = si.aura.damage;
-            } else if (truthy(find(keyword, "^SpellAddPet"))) {
-                auraTable = si.aura.pet;
-            } else if (truthy(find(keyword, "^SpellAddTarget"))) {
-                auraTable = si.aura.target;
-            } else {
-                auraTable = si.aura.player;
-            }
-            const filter = truthy(find(node.keyword, "Debuff")) && "HARMFUL" || "HELPFUL";
-            const tbl = auraTable[filter] || {};
-            let count = 0;
-            for (const [k, v] of kpairs(namedParams)) {
-                if (!checkToken(PARAMETER_KEYWORD, k)) {
-                    if (this.ovaleData.buffSpellList[k]) {
-                        tbl[k] = v;
-                        count = count + 1;
-                    } else {
-                        const id = tonumber(k);
-                        if (!id) {
-                            this.tracer.Warning(`${k} is not a parameter keyword in '${node.name}' ${node.type}`);
-                        } else {
-                            tbl[id] = v;
+            if (si.aura) {
+                let auraTable;
+                if (truthy(find(keyword, "^SpellDamage"))) {
+                    auraTable = si.aura.damage;
+                } else if (truthy(find(keyword, "^SpellAddPet"))) {
+                    auraTable = si.aura.pet;
+                } else if (truthy(find(keyword, "^SpellAddTarget"))) {
+                    auraTable = si.aura.target;
+                } else {
+                    auraTable = si.aura.player;
+                }
+                const filter = truthy(find(node.keyword, "Debuff")) && "HARMFUL" || "HELPFUL";
+                const tbl = auraTable[filter] || {};
+                let count = 0;
+                for (const [k, v] of kpairs(namedParams)) {
+                    if (!checkToken(PARAMETER_KEYWORD, k)) {
+                        if (this.ovaleData.buffSpellList[k]) {
+                            tbl[k] = v;
                             count = count + 1;
+                        } else {
+                            const id = tonumber(k);
+                            if (!id) {
+                                this.tracer.Warning(`${k} is not a parameter keyword in '${node.name}' ${node.type}`);
+                            } else {
+                                tbl[id] = v;
+                                count = count + 1;
+                            }
                         }
                     }
                 }
-            }
-            if (count > 0) {
-                auraTable[filter] = tbl;
+                if (count > 0) {
+                    auraTable[filter] = tbl;
+                }
             }
         }
         return ok;
@@ -444,7 +446,7 @@ export class OvaleCompileClass {
                     this.ovaleSpellBook.AddSpell(spellId, spellName);
                 } else if (k == "learn" && v == 1) {
                     let [spellName] = GetSpellInfo(spellId);
-                    this.ovaleSpellBook.AddSpell(spellId, spellName);
+                    if (spellName) this.ovaleSpellBook.AddSpell(spellId, spellName);
                 } else if (k == "shared_cd") {
                     si[k] = <number>v;
                     this.ovaleCooldown.AddSharedCooldown(<string>v, spellId);
@@ -675,7 +677,7 @@ export class OvaleCompileClass {
                     ok = this.EvaluateAddListItem(node);
                 } else if (nodeType == "item_info") {
                     ok = this.EvaluateItemInfo(node);
-                } else if (nodeType == "item_require") {
+                } else if (nodeType == "itemrequire") {
                     ok = this.EvaluateItemRequire(node);
                 } else if (nodeType == "list") {
                     ok = this.EvaluateList(node);
@@ -687,7 +689,9 @@ export class OvaleCompileClass {
                     ok = this.EvaluateSpellInfo(node);
                 } else if (nodeType == "spell_require") {
                     ok = this.EvaluateSpellRequire(node);
-                } else {
+                } else if (nodeType !== "define" && nodeType !== "add_function") {
+                    this.tracer.Error("Unknown node type", nodeType);
+                    ok = false;
                 }
                 if (!ok) {
                     break;

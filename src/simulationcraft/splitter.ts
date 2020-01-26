@@ -4,10 +4,10 @@ import { Annotation, TagPriority } from "./definitions";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleDataClass } from "../Data";
 import { OvaleTaggedFunctionName } from "./text-tools";
-import { lower, find, sub } from "@wowts/string";
+import { find, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 
-type SplitterFunction = (tag: string, node: AstNode, nodeList: LuaArray<AstNode>, annotation: Annotation) => [AstNode, AstNode]
+type SplitterFunction = (tag: string, node: AstNode, nodeList: LuaArray<AstNode>, annotation: Annotation) => [AstNode?, AstNode?]
     
 export class Splitter {
     private tracer: Tracer;
@@ -26,13 +26,13 @@ export class Splitter {
         } else {
             node.expressionType = "binary";
             node.child[1] = lhsNode;
-            node.child[2] = rhsNode;
+            node.child[2] = rhsNode!;
         }
         return node;
     }
 
     private ConcatenatedConditionNode(conditionList: LuaArray<AstNode>, nodeList: LuaArray<AstNode>, annotation: Annotation) {
-        let conditionNode: AstNode;
+        let conditionNode;
         if (lualength(conditionList) > 0) {
             if (lualength(conditionList) == 1) {
                 conditionNode = conditionList[1];
@@ -51,7 +51,7 @@ export class Splitter {
     }
 
     private ConcatenatedBodyNode(bodyList: LuaArray<AstNode>, nodeList: LuaArray<AstNode>, annotation: Annotation) {
-        let bodyNode: AstNode;
+        let bodyNode;
         if (lualength(bodyList) > 0) {
             bodyNode = this.ovaleAst.NewNode(nodeList, true);
             bodyNode.type = "group";
@@ -66,6 +66,7 @@ export class Splitter {
         let visitor = this.SPLIT_BY_TAG_VISITOR[node.type];
         if (!visitor) {
             this.tracer.Error("Unable to split-by-tag node of type '%s'.", node.type);
+            return [];
         } else {
             return visitor(tag, node, nodeList, annotation);
         }
@@ -73,12 +74,12 @@ export class Splitter {
     
     private SplitByTagAction: SplitterFunction = (tag, node, nodeList, annotation) => {
         let bodyNode, conditionNode;
-        let actionTag: string, invokesGCD: boolean;
+        let actionTag, invokesGCD;
         let name = "UNKNOWN";
         let actionType = node.func;
         if (actionType == "item" || actionType == "spell") {
             let firstParamNode = node.rawPositionalParams[1];
-            let id: number, name;
+            let id, name;
             if (firstParamNode.type == "variable") {
                 name = firstParamNode.name;
                 id = annotation.dictionary && annotation.dictionary[name];
@@ -97,7 +98,7 @@ export class Splitter {
             }
         } else if (actionType == "texture") {
             let firstParamNode = node.rawPositionalParams[1];
-            let id: number, name;
+            let id, name;
             if (firstParamNode.type == "variable") {
                 name = firstParamNode.name;
                 id = annotation.dictionary && annotation.dictionary[name];
@@ -105,11 +106,11 @@ export class Splitter {
                 name = firstParamNode.value;
                 id = <number>name;
             }
-            if (actionTag == undefined) {
+            if (id) {
                 [actionTag, invokesGCD] = this.ovaleData.GetSpellTagInfo(id);
-            }
-            if (actionTag == undefined) {
-                [actionTag, invokesGCD] = this.ovaleData.GetItemTagInfo(id);
+                if (actionTag == undefined) {
+                    [actionTag, invokesGCD] = this.ovaleData.GetItemTagInfo(id);
+                }
             }
             if (actionTag == undefined) {
                 actionTag = "main";
@@ -133,17 +134,18 @@ export class Splitter {
     
     private SplitByTagAddFunction: SplitterFunction = (tag, node, nodeList, annotation) => {
         let [bodyName, conditionName] = OvaleTaggedFunctionName(node.name, tag);
+        if (!bodyName || !conditionName) return [];
         let [bodyNode, conditionNode] = this.SplitByTag(tag, node.child[1], nodeList, annotation);
         if (!bodyNode || bodyNode.type != "group") {
             let newGroupNode = this.ovaleAst.NewNode(nodeList, true);
             newGroupNode.type = "group";
-            newGroupNode.child[1] = bodyNode;
+            if (bodyNode) newGroupNode.child[1] = bodyNode;
             bodyNode = newGroupNode;
         }
         if (!conditionNode || conditionNode.type != "group") {
             let newGroupNode = this.ovaleAst.NewNode(nodeList, true);
             newGroupNode.type = "group";
-            newGroupNode.child[1] = conditionNode;
+            if (conditionNode) newGroupNode.child[1] = conditionNode;
             conditionNode = newGroupNode;
         }
         let bodyFunctionNode = this.ovaleAst.NewNode(nodeList, true);
@@ -162,34 +164,34 @@ export class Splitter {
         let functionName = node.name;
         if (annotation.taggedFunctionName[functionName]) {
             let [bodyName, conditionName] = OvaleTaggedFunctionName(functionName, tag);
-            bodyNode = this.ovaleAst.NewNode(nodeList);
-            bodyNode.name = bodyName;
-            bodyNode.lowername = lower(bodyName);
-            bodyNode.type = "custom_function";
-            bodyNode.func = bodyName;
-            bodyNode.asString = `${bodyName}()`;
-            conditionNode = this.ovaleAst.NewNode(nodeList);
-            conditionNode.name = conditionName;
-            conditionNode.lowername = lower(conditionName);
-            conditionNode.type = "custom_function";
-            conditionNode.func = conditionName;
-            conditionNode.asString = `${conditionName}()`;
+            if (bodyName && conditionName) {
+                bodyNode = this.ovaleAst.NewNode(nodeList);
+                bodyNode.name = bodyName;
+                bodyNode.type = "custom_function";
+                bodyNode.func = bodyName;
+                bodyNode.asString = `${bodyName}()`;
+                conditionNode = this.ovaleAst.NewNode(nodeList);
+                conditionNode.name = conditionName;
+                conditionNode.type = "custom_function";
+                conditionNode.func = conditionName;
+                conditionNode.asString = `${conditionName}()`;
+            }
         } else {
             let functionTag = annotation.functionTag[functionName];
             if (!functionTag) {
-                if (truthy(find(functionName, "Bloodlust"))) {
+                if (truthy(find(functionName, "bloodlust"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "GetInMeleeRange"))) {
+                } else if (truthy(find(functionName, "getinmeleerange"))) {
                     functionTag = "shortcd";
-                } else if (truthy(find(functionName, "InterruptActions"))) {
+                } else if (truthy(find(functionName, "interruptactions"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "SummonPet"))) {
+                } else if (truthy(find(functionName, "summonpet"))) {
                     functionTag = "shortcd";
-                } else if (truthy(find(functionName, "UseItemActions"))) {
+                } else if (truthy(find(functionName, "useitemactions"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "UsePotion"))) {
+                } else if (truthy(find(functionName, "usepotion"))) {
                     functionTag = "cd";
-                } else if (truthy(find(functionName, "UseHeartEssence"))) {
+                } else if (truthy(find(functionName, "useheartessence"))) {
                     functionTag = "cd";
                 }
             }
@@ -207,9 +209,9 @@ export class Splitter {
     
     private SplitByTagGroup: SplitterFunction = (tag, node, nodeList, annotation) => {
         let index = lualength(node.child);
-        let bodyList = {};
-        let conditionList = {};
-        let remainderList = {};
+        let bodyList: LuaArray<AstNode> = {};
+        let conditionList: LuaArray<AstNode> = {};
+        let remainderList: LuaArray<AstNode> = {};
         while (index > 0) {
             let childNode = node.child[index];
             index = index - 1;
@@ -228,8 +230,12 @@ export class Splitter {
                     } else {
                         let unlessNode = this.ovaleAst.NewNode(nodeList, true);
                         unlessNode.type = "unless";
-                        unlessNode.child[1] = this.ConcatenatedConditionNode(conditionList, nodeList, annotation);
-                        unlessNode.child[2] = this.ConcatenatedBodyNode(bodyList, nodeList, annotation);
+                        const condition = this.ConcatenatedConditionNode(conditionList, nodeList, annotation);
+                        const body = this.ConcatenatedBodyNode(bodyList, nodeList, annotation);
+                        if (condition && body) {
+                            unlessNode.child[1] = condition;
+                            unlessNode.child[2] = body;
+                        }
                         wipe(bodyList);
                         wipe(conditionList);
                         insert(bodyList, 1, unlessNode);

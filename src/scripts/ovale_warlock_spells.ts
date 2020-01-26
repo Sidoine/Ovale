@@ -163,14 +163,17 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(grimoire_felguard 111898)
-# Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
+# Summons a Felguard who attacks the target for 17 seconds sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
   SpellInfo(grimoire_felguard soulshards=1 cd=120 duration=17 talent=grimoire_felguard_talent)
-Define(grimoire_of_sacrifice 108503)
+Define(grimoire_of_sacrifice_0 108503)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (35 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
-  SpellInfo(grimoire_of_sacrifice cd=30 talent=grimoire_of_sacrifice_talent)
+  SpellInfo(grimoire_of_sacrifice_0 cd=30 talent=grimoire_of_sacrifice_talent)
 
+Define(grimoire_of_sacrifice_1 196100)
+# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (35 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
+  SpellInfo(grimoire_of_sacrifice_1 gcd=0 offgcd=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -179,11 +182,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -223,10 +226,6 @@ Define(inner_demons 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
   SpellInfo(inner_demons channel=0 gcd=0 offgcd=1 tick=12 talent=inner_demons_talent)
   SpellAddBuff(inner_demons inner_demons=1)
-Define(lifeblood_buff 274419)
-# When you use a Healthstone, gain s1 Leech for 20 seconds.
-  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(nether_portal 267217)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
   SpellInfo(nether_portal soulshards=1 cd=180 duration=15 talent=nether_portal_talent)
@@ -234,11 +233,14 @@ Define(nightfall_buff 213784)
 # Your damaging spells have a chance to pull a nightmare star from the sky, creating a pool of corruption that deals 10*213786s1 Shadow damage to all enemies in the area over 10 seconds.
   SpellInfo(nightfall_buff channel=0 gcd=0 offgcd=1)
 
-Define(phantom_singularity 205179)
+Define(phantom_singularity_0 205179)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(18 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
-  SpellInfo(phantom_singularity cd=45 duration=16 tick=2 talent=phantom_singularity_talent)
+  SpellInfo(phantom_singularity_0 cd=45 duration=16 tick=2 talent=phantom_singularity_talent)
   # Dealing damage to all nearby targets every t1 sec and healing the casting Warlock.
-  SpellAddTargetDebuff(phantom_singularity phantom_singularity=1)
+  SpellAddTargetDebuff(phantom_singularity_0 phantom_singularity_0=1)
+Define(phantom_singularity_1 205246)
+# Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(18 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
+  SpellInfo(phantom_singularity_1 gcd=0 offgcd=1)
 Define(power_siphon 264130)
 # Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
   SpellInfo(power_siphon cd=30 channel=0 talent=power_siphon_talent)
@@ -270,12 +272,12 @@ Define(rain_of_fire 5740)
   # 42223s1 Fire damage every 5740t2 sec.
   SpellAddBuff(rain_of_fire rain_of_fire=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(seed_of_corruption 27243)
@@ -310,7 +312,7 @@ Define(soul_strike 264057)
   SpellInfo(soul_strike cd=10 talent=soul_strike_talent)
 Define(summon_darkglare 205180)
 # Summons a Darkglare from the Twisting Nether that extends the duration of your damage over time effects on all enemies by s2 sec.rnrnThe Darkglare will serve you for 20 seconds, blasting its target for (32 of Spell Power) Shadow damage, increased by s3 for every damage over time effect you have active on any target.
-  SpellInfo(summon_darkglare cd=180 duration=20)
+  SpellInfo(summon_darkglare cd=180 duration=20 channel=20)
   # Summons a Darkglare from the Twisting Nether that blasts its target for Shadow damage, dealing increased damage for every damage over time effect you have active on any target.
   SpellAddBuff(summon_darkglare summon_darkglare=1)
 Define(summon_demonic_tyrant 265187)
@@ -374,7 +376,9 @@ Define(wild_imp 279910)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
+SpellList(grimoire_of_sacrifice grimoire_of_sacrifice_0 grimoire_of_sacrifice_1)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
+SpellList(phantom_singularity phantom_singularity_0 phantom_singularity_1)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
@@ -415,7 +419,7 @@ Define(grimoire_of_sacrifice_talent 18) #19295
 Define(grimoire_of_supremacy_talent 17) #23156
 # While you have an Infernal active, every Soul Shard you spend increases the damage of your Chaos Bolt by 266091s1.
 Define(grimoire_felguard_talent 18) #21717
-# Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
+# Summons a Felguard who attacks the target for 17 seconds sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
 Define(haunt_talent 17) #23159
 # A ghostly soul haunts the target, dealing (55.00000000000001 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 15 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
 Define(inferno_talent 10) #22480

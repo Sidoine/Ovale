@@ -17,7 +17,7 @@ interface LossOfControlEventInfo{
 }
 
 export class OvaleLossOfControlClass implements StateModule {
-	private lossOfControlHistory: LuaArray<LossOfControlEventInfo>;
+	private lossOfControlHistory: LuaArray<LossOfControlEventInfo> = {};
 	private module: AceModule & AceEvent;
 	private tracer: Tracer;
 
@@ -28,8 +28,7 @@ export class OvaleLossOfControlClass implements StateModule {
 
 	private OnInitialize = () => {
 		this.tracer.Debug("Enabled LossOfControl module");
-		this.lossOfControlHistory = {};
-        this.module.RegisterEvent("LOSS_OF_CONTROL_ADDED", this.LOSS_OF_CONTROL_ADDED);
+		this.module.RegisterEvent("LOSS_OF_CONTROL_ADDED", this.LOSS_OF_CONTROL_ADDED);
         this.requirement.RegisterRequirement("lossofcontrol", this.RequireLossOfControlHandler);
     }
     private OnDisable = () => {
@@ -69,7 +68,7 @@ export class OvaleLossOfControlClass implements StateModule {
 		}
 		return [verified, requirement, index];
 	}
-	HasLossOfControl = function(locType: string, atTime: number) {
+	HasLossOfControl = (locType: string, atTime: number) => {
 		let lowestStartTime: number|undefined = undefined;
 		let highestEndTime: number|undefined  = undefined;
 		for (const [, data] of pairs<LossOfControlEventInfo>(this.lossOfControlHistory)) {

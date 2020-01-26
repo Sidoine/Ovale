@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DamageTaken", 80201)
+local __exports = LibStub:NewLibrary("ovale/DamageTaken", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Pool = LibStub:GetLibrary("ovale/Pool")
@@ -68,7 +68,7 @@ __exports.OvaleDamageTakenClass = __class(nil, {
         local event = self_pool:Get()
         event.timestamp = timestamp
         event.damage = damage
-        event.magic = isMagicDamage
+        event.magic = isMagicDamage or false
         self.damageEvent:InsertFront(event)
         self:RemoveExpiredEvents(timestamp)
         self.ovale:needRefresh()

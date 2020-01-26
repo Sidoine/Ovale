@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DataBroker", 80201)
+local __exports = LibStub:NewLibrary("ovale/DataBroker", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -28,8 +28,6 @@ local CLASS_ICONS = {
     ["WARLOCK"] = "Interface\\Icons\\ClassIcon_Warlock",
     ["WARRIOR"] = "Interface\\Icons\\ClassIcon_Warrior"
 }
-local self_menuFrame = nil
-local self_tooltipTitle = nil
 local defaultDB = {
     minimap = {}
 }
@@ -44,8 +42,8 @@ __exports.OvaleDataBrokerClass = __class(nil, {
         self.ovaleVersion = ovaleVersion
         self.broker = nil
         self.OnTooltipShow = function(tooltip)
-            self_tooltipTitle = self_tooltipTitle or self.ovale:GetName() .. " " .. self.ovaleVersion.version
-            tooltip:SetText(self_tooltipTitle, 1, 1, 1)
+            self.tooltipTitle = self.tooltipTitle or self.ovale:GetName() .. " " .. self.ovaleVersion.version
+            tooltip:SetText(self.tooltipTitle, 1, 1, 1)
             tooltip:AddLine(L["Click to select the script."])
             tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
             tooltip:AddLine(L["Right-Click for options."])
@@ -70,8 +68,8 @@ __exports.OvaleDataBrokerClass = __class(nil, {
                     }
                     insert(menu, menuItem)
                 end
-                self_menuFrame = self_menuFrame or CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate")
-                EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU")
+                self.menuFrame = self.menuFrame or CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate")
+                EasyMenu(menu, self.menuFrame, "cursor", 0, 0, "MENU")
             elseif button == "MiddleButton" then
                 self.ovaleFrameModule.frame:ToggleOptions()
             elseif button == "RightButton" then

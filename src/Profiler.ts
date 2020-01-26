@@ -10,14 +10,9 @@ import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { insert, sort, concat } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 
-let self_timestamp = debugprofilestop();
-let self_timeSpent: LuaObj<number> = {}
-let self_timesInvoked: LuaObj<number> = {}
-let self_stack: LuaArray<string> = {}
-let self_stackSize = 0;
-
 export class Profiler {
-    constructor(name: string, profiler: OvaleProfilerClass) {
+    private timestamp = debugprofilestop();
+    constructor(name: string, private profiler: OvaleProfilerClass) {
         const args = profiler.options.args.profiling.args.modules.args as any;
         args[name] = {
             name: name,
@@ -32,42 +27,47 @@ export class Profiler {
     StartProfiling(tag: string) {
         if (!this.enabled) return;
         let newTimestamp = debugprofilestop();
-        if (self_stackSize > 0) {
-            let delta = newTimestamp - self_timestamp;
-            let previous = self_stack[self_stackSize];
-            let timeSpent = self_timeSpent[previous] || 0;
+        if (this.profiler.stackSize > 0) {
+            let delta = newTimestamp - this.timestamp;
+            let previous = this.profiler.stack[this.profiler.stackSize];
+            let timeSpent = this.profiler.timeSpent[previous] || 0;
             timeSpent = timeSpent + delta;
-            self_timeSpent[previous] = timeSpent;
+            this.profiler.timeSpent[previous] = timeSpent;
         }
-        self_timestamp = newTimestamp;
-        self_stackSize = self_stackSize + 1;
-        self_stack[self_stackSize] = tag;
+        this.timestamp = newTimestamp;
+        this.profiler.stackSize = this.profiler.stackSize + 1;
+        this.profiler.stack[this.profiler.stackSize] = tag;
         {
-            let timesInvoked = self_timesInvoked[tag] || 0;
+            let timesInvoked = this.profiler.timesInvoked[tag] || 0;
             timesInvoked = timesInvoked + 1;
-            self_timesInvoked[tag] = timesInvoked;
+            this.profiler.timesInvoked[tag] = timesInvoked;
         }
     }
 
     StopProfiling(tag: string) {
         if (!this.enabled) return;
-        if (self_stackSize > 0) {
-            let currentTag = self_stack[self_stackSize];
+        if (this.profiler.stackSize > 0) {
+            let currentTag = this.profiler.stack[this.profiler.stackSize];
             if (currentTag == tag) {
                 let newTimestamp = debugprofilestop();
-                let delta = newTimestamp - self_timestamp;
-                let timeSpent = self_timeSpent[currentTag] || 0;
+                let delta = newTimestamp - this.timestamp;
+                let timeSpent = this.profiler.timeSpent[currentTag] || 0;
                 timeSpent = timeSpent + delta;
-                self_timeSpent[currentTag] = timeSpent;
-                self_timestamp = newTimestamp;
-                self_stackSize = self_stackSize - 1;
+                this.profiler.timeSpent[currentTag] = timeSpent;
+                this.timestamp = newTimestamp;
+                this.profiler.stackSize = this.profiler.stackSize - 1;
             }
         }
     }
 }
 
 export class OvaleProfilerClass {
-    self_profilingOutput: TextDump = undefined;
+    public timeSpent: LuaObj<number> = {}
+    public timesInvoked: LuaObj<number> = {}
+    public stack: LuaArray<string> = {}
+    public stackSize = 0;
+
+    profilingOutput: TextDump;
     profiles: LuaObj<{ enabled: boolean }> = {};
 
     actions = {
@@ -103,7 +103,6 @@ export class OvaleProfilerClass {
                             return (value != undefined);
                         },
                         set: (info: any, value: string) => {
-                            value = value || undefined;
                             let name = info[lualength(info)];
                             this.ovaleOptions.db.global.profiler[name] = value;
                             if (value) {
@@ -128,11 +127,11 @@ export class OvaleProfilerClass {
                         type: "execute",
                         order: 30,
                         func: () => {
-                            this.self_profilingOutput.Clear();
+                            this.profilingOutput.Clear();
                             let s = this.GetProfilingInfo();
                             if (s) {
-                                this.self_profilingOutput.AddLine(s);
-                                this.self_profilingOutput.Display();
+                                this.profilingOutput.AddLine(s);
+                                this.profilingOutput.Display();
                             }
                         }
                     }
@@ -151,42 +150,40 @@ export class OvaleProfilerClass {
         ovaleOptions.defaultDB.global.profiler = {}
         ovaleOptions.RegisterOptions(OvaleProfilerClass);
         this.module = ovale.createModule("OvaleProfiler", this.OnInitialize, this.OnDisable);
+        this.profilingOutput = LibTextDump.New(`${this.ovale.GetName()} - ${L["Profiling"]}`, 750, 500);
     }
 
     private OnInitialize = () => {
         const appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, this.options);
         AceConfigDialog.AddToBlizOptions(appName, L["Profiling"], this.ovale.GetName());
-    
-        if (!this.self_profilingOutput) {
-            this.self_profilingOutput = LibTextDump.New(`${this.ovale.GetName()} - ${L["Profiling"]}`, 750, 500);
-        }
     }
+
     private OnDisable = () => {
-        this.self_profilingOutput.Clear();
+        this.profilingOutput.Clear();
     }
 
     create(name: string) {
         return new Profiler(name, this);
     }
 
-    private array = {}
+    private array: LuaArray<string> = {}
             
     private ResetProfiling() {
-        for (const [tag] of pairs(self_timeSpent)) {
-            self_timeSpent[tag] = undefined;
+        for (const [tag] of pairs(this.timeSpent)) {
+            delete this.timeSpent[tag];
         }
-        for (const [tag] of pairs(self_timesInvoked)) {
-            self_timesInvoked[tag] = undefined;
+        for (const [tag] of pairs(this.timesInvoked)) {
+            delete this.timesInvoked[tag];
         }
     }
 
     private GetProfilingInfo() {
-        if (next(self_timeSpent)) {
+        if (next(this.timeSpent)) {
             let width = 1;
             {
                 let tenPower = 10;
-                for (const [, timesInvoked] of pairs(self_timesInvoked)) {
+                for (const [, timesInvoked] of pairs(this.timesInvoked)) {
                     while (timesInvoked > tenPower) {
                         width = width + 1;
                         tenPower = tenPower * 10;
@@ -195,8 +192,8 @@ export class OvaleProfilerClass {
             }
             wipe(this.array);
             let formatString = format("    %%08.3fms: %%0%dd (%%05f) x %%s", width);
-            for (const [tag, timeSpent] of pairs(self_timeSpent)) {
-                let timesInvoked = self_timesInvoked[tag];
+            for (const [tag, timeSpent] of pairs(this.timeSpent)) {
+                let timesInvoked = this.timesInvoked[tag];
                 insert(this.array, format(formatString, timeSpent, timesInvoked, timeSpent / timesInvoked, tag));
             }
             if (next(this.array)) {
@@ -209,10 +206,10 @@ export class OvaleProfilerClass {
     }
 
     DebuggingInfo() {
-        Print("Profiler stack size = %d", self_stackSize);
-        let index = self_stackSize;
-        while (index > 0 && self_stackSize - index < 10) {
-            let tag = self_stack[index];
+        Print("Profiler stack size = %d", this.stackSize);
+        let index = this.stackSize;
+        while (index > 0 && this.stackSize - index < 10) {
+            let tag = this.stack[index];
             Print("    [%d] %s", index, tag);
             index = index - 1;
         }
