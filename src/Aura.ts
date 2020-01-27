@@ -727,7 +727,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         this.profiler.StopProfiling("OvaleAura_ScanAuras");
     }
 
-    RequireBuffHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequireBuffHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         let verified = false;
         let stacks = 1;
         let buffName = <string>tokens[index];
@@ -784,7 +784,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return [verified, requirement, index];
     }
 
-    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         let verified = false;
         let stealthed = tokens[index];
         index = index + 1;

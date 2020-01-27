@@ -210,8 +210,13 @@ __exports.OvaleHealthClass = __class(nil, {
                 end
                 guid = guid or self.ovaleGuid:UnitGUID(unitId)
                 local health = self:UnitHealth(unitId, guid) or 0
-                local maxHealth = self:UnitHealthMax(unitId, guid) or 1
-                local healthPercent = (health / maxHealth * 100) or 100
+                local maxHealth = self:UnitHealthMax(unitId, guid)
+                local healthPercent
+                if maxHealth == 0 then
+                    healthPercent = 100
+                else
+                    healthPercent = (health / maxHealth * 100) or 100
+                end
                 if  not isBang and healthPercent <= thresholdValue or isBang and healthPercent > thresholdValue then
                     verified = true
                 end
@@ -275,7 +280,7 @@ __exports.OvaleHealthClass = __class(nil, {
                 health = health + self:UnitAbsorb(unitId, guid) - self:UnitHealAbsorb(unitId, guid)
             end
             local maxHealth = self:UnitHealthMax(unitId, guid)
-            if health and maxHealth then
+            if health and maxHealth > 0 then
                 if health == 0 then
                     timeToDie = 0
                     self.firstSeen[guid] = nil

@@ -380,9 +380,6 @@ __exports.OvaleDataClass = __class(nil, {
     end,
     CheckSpellInfo = function(self, spellId, atTime, targetGUID)
         targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
-        if  not targetGUID then
-            return false
-        end
         local verified = true
         local requirement
         for name, handler in pairs(self.requirement.nowRequirements) do

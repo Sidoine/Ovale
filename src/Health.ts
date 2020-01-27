@@ -251,7 +251,7 @@ export class OvaleHealthClass {
                 health = health + this.UnitAbsorb(unitId, guid) - this.UnitHealAbsorb(unitId, guid);
             }
             let maxHealth = this.UnitHealthMax(unitId, guid);
-            if (health && maxHealth) {
+            if (health && maxHealth > 0) {
                 if (health == 0) {
                     timeToDie = 0;
                     delete this.firstSeen[guid];
@@ -269,7 +269,7 @@ export class OvaleHealthClass {
         this.profiler.StopProfiling("OvaleHealth_UnitTimeToDie");
         return timeToDie;
     }
-    RequireHealthPercentHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequireHealthPercentHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         let verified = false;
         let threshold = <string>tokens[index];
         index = index + 1;
@@ -296,8 +296,10 @@ export class OvaleHealthClass {
             }
             guid = guid || this.ovaleGuid.UnitGUID(unitId);
             let health = this.UnitHealth(unitId, guid) || 0;
-            let maxHealth = this.UnitHealthMax(unitId, guid) || 1;
-            let healthPercent = (health / maxHealth * 100) || 100;
+            let maxHealth = this.UnitHealthMax(unitId, guid);
+            let healthPercent;
+            if (maxHealth === 0) healthPercent = 100;
+            else healthPercent = (health / maxHealth * 100) || 100;
             if (!isBang && healthPercent <= thresholdValue || isBang && healthPercent > thresholdValue) {
                 verified = true;
             }
