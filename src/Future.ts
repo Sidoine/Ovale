@@ -1077,7 +1077,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         this.profiler.StopProfiling("OvaleFuture_ApplyInFlightSpells");
     }
     
-    CombatRequirement = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+    CombatRequirement = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string, number] => {
         let verified = false;
         let combatFlag = tokens[index]; 
         index = index + 1;

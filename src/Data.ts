@@ -475,7 +475,6 @@ export class OvaleDataClass {
 
     CheckSpellInfo(spellId: number, atTime: number, targetGUID: string | undefined): [boolean, string?] {
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
-        if (!targetGUID) return [false];
         let verified = true;
         let requirement: string | undefined;
         for (const [name, handler] of pairs(this.requirement.nowRequirements)) {

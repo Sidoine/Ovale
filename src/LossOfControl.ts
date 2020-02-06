@@ -48,7 +48,7 @@ export class OvaleLossOfControlClass implements StateModule {
 		}
 		insert(this.lossOfControlHistory, data);
 	}
-	RequireLossOfControlHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+	RequireLossOfControlHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string, number] => {
 		let verified: boolean = false;
 		let locType = <string>tokens[index];
 		index = index + 1;

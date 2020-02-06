@@ -19,6 +19,7 @@ local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
+local tonumber = tonumber
 local wipe = wipe
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
@@ -643,9 +644,6 @@ __exports.OvaleBestActionClass = __class(nil, {
     end,
     getSpellActionInfo = function(self, spellId, element, atTime, target)
         local targetGUID = self.OvaleGUID:UnitGUID(target)
-        if  not targetGUID then
-            return
-        end
         local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges
         local si = self.ovaleData.spellInfo[spellId]
         local replacedSpellId = nil

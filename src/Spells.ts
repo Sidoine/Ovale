@@ -83,7 +83,7 @@ export class OvaleSpellsClass implements StateModule {
         return undefined;
     }
     
-    private RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+    private RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string, number] => {
         let verified = false;
         let countString;
         if (index) {

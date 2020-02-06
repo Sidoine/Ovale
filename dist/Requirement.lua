@@ -26,9 +26,6 @@ __exports.OvaleRequirement = __class(nil, {
     CheckRequirements = function(self, spellId, atTime, tokens, index, targetGUID)
         local requirements = self.nowRequirements
         targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
-        if  not targetGUID then
-            return false
-        end
         local name = tokens[index]
         index = index + 1
         if name then

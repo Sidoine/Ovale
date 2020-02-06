@@ -211,7 +211,6 @@ export class OvaleBestActionClass {
 
     private getSpellActionInfo(spellId: number, element: Element, atTime: number, target: string): ActionInfo {
         let targetGUID = this.OvaleGUID.UnitGUID(target);
-        if (!targetGUID) return [];
         let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
