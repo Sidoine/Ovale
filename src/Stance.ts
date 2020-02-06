@@ -179,7 +179,7 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
         this.ShapeshiftEventHandler();
         this.ready = true;
     }
-    RequireStanceHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+    RequireStanceHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string, number] => {
         let verified = false;
         let stance = tokens[index];
         index = index + 1;

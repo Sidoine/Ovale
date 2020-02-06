@@ -365,7 +365,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return [undefined, undefined];
     }
 
-    RequirePowerHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequirePowerHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         return this.getPowerRequirementAt(this.GetState(atTime), spellId, atTime, requirement, tokens, index, targetGUID);
     }
 
@@ -388,7 +388,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     }
 
-    TimeToPower(spellId: number, atTime: number, targetGUID: string, powerType: PowerType | undefined, extraPower?: number) {
+    TimeToPower(spellId: number, atTime: number, targetGUID: string | undefined, powerType: PowerType | undefined, extraPower?: number) {
         return this.getTimeToPowerStateAt(this.GetState(atTime), spellId, atTime, targetGUID, powerType, extraPower);
     }
 
@@ -508,7 +508,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * @param maximumCost Force using the maximum cost of the spell for spells that can vary in cost.
      * @return [spellCost, spellRefund]
      */
-    private getPowerCostAt(state: PowerState, spellId: number, powerType: PowerType, atTime:number, targetGUID:string, maximumCost?:boolean): [number, number] {
+    private getPowerCostAt(state: PowerState, spellId: number, powerType: PowerType, atTime:number, targetGUID:string | undefined, maximumCost?:boolean): [number, number] {
         this.profiler.StartProfiling("OvalePower_PowerCost");
         let spellCost = 0;
         let spellRefund = 0;
@@ -591,7 +591,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * @param targetGUID
      * @return [verified, requirement, index] <[boolean, string, number]>
      */
-    private getPowerRequirementAt(state: PowerState, spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] {
+    private getPowerRequirementAt(state: PowerState, spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] {
         let verified = false;
         let baseCost = tokens[index];
         index = index + 1;
@@ -634,7 +634,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * @param powerType 
      * @param extraPower If true, will add this to the cost
      */
-    private getTimeToPowerStateAt(state: PowerState, spellId:number, atTime:number, targetGUID:string, powerType:PowerType | undefined, extraPower?:number) {
+    private getTimeToPowerStateAt(state: PowerState, spellId:number, atTime:number, targetGUID:string | undefined, powerType:PowerType | undefined, extraPower?:number) {
         let seconds = 0;
         powerType = powerType || POOLED_RESOURCE[this.ovalePaperDoll.class];
         if (powerType) {
