@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerHunterMarksmanshipXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_marksmanship"
-	local desc = "[Xel][8.2] Hunter: Marksmanship"
+	local desc = "[Xel][8.3] Hunter: Marksmanship"
 	local code = [[
 # Common functions.
 Include(ovale_common)
@@ -18,32 +18,33 @@ AddIcon specialization=2 help=main
 		if Boss() Spell(hunters_mark)
 	}
 
+	if InCombat() marksmanshipinterruptactions()
+
 	if HasFullControl() and not target.DebuffPresent(crowd_control_debuff) and InCombat() and target.Present() and target.InRange(arcane_shot)
 	{
-		InterruptActions()
 		if not IsDead() and not Dead() and HealthPercent() < 50  Spell(exhilaration)
 		if target.istargetingplayer() and target.Distance(less 8) Spell(bursting_shot)
 		SummonPet()
 
 		# Cooldowns
-		if Boss() MarksmanshipDefaultCdActions()
+		if Boss() defaultcdactions()
 
 		# Short Cooldowns
-		MarksmanshipDefaultShortCdActions()
+		defaultshortcdactions()
 
 		# Default Actions
-		MarksmanshipDefaultMainActions()
+		defaultmainactions()
 	}
 }
 
-AddFunction InterruptActions
+AddFunction marksmanshipinterruptactions
 {
-	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
-	{
-		if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-	}
+ if target.hasmanagedinterrupts() and target.mustbeinterrupted() or not target.hasmanagedinterrupts() and target.isinterruptible()
+ {
+  if target.inrange(counter_shot) and target.isinterruptible() and target.remainingcasttime() <= casttime(counter_shot) + gcd() spell(counter_shot)
+  if target.inrange(quaking_palm) and not target.classification(worldboss) and target.remainingcasttime() <= casttime(quaking_palm) + gcd() spell(quaking_palm)
+  if target.distance(less 5) and not target.classification(worldboss) and target.remainingcasttime() <= casttime(war_stomp) + gcd() spell(war_stomp)
+ }
 }
 
 AddFunction MarksmanshipUseItemActions
@@ -69,350 +70,359 @@ AddFunction SummonPet
 
 ### actions.default
 
-AddFunction MarksmanshipDefaultMainActions
+AddFunction defaultmainactions
 {
  #call_action_list,name=cds
- MarksmanshipCdsMainActions()
+ marksmanshipcdsmainactions()
 
- unless MarksmanshipCdsMainPostConditions()
+ unless marksmanshipcdsmainpostconditions()
  {
   #call_action_list,name=st,if=active_enemies<3
-  if Enemies(tagged=1) < 3 MarksmanshipStMainActions()
+  if enemies(tagged=1) < 3 marksmanshipstmainactions()
 
-  unless Enemies(tagged=1) < 3 and MarksmanshipStMainPostConditions()
+  unless enemies(tagged=1) < 3 and marksmanshipstmainpostconditions()
   {
    #call_action_list,name=trickshots,if=active_enemies>2
-   if Enemies(tagged=1) > 2 MarksmanshipTrickshotsMainActions()
+   if enemies(tagged=1) > 2 marksmanshiptrickshotsmainactions()
   }
  }
 }
 
-AddFunction MarksmanshipDefaultMainPostConditions
+AddFunction defaultmainpostconditions
 {
- MarksmanshipCdsMainPostConditions() or Enemies(tagged=1) < 3 and MarksmanshipStMainPostConditions() or Enemies(tagged=1) > 2 and MarksmanshipTrickshotsMainPostConditions()
+ marksmanshipcdsmainpostconditions() or enemies(tagged=1) < 3 and marksmanshipstmainpostconditions() or enemies(tagged=1) > 2 and marksmanshiptrickshotsmainpostconditions()
 }
 
-AddFunction MarksmanshipDefaultShortCdActions
+AddFunction defaultshortcdactions
 {
  #call_action_list,name=cds
- MarksmanshipCdsShortCdActions()
+ marksmanshipcdsshortcdactions()
 
- unless MarksmanshipCdsShortCdPostConditions()
+ unless marksmanshipcdsshortcdpostconditions()
  {
   #call_action_list,name=st,if=active_enemies<3
-  if Enemies(tagged=1) < 3 MarksmanshipStShortCdActions()
+  if enemies(tagged=1) < 3 marksmanshipstshortcdactions()
 
-  unless Enemies(tagged=1) < 3 and MarksmanshipStShortCdPostConditions()
+  unless enemies(tagged=1) < 3 and marksmanshipstshortcdpostconditions()
   {
    #call_action_list,name=trickshots,if=active_enemies>2
-   if Enemies(tagged=1) > 2 MarksmanshipTrickshotsShortCdActions()
+   if enemies(tagged=1) > 2 marksmanshiptrickshotsshortcdactions()
   }
  }
 }
 
-AddFunction MarksmanshipDefaultShortCdPostConditions
+AddFunction defaultshortcdpostconditions
 {
- MarksmanshipCdsShortCdPostConditions() or Enemies(tagged=1) < 3 and MarksmanshipStShortCdPostConditions() or Enemies(tagged=1) > 2 and MarksmanshipTrickshotsShortCdPostConditions()
+ marksmanshipcdsshortcdpostconditions() or enemies(tagged=1) < 3 and marksmanshipstshortcdpostconditions() or enemies(tagged=1) > 2 and marksmanshiptrickshotsshortcdpostconditions()
 }
 
-AddFunction MarksmanshipDefaultCdActions
+AddFunction defaultcdactions
 {
- # MarksmanshipInterruptActions()
+ # marksmanshipinterruptactions()
  #auto_shot
+ #use_item,name=lurkers_insidious_gift,if=cooldown.trueshot.remains_guess<15|target.time_to_die<30
+ if spellcooldown(trueshot) < 15 or target.timetodie() < 30 marksmanshipuseitemactions()
+ #use_item,name=lustrous_golden_plumage,if=cooldown.trueshot.remains_guess<5|target.time_to_die<20
+ if spellcooldown(trueshot) < 5 or target.timetodie() < 20 marksmanshipuseitemactions()
  #use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
- if BuffPresent(trueshot_buff) or not Talent(calling_the_shots_talent) or target.TimeToDie() < 10 MarksmanshipUseItemActions()
- #use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major.rank3|debuff.blood_of_the_enemy.up|target.time_to_die<5
- if not BuffPresent(trueshot_buff) and not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 5 MarksmanshipUseItemActions()
+ if buffpresent(trueshot_buff) or not hastalent(calling_the_shots_talent) or target.timetodie() < 10 marksmanshipuseitemactions()
+ #use_item,name=ashvanes_razor_coral,if=buff.trueshot.up&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&target.health.pct<20)|debuff.razor_coral_debuff.down|target.time_to_die<20
+ if buffpresent(trueshot_buff) and { buffpresent(guardian_of_azeroth_buff) or not azeriteessenceismajor(condensed_life_force_essence_id) and target.healthpercent() < 20 } or target.debuffexpires(razor_coral_debuff) or target.timetodie() < 20 marksmanshipuseitemactions()
+ #use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up|target.time_to_die<5
+ if not buffpresent(trueshot_buff) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 5 marksmanshipuseitemactions()
  #use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
- if BuffPresent(trueshot_buff) or not Talent(calling_the_shots_talent) or target.TimeToDie() < 20 MarksmanshipUseItemActions()
+ if buffpresent(trueshot_buff) or not hastalent(calling_the_shots_talent) or target.timetodie() < 20 marksmanshipuseitemactions()
  #call_action_list,name=cds
- MarksmanshipCdsCdActions()
+ marksmanshipcdscdactions()
 
- unless MarksmanshipCdsCdPostConditions()
+ unless marksmanshipcdscdpostconditions()
  {
   #call_action_list,name=st,if=active_enemies<3
-  if Enemies(tagged=1) < 3 MarksmanshipStCdActions()
+  if enemies(tagged=1) < 3 marksmanshipstcdactions()
 
-  unless Enemies(tagged=1) < 3 and MarksmanshipStCdPostConditions()
+  unless enemies(tagged=1) < 3 and marksmanshipstcdpostconditions()
   {
    #call_action_list,name=trickshots,if=active_enemies>2
-   if Enemies(tagged=1) > 2 MarksmanshipTrickshotsCdActions()
+   if enemies(tagged=1) > 2 marksmanshiptrickshotscdactions()
   }
  }
 }
 
-AddFunction MarksmanshipDefaultCdPostConditions
+AddFunction defaultcdpostconditions
 {
- MarksmanshipCdsCdPostConditions() or Enemies(tagged=1) < 3 and MarksmanshipStCdPostConditions() or Enemies(tagged=1) > 2 and MarksmanshipTrickshotsCdPostConditions()
+ marksmanshipcdscdpostconditions() or enemies(tagged=1) < 3 and marksmanshipstcdpostconditions() or enemies(tagged=1) > 2 and marksmanshiptrickshotscdpostconditions()
 }
 
 ### actions.cds
 
-AddFunction MarksmanshipCdsMainActions
+AddFunction marksmanshipcdsmainactions
 {
  #hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
- if target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) Spell(hunters_mark)
+ if target.debuffexpires(hunters_mark_debuff) and not buffpresent(trueshot_buff) spell(hunters_mark)
 }
 
-AddFunction MarksmanshipCdsMainPostConditions
+AddFunction marksmanshipcdsmainpostconditions
 {
 }
 
-AddFunction MarksmanshipCdsShortCdActions
+AddFunction marksmanshipcdsshortcdactions
 {
- unless target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark)
+ unless target.debuffexpires(hunters_mark_debuff) and not buffpresent(trueshot_buff) and spell(hunters_mark)
  {
   #double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
-  if SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 Spell(double_tap)
-  #worldvein_resonance,if=buff.lifeblood.stack<4&!buff.trueshot.up
-  if BuffStacks(lifeblood_buff) < 4 and not BuffPresent(trueshot_buff) Spell(worldvein_resonance_essence)
+  if spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 spell(double_tap)
+  #bag_of_tricks
+  spell(bag_of_tricks)
+  #reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+  if target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 spell(reaping_flames_essence)
+  #worldvein_resonance,if=(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
+  if spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance_essence) + baseduration(worldvein_resonance_essence) or target.timetodie() < 20 spell(worldvein_resonance_essence)
   #ripple_in_space,if=cooldown.trueshot.remains<7
-  if SpellCooldown(trueshot) < 7 Spell(ripple_in_space_essence)
+  if spellcooldown(trueshot) < 7 spell(ripple_in_space_essence)
  }
 }
 
-AddFunction MarksmanshipCdsShortCdPostConditions
+AddFunction marksmanshipcdsshortcdpostconditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark)
+ target.debuffexpires(hunters_mark_debuff) and not buffpresent(trueshot_buff) and spell(hunters_mark)
 }
 
-AddFunction MarksmanshipCdsCdActions
+AddFunction marksmanshipcdscdactions
 {
- unless target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap)
+ unless target.debuffexpires(hunters_mark_debuff) and not buffpresent(trueshot_buff) and spell(hunters_mark) or { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap)
  {
   #berserking,if=buff.trueshot.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<13
-  if BuffPresent(trueshot_buff) and { target.TimeToDie() > SpellCooldownDuration(berserking) + BaseDuration(berserking) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 13 Spell(berserking)
+  if buffpresent(trueshot_buff) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 spell(berserking)
   #blood_fury,if=buff.trueshot.up&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-  if BuffPresent(trueshot_buff) and { target.TimeToDie() > SpellCooldownDuration(blood_fury_ap) + BaseDuration(blood_fury_ap) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 16 Spell(blood_fury_ap)
+  if buffpresent(trueshot_buff) and { target.timetodie() > spellcooldownduration(blood_fury_ap) + baseduration(blood_fury_ap) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(blood_fury_ap)
   #ancestral_call,if=buff.trueshot.up&(target.time_to_die>cooldown.ancestral_call.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-  if BuffPresent(trueshot_buff) and { target.TimeToDie() > SpellCooldownDuration(ancestral_call) + BaseDuration(ancestral_call) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 16 Spell(ancestral_call)
+  if buffpresent(trueshot_buff) and { target.timetodie() > spellcooldownduration(ancestral_call) + baseduration(ancestral_call) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(ancestral_call)
   #fireblood,if=buff.trueshot.up&(target.time_to_die>cooldown.fireblood.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<9
-  if BuffPresent(trueshot_buff) and { target.TimeToDie() > SpellCooldownDuration(fireblood) + BaseDuration(fireblood) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 9 Spell(fireblood)
+  if buffpresent(trueshot_buff) and { target.timetodie() > spellcooldownduration(fireblood) + baseduration(fireblood) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 9 spell(fireblood)
   #lights_judgment
-  Spell(lights_judgment)
+  spell(lights_judgment)
 
-  unless BuffStacks(lifeblood_buff) < 4 and not BuffPresent(trueshot_buff) and Spell(worldvein_resonance_essence)
+  unless spell(bag_of_tricks) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames_essence) or { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance_essence) + baseduration(worldvein_resonance_essence) or target.timetodie() < 20 } and spell(worldvein_resonance_essence)
   {
-   #guardian_of_azeroth,if=(ca_execute|target.time_to_die>210)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
-   if { Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() > 210 } and { BuffPresent(trueshot_buff) or SpellCooldown(trueshot) < 16 } or target.TimeToDie() < 30 Spell(guardian_of_azeroth)
+   #guardian_of_azeroth,if=(ca_execute|target.time_to_die>cooldown+30)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<31
+   if { talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } or target.timetodie() > spellcooldown(guardian_of_azeroth) + 30 } and { buffpresent(trueshot_buff) or spellcooldown(trueshot) < 16 } or target.timetodie() < 31 spell(guardian_of_azeroth)
 
-   unless SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
+   unless spellcooldown(trueshot) < 7 and spell(ripple_in_space_essence)
    {
     #memory_of_lucid_dreams,if=!buff.trueshot.up
-    if not BuffPresent(trueshot_buff) Spell(memory_of_lucid_dreams_essence)
-    #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
-    # if { BuffPresent(trueshot_buff) and BuffPresent(bloodlust) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
-    #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
-    if Focus() > 60 and { BuffExpires(precise_shots_buff) and SpellCooldown(rapid_fire) > 0 and target.TimeToDie() > 0 + BaseDuration(trueshot) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 15 Spell(trueshot)
+    if not buffpresent(trueshot_buff) spell(memory_of_lucid_dreams_essence)
+    #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&target.health.pct<20|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
+    if { buffpresent(trueshot_buff) and buffpresent(burst_haste_buff any=1) or buffpresent(trueshot_buff) and target.healthpercent() < 20 or { buffpresent(potion_of_unbridled_fury_buff) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+    #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+buff.trueshot.duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<15
+    if focus() > 60 and { buffexpires(precise_shots_buff) and spellcooldown(rapid_fire) > 0 and target.timetodie() > 0 + baseduration(trueshot_buff) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 15 spell(trueshot)
    }
   }
  }
 }
 
-AddFunction MarksmanshipCdsCdPostConditions
+AddFunction marksmanshipcdscdpostconditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or BuffStacks(lifeblood_buff) < 4 and not BuffPresent(trueshot_buff) and Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
+ target.debuffexpires(hunters_mark_debuff) and not buffpresent(trueshot_buff) and spell(hunters_mark) or { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap) or spell(bag_of_tricks) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames_essence) or { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance_essence) + baseduration(worldvein_resonance_essence) or target.timetodie() < 20 } and spell(worldvein_resonance_essence) or spellcooldown(trueshot) < 7 and spell(ripple_in_space_essence)
 }
 
 ### actions.precombat
 
-AddFunction MarksmanshipPrecombatMainActions
-{
- #hunters_mark
- Spell(hunters_mark)
- #aimed_shot,if=active_enemies<3
- if Enemies(tagged=1) < 3 and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } Spell(aimed_shot)
-}
-
-AddFunction MarksmanshipPrecombatMainPostConditions
-{
-}
-
-AddFunction MarksmanshipPrecombatShortCdActions
-{
- unless Spell(hunters_mark)
- {
-  #double_tap,precast_time=10
-  Spell(double_tap)
-  #worldvein_resonance
-  Spell(worldvein_resonance_essence)
- }
-}
-
-AddFunction MarksmanshipPrecombatShortCdPostConditions
-{
- Spell(hunters_mark) or Enemies(tagged=1) < 3 and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot)
-}
-
-AddFunction MarksmanshipPrecombatCdActions
+AddFunction marksmanshipprecombatmainactions
 {
  #flask
  #augmentation
  #food
  #snapshot_stats
- #potion
- # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ #hunters_mark
+ spell(hunters_mark)
+ #aimed_shot,if=active_enemies<3
+ if enemies(tagged=1) < 3 and Speed() == 0 spell(aimed_shot)
+}
 
- unless Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance_essence)
+AddFunction marksmanshipprecombatmainpostconditions
+{
+}
+
+AddFunction marksmanshipprecombatshortcdactions
+{
+ unless spell(hunters_mark)
  {
-  #guardian_of_azeroth
-  Spell(guardian_of_azeroth)
-  #memory_of_lucid_dreams
-  Spell(memory_of_lucid_dreams_essence)
-  #trueshot,precast_time=1.5,if=active_enemies>2
-  if Enemies(tagged=1) > 2 Spell(trueshot)
+  #double_tap,precast_time=10
+  spell(double_tap)
+  #worldvein_resonance
+  spell(worldvein_resonance_essence)
  }
 }
 
-AddFunction MarksmanshipPrecombatCdPostConditions
+AddFunction marksmanshipprecombatshortcdpostconditions
 {
- Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance_essence) or Enemies(tagged=1) < 3 and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot)
+ spell(hunters_mark) or enemies(tagged=1) < 3 and Speed() == 0 and spell(aimed_shot)
+}
+
+AddFunction marksmanshipprecombatcdactions
+{
+ unless spell(hunters_mark) or spell(double_tap) or spell(worldvein_resonance_essence)
+ {
+  #guardian_of_azeroth
+  spell(guardian_of_azeroth)
+  #memory_of_lucid_dreams
+  spell(memory_of_lucid_dreams_essence)
+  #trueshot,precast_time=1.5,if=active_enemies>2
+  if enemies(tagged=1) > 2 spell(trueshot)
+  #potion,dynamic_prepot=1
+  # if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ }
+}
+
+AddFunction marksmanshipprecombatcdpostconditions
+{
+ spell(hunters_mark) or spell(double_tap) or spell(worldvein_resonance_essence) or enemies(tagged=1) < 3 and Speed() == 0 and spell(aimed_shot)
 }
 
 ### actions.st
 
-AddFunction MarksmanshipStMainActions
+AddFunction marksmanshipstmainactions
 {
  #serpent_sting,if=refreshable&!action.serpent_sting.in_flight
- if target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) Spell(serpent_sting_mm)
+ if target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) spell(serpent_sting_mm)
  #rapid_fire,if=buff.trueshot.down|focus<70
- if BuffExpires(trueshot_buff) or Focus() < 70 Spell(rapid_fire)
+ if buffexpires(trueshot_buff) or focus() < 70 spell(rapid_fire)
  #arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
- if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(arcane_shot)
+ if buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) spell(arcane_shot)
  #aimed_shot,if=buff.trueshot.up|(buff.double_tap.down|ca_execute)&buff.precise_shots.down|full_recharge_time<cast_time&cooldown.trueshot.remains
- if { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } Spell(aimed_shot)
+ if { buffpresent(trueshot_buff) or { buffexpires(double_tap_buff) or talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } } and buffexpires(precise_shots_buff) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) and spellcooldown(trueshot) > 0 } and Speed() == 0 spell(aimed_shot)
  #arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&buff.memory_of_lucid_dreams.up
- if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(arcane_shot)
- #concentrated_flame,if=!buff.trueshot.up
- if not BuffPresent(trueshot_buff) Spell(concentrated_flame_essence)
+ if buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) spell(arcane_shot)
+ #concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.trueshot.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
+ if focus() + focusregenrate() * gcd() < maxfocus() and buffexpires(trueshot_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) or spellfullrecharge(concentrated_flame_essence) < gcd() or target.timetodie() < 5 spell(concentrated_flame_essence)
  #arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
- if BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } Spell(arcane_shot)
+ if buffexpires(trueshot_buff) and { buffpresent(precise_shots_buff) and { focus() > 41 or buffpresent(master_marksman_buff) } or { focus() > 50 and hasazeritetrait(focused_fire_trait) or focus() > 75 } and { spellcooldown(trueshot) > 5 or focus() > 80 } or target.timetodie() < 5 } spell(arcane_shot)
  #steady_shot
- Spell(steady_shot)
+ spell(steady_shot)
 }
 
-AddFunction MarksmanshipStMainPostConditions
+AddFunction marksmanshipstmainpostconditions
 {
 }
 
-AddFunction MarksmanshipStShortCdActions
+AddFunction marksmanshipstshortcdactions
 {
  #explosive_shot
- Spell(explosive_shot)
+ spell(explosive_shot)
  #barrage,if=active_enemies>1
- if Enemies(tagged=1) > 1 Spell(barrage)
+ if enemies(tagged=1) > 1 spell(barrage)
  #a_murder_of_crows
- Spell(a_murder_of_crows)
+ spell(a_murder_of_crows)
 
- unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot)
+ unless target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or { buffexpires(trueshot_buff) or focus() < 70 } and spell(rapid_fire)
  {
-  #piercing_shot
-  Spell(piercing_shot)
-  #purifying_blast,if=!buff.trueshot.up
-  if not BuffPresent(trueshot_buff) Spell(purifying_blast)
+  #blood_of_the_enemy,if=buff.trueshot.up&(buff.unerring_vision.stack>4|!azerite.unerring_vision.enabled)|target.time_to_die<11
+  if buffpresent(trueshot_buff) and { buffstacks(unerring_vision_buff) > 4 or not hasazeritetrait(unerring_vision_trait) } or target.timetodie() < 11 spell(blood_of_the_enemy)
 
-  unless not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence)
+  unless buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot) or { buffpresent(trueshot_buff) or { buffexpires(double_tap_buff) or talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } } and buffexpires(precise_shots_buff) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) and spellcooldown(trueshot) > 0 } and Speed() == 0 and spell(aimed_shot) or buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot)
   {
-   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-   if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+   #piercing_shot
+   spell(piercing_shot)
+   #purifying_blast,if=!buff.trueshot.up|target.time_to_die<8
+   if not buffpresent(trueshot_buff) or target.timetodie() < 8 spell(purifying_blast)
+
+   unless { focus() + focusregenrate() * gcd() < maxfocus() and buffexpires(trueshot_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) or spellfullrecharge(concentrated_flame_essence) < gcd() or target.timetodie() < 5 } and spell(concentrated_flame_essence)
+   {
+    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
+    if buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 or target.timetodie() < 5 spell(the_unbound_force)
+   }
   }
  }
 }
 
-AddFunction MarksmanshipStShortCdPostConditions
+AddFunction marksmanshipstshortcdpostconditions
 {
- target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or { buffexpires(trueshot_buff) or focus() < 70 } and spell(rapid_fire) or buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot) or { buffpresent(trueshot_buff) or { buffexpires(double_tap_buff) or talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } } and buffexpires(precise_shots_buff) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) and spellcooldown(trueshot) > 0 } and Speed() == 0 and spell(aimed_shot) or buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot) or { focus() + focusregenrate() * gcd() < maxfocus() and buffexpires(trueshot_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) or spellfullrecharge(concentrated_flame_essence) < gcd() or target.timetodie() < 5 } and spell(concentrated_flame_essence) or buffexpires(trueshot_buff) and { buffpresent(precise_shots_buff) and { focus() > 41 or buffpresent(master_marksman_buff) } or { focus() > 50 and hasazeritetrait(focused_fire_trait) or focus() > 75 } and { spellcooldown(trueshot) > 5 or focus() > 80 } or target.timetodie() < 5 } and spell(arcane_shot) or spell(steady_shot)
 }
 
-AddFunction MarksmanshipStCdActions
+AddFunction marksmanshipstcdactions
 {
- unless Spell(explosive_shot) or Enemies(tagged=1) > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire)
+ unless spell(explosive_shot) or enemies(tagged=1) > 1 and spell(barrage) or spell(a_murder_of_crows) or target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or { buffexpires(trueshot_buff) or focus() < 70 } and spell(rapid_fire)
  {
-  #blood_of_the_enemy,if=buff.trueshot.up&(buff.unerring_vision.stack>4|!azerite.unerring_vision.enabled)|target.time_to_die<11
-  if BuffPresent(trueshot_buff) and { BuffStacks(unerring_vision_buff) > 4 or not HasAzeriteTrait(unerring_vision_trait) } or target.TimeToDie() < 11 Spell(blood_of_the_enemy)
-  #focused_azerite_beam,if=!buff.trueshot.up
-  if not BuffPresent(trueshot_buff) Spell(focused_azerite_beam)
+  #focused_azerite_beam,if=!buff.trueshot.up|target.time_to_die<5
+  if not buffpresent(trueshot_buff) or target.timetodie() < 5 spell(focused_azerite_beam)
  }
 }
 
-AddFunction MarksmanshipStCdPostConditions
+AddFunction marksmanshipstcdpostconditions
 {
- Spell(explosive_shot) or Enemies(tagged=1) > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or not BuffPresent(trueshot_buff) and Spell(purifying_blast) or not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ spell(explosive_shot) or enemies(tagged=1) > 1 and spell(barrage) or spell(a_murder_of_crows) or target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or { buffexpires(trueshot_buff) or focus() < 70 } and spell(rapid_fire) or buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and not buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot) or { buffpresent(trueshot_buff) or { buffexpires(double_tap_buff) or talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } } and buffexpires(precise_shots_buff) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) and spellcooldown(trueshot) > 0 } and spell(aimed_shot) or buffpresent(trueshot_buff) and buffpresent(master_marksman_buff) and buffpresent(memory_of_lucid_dreams_essence_buff) and spell(arcane_shot) or spell(piercing_shot) or { not buffpresent(trueshot_buff) or target.timetodie() < 8 } and spell(purifying_blast) or { focus() + focusregenrate() * gcd() < maxfocus() and buffexpires(trueshot_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame_essence) or spellfullrecharge(concentrated_flame_essence) < gcd() or target.timetodie() < 5 } and spell(concentrated_flame_essence) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 or target.timetodie() < 5 } and spell(the_unbound_force) or buffexpires(trueshot_buff) and { buffpresent(precise_shots_buff) and { focus() > 41 or buffpresent(master_marksman_buff) } or { focus() > 50 and hasazeritetrait(focused_fire_trait) or focus() > 75 } and { spellcooldown(trueshot) > 5 or focus() > 80 } or target.timetodie() < 5 } and spell(arcane_shot) or spell(steady_shot)
 }
 
 ### actions.trickshots
 
-AddFunction MarksmanshipTrickshotsMainActions
+AddFunction marksmanshiptrickshotsmainactions
 {
  #aimed_shot,if=buff.trick_shots.up&ca_execute&buff.double_tap.up
- if BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } Spell(aimed_shot)
+ if buffpresent(trick_shots_buff) and talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } and buffpresent(double_tap_buff) and Speed() == 0 spell(aimed_shot)
  #rapid_fire,if=buff.trick_shots.up&(azerite.focused_fire.enabled|azerite.in_the_rhythm.rank>1|azerite.surging_shots.enabled|talent.streamline.enabled)
- if BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } Spell(rapid_fire)
+ if buffpresent(trick_shots_buff) and { hasazeritetrait(focused_fire_trait) or azeritetraitrank(in_the_rhythm_trait) > 1 or hasazeritetrait(surging_shots_trait) or hastalent(streamline_talent) } spell(rapid_fire)
  #aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|cooldown.aimed_shot.full_recharge_time<action.aimed_shot.cast_time|buff.trueshot.up)
- if BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } Spell(aimed_shot)
+ if buffpresent(trick_shots_buff) and { buffexpires(precise_shots_buff) or spellcooldown(aimed_shot) < casttime(aimed_shot) or buffpresent(trueshot_buff) } and Speed() == 0 spell(aimed_shot)
  #rapid_fire,if=buff.trick_shots.up
- if BuffPresent(trick_shots_buff) Spell(rapid_fire)
+ if buffpresent(trick_shots_buff) spell(rapid_fire)
  #multishot,if=buff.trick_shots.down|buff.precise_shots.up&!buff.trueshot.up|focus>70
- if BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 Spell(multishot_mm)
+ if buffexpires(trick_shots_buff) or buffpresent(precise_shots_buff) and not buffpresent(trueshot_buff) or focus() > 70 spell(multishot_mm)
  #concentrated_flame
- Spell(concentrated_flame_essence)
+ spell(concentrated_flame_essence)
  #serpent_sting,if=refreshable&!action.serpent_sting.in_flight
- if target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) Spell(serpent_sting_mm)
+ if target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) spell(serpent_sting_mm)
  #steady_shot
- Spell(steady_shot)
+ spell(steady_shot)
 }
 
-AddFunction MarksmanshipTrickshotsMainPostConditions
+AddFunction marksmanshiptrickshotsmainpostconditions
 {
 }
 
-AddFunction MarksmanshipTrickshotsShortCdActions
+AddFunction marksmanshiptrickshotsshortcdactions
 {
  #barrage
- Spell(barrage)
+ spell(barrage)
  #explosive_shot
- Spell(explosive_shot)
+ spell(explosive_shot)
 
- unless BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm)
+ unless buffpresent(trick_shots_buff) and talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } and buffpresent(double_tap_buff) and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and { hasazeritetrait(focused_fire_trait) or azeritetraitrank(in_the_rhythm_trait) > 1 or hasazeritetrait(surging_shots_trait) or hastalent(streamline_talent) } and spell(rapid_fire) or buffpresent(trick_shots_buff) and { buffexpires(precise_shots_buff) or spellcooldown(aimed_shot) < casttime(aimed_shot) or buffpresent(trueshot_buff) } and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots_buff) and not buffpresent(trueshot_buff) or focus() > 70 } and spell(multishot_mm)
  {
   #purifying_blast
-  Spell(purifying_blast)
+  spell(purifying_blast)
 
-  unless Spell(concentrated_flame_essence)
-  {
-   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-   if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
-   #piercing_shot
-   Spell(piercing_shot)
-   #a_murder_of_crows
-   Spell(a_murder_of_crows)
-  }
- }
-}
-
-AddFunction MarksmanshipTrickshotsShortCdPostConditions
-{
- BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm) or Spell(concentrated_flame_essence) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Spell(steady_shot)
-}
-
-AddFunction MarksmanshipTrickshotsCdActions
-{
- unless Spell(barrage) or Spell(explosive_shot) or BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm)
- {
-  #focused_azerite_beam
-  Spell(focused_azerite_beam)
-
-  unless Spell(purifying_blast) or Spell(concentrated_flame_essence)
+  unless spell(concentrated_flame_essence)
   {
    #blood_of_the_enemy
-   Spell(blood_of_the_enemy)
+   spell(blood_of_the_enemy)
+   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+   if buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 spell(the_unbound_force)
+   #piercing_shot
+   spell(piercing_shot)
+   #a_murder_of_crows
+   spell(a_murder_of_crows)
   }
  }
 }
 
-AddFunction MarksmanshipTrickshotsCdPostConditions
+AddFunction marksmanshiptrickshotsshortcdpostconditions
 {
- Spell(barrage) or Spell(explosive_shot) or BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and { Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(piercing_shot) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Spell(steady_shot)
+ buffpresent(trick_shots_buff) and talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } and buffpresent(double_tap_buff) and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and { hasazeritetrait(focused_fire_trait) or azeritetraitrank(in_the_rhythm_trait) > 1 or hasazeritetrait(surging_shots_trait) or hastalent(streamline_talent) } and spell(rapid_fire) or buffpresent(trick_shots_buff) and { buffexpires(precise_shots_buff) or spellcooldown(aimed_shot) < casttime(aimed_shot) or buffpresent(trueshot_buff) } and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots_buff) and not buffpresent(trueshot_buff) or focus() > 70 } and spell(multishot_mm) or spell(concentrated_flame_essence) or target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or spell(steady_shot)
+}
+
+AddFunction marksmanshiptrickshotscdactions
+{
+ unless spell(barrage) or spell(explosive_shot) or buffpresent(trick_shots_buff) and talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } and buffpresent(double_tap_buff) and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and { hasazeritetrait(focused_fire_trait) or azeritetraitrank(in_the_rhythm_trait) > 1 or hasazeritetrait(surging_shots_trait) or hastalent(streamline_talent) } and spell(rapid_fire) or buffpresent(trick_shots_buff) and { buffexpires(precise_shots_buff) or spellcooldown(aimed_shot) < casttime(aimed_shot) or buffpresent(trueshot_buff) } and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots_buff) and not buffpresent(trueshot_buff) or focus() > 70 } and spell(multishot_mm)
+ {
+  #focused_azerite_beam
+  spell(focused_azerite_beam)
+ }
+}
+
+AddFunction marksmanshiptrickshotscdpostconditions
+{
+ spell(barrage) or spell(explosive_shot) or buffpresent(trick_shots_buff) and talent(careful_aim_talent) and { target.healthpercent() > 80 or target.healthpercent() < 20 } and buffpresent(double_tap_buff) and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and { hasazeritetrait(focused_fire_trait) or azeritetraitrank(in_the_rhythm_trait) > 1 or hasazeritetrait(surging_shots_trait) or hastalent(streamline_talent) } and spell(rapid_fire) or buffpresent(trick_shots_buff) and { buffexpires(precise_shots_buff) or spellcooldown(aimed_shot) < casttime(aimed_shot) or buffpresent(trueshot_buff) } and Speed() == 0 and spell(aimed_shot) or buffpresent(trick_shots_buff) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots_buff) and not buffpresent(trueshot_buff) or focus() > 70 } and spell(multishot_mm) or spell(purifying_blast) or spell(concentrated_flame_essence) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 } and spell(the_unbound_force) or spell(piercing_shot) or spell(a_murder_of_crows) or target.refreshable(serpent_sting_mm_debuff) and not inflighttotarget(serpent_sting_mm) and spell(serpent_sting_mm) or spell(steady_shot)
 }
 ]]
 

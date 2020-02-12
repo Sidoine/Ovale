@@ -260,6 +260,7 @@ Define(reaping_flames_essence 311195)
 Define(moment_of_glory_essence 311203)
   SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
 Define(replica_of_knowledge_essence 312725)
+Define(vision_of_perfection_essence_id 299368)
 
 ###
 ### Racials
