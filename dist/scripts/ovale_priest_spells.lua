@@ -146,7 +146,7 @@ Define(reaping_flames_1 311194)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
   SpellInfo(reaping_flames_1 cd=45 channel=0)
 Define(reaping_flames_2 311195)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.
   SpellInfo(reaping_flames_2 cd=45 channel=0)
 Define(reaping_flames_3 311202)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
@@ -214,10 +214,16 @@ Define(the_unbound_force_7 299378)
   SpellAddBuff(the_unbound_force_7 the_unbound_force_7=1)
   SpellAddTargetDebuff(the_unbound_force_7 the_unbound_force_7=1)
 Define(vampiric_touch 34914)
+  SpellInfo(vampiric_touch insanity=-6)
+  SpellRequire(vampiric_touch insanity_percent 200=buff,surrender_to_madness_buff)
+  SpellAddTargetDebuff(vampiric_touch vampiric_touch_debuff=1)
+  SpellAddTargetDebuff(vampiric_touch shadow_word_pain_debuff=1 talent=misery_talent)
+Define(vampiric_touch_debuff 34914)
+  SpellInfo(vampiric_touch_debuff duration=21 haste=spell tick=3)
 # A touch of darkness that causes 34914o2 Shadow damage over 21 seconds, and heals you for e2*100 of damage dealt.rnrnIf Vampiric Touch is dispelled, the dispeller flees in Horror for 3 seconds.rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r
-  SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)
+  # SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
-  SpellAddTargetDebuff(vampiric_touch vampiric_touch=1)
+  # SpellAddTargetDebuff(vampiric_touch vampiric_touch=1)
 Define(void_bolt_0 228266)
 # For the duration of Voidform, your Void Eruption ability is replaced by Void Bolt:rnrn@spelltooltip205448
   SpellInfo(void_bolt_0 channel=0 gcd=0 offgcd=1)
@@ -406,13 +412,6 @@ Define(vampiric_embrace 15286)
 	SpellAddBuff(vampiric_embrace vampiric_embrace_buff=1)
 Define(vampiric_embrace_buff 15286)
 	SpellInfo(vampiric_embrace_buff duration=15)
-
-	SpellInfo(vampiric_touch insanity=-6)
-	SpellRequire(vampiric_touch insanity_percent 200=buff,surrender_to_madness_buff)
-	SpellAddTargetDebuff(vampiric_touch vampiric_touch_debuff=1)
-	SpellAddTargetDebuff(vampiric_touch shadow_word_pain_debuff=1 talent=misery_talent)
-Define(vampiric_touch_debuff 34914)
-	SpellInfo(vampiric_touch_debuff duration=21 haste=spell tick=3)
 Define(void_bolt 205448)
 	SpellInfo(void_bolt cd=4.5 insanity=-16 cd_haste=spell)
 	SpellRequire(void_bolt unusable 1=buff,!voidform_buff)
