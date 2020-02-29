@@ -1,0 +1,71 @@
+local __exports = LibStub:GetLibrary("ovale/scripts/ovale_druid")
+if not __exports then return end
+__exports.registerDruidRestorationHooves = function(OvaleScripts)
+
+do
+	local name = "hooves_resto"
+	local desc = "[Hooves][8.3] Druid: Restoration"
+	local code = [[
+  Include(ovale_common)
+
+  Include(ovale_trinkets_mop)
+  Include(ovale_trinkets_wod)
+  Include(ovale_druid_spells)
+
+  Define(travel_form 783)
+  Define(travel_form_buff 783)
+
+  # Restoration
+  AddIcon specialization=4 help=main
+  {
+      # Pre-combat stuff
+      if not mounted() and HealthPercent() > 1
+      {
+    # keep lifebloom and rejuv on tank
+      if HasFocus() and focus.TicksRemaining(lifebloom_buff) <= 0 and focus.BuffRemains(lifebloom_buff) < 5 and focustarget.Present() and not focustarget.IsFriend() Spell(lifebloom)
+      if not focus.BuffPresent(rejuvenation_buff) and focustarget.Present() and not focustarget.IsFriend() Spell(rejuvenation)
+
+
+  # wild growth if party health is less than 60%
+  if PartyMembersInRange(wild_growth) >= 3 and PartyMembersWithHealthPercent(less 85) >= 3 and { Speed() == 0 or CanMove() > 0 } Spell(wild_growth)
+  # swiftmend at 35%
+  if target.HealthPercent() <= 35 Spell(swiftmend)
+  # cenarion ward at 35%
+  if target.HealthPercent() <= 35 Spell(cenarion_ward)
+  # if clearcasting - regrowth
+  if BuffPresent(clearcasting_buff) and target.HealthPercent() <= 80 Spell(regrowth)
+  # regrowth at 60%
+  if target.HealthPercent() <= 60% Spell(regrowth)
+  # rejuve
+  if not target.BuffPresent(rejuvenation_buff) Spell(rejuvenation)
+  # regrowth
+
+  #
+  #
+  #### if bigdick aoe needed
+  # lifebloom self
+  # wild growth if party health is less than 80%
+  # swiftmend at 35%
+  # cenarion ward at 35%
+  # regrowth at 60%
+  # rejuve
+  #
+  #
+  #
+  #
+  #
+  #
+  #
+  }
+}
+
+AddFunction HasFocus
+{
+	focus.Present() and focus.InRange(lifebloom) and focus.HealthPercent() > 0
+}
+
+
+]]
+		OvaleScripts:RegisterScript("DRUID", "restoration", name, desc, code, "script")
+	end
+end

@@ -242,6 +242,7 @@ Define(worldvein_resonance_essence 295186)
 Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
+Define(conflict_and_strife_essence 304121)
 
 # Essences: TODO import from simc
 Define(anima_of_life_and_death_essence_id 7)

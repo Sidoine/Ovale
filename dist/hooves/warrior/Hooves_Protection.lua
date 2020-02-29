@@ -54,13 +54,14 @@ AddFunction ProtectionGetInMeleeRange
 
 
 ### actions.default
-
+AddCheckBox(UseRevenge L(REVENGE))
 AddFunction ProtectionDefaultMainActions
 {
  #potion,if=buff.avatar.up|target.time_to_die<25
  if { BuffPresent(avatar_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(superior_battle_potion_of_strength usable=1)
  #ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
- if RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } Spell(ignore_pain)
+ if {CheckBoxOn(UseRevenge) and RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 }} Spell(revenge)
+ if {not CheckBoxOn(UseRevenge)} and RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } Spell(ignore_pain)
  #worldvein_resonance_essence,if=cooldown.avatar.remains<=2
  if SpellCooldown(avatar) <= 2 Spell(worldvein_resonance_essence)
  #ripple_in_space_essence
