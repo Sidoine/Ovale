@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80201)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80300)
 if not __exports then return end
 __exports.registerCommon = function(OvaleScripts)
     local name = "ovale_common"
@@ -135,6 +135,8 @@ Define(coagulated_nightwell_residue 137400)
 Define(cunning_of_the_deceiver 242629)
 Define(convergence_of_fates 140806)
 Define(draught_of_souls 140808)
+Define(edits_of_the_faithless 169315)
+    ItemInfo(edits_of_the_faithless unusable=1)
 Define(gnawed_thumb_ring 134526)
 	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
@@ -169,6 +171,7 @@ Define(hyperthread_wristwraps_300142 300142)
 Define(hyperthread_wristwraps_item 168989)
 Define(balefire_branch_item 159630)
 Define(ignition_mages_fuse_item 159615)
+Define(azsharas_font_of_power_item 169314)
 
 ###
 ### Legendary Meta Gem
@@ -203,7 +206,7 @@ Define(archmages_greater_incandescence_str_buff 177175)
 	SpellInfo(archmages_greater_incandescence_str_buff duration=10)
 Define(archmages_incandescence_str_buff 177160)
 	SpellInfo(archmages_incandescence_str_buff duration=10)
-	
+
 ###
 ### Legendary Shared legiondaries
 ###
@@ -212,12 +215,12 @@ Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 Define(ashvanes_razor_coral_item 169311)
-	
+
 ### Missing items (temporary)
 Define(dread_combatants_insignia_item 161813)
 Define(dread_combatants_medallion_item 161811)
 
-### Missing spells 
+### Missing spells
 Define(trinket_grongs_primal_rage_cooldown_buff 288267)
 Define(trinket_ashvanes_razor_coral_cooldown_buff 303568)
 Define(hyperthread_wristwraps_300142 300142)
@@ -228,32 +231,37 @@ Define(conductive_ink_debuff 302565)
 ### Essences
 ###
 
+Define(anima_of_death_essence 294926)
+    SpellInfo(anima_of_death_essence tag=cd)
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
-    Define(concentrated_flame_burn_debuff 295368)
+Define(concentrated_flame_burn_debuff 295368)
+    SpellInfo(concentrated_flame_burn_debuff duration=6)
+    SpellAddTargetDebuff(concentrated_flame_essence concentrated_flame_burn_debuff=1)
+Define(focused_azerite_beam_essence 295258)
+    SpellInfo(focused_azerite_beam_essence cd=90 tag=cd)
 Define(memory_of_lucid_dreams_essence 298357)
     SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
     Define(memory_of_lucid_dreams_essence_buff 298357)
 Define(ripple_in_space_essence 302731)
     SpellInfo(ripple_in_space_essence cd=60 tag=shortcd)
+Define(the_unbound_force_essence 298452)
+    SpellInfo(the_unbound_force_essence cd=60 tag=shortcd)
+    Define(reckless_force_counter_buff 302917)
+    SpellInfo(reckless_force_counter_buff max_stacks=20)
 Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
 Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
+Define(reaping_flames_essence 311195)
+  SpellInfo(reaping_flames_essence cd=90 tag=shortcd)
+Define(moment_of_glory_essence 311203)
+  SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
+Define(replica_of_knowledge_essence 312725)
+Define(vision_of_perfection_essence_id 299368)
 
-
-# Essences: TODO import from simc
-Define(anima_of_life_and_death_essence_id 7)
-Define(blood_of_the_enemy_essence_id 23)
-Define(condensed_lifeforce_essence_id 14)
-Define(conflict_and_strife_essence_id 32)
-Define(essence_of_the_focusing_iris_essence_id 5)
-Define(memory_of_lucid_dreams_essence_id 27)
-Define(the_crucible_of_flame_essence_id 12)
-Define(vision_of_perfection_essence_id 22)
-Define(worldvein_resonance_essence_id 4)
 ###
 ### Racials
 ###
@@ -322,18 +330,20 @@ Define(fireblood 265221)
 	SpellInfo(fireblood cd=120)
 Define(ancestral_call 274738)
 	SpellInfo(ancestral_call cd=120)
-Define(arcane_pulse 260364)  
+Define(arcane_pulse 260364)
 	SpellInfo(arcane_pulse cd=180)
 	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
 Define(arcane_pulse_debuff 260369)
 	SpellInfo(arcane_pulse_debuff duration=12)
-	
+Define(bag_of_tricks 312411)
+  SpellInfo(bag_of_tricks cd=90)
+
 ###
 ### Boss Spells
 ###
 Define(misery_debuff 243961)
 	SpellInfo(misery_debuff duration=7)
-	
+
 ###
 ### Healing
 ###
@@ -347,7 +357,7 @@ AddFunction UseRacialSurvivalActions
 AddFunction UseHealthPotions
 {
 	Item(healthstone usable=1)
-	if CheckBoxOn(opt_use_consumables) 
+	if CheckBoxOn(opt_use_consumables)
 	{
         Item(coastal_healing_potion usable=1)
         Item(astral_healing_potion usable=1)
@@ -360,20 +370,6 @@ AddFunction UseHealthPotions
 ### Xel's custom stuff
 ###
 
-# Movement allowing defines
-Define(stellar_drift_buff 202461)
-Define(norgannons_foresight_buff 236380)
-Define(spiritwalkers_grace_buff 79206)
-
-AddFunction CanMove
-{
-	if BuffPresent(norgannons_foresight_buff) 1
-    if BuffPresent(stellar_drift_buff) 1
-	if BuffPresent(ice_floes_buff) 1
-	if BuffPresent(spiritwalkers_grace_buff) 1
-    0
-}
-
 AddFunction Boss
 {
 	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or target.Classification(rare) or { target.IsPvP() and not target.IsFriend() }
@@ -382,6 +378,7 @@ AddFunction Boss
 Define(ghost_debuff 8326)
 AddFunction Dead
 {
+  if IsDead() 1
 	if Health() <= 0 1
 	if DebuffPresent(ghost_debuff) 1
 	0
