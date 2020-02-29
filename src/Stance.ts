@@ -25,16 +25,17 @@ const [rogue_stealth] = GetSpellInfo(1784);
 
 type Stance = "druid_cat_form" | "druid_travel_form" | "druid_aquatic_form" | "druid_bear_form" | "druid_moonkin_form" | "druid_flight_form" | "druid_swift_flight_form" | "rogue_stealth";
 
-let SPELL_NAME_TO_STANCE: LuaObj<Stance> = {
-    [druidCatForm]: "druid_cat_form",
-    [druidTravelForm]: "druid_travel_form",
-    [druidAquaticForm]: "druid_aquatic_form",
-    [druidBearForm]: "druid_bear_form",
-    [druidMoonkinForm]: "druid_moonkin_form",
-    [druid_flight_form]: "druid_flight_form",
-    [druid_swift_flight_form]: "druid_swift_flight_form",
-    [rogue_stealth]: "rogue_stealth"
-}
+let SPELL_NAME_TO_STANCE: LuaObj<Stance> = {};
+
+if (druidCatForm) SPELL_NAME_TO_STANCE[druidCatForm] = "druid_cat_form";
+if (druidTravelForm) SPELL_NAME_TO_STANCE[druidTravelForm] = "druid_travel_form";
+if (druidAquaticForm) SPELL_NAME_TO_STANCE[druidAquaticForm] = "druid_aquatic_form";
+if (druidBearForm) SPELL_NAME_TO_STANCE[druidBearForm] = "druid_bear_form";
+if (druidMoonkinForm) SPELL_NAME_TO_STANCE[druidMoonkinForm] = "druid_moonkin_form";
+if (druid_flight_form) SPELL_NAME_TO_STANCE[druid_flight_form] = "druid_flight_form";
+if (druid_swift_flight_form) SPELL_NAME_TO_STANCE[druid_swift_flight_form] = "druid_swift_flight_form";
+if (rogue_stealth) SPELL_NAME_TO_STANCE[rogue_stealth] = "rogue_stealth";
+
 export const STANCE_NAME: {[key in Stance]: boolean } = {
     druid_aquatic_form: true,
     druid_bear_form: true,
@@ -49,7 +50,7 @@ export const STANCE_NAME: {[key in Stance]: boolean } = {
 let array = {}
 
 class StanceData {
-    stance: number = undefined;
+    stance: number = 0;
 }
 
 export class OvaleStanceClass extends States<StanceData> implements StateModule {
@@ -120,10 +121,12 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
         for (let i = 1; i <= GetNumShapeshiftForms(); i += 1) {
             [, , , spellId] = GetShapeshiftFormInfo(i);
             [name] = GetSpellInfo(spellId);
-            stanceName = SPELL_NAME_TO_STANCE[name];
-            if (stanceName) {
-                this.stanceList[i] = stanceName;
-                this.stanceId[stanceName] = i;
+            if (name) {
+                stanceName = SPELL_NAME_TO_STANCE[name];
+                if (stanceName) {
+                    this.stanceList[i] = stanceName;
+                    this.stanceId[stanceName] = i;
+                }
             }
         }
         this.profiler.StopProfiling("OvaleStance_CreateStanceList");
@@ -145,7 +148,7 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
         stanceId = stanceId || this.current.stance;
         return this.stanceList[stanceId];
     }
-    IsStance(name: string|number, atTime: number) {
+    IsStance(name: string|number, atTime: number | undefined) {
         const state = this.GetState(atTime);
         if (name && state.stance) {
             if (type(name) == "number") {
@@ -176,7 +179,7 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
         this.ShapeshiftEventHandler();
         this.ready = true;
     }
-    RequireStanceHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+    RequireStanceHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string | undefined):[boolean, string, number] => {
         let verified = false;
         let stance = tokens[index];
         index = index + 1;
@@ -205,13 +208,13 @@ export class OvaleStanceClass extends States<StanceData> implements StateModule 
     }
 
     InitializeState() {
-        this.next.stance = undefined;
+        this.next.stance = 0;
     }
     CleanState(): void {
     }
     ResetState() {
         this.profiler.StartProfiling("OvaleStance_ResetState");
-        this.next.stance = this.current.stance || 0;
+        this.next.stance = this.current.stance;
         this.profiler.StopProfiling("OvaleStance_ResetState");
     }
     ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {

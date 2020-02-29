@@ -72,14 +72,14 @@ let array = {}
 //let CLEU_SCHOOL_MASK_MAGIC = bit_bor(_SCHOOL_MASK_ARCANE, _SCHOOL_MASK_FIRE, _SCHOOL_MASK_FROST, _SCHOOL_MASK_HOLY, _SCHOOL_MASK_NATURE, _SCHOOL_MASK_SHADOW);
 
 
-export interface Aura {
+export interface Aura extends SpellCast {
     serial: number;
     stacks: number;
     start: number;
     ending: number;
     debuffType: number | string | undefined;
     filter: AuraType;
-    state: any;
+    state: boolean;
     name: string;
     gain: number;
     spellId: number;
@@ -509,22 +509,20 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
     }
-    IsActiveAura(aura: Aura | undefined, atTime: number) : aura is Aura {
+    IsActiveAura(aura: Aura, atTime: number) : aura is Aura {
         let boolean = false;
         atTime = atTime || this.baseState.next.currentTime;
-        if (aura) {
-            if (aura.state) {
-                if (aura.serial == this.next.auraSerial && aura.stacks > 0 && aura.gain <= atTime && atTime <= aura.ending) {
-                    boolean = true;
-                } else if (aura.consumed && this.IsWithinAuraLag(aura.ending, atTime)) {
-                    boolean = true;
-                }
-            } else {
-                if (aura.serial == this.current.serial[aura.guid] && aura.stacks > 0 && aura.gain <= atTime && atTime <= aura.ending) {
-                    boolean = true;
-                } else if (aura.consumed && this.IsWithinAuraLag(aura.ending, atTime)) {
-                    boolean = true;
-                }
+        if (aura.state) {
+            if (aura.serial == this.next.auraSerial && aura.stacks > 0 && aura.gain <= atTime && atTime <= aura.ending) {
+                boolean = true;
+            } else if (aura.consumed && this.IsWithinAuraLag(aura.ending, atTime)) {
+                boolean = true;
+            }
+        } else {
+            if (aura.serial == this.current.serial[aura.guid] && aura.stacks > 0 && aura.gain <= atTime && atTime <= aura.ending) {
+                boolean = true;
+            } else if (aura.consumed && this.IsWithinAuraLag(aura.ending, atTime)) {
+                boolean = true;
             }
         }
         return boolean;
@@ -699,11 +697,13 @@ export class OvaleAuraClass extends States<AuraInterface> {
                     }
                 } else {
                     const casterGUID = unitCaster && this.ovaleGuid.UnitGUID(unitCaster);
-                    if (debuffType == "") {
-                        debuffType = "enrage";
+                    if (casterGUID) {
+                        if (debuffType == "") {
+                            debuffType = "enrage";
+                        }
+                        const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
+                        this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
                     }
-                    const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
-                    this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
                     i = i + 1;
                 }
             }
@@ -727,7 +727,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         this.profiler.StopProfiling("OvaleAura_ScanAuras");
     }
 
-    RequireBuffHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequireBuffHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         let verified = false;
         let stacks = 1;
         let buffName = <string>tokens[index];
@@ -749,7 +749,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 if (targetGUID) {
                     guid = targetGUID;
                     const [unitIdForGuid] = this.ovaleGuid.GUIDUnit(guid);
-                    unitId = unitIdForGuid;
+                    unitId = unitIdForGuid || "target";
                 } else {
                     unitId = this.baseState.next.defaultTarget || "target";
                 }
@@ -765,24 +765,26 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 mine = !(strsub(requirement, -4) == "_any");
             }
             guid = guid || this.ovaleGuid.UnitGUID(unitId);
-            let aura = this.GetAuraByGUID(guid, buffId, filter, mine, atTime);
-            let isActiveAura = this.IsActiveAura(aura, atTime) && aura.stacks >= stacks;
-            if (!isBang && isActiveAura || isBang && !isActiveAura) {
-                verified = true;
-            }
-            let result = verified && "passed" || "FAILED";
-            if (isBang) {
-                this.debug.Log("    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s", buffName, stacks, unitId, atTime, result);
-            } else {
-                this.debug.Log("    Require aura %s with at least %d stack(s) on %s at time=%f: %s", buffName, stacks, unitId, atTime, result);
-            }
+            if (guid) {
+                let aura = this.GetAuraByGUID(guid, buffId, filter, mine, atTime);
+                let isActiveAura = aura && this.IsActiveAura(aura, atTime) && aura.stacks >= stacks;
+                if (!isBang && isActiveAura || isBang && !isActiveAura) {
+                    verified = true;
+                }
+                let result = verified && "passed" || "FAILED";
+                if (isBang) {
+                    this.debug.Log("    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s", buffName, stacks, unitId, atTime, result);
+                } else {
+                    this.debug.Log("    Require aura %s with at least %d stack(s) on %s at time=%f: %s", buffName, stacks, unitId, atTime, result);
+                }
+            }           
         } else {
             this.ovale.OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement);
         }
         return [verified, requirement, index];
     }
 
-    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
+    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string | undefined): [boolean, string, number] => {
         let verified = false;
         let stealthed = tokens[index];
         index = index + 1;
@@ -790,7 +792,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         if (stealthed) {
             stealthed = tonumber(stealthed);
             let aura = this.GetAura("player", "stealthed_buff", atTime, "HELPFUL", true);
-            let isActiveAura = this.IsActiveAura(aura, atTime);
+            let isActiveAura = aura && this.IsActiveAura(aura, atTime);
             if (stealthed == 1 && isActiveAura || stealthed != 1 && !isActiveAura) {
                 verified = true;
             }
@@ -818,7 +820,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
     DebugUnitAuras(unitId: string, filter: AuraType, atTime: number) {
         wipe(array);
         let guid = this.ovaleGuid.UnitGUID(unitId);
-        if (atTime && this.next.aura[guid]) {
+        if (atTime && guid && this.next.aura[guid]) {
             for (const [auraId, whoseTable] of pairs(this.next.aura[guid])) {
                 for (const [, aura] of pairs(whoseTable)) {
                     if (this.IsActiveAura(aura, atTime) && aura.filter == filter && !aura.state) {
@@ -828,7 +830,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 }
             }
         }
-        if (this.current.aura[guid]) {
+        if (guid && this.current.aura[guid]) {
             for (const [auraId, whoseTable] of pairs(this.current.aura[guid])) {
                 for (const [, aura] of pairs(whoseTable)) {
                     if (this.IsActiveAura(aura, atTime) && aura.filter == filter) {
@@ -869,7 +871,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return auraFound;
     }
 
-    GetStateDebuffType(guid: string, debuffType: number | string, filter: string, casterGUID: string, atTime: number) {
+    GetStateDebuffType(guid: string, debuffType: number | string, filter: AuraType | undefined, casterGUID: string, atTime: number) {
         let auraFound: Aura | undefined = undefined;
         if (this.current.aura[guid]) {
             for (const [, whoseTable] of pairs(this.current.aura[guid])) {
@@ -897,7 +899,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         }
         return auraFound;
     }
-    GetStateDebuffTypeAnyCaster(guid: string, debuffType: number | string, filter: string, atTime: number) {
+    GetStateDebuffTypeAnyCaster(guid: string, debuffType: number | string, filter: AuraType | undefined, atTime: number) {
         let auraFound;
         if (this.current.aura[guid]) {
             for (const [, whoseTable] of pairs(this.current.aura[guid])) {
@@ -927,7 +929,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         }
         return auraFound;
     }
-    GetStateAuraOnGUID(guid: string, auraId: AuraId, filter: string, mine: boolean | undefined, atTime: number) {
+    GetStateAuraOnGUID(guid: string, auraId: AuraId, filter: AuraType | undefined, mine: boolean | undefined, atTime: number) {
         let auraFound: Aura | undefined = undefined;
         if (DEBUFF_TYPE[auraId]) {
             if (mine) {
@@ -964,7 +966,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return auraFound;
     }
 
-    GetAuraByGUID(guid: string, auraId: AuraId, filter: AuraType, mine: boolean | undefined, atTime: number) {
+    GetAuraByGUID(guid: string, auraId: AuraId, filter: AuraType | undefined, mine: boolean | undefined, atTime: number) {
         let auraFound: Aura | undefined = undefined;
         if (this.ovaleData.buffSpellList[auraId]) {
             for (const [id] of pairs(this.ovaleData.buffSpellList[auraId])) {
@@ -990,16 +992,18 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return auraFound;
     }
 
-    GetAura(unitId: string, auraId: AuraId, atTime: number, filter: AuraType, mine?: boolean) {
+    GetAura(unitId: string, auraId: AuraId, atTime: number, filter?: AuraType, mine?: boolean) {
         const guid = this.ovaleGuid.UnitGUID(unitId);
+        if (!guid) return;
         return this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
     }
 
     GetAuraWithProperty(unitId: string, propertyName: keyof Aura, filter: AuraType, atTime: number): ConditionResult {
         let count = 0;
         let guid = this.ovaleGuid.UnitGUID(unitId);
-        let start: number | undefined = huge;
-        let ending: number | undefined = 0;
+        if (!guid) return [];
+        let start: number = huge;
+        let ending: number = 0;
         if (this.current.aura[guid]) {
             for (const [, whoseTable] of pairs(this.current.aura[guid])) {
                 for (const [, aura] of pairs(whoseTable)) {
@@ -1030,13 +1034,12 @@ export class OvaleAuraClass extends States<AuraInterface> {
             this.debug.Log("Aura with '%s' property found on %s (count=%s, minStart=%s, maxEnding=%s).", propertyName, unitId, count, start, ending);
         } else {
             this.debug.Log("Aura with '%s' property is missing on %s.", propertyName, unitId);
-            start = undefined;
-            ending = undefined;
+            return [];
         }
         return [start, ending];
     }
 
-    AuraCount(auraId: number, filter: AuraType, mine: boolean, minStacks: number | undefined, atTime: number, excludeUnitId: string | undefined) {
+    AuraCount(auraId: number, filter: AuraType | undefined, mine: boolean, minStacks: number | undefined, atTime: number, excludeUnitId: string | undefined) {
         this.profiler.StartProfiling("OvaleAura_state_AuraCount");
         minStacks = minStacks || 1;
         count = 0;
@@ -1048,19 +1051,19 @@ export class OvaleAuraClass extends States<AuraInterface> {
             if (guid != excludeGUID && auraTable[auraId]) {
                 if (mine && self_playerGUID) {
                     let aura = this.GetStateAura(guid, auraId, self_playerGUID, atTime);
-                    if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
+                    if (aura && this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
                         this.CountMatchingActiveAura(aura);
                     }
                     for (const [petGUID] of pairs(self_petGUID)) {
                         aura = this.GetStateAura(guid, auraId, petGUID, atTime);
-                        if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
+                        if (aura && this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
                             this.CountMatchingActiveAura(aura);
                         }
                     }
                 } else {
                     for (const [casterGUID] of pairs(auraTable[auraId])) {
                         let aura = this.GetStateAura(guid, auraId, casterGUID, atTime);
-                        if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
+                        if (aura && this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
                             this.CountMatchingActiveAura(aura);
                         }
                     }
@@ -1221,16 +1224,14 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 if (verified) {
                     let si = this.ovaleData.spellInfo[auraId];
                     let auraFound = this.GetAuraByGUID(guid, auraId, filter, true, atTime);
-                    let isActiveAura = this.IsActiveAura(auraFound, atTime)
-                    this.debug.Log("Aura found, checking if it is Active at %f => IsActiveAura=%s", atTime, isActiveAura && "true" || "FALSE");
-                    if (isActiveAura) {
+                    if (auraFound && this.IsActiveAura(auraFound, atTime)) {
                         let aura: Aura;
                         if (auraFound.state) {
                             aura = auraFound;
                         } else {
                             aura = this.AddAuraToGUID(guid, auraId, auraFound.source, filter, undefined, 0, huge, atTime);
                             for (const [k, v] of kpairs(auraFound)) {
-                                aura[k] = v;
+                                (<any>aura)[k] = v;
                             }
                             aura.serial = this.next.auraSerial;
                             this.debug.Log("Aura %d is copied into simulator.", auraId);
@@ -1356,14 +1357,14 @@ export class OvaleAuraClass extends States<AuraInterface> {
     }
     RemoveAuraOnGUID(guid: string, auraId: AuraId, filter: AuraType, mine: boolean, atTime: number) {
         let auraFound = this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
-        if (this.IsActiveAura(auraFound, atTime)) {
+        if (auraFound && this.IsActiveAura(auraFound, atTime)) {
             let aura;
             if (auraFound.state) {
                 aura = auraFound;
             } else {
                 aura = this.AddAuraToGUID(guid, auraId, auraFound.source, filter, undefined, 0, huge, atTime);
                 for (const [k, v] of kpairs(auraFound)) {
-                    aura[k] = v;
+                    (<any>aura)[k] = v;
                 }
                 aura.serial = this.next.auraSerial;
             }
@@ -1374,7 +1375,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
     }
 
 
-    GetBaseDuration(auraId: number, spellcast?: SpellCast) {
+    GetBaseDuration(auraId: number, spellcast?: PaperDollSnapshot) {
         spellcast = spellcast || this.ovalePaperDoll.current;
         let combopoints = spellcast.combopoints || 0;
         let duration = INFINITY
@@ -1396,6 +1397,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return duration;
     }
     GetTickLength(auraId: number, snapshot?: PaperDollSnapshot) {
+        snapshot = snapshot || this.ovalePaperDoll.current;
         let tick = 3;
         let si = this.ovaleData.spellInfo[auraId];
         if (si) {

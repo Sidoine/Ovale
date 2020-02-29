@@ -49,11 +49,11 @@ Define(chaos_strike 162794)
   SpellInfo(chaos_strike fury=40)
 
 Define(conductive_ink_0 302491)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
 
 Define(conductive_ink_1 302597)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
 
 Define(consume_magic 278326)
@@ -109,20 +109,30 @@ Define(fiery_brand 204021)
   SpellInfo(chaos_nova replaced_by=fiery_brand)
   # Dealing s1 less damage to the branding Demon Hunter.
   SpellAddBuff(fiery_brand fiery_brand=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)
 
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -131,11 +141,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -215,20 +225,29 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2/10 Pain.|r
   SpellInfo(shear pain=-10)
@@ -292,10 +311,11 @@ Define(vengeful_retreat 198793)
   SpellAddBuff(vengeful_retreat vengeful_retreat=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 Define(blind_fury_talent 1) #21854
@@ -332,7 +352,10 @@ Define(spirit_bomb_talent 17) #22513
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
+Define(unbridled_fury_item 169299)
+Define(steelskin_potion_item 152557)
 Define(chaotic_transformation_trait 288754)
+Define(eyes_of_rage_trait 278500)
 Define(revolving_blades_trait 279581)
     `;
 // END
@@ -375,12 +398,7 @@ Define(darkness 196718)
 	SpellInfo(death_sweep fury=35 cd=9 cd_haste=melee)
 	SpellInfo(death_sweep add_fury=-20 talent=first_blood_talent)
     SpellRequire(death_sweep add_fury_from_aura -3=buff,revolving_blades_buff)
-
-	SpellInfo(demon_spikes cd_haste=melee haste=melee specialization=vengeance cd=20 gcd=0 offgcd=1 charges=2)
-	SpellAddBuff(demon_spikes demon_spikes_buff=1)
-Define(demon_spikes_buff 203819)
-	SpellInfo(demon_spikes_buff duration=6)
-
+	
 	SpellInfo(demons_bite fury=-20)
 	SpellInfo(demons_bite unusable=1 talent=demon_blades_talent)
 
@@ -529,8 +547,7 @@ Define(void_reaver_debuff 268178)
 	
 #items
 Define(oblivions_embrace_item 151799)
-	SpellInfo(demon_spikes charges=3 if_equipped=oblivions_embrace)
-
+	
 # Tier set
 SpellInfo(demons_bite fury_percent=110 itemset=T19 itemcount=2)
 SpellInfo(felblade fury_percent=110 itemset=T19 itemcount=2)
@@ -580,7 +597,6 @@ Define(void_reaver_talent 20)
 
 # Tags
 SpellInfo(dark_slash tag=main)
-SpellInfo(demon_spikes tag=shortcd)
 SpellInfo(immolation_aura_havoc tag=main)
 SpellInfo(fel_barrage tag=shortcd)
 SpellInfo(fel_eruption tag=main)

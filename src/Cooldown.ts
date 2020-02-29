@@ -78,17 +78,17 @@ const BASE_GCD = {
 
 export interface Cooldown {
     serial?: number;
-    start?: number;
-    charges?: number;
-    duration?: number;
-    enable?: boolean;
-    maxCharges?: number;
-    chargeStart?: number;
-    chargeDuration?: number;
+    start: number;
+    charges: number;
+    duration: number;
+    enable: boolean;
+    maxCharges: number;
+    chargeStart: number;
+    chargeDuration: number;
 }
 
 export class CooldownData {
-    cd: LuaObj<Cooldown> = undefined;
+    cd: LuaObj<Cooldown> = {};
 }
 
 export class OvaleCooldownClass extends States<CooldownData> implements SpellCastModule {
@@ -174,7 +174,7 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
     ResetSharedCooldowns() {
         for (const [, spellTable] of pairs(this.sharedCooldown)) {
             for (const [spellId] of pairs(spellTable)) {
-                spellTable[spellId] = undefined;
+                delete spellTable[spellId];
             }
         }
     }
@@ -231,7 +231,7 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
                     cdEnable = enable;
                 }
             } else {
-                [cdStart, cdDuration, cdEnable] = [start || 0, duration, enable];
+                [cdStart, cdDuration, cdEnable] = [start || 0, duration || 0, enable];
             }
         }
         return [cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable];
@@ -246,16 +246,15 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
         }
         return [gcd, haste];
     }
-    CopySpellcastInfo = (mod: SpellCastModule, spellcast: SpellCast, dest: SpellCast) => {
+    CopySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
         if (spellcast.offgcd) {
             dest.offgcd = spellcast.offgcd;
         }
     }
-    SaveSpellcastInfo= (mod: SpellCastModule, spellcast: SpellCast) => {
+    SaveSpellcastInfo= (spellcast: SpellCast) => {
         let spellId = spellcast.spellId;
         if (spellId) {
-            let gcd:number| string;
-            gcd = this.ovaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
+            const gcd = this.ovaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
             if (gcd && gcd == 0) {
                 spellcast.offgcd = true;
             }
@@ -270,7 +269,7 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
             cdName = si.shared_cd;
         }
         if (!this.next.cd[cdName]) {
-            this.next.cd[cdName] = {}
+            this.next.cd[cdName] = { start: 0, duration: 0, enable: false, chargeDuration: 0, chargeStart: 0, charges: 0, maxCharges: 0 };
         }
         let cd = this.next.cd[cdName];
         if (!cd.start || !cd.serial || cd.serial < this.serial) {

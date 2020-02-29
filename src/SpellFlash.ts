@@ -13,13 +13,13 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStanceClass } from "./Stance";
 
 interface SpellFlashCoreClass {
-    FlashForm: (spellId: number, color: Color, size: number, brightness: number) => void;   
-    FlashPet: (spellId: number, color: Color, size: number, brightness: number) => void;
-    FlashAction: (spellId: number, color: Color, size: number, brightness: number) => void;
-    FlashItem: (spellId: number, color: Color, size: number, brightness: number) => void;
+    FlashForm: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;   
+    FlashPet: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
+    FlashAction: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
+    FlashItem: (spellId: number, color: Color | undefined, size: number, brightness: number) => void;
 }
 
-let SpellFlashCore: SpellFlashCoreClass = undefined;
+let SpellFlashCore: SpellFlashCoreClass | undefined = undefined;
 export interface Color {
     r?: number;
     g?: number;
@@ -92,7 +92,7 @@ export class OvaleSpellFlashClass {
 
     constructor(private ovaleOptions: OvaleOptionsClass, ovale: OvaleClass, private ovaleFuture: OvaleFutureClass, private ovaleData: OvaleDataClass, private ovaleSpellBook: OvaleSpellBookClass, private ovaleStance: OvaleStanceClass) {
         this.module = ovale.createModule("OvaleSpellFlash", this.OnInitialize, this.OnDisable, aceEvent);
-        this.ovaleOptions.options.args.apparence.spellFlash = this.getSpellFlashOptions();
+        this.ovaleOptions.options.args.apparence.args.spellFlash = this.getSpellFlashOptions();
     }
 
     private getSpellFlashOptions() {
@@ -284,13 +284,13 @@ export class OvaleSpellFlashClass {
         }
         return enabled;
     }
-    Flash(state: {}, node: AstNode, element: Element, start: number, now?:number) {
+    Flash(node: AstNode, element: Element | undefined, start: number, now?:number) {
         const db = this.ovaleOptions.db.profile.apparence.spellFlash
         now = now || GetTime();
         if (this.IsSpellFlashEnabled() && start && start - now <= db.threshold / 1000) {
             if (element && element.type == "action") {
                 let spellId, spellInfo;
-                if (element.lowername == "spell") {
+                if (element.name == "spell") {
                     spellId = <number>element.positionalParams[1];
                     spellInfo = this.ovaleData.spellInfo[spellId];
                 }
@@ -316,17 +316,19 @@ export class OvaleSpellFlashClass {
                     }
                 }
                 let brightness = db.brightness * 100;
-                if (element.lowername == "spell") {
-                    if (this.ovaleStance.IsStanceSpell(spellId)) {
-                        SpellFlashCore.FlashForm(spellId, color, size, brightness);
+                if (SpellFlashCore) {
+                    if (element.name == "spell" && spellId) {
+                        if (this.ovaleStance.IsStanceSpell(spellId)) {
+                            SpellFlashCore.FlashForm(spellId, color, size, brightness);
+                        }
+                        if (this.ovaleSpellBook.IsPetSpell(spellId)) {
+                            SpellFlashCore.FlashPet(spellId, color, size, brightness);
+                        }
+                        SpellFlashCore.FlashAction(spellId, color, size, brightness);
+                    } else if (element.name == "item") {
+                        let itemId = <number>element.positionalParams[1];
+                        SpellFlashCore.FlashItem(itemId, color, size, brightness);
                     }
-                    if (this.ovaleSpellBook.IsPetSpell(spellId)) {
-                        SpellFlashCore.FlashPet(spellId, color, size, brightness);
-                    }
-                    SpellFlashCore.FlashAction(spellId, color, size, brightness);
-                } else if (element.lowername == "item") {
-                    let itemId = <number>element.positionalParams[1];
-                    SpellFlashCore.FlashItem(itemId, color, size, brightness);
                 }
             }
         }

@@ -99,6 +99,8 @@ export class Unparser {
                 rhsExpression = this.Unparse(rhsNode);
             }
             expression = `${lhsExpression}${node.operator}${rhsExpression}`;
+        } else {
+            return "Unknown node expression type";
         }
         return expression;
     }

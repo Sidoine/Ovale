@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk_spells", 80201)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk_spells", 80300)
 if not __exports then return end
 __exports.registerMonkSpells = function(OvaleScripts)
     local name = "ovale_monk_spells"
@@ -7,6 +7,9 @@ __exports.registerMonkSpells = function(OvaleScripts)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -56,12 +59,44 @@ Define(bloodlust 2825)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
-Define(chi_burst 123986)
+Define(chi_burst_0 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
-  SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
-Define(chi_wave 115098)
+  SpellInfo(chi_burst_0 cd=30 duration=1 talent=chi_burst_talent)
+Define(chi_burst_1 130654)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+  SpellInfo(chi_burst_1 gcd=0 offgcd=1)
+Define(chi_burst_2 148135)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+  SpellInfo(chi_burst_2 gcd=0 offgcd=1)
+Define(chi_burst_3 261682)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+  SpellInfo(chi_burst_3 gcd=0 offgcd=1 chi=-1)
+Define(chi_wave_0 115098)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
-  SpellInfo(chi_wave cd=15 talent=chi_wave_talent)
+  SpellInfo(chi_wave_0 cd=15 talent=chi_wave_talent)
+Define(chi_wave_1 132463)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+  SpellInfo(chi_wave_1 channel=0 gcd=0 offgcd=1)
+Define(chi_wave_2 132466)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+  SpellInfo(chi_wave_2 channel=0 gcd=0 offgcd=1)
+Define(chi_wave_3 132467)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+  SpellInfo(chi_wave_3 duration=0.1 channel=0.1 gcd=0 offgcd=1)
+  SpellAddTargetDebuff(chi_wave_3 chi_wave_3=1)
+Define(conductive_ink_0 302491)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
+
+Define(conductive_ink_1 302597)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
+
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1 talent=dampen_harm_talent)
@@ -106,14 +141,24 @@ Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
   SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
@@ -121,8 +166,13 @@ Define(gift_of_the_ox 124502)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
   SpellInfo(gift_of_the_ox channel=0 gcd=0 offgcd=1)
   SpellAddBuff(gift_of_the_ox gift_of_the_ox=1)
+Define(gladiators_badge 277185)
+# Increases primary stat by s1 for 15 seconds.rn
+  SpellInfo(gladiators_badge cd=120 duration=15 channel=15 gcd=0 offgcd=1)
+  # Primary stat increased by s4.
+  SpellAddBuff(gladiators_badge gladiators_badge=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -131,11 +181,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -202,6 +252,40 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
+Define(razor_coral_0 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
+Define(razor_coral_1 303565)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_1 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  SpellAddBuff(razor_coral_1 razor_coral_1=1)
+Define(razor_coral_2 303568)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_2 duration=120 max_stacks=100 gcd=0 offgcd=1)
+  # Withdrawing the Razor Coral will grant w1 Critical Strike.
+  SpellAddTargetDebuff(razor_coral_2 razor_coral_2=1)
+Define(razor_coral_3 303570)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_3 duration=20 channel=20 max_stacks=100 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(razor_coral_3 razor_coral_3=1)
+Define(razor_coral_4 303572)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
+  SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reverse_harm 290461)
 # Heals a friendly target for m1 of their maximum health, and causes m2 of the amount healed to instantly be dealt to the nearest enemy as Nature damage within 5 yards. rnrn|cFFFFFFFFGenerates s3 Chi.
   SpellInfo(reverse_harm gcd=0 offgcd=1)
@@ -234,10 +318,6 @@ Define(storm_earth_and_fire 137639)
   SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=1)
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
-Define(swift_roundhouse_buff 278707)
-# Blackout Kick increases the damage of your next Rising Sun Kick by s1, stacking up to 278710u times.
-  SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(the_unbound_force_0 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force_0 cd=60 duration=2 channel=2 tick=0.33)
@@ -292,11 +372,16 @@ Define(whirling_dragon_punch 152175)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
   SpellInfo(whirling_dragon_punch cd=24 duration=1 gcd=1 tick=0.25 talent=whirling_dragon_punch_talent)
   SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
+SpellList(chi_burst chi_burst_0 chi_burst_1 chi_burst_2 chi_burst_3)
+SpellList(chi_wave chi_wave_0 chi_wave_1 chi_wave_2 chi_wave_3)
+SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
 SpellList(fireblood fireblood_0 fireblood_1)
+SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 Define(black_ox_brew_talent 9) #19992
 # Chug some Black Ox Brew, which instantly refills your Energy, and your Ironskin Brew and Purifying Brew charges.
@@ -330,6 +415,15 @@ Define(special_delivery_talent 16) #19819
 # Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+Define(superior_battle_potion_of_agility_item 168489)
+Define(ashvanes_razor_coral_item 169311)
+Define(cyclotronic_blast_item 167672)
+Define(dribbling_inkpod_item 169319)
+Define(gladiators_medallion_item 111306)
+Define(lustrous_golden_plumage_item 159617)
+Define(unbridled_fury_item 169299)
+Define(the_crucible_of_flame_essence_id 12)
+Define(worldvein_resonance_essence_id 4)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
@@ -342,7 +436,6 @@ SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free spec
 SpellAddBuff(blackout_kick_windwalker blackout_kick_buff=0 specialization=windwalker)
 SpellAddBuff(blackout_kick_windwalker teachings_of_the_monastery_buff=0 specialization=mistweaver)
 SpellAddTargetDebuff(blackout_kick_windwalker mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(blackout_kick_windwalker swift_roundhouse_buff=1)
 
 Define(blackout_kick_buff 116768)
 SpellInfo(blackout_kick_buff duration=15)
@@ -370,7 +463,7 @@ Define(chi_torpedo_buff 119085)
 # SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
 Define(dance_of_chiji_buff 286587)
     SpellInfo(dance_of_chiji_buff duration=15)
-    
+
 Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
 
@@ -472,7 +565,7 @@ Define(mana_tea 197908)
 
 Define(mark_of_the_crane_debuff 228287)
 		SpellInfo(mark_of_the_crane_debuff duration=15)
-		
+
 Define(mystic_touch 8647)
 Define(mystic_touch_debuff 113746)
 
@@ -484,7 +577,6 @@ Define(provoke 115546)
 SpellInfo(purifying_brew charges=3 cd_haste=melee)
 SpellInfo(purifying_brew add_cd=-3 charges=4 talent=light_brewing_talent)
 SpellInfo(purifying_brew unusable=1)
-SpellAddBuff(purifying_brew blackout_combo_buff=0)
 SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
 
 Define(reawaken 212051)
@@ -515,7 +607,6 @@ SpellInfo(rising_sun_kick cd_haste=spell cd=12 chi=0 specialization=mistweaver)
 SpellRequire(rising_sun_kick chi_percent 0=buff,serenity)
 SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
 SpellAddTargetDebuff(rising_sun_kick mark_of_the_crane_debuff=1 specialization=windwalker)
-SpellAddBuff(rising_sun_kick swift_roundhouse_buff=0)
 
 Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
@@ -530,7 +621,7 @@ Define(rushing_jade_wind_buff 116847)
 Define(rushing_jade_wind_windwalker_buff 261715)
     SpellInfo(rushing_jade_wind_windwalker_buff tick=0.8 haste=melee)
     SpellAddBuff(rushing_jade_wind rushing_jade_wind_windwalker_buff=1 specialization=windwalker)
-    
+
 Define(song_of_chiji 198898)
 	SpellInfo(song_of_chiji cd=30)
 	SpellAddTargetDebuff(song_of_chiji song_of_chiji_debuff=1)
@@ -553,8 +644,6 @@ Define(summon_black_ox_statue 115315)
 Define(summon_jade_serpent_statue 115313)
     SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
 
-SpellInfo(swift_roundhouse_buff max_stacks=2)
-
 Define(teachings_of_the_monastery 116645)
 Define(teachings_of_the_monastery_buff 202090)
 	SpellInfo(teachings_of_the_monastery_buff duration=12 max_stacks=3)
@@ -567,7 +656,7 @@ Define(thunder_focus_tea 116680)
 SpellInfo(tiger_palm energy=50 specialization=windwalker)
 SpellInfo(tiger_palm energy=25 specialization=brewmaster)
 SpellAddBuff(tiger_palm teachings_of_the_monastery_buff=1 specialization=mistweaver)
-SpellAddBuff(tiger_palm blackout_combo_buff=0 specialization=windwalker)
+SpellAddBuff(tiger_palm blackout_combo_buff=0)
 SpellAddTargetDebuff(tiger_palm eye_of_the_tiger_debuff=1 specialization=!mistweaver talent=eye_of_the_tiger_talent)
 SpellAddTargetDebuff(tiger_palm mark_of_the_crane_debuff=1 specialization=windwalker)
 
@@ -592,7 +681,7 @@ Define(zen_meditation 115176)
 	SpellAddBuff(zen_meditation zen_meditation_buff=1)
 Define(zen_meditation_buff 115176)
 	SpellInfo(zen_meditation_buff duration=8)
-	
+
 ## Stagger
 Define(stagger 115069)
 Define(heavy_stagger_debuff 124273)
@@ -609,6 +698,10 @@ SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_
 ## Items
 Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
+Define(cyclotronic_blast_item 167672)
+Define(cyclotronic_blast 293491)
+  SpellInfo(cyclotronic_blast cd=120)
+Define(dribbling_inkpod_item 169319)
 # SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
 
 
@@ -653,6 +746,10 @@ SpellInfo(fist_of_the_white_tiger tag=main)
 SpellInfo(ironskin_brew tag=shortcd)
 SpellInfo(purifying_brew tag=shortcd)
 SpellInfo(storm_earth_and_fire tag=cd)
+
+# traits
+Define(glory_of_the_dawn_trait 288634)
+Define(open_palm_strikes_trait 279918)
 ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end

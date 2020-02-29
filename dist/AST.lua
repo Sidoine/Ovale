@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/AST", 80201)
+local __exports = LibStub:NewLibrary("ovale/AST", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -38,20 +38,20 @@ local KEYWORD = {
     ["unless"] = true
 }
 local DECLARATION_KEYWORD = {
-    ["AddActionIcon"] = true,
-    ["AddCheckBox"] = true,
-    ["AddFunction"] = true,
-    ["AddIcon"] = true,
-    ["AddListItem"] = true,
-    ["Define"] = true,
-    ["Include"] = true,
-    ["ItemInfo"] = true,
-    ["ItemRequire"] = true,
-    ["ItemList"] = true,
-    ["ScoreSpells"] = true,
-    ["SpellInfo"] = true,
-    ["SpellList"] = true,
-    ["SpellRequire"] = true
+    ["addactionicon"] = true,
+    ["addcheckbox"] = true,
+    ["addfunction"] = true,
+    ["addicon"] = true,
+    ["addlistitem"] = true,
+    ["define"] = true,
+    ["include"] = true,
+    ["iteminfo"] = true,
+    ["itemrequire"] = true,
+    ["itemlist"] = true,
+    ["scorespells"] = true,
+    ["spellinfo"] = true,
+    ["spelllist"] = true,
+    ["spellrequire"] = true
 }
 __exports.PARAMETER_KEYWORD = {
     ["checkbox"] = true,
@@ -73,14 +73,14 @@ __exports.PARAMETER_KEYWORD = {
     ["wait"] = true
 }
 local SPELL_AURA_KEYWORD = {
-    ["SpellAddBuff"] = true,
-    ["SpellAddDebuff"] = true,
-    ["SpellAddPetBuff"] = true,
-    ["SpellAddPetDebuff"] = true,
-    ["SpellAddTargetBuff"] = true,
-    ["SpellAddTargetDebuff"] = true,
-    ["SpellDamageBuff"] = true,
-    ["SpellDamageDebuff"] = true
+    ["spelladdbuff"] = true,
+    ["spelladddebuff"] = true,
+    ["spelladdpetbuff"] = true,
+    ["spelladdpetdebuff"] = true,
+    ["spelladdtargetbuff"] = true,
+    ["spelladdtargetdebuff"] = true,
+    ["spelldamagebuff"] = true,
+    ["spelldamagedebuff"] = true
 }
 local STANCE_KEYWORD = {
     ["if_stance"] = true,
@@ -109,9 +109,9 @@ local STATE_ACTION = {
     ["setstate"] = true
 }
 local STRING_LOOKUP_FUNCTION = {
-    ["ItemName"] = true,
-    ["L"] = true,
-    ["SpellName"] = true
+    ["itemname"] = true,
+    ["l"] = true,
+    ["spellname"] = true
 }
 local UNARY_OPERATOR = {
     ["not"] = {
@@ -192,6 +192,10 @@ local BINARY_OPERATOR = {
     [">?"] = {
         [1] = "arithmetic",
         [2] = 25
+    },
+    ["<?"] = {
+        [1] = "arithmetic",
+        [2] = 25
     }
 }
 local indent = {}
@@ -230,6 +234,7 @@ local TokenizeComment = function(token)
 end
 
 local TokenizeName = function(token)
+    token = lower(token)
     if KEYWORD[token] then
         return "keyword", token
     else
@@ -308,10 +313,14 @@ local MATCHES = {
         [2] = Tokenize
     },
     [13] = {
-        [1] = "^.",
+        [1] = "^<%?",
         [2] = Tokenize
     },
     [14] = {
+        [1] = "^.",
+        [2] = Tokenize
+    },
+    [15] = {
         [1] = "^$",
         [2] = NoToken
     }
@@ -327,11 +336,11 @@ local SelfPool = __class(OvalePool, {
     end,
     Clean = function(self, node)
         if node.child then
-            self.ovaleAst.self_childrenPool:Release(node.child)
+            self.ovaleAst.childrenPool:Release(node.child)
             node.child = nil
         end
         if node.postOrder then
-            self.ovaleAst.self_postOrderPool:Release(node.postOrder)
+            self.ovaleAst.postOrderPool:Release(node.postOrder)
             node.postOrder = nil
         end
     end,
@@ -344,21 +353,19 @@ __exports.OvaleASTClass = __class(nil, {
         self.ovaleCondition = ovaleCondition
         self.ovaleScripts = ovaleScripts
         self.ovaleSpellBook = ovaleSpellBook
-        self.self_indent = 0
-        self.self_outputPool = OvalePool("OvaleAST_outputPool")
-        self.self_listPool = OvalePool("OvaleAST_listPool")
-        self.self_checkboxPool = OvalePool("OvaleAST_checkboxPool")
-        self.self_flattenParameterValuesPool = OvalePool("OvaleAST_FlattenParameterValues")
-        self.self_namedParametersPool = OvalePool("OvaleAST_parametersPool")
-        self.self_rawNamedParametersPool = OvalePool("OvaleAST_rawNamedParametersPool")
-        self.self_positionalParametersPool = OvalePool("OVALEAST_positionParametersPool")
-        self.self_rawPositionalParametersPool = OvalePool("OVALEAST_rawPositionParametersPool")
-        self.self_flattenParametersPool = OvalePool("OvaleAST_FlattenParametersPool")
+        self.indent = 0
+        self.outputPool = OvalePool("OvaleAST_outputPool")
+        self.listPool = OvalePool("OvaleAST_listPool")
+        self.checkboxPool = OvalePool("OvaleAST_checkboxPool")
+        self.flattenParameterValuesPool = OvalePool("OvaleAST_FlattenParameterValues")
+        self.rawNamedParametersPool = OvalePool("OvaleAST_rawNamedParametersPool")
+        self.rawPositionalParametersPool = OvalePool("OVALEAST_rawPositionParametersPool")
+        self.flattenParametersPool = OvalePool("OvaleAST_FlattenParametersPool")
         self.objectPool = OvalePool("OvalePool")
-        self.self_childrenPool = OvalePool("OvaleAST_childrenPool")
-        self.self_postOrderPool = OvalePool("OvaleAST_postOrderPool")
+        self.childrenPool = OvalePool("OvaleAST_childrenPool")
+        self.postOrderPool = OvalePool("OvaleAST_postOrderPool")
         self.postOrderVisitedPool = OvalePool("OvaleAST_postOrderVisitedPool")
-        self.self_pool = SelfPool(self)
+        self.nodesPool = SelfPool(self)
         self.UnparseAddCheckBox = function(node)
             local s
             if node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams) then
@@ -406,12 +413,12 @@ __exports.OvaleASTClass = __class(nil, {
             end
         end
         self.UnparseCommaSeparatedValues = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             for k, v in ipairs(node.csv) do
                 output[k] = self:Unparse(v)
             end
             local outputString = concat(output, ",")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseDefine = function(node)
@@ -486,22 +493,22 @@ __exports.OvaleASTClass = __class(nil, {
             return s
         end
         self.UnparseGroup = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             output[#output + 1] = ""
-            output[#output + 1] = INDENT(self.self_indent) .. "{"
-            self.self_indent = self.self_indent + 1
+            output[#output + 1] = INDENT(self.indent) .. "{"
+            self.indent = self.indent + 1
             for _, statementNode in ipairs(node.child) do
                 local s = self:Unparse(statementNode)
                 if s == "" then
                     output[#output + 1] = s
                 else
-                    output[#output + 1] = INDENT(self.self_indent) .. s
+                    output[#output + 1] = INDENT(self.indent) .. s
                 end
             end
-            self.self_indent = self.self_indent - 1
-            output[#output + 1] = INDENT(self.self_indent) .. "}"
+            self.indent = self.indent - 1
+            output[#output + 1] = INDENT(self.indent) .. "}"
             local outputString = concat(output, "\n")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseIf = function(node)
@@ -529,7 +536,7 @@ __exports.OvaleASTClass = __class(nil, {
             return format("ScoreSpells(%s)", self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseScript = function(node)
-            local output = self.self_outputPool:Get()
+            local output = self.outputPool:Get()
             local previousDeclarationType
             for _, declarationNode in ipairs(node.child) do
                 if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" or declarationNode.type == "spell_require" then
@@ -537,7 +544,7 @@ __exports.OvaleASTClass = __class(nil, {
                     if s == "" then
                         output[#output + 1] = s
                     else
-                        output[#output + 1] = INDENT(self.self_indent + 1) .. s
+                        output[#output + 1] = INDENT(self.indent + 1) .. s
                     end
                 else
                     local insertBlank = false
@@ -555,7 +562,7 @@ __exports.OvaleASTClass = __class(nil, {
                 end
             end
             local outputString = concat(output, "\n")
-            self.self_outputPool:Release(output)
+            self.outputPool:Release(output)
             return outputString
         end
         self.UnparseSpellAuraList = function(node)
@@ -599,7 +606,7 @@ __exports.OvaleASTClass = __class(nil, {
             ["icon"] = self.UnparseAddIcon,
             ["if"] = self.UnparseIf,
             ["item_info"] = self.UnparseItemInfo,
-            ["item_require"] = self.UnparseItemRequire,
+            ["itemrequire"] = self.UnparseItemRequire,
             ["list"] = self.UnparseList,
             ["list_item"] = self.UnparseAddListItem,
             ["logical"] = self.UnparseExpression,
@@ -616,36 +623,35 @@ __exports.OvaleASTClass = __class(nil, {
         }
         self.ParseAddCheckBox = function(tokenStream, nodeList, annotation)
             local tokenType, token = tokenStream:Consume()
-            if  not (tokenType == "keyword" and token == "AddCheckBox") then
+            if  not (tokenType == "keyword" and token == "addcheckbox") then
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; 'AddCheckBox' expected.", token)
-                return false
+                return nil
             end
             tokenType, token = tokenStream:Consume()
             if tokenType ~= "(" then
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; '(' expected.", token)
-                return false
+                return nil
             end
             local name = ""
             tokenType, token = tokenStream:Consume()
-            if tokenType == "name" then
+            if tokenType == "name" and token ~= nil then
                 name = token
             else
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; name expected.", token)
-                return false
+                return nil
             end
-            local ok, descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
-            if  not ok then
-                return false
+            local descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
+            if  not descriptionNode then
+                return nil
             end
-            local positionalParams, namedParams
-            ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
-            if  not ok then
-                return false
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
             tokenType, token = tokenStream:Consume()
             if tokenType ~= ")" then
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; ')' expected.", token)
-                return false
+                return nil
             end
             local node = self:NewNode(nodeList)
             node.type = "checkbox"
@@ -655,286 +661,259 @@ __exports.OvaleASTClass = __class(nil, {
             node.rawNamedParams = namedParams
             annotation.parametersReference = annotation.parametersReference or {}
             annotation.parametersReference[#annotation.parametersReference + 1] = node
-            return true, node
+            return node
         end
         self.ParseAddFunction = function(tokenStream, nodeList, annotation)
-            local ok = true
             local tokenType, token = tokenStream:Consume()
-            if  not (tokenType == "keyword" and token == "AddFunction") then
+            if  not (tokenType == "keyword" and token == "addfunction") then
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDFUNCTION; 'AddFunction' expected.", token)
-                ok = false
+                return nil
             end
             local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDFUNCTION; name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDFUNCTION; name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            local bodyNode
-            if ok then
-                ok, bodyNode = self.ParseGroup(tokenStream, nodeList, annotation)
+            local bodyNode = self.ParseGroup(tokenStream, nodeList, annotation)
+            if  not bodyNode then
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList, true)
-                node.type = "add_function"
-                node.name = name
-                node.child[1] = bodyNode
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                annotation.postOrderReference = annotation.postOrderReference or {}
-                annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
-                annotation.customFunction = annotation.customFunction or {}
-                annotation.customFunction[name] = node
-            end
-            return ok, node
+            node = self:NewNode(nodeList, true)
+            node.type = "add_function"
+            node.name = name
+            node.child[1] = bodyNode
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            annotation.postOrderReference = annotation.postOrderReference or {}
+            annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
+            annotation.customFunction = annotation.customFunction or {}
+            annotation.customFunction[name] = node
+            return node
         end
         self.ParseAddIcon = function(tokenStream, nodeList, annotation)
-            local ok = true
             local tokenType, token = tokenStream:Consume()
-            if  not (tokenType == "keyword" and token == "AddIcon") then
+            if  not (tokenType == "keyword" and token == "addicon") then
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDICON; 'AddIcon' expected.", token)
-                ok = false
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            local bodyNode
-            if ok then
-                ok, bodyNode = self.ParseGroup(tokenStream, nodeList, annotation)
+            local bodyNode = self.ParseGroup(tokenStream, nodeList, annotation)
+            if  not bodyNode then
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList, true)
-                node.type = "icon"
-                node.child[1] = bodyNode
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                annotation.postOrderReference = annotation.postOrderReference or {}
-                annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
-            end
-            return ok, node
+            node = self:NewNode(nodeList, true)
+            node.type = "icon"
+            node.child[1] = bodyNode
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            annotation.postOrderReference = annotation.postOrderReference or {}
+            annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
+            return node
         end
         self.ParseAddListItem = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "AddListItem") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; 'AddListItem' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "addlistitem") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; 'AddListItem' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; '(' expected.", token)
+                return nil
             end
             local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.", token)
+                return nil
             end
             local item
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    item = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                item = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.", token)
+                return nil
             end
-            local descriptionNode
-            if ok then
-                ok, descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
+            local descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
+            if  not descriptionNode then
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "list_item"
-                node.name = name
-                node.item = item
-                node.description = descriptionNode
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-            end
-            return ok, node
+            node = self:NewNode(nodeList)
+            node.type = "list_item"
+            node.name = name
+            node.item = item
+            node.description = descriptionNode
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            return node
         end
         self.ParseComment = function(tokenStream, nodeList, annotation)
             return nil
         end
         self.ParseDeclaration = function(tokenStream, nodeList, annotation)
-            local ok = true
             local node
             local tokenType, token = tokenStream:Peek()
-            if tokenType == "keyword" and DECLARATION_KEYWORD[token] then
-                if token == "AddCheckBox" then
-                    ok, node = self.ParseAddCheckBox(tokenStream, nodeList, annotation)
-                elseif token == "AddFunction" then
-                    ok, node = self.ParseAddFunction(tokenStream, nodeList, annotation)
-                elseif token == "AddIcon" then
-                    ok, node = self.ParseAddIcon(tokenStream, nodeList, annotation)
-                elseif token == "AddListItem" then
-                    ok, node = self.ParseAddListItem(tokenStream, nodeList, annotation)
-                elseif token == "Define" then
-                    ok, node = self.ParseDefine(tokenStream, nodeList, annotation)
-                elseif token == "Include" then
-                    ok, node = self.ParseInclude(tokenStream, nodeList, annotation)
-                elseif token == "ItemInfo" then
-                    ok, node = self.ParseItemInfo(tokenStream, nodeList, annotation)
-                elseif token == "ItemRequire" then
-                    ok, node = self.ParseItemRequire(tokenStream, nodeList, annotation)
-                elseif token == "ItemList" then
-                    ok, node = self.ParseList(tokenStream, nodeList, annotation)
-                elseif token == "ScoreSpells" then
-                    ok, node = self.ParseScoreSpells(tokenStream, nodeList, annotation)
+            if tokenType == "keyword" and token and DECLARATION_KEYWORD[token] then
+                if token == "addcheckbox" then
+                    node = self.ParseAddCheckBox(tokenStream, nodeList, annotation)
+                elseif token == "addfunction" then
+                    node = self.ParseAddFunction(tokenStream, nodeList, annotation)
+                elseif token == "addicon" then
+                    node = self.ParseAddIcon(tokenStream, nodeList, annotation)
+                elseif token == "addlistitem" then
+                    node = self.ParseAddListItem(tokenStream, nodeList, annotation)
+                elseif token == "define" then
+                    node = self.ParseDefine(tokenStream, nodeList, annotation)
+                elseif token == "include" then
+                    node = self.ParseInclude(tokenStream, nodeList, annotation)
+                elseif token == "iteminfo" then
+                    node = self.ParseItemInfo(tokenStream, nodeList, annotation)
+                elseif token == "itemrequire" then
+                    node = self.ParseItemRequire(tokenStream, nodeList, annotation)
+                elseif token == "itemlist" then
+                    node = self.ParseList(tokenStream, nodeList, annotation)
+                elseif token == "scorespells" then
+                    node = self.ParseScoreSpells(tokenStream, nodeList, annotation)
                 elseif SPELL_AURA_KEYWORD[token] then
-                    ok, node = self.ParseSpellAuraList(tokenStream, nodeList, annotation)
-                elseif token == "SpellInfo" then
-                    ok, node = self.ParseSpellInfo(tokenStream, nodeList, annotation)
-                elseif token == "SpellList" then
-                    ok, node = self.ParseList(tokenStream, nodeList, annotation)
-                elseif token == "SpellRequire" then
-                    ok, node = self.ParseSpellRequire(tokenStream, nodeList, annotation)
+                    node = self.ParseSpellAuraList(tokenStream, nodeList, annotation)
+                elseif token == "spellinfo" then
+                    node = self.ParseSpellInfo(tokenStream, nodeList, annotation)
+                elseif token == "spelllist" then
+                    node = self.ParseList(tokenStream, nodeList, annotation)
+                elseif token == "spellrequire" then
+                    node = self.ParseSpellRequire(tokenStream, nodeList, annotation)
+                else
+                    self:SyntaxError(tokenStream, "Syntax error: unknown keywork '%s'", token)
+                    return 
                 end
             else
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DECLARATION; declaration keyword expected.", token)
                 tokenStream:Consume()
-                ok = false
+                return nil
             end
-            return ok, node
+            return node
         end
         self.ParseDefine = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "Define") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; 'Define' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "define") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; 'Define' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; '(' expected.", token)
+                return nil
             end
             local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; name expected.", token)
+                return nil
             end
             local value
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "-" then
-                    tokenType, token = tokenStream:Consume()
-                    if tokenType == "number" then
-                        value = -1 * tonumber(token)
-                    else
-                        self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; number expected after '-'.", token)
-                        ok = false
-                    end
-                elseif tokenType == "number" then
-                    value = tonumber(token)
-                elseif tokenType == "string" then
-                    value = token
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "-" then
+                tokenType, token = tokenStream:Consume()
+                if tokenType == "number" then
+                    value = -1 * tonumber(token)
                 else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; number or string expected.", token)
-                    ok = false
+                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; number expected after '-'.", token)
+                    return nil
                 end
+            elseif tokenType == "number" then
+                value = tonumber(token)
+            elseif tokenType == "string" and token then
+                value = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; number or string expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DEFINE; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "define"
-                node.name = name
-                node.value = value
-                annotation.definition = annotation.definition or {}
-                annotation.definition[name] = value
-            end
-            return ok, node
+            node = self:NewNode(nodeList)
+            node.type = "define"
+            node.name = name
+            node.value = value
+            annotation.definition = annotation.definition or {}
+            annotation.definition[name] = value
+            return node
         end
         self.ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
             minPrecedence = minPrecedence or 0
-            local ok = true
             local node
-            do
-                local tokenType, token = tokenStream:Peek()
-                if tokenType then
-                    local opInfo = UNARY_OPERATOR[token]
-                    if opInfo then
-                        local opType, precedence = opInfo[1], opInfo[2]
-                        tokenStream:Consume()
-                        local operator = token
-                        local rhsNode
-                        ok, rhsNode = self.ParseExpression(tokenStream, nodeList, annotation, precedence)
-                        if ok then
-                            if operator == "-" and __exports.isNodeType(rhsNode, "value") then
-                                local value = -1 * tonumber(rhsNode.value)
-                                node = self:GetNumberNode(value, nodeList, annotation)
-                            else
-                                node = self:NewNode(nodeList, true)
-                                node.type = opType
-                                node.expressionType = "unary"
-                                node.operator = operator
-                                node.precedence = precedence
-                                node.child[1] = rhsNode
-                            end
+            local tokenType, token = tokenStream:Peek()
+            if tokenType then
+                local opInfo = UNARY_OPERATOR[token]
+                if opInfo then
+                    local opType, precedence = opInfo[1], opInfo[2]
+                    tokenStream:Consume()
+                    local operator = token
+                    local rhsNode = self.ParseExpression(tokenStream, nodeList, annotation, precedence)
+                    if rhsNode then
+                        if operator == "-" and __exports.isNodeType(rhsNode, "value") then
+                            local value = -1 * tonumber(rhsNode.value)
+                            node = self:GetNumberNode(value, nodeList, annotation)
+                        else
+                            node = self:NewNode(nodeList, true)
+                            node.type = opType
+                            node.expressionType = "unary"
+                            node.operator = operator
+                            node.precedence = precedence
+                            node.child[1] = rhsNode
                         end
                     else
-                        ok, node = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
+                        return nil
                     end
+                else
+                    local simpleExpression = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
+                    if  not simpleExpression then
+                        return nil
+                    end
+                    node = simpleExpression
                 end
+            else
+                return nil
             end
-            while ok do
-                local keepScanning = false
+            local keepScanning = true
+            while keepScanning do
+                keepScanning = false
                 local tokenType, token = tokenStream:Peek()
                 if tokenType then
                     local opInfo = BINARY_OPERATOR[token]
@@ -945,9 +924,8 @@ __exports.OvaleASTClass = __class(nil, {
                             tokenStream:Consume()
                             local operator = token
                             local lhsNode = node
-                            local rhsNode
-                            ok, rhsNode = self.ParseExpression(tokenStream, nodeList, annotation, precedence)
-                            if ok then
+                            local rhsNode = self.ParseExpression(tokenStream, nodeList, annotation, precedence)
+                            if rhsNode then
                                 node = self:NewNode(nodeList, true)
                                 node.type = opType
                                 node.expressionType = "binary"
@@ -955,454 +933,373 @@ __exports.OvaleASTClass = __class(nil, {
                                 node.precedence = precedence
                                 node.child[1] = lhsNode
                                 node.child[2] = rhsNode
-                                local rotated = false
-                                while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
+                                local operatorInfo = BINARY_OPERATOR[node.operator]
+                                if  not operatorInfo then
+                                    return nil
+                                end
+                                while node.type == rhsNode.type and node.operator == rhsNode.operator and operatorInfo[3] == "associative" and rhsNode.expressionType == "binary" do
                                     node.child[2] = rhsNode.child[1]
                                     rhsNode.child[1] = node
-                                    node.asString = self.UnparseExpression(node)
                                     node = rhsNode
                                     rhsNode = node.child[2]
-                                    rotated = true
                                 end
-                                if rotated then
-                                    node.asString = self.UnparseExpression(node)
-                                end
+                            else
+                                return nil
                             end
                         end
                     end
                 end
-                if  not keepScanning then
-                    break
-                end
             end
-            if ok and node then
-                node.asString = node.asString or self:Unparse(node)
-            end
-            return ok, node
+            return node
         end
         self.ParseFunction = function(tokenStream, nodeList, annotation)
-            local ok = true
-            local name, lowername
+            local name
             do
                 local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
+                if (tokenType == "name" or tokenType == "keyword") and token then
                     name = token
-                    lowername = lower(name)
                 else
                     self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token)
-                    ok = false
+                    return nil
                 end
             end
             local target
-            if ok then
-                local tokenType, token = tokenStream:Peek()
-                if tokenType == "." then
-                    target = name
-                    tokenType, token = tokenStream:Consume(2)
-                    if tokenType == "name" then
-                        name = token
-                        lowername = lower(name)
-                    else
-                        self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token)
-                        ok = false
-                    end
+            local tokenType, token = tokenStream:Peek()
+            if tokenType == "." then
+                target = name
+                tokenType, token = tokenStream:Consume(2)
+                if tokenType == "name" and token then
+                    name = token
+                else
+                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token)
+                    return nil
                 end
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; '(' expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok and ACTION_PARAMETER_COUNT[lowername] then
-                local count = ACTION_PARAMETER_COUNT[lowername]
+            if ACTION_PARAMETER_COUNT[name] then
+                local count = ACTION_PARAMETER_COUNT[name]
                 if count > #positionalParams then
                     self:SyntaxError(tokenStream, "Syntax error: action '%s' requires at least %d fixed parameter(s).", name, count)
-                    ok = false
+                    return nil
                 end
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.", token)
-                    ok = false
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.", token)
+                return nil
+            end
+            if  not namedParams.target then
+                if sub(name, 1, 6) == "target" then
+                    namedParams.target = "target"
+                    name = sub(name, 7)
                 end
             end
-            if ok then
-                if  not namedParams.target then
-                    if sub(lowername, 1, 6) == "target" then
-                        namedParams.target = "target"
-                        lowername = sub(lowername, 7)
-                        name = sub(name, 7)
-                    end
+            if  not namedParams.filter then
+                if sub(name, 1, 6) == "debuff" then
+                    namedParams.filter = "debuff"
+                elseif sub(name, 1, 4) == "buff" then
+                    namedParams.filter = "buff"
+                elseif sub(name, 1, 11) == "otherdebuff" then
+                    namedParams.filter = "debuff"
+                elseif sub(name, 1, 9) == "otherbuff" then
+                    namedParams.filter = "buff"
                 end
-                if  not namedParams.filter then
-                    if sub(lowername, 1, 6) == "debuff" then
-                        namedParams.filter = "debuff"
-                    elseif sub(lowername, 1, 4) == "buff" then
-                        namedParams.filter = "buff"
-                    elseif sub(lowername, 1, 11) == "otherdebuff" then
-                        namedParams.filter = "debuff"
-                    elseif sub(lowername, 1, 9) == "otherbuff" then
-                        namedParams.filter = "buff"
-                    end
-                end
-                if target then
-                    namedParams.target = target
-                end
+            end
+            if target then
+                namedParams.target = target
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.name = name
-                node.lowername = lowername
-                if STATE_ACTION[lowername] then
-                    node.type = "state"
-                    node.func = lowername
-                elseif ACTION_PARAMETER_COUNT[lowername] then
-                    node.type = "action"
-                    node.func = lowername
-                elseif STRING_LOOKUP_FUNCTION[name] then
-                    node.type = "function"
-                    node.func = name
-                    annotation.stringReference = annotation.stringReference or {}
-                    annotation.stringReference[#annotation.stringReference + 1] = node
-                elseif self.ovaleCondition:IsCondition(lowername) then
-                    node.type = "function"
-                    node.func = lowername
-                else
-                    node.type = "custom_function"
-                    node.func = name
-                end
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                node.asString = self.UnparseFunction(node)
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                annotation.functionCall = annotation.functionCall or {}
-                annotation.functionCall[node.func] = true
-                annotation.functionReference = annotation.functionReference or {}
-                annotation.functionReference[#annotation.functionReference + 1] = node
+            node = self:NewNode(nodeList)
+            node.name = name
+            if STATE_ACTION[name] then
+                node.type = "state"
+                node.func = name
+            elseif ACTION_PARAMETER_COUNT[name] then
+                node.type = "action"
+                node.func = name
+            elseif STRING_LOOKUP_FUNCTION[name] then
+                node.type = "function"
+                node.func = name
+                annotation.stringReference = annotation.stringReference or {}
+                annotation.stringReference[#annotation.stringReference + 1] = node
+            elseif self.ovaleCondition:IsCondition(name) then
+                node.type = "function"
+                node.func = name
+            else
+                node.type = "custom_function"
+                node.func = name
             end
-            return ok, node
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            node.asString = self.UnparseFunction(node)
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            annotation.functionCall = annotation.functionCall or {}
+            annotation.functionCall[node.func] = true
+            annotation.functionReference = annotation.functionReference or {}
+            annotation.functionReference[#annotation.functionReference + 1] = node
+            return node
         end
         self.ParseGroup = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "{" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing GROUP; '{' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if tokenType ~= "{" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing GROUP; '{' expected.", token)
+                return nil
             end
-            local child = self.self_childrenPool:Get()
-            local tokenType = tokenStream:Peek()
-            while ok and tokenType and tokenType ~= "}" do
+            local child = self.childrenPool:Get()
+            tokenType = tokenStream:Peek()
+            while tokenType and tokenType ~= "}" do
                 local statementNode
-                ok, statementNode = self:ParseStatement(tokenStream, nodeList, annotation)
-                if ok then
+                statementNode = self:ParseStatement(tokenStream, nodeList, annotation)
+                if statementNode then
                     child[#child + 1] = statementNode
                     tokenType = tokenStream:Peek()
                 else
-                    break
+                    return nil
                 end
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "}" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing GROUP; '}' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "}" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing GROUP; '}' expected.", token)
+                self.childrenPool:Release(child)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "group"
-                node.child = child
-            else
-                self.self_childrenPool:Release(child)
-            end
-            return ok, node
+            node = self:NewNode(nodeList)
+            node.type = "group"
+            node.child = child
+            return node
         end
         self.ParseIf = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "if") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing IF; 'if' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "if") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing IF; 'if' expected.", token)
+                return nil
             end
             local conditionNode, bodyNode
-            if ok then
-                ok, conditionNode = self.ParseExpression(tokenStream, nodeList, annotation)
+            conditionNode = self.ParseExpression(tokenStream, nodeList, annotation)
+            if  not conditionNode then
+                return nil
             end
-            if ok then
-                ok, bodyNode = self:ParseStatement(tokenStream, nodeList, annotation)
+            bodyNode = self:ParseStatement(tokenStream, nodeList, annotation)
+            if  not bodyNode then
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList, true)
-                node.type = "if"
-                node.child[1] = conditionNode
-                node.child[2] = bodyNode
-            end
-            return ok, node
+            node = self:NewNode(nodeList, true)
+            node.type = "if"
+            node.child[1] = conditionNode
+            node.child[2] = bodyNode
+            return node
         end
         self.ParseInclude = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "Include") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; 'Include' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "include") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; 'Include' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; '(' expected.", token)
+                return nil
             end
             local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; script name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; script name expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing INCLUDE; ')' expected.", token)
+                return nil
             end
             local code = self.ovaleScripts:GetScript(name)
             if code == nil then
                 self.debug:Error("Script '%s' not found when parsing INCLUDE.", name)
-                ok = false
+                return nil
             end
             local node
-            if ok then
-                local includeTokenStream = OvaleLexer(name, code, MATCHES, FILTERS)
-                ok, node = self.ParseScriptStream(includeTokenStream, nodeList, annotation)
-                includeTokenStream:Release()
-            end
-            return ok, node
+            local includeTokenStream = OvaleLexer(name, code, MATCHES, FILTERS)
+            node = self.ParseScriptStream(includeTokenStream, nodeList, annotation)
+            includeTokenStream:Release()
+            return node
         end
         self.ParseItemInfo = function(tokenStream, nodeList, annotation)
-            local ok = true
             local name
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "ItemInfo") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; 'ItemInfo' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "iteminfo") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; 'ItemInfo' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; '(' expected.", token)
+                return nil
             end
             local itemId
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    itemId = token
-                elseif tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; number or name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                itemId = token
+            elseif tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; number or name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMINFO; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "item_info"
-                node.itemId = tonumber(itemId)
+            node = self:NewNode(nodeList)
+            node.type = "item_info"
+            node.itemId = tonumber(itemId)
+            if name then
                 node.name = name
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                if name then
-                    annotation.nameReference = annotation.nameReference or {}
-                    annotation.nameReference[#annotation.nameReference + 1] = node
-                end
             end
-            return ok, node
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            if name then
+                annotation.nameReference = annotation.nameReference or {}
+                annotation.nameReference[#annotation.nameReference + 1] = node
+            end
+            return node
         end
         self.ParseItemRequire = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "ItemRequire") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; keyword expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "itemrequire") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; keyword expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; '(' expected.", token)
+                return nil
             end
             local itemId, name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    itemId = token
-                elseif tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; number or name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                itemId = token
+            elseif tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; number or name expected.", token)
+                return nil
             end
             local property
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    property = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; property name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" then
+                property = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; property name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "item_require"
-                node.itemId = tonumber(itemId)
+            node = self:NewNode(nodeList)
+            node.type = "itemrequire"
+            node.itemId = tonumber(itemId)
+            if name then
                 node.name = name
-                node.property = property
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                if name then
-                    annotation.nameReference = annotation.nameReference or {}
-                    annotation.nameReference[#annotation.nameReference + 1] = node
-                end
             end
-            return ok, node
+            node.property = property
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            if name then
+                annotation.nameReference = annotation.nameReference or {}
+                annotation.nameReference[#annotation.nameReference + 1] = node
+            end
+            return node
         end
         self.ParseList = function(tokenStream, nodeList, annotation)
-            local ok = true
             local keyword
-            do
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "keyword" and (token == "ItemList" or token == "SpellList") then
-                    keyword = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; keyword expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if tokenType == "keyword" and (token == "itemlist" or token == "spelllist") then
+                keyword = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; keyword expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; '(' expected.", token)
+                return nil
             end
             local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing LIST; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "list"
-                node.keyword = keyword
-                node.name = name
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-            end
-            return ok, node
+            node = self:NewNode(nodeList)
+            node.type = "list"
+            node.keyword = keyword
+            node.name = name
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            return node
         end
         self.ParseNumber = function(tokenStream, nodeList, annotation)
-            local ok = true
             local value
-            do
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    value = tonumber(token)
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                value = tonumber(token)
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.", token)
+                return nil
             end
-            local node
-            if ok then
-                node = self:GetNumberNode(value, nodeList, annotation)
-            end
-            return ok, node
+            local node = self:GetNumberNode(value, nodeList, annotation)
+            return node
         end
         self.ParseParameterValue = function(tokenStream, nodeList, annotation)
-            local ok = true
             local node
             local tokenType
             local parameters
             repeat
-                ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
-                if ok and node then
+                node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                if node then
                     tokenType = tokenStream:Peek()
                     if tokenType == "," then
                         tokenStream:Consume()
@@ -1411,91 +1308,78 @@ __exports.OvaleASTClass = __class(nil, {
                     if parameters then
                         parameters[#parameters + 1] = node
                     end
+                else
+                    return nil
                 end
-            until not ( not ( not ok or tokenType ~= ","))
-            if ok and parameters then
+            until not (node and tokenType == ",")
+            if parameters then
                 node = self:NewNode(nodeList)
                 node.type = "comma_separated_values"
                 node.csv = parameters
                 annotation.objects = annotation.objects or {}
                 annotation.objects[#annotation.objects + 1] = parameters
             end
-            return ok, node
+            return node
         end
         self.ParseScoreSpells = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "ScoreSpells") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; 'ScoreSpells' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "scorespells") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; 'ScoreSpells' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; '(' expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SCORESPELLS; ')' expected.", token)
+                return nil
             end
-            local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "score_spells"
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-            end
-            return ok, node
+            local node = self:NewNode(nodeList)
+            node.type = "score_spells"
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            return node
         end
         self.ParseScriptStream = function(tokenStream, nodeList, annotation)
             self.profiler:StartProfiling("OvaleAST_ParseScript")
-            local ok = true
-            local child = self.self_childrenPool:Get()
-            while ok do
+            local child = self.childrenPool:Get()
+            while true do
                 local tokenType = tokenStream:Peek()
                 if tokenType then
-                    local declarationNode
-                    ok, declarationNode = self.ParseDeclaration(tokenStream, nodeList, annotation)
-                    if ok then
-                        if declarationNode.type == "script" then
-                            for _, node in ipairs(declarationNode.child) do
-                                child[#child + 1] = node
-                            end
-                            self.self_pool:Release(declarationNode)
-                        else
-                            child[#child + 1] = declarationNode
+                    local declarationNode = self.ParseDeclaration(tokenStream, nodeList, annotation)
+                    if  not declarationNode then
+                        self.childrenPool:Release(child)
+                        return nil
+                    end
+                    if declarationNode.type == "script" then
+                        for _, node in ipairs(declarationNode.child) do
+                            child[#child + 1] = node
                         end
+                        self.nodesPool:Release(declarationNode)
+                    else
+                        child[#child + 1] = declarationNode
                     end
                 else
                     break
                 end
             end
             local ast
-            if ok then
-                ast = self:NewNode()
-                ast.type = "script"
-                ast.child = child
-            else
-                self.self_childrenPool:Release(child)
-            end
+            ast = self:NewNode()
+            ast.type = "script"
+            ast.child = child
             self.profiler:StopProfiling("OvaleAST_ParseScript")
-            return ok, ast
+            return ast
         end
         self.ParseSimpleParameterValue = function(tokenStream, nodeList, annotation)
-            local ok = true
             local isBang = false
             local tokenType = tokenStream:Peek()
             if tokenType == "!" then
@@ -1505,9 +1389,12 @@ __exports.OvaleASTClass = __class(nil, {
             local expressionNode
             tokenType = tokenStream:Peek()
             if tokenType == "(" or tokenType == "-" then
-                ok, expressionNode = self.ParseExpression(tokenStream, nodeList, annotation)
+                expressionNode = self.ParseExpression(tokenStream, nodeList, annotation)
             else
-                ok, expressionNode = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
+                expressionNode = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
+            end
+            if  not expressionNode then
+                return nil
             end
             local node
             if isBang then
@@ -1517,200 +1404,177 @@ __exports.OvaleASTClass = __class(nil, {
             else
                 node = expressionNode
             end
-            return ok, node
+            return node
         end
         self.ParseSpellAuraList = function(tokenStream, nodeList, annotation)
-            local ok = true
             local keyword
-            do
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "keyword" and SPELL_AURA_KEYWORD[token] then
-                    keyword = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; keyword expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if tokenType == "keyword" and token and SPELL_AURA_KEYWORD[token] then
+                keyword = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; keyword expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; '(' expected.", token)
+                return nil
             end
             local spellId, name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    spellId = tonumber(token)
-                elseif tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; number or name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                spellId = tonumber(token)
+            elseif tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; number or name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "spell_aura_list"
-                node.keyword = keyword
+            node = self:NewNode(nodeList)
+            node.type = "spell_aura_list"
+            node.keyword = keyword
+            if spellId then
                 node.spellId = spellId
-                node.name = name
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                if name then
-                    annotation.nameReference = annotation.nameReference or {}
-                    annotation.nameReference[#annotation.nameReference + 1] = node
-                end
             end
-            return ok, node
+            if name then
+                node.name = name
+            end
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            if name then
+                annotation.nameReference = annotation.nameReference or {}
+                annotation.nameReference[#annotation.nameReference + 1] = node
+            end
+            return node
         end
         self.ParseSpellInfo = function(tokenStream, nodeList, annotation)
-            local ok = true
             local name
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "SpellInfo") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; 'SpellInfo' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "spellinfo") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; 'SpellInfo' expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; '(' expected.", token)
+                return nil
             end
             local spellId
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    spellId = tonumber(token)
-                elseif tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; number or name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                spellId = tonumber(token)
+            elseif tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; number or name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLINFO; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "spell_info"
+            node = self:NewNode(nodeList)
+            node.type = "spell_info"
+            if spellId then
                 node.spellId = spellId
-                node.name = name
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                if name then
-                    annotation.nameReference = annotation.nameReference or {}
-                    annotation.nameReference[#annotation.nameReference + 1] = node
-                end
             end
-            return ok, node
+            if name then
+                node.name = name
+            end
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            if name then
+                annotation.nameReference = annotation.nameReference or {}
+                annotation.nameReference[#annotation.nameReference + 1] = node
+            end
+            return node
         end
         self.ParseSpellRequire = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "SpellRequire") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; keyword expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "spellrequire") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; keyword expected.", token)
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; '(' expected.", token)
+                return nil
             end
             local spellId, name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "number" then
-                    spellId = tonumber(token)
-                elseif tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; number or name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "number" then
+                spellId = tonumber(token)
+            elseif tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; number or name expected.", token)
+                return nil
             end
             local property
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    property = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; property name expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" then
+                property = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; property name expected.", token)
+                return nil
             end
-            local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            local positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not positionalParams or  not namedParams then
+                return nil
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; ')' expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "spell_require"
+            node = self:NewNode(nodeList)
+            node.type = "spell_require"
+            if spellId then
                 node.spellId = spellId
-                node.name = name
-                node.property = property
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-                if name then
-                    annotation.nameReference = annotation.nameReference or {}
-                    annotation.nameReference[#annotation.nameReference + 1] = node
-                end
             end
-            return ok, node
+            if name then
+                node.name = name
+            end
+            node.property = property
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            if name then
+                annotation.nameReference = annotation.nameReference or {}
+                annotation.nameReference[#annotation.nameReference + 1] = node
+            end
+            return node
         end
         self.ParseString = function(tokenStream, nodeList, annotation)
             local value
             local tokenType, token = tokenStream:Peek()
-            if tokenType == "string" then
+            if tokenType == "string" and token then
                 value = token
                 tokenStream:Consume()
-            elseif tokenType == "name" then
-                if STRING_LOOKUP_FUNCTION[token] then
+            elseif tokenType == "name" and token then
+                if STRING_LOOKUP_FUNCTION[lower(token)] then
                     return self.ParseFunction(tokenStream, nodeList, annotation)
                 else
                     value = token
@@ -1719,7 +1583,7 @@ __exports.OvaleASTClass = __class(nil, {
             else
                 tokenStream:Consume()
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
-                return false
+                return nil
             end
             local node
             node = self:NewNode(nodeList)
@@ -1727,54 +1591,46 @@ __exports.OvaleASTClass = __class(nil, {
             node.value = value
             annotation.stringReference = annotation.stringReference or {}
             annotation.stringReference[#annotation.stringReference + 1] = node
-            return true, node
+            return node
         end
         self.ParseUnless = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "unless") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing UNLESS; 'unless' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "unless") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing UNLESS; 'unless' expected.", token)
+                return nil
             end
             local conditionNode, bodyNode
-            if ok then
-                ok, conditionNode = self.ParseExpression(tokenStream, nodeList, annotation)
+            conditionNode = self.ParseExpression(tokenStream, nodeList, annotation)
+            if  not conditionNode then
+                return nil
             end
-            if ok then
-                ok, bodyNode = self:ParseStatement(tokenStream, nodeList, annotation)
+            bodyNode = self:ParseStatement(tokenStream, nodeList, annotation)
+            if  not bodyNode then
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList, true)
-                node.type = "unless"
-                node.child[1] = conditionNode
-                node.child[2] = bodyNode
-            end
-            return ok, node
+            node = self:NewNode(nodeList, true)
+            node.type = "unless"
+            node.child[1] = conditionNode
+            node.child[2] = bodyNode
+            return node
         end
         self.ParseVariable = function(tokenStream, nodeList, annotation)
-            local ok = true
             local name
-            do
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing VARIABLE; name expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if tokenType == "name" and token then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing VARIABLE; name expected.", token)
+                return nil
             end
             local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "variable"
-                node.name = name
-                annotation.nameReference = annotation.nameReference or {}
-                annotation.nameReference[#annotation.nameReference + 1] = node
-            end
-            return ok, node
+            node = self:NewNode(nodeList)
+            node.type = "variable"
+            node.name = name
+            annotation.nameReference = annotation.nameReference or {}
+            annotation.nameReference[#annotation.nameReference + 1] = node
+            return node
         end
         self.PARSE_VISITOR = {
             ["action"] = self.ParseFunction,
@@ -1792,7 +1648,7 @@ __exports.OvaleASTClass = __class(nil, {
             ["icon"] = self.ParseAddIcon,
             ["if"] = self.ParseIf,
             ["item_info"] = self.ParseItemInfo,
-            ["item_require"] = self.ParseItemRequire,
+            ["itemrequire"] = self.ParseItemRequire,
             ["list"] = self.ParseList,
             ["list_item"] = self.ParseAddListItem,
             ["logical"] = self.ParseExpression,
@@ -1808,8 +1664,6 @@ __exports.OvaleASTClass = __class(nil, {
         }
         self.debug = ovaleDebug:create("OvaleAST")
         self.profiler = ovaleProfiler:create("OvaleAST")
-    end,
-    OnInitialize = function(self)
     end,
     print_r = function(self, node, indent, done, output)
         done = done or {}
@@ -1889,7 +1743,7 @@ __exports.OvaleASTClass = __class(nil, {
     end,
     FlattenParameterValue = function(self, parameterValue, annotation)
         if isAstNode(parameterValue) and isCsvNode(parameterValue) then
-            local parameters = self.self_flattenParametersPool:Get()
+            local parameters = self.flattenParametersPool:Get()
             for k, v in ipairs(parameterValue.csv) do
                 parameters[k] = self:FlattenParameterValueNotCsv(v, annotation)
             end
@@ -1937,12 +1791,13 @@ __exports.OvaleASTClass = __class(nil, {
                 self.debug:Error("Unable to unparse node of type '%s'.", node.type)
                 return "Unkown_" .. node.type
             else
-                return visitor(node)
+                node.asString = visitor(node)
+                return node.asString
             end
         end
     end,
     UnparseParameters = function(self, positionalParams, namedParams)
-        local output = self.self_outputPool:Get()
+        local output = self.outputPool:Get()
         for k, v in kpairs(namedParams) do
             if isListItemParameter(k, v) then
                 for list, item in pairs(v) do
@@ -1964,7 +1819,7 @@ __exports.OvaleASTClass = __class(nil, {
             insert(output, 1, self:Unparse(positionalParams[k]))
         end
         local outputString = concat(output, " ")
-        self.self_outputPool:Release(output)
+        self.outputPool:Release(output)
         return outputString
     end,
     SyntaxError = function(self, tokenStream, ...)
@@ -1974,7 +1829,7 @@ __exports.OvaleASTClass = __class(nil, {
         }
         for i = 1, 20, 1 do
             local tokenType, token = tokenStream:Peek(i)
-            if tokenType then
+            if tokenType and token then
                 context[#context + 1] = token
             else
                 context[#context + 1] = "<EOS>"
@@ -1987,46 +1842,54 @@ __exports.OvaleASTClass = __class(nil, {
         local visitor = self.PARSE_VISITOR[nodeType]
         if  not visitor then
             self.debug:Error("Unable to parse node of type '%s'.", nodeType)
+            return nil
         else
             return visitor(tokenStream, nodeList, annotation)
         end
     end,
     ParseParameters = function(self, tokenStream, nodeList, annotation, isList)
-        local ok = true
-        local positionalParams = self.self_rawPositionalParametersPool:Get()
-        local namedParams = self.self_rawNamedParametersPool:Get()
-        while ok do
+        local positionalParams = self.rawPositionalParametersPool:Get()
+        local namedParams = self.rawNamedParametersPool:Get()
+        while true do
             local tokenType, token = tokenStream:Peek()
             if tokenType then
                 local name
                 local node
                 if tokenType == "name" then
-                    ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
-                    if ok then
+                    node = self.ParseVariable(tokenStream, nodeList, annotation)
+                    if node then
                         name = node.name
+                    else
+                        return 
                     end
                 elseif tokenType == "number" then
-                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
-                    if ok then
+                    node = self.ParseNumber(tokenStream, nodeList, annotation)
+                    if node then
                         name = tostring(node.value)
+                    else
+                        return 
                     end
                 elseif tokenType == "-" then
                     tokenStream:Consume()
-                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
-                    if ok then
+                    node = self.ParseNumber(tokenStream, nodeList, annotation)
+                    if node then
                         local value = -1 * node.value
                         node = self:GetNumberNode(value, nodeList, annotation)
                         name = tostring(value)
+                    else
+                        return 
                     end
                 elseif tokenType == "string" then
-                    ok, node = self.ParseString(tokenStream, nodeList, annotation)
-                    if ok and __exports.isNodeType(node, "string") then
+                    node = self.ParseString(tokenStream, nodeList, annotation)
+                    if node and __exports.isNodeType(node, "string") then
                         name = node.value
+                    else
+                        return 
                     end
                 elseif checkToken(__exports.PARAMETER_KEYWORD, token) then
                     if isList then
                         self:SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token)
-                        ok = false
+                        return 
                     else
                         tokenStream:Consume()
                         name = token
@@ -2034,41 +1897,36 @@ __exports.OvaleASTClass = __class(nil, {
                 else
                     break
                 end
-                if ok and name then
+                if name then
                     tokenType, token = tokenStream:Peek()
                     if tokenType == "=" then
                         tokenStream:Consume()
                         local parameterName = name
                         if parameterName == "listitem" then
                             local np = namedParams[parameterName]
-                            local control = np or self.self_listPool:Get()
+                            local control = np or self.listPool:Get()
                             tokenType, token = tokenStream:Consume()
                             local list
-                            if tokenType == "name" then
+                            if tokenType == "name" and token then
                                 list = token
                             else
                                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; name expected.", token)
-                                ok = false
+                                return 
                             end
-                            if ok then
-                                tokenType, token = tokenStream:Consume()
-                                if tokenType ~= ":" then
-                                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.", token)
-                                    ok = false
-                                end
+                            tokenType, token = tokenStream:Consume()
+                            if tokenType ~= ":" then
+                                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.", token)
+                                return 
                             end
-                            if ok then
-                                ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                            node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                            if  not node then
+                                return 
                             end
-                            if ok and node then
-                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
-                                    self:SyntaxError(tokenStream, "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.", self:Unparse(node))
-                                    ok = false
-                                end
+                            if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+                                self:SyntaxError(tokenStream, "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.", self:Unparse(node))
+                                return 
                             end
-                            if ok then
-                                control[list] = node
-                            end
+                            control[list] = node
                             if  not namedParams[parameterName] then
                                 namedParams[parameterName] = control
                                 annotation.listList = annotation.listList or {}
@@ -2076,27 +1934,32 @@ __exports.OvaleASTClass = __class(nil, {
                             end
                         elseif name == "checkbox" then
                             local np = namedParams[name]
-                            local control = np or self.self_checkboxPool:Get()
-                            ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
-                            if ok and node then
-                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
-                                    self:SyntaxError(tokenStream, "Syntax error: 'checkbox' parameter with unexpected value '%s'.", self:Unparse(node))
-                                    ok = false
-                                end
+                            local control = np or self.checkboxPool:Get()
+                            node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                            if  not node then
+                                return 
                             end
-                            if ok then
-                                control[#control + 1] = node
+                            if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+                                self:SyntaxError(tokenStream, "Syntax error: 'checkbox' parameter with unexpected value '%s'.", self:Unparse(node))
+                                return 
                             end
+                            control[#control + 1] = node
                             if  not namedParams[name] then
                                 namedParams[name] = control
                                 annotation.checkBoxList = annotation.checkBoxList or {}
                                 annotation.checkBoxList[#annotation.checkBoxList + 1] = control
                             end
                         else
-                            ok, node = self.ParseParameterValue(tokenStream, nodeList, annotation)
+                            node = self.ParseParameterValue(tokenStream, nodeList, annotation)
+                            if  not node then
+                                return 
+                            end
                             namedParams[parameterName] = node
                         end
                     else
+                        if  not node then
+                            return 
+                        end
                         positionalParams[#positionalParams + 1] = node
                     end
                 end
@@ -2104,19 +1967,13 @@ __exports.OvaleASTClass = __class(nil, {
                 break
             end
         end
-        if ok then
-            annotation.rawPositionalParametersList = annotation.rawPositionalParametersList or {}
-            annotation.rawPositionalParametersList[#annotation.rawPositionalParametersList + 1] = positionalParams
-            annotation.rawNamedParametersList = annotation.rawNamedParametersList or {}
-            annotation.rawNamedParametersList[#annotation.rawNamedParametersList + 1] = namedParams
-        else
-            positionalParams = nil
-            namedParams = nil
-        end
-        return ok, positionalParams, namedParams
+        annotation.rawPositionalParametersList = annotation.rawPositionalParametersList or {}
+        annotation.rawPositionalParametersList[#annotation.rawPositionalParametersList + 1] = positionalParams
+        annotation.rawNamedParametersList = annotation.rawNamedParametersList or {}
+        annotation.rawNamedParametersList[#annotation.rawNamedParametersList + 1] = namedParams
+        return positionalParams, namedParams
     end,
     ParseParentheses = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local leftToken, rightToken
         do
             local tokenType, token = tokenStream:Consume()
@@ -2126,52 +1983,46 @@ __exports.OvaleASTClass = __class(nil, {
                 leftToken, rightToken = "{", "}"
             else
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.", token)
-                ok = false
+                return nil
             end
         end
-        local node
-        if ok then
-            ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+        local node = self.ParseExpression(tokenStream, nodeList, annotation)
+        if  not node then
+            return nil
         end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= rightToken then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if tokenType ~= rightToken then
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
+            return nil
         end
-        if ok then
-            node.left = leftToken
-            node.right = rightToken
-        end
-        return ok, node
+        node.left = leftToken
+        node.right = rightToken
+        return node
     end,
     ParseSimpleExpression = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local node
         local tokenType, token = tokenStream:Peek()
         if tokenType == "number" then
-            ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
+            node = self.ParseNumber(tokenStream, nodeList, annotation)
         elseif tokenType == "string" then
-            ok, node = self.ParseString(tokenStream, nodeList, annotation)
-        elseif tokenType == "name" then
+            node = self.ParseString(tokenStream, nodeList, annotation)
+        elseif tokenType == "name" or tokenType == "keyword" then
             tokenType, token = tokenStream:Peek(2)
             if tokenType == "." or tokenType == "(" then
-                ok, node = self.ParseFunction(tokenStream, nodeList, annotation)
+                node = self.ParseFunction(tokenStream, nodeList, annotation)
             else
-                ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
+                node = self.ParseVariable(tokenStream, nodeList, annotation)
             end
         elseif tokenType == "(" or tokenType == "{" then
-            ok, node = self:ParseParentheses(tokenStream, nodeList, annotation)
+            node = self:ParseParentheses(tokenStream, nodeList, annotation)
         else
             tokenStream:Consume()
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
-            ok = false
+            return nil
         end
-        return ok, node
+        return node
     end,
     ParseStatement = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local node
         local tokenType, token = tokenStream:Peek()
         if tokenType then
@@ -2192,40 +2043,32 @@ __exports.OvaleASTClass = __class(nil, {
                 end
                 if tokenType then
                     if BINARY_OPERATOR[token] then
-                        ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+                        node = self.ParseExpression(tokenStream, nodeList, annotation)
                     else
-                        ok, node = self.ParseGroup(tokenStream, nodeList, annotation)
+                        node = self.ParseGroup(tokenStream, nodeList, annotation)
                     end
                 else
                     self:SyntaxError(tokenStream, "Syntax error: unexpected end of script.")
                 end
             elseif token == "if" then
-                ok, node = self.ParseIf(tokenStream, nodeList, annotation)
+                node = self.ParseIf(tokenStream, nodeList, annotation)
             elseif token == "unless" then
-                ok, node = self.ParseUnless(tokenStream, nodeList, annotation)
+                node = self.ParseUnless(tokenStream, nodeList, annotation)
             else
-                ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+                node = self.ParseExpression(tokenStream, nodeList, annotation)
             end
         end
-        return ok, node
-    end,
-    DebugAST = function(self)
-        self.debug:Log(self.self_pool:DebuggingInfo())
-        self.debug:Log(self.self_namedParametersPool:DebuggingInfo())
-        self.debug:Log(self.self_checkboxPool:DebuggingInfo())
-        self.debug:Log(self.self_listPool:DebuggingInfo())
-        self.debug:Log(self.self_childrenPool:DebuggingInfo())
-        self.debug:Log(self.self_outputPool:DebuggingInfo())
+        return node
     end,
     NewNode = function(self, nodeList, hasChild)
-        local node = self.self_pool:Get()
+        local node = self.nodesPool:Get()
         if nodeList then
             local nodeId = #nodeList + 1
             node.nodeId = nodeId
             nodeList[nodeId] = node
         end
         if hasChild then
-            node.child = self.self_childrenPool:Get()
+            node.child = self.childrenPool:Get()
         end
         return node
     end,
@@ -2236,12 +2079,12 @@ __exports.OvaleASTClass = __class(nil, {
     ReleaseAnnotation = function(self, annotation)
         if annotation.checkBoxList then
             for _, control in ipairs(annotation.checkBoxList) do
-                self.self_checkboxPool:Release(control)
+                self.checkboxPool:Release(control)
             end
         end
         if annotation.listList then
             for _, control in ipairs(annotation.listList) do
-                self.self_listPool:Release(control)
+                self.listPool:Release(control)
             end
         end
         if annotation.objects then
@@ -2251,17 +2094,17 @@ __exports.OvaleASTClass = __class(nil, {
         end
         if annotation.rawPositionalParametersList then
             for _, parameters in ipairs(annotation.rawPositionalParametersList) do
-                self.self_rawPositionalParametersPool:Release(parameters)
+                self.rawPositionalParametersPool:Release(parameters)
             end
         end
         if annotation.rawNamedParametersList then
             for _, parameters in ipairs(annotation.rawNamedParametersList) do
-                self.self_rawNamedParametersPool:Release(parameters)
+                self.rawNamedParametersPool:Release(parameters)
             end
         end
         if annotation.nodeList then
             for _, node in ipairs(annotation.nodeList) do
-                self.self_pool:Release(node)
+                self.nodesPool:Release(node)
             end
         end
         for _, value in kpairs(annotation) do
@@ -2276,7 +2119,7 @@ __exports.OvaleASTClass = __class(nil, {
             self:ReleaseAnnotation(ast.annotation)
             ast.annotation = nil
         end
-        self.self_pool:Release(ast)
+        self.nodesPool:Release(ast)
     end,
     ParseCode = function(self, nodeType, code, nodeList, annotation)
         nodeList = nodeList or {}
@@ -2285,44 +2128,48 @@ __exports.OvaleASTClass = __class(nil, {
             comments = TokenizeComment,
             space = TokenizeWhitespace
         })
-        local _, node = self:Parse(nodeType, tokenStream, nodeList, annotation)
+        local node = self:Parse(nodeType, tokenStream, nodeList, annotation)
         tokenStream:Release()
+        if  not node then
+            return 
+        end
         return node, nodeList, annotation
     end,
-    ParseScript = function(self, name, options)
-        local code = self.ovaleScripts:GetScriptOrDefault(name)
-        local ast
-        if code then
-            options = options or {
-                optimize = true,
-                verify = true
-            }
-            local annotation = {
-                nodeList = {},
-                verify = options.verify
-            }
-            ast = self:ParseCode("script", code, annotation.nodeList, annotation)
-            if ast then
-                ast.annotation = annotation
-                self:PropagateConstants(ast)
-                self:PropagateStrings(ast)
-                self:FlattenParameters(ast)
-                self:VerifyParameterStances(ast)
-                self:VerifyFunctionCalls(ast)
-                if options.optimize then
-                    self:Optimize(ast)
-                end
-                self:InsertPostOrderTraversal(ast)
-            else
-                ast = self:NewNode()
-                ast.annotation = annotation
-                self:Release(ast)
-                ast = nil
+    parseScript = function(self, code, options)
+        options = options or {
+            optimize = true,
+            verify = true
+        }
+        local annotation = {
+            nodeList = {},
+            verify = options.verify,
+            definition = {}
+        }
+        local ast = self:ParseCode("script", code, annotation.nodeList, annotation)
+        if ast then
+            ast.annotation = annotation
+            self:PropagateConstants(ast)
+            self:PropagateStrings(ast)
+            self:FlattenParameters(ast)
+            self:VerifyParameterStances(ast)
+            self:VerifyFunctionCalls(ast)
+            if options.optimize then
+                self:Optimize(ast)
             end
+            self:InsertPostOrderTraversal(ast)
         else
-            self.debug:Debug("No code to parse")
+            self:ReleaseAnnotation(annotation)
         end
         return ast
+    end,
+    parseNamedScript = function(self, name, options)
+        local code = self.ovaleScripts:GetScriptOrDefault(name)
+        if code then
+            return self:parseScript(code, options)
+        else
+            self.debug:Debug("No code to parse")
+            return nil
+        end
     end,
     PropagateConstants = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_PropagateConstants")
@@ -2331,7 +2178,7 @@ __exports.OvaleASTClass = __class(nil, {
             if dictionary and ast.annotation.nameReference then
                 for _, node in ipairs(ast.annotation.nameReference) do
                     local valueNode = node
-                    if (node.type == "item_info" or node.type == "item_require") and node.name then
+                    if (node.type == "item_info" or node.type == "itemrequire") and node.name then
                         local itemId = dictionary[node.name]
                         if itemId then
                             node.itemId = itemId
@@ -2398,14 +2245,14 @@ __exports.OvaleASTClass = __class(nil, {
                     if stringKey then
                         local value
                         local name = node.name
-                        if name == "ItemName" then
+                        if name == "itemname" then
                             value = GetItemInfo(stringKey)
                             if  not value then
                                 value = "item:" .. stringKey
                             end
-                        elseif name == "L" then
+                        elseif name == "l" then
                             value = L[stringKey]
-                        elseif name == "SpellName" then
+                        elseif name == "spellname" then
                             value = self.ovaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
                         end
                         if value then
@@ -2427,7 +2274,7 @@ __exports.OvaleASTClass = __class(nil, {
             local dictionary = annotation.definition
             for _, node in ipairs(annotation.parametersReference) do
                 if node.rawPositionalParams then
-                    local parameters = self.self_flattenParameterValuesPool:Get()
+                    local parameters = self.flattenParameterValuesPool:Get()
                     for key, value in ipairs(node.rawPositionalParams) do
                         parameters[key] = self:FlattenParameterValue(value, annotation)
                     end
@@ -2474,7 +2321,7 @@ __exports.OvaleASTClass = __class(nil, {
                     annotation.parametersList = annotation.parametersList or {}
                     annotation.parametersList[#annotation.parametersList + 1] = parameters
                 end
-                local output = self.self_outputPool:Get()
+                local output = self.outputPool:Get()
                 for k, v in kpairs(node.namedParams) do
                     if isCheckBoxFlattenParameters(k, v) then
                         for _, name in ipairs(v) do
@@ -2499,7 +2346,7 @@ __exports.OvaleASTClass = __class(nil, {
                 else
                     node.paramsAsString = ""
                 end
-                self.self_outputPool:Release(output)
+                self.outputPool:Release(output)
             end
         end
         self.profiler:StopProfiling("OvaleAST_FlattenParameters")
@@ -2558,7 +2405,7 @@ __exports.OvaleASTClass = __class(nil, {
         local annotation = ast.annotation
         if annotation and annotation.postOrderReference then
             for _, node in ipairs(annotation.postOrderReference) do
-                local array = self.self_postOrderPool:Get()
+                local array = self.postOrderPool:Get()
                 local visited = self.postOrderVisitedPool:Get()
                 self:PostOrderTraversal(node, array, visited)
                 self.postOrderVisitedPool:Release(visited)
@@ -2568,39 +2415,6 @@ __exports.OvaleASTClass = __class(nil, {
         self.profiler:StopProfiling("OvaleAST_InsertPostOrderTraversal")
     end,
     Optimize = function(self, ast)
-        self:CommonFunctionElimination(ast)
-        self:CommonSubExpressionElimination(ast)
-    end,
-    CommonFunctionElimination = function(self, ast)
-        self.profiler:StartProfiling("OvaleAST_CommonFunctionElimination")
-        if ast.annotation then
-            if ast.annotation.functionReference then
-                local functionHash = ast.annotation.functionHash or {}
-                for _, node in ipairs(ast.annotation.functionReference) do
-                    if node.positionalParams or node.namedParams then
-                        local hash = node.name .. "(" .. node.paramsAsString .. ")"
-                        node.functionHash = hash
-                        functionHash[hash] = functionHash[hash] or node
-                    end
-                end
-                ast.annotation.functionHash = functionHash
-            end
-            if ast.annotation.functionHash and ast.annotation.nodeList then
-                local functionHash = ast.annotation.functionHash
-                for _, node in ipairs(ast.annotation.nodeList) do
-                    if node.child then
-                        for k, childNode in ipairs(node.child) do
-                            if childNode.functionHash then
-                                node.child[k] = functionHash[childNode.functionHash]
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        self.profiler:StopProfiling("OvaleAST_CommonFunctionElimination")
-    end,
-    CommonSubExpressionElimination = function(self, ast)
         self.profiler:StartProfiling("OvaleAST_CommonSubExpressionElimination")
         if ast and ast.annotation and ast.annotation.nodeList then
             local expressionHash = {}
@@ -2609,9 +2423,11 @@ __exports.OvaleASTClass = __class(nil, {
                 if hash then
                     expressionHash[hash] = expressionHash[hash] or node
                 end
+            end
+            for _, node in ipairs(ast.annotation.nodeList) do
                 if node.child then
                     for i, childNode in ipairs(node.child) do
-                        hash = childNode.asString
+                        local hash = childNode.asString
                         if hash then
                             local hashNode = expressionHash[hash]
                             if hashNode then

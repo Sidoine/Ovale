@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/CooldownState", 80201)
+local __exports = LibStub:NewLibrary("ovale/CooldownState", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
@@ -35,7 +35,7 @@ __exports.CooldownState = __class(nil, {
     CleanState = function(self)
         for spellId, cd in pairs(self.next.cd) do
             for k in kpairs(cd) do
-                (cd)[k] = nil
+                cd[k] = nil
             end
             self.next.cd[spellId] = nil
         end

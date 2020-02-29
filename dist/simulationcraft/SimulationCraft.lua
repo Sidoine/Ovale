@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/SimulationCraft", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/SimulationCraft", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -35,13 +35,13 @@ local print_r = __texttools.print_r
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local OvaleTaggedFunctionName = __texttools.OvaleTaggedFunctionName
 local self_outputPool = __texttools.self_outputPool
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local CamelCase = __texttools.CamelCase
 local __generator = LibStub:GetLibrary("ovale/simulationcraft/generator")
 local Mark = __generator.Mark
 local Sweep = __generator.Sweep
-local self_lastSimC = nil
-local self_lastScript = nil
+local self_lastSimC = ""
+local self_lastScript = ""
 local name = "OvaleSimulationCraft"
 __exports.OvaleSimulationCraftClass = __class(nil, {
     constructor = function(self, ovaleOptions, ovaleData, emiter, ovaleAst, parser, unparser, ovaleDebug, ovaleCompile, splitter, generator, ovale)
@@ -64,11 +64,11 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         end
         self:registerOptions()
         self.module = ovale:createModule("OvaleSimulationCraft", self.OnInitialize, self.handleDisable)
-        self.tracer = ovaleDebug:create("")
+        self.tracer = ovaleDebug:create("SimulationCraft")
     end,
     AddSymbol = function(self, annotation, symbol)
         local symbolTable = annotation.symbolTable or {}
-        local symbolList = annotation.symbolList or {}
+        local symbolList = annotation.symbolList
         if  not symbolTable[symbol] and  not self.ovaleData.DEFAULT_SPELL_LIST[symbol] then
             symbolTable[symbol] = true
             symbolList[#symbolList + 1] = symbol
@@ -122,38 +122,58 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         end
         profile.actionList = nil
     end,
-    ParseProfile = function(self, simc, annotation)
-        local profile = {}
+    readProfile = function(self, simc)
+        local parsedProfile = {}
         for _line in gmatch(simc, "[^\r\n]+") do
             local line = match(_line, "^%s*(.-)%s*$")
             if  not (match(line, "^#.*") or match(line, "^$")) then
                 local k, operator, value = match(line, "([^%+=]+)(%+?=)(.*)")
                 local key = k
                 if operator == "=" then
-                    (profile)[key] = value
+                    (parsedProfile)[key] = value
                 elseif operator == "+=" then
-                    if type(profile[key]) ~= "table" then
-                        local oldValue = profile[key]
-                        profile[key] = {}
-                        insert(profile[key], oldValue)
+                    if type(parsedProfile[key]) ~= "table" then
+                        local oldValue = parsedProfile[key]
+                        parsedProfile[key] = {}
+                        insert(parsedProfile[key], oldValue)
                     end
-                    insert(profile[key], value)
+                    insert(parsedProfile[key], value)
                 end
             end
         end
-        for k, v in kpairs(profile) do
+        for k, v in kpairs(parsedProfile) do
             if isLuaArray(v) then
-                (profile)[k] = concat(v)
+                (parsedProfile)[k] = concat(v)
             end
         end
-        profile.templates = {}
-        for k in kpairs(profile) do
+        parsedProfile.templates = {}
+        for k in kpairs(parsedProfile) do
             if sub(k, 1, 2) == "$(" and sub(k, -1) == ")" then
-                insert(profile.templates, k)
+                insert(parsedProfile.templates, k)
             end
         end
+        return parsedProfile
+    end,
+    ParseProfile = function(self, simc, dictionary)
+        local profile = self:readProfile(simc)
+        local classId = nil
+        local name = nil
+        for className in kpairs(RAID_CLASS_COLORS) do
+            local lowerClass = lower(className)
+            if profile[lowerClass] then
+                classId = className
+                name = profile[lowerClass]
+            end
+        end
+        if  not classId or  not name or  not profile.spec then
+            return nil
+        end
+        local annotation = Annotation(self.ovaleData, name, classId, profile.spec)
+        if dictionary then
+            annotation.dictionary = dictionary
+        end
+        profile.annotation = annotation
         local ok = true
-        annotation = annotation or Annotation(self.ovaleData)
         local nodeList = {}
         local actionList = {}
         for k, _v in kpairs(profile) do
@@ -169,9 +189,8 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                     local pattern = "%$%(" .. variable .. "%)"
                     v = gsub(v, pattern, profile[template])
                 end
-                local node
-                ok, node = self.parser:ParseActionList(name, v, nodeList, annotation)
-                if ok then
+                local node = self.parser:ParseActionList(name, v, nodeList, annotation)
+                if node then
                     actionList[#actionList + 1] = node
                 else
                     break
@@ -182,18 +201,11 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             return a.name < b.name
         end
 )
-        for className in kpairs(RAID_CLASS_COLORS) do
-            local lowerClass = lower(className)
-            if profile[lowerClass] then
-                annotation.class = className
-                annotation.name = profile[lowerClass]
-            end
-        end
         annotation.specialization = profile.spec
         annotation.level = profile.level
-        ok = ok and (annotation.class ~= nil and annotation.specialization ~= nil and annotation.level ~= nil)
+        ok = ok and (annotation.classId ~= nil and annotation.specialization ~= nil and annotation.level ~= nil)
         annotation.pet = profile.default_pet
-        local consumables = {}
+        local consumables = annotation.consumables
         for k, v in pairs(CONSUMABLE_ITEMS) do
             if v then
                 if profile[k] ~= nil then
@@ -201,40 +213,40 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 end
             end
         end
-        annotation.consumables = consumables
         if profile.role == "tank" then
             annotation.role = profile.role
-            annotation.melee = annotation.class
+            annotation.melee = annotation.classId
         elseif profile.role == "spell" then
             annotation.role = profile.role
-            annotation.ranged = annotation.class
+            annotation.ranged = annotation.classId
         elseif profile.role == "attack" or profile.role == "dps" then
             annotation.role = "attack"
             if profile.position == "ranged_back" then
-                annotation.ranged = annotation.class
+                annotation.ranged = annotation.classId
             else
-                annotation.melee = annotation.class
+                annotation.melee = annotation.classId
             end
         end
         annotation.position = profile.position
-        local taggedFunctionName = {}
+        local taggedFunctionName = annotation.taggedFunctionName
         for _, node in ipairs(actionList) do
             local fname = OvaleFunctionName(node.name, annotation)
             taggedFunctionName[fname] = true
             for _, tag in pairs(OVALE_TAGS) do
                 local bodyName, conditionName = OvaleTaggedFunctionName(fname, tag)
-                taggedFunctionName[bodyName] = true
-                taggedFunctionName[conditionName] = true
+                if bodyName and conditionName then
+                    taggedFunctionName[lower(bodyName)] = true
+                    taggedFunctionName[lower(conditionName)] = true
+                end
             end
         end
-        annotation.taggedFunctionName = taggedFunctionName
         annotation.functionTag = {}
         profile.actionList = actionList
         profile.annotation = annotation
         annotation.nodeList = nodeList
         if  not ok then
             self:Release(profile)
-            profile = nil
+            return nil
         end
         return profile
     end,
@@ -242,7 +254,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         local output = self_outputPool:Get()
         if profile.actionList then
             for _, node in ipairs(profile.actionList) do
-                output[#output + 1] = self.unparser:Unparse(node)
+                output[#output + 1] = self.unparser:Unparse(node) or ""
             end
         end
         local s = concat(output, "\n")
@@ -257,46 +269,49 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         local annotation = profile.annotation
         local ok = true
         if profile.actionList then
-            annotation.astAnnotation = annotation.astAnnotation or {}
-            annotation.astAnnotation.nodeList = nodeList
-            local dictionaryAST
-            do
-                self.ovaleDebug:ResetTrace()
-                local dictionaryAnnotation = {
-                    nodeList = {},
-                    definition = profile.annotation.dictionary
+            if annotation.astAnnotation then
+                annotation.astAnnotation.nodeList = nodeList
+            else
+                annotation.astAnnotation = {
+                    nodeList = nodeList,
+                    definition = annotation.dictionary
                 }
-                local dictionaryFormat = [[
-				Include(ovale_common)
-				Include(ovale_trinkets_mop)
-				Include(ovale_trinkets_wod)
-				Include(ovale_%s_spells)
-				%s
-			]]
-                local dictionaryCode = format(dictionaryFormat, lower(annotation.class), (self.ovaleOptions.db.profile.overrideCode) or "")
-                dictionaryAST = self.ovaleAst:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
-                if dictionaryAST then
-                    dictionaryAST.annotation = dictionaryAnnotation
-                    annotation.dictionaryAST = dictionaryAST
-                    annotation.dictionary = dictionaryAnnotation.definition
-                    self.ovaleAst:PropagateConstants(dictionaryAST)
-                    self.ovaleAst:PropagateStrings(dictionaryAST)
-                    self.ovaleAst:FlattenParameters(dictionaryAST)
-                    ResetControls()
-                    self.ovaleCompile:EvaluateScript(dictionaryAST, true)
-                end
+            end
+            self.ovaleDebug:ResetTrace()
+            local dictionaryAnnotation = {
+                nodeList = {},
+                definition = profile.annotation.dictionary
+            }
+            local dictionaryFormat = [[
+            Include(ovale_common)
+            Include(ovale_trinkets_mop)
+            Include(ovale_trinkets_wod)
+            Include(ovale_%s_spells)
+            %s
+        ]]
+            local dictionaryCode = format(dictionaryFormat, lower(annotation.classId), (self.ovaleOptions.db.profile.overrideCode) or "")
+            local dictionaryAST = self.ovaleAst:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
+            if dictionaryAST then
+                dictionaryAST.annotation = dictionaryAnnotation
+                annotation.dictionaryAST = dictionaryAST
+                annotation.dictionary = dictionaryAnnotation.definition
+                self.ovaleAst:PropagateConstants(dictionaryAST)
+                self.ovaleAst:PropagateStrings(dictionaryAST)
+                self.ovaleAst:FlattenParameters(dictionaryAST)
+                ResetControls()
+                self.ovaleCompile:EvaluateScript(dictionaryAST, true)
             end
             for _, node in ipairs(profile.actionList) do
                 local addFunctionNode = self.emiter.EmitActionList(node, nodeList, annotation, nil)
                 if addFunctionNode then
                     if node.name == "_default" and  not annotation.interrupt then
-                        local defaultInterrupt = classInfos[annotation.class][annotation.specialization]
+                        local defaultInterrupt = classInfos[annotation.classId][annotation.specialization]
                         if defaultInterrupt and defaultInterrupt.interrupt then
                             local interruptCall = self.ovaleAst:NewNode(nodeList)
                             interruptCall.type = "custom_function"
-                            interruptCall.name = CamelSpecialization(annotation) .. "InterruptActions"
-                            annotation.interrupt = annotation.class
-                            annotation[defaultInterrupt.interrupt] = annotation.class
+                            interruptCall.name = lower(LowerSpecialization(annotation) .. "InterruptActions")
+                            annotation.interrupt = annotation.classId
+                            annotation[defaultInterrupt.interrupt] = annotation.classId
                             insert(addFunctionNode.child[1].child, 1, interruptCall)
                         end
                     end
@@ -307,8 +322,10 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                     child[#child + 1] = commentNode
                     for _, tag in pairs(OVALE_TAGS) do
                         local bodyNode, conditionNode = self.splitter.SplitByTag(tag, addFunctionNode, nodeList, annotation)
-                        child[#child + 1] = bodyNode
-                        child[#child + 1] = conditionNode
+                        if bodyNode and conditionNode then
+                            child[#child + 1] = bodyNode
+                            child[#child + 1] = conditionNode
+                        end
                     end
                 else
                     ok = false
@@ -318,10 +335,10 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         end
         if ok then
             annotation.supportingFunctionCount = self.generator:InsertSupportingFunctions(child, annotation)
-            annotation.supportingInterruptCount = annotation.interrupt and self.generator:InsertInterruptFunctions(child, annotation)
+            annotation.supportingInterruptCount = (annotation.interrupt and self.generator:InsertInterruptFunctions(child, annotation)) or nil
             annotation.supportingControlCount = self.generator:InsertSupportingControls(child, annotation)
             self.generator:InsertVariables(child, annotation)
-            local className, specialization = annotation.class, annotation.specialization
+            local className, specialization = annotation.classId, annotation.specialization
             local lowerclass = lower(className)
             local aoeToggle = "opt_" .. lowerclass .. "_" .. specialization .. "_aoe"
             do
@@ -331,7 +348,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 insert(child, commentNode)
                 local code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization)
                 local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -342,7 +361,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("shortcd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -353,7 +374,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("shortcd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -364,7 +387,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, specialization, self.generator:GenerateIconBody("main", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -375,7 +400,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("main", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -386,7 +413,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("cd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             do
                 local fmt = [[
@@ -397,7 +426,9 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 			]]
                 local code = format(fmt, aoeToggle, specialization, self.generator:GenerateIconBody("cd", profile))
                 local node = self.ovaleAst:ParseCode("icon", code, nodeList, annotation.astAnnotation)
-                insert(child, node)
+                if node then
+                    insert(child, node)
+                end
             end
             Mark(ast)
             local changed = Sweep(ast)
@@ -410,14 +441,17 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         end
         if  not ok then
             self.ovaleAst:Release(ast)
-            ast = nil
+            return nil
         end
         return ast
     end,
     Emit = function(self, profile, noFinalNewLine)
         local ast = self:EmitAST(profile)
+        if  not ast then
+            return "error"
+        end
         local annotation = profile.annotation
-        local className = annotation.class
+        local className = annotation.classId
         local lowerclass = lower(className)
         local specialization = annotation.specialization
         local output = self_outputPool:Get()
@@ -447,7 +481,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 output[#output + 1] = "# Overrides."
                 output[#output + 1] = overrideCode
             end
-            if annotation.supportingControlCount > 0 then
+            if annotation.supportingControlCount and annotation.supportingControlCount > 0 then
                 output[#output + 1] = ""
             end
         end

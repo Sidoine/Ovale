@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Totem", 80201)
+local __exports = LibStub:NewLibrary("ovale/Totem", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -57,7 +57,9 @@ __exports.OvaleTotemClass = __class(States, {
         for slot = 1, MAX_TOTEMS + 1, 1 do
             self.next.totems[slot] = {
                 slot = slot,
-                serial = 0
+                serial = 0,
+                start = 0,
+                duration = 0
             }
         end
     end,
@@ -120,7 +122,7 @@ __exports.OvaleTotemClass = __class(States, {
             local buffPresent = (self.ovaleFuture.next.lastGCDSpellId == spellId)
             if  not buffPresent and si.buff_totem then
                 local aura = self.ovaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
-                buffPresent = self.ovaleAura:IsActiveAura(aura, atTime)
+                buffPresent = (aura and self.ovaleAura:IsActiveAura(aura, atTime)) or false
             end
             if  not si.buff_totem or buffPresent then
                 local texture = self.ovaleSpellBook:GetSpellTexture(spellId)
@@ -147,14 +149,16 @@ __exports.OvaleTotemClass = __class(States, {
     SummonTotem = function(self, spellId, atTime)
         self.profiler:StartProfiling("OvaleTotem_state_SummonTotem")
         local totemSlot = self:GetAvailableTotemSlot(spellId, atTime)
-        local name, _, icon = self.ovaleSpellBook:GetSpellInfo(spellId)
-        local duration = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
-        local totem = self.next.totems[totemSlot]
-        totem.name = name
-        totem.start = atTime
-        totem.duration = duration or 15
-        totem.icon = icon
-        totem.slot = totemSlot
+        if totemSlot then
+            local name, _, icon = self.ovaleSpellBook:GetSpellInfo(spellId)
+            local duration = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
+            local totem = self.next.totems[totemSlot]
+            totem.name = name
+            totem.start = atTime
+            totem.duration = duration or 15
+            totem.icon = icon
+            totem.slot = totemSlot
+        end
         self.profiler:StopProfiling("OvaleTotem_state_SummonTotem")
     end,
     GetAvailableTotemSlot = function(self, spellId, atTime)

@@ -1,9 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80201)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80300)
 if not __exports then return end
 __exports.registerRogueSpells = function(OvaleScripts)
     local name = "ovale_rogue_spells"
     local desc = "[8.2] Ovale: Rogue spells"
-    local code = [[Define(adrenaline_rush 13750)
+    local code = [[
+Define(adrenaline_rush 13750)
 # Increases your Energy regeneration rate by (25 of Spell Power), your maximum Energy by (25 of Spell Power), and your attack speed by s2 for 20 seconds.
   SpellInfo(adrenaline_rush cd=180 duration=20 gcd=0.8)
   # Energy regeneration increased by w1 and maximum Energy increased by w4.rnAttack speed increased by w2.
@@ -22,6 +23,9 @@ Define(arcane_pulse 260364)
 Define(backstab 53)
 # Stab the target, causing s2*<mult> Physical damage. Damage increased by s4 when you are behind your target.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(backstab energy=35 gcd=1 combopoints=-1)
+Define(bag_of_tricks 312411)
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+  SpellInfo(bag_of_tricks cd=90)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -80,11 +84,11 @@ Define(cheap_shot 1833)
   # Stunned.
   SpellAddTargetDebuff(cheap_shot cheap_shot=1)
 Define(conductive_ink_0 302491)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_0 channel=0 gcd=0 offgcd=1)
 
 Define(conductive_ink_1 302597)
-# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_1 channel=0 gcd=0 offgcd=1)
 
 Define(crimson_tempest 121411)
@@ -93,8 +97,9 @@ Define(crimson_tempest 121411)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(crimson_tempest crimson_tempest=1)
 Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(deadshot_buff 272936)
 # Mutilate has a s1 chance to apply additional Deadly Poison, and does s2*2 additional damage.rnrn|C000FFF00Assassination|R
@@ -127,14 +132,24 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over 18 seconds.?a231719[ Silences the target for 3 seconds when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
 # Rank 2: Garrote silences the target for 3 seconds when used from Stealth.rn
@@ -155,7 +170,7 @@ Define(gouge 1776)
   # Incapacitated.
   SpellAddTargetDebuff(gouge gouge=1)
 Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
 Define(guardian_of_azeroth_1 295855)
@@ -164,11 +179,11 @@ Define(guardian_of_azeroth_1 295855)
   # Haste increased by s1.
   SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
 Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
   SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
   SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
 Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
   SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
 Define(guardian_of_azeroth_4 300091)
@@ -199,10 +214,6 @@ Define(latent_arcana 296971)
   SpellInfo(latent_arcana cd=120 duration=4 channel=4 tick=1)
   # Infusing your body with arcane energies.
   SpellAddBuff(latent_arcana latent_arcana=1)
-Define(lifeblood_buff 274419)
-# When you use a Healthstone, gain s1 Leech for 20 seconds.
-  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -285,20 +296,29 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
+Define(reaping_flames_0 310690)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_0 cd=45 channel=0)
+Define(reaping_flames_1 311194)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
+  SpellInfo(reaping_flames_1 cd=45 channel=0)
+Define(reaping_flames_2 311195)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+  SpellInfo(reaping_flames_2 cd=45 channel=0)
+Define(reaping_flames_3 311202)
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
+  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
+  # Damage of next Reaping Flames increased by w1.
+  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
 Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
 Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -350,7 +370,7 @@ Define(shuriken_storm 197835)
 # Sprays shurikens at all targets within A1 yards, dealing s1*<CAP>/AP Physical damage.rnrnDamage increased by s3 while Stealth or Shadow Dance is active.rnrn|cFFFFFFFFAwards s2 combo lpoint:points; per target hit?a121471[ plus an additional 121471s2][].|r
   SpellInfo(shuriken_storm energy=35 gcd=1)
 Define(shuriken_tornado 277925)
-# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
+# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds.
   SpellInfo(shuriken_tornado energy=60 cd=60 duration=4 gcd=1 tick=1 talent=shuriken_tornado_talent)
   # Releasing a Shuriken Storm every sec.
   SpellAddBuff(shuriken_tornado shuriken_tornado=1)
@@ -425,10 +445,11 @@ Define(vendetta 79140)
   SpellAddTargetDebuff(vendetta vendetta=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(conductive_ink conductive_ink_0 conductive_ink_1)
@@ -471,7 +492,7 @@ Define(secret_technique_talent 20) #23183
 Define(shadow_focus_talent 6) #22333
 # ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
 Define(shuriken_tornado_talent 21) #21188
-# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
+# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds.
 Define(slice_and_dice_talent 18) #19250
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by (25 of Spell Power). Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
 Define(subterfuge_talent 5) #22332
@@ -486,7 +507,9 @@ Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
 Define(ashvanes_razor_coral_item 169311)
 Define(azsharas_font_of_power_item 169314)
+Define(focused_resolve_item 168506)
 Define(pocket_sized_computation_device_item 167555)
+Define(unbridled_fury_item 169299)
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
 Define(scent_of_blood_trait 277679)
@@ -500,6 +523,7 @@ Define(nights_vengeance_trait 273418)
 Define(perforate_trait 277673)
 Define(replicating_shadows_trait 286121)
 Define(the_first_dance_trait 278681)
+Define(blood_of_the_enemy_essence_id 23)
     ]]
     code = code .. [[
 # Rogue spells and functions.
@@ -541,7 +565,7 @@ Define(blade_flurry_buff 13877)
 Define(blade_rush_buff 271896)
 	SpellInfo(blade_rush_buff duration=5)
 Define(blind 2094)
-	SpellInfo(blind cd=120)
+	SpellInfo(blind cd=120 interrupt=1)
 	SpellInfo(blind add_cd=30 talent=blinding_powder_talent)
 	SpellAddTargetDebuff(blind blind_debuff=1)
 Define(blind_debuff 2094)
@@ -587,7 +611,7 @@ Define(deadly_poison_buff 2823)
 Define(deadly_poison_debuff 2818)
 	SpellInfo(deadly_poison_debuff duration=12 tick=2 haste=melee)
 Define(deadshot_buff 272940)
-	
+
 Define(elaborate_planning_buff 193640)
 	SpellInfo(elaborate_planning_buff duration=5)
 
@@ -766,7 +790,7 @@ Define(sprint_buff 2983)
 	SpellRequire(stealth unusable 1=combat,1)
 	SpellAddBuff(stealth stealth_buff=1)
 	SpellAddBuff(stealth master_of_shadows=1 talent=master_of_shadows_talent specialization=subtlety)
-	
+
 	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=assassination)
 	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=subtlety)
 Define(stealth_buff 1784)
@@ -784,7 +808,7 @@ Define(symbols_of_death_buff 212283)
 	SpellInfo(symbols_of_death_buff duration=10)
 
 	SpellInfo(toxic_blade energy=20 cd=25 combopoints=-1 tag=main)
-	
+
 
 	SpellInfo(toxic_blade_debuff duration=9)
 Define(tricks_of_the_trade 57934)
@@ -808,14 +832,14 @@ Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
 Define(wound_poison_debuff 8679)
 	SpellInfo(wound_poison_debuff duration=12)
-	
+
 
 # Roll the Bones buffs
 Define(broadside_buff 193356)
 	SpellInfo(broadside_buff duration=12 add_duration_combopoints=6)
 Define(buried_treasure_buff 199600)
 	SpellInfo(buried_treasure_buff duration=12 add_duration_combopoints=6)
-Define(grand_melee_buff 193358)	
+Define(grand_melee_buff 193358)
 	SpellInfo(grand_melee_buff duration=12 add_duration_combopoints=6)
 Define(ruthless_precision_buff 193357)
 	SpellInfo(ruthless_precision_buff duration=12 add_duration_combopoints=6)

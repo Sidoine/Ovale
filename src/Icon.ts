@@ -17,21 +17,21 @@ interface IconParent {
 }
 
 export class OvaleIcon {
-    actionHelp: any;
+    actionHelp: string | undefined;
     actionId: any;
     actionType: any;
-    actionButton: boolean;
+    actionButton: boolean = false;
     namedParams: any;
     positionalParams: any;
-    texture: any;
+    texture: string | undefined;
     cooldownStart: any;
     cooldownEnd: any;
     lastSound: any;
     fontScale: any;
     value: any;
-    help: any;
-    shouldClick: boolean;
-    cdShown: boolean;
+    help: string | undefined;
+    shouldClick: boolean = false;
+    cdShown: boolean = false;
     focusText: UIFontString;
     fontFlags: any;
     fontHeight: any;
@@ -48,17 +48,55 @@ export class OvaleIcon {
         return (next(this.parent.checkBoxWidget) != undefined || next(this.parent.listWidget) != undefined);
     }
 
-    constructor(private name: string, private parent: IconParent, secure: boolean, private ovaleOptions: OvaleOptionsClass, private ovaleSpellBook: OvaleSpellBookClass) {
+    constructor(name: string, private parent: IconParent, secure: boolean, private ovaleOptions: OvaleOptionsClass, private ovaleSpellBook: OvaleSpellBookClass) {
         if (!secure) {
             this.frame = CreateFrame("CheckButton", name, parent.frame, "ActionButtonTemplate");
         }        
         else{
             this.frame = CreateFrame("CheckButton", name, parent.frame, "SecureActionButtonTemplate, ActionButtonTemplate");
         }
-        this.OvaleIcon_OnLoad();
+        const profile = this.ovaleOptions.db.profile;
+        this.icone = _G[`${name}Icon`];
+        this.shortcut = _G[`${name}HotKey`];
+        this.remains = _G[`${name}Name`];
+        this.rangeIndicator = _G[`${name}Count`];
+        this.rangeIndicator.SetText(profile.apparence.targetText);
+        this.cd = _G[`${name}Cooldown`];
+        this.normalTexture = _G[`${name}NormalTexture`];
+        let [fontName, fontHeight, fontFlags] = this.shortcut.GetFont();
+        this.fontName = fontName;
+        this.fontHeight = fontHeight;
+        this.fontFlags = fontFlags;
+        this.focusText = this.frame.CreateFontString(undefined, "OVERLAY");
+        this.cdShown = true;
+        this.shouldClick = false;
+        this.help = undefined;
+        this.value = undefined;
+        this.fontScale = undefined;
+        this.lastSound = undefined;
+        this.cooldownEnd = undefined;
+        this.cooldownStart = undefined;
+        this.texture = undefined;
+        this.positionalParams = undefined;
+        this.namedParams = undefined;
+        this.actionButton = false;
+        this.actionType = undefined;
+        this.actionId = undefined;
+        this.actionHelp = undefined;
+        this.frame.SetScript("OnMouseUp", () => this.OvaleIcon_OnMouseUp());
+        this.frame.SetScript("OnEnter", () => this.OvaleIcon_OnEnter());
+        this.frame.SetScript("OnLeave", () => this.OvaleIcon_OnLeave());
+        this.focusText.SetFontObject("GameFontNormalSmall");
+        this.focusText.SetAllPoints(this.frame);
+        this.focusText.SetTextColor(1, 1, 1);
+        this.focusText.SetText(L["Focus"]);
+        this.frame.RegisterForClicks("AnyUp");
+        if (profile.apparence.clickThru) {
+            this.frame.EnableMouse(false);
+        }
     }
 
-    SetValue(value: number, actionTexture: string) {
+    SetValue(value: number | undefined, actionTexture: string | undefined) {
         this.icone.Show();
         this.icone.SetTexture(actionTexture);
         this.icone.SetAlpha(this.ovaleOptions.db.profile.apparence.alpha);
@@ -83,7 +121,7 @@ export class OvaleIcon {
         }
         this.frame.Show();
     }
-    Update(element: AstNode, startTime: number, actionTexture?: string, actionInRange?: boolean, actionCooldownStart?: number, actionCooldownDuration?: number, actionUsable?: boolean, actionShortcut?: string, actionIsCurrent?: boolean, actionEnable?: boolean, actionType?: string, actionId?: string | number, actionTarget?: string, actionResourceExtend?: number) {
+    Update(element?: AstNode, startTime?: number, actionTexture?: string, actionInRange?: boolean, actionCooldownStart?: number, actionCooldownDuration?: number, actionUsable?: boolean, actionShortcut?: string, actionIsCurrent?: boolean, actionEnable?: boolean, actionType?: string, actionId?: string | number, actionTarget?: string, actionResourceExtend?: number) {
         this.actionType = actionType;
         this.actionId = actionId;
         this.value = undefined;
@@ -135,22 +173,26 @@ export class OvaleIcon {
             } else {
                 this.icone.SetAlpha(0.5);
             }
-            if (element.namedParams.nored != 1 && actionResourceExtend && actionResourceExtend > 0) {
-                this.icone.SetVertexColor(0.75, 0.2, 0.2);
-            } else {
-                this.icone.SetVertexColor(1, 1, 1);
-            }
-            this.actionHelp = element.namedParams.help;
-            if (!(this.cooldownStart && this.cooldownEnd)) {
-                this.lastSound = undefined;
-            }
-            if (element.namedParams.sound && !this.lastSound) {
-                let delay = element.namedParams.soundtime || 0.5;
-                if (now >= startTime - delay) {
-                    this.lastSound = element.namedParams.sound;
-                    PlaySoundFile(this.lastSound);
+
+            if (element) {
+                if (element.namedParams.nored != 1 && actionResourceExtend && actionResourceExtend > 0) {
+                    this.icone.SetVertexColor(0.75, 0.2, 0.2);
+                } else {
+                    this.icone.SetVertexColor(1, 1, 1);
+                }
+                this.actionHelp = element.namedParams.help;
+                if (!(this.cooldownStart && this.cooldownEnd)) {
+                    this.lastSound = undefined;
+                }
+                if (element.namedParams.sound && !this.lastSound) {
+                    let delay = element.namedParams.soundtime || 0.5;
+                    if (now >= startTime - delay) {
+                        this.lastSound = element.namedParams.sound;
+                        PlaySoundFile(this.lastSound);
+                    }
                 }
             }
+
             let red = false; // TODO This value is not set anymore, find why
             if (!red && startTime > now && profile.apparence.highlightIcon) {
                 let lag = 0.6;
@@ -188,7 +230,7 @@ export class OvaleIcon {
                 this.rangeIndicator.SetVertexColor(1.0, 0.1, 0.1);
                 this.rangeIndicator.Show();
             } 
-            if (element.namedParams.text) {
+            if (element && element.namedParams.text) {
                 this.focusText.SetText(tostring(element.namedParams.text));
                 this.focusText.Show();
             } else if (actionTarget && actionTarget != "target") {
@@ -216,7 +258,7 @@ export class OvaleIcon {
         }
         return [startTime, element];
     }
-    SetHelp(help: string) {
+    SetHelp(help: string | undefined) {
         this.help = help;
     }
     SetParams(positionalParams: PositionalParameters, namedParams: NamedParameters, secure?: boolean) {
@@ -231,7 +273,7 @@ export class OvaleIcon {
                     let suffix = sub(k, index + 5);
                     this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
                     this.frame.SetAttribute("unit", this.namedParams.target || "target");
-                    this.frame.SetAttribute(k, this.ovaleSpellBook.GetSpellName(<number>v));
+                    this.frame.SetAttribute(k, this.ovaleSpellBook.GetSpellName(<number>v) || "Unknown spell");
                     this.actionButton = true;
                 }
             }
@@ -265,10 +307,13 @@ export class OvaleIcon {
                 GameTooltip.SetText(L[this.help]);
             }
             if (this.actionType) {
-                let actionHelp = this.actionHelp;
-                if (!actionHelp) {
+                let actionHelp: string;
+                if (this.actionHelp) {
+                    actionHelp = this.actionHelp
+                }
+                else {
                     if (this.actionType == "spell") {
-                        actionHelp = this.ovaleSpellBook.GetSpellName(this.actionId);
+                        actionHelp = this.ovaleSpellBook.GetSpellName(this.actionId) || "Unknown spell";
                     } else if (this.actionType == "value") {
                         actionHelp = (this.value < INFINITY) && tostring(this.value) || "infinity";
                     } else {
@@ -288,49 +333,6 @@ export class OvaleIcon {
             GameTooltip.Hide();
         }
     }
-    OvaleIcon_OnLoad() {
-        let name = this.name;
-        const profile = this.ovaleOptions.db.profile;
-        this.icone = _G[`${name}Icon`];
-        this.shortcut = _G[`${name}HotKey`];
-        this.remains = _G[`${name}Name`];
-        this.rangeIndicator = _G[`${name}Count`];
-        this.rangeIndicator.SetText(profile.apparence.targetText);
-        this.cd = _G[`${name}Cooldown`];
-        this.normalTexture = _G[`${name}NormalTexture`];
-        let [fontName, fontHeight, fontFlags] = this.shortcut.GetFont();
-        this.fontName = fontName;
-        this.fontHeight = fontHeight;
-        this.fontFlags = fontFlags;
-        this.focusText = this.frame.CreateFontString(undefined, "OVERLAY");
-        this.cdShown = true;
-        this.shouldClick = false;
-        this.help = undefined;
-        this.value = undefined;
-        this.fontScale = undefined;
-        this.lastSound = undefined;
-        this.cooldownEnd = undefined;
-        this.cooldownStart = undefined;
-        this.texture = undefined;
-        this.positionalParams = undefined;
-        this.namedParams = undefined;
-        this.actionButton = false;
-        this.actionType = undefined;
-        this.actionId = undefined;
-        this.actionHelp = undefined;
-        this.frame.SetScript("OnMouseUp", () => this.OvaleIcon_OnMouseUp());
-        this.frame.SetScript("OnEnter", () => this.OvaleIcon_OnEnter());
-        this.frame.SetScript("OnLeave", () => this.OvaleIcon_OnLeave());
-        this.focusText.SetFontObject("GameFontNormalSmall");
-        this.focusText.SetAllPoints(this.frame);
-        this.focusText.SetTextColor(1, 1, 1);
-        this.focusText.SetText(L["Focus"]);
-        this.frame.RegisterForClicks("AnyUp");
-        if (profile.apparence.clickThru) {
-            this.frame.EnableMouse(false);
-        }
-    }
-
     SetPoint(anchor: UIPosition, reference: UIFrame, refAnchor: UIPosition, x:number, y: number) {
         this.frame.SetPoint(anchor, reference, refAnchor, x, y);
     }

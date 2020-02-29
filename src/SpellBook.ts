@@ -7,6 +7,8 @@ import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
+import { OvaleDataClass } from "./Data";
+import { isNumber } from "./tools";
 
 let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
 
@@ -47,7 +49,7 @@ export class OvaleSpellBookClass {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
     
-    constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {    
+    constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass, private ovaleData: OvaleDataClass) {    
         let debugOptions = {
             spellbook: {
                 name: L["Spellbook"],
@@ -170,26 +172,30 @@ export class OvaleSpellBookClass {
                     let [, , linkData, spellName] = ParseHyperlink(spellLink);
                     let id = tonumber(linkData);
                     let [name] = GetSpellInfo(id);
-                    this.spell[id] = name;
-                    this.isHarmful[id] = IsHarmfulSpell(index, bookType);
-                    this.isHelpful[id] = IsHelpfulSpell(index, bookType);
-                    this.texture[id] = GetSpellTexture(index, bookType);
-                    this.spellbookId[bookType][id] = index;
-                    this.tracer.Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"));
-                    if (spellId && id != spellId) {
-                        let name;
-                        if (skillType == "PETACTION" && spellName) {
-                            name = spellName;
-                        } else {
-                            [name] = GetSpellInfo(spellId);
+                    if (name) {
+                        this.spell[id] = name;
+                        this.isHarmful[id] = IsHarmfulSpell(index, bookType);
+                        this.isHelpful[id] = IsHelpfulSpell(index, bookType);
+                        this.texture[id] = GetSpellTexture(index, bookType);
+                        this.spellbookId[bookType][id] = index;
+                        this.tracer.Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"));
+                        if (spellId && id != spellId) {
+                            let name;
+                            if (skillType == "PETACTION" && spellName) {
+                                name = spellName;
+                            } else {
+                                [name] = GetSpellInfo(spellId);
+                            }
+                            if (name) {
+                                this.spell[spellId] = name;
+                                this.isHarmful[spellId] = this.isHarmful[id];
+                                this.isHelpful[spellId] = this.isHelpful[id];
+                                this.texture[spellId] = this.texture[id];
+                                this.spellbookId[bookType][spellId] = index;
+                                this.tracer.Debug("    %s (%d) is at offset %d.", name, spellId, index);
+                            }
                         }
-                        this.spell[spellId] = name;
-                        this.isHarmful[spellId] = this.isHarmful[id];
-                        this.isHelpful[spellId] = this.isHelpful[id];
-                        this.texture[spellId] = this.texture[id];
-                        this.spellbookId[bookType][spellId] = index;
-                        this.tracer.Debug("    %s (%d) is at offset %d.", name, spellId, index);
-                    }
+                    }                    
                 }
             } else if (skillType == "FLYOUT") {
                 let flyoutId = spellId;
@@ -199,20 +205,25 @@ export class OvaleSpellBookClass {
                         let [id, overrideId, isKnown, spellName] = GetFlyoutSlotInfo(flyoutId, flyoutIndex);
                         if (isKnown) {
                             let [name] = GetSpellInfo(id);
-                            this.spell[id] = name;
-                            this.isHarmful[id] = IsHarmfulSpell(spellName);
-                            this.isHelpful[id] = IsHelpfulSpell(spellName);
-                            this.texture[id] = GetSpellTexture(index, bookType);
-                            this.spellbookId[bookType][id] = undefined;
-                            this.tracer.Debug("    %s (%d) is at offset %d.", name, id, index);
+                            if (name) {
+                                this.spell[id] = name;
+                                this.isHarmful[id] = IsHarmfulSpell(spellName);
+                                this.isHelpful[id] = IsHelpfulSpell(spellName);
+                                this.texture[id] = GetSpellTexture(index, bookType);
+                                delete this.spellbookId[bookType][id];
+                                this.tracer.Debug("    %s (%d) is at offset %d.", name, id, index);
+                            }
+                            
                             if (id != overrideId) {
                                 let [name] = GetSpellInfo(overrideId);
-                                this.spell[overrideId] = name;
-                                this.isHarmful[overrideId] = this.isHarmful[id];
-                                this.isHelpful[overrideId] = this.isHelpful[id];
-                                this.texture[overrideId] = this.texture[id];
-                                this.spellbookId[bookType][overrideId] = undefined;
-                                this.tracer.Debug("    %s (%d) is at offset %d.", name, overrideId, index);
+                                if (name) {
+                                    this.spell[overrideId] = name;
+                                    this.isHarmful[overrideId] = this.isHarmful[id];
+                                    this.isHelpful[overrideId] = this.isHelpful[id];
+                                    this.texture[overrideId] = this.texture[id];
+                                    delete this.spellbookId[bookType][overrideId];
+                                    this.tracer.Debug("    %s (%d) is at offset %d.", name, overrideId, index);
+                                }
                             }
                         }
                     }
@@ -223,7 +234,7 @@ export class OvaleSpellBookClass {
             }
         }
     }
-    GetCastTime(spellId: number): number {
+    GetCastTime(spellId: number): number | undefined {
         if (spellId) {
             let [name, , , castTime] = this.GetSpellInfo(spellId);
             if (name) {
@@ -233,12 +244,12 @@ export class OvaleSpellBookClass {
                     castTime = 0;
                 }
             } else {
-                castTime = undefined;
+                return undefined;
             }
             return castTime;
         }
     }
-    GetSpellInfo(spellId: number): [string, string, string, number, number, number, number] {
+    GetSpellInfo(spellId: number): [string | undefined, string | undefined, string, number, number, number, number] {
         let [index, bookType] = this.GetSpellBookIndex(spellId);
         if (index && bookType) {
             return GetSpellInfo(index, bookType);
@@ -246,14 +257,12 @@ export class OvaleSpellBookClass {
             return GetSpellInfo(spellId);
         }
     }
-    GetSpellName(spellId: number): string {
-        if (spellId) {
-            let spellName = this.spell[spellId];
-            if (!spellName) {
-                [spellName] = this.GetSpellInfo(spellId);
-            }
-            return spellName;
+    GetSpellName(spellId: number): string | undefined {
+        let spellName: string | undefined = this.spell[spellId];
+        if (!spellName) {
+            [spellName] = this.GetSpellInfo(spellId);
         }
+        return spellName;
     }
     GetSpellTexture(spellId: number): string {
         return this.texture[spellId];
@@ -283,7 +292,21 @@ export class OvaleSpellBookClass {
     IsKnownTalent(talentId: number): boolean {
         return (talentId && this.talentPoints[talentId]) && true || false;
     }
-    GetSpellBookIndex(spellId: number): [number, BookType] {
+
+    getKnownSpellId(spell: number | string) {
+        if (isNumber(spell)) return spell;
+        const spells = this.ovaleData.buffSpellList[spell];
+        if (!spells) {
+            this.ovale.OneTimeMessage(`Unknown spell list ${spell}`);
+            return undefined;
+        } 
+        for (const [spellId] of pairs(spells)) {
+            if (this.spell[spellId]) return spellId;
+        }
+        return undefined;
+    }
+
+    GetSpellBookIndex(spellId: number): [number?, BookType?] {
         let bookType: BookType = BOOKTYPE_SPELL;
         while (true) {
             let index = this.spellbookId[bookType][spellId];

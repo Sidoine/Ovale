@@ -92,6 +92,11 @@ export class OvaleAzeriteEssenceClass {
     IsMinorEssence(essenceId: number) {
         return this.self_essences[essenceId] !== undefined && true || false;
     }
+    
+    EssenceRank(essenceId: number) {
+        let essence = this.self_essences[essenceId];
+        return essence !== undefined && essence.rank || 0;
+    }
 
     DebugEssences(){
         let output: LuaArray<string> = {};

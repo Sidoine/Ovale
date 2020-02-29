@@ -14,10 +14,13 @@ AddIcon
 	Texture(ability_rogue_eviscerate) # Eviscerate
 	Texture(ability_rogue_nightblade) # Nightblade
 	Texture(ability_rogue_shurikenstorm) # Shuriken Storm
+	Texture(inv_throwingknife_07) # Shuriken Toss
+
+	# Interrupts
 	Texture(ability_kick) # Kick
 	Texture(ability_rogue_kidneyshot) # Kidney Shot
 	Texture(ability_cheapshot) # Cheap Shot
-	Texture(inv_throwingknife_07) # Shuriken Toss
+	Texture(spell_shadow_mindsteal) # Blind
 
 	# Buffs
 	Texture(ability_stealth) # Stealth
@@ -27,13 +30,13 @@ AddIcon
 	Texture(ability_rogue_shadowdance) # Shadow Dance
 	Texture(ability_vanish) # Vanish
 	Texture(inv_knife_1h_grimbatolraid_d_03) # Shadow Blades
-	
+
 	# Buffs PvP (Used in PvE)
 	Texture(spell_ice_lament) # Cold Blood
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -44,7 +47,10 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
-	
+	Texture(ability_essence_reapingflames) # Reaping Flames
+	Texture(ability_essence_momentofglory) # Moment of Glory
+	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
+
 	# Talents
 	Texture(ability_ironmaidens_convulsiveshadows) # Gloomblade (T1) (Replaces Backstab)
 	Texture(achievement_bg_killingblow_berserker) # Marked for Death (T3)
@@ -62,58 +68,67 @@ AddIcon
 	Texture(spell_shadow_charm) # Every Man for Himself (Human)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
-	Texture(ability_ambush) # Shadowmeld (Night Elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_ambush) # Shadowmeld (Night elf)
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

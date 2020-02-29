@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerWarriorArmsHelper = function(OvaleScripts)
 do
 	local name = "WARRARMShelp"
-	local desc = "[Xel][7.0.3] Spellhelper: Arms"
+	local desc = "[Xel][8.x] Spellhelper: Arms"
 	local code = [[
 AddIcon
 {
@@ -11,9 +11,9 @@ AddIcon
 	# Spells
 	Texture(ability_warrior_decisivestrike) # Slam
 	Texture(ability_warrior_savageblow) # Mortal Strike
+	Texture(ability_meleedamage) # Overpower
 	Texture(ability_warrior_colossussmash) # Colossus Smash
 	Texture(ability_warrior_bladestorm) # Bladestorm
-	Texture(ability_warrior_cleave) # Cleave
 	Texture(ability_whirlwind) # Whirlwind
 	Texture(inv_sword_48) # Execute
 	Texture(inv_gauntlets_04) # Pummel
@@ -22,12 +22,13 @@ AddIcon
 	Texture(ability_warrior_devastate) # Victory Rush
 
 	# Buffs
-	Texture(warrior_talent_icon_innerrage) # Battle Cry
+	Texture(ability_rogue_slicedice) # Sweeping Strikes
+	Texture(ability_warrior_battleshout) # Battle Shout
 	Texture(spell_nature_ancestralguardian) # Berserker Rage
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -38,15 +39,20 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
-	
+	Texture(ability_essence_reapingflames) # Reaping Flames
+	Texture(ability_essence_momentofglory) # Moment of Glory
+	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
+
 	# Talents
-	Texture(ability_meleedamage) # Overpower (T1)
-	Texture(ability_warrior_shockwave) # Shockwave (T2)
+	Texture(inv_skullsplitter) # Skullsplitter (T1)
+	Texture(spell_impending_victory) # Impending Victory (T2)
 	Texture(warrior_talent_icon_stormbolt) # Storm Bolt (T2)
 	Texture(ability_gouge) # Rend (T3)
-	Texture(warrior_talent_icon_avatar) # Avatar (T3)
 	Texture(ability_warrior_defensivestance) # Defensive Stance (T4)
-	Texture(ability_warrior_focusedrage) # Focused Rage (T5)
+	Texture(inv_warbreaker) # Warbreaker (T5) (replaces Colossus Smash)
+	Texture(ability_warrior_cleave) # Cleave (T5)
+	Texture(warrior_talent_icon_avatar) # Avatar (T6)
+	Texture(achievement_boss_kingymiron) # Deadly Calm (T6)
 	Texture(warrior_talent_icon_ravager) # Ravager (T7)
 
 	# Racials
@@ -62,49 +68,58 @@ AddIcon
 	Texture(spell_holy_holyprotection) # Gift of the Naaru (Draenei)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
-	Texture(ability_ambush) # Shadowmeld (Night Elf)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_ambush) # Shadowmeld (Night elf)
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Warlock", 80201)
+local __exports = LibStub:NewLibrary("ovale/Warlock", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -64,7 +64,7 @@ __exports.OvaleWarlockClass = __class(nil, {
         self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
             local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId = CombatLogGetCurrentEventInfo()
             if sourceGUID ~= self.ovale.playerGUID then
-                return 
+                return
             end
             self_serial = self_serial + 1
             if cleuEvent == "SPELL_SUMMON" then
@@ -88,7 +88,8 @@ __exports.OvaleWarlockClass = __class(nil, {
                 end
                 self.ovale:needRefresh()
             elseif cleuEvent == "SPELL_CAST_SUCCESS" then
-                if spellId == 196277 then
+                local demonicConsumptionTalent = 20
+                if spellId == 196277 or (spellId == 265187 and self.ovaleSpellBook:IsKnownTalent(demonicConsumptionTalent)) then
                     for k, d in pairs(self_demons) do
                         if d.id == 55659 or d.id == 143622 then
                             self_demons[k] = nil

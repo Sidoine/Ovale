@@ -14,10 +14,13 @@ AddIcon
 	Texture(ability_rogue_pistolshot) # Pistol Shot
 	Texture(inv_weapon_rifle_01) # Between the Eyes
 	Texture(ability_rogue_waylay) # Dispatch
+
+	# Interrupts
 	Texture(ability_kick) # Kick
 	Texture(ability_gouge) # Gouge
 	Texture(ability_cheapshot) # Cheap Shot
-	
+	Texture(spell_shadow_mindsteal) # Blind
+
 	# Buffs
 	Texture(ability_rogue_rollthebones) # Roll the Bones
 	Texture(ability_stealth) # Stealth
@@ -25,10 +28,10 @@ AddIcon
 	Texture(spell_shadow_shadowworddominate) # Adrenaline Rush
 	Texture(ability_rogue_crimsonvial) # Crimson Vial
 	Texture(ability_warrior_punishingblow) # Blade Flurry
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -39,6 +42,9 @@ AddIcon
 	Texture(spell_azerite_essence10) # Ripple in Space
 	Texture(spell_azerite_essence03) # The Unbound Force
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
+	Texture(ability_essence_reapingflames) # Reaping Flames
+	Texture(ability_essence_momentofglory) # Moment of Glory
+	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
 
 	# Talents
 	Texture(ability_creature_cursed_02) # Ghostly Strike (T1)
@@ -58,39 +64,48 @@ AddIcon
 	Texture(spell_shadow_charm) # Every Man for Himself (Human)
 	Texture(ability_racial_darkflight) # Darkflight (Worgen)
 	Texture(ability_rogue_trip) # Escape Artist (Gnome)
-	Texture(ability_ambush) # Shadowmeld (Night Elf)
+	Texture(ability_ambush) # Shadowmeld (Night elf)
 	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
+	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
+	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
+	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
+	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
+	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
+	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
+	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
+	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

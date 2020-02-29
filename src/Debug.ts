@@ -9,9 +9,8 @@ import { format } from "@wowts/string";
 import { pairs, lualength, LuaArray } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
-let self_traced = false;
-let self_traceLog: TextDump = undefined;
-let OVALE_TRACELOG_MAXLINES = 4096;
+
+const OVALE_TRACELOG_MAXLINES = 4096;
 
 export class Tracer {
     constructor(private options: OvaleOptionsClass, private debug: OvaleDebugClass, private name: string) {
@@ -38,11 +37,11 @@ export class Tracer {
     }
     Log(...__args:any[]) {
         if (this.debug.trace) {
-            let N = self_traceLog.Lines();
+            let N = this.debug.traceLog.Lines();
             if (N < OVALE_TRACELOG_MAXLINES - 1) {
-                self_traceLog.AddLine(MakeString(...__args));
+                this.debug.traceLog.AddLine(MakeString(...__args));
             } else if (N == OVALE_TRACELOG_MAXLINES - 1) {
-                self_traceLog.AddLine("WARNING: Maximum length of trace log has been reached.");
+                this.debug.traceLog.AddLine("WARNING: Maximum length of trace log has been reached.");
             }
         }
     }
@@ -66,6 +65,8 @@ export class Tracer {
 }
 
 export class OvaleDebugClass {
+    self_traced = false;
+    
     defaultOptions: any = {
         name: `Ovale ${L["Debug"]}`,
         type: "group",
@@ -81,8 +82,11 @@ export class OvaleDebugClass {
                     return (value != undefined);
                 },
                 set: (info: LuaArray<string>, value: string) => {
-                    value = value || undefined;
-                    this.options.db.global.debug[info[lualength(info)]] = value;
+                    if (!value) {
+                        delete this.options.db.global.debug[info[lualength(info)]];
+                    } else {
+                        this.options.db.global.debug[info[lualength(info)]] = value;
+                    }
                 }
             },
             trace: {
@@ -112,13 +116,15 @@ export class OvaleDebugClass {
         }
     }
 
+    traceLog: TextDump;
     bug?: string;
     warning?: string;
     trace = false;
     private module: AceModule & AceTimer;
 
     constructor(private ovale: OvaleClass, private options: OvaleOptionsClass) {
-        this.module = new (ovale.NewModule("OvaleDebug", aceTimer));
+        this.module = ovale.createModule("OvaleDebug", this.OnInitialize, this.OnDisable, aceTimer);
+        this.traceLog = LibTextDump.New(`${this.ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
 
         let actions = {
             debug: {
@@ -144,43 +150,45 @@ export class OvaleDebugClass {
         return new Tracer(this.options, this, name);
     }
 
-    OnInitialize() {
+    private OnInitialize = () => {
         let appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, this.defaultOptions);
         AceConfigDialog.AddToBlizOptions(appName, L["Debug"], this.ovale.GetName());
     
-        self_traceLog = LibTextDump.New(`${this.ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
     }
+    private OnDisable = () => {
+    }
+    
     DoTrace(displayLog: boolean) {
-        self_traceLog.Clear();
+        this.traceLog.Clear();
         this.trace = true;
         DEFAULT_CHAT_FRAME.AddMessage(format("=== Trace @%f", GetTime()));
         if (displayLog) {
-            this.module.ScheduleTimer("DisplayTraceLog", 0.5);
+            this.module.ScheduleTimer(() => {this.DisplayTraceLog()}, 0.5);
         }
     }
     ResetTrace() {
         this.bug = undefined;
         this.trace = false;
-        self_traced = false;
+        this.self_traced = false;
     }
     UpdateTrace() {
         if (this.trace) {
-            self_traced = true;
+            this.self_traced = true;
         }
         if (this.bug) {
             this.trace = true;
         }
-        if (this.trace && self_traced) {
-            self_traced = false;
+        if (this.trace && this.self_traced) {
+            this.self_traced = false;
             this.trace = false;
         }
     }
 
     DisplayTraceLog() {
-        if (self_traceLog.Lines() == 0) {
-            self_traceLog.AddLine("Trace log is empty.");
+        if (this.traceLog.Lines() == 0) {
+            this.traceLog.AddLine("Trace log is empty.");
         }
-        self_traceLog.Display();
+        this.traceLog.Display();
     }
 }

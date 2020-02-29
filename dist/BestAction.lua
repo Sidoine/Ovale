@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/BestAction", 80201)
+local __exports = LibStub:NewLibrary("ovale/BestAction", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Pool = LibStub:GetLibrary("ovale/Pool")
@@ -19,8 +19,8 @@ local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
+local tonumber = tonumber
 local wipe = wipe
-local kpairs = pairs
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
 local GetItemIcon = GetItemIcon
@@ -111,7 +111,9 @@ __exports.OvaleBestActionClass = __class(nil, {
                 local spellInfo
                 if actionType == "spell" then
                     local spellId = actionId
-                    spellInfo = spellId and self.ovaleData.spellInfo[spellId]
+                    if spellId then
+                        spellInfo = self.ovaleData.spellInfo[spellId]
+                    end
                     if spellInfo and spellInfo.casttime then
                         element.castTime = spellInfo.casttime
                     else
@@ -139,7 +141,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                         start = atTime
                     else
                         self.tracer:Log("[%d]    Action %s still has %f charges but is on GCD (start=%f).", nodeId, action, actionCharges, actionCooldownStart)
-                        start = actionCooldownStart
+                        start = actionCooldownStart or 0
                     end
                 end
                 if actionResourceExtend and actionResourceExtend > 0 then
@@ -160,22 +162,24 @@ __exports.OvaleBestActionClass = __class(nil, {
                     local newStart = atTime
                     if self.OvaleFuture:IsChanneling(atTime) then
                         local spell = self.OvaleFuture:GetCurrentCast(atTime)
-                        local si = spell and spell.spellId and self.ovaleData.spellInfo[spell.spellId]
-                        if si then
-                            local channel = si.channel or si.canStopChannelling
-                            if channel then
-                                local hasteMultiplier = self.ovalePaperDoll:GetHasteMultiplier(si.haste, self.ovalePaperDoll.next)
-                                local numTicks = floor(channel * hasteMultiplier + 0.5)
-                                local tick = (spell.stop - spell.start) / numTicks
-                                local tickTime = spell.start
-                                for i = 1, numTicks, 1 do
-                                    tickTime = tickTime + tick
-                                    if newStart <= tickTime then
-                                        break
+                        if spell then
+                            local si = spell.spellId and self.ovaleData.spellInfo[spell.spellId]
+                            if si then
+                                local channel = si.channel or si.canStopChannelling
+                                if channel then
+                                    local hasteMultiplier = self.ovalePaperDoll:GetHasteMultiplier(si.haste, self.ovalePaperDoll.next)
+                                    local numTicks = floor(channel * hasteMultiplier + 0.5)
+                                    local tick = (spell.stop - spell.start) / numTicks
+                                    local tickTime = spell.start
+                                    for i = 1, numTicks, 1 do
+                                        tickTime = tickTime + tick
+                                        if newStart <= tickTime then
+                                            break
+                                        end
                                     end
+                                    newStart = tickTime
+                                    self.tracer:Log("[%d]    %s start=%f, numTicks=%d, tick=%f, tickTime=%f", nodeId, spell.spellId, newStart, numTicks, tick, tickTime)
                                 end
-                                newStart = tickTime
-                                self.tracer:Log("[%d]    %s start=%f, numTicks=%d, tick=%f, tickTime=%f", nodeId, spell.spellId, newStart, numTicks, tick, tickTime)
                             end
                         end
                     end
@@ -223,7 +227,9 @@ __exports.OvaleBestActionClass = __class(nil, {
                     n = A * z + B * c
                 elseif operator == "/" then
                     if B == 0 then
-                        -- self.Ovale:OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString)
+                        if A ~= 0 then
+                            self.Ovale:OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString)
+                        end
                         B = 0.00001
                     end
                     l = A / B
@@ -261,6 +267,14 @@ __exports.OvaleBestActionClass = __class(nil, {
                         n = c
                     else
                         n = z
+                    end
+                elseif operator == "<?" then
+                    l = min(A, B)
+                    m = t
+                    if l == A then
+                        n = z
+                    else
+                        n = c
                     end
                 end
                 self.tracer:Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n)
@@ -323,7 +337,9 @@ __exports.OvaleBestActionClass = __class(nil, {
             local node = self.ovaleCompile:GetFunctionNode(element.name)
             if node then
                 local timeSpanA, elementA = self:Compute(node.child[1], atTime)
-                timeSpan:copyFromArray(timeSpanA)
+                if timeSpanA then
+                    timeSpan:copyFromArray(timeSpanA)
+                end
                 result = elementA
             else
                 wipe(timeSpan)
@@ -336,12 +352,12 @@ __exports.OvaleBestActionClass = __class(nil, {
             local timeSpan = self:GetTimeSpan(element)
             local result
             local start, ending, value, origin, rate = self.ovaleCondition:EvaluateCondition(element.func, element.positionalParams, element.namedParams, atTime)
-            if start and ending then
+            if start ~= nil and ending ~= nil then
                 timeSpan:Copy(start, ending)
             else
                 wipe(timeSpan)
             end
-            if value then
+            if value ~= nil then
                 result = self:SetValue(element, value, origin, rate)
             end
             self.tracer:Log("[%d]    condition '%s' returns %s, %s, %s, %s, %s", element.nodeId, element.name, start, ending, value, origin, rate)
@@ -463,6 +479,9 @@ __exports.OvaleBestActionClass = __class(nil, {
             return timeSpan, element
         end
         self.ComputeLua = function(element, atTime)
+            if  not element.lua then
+                return EMPTY_SET
+            end
             self.profiler:StartProfiling("OvaleBestAction_ComputeLua")
             local value = loadstring(element.lua)()
             self.tracer:Log("[%d]    lua returns %s", element.nodeId, value)
@@ -531,7 +550,10 @@ __exports.OvaleBestActionClass = __class(nil, {
     AsValue = function(self, atTime, timeSpan, node)
         local value, origin, rate
         if node and isNodeType(node, "value") then
-            value, origin, rate = node.value, node.origin, node.rate
+            value = node.value
+            origin = node.origin
+            rate = node.rate
+            timeSpan = timeSpan or UNIVERSE
         elseif timeSpan and timeSpan:HasTime(atTime) then
             value, origin, rate, timeSpan = 1, 0, 0, UNIVERSE
         else
@@ -556,30 +578,31 @@ __exports.OvaleBestActionClass = __class(nil, {
         local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
         local itemId = element.positionalParams[1]
         if  not isNumber(itemId) then
-            itemId = self.ovaleEquipment:GetEquippedItemBySlotName(itemId)
-        end
-        if  not itemId then
-            self.tracer:Log("Unknown item '%s'.", element.positionalParams[1])
-        else
-            self.tracer:Log("Item ID '%s'", itemId)
-            local action = self.ovaleActionBar:GetForItem(itemId)
-            local spellName = GetItemSpell(itemId)
-            if element.namedParams.texture then
-                actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
+            local itemIdFromSlot = self.ovaleEquipment:GetEquippedItemBySlotName(itemId)
+            if  not itemIdFromSlot then
+                self.tracer:Log("Unknown item '%s'.", element.positionalParams[1])
+                return
             end
-            actionTexture = actionTexture or GetItemIcon(itemId)
-            actionInRange = IsItemInRange(itemId, target)
-            actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
-            actionUsable = spellName and IsUsableItem(itemId) and self.OvaleSpells:IsUsableItem(itemId, atTime)
-            if action then
-                actionShortcut = self.ovaleActionBar:GetBinding(action)
-                actionIsCurrent = IsCurrentAction(action)
-            end
-            actionType = "item"
-            actionId = itemId
+            itemId = itemIdFromSlot
         end
+        self.tracer:Log("Item ID '%s'", itemId)
+        local action = self.ovaleActionBar:GetForItem(itemId)
+        local spellName = GetItemSpell(itemId)
+        if element.namedParams.texture then
+            actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
+        end
+        actionTexture = actionTexture or GetItemIcon(itemId)
+        actionInRange = IsItemInRange(itemId, target)
+        actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+        actionUsable = (spellName and IsUsableItem(itemId) and self.OvaleSpells:IsUsableItem(itemId, atTime)) or false
+        if action then
+            actionShortcut = self.ovaleActionBar:GetBinding(action)
+            actionIsCurrent = IsCurrentAction(action)
+        end
+        actionType = "item"
+        actionId = itemId
         self.profiler:StopProfiling("OvaleBestAction_GetActionItemInfo")
-        return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0
+        return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent or false, actionEnable, actionType, actionId, target, 0, 0
     end,
     GetActionMacroInfo = function(self, element, atTime, target)
         self.profiler:StartProfiling("OvaleBestAction_GetActionMacroInfo")
@@ -588,19 +611,19 @@ __exports.OvaleBestActionClass = __class(nil, {
         local action = self.ovaleActionBar:GetForMacro(macro)
         if  not action then
             self.tracer:Log("Unknown macro '%s'.", macro)
-        else
-            if element.namedParams.texture then
-                actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
-            end
-            actionTexture = actionTexture or GetActionTexture(action)
-            actionInRange = IsActionInRange(action, target)
-            actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
-            actionUsable = IsUsableAction(action)
-            actionShortcut = self.ovaleActionBar:GetBinding(action)
-            actionIsCurrent = IsCurrentAction(action)
-            actionType = "macro"
-            actionId = macro
+            return
         end
+        if element.namedParams.texture then
+            actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
+        end
+        actionTexture = actionTexture or GetActionTexture(action)
+        actionInRange = IsActionInRange(action, target)
+        actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
+        actionUsable = IsUsableAction(action)
+        actionShortcut = self.ovaleActionBar:GetBinding(action)
+        actionIsCurrent = IsCurrentAction(action)
+        actionType = "macro"
+        actionId = macro
         self.profiler:StopProfiling("OvaleBestAction_GetActionMacroInfo")
         return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0
     end,
@@ -611,13 +634,13 @@ __exports.OvaleBestActionClass = __class(nil, {
             return self:getSpellActionInfo(spell, element, atTime, target)
         elseif isString(spell) then
             local spellList = self.ovaleData.buffSpellList[spell]
-            for spellId in kpairs(spellList) do
+            for spellId in pairs(spellList) do
                 if self.OvaleSpellBook:IsKnownSpell(spellId) then
                     return self:getSpellActionInfo(spellId, element, atTime, target)
                 end
             end
         end
-        return nil
+        return
     end,
     getSpellActionInfo = function(self, spellId, element, atTime, target)
         local targetGUID = self.OvaleGUID:UnitGUID(target)
@@ -651,51 +674,52 @@ __exports.OvaleBestActionClass = __class(nil, {
         end
         if  not isKnownSpell and  not action then
             self.tracer:Log("Unknown spell ID '%s'.", spellId)
-        else
-            local isUsable, noMana = self.OvaleSpells:IsUsableSpell(spellId, atTime, targetGUID)
-            self.tracer:Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana)
-            if isUsable or noMana then
-                if element.namedParams.texture then
-                    actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
-                end
-                actionTexture = actionTexture or GetSpellTexture(spellId)
-                actionInRange = self.OvaleSpells:IsSpellInRange(spellId, target)
-                actionCooldownStart, actionCooldownDuration, actionEnable = self.ovaleCooldown:GetSpellCooldown(spellId, atTime)
-                self.tracer:Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration)
-                actionCharges = self.ovaleCooldown:GetSpellCharges(spellId, atTime)
-                actionResourceExtend = 0
-                actionUsable = isUsable
-                if action then
-                    actionShortcut = self.ovaleActionBar:GetBinding(action)
-                    actionIsCurrent = IsCurrentAction(action)
-                end
-                actionType = "spell"
-                actionId = spellId
-                if si then
-                    if si.texture then
-                        actionTexture = "Interface\\Icons\\" .. si.texture
+            return
+        end
+        local isUsable, noMana = self.OvaleSpells:IsUsableSpell(spellId, atTime, targetGUID)
+        self.tracer:Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana)
+        if  not isUsable and  not noMana then
+            return
+        end
+        if element.namedParams.texture then
+            actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
+        end
+        actionTexture = actionTexture or GetSpellTexture(spellId)
+        actionInRange = self.OvaleSpells:IsSpellInRange(spellId, target)
+        actionCooldownStart, actionCooldownDuration, actionEnable = self.ovaleCooldown:GetSpellCooldown(spellId, atTime)
+        self.tracer:Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration)
+        actionCharges = self.ovaleCooldown:GetSpellCharges(spellId, atTime)
+        actionResourceExtend = 0
+        actionUsable = isUsable
+        if action then
+            actionShortcut = self.ovaleActionBar:GetBinding(action)
+            actionIsCurrent = IsCurrentAction(action)
+        end
+        actionType = "spell"
+        actionId = spellId
+        if si then
+            if si.texture then
+                actionTexture = "Interface\\Icons\\" .. si.texture
+            end
+            if actionCooldownStart and actionCooldownDuration then
+                local extraPower = element.namedParams.extra_amount or 0
+                local timeToCd = (actionCooldownDuration > 0) and (actionCooldownStart + actionCooldownDuration - atTime) or 0
+                local timeToPower = self.OvalePower:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
+                local runes = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
+                if runes then
+                    local timeToRunes = self.ovaleRunes:GetRunesCooldown(atTime, runes)
+                    if timeToPower < timeToRunes then
+                        timeToPower = timeToRunes
                     end
-                    if actionCooldownStart and actionCooldownDuration then
-                        local extraPower = element.namedParams.extra_amount or 0
-                        local timeToCd = (actionCooldownDuration > 0) and (actionCooldownStart + actionCooldownDuration - atTime) or 0
-                        local timeToPower = self.OvalePower:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
-                        local runes = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
-                        if runes then
-                            local timeToRunes = self.ovaleRunes:GetRunesCooldown(atTime, runes)
-                            if timeToPower < timeToRunes then
-                                timeToPower = timeToRunes
-                            end
-                        end
-                        if timeToPower > timeToCd then
-                            actionResourceExtend = timeToPower - timeToCd
-                            self.tracer:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend)
-                        end
-                    end
+                end
+                if timeToPower > timeToCd then
+                    actionResourceExtend = timeToPower - timeToCd
+                    self.tracer:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend)
                 end
             end
         end
         self.profiler:StopProfiling("OvaleBestAction_GetActionSpellInfo")
-        return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, actionResourceExtend, actionCharges
+        return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent or false, actionEnable, actionType, actionId, target, actionResourceExtend, actionCharges
     end,
     GetActionTextureInfo = function(self, element, atTime, target)
         self.profiler:StartProfiling("OvaleBestAction_GetActionTextureInfo")
@@ -709,13 +733,13 @@ __exports.OvaleBestActionClass = __class(nil, {
                 actionTexture = "Interface\\Icons\\" .. texture
             end
         end
-        local actionInRange = nil
+        local actionInRange = false
         local actionCooldownStart = 0
         local actionCooldownDuration = 0
         local actionEnable = true
         local actionUsable = true
         local actionShortcut = nil
-        local actionIsCurrent = nil
+        local actionIsCurrent = false
         local actionType = "texture"
         local actionId = actionTexture
         self.profiler:StopProfiling("OvaleBestAction_GetActionTextureInfo")
@@ -733,24 +757,24 @@ __exports.OvaleBestActionClass = __class(nil, {
                 return element.actionTexture, element.actionInRange, element.actionCooldownStart, element.actionCooldownDuration, element.actionUsable, element.actionShortcut, element.actionIsCurrent, element.actionEnable, element.actionType, element.actionId, element.actionTarget, element.actionResourceExtend, element.actionCharges
             else
                 local target = element.namedParams.target or self.baseState.next.defaultTarget
-                if element.lowername == "item" then
+                if element.name == "item" then
                     return self:GetActionItemInfo(element, atTime, target)
-                elseif element.lowername == "macro" then
+                elseif element.name == "macro" then
                     return self:GetActionMacroInfo(element, atTime, target)
-                elseif element.lowername == "spell" then
+                elseif element.name == "spell" then
                     return self:GetActionSpellInfo(element, atTime, target)
-                elseif element.lowername == "texture" then
+                elseif element.name == "texture" then
                     return self:GetActionTextureInfo(element, atTime, target)
                 end
             end
         end
-        return nil
+        return
     end,
     GetAction = function(self, node, atTime)
         self.profiler:StartProfiling("OvaleBestAction_GetAction")
         local groupNode = node.child[1]
-        local timeSpan, element = self:Compute(groupNode, atTime)
-        if element and element.type == "state" then
+        local timeSpan, element = self:PostOrderCompute(groupNode, atTime)
+        if element and element.type == "state" and timeSpan then
             local variable, value = element.positionalParams[1], element.positionalParams[2]
             local isFuture =  not timeSpan:HasTime(atTime)
             self.variables:PutState(variable, value, isFuture, atTime)
@@ -769,7 +793,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                 local childNode, parentNode = postOrder[index], postOrder[index + 1]
                 index = index + 2
                 timeSpan, result = self:PostOrderCompute(childNode, atTime)
-                if parentNode then
+                if parentNode and timeSpan then
                     local shortCircuit = false
                     if parentNode.child and parentNode.child[1] == childNode then
                         if parentNode.type == "if" and timeSpan:Measure() == 0 then
@@ -809,7 +833,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                 self.Ovale:OneTimeMessage("Recursive call is not supported. This is a known bug with arcane mage script")
                 return EMPTY_SET, element.result
             elseif element.serial and element.serial >= self.self_serial then
-                timeSpan = element.timeSpan
+                timeSpan = element.timeSpan or EMPTY_SET
                 result = element.result
             else
                 if element.asString then
@@ -826,6 +850,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                     element.result = result
                 else
                     self.tracer:Log("[%d] Runtime error: unable to compute node of type '%s'.", element.nodeId, element.type)
+                    timeSpan = EMPTY_SET
                 end
                 if result and isNodeType(result, "value") then
                     self.tracer:Log("[%d] <<< '%s' returns %s with value = %s, %s, %s", element.nodeId, element.type, timeSpan, result.value, result.origin, result.rate)
@@ -835,6 +860,8 @@ __exports.OvaleBestActionClass = __class(nil, {
                     self.tracer:Log("[%d] <<< '%s' returns %s", element.nodeId, element.type, timeSpan)
                 end
             end
+        else
+            timeSpan = EMPTY_SET
         end
         self.profiler:StopProfiling("OvaleBestAction_RecursiveCompute")
         return timeSpan, result

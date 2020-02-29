@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
@@ -25,7 +25,7 @@ local len = string.len
 local upper = string.upper
 local insert = table.insert
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
-local CamelSpecialization = __texttools.CamelSpecialization
+local LowerSpecialization = __texttools.LowerSpecialization
 local CamelCase = __texttools.CamelCase
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local __Power = LibStub:GetLibrary("ovale/Power")
@@ -55,7 +55,7 @@ __exports.Emiter = __class(nil, {
         self.EMIT_DISAMBIGUATION = {}
         self.EmitModifier = function(modifier, parseNode, nodeList, annotation, action, modifiers)
             local node, code
-            local className = annotation.class
+            local className = annotation.classId
             local specialization = annotation.specialization
             if modifier == "if" then
                 node = self:Emit(parseNode, nodeList, annotation, action)
@@ -71,14 +71,22 @@ __exports.Emiter = __class(nil, {
             elseif modifier == "line_cd" then
                 if  not SPECIAL_ACTION[action] then
                     self:AddSymbol(annotation, action)
-                    local expressionCode = self.ovaleAst:Unparse(self:Emit(parseNode, nodeList, annotation, action))
+                    local node = self:Emit(parseNode, nodeList, annotation, action)
+                    if  not node then
+                        return nil
+                    end
+                    local expressionCode = self.ovaleAst:Unparse(node)
                     code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode)
                 end
             elseif modifier == "max_cycle_targets" then
                 local debuffName = self:Disambiguate(annotation, action .. "_debuff", className, specialization)
                 self:AddSymbol(annotation, debuffName)
-                local expressionCode = self.ovaleAst:Unparse(self:Emit(parseNode, nodeList, annotation, action))
-                code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
+                local node = self:Emit(parseNode, nodeList, annotation, action)
+                if  not node then
+                    return nil
+                end
+                local expressionCode = self.ovaleAst:Unparse(node)
+                code = format("DebuffCountOnAny(%s) < Enemies(tagged=1) and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
             elseif modifier == "max_energy" then
                 local value = tonumber(self.unparser:Unparse(parseNode))
                 if value == 1 then
@@ -107,47 +115,51 @@ __exports.Emiter = __class(nil, {
                 end
             elseif modifier == "sync" then
                 local name = self.unparser:Unparse(parseNode)
+                if  not name then
+                    return nil
+                end
                 if name == "whirlwind_mh" then
                     name = "whirlwind"
                 end
                 node = annotation.astAnnotation and annotation.astAnnotation.sync and annotation.astAnnotation.sync[name]
                 if  not node then
-                    local syncParseNode = annotation.sync[name]
+                    local syncParseNode = annotation.sync and annotation.sync[name]
                     if syncParseNode then
                         local syncActionNode = self.EmitAction(syncParseNode, nodeList, annotation, action)
-                        local syncActionType = syncActionNode.type
-                        if syncActionType == "action" then
-                            node = syncActionNode
-                        elseif syncActionType == "custom_function" then
-                            node = syncActionNode
-                        elseif syncActionType == "if" or syncActionType == "unless" then
-                            local lhsNode = syncActionNode.child[1]
-                            if syncActionType == "unless" then
-                                local notNode = self.ovaleAst:NewNode(nodeList, true)
-                                notNode.type = "logical"
-                                notNode.expressionType = "unary"
-                                notNode.operator = "not"
-                                notNode.child[1] = lhsNode
-                                lhsNode = notNode
+                        if syncActionNode then
+                            local syncActionType = syncActionNode.type
+                            if syncActionType == "action" then
+                                node = syncActionNode
+                            elseif syncActionType == "custom_function" then
+                                node = syncActionNode
+                            elseif syncActionType == "if" or syncActionType == "unless" then
+                                local lhsNode = syncActionNode.child[1]
+                                if syncActionType == "unless" then
+                                    local notNode = self.ovaleAst:NewNode(nodeList, true)
+                                    notNode.type = "logical"
+                                    notNode.expressionType = "unary"
+                                    notNode.operator = "not"
+                                    notNode.child[1] = lhsNode
+                                    lhsNode = notNode
+                                end
+                                local rhsNode = syncActionNode.child[2]
+                                local andNode = self.ovaleAst:NewNode(nodeList, true)
+                                andNode.type = "logical"
+                                andNode.expressionType = "binary"
+                                andNode.operator = "and"
+                                andNode.child[1] = lhsNode
+                                andNode.child[2] = rhsNode
+                                node = andNode
+                            else
+                                self.tracer:Print("Warning: Unable to emit action for 'sync=%s'.", name)
+                                name = self:Disambiguate(annotation, name, className, specialization)
+                                self:AddSymbol(annotation, name)
+                                code = format("Spell(%s)", name)
                             end
-                            local rhsNode = syncActionNode.child[2]
-                            local andNode = self.ovaleAst:NewNode(nodeList, true)
-                            andNode.type = "logical"
-                            andNode.expressionType = "binary"
-                            andNode.operator = "and"
-                            andNode.child[1] = lhsNode
-                            andNode.child[2] = rhsNode
-                            node = andNode
-                        else
-                            self.tracer:Print("Warning: Unable to emit action for 'sync=%s'.", name)
-                            name = self:Disambiguate(annotation, name, className, specialization)
-                            self:AddSymbol(annotation, name)
-                            code = format("Spell(%s)", name)
                         end
                     end
                 end
                 if node then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
                     annotation.astAnnotation.sync = annotation.astAnnotation.sync or {}
                     annotation.astAnnotation.sync[name] = node
                 end
@@ -158,9 +170,8 @@ __exports.Emiter = __class(nil, {
             end
             return node
         end
-        self.EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode, annotation, action, modifiers)
-            local extraConditionNode = conditionNode
-            conditionNode = nil
+        self.EmitConditionNode = function(nodeList, bodyNode, extraConditionNode, parseNode, annotation, action, modifiers)
+            local conditionNode = nil
             for modifier, expressionNode in kpairs(parseNode.modifiers) do
                 local rhsNode = self.EmitModifier(modifier, expressionNode, nodeList, annotation, action, modifiers)
                 if rhsNode then
@@ -207,9 +218,6 @@ __exports.Emiter = __class(nil, {
             end
         end
         self.EmitNamedVariable = function(name, nodeList, annotation, modifiers, parseNode, action, conditionNode)
-            if  not annotation.variable then
-                annotation.variable = {}
-            end
             local node = annotation.variable[name]
             local group
             if  not node then
@@ -224,8 +232,15 @@ __exports.Emiter = __class(nil, {
                 group = node.child[1]
             end
             annotation.currentVariable = node
+            if  not modifiers.value then
+                self.tracer:Error("'value' modifier is undefined")
+                return
+            end
             local value = self:Emit(modifiers.value, nodeList, annotation, action)
-            local newNode = self.EmitConditionNode(nodeList, value, conditionNode or nil, parseNode, annotation, action, modifiers)
+            if  not value then
+                return
+            end
+            local newNode = self.EmitConditionNode(nodeList, value, conditionNode, parseNode, annotation, action, modifiers)
             if newNode.type == "if" then
                 insert(group.child, 1, newNode)
             else
@@ -240,7 +255,9 @@ __exports.Emiter = __class(nil, {
             annotation.variable[valueNode.name] = valueNode
             local bodyCode = format("AddFunction %s { if %s_value() > %s_min() %s_value() %s_min() }", name, name, name, name, name)
             local node = self.ovaleAst:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
-            annotation.variable[name] = node
+            if node then
+                annotation.variable[name] = node
+            end
         end
         self.EmitVariableMax = function(name, nodeList, annotation, modifier, parseNode, action)
             self.EmitNamedVariable(name .. "_max", nodeList, annotation, modifier, parseNode, action)
@@ -249,19 +266,21 @@ __exports.Emiter = __class(nil, {
             annotation.variable[valueNode.name] = valueNode
             local bodyCode = format("AddFunction %s { if %s_value() < %s_max() %s_value() %s_max() }", name, name, name, name, name)
             local node = self.ovaleAst:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
-            annotation.variable[name] = node
+            if node then
+                annotation.variable[name] = node
+            end
         end
         self.EmitVariableAdd = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
         self.EmitVariableSub = function(name, nodeList, annotation, modifiers, parseNode, action)
             local valueNode = annotation.variable[name]
             if valueNode then
-                return 
+                return
             end
             self.EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
         end
@@ -280,24 +299,42 @@ __exports.Emiter = __class(nil, {
                 group = node.child[1]
             end
             annotation.currentVariable = node
+            if  not modifiers.condition or  not modifiers.value or  not modifiers.value_else then
+                self.tracer:Error("Modifier missing in if")
+                return
+            end
             local ifNode = self.ovaleAst:NewNode(nodeList, true)
             ifNode.type = "if"
-            ifNode.child[1] = self:Emit(modifiers.condition, nodeList, annotation, nil)
-            ifNode.child[2] = self:Emit(modifiers.value, nodeList, annotation, nil)
+            local condition = self:Emit(modifiers.condition, nodeList, annotation, nil)
+            local value = self:Emit(modifiers.value, nodeList, annotation, nil)
+            if  not condition or  not value then
+                return
+            end
+            ifNode.child[1] = condition
+            ifNode.child[2] = value
             insert(group.child, ifNode)
             local elseNode = self.ovaleAst:NewNode(nodeList, true)
             elseNode.type = "unless"
             elseNode.child[1] = ifNode.child[1]
-            elseNode.child[2] = self:Emit(modifiers.value_else, nodeList, annotation, nil)
+            local valueElse = self:Emit(modifiers.value_else, nodeList, annotation, nil)
+            if  not valueElse then
+                return
+            end
+            elseNode.child[2] = valueElse
             insert(group.child, elseNode)
             annotation.currentVariable = nil
         end
         self.EmitVariable = function(nodeList, annotation, modifier, parseNode, action, conditionNode)
-            if  not annotation.variable then
-                annotation.variable = {}
-            end
             local op = (modifier.op and self.unparser:Unparse(modifier.op)) or "set"
+            if  not modifier.name then
+                self.tracer:Error("Modifier name is missing")
+                return
+            end
             local name = self.unparser:Unparse(modifier.name)
+            if  not name then
+                self.tracer:Error("Unable to parse name of variable in %s", modifier.name)
+                return
+            end
             if match(name, "^%d") then
                 name = "_" .. name
             end
@@ -321,9 +358,9 @@ __exports.Emiter = __class(nil, {
         self.EmitAction = function(parseNode, nodeList, annotation)
             local node
             local canonicalizedName = lower(gsub(parseNode.name, ":", "_"))
-            local className = annotation.class
+            local className = annotation.classId
             local specialization = annotation.specialization
-            local camelSpecialization = CamelSpecialization(annotation)
+            local camelSpecialization = LowerSpecialization(annotation)
             local role = annotation.role
             local action, type = self:Disambiguate(annotation, canonicalizedName, className, specialization, "Spell")
             local bodyNode
@@ -368,8 +405,30 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, "bloodtalons_talent")
                     self:AddSymbol(annotation, "bloodtalons_buff")
                     self:AddSymbol(annotation, "regrowth")
+                elseif className == "DRUID" and action == "solar_wrath_balance" and specialization == "balance" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "DRUID" and action == "lunar_strike" and specialization == "balance" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "HUNTER" and action == "kill_command" then
                     conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+                elseif className == "HUNTER" and action == "aspect_of_the_eagle" then
+                    conditionCode = "{ not target.InRange(harpoon) or SpellCooldown(harpoon) > GCD() } and SpellCooldown(harpoon) <= 15 and Boss()"
+                elseif className == "HUNTER" and action == "carve" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "mongoose_bite" then
+                  conditionCode = "target.InRange(mongoose_bite)"
+                elseif className == "HUNTER" and action == "butchery" then
+                  conditionCode = "target.InRange(butchery)"
+                elseif className == "HUNTER" and action == "raptor_strike" then
+                  conditionCode = "target.InRange(raptor_strike)"
+                elseif className == "HUNTER" and action == "flanking_strike" then
+                  conditionCode = "target.InRange(flanking_strike)"
+                elseif className == "HUNTER" and action == "steel_trap" then
+                  conditionCode = "target.InRange(muzzle)"
+                elseif className == "HUNTER" and action == "harpoon" then
+                  conditionCode = "target.InRange(harpoon)"
+                elseif className == "HUNTER" and action == "bestial_wrath" then
+                  conditionCode = "{ target.Classification(normal) and Enemies(tagged=1) >= 5 or target.Classification(elite) and Enemies(tagged=1) >= 3 or Boss() }"
                 elseif className == "MAGE" and action == "arcane_brilliance" then
                     conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
                 elseif className == "MAGE" and find(action, "pet_") then
@@ -406,10 +465,10 @@ __exports.Emiter = __class(nil, {
                 elseif className == "MONK" and action == "nimble_brew" then
                     conditionCode = "IsFeared() or IsRooted() or IsStunned()"
                 elseif className == "MONK" and action == "storm_earth_and_fire" then
-                    conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
+                    conditionCode = "not BuffPresent(storm_earth_and_fire_buff)"
                     annotation[action] = className
                 elseif className == "MONK" and action == "touch_of_death" then
-                    conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+                    conditionCode = "(not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
                     annotation[action] = className
                     annotation.opt_touch_of_death_on_elite_only = "MONK"
                     self:AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
@@ -425,6 +484,22 @@ __exports.Emiter = __class(nil, {
                     end
                 elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
                     isSpellAction = false
+                elseif className == "PRIEST" and action == "mind_blast" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(shadowy_insight_buff) }"
+                elseif className == "PRIEST" and action == "shadow_word_void" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "mind_flay" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "mind_sear" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "void_torrent" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "vampiric_touch" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "void_eruption" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "PRIEST" and action == "dark_void" and specialization == "shadow" then
+                  conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "ROGUE" and action == "adrenaline_rush" then
                     conditionCode = "EnergyDeficit() > 1"
                 elseif className == "ROGUE" and action == "apply_poison" then
@@ -441,33 +516,38 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "ROGUE" and action == "premeditation" then
                     conditionCode = "ComboPoints() < 5"
-                elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
+                elseif className == "ROGUE" and action == "vanish" and specialization == "subtlety" then
                     annotation.vanish = className
-                    conditionCode = format("CheckBoxOn(opt_vanish)", action)
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
+                    conditionCode = "VanishAllowed()"
+                elseif className == "ROGUE" and action == "vanish" and specialization == "assassination" then
+                    annotation.vanish = className
+                    conditionCode = "VanishAllowed()"
+                elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
                     conditionCode = "target.InRange(shadowstrike)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "eviscerate" then
+				        elseif className == "ROGUE" and specialization == "subtlety" and action == "eviscerate" then
                     conditionCode = "target.InRange(eviscerate)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "stealth" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "stealth" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "ambush" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "ambush" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_dance" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_dance" then
                     conditionCode = "target.InRange(shadowstep)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_blades" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_blades" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "nightblade" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "nightblade" then
                     conditionCode = "target.InRange(nightblade)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_storm" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_storm" then
                     conditionCode = "target.InRange(backstab)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "kidney_shot" then
+        				elseif className == "ROGUE" and specialization == "subtlety" and action == "kidney_shot" then
                     conditionCode = "target.InRange(kidney_shot)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "secret_technique" then
+	              elseif className == "ROGUE" and specialization == "subtlety" and action == "secret_technique" then
                     conditionCode = "target.InRange(secret_technique)"
-				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
+	              elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
                     conditionCode = "target.InRange(backstab)"
+                elseif className == "ROGUE" and action == "vanish" and specialization == "outlaw" then
+                    conditionCode = "VanishAllowed()"
                 elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
                     local buffName = action .. "_buff"
                     self:AddSymbol(annotation, buffName)
@@ -485,7 +565,7 @@ __exports.Emiter = __class(nil, {
                 elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
                     conditionCode = "pet.Present()"
                 elseif className == "WARLOCK" and action == "havoc" then
-                    conditionCode = "Enemies() > 1"
+                    conditionCode = "Enemies(tagged) > 1"
                 elseif className == "WARLOCK" and action == "service_pet" then
                     if annotation.pet then
                         local spellName = "service_" .. annotation.pet
@@ -505,8 +585,42 @@ __exports.Emiter = __class(nil, {
                     end
                     conditionCode = "not pet.Present()"
                     isSpellAction = false
+                elseif className == "WARLOCK" and action == "demonic_strength" then
+                    conditionCode = "not pet.BuffPresent(pet_auto_spin)"
                 elseif className == "WARLOCK" and action == "wrathguard_wrathstorm" then
                     conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
+                elseif className == "WARLOCK" and action == "shadow_bolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "hand_of_guldan" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "demonbolt" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_core_buff) }"
+                elseif className == "WARLOCK" and action == "drain_life" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "health_funnel" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "call_dreadstalkers" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(demonic_calling_buff) }"
+                elseif className == "WARLOCK" and action == "summon_demonic_tyrant" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "summon_vilefiend" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "nether_portal" and specialization == "demonology" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "drain_soul" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "shadow_bolt_affliction" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) or BuffPresent(nightfall_buff) }"
+                elseif className == "WARLOCK" and action == "vile_taint" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "haunt" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "drain_life" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "seed_of_corruption" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "WARLOCK" and action == "unstable_affliction" and specialization == "affliction" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "WARRIOR" and action == "battle_shout" and role == "tank" then
                     conditionCode = "BuffExpires(stamina_buff)"
                 elseif className == "WARRIOR" and action == "charge" then
@@ -535,32 +649,38 @@ __exports.Emiter = __class(nil, {
                     annotation.opt_meta_only_during_boss = "DEMONHUNTER"
                 elseif className == "DEMONHUNTER" and action == "consume_magic" then
                     conditionCode = "target.HasDebuffType(magic)"
+                elseif className == "DEMONHUNTER" and action == "eye_beam" and specialization == "havoc" then
+                    conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif checkOptionalSkill(action, className, specialization) then
                     annotation[action] = className
                     conditionCode = "CheckBoxOn(opt_" .. action .. ")"
                 elseif action == "variable" then
-                    self.EmitVariable(nodeList, annotation, modifiers, parseNode, action, conditionNode)
+                    self.EmitVariable(nodeList, annotation, modifiers, parseNode, action)
                     isSpellAction = false
                 elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
                     if modifiers.name then
                         local name = self.unparser:Unparse(modifiers.name)
-                        local functionName = OvaleFunctionName(name, annotation)
-                        bodyCode = functionName .. "()"
-                        if className == "MAGE" and specialization == "arcane" and (name == "burn" or name == "init_burn") then
-                            conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)"
-                            annotation.opt_arcane_mage_burn_phase = className
+                        if name then
+                            local functionName = OvaleFunctionName(name, annotation)
+                            bodyCode = functionName .. "()"
+                            if className == "MAGE" and specialization == "arcane" and (name == "burn" or name == "init_burn") then
+                                conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)"
+                                annotation.opt_arcane_mage_burn_phase = className
+                            end
                         end
+                        isSpellAction = false
                     end
-                    isSpellAction = false
                 elseif action == "cancel_buff" then
                     if modifiers.name then
                         local spellName = self.unparser:Unparse(modifiers.name)
-                        local buffName = self:Disambiguate(annotation, spellName .. "_buff", className, specialization, "spell")
-                        self:AddSymbol(annotation, spellName)
-                        self:AddSymbol(annotation, buffName)
-                        bodyCode = format("Texture(%s text=cancel)", spellName)
-                        conditionCode = format("BuffPresent(%s)", buffName)
-                        isSpellAction = false
+                        if spellName then
+                            local buffName = self:Disambiguate(annotation, spellName .. "_buff", className, specialization, "spell")
+                            self:AddSymbol(annotation, spellName)
+                            self:AddSymbol(annotation, buffName)
+                            bodyCode = format("Texture(%s text=cancel)", spellName)
+                            conditionCode = format("BuffPresent(%s)", buffName)
+                            isSpellAction = false
+                        end
                     end
                 elseif action == "pool_resource" then
                     bodyNode = self.ovaleAst:NewNode(nodeList)
@@ -573,11 +693,11 @@ __exports.Emiter = __class(nil, {
                 elseif action == "potion" then
                     local name = (modifiers.name and self.unparser:Unparse(modifiers.name)) or annotation.consumables["potion"]
                     if name then
-                        name = self:Disambiguate(annotation, name, className, specialization, "item")
-                        bodyCode = format("Item(item_%s usable=1)", name)
+                        name = self:Disambiguate(annotation, name .. "_item", className, specialization, "item")
+                        bodyCode = format("Item(%s usable=1)", name)
                         conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                         annotation.opt_use_consumables = className
-                        self:AddSymbol(annotation, format("item_%s", name))
+                        self:AddSymbol(annotation, name)
                         isSpellAction = false
                     end
                 elseif action == "sequence" then
@@ -585,12 +705,14 @@ __exports.Emiter = __class(nil, {
                 elseif action == "stance" then
                     if modifiers.choose then
                         local name = self.unparser:Unparse(modifiers.choose)
-                        if className == "MONK" then
-                            action = "stance_of_the_" .. name
-                        elseif className == "WARRIOR" then
-                            action = name .. "_stance"
-                        else
-                            action = name
+                        if name then
+                            if className == "MONK" then
+                                action = "stance_of_the_" .. name
+                            elseif className == "WARRIOR" then
+                                action = name .. "_stance"
+                            else
+                                action = name
+                            end
                         end
                     else
                         isSpellAction = false
@@ -607,14 +729,16 @@ __exports.Emiter = __class(nil, {
                     local legendaryRing = nil
                     if modifiers.slot then
                         local slot = self.unparser:Unparse(modifiers.slot)
-                        if match(slot, "finger") then
+                        if slot and match(slot, "finger") then
                             legendaryRing = self:Disambiguate(annotation, "legendary_ring", className, specialization)
                         end
                     elseif modifiers.name then
                         local name = self.unparser:Unparse(modifiers.name)
-                        name = self:Disambiguate(annotation, name, className, specialization)
-                        if match(name, "legendary_ring") then
-                            legendaryRing = name
+                        if name then
+                            name = self:Disambiguate(annotation, name, className, specialization)
+                            if match(name, "legendary_ring") then
+                                legendaryRing = name
+                            end
                         end
                     elseif modifiers.effect_name then
                     end
@@ -636,8 +760,10 @@ __exports.Emiter = __class(nil, {
                             bodyNode = self.ovaleAst:NewNode(nodeList)
                             bodyNode.type = "simc_wait"
                             local expressionNode = self:Emit(modifiers.sec, nodeList, annotation, action)
-                            local code = self.ovaleAst:Unparse(expressionNode)
-                            conditionCode = code .. " > 0"
+                            if expressionNode then
+                                local code = self.ovaleAst:Unparse(expressionNode)
+                                conditionCode = code .. " > 0"
+                            end
                         end
                     end
                     isSpellAction = false
@@ -659,7 +785,6 @@ __exports.Emiter = __class(nil, {
                     end
                     bodyCode = bodyCode or type .. "(" .. action .. ")"
                 end
-                annotation.astAnnotation = annotation.astAnnotation or {}
                 if  not bodyNode and bodyCode then
                     bodyNode = self.ovaleAst:ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation)
                 end
@@ -687,7 +812,7 @@ __exports.Emiter = __class(nil, {
                     local statementNode = self.EmitAction(actionNode, nodeList, annotation, actionNode.name)
                     if statementNode then
                         if statementNode.type == "simc_pool_resource" then
-                            local powerType = POOLED_RESOURCE[annotation.class]
+                            local powerType = POOLED_RESOURCE[annotation.classId]
                             if powerType then
                                 if statementNode.for_next then
                                     poolResourceNode = statementNode
@@ -725,26 +850,28 @@ __exports.Emiter = __class(nil, {
                                 end
                                 local code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition)
                                 local conditionNode = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                                if statementNode.child then
-                                    local rhsNode = conditionNode
-                                    conditionNode = self.ovaleAst:NewNode(nodeList, true)
-                                    conditionNode.type = "logical"
-                                    conditionNode.expressionType = "binary"
-                                    conditionNode.operator = "and"
-                                    conditionNode.child[1] = poolingConditionNode
-                                    conditionNode.child[2] = rhsNode
+                                if conditionNode then
+                                    if statementNode.child and poolingConditionNode then
+                                        local rhsNode = conditionNode
+                                        conditionNode = self.ovaleAst:NewNode(nodeList, true)
+                                        conditionNode.type = "logical"
+                                        conditionNode.expressionType = "binary"
+                                        conditionNode.operator = "and"
+                                        conditionNode.child[1] = poolingConditionNode
+                                        conditionNode.child[2] = rhsNode
+                                    end
+                                    local restNode = self.ovaleAst:NewNode(nodeList, true)
+                                    child[#child + 1] = restNode
+                                    if statementNode.type == "unless" then
+                                        restNode.type = "if"
+                                    else
+                                        restNode.type = "unless"
+                                    end
+                                    restNode.child[1] = conditionNode
+                                    restNode.child[2] = self.ovaleAst:NewNode(nodeList, true)
+                                    restNode.child[2].type = "group"
+                                    child = restNode.child[2].child
                                 end
-                                local restNode = self.ovaleAst:NewNode(nodeList, true)
-                                child[#child + 1] = restNode
-                                if statementNode.type == "unless" then
-                                    restNode.type = "if"
-                                else
-                                    restNode.type = "unless"
-                                end
-                                restNode.child[1] = conditionNode
-                                restNode.child[2] = self.ovaleAst:NewNode(nodeList, true)
-                                restNode.child[2].type = "group"
-                                child = restNode.child[2].child
                             end
                             poolResourceNode = nil
                         elseif statementNode.type == "simc_wait" then
@@ -911,89 +1038,90 @@ __exports.Emiter = __class(nil, {
             return node
         end
         self.EmitOperand = function(parseNode, nodeList, annotation, action)
-            local ok = false
             local node
             local operand = parseNode.name
             local token = match(operand, OPERAND_TOKEN_PATTERN)
             local target
             if token == "target" then
-                ok, node = self.EmitOperandTarget(operand, parseNode, nodeList, annotation, action)
-                if  not ok then
+                node = self.EmitOperandTarget(operand, parseNode, nodeList, annotation, action)
+                if node then
                     target = token
                     operand = sub(operand, len(target) + 2)
                     token = match(operand, OPERAND_TOKEN_PATTERN)
                 end
             end
-            if  not ok then
-                ok, node = self.EmitOperandRune(operand, parseNode, nodeList, annotation, action)
+            if  not node then
+                node = self.EmitOperandRune(operand, parseNode, nodeList, annotation, action)
             end
-            if  not ok then
-                ok, node = self.EmitOperandSpecial(operand, parseNode, nodeList, annotation, action, target)
+            if  not node then
+                node = self.EmitOperandSpecial(operand, parseNode, nodeList, annotation, action, target)
             end
-            if  not ok then
-                ok, node = self.EmitOperandRaidEvent(operand, parseNode, nodeList, annotation, action)
+            if  not node then
+                node = self.EmitOperandRaidEvent(operand, parseNode, nodeList, annotation, action)
             end
-            if  not ok then
-                ok, node = self.EmitOperandRace(operand, parseNode, nodeList, annotation, action)
+            if  not node then
+                node = self.EmitOperandRace(operand, parseNode, nodeList, annotation, action)
             end
-            if  not ok then
-                ok, node = self.EmitOperandAction(operand, parseNode, nodeList, annotation, action, target)
+            if  not node then
+                node = self.EmitOperandAction(operand, parseNode, nodeList, annotation, action, target)
             end
-            if  not ok then
-                ok, node = self.EmitOperandCharacter(operand, parseNode, nodeList, annotation, action, target)
+            if  not node then
+                node = self.EmitOperandCharacter(operand, parseNode, nodeList, annotation, action, target)
             end
-            if  not ok then
+            if  not node then
                 if token == "active_dot" then
                     target = target or "target"
-                    ok, node = self.EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "aura" then
-                    ok, node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "artifact" then
-                    ok, node = self.EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "azerite" then
-                    ok, node = self.EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "buff" then
-                    ok, node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "consumable" then
-                    ok, node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "cooldown" then
-                    ok, node = self.EmitOperandCooldown(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandCooldown(operand, parseNode, nodeList, annotation, action)
                 elseif token == "debuff" then
                     target = target or "target"
-                    ok, node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "disease" then
                     target = target or "target"
-                    ok, node = self.EmitOperandDisease(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandDisease(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "dot" then
                     target = target or "target"
-                    ok, node = self.EmitOperandDot(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandDot(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "essence" then
-                    ok, node = self.EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "glyph" then
-                    ok, node = self.EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
                 elseif token == "pet" then
-                    ok, node = self.EmitOperandPet(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandPet(operand, parseNode, nodeList, annotation, action)
                 elseif token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
-                    ok, node = self.EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action)
                 elseif token == "refreshable" then
-                    ok, node = self.EmitOperandRefresh(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandRefresh(operand, parseNode, nodeList, annotation, action)
                 elseif token == "seal" then
-                    ok, node = self.EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
                 elseif token == "set_bonus" then
-                    ok, node = self.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandSetBonus(operand, parseNode, nodeList, annotation, action)
+                elseif token == "stack" then
+                    node = self.ovaleAst:ParseCode("expression", "buffstacks(" .. action .. ")", nodeList, annotation.astAnnotation)
                 elseif token == "talent" then
-                    ok, node = self.EmitOperandTalent(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandTalent(operand, parseNode, nodeList, annotation, action)
                 elseif token == "totem" then
-                    ok, node = self.EmitOperandTotem(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandTotem(operand, parseNode, nodeList, annotation, action)
                 elseif token == "trinket" then
-                    ok, node = self.EmitOperandTrinket(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandTrinket(operand, parseNode, nodeList, annotation, action)
                 elseif token == "variable" then
-                    ok, node = self.EmitOperandVariable(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandVariable(operand, parseNode, nodeList, annotation, action)
                 elseif token == "ground_aoe" then
-                    ok, node = self.EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action)
+                    node = self.EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action)
                 end
             end
-            if  not ok then
+            if  not node then
                 self.tracer:Print("Warning: Variable '%s' is not implemented.", parseNode.name)
                 node = self.ovaleAst:NewNode(nodeList)
                 node.type = "variable"
@@ -1002,7 +1130,6 @@ __exports.Emiter = __class(nil, {
             return node
         end
         self.EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local name
             local property
@@ -1016,9 +1143,9 @@ __exports.Emiter = __class(nil, {
                 property = operand
             end
             if  not name then
-                return false, nil
+                return nil
             end
-            local className, specialization = annotation.class, annotation.specialization
+            local className, specialization = annotation.classId, annotation.specialization
             name = self:Disambiguate(annotation, name, className, specialization)
             target = target and (target .. ".") or ""
             local buffName = name .. "_debuff"
@@ -1116,10 +1243,8 @@ __exports.Emiter = __class(nil, {
                 code = format("SpellCooldown(%s)", name)
             elseif property == "marks_next_gcd" then
                 code = "0"
-            else
-                ok = false
             end
-            if ok and code then
+            if code then
                 if name == "call_action_list" and property ~= "gcd" then
                     self.tracer:Print("Warning: dubious use of call_action_list in %s", code)
                 end
@@ -1129,33 +1254,28 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, symbol)
                 end
             end
-            return ok, node
+            return node
         end
         self.EmitOperandActiveDot = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "active_dot" then
                 local name = tokenIterator()
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
-                dotName = self:Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
+                dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
                 local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
                 target = target and (target .. ".") or ""
                 local code = format("%sCountOnAny(%s)", prefix, dotName)
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1167,21 +1287,16 @@ __exports.Emiter = __class(nil, {
                     code = format("ArtifactTraitRank(%s)", name)
                 elseif property == "enabled" then
                     code = format("HasArtifactTrait(%s)", name)
-                else
-                    ok = false
                 end
-                if ok and code then
+                if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1193,21 +1308,16 @@ __exports.Emiter = __class(nil, {
                     code = format("AzeriteTraitRank(%s_trait)", name)
                 elseif property == "enabled" then
                     code = format("HasAzeriteTrait(%s_trait)", name)
-                else
-                    ok = false
                 end
-                if ok and code then
+                if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name .. "_trait")
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1216,6 +1326,7 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 local property = tokenIterator()
                 local essenceId = format("%s_essence_id", name)
+                essenceId = self:Disambiguate(annotation, essenceId, annotation.classId, annotation.specialization)
                 if property == "major" then
                     code = format("AzeriteEssenceIsMajor(%s)", essenceId)
                 elseif property == "minor" then
@@ -1224,27 +1335,21 @@ __exports.Emiter = __class(nil, {
                     code = format("AzeriteEssenceIsEnabled(%s)", essenceId)
                 elseif property == "rank" then
                     code = format("AzeriteEssenceRank(%s)", essenceId)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, essenceId)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "refreshable" then
                 local buffName = action .. "_debuff"
-                buffName = self:Disambiguate(annotation, buffName, annotation.class, annotation.specialization)
+                buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
                 local target
                 local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
                 if prefix == "Debuff" then
@@ -1257,10 +1362,9 @@ __exports.Emiter = __class(nil, {
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 self:AddSymbol(annotation, buffName)
             end
-            return ok, node
+            return node
         end
         self.EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1270,9 +1374,9 @@ __exports.Emiter = __class(nil, {
                 if (token == "consumable" and property == nil) then
                     property = "remains"
                 end
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
-                buffName = self:Disambiguate(annotation, buffName, annotation.class, annotation.specialization)
+                buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
                 local prefix
                 if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
                     prefix = target == "target" and "Debuff" or "Buff"
@@ -1317,25 +1421,20 @@ __exports.Emiter = __class(nil, {
                     code = format("%sImproved(%s%s)", prefix, buffName)
                 elseif property == "value" then
                     code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
-                else
-                    ok = false
                 end
-                if ok and code then
+                if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, buffName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
-            local className = annotation.class
+            local className = annotation.classId
             local specialization = annotation.specialization
-            local camelSpecialization = CamelSpecialization(annotation)
+            local camelSpecialization = LowerSpecialization(annotation)
             target = target and (target .. ".") or ""
             local code
             if CHARACTER_PROPERTY[operand] then
@@ -1366,7 +1465,7 @@ __exports.Emiter = __class(nil, {
                 code = format("BuffStacks(%s)", name)
                 self:AddSymbol(annotation, name)
             elseif sub(operand, 1, 22) == "active_enemies_within." then
-                code = "Enemies()"
+                code = "Enemies(tagged=1)"
             elseif find(operand, "^incoming_damage_") then
                 local _seconds, measure = match(operand, "^incoming_damage_([%d]+)(m?s?)$")
                 local seconds = tonumber(_seconds)
@@ -1399,21 +1498,18 @@ __exports.Emiter = __class(nil, {
             elseif operand == "attack_haste" or operand == "stat.attack_haste" then
                 code = "100 / { 100 + MeleeAttackSpeedPercent() }"
             elseif sub(operand, 1, 13) == "spell_targets" then
-                code = "Enemies()"
+                code = "Enemies(tagged=1)"
             elseif operand == "t18_class_trinket" then
                 code = format("HasTrinket(%s)", operand)
                 self:AddSymbol(annotation, operand)
-            else
-                ok = false
             end
-            if ok and code then
+            if code then
                 annotation.astAnnotation = annotation.astAnnotation or {}
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
-            return ok, node
+            return node
         end
         self.EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1421,7 +1517,7 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 local property = tokenIterator()
                 local prefix
-                name, prefix = self:Disambiguate(annotation, name, annotation.class, annotation.specialization, "Spell")
+                name, prefix = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization, "Spell")
                 local code
                 if property == "execute_time" then
                     code = format("ExecuteTime(%s)", name)
@@ -1449,21 +1545,15 @@ __exports.Emiter = __class(nil, {
                     code = format("%sMaxCharges(%s)", prefix, name)
                 elseif property == "full_recharge_time" then
                     code = format("%sCooldown(%s)", prefix, name)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandDisease = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1479,58 +1569,46 @@ __exports.Emiter = __class(nil, {
                     code = target .. "DiseasesTicking()"
                 elseif property == "ticking" then
                     code = target .. "DiseasesAnyTicking()"
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "ground_aoe" then
                 local name = tokenIterator()
                 local property = tokenIterator()
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
-                dotName = self:Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
+                dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
                 local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
                 local target = (prefix == "Debuff" and "target.") or ""
                 local code
                 if property == "remains" then
                     code = format("%s%sRemaining(%s)", target, prefix, dotName)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "dot" then
                 local name = tokenIterator()
                 local property = tokenIterator()
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
-                dotName = self:Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
+                dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
                 local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
                 target = target and (target .. ".") or ""
                 local code
@@ -1556,57 +1634,45 @@ __exports.Emiter = __class(nil, {
                     code = format("%s%sRefreshable(%s)", target, prefix, dotName)
                 elseif property == "max_stacks" then
                     code = format("MaxStacks(%s)", dotName)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandGlyph = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "glyph" then
                 local name = tokenIterator()
                 local property = tokenIterator()
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local glyphName = "glyph_of_" .. name
-                glyphName = self:Disambiguate(annotation, glyphName, annotation.class, annotation.specialization)
+                glyphName = self:Disambiguate(annotation, glyphName, annotation.classId, annotation.specialization)
                 local code
                 if property == "disabled" then
                     code = format("not Glyph(%s)", glyphName)
                 elseif property == "enabled" then
                     code = format("Glyph(%s)", glyphName)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, glyphName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             if token == "pet" then
                 local name = tokenIterator()
                 local property = tokenIterator()
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local isTotem = IsTotem(name)
                 local code
                 if isTotem and property == "active" then
@@ -1618,53 +1684,47 @@ __exports.Emiter = __class(nil, {
                 elseif name == "buff" then
                     local pattern = format("^pet%%.([%%w_.]+)", operand)
                     local petOperand = match(operand, pattern)
-                    ok, node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet")
+                    node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet")
                 else
                     local pattern = format("^pet%%.%s%%.([%%w_.]+)", name)
                     local petOperand = match(operand, pattern)
                     local target = "pet"
                     if petOperand then
-                        ok, node = self.EmitOperandSpecial(petOperand, parseNode, nodeList, annotation, action, target)
-                        if  not ok then
-                            ok, node = self.EmitOperandAction(petOperand, parseNode, nodeList, annotation, action, target)
+                        node = self.EmitOperandSpecial(petOperand, parseNode, nodeList, annotation, action, target)
+                        if  not node then
+                            node = self.EmitOperandAction(petOperand, parseNode, nodeList, annotation, action, target)
                         end
-                        if  not ok then
-                            ok, node = self.EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target)
+                        if  not node then
+                            node = self.EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target)
                         end
-                        if  not ok then
+                        if  not node then
                             local petAbilityName = match(petOperand, "^[%w_]+%.([^.]+)")
-                            petAbilityName = self:Disambiguate(annotation, petAbilityName, annotation.class, annotation.specialization)
+                            petAbilityName = self:Disambiguate(annotation, petAbilityName, annotation.classId, annotation.specialization)
                             if sub(petAbilityName, 1, 4) ~= "pet_" then
                                 petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
                             end
                             if property == "buff" then
-                                ok, node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
+                                node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
                             elseif property == "cooldown" then
-                                ok, node = self.EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action)
+                                node = self.EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action)
                             elseif property == "debuff" then
-                                ok, node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
+                                node = self.EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
                             elseif property == "dot" then
-                                ok, node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
-                            else
-                                ok = false
+                                node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
                             end
                         end
-                    else
-                        ok = false
                     end
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    self:AddSymbol(annotation, name)
+                    if isTotem then
+                        self:AddSymbol(annotation, name)
+                    end
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1675,7 +1735,7 @@ __exports.Emiter = __class(nil, {
                     howMany = tonumber(name)
                     name = tokenIterator()
                 end
-                name = self:Disambiguate(annotation, name, annotation.class, annotation.specialization)
+                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local code
                 if token == "prev" then
                     code = format("PreviousSpell(%s)", name)
@@ -1688,18 +1748,14 @@ __exports.Emiter = __class(nil, {
                 else
                     code = format("PreviousOffGCDSpell(%s)", name)
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, name)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local name
             local property
@@ -1723,8 +1779,6 @@ __exports.Emiter = __class(nil, {
                     code = "False(raid_event_movement_exists)"
                 elseif property == "remains" then
                     code = "0"
-                else
-                    ok = false
                 end
             elseif name == "adds" then
                 if property == "cooldown" then
@@ -1737,26 +1791,18 @@ __exports.Emiter = __class(nil, {
                     code = "600"
                 elseif property == "duration" then
                     code = "10"
-                else
-                    ok = false
                 end
             elseif name == "invulnerable" then
                 if property == "up" then
                     code = "False(raid_events_invulnerable_up)"
-                else
-                    ok = false
                 end
-            else
-                ok = false
             end
-            if ok and code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
+            if code then
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
-            return ok, node
+            return node
         end
         self.EmitOperandRace = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1775,20 +1821,14 @@ __exports.Emiter = __class(nil, {
                         self.tracer:Print("Warning: Race '%s' not defined", race)
                     end
                     code = format("Race(%s)", raceId)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local code
             if parseNode.rune then
@@ -1801,16 +1841,12 @@ __exports.Emiter = __class(nil, {
                 local runes = match(operand, "^rune.time_to_([%d]+)$")
                 code = format("TimeToRunes(%d)", runes)
             else
-                ok = false
+                return nil
             end
-            if ok and code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
-                node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-            end
-            return ok, node
+            node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            return node
         end
         self.EmitOperandSetBonus = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local setBonus = match(operand, "^set_bonus%.(.*)$")
             local code
@@ -1837,20 +1873,13 @@ __exports.Emiter = __class(nil, {
                         code = format("ArmorSetBonus(%s %d)", name, count)
                     end
                 end
-                if  not code then
-                    ok = false
-                end
-            else
-                ok = false
             end
-            if ok and code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
+            if code then
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
-            return ok, node
+            return node
         end
         self.EmitOperandSeal = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -1859,22 +1888,16 @@ __exports.Emiter = __class(nil, {
                 local code
                 if name then
                     code = format("Stance(paladin_seal_of_%s)", name)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, target)
-            local ok = true
             local node
-            local className = annotation.class
+            local className = annotation.classId
             local specialization = annotation.specialization
             target = target and (target .. ".") or ""
             operand = lower(operand)
@@ -1883,6 +1906,8 @@ __exports.Emiter = __class(nil, {
                 local buffName = "breath_of_sindragosa"
                 code = format("BuffPresent(%s)", buffName)
                 self:AddSymbol(annotation, buffName)
+            elseif operand == "ovale.boss" then
+                code = "(target.Classification(normal) and Enemies(tagged=1) >= 7 and not IsGrouped()) or (target.Classification(elite) and Enemies(tagged=1) > 5) or Boss()"
             elseif className == "DEATHKNIGHT" and sub(operand, 1, 24) == "pet.dancing_rune_weapon." then
                 local petOperand = sub(operand, 25)
                 local tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN)
@@ -1897,8 +1922,12 @@ __exports.Emiter = __class(nil, {
                     else
                         target = sub(target, 1, -2)
                     end
-                    ok, node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
+                    node = self.EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
                 end
+            elseif className == "DEATHKNIGHT" and operand == "death_knight.disable_aotd" then
+                code = "True(disable_aotd)"
+            elseif className == "DEATHKNIGHT" and operand == "pet.apoc_ghoul.active" then
+                code = "SpellCooldown(apocalypse) >= SpellCooldownDuration(apocalypse) - 15"
             elseif className == "DEMONHUNTER" and operand == "buff.metamorphosis.extended_by_demonic" then
                 code = "not BuffExpires(extended_by_demonic_buff)"
             elseif className == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
@@ -1980,8 +2009,6 @@ __exports.Emiter = __class(nil, {
                     code = format("%sDebuffExpires(%s)", target, debuffName)
                 elseif property == "up" then
                     code = format("%sDebuffPresent(%s)", target, debuffName)
-                else
-                    ok = false
                 end
             elseif className == "MONK" and operand == "dot.zen_sphere.ticking" then
                 local buffName = "zen_sphere_buff"
@@ -1998,12 +2025,18 @@ __exports.Emiter = __class(nil, {
                 elseif match(property, "last_tick_damage_(%d+)") then
                     local ticks = match(property, "last_tick_damage_(%d+)")
                     code = format("StaggerTick(%d)", ticks)
-                else
-                    ok = false
                 end
             elseif className == "MONK" and operand == "spinning_crane_kick.count" then
                 code = "SpellCount(spinning_crane_kick)"
                 self:AddSymbol(annotation, "spinning_crane_kick")
+            elseif className == "MONK" and operand == "combo_strike" then
+                if action then
+                    code = format("not PreviousSpell(%s)", action)
+                end
+            elseif className == "MONK" and operand == "combo_break" then
+                if action then
+                    code = format("PreviousSpell(%s)", action)
+                end
             elseif className == "PALADIN" and operand == "dot.sacred_shield.remains" then
                 local buffName = "sacred_shield_buff"
                 code = format("BuffRemaining(%s)", buffName)
@@ -2034,7 +2067,7 @@ __exports.Emiter = __class(nil, {
             elseif className == "ROGUE" and operand == "ss_buffed" then
                 code = "False(ss_buffed)"
             elseif className == "ROGUE" and operand == "non_ss_buffed_targets" then
-                code = "Enemies() - DebuffCountOnAny(garrote_debuff)"
+                code = "Enemies(tagged=1) - DebuffCountOnAny(garrote_debuff)"
                 self:AddSymbol(annotation, "garrote_debuff")
             elseif className == "ROGUE" and operand == "ss_buffed_targets_above_pandemic" then
                 code = "0"
@@ -2048,20 +2081,16 @@ __exports.Emiter = __class(nil, {
                 code = "BuffPresent(roll_the_bones_buff)"
                 self:AddSymbol(annotation, "roll_the_bones_buff")
             elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
-                local spell = self:Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization)
+                local spell = self:Disambiguate(annotation, "totem_mastery", annotation.classId, annotation.specialization)
                 code = format("TotemRemaining(%s)", spell)
-                ok = true
                 self:AddSymbol(annotation, spell)
             elseif className == "SHAMAN" and match(operand, "pet.[a-z_]+.active") then
                 code = "pet.Present()"
-                ok = true
             elseif className == "WARLOCK" and match(operand, "pet%.service_[a-z_]+%..+") then
                 local spellName, property = match(operand, "pet%.(service_[a-z_]+)%.(.+)")
                 if property == "active" then
                     code = format("SpellCooldown(%s) > 100", spellName)
                     self:AddSymbol(annotation, spellName)
-                else
-                    ok = false
                 end
             elseif className == "WARLOCK" and match(operand, "dot.unstable_affliction_([1-5]).remains") then
                 local num = match(operand, "dot.unstable_affliction_([1-5]).remains")
@@ -2167,19 +2196,16 @@ __exports.Emiter = __class(nil, {
                 local t = target or "target."
                 code = format("not %sClassification(worldboss)", t)
             elseif operand == "priority_rotation" then
-                code = "CheckBoxOn(opt_priority_rotation)"
-                annotation.opt_priority_rotation = className
+                code = "False(priority_rotation)"
             else
                 ok = false
             end
-            if ok and code then
-                annotation.astAnnotation = annotation.astAnnotation or {}
+            if code then
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
-            return ok, node
+            return node
         end
         self.EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -2187,35 +2213,29 @@ __exports.Emiter = __class(nil, {
                 local name = lower(tokenIterator())
                 local property = tokenIterator()
                 local talentName = name .. "_talent"
-                talentName = self:Disambiguate(annotation, talentName, annotation.class, annotation.specialization)
+                talentName = self:Disambiguate(annotation, talentName, annotation.classId, annotation.specialization)
                 local code
                 if property == "disabled" then
                     if parseNode.asType == "boolean" then
-                        code = format("not Talent(%s)", talentName)
+                        code = format("not HasTalent(%s)", talentName)
                     else
-                        code = format("Talent(%s no)", talentName)
+                        code = format("HasTalent(%s no)", talentName)
                     end
                 elseif property == "enabled" then
                     if parseNode.asType == "boolean" then
-                        code = format("Talent(%s)", talentName)
+                        code = format("HasTalent(%s)", talentName)
                     else
                         code = format("TalentPoints(%s)", talentName)
                     end
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, talentName)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -2231,25 +2251,29 @@ __exports.Emiter = __class(nil, {
                 end
                 local code
                 if property == "adds" then
-                    code = "Enemies()-1"
+                    code = "Enemies(tagged=1)-1"
                 elseif property == "time_to_die" then
                     code = "target.TimeToDie()"
-                elseif property == "time_to_pct_30" then
-                    code = "target.TimeToHealthPercent(30)"
+                elseif property == "distance" then
+                    code = "target.Distance()"
+                elseif property == "health" then
+                    local modifier = tokenIterator()
+                    if modifier == "pct" then
+                        code = "target.HealthPercent()"
+                    end
                 else
-                    ok = false
+                    local percent = match(property, "^time_to_pct_(%d+)")
+                    if percent then
+                        code = "target.TimeToHealthPercent(" .. percent .. ")"
+                    end
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandTotem = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -2261,20 +2285,14 @@ __exports.Emiter = __class(nil, {
                     code = format("TotemPresent(%s)", name)
                 elseif property == "remains" then
                     code = format("TotemRemaining(%s)", name)
-                else
-                    ok = false
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
-            local ok = true
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
@@ -2288,15 +2306,13 @@ __exports.Emiter = __class(nil, {
                 if procType == "cooldown" then
                     if statName == "remains" then
                         code = "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }"
-                    else
-                        ok = false
                     end
                 elseif sub(procType, 1, 4) == "has_" then
                     code = format("True(trinket_%s_%s)", procType, statName)
                 else
                     local property = tokenIterator()
                     local buffName = format("trinket_%s_%s_buff", procType, statName)
-                    buffName = self:Disambiguate(annotation, buffName, annotation.class, annotation.specialization)
+                    buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
                     if property == "cooldown" then
                         code = format("BuffCooldownDuration(%s)", buffName)
                     elseif property == "cooldown_remains" then
@@ -2315,30 +2331,24 @@ __exports.Emiter = __class(nil, {
                         code = format("BuffStacks(%s)", buffName)
                     elseif property == "up" then
                         code = format("BuffPresent(%s)", buffName)
-                    else
-                        ok = false
                     end
-                    if ok then
-                        self:AddSymbol(annotation, buffName)
-                    end
+                    self:AddSymbol(annotation, buffName)
                 end
-                if ok and code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
+                if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 end
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
             local token = tokenIterator()
             local node
-            local ok
             if token == "variable" then
                 local name = tokenIterator()
-                if annotation.currentVariable and annotation.currentVariable.name == name then
+                if  not name then
+                    self.tracer:Error("Unable to parse variable name in EmitOperandVariable")
+                elseif annotation.currentVariable and annotation.currentVariable.name == name then
                     local group = annotation.currentVariable.child[1]
                     if #group.child == 0 then
                         node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
@@ -2350,11 +2360,8 @@ __exports.Emiter = __class(nil, {
                     node.type = "function"
                     node.name = name
                 end
-                ok = true
-            else
-                ok = false
             end
-            return ok, node
+            return node
         end
         self.EMIT_VISITOR = {
             ["action"] = self.EmitAction,
@@ -2426,16 +2433,22 @@ __exports.Emiter = __class(nil, {
         if info then
             return info[1], info[2]
         end
-        return 
+        return
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("bloodlust", "burst_haste")
+        self:AddDisambiguation("169314", "azsharas_font_of_power")
         self:AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
         self:AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
         self:AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
         self:AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
         self:AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
         self:AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
+        self:AddDisambiguation("reaping_flames", "reaping_flames_essence")
+        self:AddDisambiguation("moment_of_glory", "moment_of_glory_essence")
+        self:AddDisambiguation("replica_of_knowledge", "replica_of_knowledge_essence")
+        self:AddDisambiguation("concentrated_flame_missile", "concentrated_flame")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
         self:AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
@@ -2466,6 +2479,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
+        self:AddDisambiguation("icy_citadel_buff", "icy_citadel_expires_buff", "DEATHKNIGHT")
         self:AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
@@ -2514,7 +2528,6 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy")
         self:AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
         self:AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
-        self:AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow")
         self:AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination")
         self:AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
         self:AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
@@ -2533,10 +2546,11 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
         self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
         self:AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection")
-        self:AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
         self:AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
         self:AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
         self:AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
+        self:AddDisambiguation("condensed_lifeforce", "condensed_life_force")
+        self:AddDisambiguation("condensed_lifeforce_essence_id", "condensed_life_force_essence_id")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

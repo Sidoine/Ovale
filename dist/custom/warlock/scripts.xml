@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Script file="Xeltor_Affliction.lua" />
-	<Script file="Xeltor_Demonology.lua" />
-	<Script file="Xeltor_Destruction.lua" />
+	<Script file="Xeltor_Affliction.osl" />
+	<Script file="Xeltor_Demonology.osl" />
+	<Script file="Xeltor_Destruction.osl" />
 </Ui>

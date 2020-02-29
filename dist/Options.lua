@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Options", 80201)
+local __exports = LibStub:NewLibrary("ovale/Options", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -18,11 +18,10 @@ local self_register = {}
 __exports.OvaleOptionsClass = __class(nil, {
     constructor = function(self, ovale)
         self.ovale = ovale
-        self.db = nil
         self.defaultDB = {
             profile = {
-                source = nil,
-                code = nil,
+                source = {},
+                code = "",
                 showHiddenScripts = false,
                 overrideCode = nil,
                 check = {},
@@ -102,7 +101,10 @@ __exports.OvaleOptionsClass = __class(nil, {
                     }
                 }
             },
-            global = nil
+            global = {
+                debug = {},
+                profiler = {}
+            }
         }
         self.options = {
             type = "group",
@@ -497,13 +499,13 @@ __exports.OvaleOptionsClass = __class(nil, {
         }
         self.OnInitialize = function()
             local ovale = self.ovale:GetName()
-            local db = AceDB:New("OvaleDB", self.defaultDB)
+            self.db = AceDB:New("OvaleDB", self.defaultDB)
+            local db = self.db
             self.options.args.profile = AceDBOptions:GetOptionsTable(db)
             db.RegisterCallback(self, "OnNewProfile", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileReset", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileChanged", self.HandleProfileChanges)
             db.RegisterCallback(self, "OnProfileCopied", self.HandleProfileChanges)
-            self.db = db
             self:UpgradeSavedVariables()
             AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
             AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)

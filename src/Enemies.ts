@@ -40,7 +40,7 @@ let CLEU_UNIT_REMOVED: LuaObj<boolean> = {
 let self_enemyName: LuaObj<string> = {}
 let self_enemyLastSeen: LuaObj<number> = {}
 let self_taggedEnemyLastSeen: LuaObj<number> = {}
-let self_reaperTimer: Timer = undefined;
+let self_reaperTimer: Timer | undefined = undefined;
 let REAP_INTERVAL = 3;
 const IsTagEvent = function(cleuEvent: string) {
     let isTagEvent = false;
@@ -87,7 +87,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     }
     
     private OnDisable = () => {
-        if (!self_reaperTimer) {
+        if (self_reaperTimer) {
             this.module.CancelTimer(self_reaperTimer);
             self_reaperTimer = undefined;
         }
@@ -172,14 +172,14 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             let name = self_enemyName[guid];
             let changed = false;
             if (self_enemyLastSeen[guid]) {
-                self_enemyLastSeen[guid] = undefined;
+                delete self_enemyLastSeen[guid];
                 if (this.current.activeEnemies > 0) {
                     this.current.activeEnemies = this.current.activeEnemies - 1;
                     changed = true;
                 }
             }
             if (self_taggedEnemyLastSeen[guid]) {
-                self_taggedEnemyLastSeen[guid] = undefined;
+                delete self_taggedEnemyLastSeen[guid];
                 if (this.current.taggedEnemies > 0) {
                     this.current.taggedEnemies = this.current.taggedEnemies - 1;
                     changed = true;
@@ -199,7 +199,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             let name = self_enemyName[guid];
             let tagged = self_taggedEnemyLastSeen[guid];
             if (tagged) {
-                self_taggedEnemyLastSeen[guid] = undefined;
+                delete self_taggedEnemyLastSeen[guid];
                 if (this.current.taggedEnemies > 0) {
                     this.current.taggedEnemies = this.current.taggedEnemies - 1;
                 }
@@ -233,8 +233,8 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
         this.profiler.StopProfiling("OvaleEnemies_ResetState");
     }
     CleanState() {
-        this.next.activeEnemies = undefined;
-        this.next.taggedEnemies = undefined;
+        this.next.activeEnemies = 0;
+        this.next.taggedEnemies = 0;
         this.next.enemies = undefined;
     }
 }

@@ -84,20 +84,6 @@ SpellList(trinket_stacking_proc_spell_power_buff)
 
 Define(umbral_glaive_storm 242553)
 
-# Battle for Azeroth
-Define(battle_scarred 160053)
-
-Define(item_battle_potion_of_agility 163223)
-Define(item_battle_potion_of_intellect 163222)
-Define(item_battle_potion_of_strength 163224)
-Define(item_battle_potion_of_stamina 163225)
-Define(item_bursting_blood 152560)
-Define(item_focused_resolve 168506)
-Define(item_rising_death 152559)
-Define(item_steelskin_potion 152557)
-Define(item_unbridled_fury 169299)
-Define(item_superior_battle_potion_of_strength 168500)
-
 ###
 ### Trinkets & OnUse Rings
 ###
@@ -115,6 +101,8 @@ Define(coagulated_nightwell_residue 137400)
 Define(cunning_of_the_deceiver 242629)
 Define(convergence_of_fates 140806)
 Define(draught_of_souls 140808)
+Define(edits_of_the_faithless 169315)
+    ItemInfo(edits_of_the_faithless unusable=1)
 Define(gnawed_thumb_ring 134526)
 	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
@@ -179,28 +167,28 @@ Define(hyperthread_wristwraps_300142 300142)
 ### Essences
 ###
 
+Define(anima_of_death_essence 294926)
+    SpellInfo(anima_of_death_essence tag=cd)
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
-    Define(concentrated_flame_burn_debuff 295377)
+    Define(concentrated_flame_burn_debuff 295368)
+    SpellInfo(concentrated_flame_burn_debuff duration=6)
+    SpellAddTargetDebuff(concentrated_flame_essence concentrated_flame_burn_debuff=1)
+Define(focused_azerite_beam_essence 295258)
+    SpellInfo(focused_azerite_beam_essence cd=90 tag=cd)
 Define(memory_of_lucid_dreams_essence 298357)
     SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
     Define(memory_of_lucid_dreams_essence_buff 298357)
 Define(ripple_in_space_essence 302731)
     SpellInfo(ripple_in_space_essence cd=60 tag=shortcd)
+Define(the_unbound_force_essence 298452)
+    SpellInfo(the_unbound_force_essence cd=60 tag=shortcd)
+    Define(reckless_force_counter_buff 302917)
+    SpellInfo(reckless_force_counter_buff max_stacks=20)
 Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
 
-# Essences: TODO import from simc
-Define(anima_of_life_and_death_essence_id 7)
-Define(blood_of_the_enemy_essence_id 23)
-Define(condensed_lifeforce_essence_id 14)
-Define(conflict_and_strife_essence_id 32)
-Define(essence_of_the_focusing_iris_essence_id 5)
-Define(memory_of_lucid_dreams_essence_id 27)
-Define(the_crucible_of_flame_essence_id 12)
-Define(vision_of_perfection_essence_id 22)
-Define(worldvein_resonance_essence_id 4)
 ###
 ### Racials
 ###

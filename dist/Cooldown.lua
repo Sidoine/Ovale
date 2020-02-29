@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Cooldown", 80201)
+local __exports = LibStub:NewLibrary("ovale/Cooldown", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -65,7 +65,7 @@ local BASE_GCD = {
 }
 __exports.CooldownData = __class(nil, {
     constructor = function(self)
-        self.cd = nil
+        self.cd = {}
     end
 })
 __exports.OvaleCooldownClass = __class(States, {
@@ -129,16 +129,15 @@ __exports.OvaleCooldownClass = __class(States, {
                 self.tracer:Debug(event, self.serial)
             end
         end
-        self.CopySpellcastInfo = function(mod, spellcast, dest)
+        self.CopySpellcastInfo = function(spellcast, dest)
             if spellcast.offgcd then
                 dest.offgcd = spellcast.offgcd
             end
         end
-        self.SaveSpellcastInfo = function(mod, spellcast)
+        self.SaveSpellcastInfo = function(spellcast)
             local spellId = spellcast.spellId
             if spellId then
-                local gcd
-                gcd = self.ovaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+                local gcd = self.ovaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
                 if gcd and gcd == 0 then
                     spellcast.offgcd = true
                 end
@@ -227,7 +226,7 @@ __exports.OvaleCooldownClass = __class(States, {
                     cdEnable = enable
                 end
             else
-                cdStart, cdDuration, cdEnable = start or 0, duration, enable
+                cdStart, cdDuration, cdEnable = start or 0, duration or 0, enable
             end
         end
         return cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable
@@ -250,7 +249,15 @@ __exports.OvaleCooldownClass = __class(States, {
             cdName = si.shared_cd
         end
         if  not self.next.cd[cdName] then
-            self.next.cd[cdName] = {}
+            self.next.cd[cdName] = {
+                start = 0,
+                duration = 0,
+                enable = false,
+                chargeDuration = 0,
+                chargeStart = 0,
+                charges = 0,
+                maxCharges = 0
+            }
         end
         local cd = self.next.cd[cdName]
         if  not cd.start or  not cd.serial or cd.serial < self.serial then

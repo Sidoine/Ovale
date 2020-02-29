@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 80201)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
@@ -115,10 +115,14 @@ local MATCHES = {
         [2] = Tokenize
     },
     [10] = {
-        [1] = "^.",
+        [1] = "^<%?",
         [2] = Tokenize
     },
     [11] = {
+        [1] = "^.",
+        [2] = Tokenize
+    },
+    [12] = {
         [1] = "^$",
         [2] = NoToken
     }
@@ -139,7 +143,7 @@ __exports.Parser = __class(nil, {
         }
         for i = 1, 20, 1 do
             local tokenType, token = tokenStream:Peek(i)
-            if tokenType then
+            if tokenType and token then
                 context[#context + 1] = token
             else
                 context[#context + 1] = "<EOS>"
@@ -149,7 +153,6 @@ __exports.Parser = __class(nil, {
         self.tracer:Warning(concat(context, " "))
     end,
     ParseAction = function(self, action, nodeList, annotation)
-        local ok = true
         local stream = action
         do
             stream = gsub(stream, "||", "|")
@@ -188,110 +191,100 @@ __exports.Parser = __class(nil, {
         end
         local tokenStream = OvaleLexer("SimulationCraft", stream, MATCHES)
         local name
-        do
-            local tokenType, token = tokenStream:Consume()
-            if (tokenType == "keyword" and SPECIAL_ACTION[token]) or tokenType == "name" then
-                name = token
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.", token, action)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Action")
+            return nil
+        end
+        if (tokenType == "keyword" and SPECIAL_ACTION[token]) or tokenType == "name" then
+            name = token
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.", token, action)
+            return nil
         end
         local child = self_childrenPool:Get()
         local modifiers = self_childrenPool:Get()
-        if ok then
-            local tokenType, token = tokenStream:Peek()
-            while ok and tokenType do
-                if tokenType == "," then
-                    tokenStream:Consume()
-                    local modifier, expressionNode
-                    ok, modifier, expressionNode = self:ParseModifier(tokenStream, nodeList, annotation)
-                    if ok then
-                        modifiers[modifier] = expressionNode
-                        tokenType, token = tokenStream:Peek()
-                    end
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.", token, action)
-                    ok = false
+        tokenType, token = tokenStream:Peek()
+        while tokenType do
+            if tokenType == "," then
+                tokenStream:Consume()
+                local modifier, expressionNode = self:ParseModifier(tokenStream, nodeList, annotation)
+                if modifier and expressionNode then
+                    modifiers[modifier] = expressionNode
+                    tokenType, token = tokenStream:Peek()
                 end
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.", token, action)
+                self_childrenPool:Release(child)
+                return nil
             end
         end
         local node
-        if ok then
-            node = NewNode(nodeList)
-            node.type = "action"
-            node.action = action
-            node.name = name
-            node.child = child
-            node.modifiers = modifiers
-            annotation.sync = annotation.sync or {}
-            annotation.sync[name] = annotation.sync[name] or node
-        else
-            self_childrenPool:Release(child)
-        end
-        return ok, node
+        node = NewNode(nodeList)
+        node.type = "action"
+        node.action = action
+        node.name = name
+        node.child = child
+        node.modifiers = modifiers
+        annotation.sync = annotation.sync or {}
+        annotation.sync[name] = annotation.sync[name] or node
+        return node
     end,
     ParseActionList = function(self, name, actionList, nodeList, annotation)
-        local ok = true
         local child = self_childrenPool:Get()
         for action in gmatch(actionList, "[^/]+") do
-            local actionNode
-            ok, actionNode = self:ParseAction(action, nodeList, annotation)
-            if ok then
-                child[#child + 1] = actionNode
-            else
-                break
+            local actionNode = self:ParseAction(action, nodeList, annotation)
+            if  not actionNode then
+                self_childrenPool:Release(child)
+                return nil
             end
+            child[#child + 1] = actionNode
         end
         local node
-        if ok then
-            node = NewNode(nodeList)
-            node.type = "action_list"
-            node.name = name
-            node.child = child
-        else
-            self_childrenPool:Release(child)
-        end
-        return ok, node
+        node = NewNode(nodeList)
+        node.type = "action_list"
+        node.name = name
+        node.child = child
+        return node
     end,
     ParseExpression = function(self, tokenStream, nodeList, annotation, minPrecedence)
         minPrecedence = minPrecedence or 0
-        local ok = true
         local node
-        do
-            local tokenType, token = tokenStream:Peek()
-            if tokenType then
-                local opInfo = UNARY_OPERATOR[token]
-                if opInfo then
-                    local opType, precedence = opInfo[1], opInfo[2]
-                    local asType = (opType == "logical") and "boolean" or "value"
-                    tokenStream:Consume()
-                    local operator = token
-                    local rhsNode
-                    ok, rhsNode = self:ParseExpression(tokenStream, nodeList, annotation, precedence)
-                    if ok then
-                        if operator == "-" and rhsNode.type == "number" then
-                            rhsNode.value = -1 * rhsNode.value
-                            node = rhsNode
-                        else
-                            node = NewNode(nodeList, true)
-                            node.type = opType
-                            node.expressionType = "unary"
-                            node.operator = operator
-                            node.precedence = precedence
-                            node.child[1] = rhsNode
-                            rhsNode.asType = asType
-                        end
-                    end
-                else
-                    ok, node = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
-                    if ok and node then
-                        node.asType = "boolean"
-                    end
-                end
-            end
+        local tokenType, token = tokenStream:Peek()
+        if  not tokenType then
+            return nil
         end
-        while ok do
+        local opInfo = UNARY_OPERATOR[token]
+        if opInfo then
+            local opType, precedence = opInfo[1], opInfo[2]
+            local asType = (opType == "logical") and "boolean" or "value"
+            tokenStream:Consume()
+            local operator = token
+            local rhsNode = self:ParseExpression(tokenStream, nodeList, annotation, precedence)
+            if rhsNode == nil then
+                return nil
+            end
+            if operator == "-" and rhsNode.type == "number" then
+                rhsNode.value = -1 * rhsNode.value
+                node = rhsNode
+            else
+                node = NewNode(nodeList, true)
+                node.type = opType
+                node.expressionType = "unary"
+                node.operator = operator
+                node.precedence = precedence
+                node.child[1] = rhsNode
+                rhsNode.asType = asType
+            end
+        else
+            local n = self:ParseSimpleExpression(tokenStream, nodeList, annotation)
+            if  not n then
+                return nil
+            end
+            node = n
+            node.asType = "boolean"
+        end
+        while true do
             local keepScanning = false
             local tokenType, token = tokenStream:Peek()
             if  not tokenType then
@@ -306,224 +299,206 @@ __exports.Parser = __class(nil, {
                     tokenStream:Consume()
                     local operator = token
                     local lhsNode = node
-                    local rhsNode
-                    ok, rhsNode = self:ParseExpression(tokenStream, nodeList, annotation, precedence)
-                    if ok then
-                        node = NewNode(nodeList, true)
-                        node.type = opType
-                        node.expressionType = "binary"
-                        node.operator = operator
-                        node.precedence = precedence
-                        node.child[1] = lhsNode
-                        node.child[2] = rhsNode
-                        lhsNode.asType = asType
-                        if  not rhsNode then
-                            self:SyntaxError(tokenStream, "Internal error: no right operand in binary operator %s.", token)
-                            return false, nil
-                        end
-                        rhsNode.asType = asType
-                        while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
-                            node.child[2] = rhsNode.child[1]
-                            rhsNode.child[1] = node
-                            node = rhsNode
-                            rhsNode = node.child[2]
-                        end
+                    local rhsNode = self:ParseExpression(tokenStream, nodeList, annotation, precedence)
+                    if  not rhsNode then
+                        return nil
+                    end
+                    node = NewNode(nodeList, true)
+                    node.type = opType
+                    node.expressionType = "binary"
+                    node.operator = operator
+                    node.precedence = precedence
+                    node.child[1] = lhsNode
+                    node.child[2] = rhsNode
+                    lhsNode.asType = asType
+                    if  not rhsNode then
+                        self:SyntaxError(tokenStream, "Internal error: no right operand in binary operator %s.", token)
+                        return nil
+                    end
+                    rhsNode.asType = asType
+                    while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
+                        node.child[2] = rhsNode.child[1]
+                        rhsNode.child[1] = node
+                        node = rhsNode
+                        rhsNode = node.child[2]
                     end
                 end
             elseif  not node then
                 self:SyntaxError(tokenStream, "Syntax error: %s of type %s is not a binary operator", token, tokenType)
-                return false, nil
+                return nil
             end
             if  not keepScanning then
                 break
             end
         end
-        return ok, node
+        return node
     end,
     ParseFunction = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local name
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "keyword" and FUNCTION_KEYWORD[token] then
-                name = token
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Function")
+            return nil
         end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= "(" then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; '(' expected.", token)
-                ok = false
-            end
+        if tokenType == "keyword" and FUNCTION_KEYWORD[token] then
+            name = token
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.", token)
+            return nil
         end
-        local argumentNode
-        if ok then
-            ok, argumentNode = self:ParseExpression(tokenStream, nodeList, annotation)
+        tokenType, token = tokenStream:Consume()
+        if tokenType ~= "(" then
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; '(' expected.", token)
+            return nil
         end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= ")" then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.", token)
-                ok = false
-            end
+        local argumentNode = self:ParseExpression(tokenStream, nodeList, annotation)
+        if  not argumentNode then
+            return nil
+        end
+        tokenType, token = tokenStream:Consume()
+        if tokenType ~= ")" then
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.", token)
+            return nil
         end
         local node
-        if ok then
-            node = NewNode(nodeList, true)
-            node.type = "function"
-            node.name = name
-            node.child[1] = argumentNode
-        end
-        return ok, node
+        node = NewNode(nodeList, true)
+        node.type = "function"
+        node.name = name
+        node.child[1] = argumentNode
+        return node
     end,
     ParseIdentifier = function(self, tokenStream, nodeList, annotation)
         local _, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing Identifier")
+            return nil
+        end
         local node = NewNode(nodeList)
         node.type = "operand"
         node.name = token
         annotation.operand = annotation.operand or {}
         annotation.operand[#annotation.operand + 1] = node
-        return true, node
+        return node
     end,
     ParseModifier = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local name
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "keyword" and checkToken(MODIFIER_KEYWORD, token) then
-                name = token
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; expression keyword expected.", token)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if tokenType == "keyword" and checkToken(MODIFIER_KEYWORD, token) then
+            name = token
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; expression keyword expected.", token)
+            return 
         end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= "=" then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; '=' expected.", token)
-                ok = false
-            end
+        tokenType, token = tokenStream:Consume()
+        if tokenType ~= "=" then
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; '=' expected.", token)
+            return 
         end
         local expressionNode
-        if ok then
-            if LITTERAL_MODIFIER[name] then
-                ok, expressionNode = self:ParseIdentifier(tokenStream, nodeList, annotation)
-            else
-                ok, expressionNode = self:ParseExpression(tokenStream, nodeList, annotation)
-                if ok and expressionNode and name == "sec" then
-                    expressionNode.asType = "value"
-                end
+        if LITTERAL_MODIFIER[name] then
+            expressionNode = self:ParseIdentifier(tokenStream, nodeList, annotation)
+        else
+            expressionNode = self:ParseExpression(tokenStream, nodeList, annotation)
+            if expressionNode and name == "sec" then
+                expressionNode.asType = "value"
             end
         end
-        return ok, name, expressionNode
+        return name, expressionNode
     end,
     ParseNumber = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local value
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "number" then
-                value = tonumber(token)
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.", token)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if tokenType == "number" then
+            value = tonumber(token)
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.", token)
+            return nil
         end
         local node
-        if ok then
-            node = NewNode(nodeList)
-            node.type = "number"
-            node.value = value
-        end
-        return ok, node
+        node = NewNode(nodeList)
+        node.type = "number"
+        node.value = value
+        return node
     end,
     ParseOperand = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local name
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "name" then
-                name = token
-            elseif tokenType == "keyword" and (token == "target" or token == "cooldown") then
-                name = token
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing OPERAND; operand expected.", token)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing OPERAND")
+            return nil
+        end
+        if tokenType == "name" then
+            name = token
+        elseif tokenType == "keyword" and (token == "target" or token == "cooldown") then
+            name = token
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing OPERAND; operand expected.", token)
+            return nil
         end
         local node
-        if ok then
-            node = NewNode(nodeList)
-            node.type = "operand"
-            node.name = name
-            node.rune = RUNE_OPERAND[name]
-            if node.rune then
-                local firstCharacter = sub(name, 1, 1)
-                node.includeDeath = (firstCharacter == "B" or firstCharacter == "F" or firstCharacter == "U")
-            end
-            annotation.operand = annotation.operand or {}
-            annotation.operand[#annotation.operand + 1] = node
+        node = NewNode(nodeList)
+        node.type = "operand"
+        node.name = name
+        node.rune = RUNE_OPERAND[name]
+        if node.rune then
+            local firstCharacter = sub(name, 1, 1)
+            node.includeDeath = (firstCharacter == "B" or firstCharacter == "F" or firstCharacter == "U")
         end
-        return ok, node
+        annotation.operand = annotation.operand or {}
+        annotation.operand[#annotation.operand + 1] = node
+        return node
     end,
     ParseParentheses = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local leftToken, rightToken
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "(" then
-                leftToken, rightToken = "(", ")"
-            elseif tokenType == "{" then
-                leftToken, rightToken = "{", "}"
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.", token)
-                ok = false
-            end
+        local tokenType, token = tokenStream:Consume()
+        if tokenType == "(" then
+            leftToken, rightToken = "(", ")"
+        elseif tokenType == "{" then
+            leftToken, rightToken = "{", "}"
+        else
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.", token)
+            return nil
         end
-        local node
-        if ok then
-            ok, node = self:ParseExpression(tokenStream, nodeList, annotation)
+        local node = self:ParseExpression(tokenStream, nodeList, annotation)
+        if  not node then
+            return nil
         end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= rightToken then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
-                ok = false
-            end
+        tokenType, token = tokenStream:Consume()
+        if tokenType ~= rightToken then
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
+            return nil
         end
-        if ok then
-            node.left = leftToken
-            node.right = rightToken
-        end
-        return ok, node
+        node.left = leftToken
+        node.right = rightToken
+        return node
     end,
     ParseSimpleExpression = function(self, tokenStream, nodeList, annotation)
-        local ok = true
         local node
         local tokenType, token = tokenStream:Peek()
+        if  not token then
+            self:SyntaxError(tokenStream, "Warning: end of stream when parsing SIMPLE EXPRESSION")
+            return nil
+        end
         if tokenType == "number" then
-            ok, node = self:ParseNumber(tokenStream, nodeList, annotation)
+            node = self:ParseNumber(tokenStream, nodeList, annotation)
         elseif tokenType == "keyword" then
             if FUNCTION_KEYWORD[token] then
-                ok, node = self:ParseFunction(tokenStream, nodeList, annotation)
+                node = self:ParseFunction(tokenStream, nodeList, annotation)
             elseif token == "target" or token == "cooldown" then
-                ok, node = self:ParseOperand(tokenStream, nodeList, annotation)
+                node = self:ParseOperand(tokenStream, nodeList, annotation)
             else
                 self:SyntaxError(tokenStream, "Warning: unknown keyword %s when parsing SIMPLE EXPRESSION", token)
-                return false, nil
+                return nil
             end
         elseif tokenType == "name" then
-            ok, node = self:ParseOperand(tokenStream, nodeList, annotation)
+            node = self:ParseOperand(tokenStream, nodeList, annotation)
         elseif tokenType == "(" then
-            ok, node = self:ParseParentheses(tokenStream, nodeList, annotation)
+            node = self:ParseParentheses(tokenStream, nodeList, annotation)
         else
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
             tokenStream:Consume()
-            ok = false
+            return nil
         end
-        return ok, node
+        return node
     end,
 })
