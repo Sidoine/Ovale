@@ -23,10 +23,11 @@ AddIcon
 	Texture(spell_holy_wordfortitude) # Power Word: Fortitude
 	Texture(spell_shadow_dispersion) # Dispersion
 	Texture(spell_shadow_shadowfiend) # Shadowfiend
-	
+	Texture(spell_shadow_unsummonbuilding) # Vampiric Embrace
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -75,33 +76,33 @@ AddIcon
 	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
 	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
 	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 

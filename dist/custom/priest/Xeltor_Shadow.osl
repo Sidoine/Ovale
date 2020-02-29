@@ -15,6 +15,7 @@ AddIcon specialization=3 help=main
 	if not mounted() and not PlayerIsResting() and not Dead() and not IsDead()
 	{
 		if not BuffPresent(power_word_fortitude_buff any=1) and { not target.Present() or not target.IsFriend() } Spell(power_word_fortitude)
+		if UnitInParty() and PartyMembersInRange(power_word_shield) > BuffCountOnAny(power_word_fortitude_buff) and PartyMembersWithHealthPercent(more 0) > BuffCountOnAny(power_word_fortitude_buff) and { not target.Present() or not target.IsFriend() } Spell(power_word_fortitude)
 		#shadowform,if=!buff.shadowform.up
 		if not BuffPresent(shadowform_buff) Spell(shadowform)
 	}
@@ -316,8 +317,9 @@ AddFunction cdsmainpostconditions
 
 AddFunction cdsshortcdactions
 {
- #the_unbound_force
- spell(the_unbound_force)
+	if { HealthPercent() < 50 or PartyHealthPercent() < 70 and UnitInParty() } and Enemies(tagged=1) <= 1 Spell(vampiric_embrace)
+	#the_unbound_force
+	spell(the_unbound_force)
 }
 
 AddFunction cdsshortcdpostconditions
