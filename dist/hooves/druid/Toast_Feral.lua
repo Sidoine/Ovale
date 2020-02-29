@@ -9,7 +9,7 @@ do
 #    class=druid
 #    spec=feral
 #    talents=2000122
-	
+
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -72,7 +72,7 @@ FeralDefaultMainActions()
 }
 AddFunction Boss
 {
-IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or { target.IsPvP() and not target.IsFriend() } 
+IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or { target.IsPvP() and not target.IsFriend() }
 }
 
 AddFunction opener_done
@@ -205,7 +205,7 @@ AddFunction FeralCooldownsMainActions
 {
  #thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
  if enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 Spell(thorns)
- 
+
 }
 
 AddFunction FeralCooldownsMainPostConditions
@@ -222,11 +222,11 @@ AddFunction FeralCooldownsShortCdActions
   #the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
   if BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) Spell(the_unbound_force)
   #blood_of_the_enemy,if=buff.tigers_fury.up
-  if BuffPresent(tigers_fury_buff) Spell(blood_of_the_enemy)
+  #if BuffPresent(tigers_fury_buff) Spell(blood_of_the_enemy)
   #feral_frenzy,if=combo_points=0
   if ComboPoints() == 0 Spell(feral_frenzy)
   #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
-  if enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 Spell(focused_azerite_beam)
+  #if enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 Spell(focused_azerite_beam)
   #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
   if enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 Spell(purifying_blast)
  }
@@ -234,15 +234,15 @@ AddFunction FeralCooldownsShortCdActions
 
 AddFunction FeralCooldownsShortCdPostConditions
 {
- 
+
 }
 
 AddFunction FeralCooldownsCdActions
 {
  #berserk,if=energy>=30&(cooldown.tigers_fury.remains>5|buff.tigers_fury.up)
- if Energy() >= 30 and { SpellCooldown(tigers_fury) > 5 or BuffPresent(tigers_fury_buff) } Spell(berserk)
+ if Energy() >= 30 and { SpellCooldown(tigers_fury) > 5 or BuffPresent(tigers_fury_buff) } and CheckBoxOn(UseCooldowns) Spell(berserk)
  #berserking
- Spell(berserking)
+ if CheckBoxOn(UseCooldowns) Spell(berserking)
 
  unless { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force)
  {
@@ -277,7 +277,7 @@ AddFunction FeralCooldownsCdActions
 
 AddFunction FeralCooldownsCdPostConditions
 {
- { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } 
+ { enemies(tagged=1) > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force) or ComboPoints() == 0 and Spell(feral_frenzy) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 90 and EnergyDeficit() >= 50 } and Spell(focused_azerite_beam) or { enemies(tagged=1) > Enemies(tagged=1) or 600 > 60 } and Spell(purifying_blast) or { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } }
 }
 
 ### actions.finishers
@@ -486,7 +486,7 @@ AddFunction FeralPrecombatMainActions
  #cat_form
  Spell(cat_form)
  #potion,dynamic_prepot=1
- 
+
 }
 
 AddFunction FeralPrecombatMainPostConditions
@@ -517,7 +517,7 @@ AddFunction FeralPrecombatCdActions
   unless Spell(cat_form)
   {
    #berserk
-   Spell(berserk)
+   if CheckBoxOn(UseCooldowns) Spell(berserk)
   }
  }
 }
@@ -526,6 +526,9 @@ AddFunction FeralPrecombatCdPostConditions
 {
  Talent(bloodtalons_talent) and Talent(bloodtalons_talent) and { BuffRemaining(bloodtalons_buff) < CastTime(regrowth) + GCDRemaining() or InCombat() } and Spell(regrowth) or Spell(cat_form)
 }
+
+AddCheckBox(UseCooldowns L(Cooldowns))
+
 ]]
 		OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
 	end

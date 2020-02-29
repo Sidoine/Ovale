@@ -1,0 +1,129 @@
+<?xml version="1.0" standalone="yes"?>
+<AhkDataSet>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>1</Keybind>
+    <Color_x0020__x0023_1>0xBDE707</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xB0D43C</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>2</Keybind>
+    <Color_x0020__x0023_1>0x131310</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x923EC2</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>5</Keybind>
+    <Color_x0020__x0023_1>0xCDFBF8</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x000003</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>3</Keybind>
+    <Color_x0020__x0023_1>0xFEFFCE</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x441F08</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>4</Keybind>
+    <Color_x0020__x0023_1>0x20592A</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x0B4B18</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}8{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x100DF0</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x1010F7</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>8</Keybind>
+    <Color_x0020__x0023_1>0x678017</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x6E8319</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>9</Keybind>
+    <Color_x0020__x0023_1>0x17548F</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x1D2635</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}6{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0xCD90EE</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xBE5BC4</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>=</Keybind>
+    <Color_x0020__x0023_1>0x9D7642</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x74BADB</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>=</Keybind>
+    <Color_x0020__x0023_1>0x4C2118</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x163665</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>=</Keybind>
+    <Color_x0020__x0023_1>0xF8E148</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x0D0508</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0xA2D136</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xC6F07A</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0xE36ABB</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xF7CCF7</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}3{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x3F3F38</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4D565A</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}3{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x50524D</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x1AA139</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>{SHIFTDOWN}4{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x111100</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x5C3E01</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>-</Keybind>
+    <Color_x0020__x0023_1>0xCEFB39</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x101400</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>-</Keybind>
+    <Color_x0020__x0023_1>0xF7F7D8</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4D3D25</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x5C81A4</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4C603B</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aged healing potion</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0xFFFFE7</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x425121</Color_x0020__x0023_2>
+  </AhkData>
+</AhkDataSet>
