@@ -2,4 +2,5 @@
 	<!-- <Script file="filename.lua" /> -->
 	<Script file="Hooves_Brewmaster.lua" />
 	<Script file="Hooves_Windwalker.lua" />
+	<Script file="Toast_Mistweaver.lua" />
 </Ui>
