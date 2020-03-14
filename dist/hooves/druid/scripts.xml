@@ -3,4 +3,5 @@
 	<Script file="Hooves_Guardian.lua" />
 	<Script file="Hooves_Balance.lua" />
 	<Script file="Hooves_Resto.lua" />
+	<Script file="Toast_Feral83.lua" />
 </Ui>
