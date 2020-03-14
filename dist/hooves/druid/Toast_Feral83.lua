@@ -370,6 +370,9 @@ AddFunction feralfinisherscdpostconditions
 
 AddFunction feralgeneratorsmainactions
 {
+	if ComboPoints() > 4 and Energy() >= energycost(ferocious_bite max=1) spell(ferocious_bite)
+	unless ComboPoints() > 4
+	{
  #regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points=4&dot.rake.remains<4
  if hastalent(bloodtalons_talent) and buffpresent(predatory_swiftness_buff) and buffexpires(bloodtalons_buff) and combopoints() == 4 and target.debuffremaining(rake_debuff) < 4 and talent(bloodtalons_talent) and { buffremaining(bloodtalons_buff) < casttime(regrowth) + gcdremaining() or incombat() } spell(regrowth)
  #regrowth,if=talent.bloodtalons.enabled&buff.bloodtalons.down&buff.predatory_swiftness.up&talent.lunar_inspiration.enabled&dot.rake.remains<1
@@ -428,6 +431,7 @@ AddFunction feralgeneratorsmainactions
    }
   }
  }
+}
 }
 
 AddFunction feralgeneratorsmainpostconditions
