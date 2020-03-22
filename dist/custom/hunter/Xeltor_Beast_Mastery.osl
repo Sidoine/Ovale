@@ -213,7 +213,7 @@ AddFunction masterycleavemainactions
  #barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max
  if pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() spell(barbed_shot)
  #multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25
- if gcd() - pet.buffremaining(turtle_beast_cleave_buff) > 0.25 spell(multishot_bm)
+ if gcd() - pet.buffremaining(pet_beast_cleave_buff) > 0.25 spell(multishot_bm)
  #barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
  if spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 spell(barbed_shot)
  #kill_command,if=active_enemies<4|!azerite.rapid_reload.enabled
@@ -236,7 +236,7 @@ AddFunction masterycleavemainpostconditions
 
 AddFunction masterycleaveshortcdactions
 {
- unless pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(turtle_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot)
+ unless pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(pet_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot)
  {
   #bestial_wrath,if=cooldown.aspect_of_the_wild.remains_guess>20|talent.one_with_the_pack.enabled|target.time_to_die<15
   if { spellcooldown(aspect_of_the_wild) > 20 or hastalent(one_with_the_pack_talent) or target.timetodie() < 15 } and { target.classification(normal) and enemies(tagged=1) >= 5 or target.classification(elite) and enemies(tagged=1) >= 3 or boss() } spell(bestial_wrath)
@@ -271,12 +271,12 @@ AddFunction masterycleaveshortcdactions
 
 AddFunction masterycleaveshortcdpostconditions
 {
- pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(turtle_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot) or { enemies(tagged=1) < 4 or not hasazeritetrait(rapid_reload_trait) } and pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { pet.buffexpires(turtle_frenzy_buff) and { charges(barbed_shot count=0) > 1.8 or buffpresent(bestial_wrath_buff) } or spellcooldown(aspect_of_the_wild) < baseduration(turtle_frenzy_buff) - gcd() and hasazeritetrait(primal_instincts_trait) or charges(barbed_shot count=0) > 1.4 or target.timetodie() < 9 } and spell(barbed_shot) or spell(concentrated_flame_essence) or hasazeritetrait(rapid_reload_trait) and enemies(tagged=1) > 2 and spell(multishot_bm) or spellcooldown(kill_command) > TimeToMaxFocus() and { enemies(tagged=1) < 3 or not hasazeritetrait(rapid_reload_trait) } and spell(cobra_shot)
+ pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(pet_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot) or { enemies(tagged=1) < 4 or not hasazeritetrait(rapid_reload_trait) } and pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { pet.buffexpires(turtle_frenzy_buff) and { charges(barbed_shot count=0) > 1.8 or buffpresent(bestial_wrath_buff) } or spellcooldown(aspect_of_the_wild) < baseduration(turtle_frenzy_buff) - gcd() and hasazeritetrait(primal_instincts_trait) or charges(barbed_shot count=0) > 1.4 or target.timetodie() < 9 } and spell(barbed_shot) or spell(concentrated_flame_essence) or hasazeritetrait(rapid_reload_trait) and enemies(tagged=1) > 2 and spell(multishot_bm) or spellcooldown(kill_command) > TimeToMaxFocus() and { enemies(tagged=1) < 3 or not hasazeritetrait(rapid_reload_trait) } and spell(cobra_shot)
 }
 
 AddFunction masterycleavecdactions
 {
- unless pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(turtle_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot)
+ unless pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(pet_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot)
  {
   #aspect_of_the_wild
   spell(aspect_of_the_wild)
@@ -293,7 +293,7 @@ AddFunction masterycleavecdactions
 
 AddFunction masterycleavecdpostconditions
 {
- pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(turtle_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot) or { spellcooldown(aspect_of_the_wild) > 20 or hastalent(one_with_the_pack_talent) or target.timetodie() < 15 } and { target.classification(normal) and enemies(tagged=1) >= 5 or target.classification(elite) and enemies(tagged=1) >= 3 or boss() } and spell(bestial_wrath) or spell(a_murder_of_crows) or spell(barrage) or { enemies(tagged=1) < 4 or not hasazeritetrait(rapid_reload_trait) } and pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { pet.buffexpires(turtle_frenzy_buff) and { charges(barbed_shot count=0) > 1.8 or buffpresent(bestial_wrath_buff) } or spellcooldown(aspect_of_the_wild) < baseduration(turtle_frenzy_buff) - gcd() and hasazeritetrait(primal_instincts_trait) or charges(barbed_shot count=0) > 1.4 or target.timetodie() < 9 } and spell(barbed_shot) or spell(purifying_blast) or spell(concentrated_flame_essence) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 } and spell(the_unbound_force) or hasazeritetrait(rapid_reload_trait) and enemies(tagged=1) > 2 and spell(multishot_bm) or spellcooldown(kill_command) > TimeToMaxFocus() and { enemies(tagged=1) < 3 or not hasazeritetrait(rapid_reload_trait) } and spell(cobra_shot) or spell(spitting_cobra)
+ pet.buffpresent(turtle_frenzy_buff) and pet.buffremaining(turtle_frenzy_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(pet_beast_cleave_buff) > 0.25 and spell(multishot_bm) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 and spell(barbed_shot) or { spellcooldown(aspect_of_the_wild) > 20 or hastalent(one_with_the_pack_talent) or target.timetodie() < 15 } and { target.classification(normal) and enemies(tagged=1) >= 5 or target.classification(elite) and enemies(tagged=1) >= 3 or boss() } and spell(bestial_wrath) or spell(a_murder_of_crows) or spell(barrage) or { enemies(tagged=1) < 4 or not hasazeritetrait(rapid_reload_trait) } and pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { pet.buffexpires(turtle_frenzy_buff) and { charges(barbed_shot count=0) > 1.8 or buffpresent(bestial_wrath_buff) } or spellcooldown(aspect_of_the_wild) < baseduration(turtle_frenzy_buff) - gcd() and hasazeritetrait(primal_instincts_trait) or charges(barbed_shot count=0) > 1.4 or target.timetodie() < 9 } and spell(barbed_shot) or spell(purifying_blast) or spell(concentrated_flame_essence) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter_buff) < 10 } and spell(the_unbound_force) or hasazeritetrait(rapid_reload_trait) and enemies(tagged=1) > 2 and spell(multishot_bm) or spellcooldown(kill_command) > TimeToMaxFocus() and { enemies(tagged=1) < 3 or not hasazeritetrait(rapid_reload_trait) } and spell(cobra_shot) or spell(spitting_cobra)
 }
 
 ### actions.precombat
