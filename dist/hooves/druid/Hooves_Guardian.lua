@@ -127,8 +127,8 @@ AddFunction GuardianDefaultMainActions
 
  unless GuardianCooldownsMainPostConditions()
  {
-   if CheckBoxOn(useMaul) and Rage() >= 40 Spell(maul)
-  if (not CheckBoxOn(useMaul) and BuffPresent(ironfur_buff) == 0) or BuffPresent(gory_fur_buff) == 1 or Rage() >= 50 Spell(ironfur)
+   
+  if (not CheckBoxOn(useMaul)) Spell(ironfur)
 	
   if not(target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff)) or target.DebuffRefreshable(thrash_bear_debuff) Spell(thrash)
   #maul,if=rage.deficit<10&active_enemies<4
@@ -146,7 +146,7 @@ AddFunction GuardianDefaultMainActions
   #moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
   if BuffPresent(galactic_guardian_buff) and enemies(tagged=1) < 2 Spell(moonfire)
   #maul
-  #Spell(maul)
+  if CheckBoxOn(useMaul) Spell(maul)
   #swipe
   Spell(swipe_bear)
  }

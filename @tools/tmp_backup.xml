@@ -1,129 +1,195 @@
 <?xml version="1.0" standalone="yes"?>
 <AhkDataSet>
   <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>cobra shot</Spell>
     <Keybind>1</Keybind>
-    <Color_x0020__x0023_1>0xBDE707</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0xB0D43C</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0x05351E</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x101010</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>barbed shot</Spell>
+    <Keybind>6</Keybind>
+    <Color_x0020__x0023_1>0x18242A</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x0E0D45</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>kill command</Spell>
     <Keybind>2</Keybind>
-    <Color_x0020__x0023_1>0x131310</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x923EC2</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0x000000</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x78A6F9</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>5</Keybind>
-    <Color_x0020__x0023_1>0xCDFBF8</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x000003</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>3</Keybind>
-    <Color_x0020__x0023_1>0xFEFFCE</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x441F08</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>multishot bm</Spell>
     <Keybind>4</Keybind>
-    <Color_x0020__x0023_1>0x20592A</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x0B4B18</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0x170017</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x150015</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}8{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0x100DF0</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x1010F7</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>8</Keybind>
-    <Color_x0020__x0023_1>0x678017</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x6E8319</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>counter shot</Spell>
     <Keybind>9</Keybind>
-    <Color_x0020__x0023_1>0x17548F</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x1D2635</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0xCEC7AD</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x716A54</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>intimidation</Spell>
+    <Keybind>-</Keybind>
+    <Color_x0020__x0023_1>0xB0BDC0</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x000000</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>aspect of the wild</Spell>
+    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x08460E</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x000C00</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>bestial wrath</Spell>
+    <Keybind>{SHIFTDOWN}3{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x61506C</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x1B196D</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>exhilaration</Spell>
+    <Keybind>{SHIFTDOWN}4{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x10DC73</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x006C3D</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>misdirection</Spell>
     <Keybind>{SHIFTDOWN}6{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0xCD90EE</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0xBE5BC4</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0x1E1F0F</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x020602</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>=</Keybind>
+    <Spell>mend pet</Spell>
+    <Keybind>8</Keybind>
+    <Color_x0020__x0023_1>0x000000</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xA2C2C9</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>heart of the phoenix</Spell>
+    <Keybind>{SHIFTDOWN}7{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x196DC2</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x73F7FF</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>revive pet</Spell>
+    <Keybind>{SHIFTDOWN}8{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x68AC9E</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x476E84</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>concentrated flame</Spell>
+    <Keybind>0</Keybind>
     <Color_x0020__x0023_1>0x9D7642</Color_x0020__x0023_1>
     <Color_x0020__x0023_2>0x74BADB</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>=</Keybind>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x693519</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x100400</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x733532</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xE6D0AF</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
     <Color_x0020__x0023_1>0x4C2118</Color_x0020__x0023_1>
     <Color_x0020__x0023_2>0x163665</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>=</Keybind>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
     <Color_x0020__x0023_1>0xF8E148</Color_x0020__x0023_1>
     <Color_x0020__x0023_2>0x0D0508</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0xA2D136</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0xC6F07A</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0xE36ABB</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0xF7CCF7</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}3{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0x3F3F38</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x4D565A</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}3{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0x50524D</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x1AA139</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>{SHIFTDOWN}4{SHIFTUP}</Keybind>
-    <Color_x0020__x0023_1>0x111100</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x5C3E01</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>-</Keybind>
-    <Color_x0020__x0023_1>0xCEFB39</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x101400</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
-    <Keybind>-</Keybind>
-    <Color_x0020__x0023_1>0xF7F7D8</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x4D3D25</Color_x0020__x0023_2>
-  </AhkData>
-  <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>memory of lucid dreams</Spell>
     <Keybind>0</Keybind>
-    <Color_x0020__x0023_1>0x5C81A4</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x4C603B</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0xCB640F</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xDF6E08</Color_x0020__x0023_2>
   </AhkData>
   <AhkData>
-    <Spell>aged healing potion</Spell>
+    <Spell>memory of lucid dreams</Spell>
     <Keybind>0</Keybind>
-    <Color_x0020__x0023_1>0xFFFFE7</Color_x0020__x0023_1>
-    <Color_x0020__x0023_2>0x425121</Color_x0020__x0023_2>
+    <Color_x0020__x0023_1>0x264262</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x334A66</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x8D8C5A</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x190900</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x0F0C00</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x305066</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x0E131C</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4F5765</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x8F9370</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xF3D241</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>memory of lucid dreams</Spell>
+    <Keybind>0</Keybind>
+    <Color_x0020__x0023_1>0x1BBDF1</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x313750</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>dire beast</Spell>
+    <Keybind>3</Keybind>
+    <Color_x0020__x0023_1>0x0B5577</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x66CBF4</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>chimaera shot</Spell>
+    <Keybind>{SHIFTDOWN}1{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0xF70CB6</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4F4C42</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>murder of crows</Spell>
+    <Keybind>{SHIFTDOWN}9{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x4F4639</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xADA45C</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>binding shot</Spell>
+    <Keybind>{SHIFTDOWN}0{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x391B41</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x000000</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>barrage</Spell>
+    <Keybind>{SHIFTDOWN}-{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x764F1A</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x4E4B42</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>stampede</Spell>
+    <Keybind>{SHIFTDOWN}-{SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x282C36</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0xCCD5D5</Color_x0020__x0023_2>
+  </AhkData>
+  <AhkData>
+    <Spell>spitting cobra</Spell>
+    <Keybind>{SHIFTDOWN}={SHIFTUP}</Keybind>
+    <Color_x0020__x0023_1>0x847797</Color_x0020__x0023_1>
+    <Color_x0020__x0023_2>0x2E193F</Color_x0020__x0023_2>
   </AhkData>
 </AhkDataSet>
