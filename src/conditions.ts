@@ -3644,7 +3644,7 @@ l    */
                 }
             }
         }
-        if (!comparator || limit === undefined) return [];
+
         if (earliest == INFINITY) {
             return Compare(0, comparator, limit);
         } else if (earliest > 0) {
