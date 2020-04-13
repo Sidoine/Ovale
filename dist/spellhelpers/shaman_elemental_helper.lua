@@ -56,6 +56,9 @@ AddIcon
 	Texture(ability_thunderking_lightningwhip) # Stormkeeper (T6)
 	Texture(spell_fire_elementaldevastation) # Ascendance (T7)
 
+	# PvP Talent (also used in PvE during BFA)
+	Texture(shaman_pvp_lightninglasso) # Lightning Lasso
+
 	# Racials
 	Texture(racial_orc_berserkerstrength) # Blood Fury (Orc)
 	Texture(racial_troll_berserk) # Berserking (Troll)

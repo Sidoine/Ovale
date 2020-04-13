@@ -2437,7 +2437,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
-        self:AddDisambiguation("bloodlust", "burst_haste")
+        self:AddDisambiguation("bloodlust", "burst_haste_buff")
         self:AddDisambiguation("169314", "azsharas_font_of_power")
         self:AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
         self:AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
