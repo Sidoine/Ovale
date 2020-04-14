@@ -331,7 +331,7 @@ Define(mind_control 605)
 
 	SpellInfo(mind_sear channel=3 haste=spell)
 Define(mind_vision 2096)
-
+Define(smite 585)
 Define(mindbender_discipline 123040)
 	SpellInfo(mindbender_discipline cd=60 tag=main)
 
@@ -357,7 +357,7 @@ Define(purify_disease 213634)
 Define(purge_the_wicked 204197)
 	SpellInfo(purge_the_wicked replaced_by=shadow_word_pain talent=purge_the_wicked_talent specialization=discipline)
 	SpellAddTargetDebuff(purge_the_wicked purge_the_wicked_debuff=1)
-Define(purge_the_wicked_debuff 204197)
+Define(purge_the_wicked_debuff 204213)
 	SpellInfo(purge_the_wicked_debuff duration=20 haste=spell tick=2)
 Define(rapture 47536)
 	SpellInfo(rapture cd=90)
