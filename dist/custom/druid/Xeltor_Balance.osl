@@ -15,10 +15,10 @@ AddIcon specialization=1 help=main
 {
 	if not mounted() and not BuffPresent(travel_form) and not Dead() and not PlayerIsResting()
 	{
-		if InCombat() Spell(moonkin_form)
+		if InCombat() Spell(moonkin_form_balance)
 		unless target.Present() and target.Distance(less 5)
 		{
-			if Speed() > 0 Spell(moonkin_form)
+			if Speed() > 0 Spell(moonkin_form_balance)
 		}
 	}
 
