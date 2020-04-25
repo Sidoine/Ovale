@@ -53,6 +53,20 @@ local TAUREN_CLASSES = {
     ["WARLOCK"] = false,
     ["WARRIOR"] = true
 }
+local KULTIRAN_CLASSES = {
+    ["DEATHKNIGHT"] = true,
+    ["DEMONHUNTER"] = false,
+    ["DRUID"] = true,
+    ["HUNTER"] = true,
+    ["MAGE"] = true,
+    ["MONK"] = true,
+    ["PALADIN"] = false,
+    ["PRIEST"] = true,
+    ["ROGUE"] = true,
+    ["SHAMAN"] = true,
+    ["WARLOCK"] = false,
+    ["WARRIOR"] = true
+}
 local STAT_NAMES = {
     [1] = "agility",
     [2] = "bonus_armor",

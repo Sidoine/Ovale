@@ -229,6 +229,14 @@ __exports.Generator = __class(nil, {
                 range = "target.Distance(less 5)"
             })
         end
+        if self.ovaleData.KULTIRAN_CLASSES[className] then
+            insert(interrupts, {
+                name = "haymaker",
+                stun = 1,
+                order = 99,
+                range = "target.Distance(less 6)"
+            })
+        end
         if annotation.mind_freeze == "DEATHKNIGHT" then
             insert(interrupts, {
                 name = "mind_freeze",
