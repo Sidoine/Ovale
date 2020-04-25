@@ -13,9 +13,8 @@ Include(druid_common_functions)
 
 AddIcon specialization=1 help=main
 {
-	if not mounted() and not BuffPresent(travel_form) and not Dead() and not PlayerIsResting()
+	if not mounted() and not BuffPresent(travel_form) and not BuffPresent(dash) and not Dead() and not PlayerIsResting()
 	{
-		if InCombat() Spell(moonkin_form_balance)
 		unless target.Present() and target.Distance(less 5)
 		{
 			if Speed() > 0 Spell(moonkin_form_balance)
@@ -23,13 +22,15 @@ AddIcon specialization=1 help=main
 	}
 
 	if not mounted() and not BuffPresent(travel_form) and not Dead() SaveActions()
-	if CheckBoxOn(ap) and not target.Exists() MoveActions()
+	if CheckBoxOn(ap) and not target.Exists() or { Wet() and not InCombat() } MoveActions()
 
 	# Interrupt
 	if InCombat() InterruptActions()
 
 	if target.InRange(solar_wrath) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl() and target.Present() and InCombat()
 	{
+		if InCombat() Spell(moonkin_form_balance)
+
 		# Cooldowns
 		if Boss() defaultcdactions()
 
@@ -107,6 +108,7 @@ AddFunction defaultmainactions
  if astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) spell(full_moon)
  #lunar_strike,if=buff.solar_empowerment.stack<3&(ap_check|buff.lunar_empowerment.stack=3)&((buff.warrior_of_elune.up|buff.lunar_empowerment.up|spell_targets>=2&!buff.solar_empowerment.up)&(!variable.az_ss|!buff.ca_inc.up)|variable.az_ss&buff.ca_inc.up&prev.solar_wrath)
  if buffstacks(solar_empowerment_buff) < 3 and { astralpower() >= astralpowercost(lunar_strike) or buffstacks(lunar_empowerment_buff) == 3 } and { { buffpresent(warrior_of_elune_buff) or buffpresent(lunar_empowerment_buff) or enemies(tagged=1) >= 2 and not buffpresent(solar_empowerment_buff) } and { not az_ss() or not buffpresent(ca_inc) } or az_ss() and buffpresent(ca_inc) and previousspell(solar_wrath_balance) } and { speed() == 0 or buffpresent(movement_allowed_buff) } spell(lunar_strike)
+ if talent(twin_moons_talent) and DebuffCountOnAny(moonfire_debuff) < DebuffCountOnAny(sunfire_debuff) and { buffstacks(solar_empowerment_buff) < 3 or Speed() > 0 and not buffpresent(movement_allowed_buff) } Spell(moonfire)
  #solar_wrath,if=variable.az_ss<3|!buff.ca_inc.up|!prev.solar_wrath
  if { az_ss() < 3 or not buffpresent(ca_inc) or not previousspell(solar_wrath_balance) } and { speed() == 0 or buffpresent(movement_allowed_buff) } spell(solar_wrath_balance)
  #sunfire

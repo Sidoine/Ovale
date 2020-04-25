@@ -16,7 +16,7 @@ AddIcon
 	Texture(spell_arcane_arcane03) # Starsurge
 	Texture(ability_druid_starfall) # Starfall
 	Texture(ability_vehicle_sonicshockwave) # Solar Beam
-	
+
 	# Buffs
 	Texture(spell_nature_forceofnature) # Moonkin Form
 	Texture(ability_druid_travelform) # Travel Form
@@ -27,10 +27,11 @@ AddIcon
 	Texture(spell_nature_resistnature) # Regrowth
 	Texture(spell_nature_rejuvenation) # Rejuvenation
 	Texture(inv_relics_idolofrejuvenation) # Swiftmend
-	
+	Texture(spell_nature_lightning) # Innervate
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Trinkets
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -44,7 +45,7 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
+
 	# Talents
 	Texture(spell_holy_elunesgrace) # Warrior of Elune (T1)
 	Texture(ability_druid_forceofnature) # Force of Nature (T1)
@@ -60,7 +61,7 @@ AddIcon
 	Texture(artifactability_balancedruid_newmoon) # New Moon (T7)
 	Texture(artifactability_balancedruid_halfmoon) # Half Moon (T7)
 	Texture(artifactability_balancedruid_fullmoon) # Full Moon (T7)
-	
+
 	# Racials
 	Texture(racial_orc_berserkerstrength) # Blood Fury (Orc)
 	Texture(racial_troll_berserk) # Berserking (Troll)
@@ -84,47 +85,47 @@ AddIcon
 	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
 	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
 	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
