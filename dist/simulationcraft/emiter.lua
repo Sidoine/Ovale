@@ -407,6 +407,8 @@ __exports.Emiter = __class(nil, {
                     self:AddSymbol(annotation, "regrowth")
                 elseif className == "DRUID" and action == "solar_wrath_balance" and specialization == "balance" then
                   conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
+                elseif className == "DRUID" and action == "starfall" and specialization == "balance" then
+                  conditionCode = "{ mouseover.present() and not mouseover.IsFriend() and mouseover.healthpercent() < 100 }"
                 elseif className == "DRUID" and action == "lunar_strike" and specialization == "balance" then
                   conditionCode = "{ Speed() == 0 or BuffPresent(movement_allowed_buff) }"
                 elseif className == "HUNTER" and action == "kill_command" then

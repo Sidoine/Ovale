@@ -498,7 +498,7 @@ AddFunction FrostCooldownsCdActions
  #arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
  if not BuffPresent(pillar_of_frost_buff) and Enemies(tagged=1) >= 2 or not BuffPresent(pillar_of_frost_buff) and RuneDeficit() >= 5 and RunicPowerDeficit() >= 60 Spell(arcane_pulse)
  #lights_judgment,if=buff.pillar_of_frost.up
- if BuffPresent(pillar_of_frost_buff) Spell(lights_judgment)
+ # if BuffPresent(pillar_of_frost_buff) Spell(lights_judgment)
  #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) Spell(ancestral_call)
  #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up

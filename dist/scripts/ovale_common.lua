@@ -256,7 +256,7 @@ Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
 Define(reaping_flames_essence 311195)
-  SpellInfo(reaping_flames_essence cd=90 tag=shortcd)
+  SpellInfo(reaping_flames_essence cd=45 tag=shortcd)
 Define(moment_of_glory_essence 311203)
   SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
 Define(replica_of_knowledge_essence 312725)
@@ -337,6 +337,8 @@ Define(arcane_pulse_debuff 260369)
 	SpellInfo(arcane_pulse_debuff duration=12)
 Define(bag_of_tricks 312411)
   SpellInfo(bag_of_tricks cd=90)
+Define(haymaker 287712)
+  SpellInfo(haymaker cd=150)
 
 ###
 ### Boss Spells
