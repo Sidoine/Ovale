@@ -14,8 +14,8 @@ AddFunction SaveActions
 
 AddFunction MoveActions
 {
-	if not InCombat() and not Mounted() and not BuffPresent(travel_form) and not BuffPresent(dash) and Speed() > 0 and not InDoors() Spell(travel_form)
-	if not InCombat() and not Mounted() and not BuffPresent(cat_form) and Speed() > 0 and InDoors() Spell(cat_form)
+	if not InCombat() and not Mounted() and not BuffPresent(travel_form) and not BuffPresent(dash) and Speed() > 0 and { not InDoors() or Wet() } Spell(travel_form)
+	if not InCombat() and not Mounted() and not BuffPresent(cat_form) and Speed() > 0 and InDoors() and not Wet() Spell(cat_form)
 }
 
 ]]
