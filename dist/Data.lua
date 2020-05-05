@@ -155,6 +155,7 @@ __exports.OvaleDataClass = __class(nil, {
         self.BLOODELF_CLASSES = BLOODELF_CLASSES
         self.PANDAREN_CLASSES = PANDAREN_CLASSES
         self.TAUREN_CLASSES = TAUREN_CLASSES
+        self.KULTIRAN_CLASSES = KULTIRAN_CLASSES
 		self.PARTY_UIDS = PARTY_UIDS
 		self.RAID_UIDS = RAID_UIDS
         self.itemInfo = {}
