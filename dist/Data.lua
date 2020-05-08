@@ -280,7 +280,9 @@ __exports.OvaleDataClass = __class(nil, {
                 [2825] = true,
                 [32182] = true,
                 [80353] = true,
-                [90355] = true
+                [90355] = true,
+                [204361] = true,
+                [204362] = true
             },
             burst_haste_debuff = {
                 [57723] = true,

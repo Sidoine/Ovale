@@ -14,7 +14,7 @@ Define(ascendance_enhancement 114051)
   # Transformed into a powerful Air ascendant. Auto attacks have a 114089r yard range. Stormstrike is empowered and has a 114089r yard range.
   SpellAddBuff(ascendance_enhancement ascendance_enhancement=1)
 Define(bag_of_tricks 312411)
-# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
+# Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>.
   SpellInfo(bag_of_tricks cd=90)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
@@ -55,7 +55,7 @@ Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 3 seconds.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
 Define(chain_lightning_elemental 188443)
-# Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
+# Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r
   SpellInfo(chain_lightning_elemental)
 Define(conductive_ink_0 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
@@ -151,7 +151,7 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(frost_shock 196840)
-# Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds. 
+# Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds.
   SpellInfo(frost_shock duration=6)
   # Movement speed reduced by s2.
   SpellAddTargetDebuff(frost_shock frost_shock=1)
@@ -255,7 +255,7 @@ Define(landslide_buff 202004)
   # Your next Stormstrike will deal s1 increased damage.
   SpellAddBuff(landslide_buff landslide_buff=1)
 Define(lava_beam 114074)
-# Unleashes a blast of superheated flame at the enemy, dealing (43 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
+# Unleashes a blast of superheated flame at the enemy, dealing (43 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r
   SpellInfo(lava_beam)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing (53.125 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?s137039[][rnrn|cFFFFFFFFGenerates 190493s2 Maelstrom.|r ]
@@ -381,7 +381,7 @@ Define(reaping_flames_1 311194)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
   SpellInfo(reaping_flames_1 cd=45 channel=0)
 Define(reaping_flames_2 311195)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
+# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.
   SpellInfo(reaping_flames_2 cd=45 channel=0)
 Define(reaping_flames_3 311202)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
@@ -514,7 +514,7 @@ Define(boulderfist_talent 1) #22354
 Define(call_the_thunder_talent 5) #22139
 # Your maximum Maelstrom increased by s2, and the Maelstrom cost of Earth Shock?PL<48[][ and Earthquake] is reduced by s1.
 Define(crashing_storm_talent 16) #21973
-# Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 6 seconds. 
+# Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 6 seconds.
 Define(earthen_spike_talent 20) #22977
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for 10 seconds.
 Define(echo_of_the_elements_talent_elemental 2) #22357
@@ -622,7 +622,7 @@ Define(bloodlust_buff 2825)
 Define(chain_heal 1064)
 	SpellAddBuff(chain_heal tidal_waves_buff=1)
 	SpellAddBuff(chain_heal ancestral_vigor_buff=1 talent=ancestral_vigor_talent)
-Define(chain_lightning_restoration 421)	
+Define(chain_lightning_restoration 421)
 Define(chain_lightning 188443)
 	SpellInfo(chain_lightning maelstrom=-4)
 	SpellRequire(chain_lightning replace lava_beam=buff,ascendance_elemental_buff)
@@ -639,13 +639,13 @@ Define(crash_lightning_buff 187878)
 Define(downpour 207778)
 
     SpellInfo(earth_elemental totem=1 max_totems=1)
-	
+
 Define(earth_shield 974)
 	SpellAddTargetBuff(earth_shield earth_shield_buff=9)
 Define(earth_shield_buff 974)
 	SpellInfo(earth_shield_buff duration=600 max_charges=9)
 
-	
+
 	SpellAddTargetDebuff(earth_shock exposed_elements_debuff=1)
 	SpellAddBuff(earth_shock master_of_the_elements_buff=-1 talent=master_of_the_elements_talent specialization=elemental)
 Define(earthbind_totem 2484)
@@ -664,7 +664,7 @@ Define(earthgrab_totem 51485)
 
 	SpellInfo(earthquake maelstrom=60)
 Define(earthquake_debuff 182387)
-  
+
 	SpellInfo(elemental_blast cd=12 travel_time=1)
 	SpellAddBuff(elemental_blast master_of_the_elements_buff=-1 talent=master_of_the_elements_talent specialization=elemental)
 Define(elemental_blast_crit_buff 118522)
@@ -685,7 +685,7 @@ Define(far_sight 6196)
 	SpellAddBuff(feral_spirit icy_edge_buff=1)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
 
-	
+
 	SpellInfo(fire_elemental totem=1 max_totems=1)
     SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
 
@@ -699,7 +699,7 @@ Define(flame_shock_restoration_debuff 188389)
 	SpellInfo(flame_shock_restoration_debuff duration=21 haste=spell tick=3)
 
 	SpellInfo(flametongue cd=12 cd_haste=melee)
-	
+
 	SpellAddTargetDebuff(flametongue searing_assault_debuff=1 talent=searing_assault_talent)
 Define(flametongue_buff 193796)
 	SpellInfo(flametongue_buff duration=16)
@@ -770,7 +770,7 @@ Define(icy_edge_buff 224126)
 	SpellAddBuff(lava_burst master_of_the_elements_buff=1 talent=master_of_the_elements_talent specialization=elemental)
 	SpellRequire(lava_burst cd_percent 0=buff,lava_burst_nocd)
 
-	
+
 	SpellRequire(lava_lash maelstrom_percent 0=buff,hot_hand_buff)
 Define(lava_surge_buff 77762)
 	SpellInfo(lava_surge_buff duration=10)
@@ -974,6 +974,8 @@ Define(wind_rush_totem_talent 15)
 # PvP Talents
 Define(bloodlust_shamanism 204361)
 	SpellInfo(bloodlust_shamanism cd=60)
+Define(heroism_shamanism 204362)
+	SpellInfo(heroism_shamanism cd=60)
 Define(shamanism 193876)
 ]]
     OvaleScripts:RegisterScript("SHAMAN", nil, name, desc, code, "include")

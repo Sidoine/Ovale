@@ -1273,6 +1273,9 @@ __exports.OvaleConditions = __class(nil, {
         self.Maelstrom = function(positionalParams, namedParams, atTime)
             return self:Power("maelstrom", positionalParams, namedParams, atTime)
         end
+        self.MaelstromDeficit = function(positionalParams, namedParams, atTime)
+            return self:PowerDeficit("maelstrom", positionalParams, namedParams, atTime)
+        end
         self.Pain = function(positionalParams, namedParams, atTime)
             return self:Power("pain", positionalParams, namedParams, atTime)
         end
@@ -2369,6 +2372,7 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("holypower", false, self.HolyPower)
         ovaleCondition:RegisterCondition("insanity", false, self.Insanity)
         ovaleCondition:RegisterCondition("maelstrom", false, self.Maelstrom)
+        ovaleCondition:RegisterCondition("maelstromdeficit", false, self.MaelstromDeficit)
         ovaleCondition:RegisterCondition("mana", false, self.Mana)
         ovaleCondition:RegisterCondition("pain", false, self.Pain)
         ovaleCondition:RegisterCondition("rage", false, self.Rage)

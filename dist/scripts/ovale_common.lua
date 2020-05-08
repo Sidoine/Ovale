@@ -361,8 +361,8 @@ AddFunction UseHealthPotions
 	Item(healthstone usable=1)
 	if CheckBoxOn(opt_use_consumables)
 	{
-        Item(coastal_healing_potion usable=1)
-        Item(astral_healing_potion usable=1)
+    Item(coastal_healing_potion usable=1)
+    Item(astral_healing_potion usable=1)
 		Item(ancient_healing_potion usable=1)
 		Item(aged_healing_potion usable=1)
 	}
@@ -374,7 +374,13 @@ AddFunction UseHealthPotions
 
 AddFunction Boss
 {
-	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or target.Classification(rare) or { target.IsPvP() and not target.IsFriend() }
+	if IsBossFight() 1 # Trigger on DBM and BigWigs boss detection.
+  if target.Classification(worldboss) 1 # Trigger on Worldboss.
+  if target.Classification(rareelite) 1 # Trigger on Rare Elites.
+  if BuffPresent(burst_haste_buff any=1) 1 # Trigger on Burst Haste (Bloodlust, Heroism, Time Warp, Drums etc)
+  if target.Classification(rare) 1 # Trigger on Rares.
+  if target.IsPvP() and not target.IsFriend() 1 # Trigger on PvP targets.
+  0
 }
 
 Define(ghost_debuff 8326)

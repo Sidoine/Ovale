@@ -9,15 +9,15 @@ AddIcon
 {
 	# Remove a line when you have its colour
 	# Spells
-    Texture(ability_shaman_stormstrike) # Stormstrike
-    Texture(ability_skyreach_four_wind) # Windstrike (Stormstrike during Ascendance)
+	Texture(ability_shaman_stormstrike) # Stormstrike
+	Texture(ability_skyreach_four_wind) # Windstrike (Stormstrike during Ascendance)
 	Texture(spell_nature_rockbiter) # Rockbiter
-    Texture(spell_fire_flametounge) # Flametongue
-    Texture(spell_shaman_unleashweapon_frost) # Frostbrand
-    Texture(ability_shaman_lavalash) # Lava Lash
-    Texture(spell_shaman_crashlightning) # Crash Lightning
+	Texture(spell_fire_flametounge) # Flametongue
+	Texture(spell_shaman_unleashweapon_frost) # Frostbrand
+	Texture(ability_shaman_lavalash) # Lava Lash
+	Texture(spell_shaman_crashlightning) # Crash Lightning
 	Texture(spell_nature_lightning) # Lightning Bolt
-    Texture(spell_nature_cyclone) # Wind Shear
+	Texture(spell_nature_cyclone) # Wind Shear
 	Texture(spell_nature_brilliance) # Lightning Surge Totem
 	Texture(spell_shaman_hex) # Hex
 
@@ -27,6 +27,10 @@ AddIcon
 	Texture(spell_nature_spiritwolf) # Ghost Wolf
 	Texture(spell_nature_healingway) # Healing Surge
 	Texture(ability_shaman_astralshift) # Astral Shift
+
+	# PvP Talent skills
+	Texture(spell_nature_bloodlust) # Bloodlust (Shamanism, Horde)
+	Texture(ability_shaman_heroism) # Heroism (Shamanism, Alliance)
 
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
