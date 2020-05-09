@@ -464,16 +464,13 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "MONK" and action == "gift_of_the_ox" then
                     isSpellAction = false
+                elseif className == "MONK" and action == "touch_of_karma" then
+                    isSpellAction = false
                 elseif className == "MONK" and action == "nimble_brew" then
                     conditionCode = "IsFeared() or IsRooted() or IsStunned()"
                 elseif className == "MONK" and action == "storm_earth_and_fire" then
                     conditionCode = "not BuffPresent(storm_earth_and_fire_buff)"
                     annotation[action] = className
-                elseif className == "MONK" and action == "touch_of_death" then
-                    conditionCode = "(not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
-                    annotation[action] = className
-                    annotation.opt_touch_of_death_on_elite_only = "MONK"
-                    self:AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
                 elseif className == "MONK" and action == "whirling_dragon_punch" then
                     conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
                 elseif className == "PALADIN" and action == "blessing_of_kings" then

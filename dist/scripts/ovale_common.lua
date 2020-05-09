@@ -172,6 +172,7 @@ Define(hyperthread_wristwraps_item 168989)
 Define(balefire_branch_item 159630)
 Define(ignition_mages_fuse_item 159615)
 Define(azsharas_font_of_power_item 169314)
+Define(remote_guidance_device_item 169769)
 
 ###
 ### Legendary Meta Gem
@@ -261,6 +262,7 @@ Define(moment_of_glory_essence 311203)
   SpellInfo(moment_of_glory_essence cd=60 tag=shortgcd)
 Define(replica_of_knowledge_essence 312725)
 Define(vision_of_perfection_essence_id 299368)
+Define(conflict_and_strife_essence_id 304121)
 
 ###
 ### Racials
