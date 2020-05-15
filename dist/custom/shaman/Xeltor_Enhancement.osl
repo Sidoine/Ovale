@@ -35,8 +35,8 @@ AddIcon specialization=2 help=main
 	if target.InRange(lava_lash) and not target.DebuffPresent(crowd_control_debuff) and HasFullControl()
   {
 		# Shamanism (PvP talent)
-		if Boss() and SpellKnown(bloodlust_shamanism) and Shamanism_Allowed() Spell(bloodlust_shamanism)
-		if Boss() and SpellKnown(heroism_shamanism) and Shamanism_Allowed() Spell(heroism_shamanism)
+		if Boss() and SpellKnown(bloodlust_shamanism) and not BuffPresent(bloodlust_shamanism) and Shamanism_Allowed() Spell(bloodlust_shamanism)
+		if Boss() and SpellKnown(heroism_shamanism) and not BuffPresent(heroism_shamanism) and Shamanism_Allowed() Spell(heroism_shamanism)
 
 		# Cooldowns
 		if Boss() defaultcdactions()
@@ -459,7 +459,7 @@ AddFunction enhancementcdscdactions
   #use_items
   enhancementuseitemactions()
   #earth_elemental
-  spell(earth_elemental)
+  # spell(earth_elemental)
  }
 }
 
