@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerDemonHunterHavocHelper = function(OvaleScripts)
 do
 	local name = "DMHAVOChelper"
-	local desc = "[Xel][7.x] Spellhelper: Havoc"
+	local desc = "[Xel][8.x] Spellhelper: Havoc"
 	local code = [[
 AddIcon
 {
@@ -13,18 +13,18 @@ AddIcon
 	Texture(ability_demonhunter_chaosstrike) # Chaos Strike
 	Texture(inv_glaive_1h_npc_d_02) # Annihilation (Chaos Strike)
 	Texture(ability_demonhunter_eyebeam) # Eye Beam
-	Texture(ability_demonhunter_throwglaive) # Throw Glaive
 	Texture(ability_demonhunter_bladedance) # Blade Dance
 	Texture(inv_glaive_1h_artifactaldrochi_d_02dual) # Death Sweep (Blade Dance)
 	Texture(spell_fire_felfirenova) # Chaos Nova
+	Texture(ability_demonhunter_throwglaive) # Throw Glaive
 	Texture(ability_demonhunter_consumemagic) # Consume Magic
 
 	# Buffs
 	Texture(ability_demonhunter_metamorphasisdps) # Metamorphosis
-	
+
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
-	
+
 	# Heart of Azeroth Skills
 	Texture(spell_azerite_essence_15) # Concentrated Flame
 	Texture(spell_azerite_essence05) # Memory of Lucid Dreams
@@ -38,72 +38,61 @@ AddIcon
 	Texture(ability_essence_reapingflames) # Reaping Flames
 	Texture(ability_essence_momentofglory) # Moment of Glory
 	Texture(ability_essence_replicaofknowledge) # Replica of Knowledge
-	
-	# Artifact
-	Texture(inv_glaive_1h_artifactazgalor_d_01) # Fury of the Illidari
 
 	# Talents
 	Texture(ability_demonhunter_felblade) # Felblade (T1)
-	Texture(ability_bossfellord_felspike) # Fel Eruption (T5)
-	Texture(ability_warlock_improveddemonictactics) # Nemesis (T5)
-	Texture(inv_glaive_1h_artifactaldrochi_d_03dual) # Chaos Blades (T7)
-	Texture(ability_felarakkoa_feldetonation_green) # Fel Barrage (T7)
+	Texture(ability_demonhunter_immolation) # Immolation Aura (T2)
+	Texture(inv_felbarrage) # Fel Barrage (T3)
+	Texture(spell_shadow_ritualofsacrifice) # Dark Slash (T5)
+	Texture(ability_bossfellord_felspike) # Fel Eruption (T6)
+	Texture(ability_warlock_improveddemonictactics) # Nemesis (T7)
 
 	# Racials
 	Texture(spell_shadow_teleport) # Arcane Torrent (Blood Elf)
 	Texture(ability_ambush) # Shadowmeld (Night elf)
-	Texture(ability_racial_forceshield) # Arcane Pulse (Nightborne)
-	Texture(ability_racial_bullrush) # Bull Rush (Highmountain Tauren)
-	Texture(ability_racial_orbitalstrike) # Light's Judgment (Lightforged Draenei)
-	Texture(ability_racial_ancestralcall) # Ancestral Call (Mag'har Orcs)
-	Texture(ability_racial_fireblood) # Fireblood (Dark Iron Dwarves)
-	Texture(ability_racial_haymaker) # Haymaker (Kul Tiran Human)
-	Texture(ability_racial_regeneratin) # Regeneratin (Zandalari Trolls)
-	Texture(ability_racial_hyperorganiclightoriginator) # Hyper Organic Light Originator (Mechagnome)
-	Texture(ability_racial_bagoftricks) # Bag of Tricks (Vulpera)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ]]
 
