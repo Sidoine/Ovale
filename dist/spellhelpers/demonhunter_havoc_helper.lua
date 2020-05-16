@@ -18,6 +18,7 @@ AddIcon
 	Texture(spell_fire_felfirenova) # Chaos Nova
 	Texture(ability_demonhunter_throwglaive) # Throw Glaive
 	Texture(ability_demonhunter_consumemagic) # Consume Magic
+	Texture(ability_demonhunter_imprison) # Imprison
 
 	# Buffs
 	Texture(ability_demonhunter_metamorphasisdps) # Metamorphosis

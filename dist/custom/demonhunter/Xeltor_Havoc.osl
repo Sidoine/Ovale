@@ -310,7 +310,7 @@ AddFunction havocdemonicshortcdactions
  unless blade_dance() and spell(death_sweep)
  {
   #eye_beam
-  if speed() == 0 or buffpresent(movement_allowed_buff) spell(eye_beam)
+  spell(eye_beam)
   #fel_barrage,if=buff.metamorphosis.up|active_enemies>3
   if buffpresent(metamorphosis_havoc_buff) or enemies(tagged=1) > 3 spell(fel_barrage)
  }
@@ -327,7 +327,7 @@ AddFunction havocdemoniccdactions
 
 AddFunction havocdemoniccdpostconditions
 {
- blade_dance() and spell(death_sweep) or { speed() == 0 or buffpresent(movement_allowed_buff) } and spell(eye_beam) or { buffpresent(metamorphosis_havoc_buff) or enemies(tagged=1) > 3 } and spell(fel_barrage) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 and spell(blade_dance) or spell(immolation_aura_havoc) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or spell(demons_bite) or hastalent(demon_blades_talent) and spell(throw_glaive_havoc)
+ blade_dance() and spell(death_sweep) or spell(eye_beam) or { buffpresent(metamorphosis_havoc_buff) or enemies(tagged=1) > 3 } and spell(fel_barrage) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 and spell(blade_dance) or spell(immolation_aura_havoc) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or spell(demons_bite) or hastalent(demon_blades_talent) and spell(throw_glaive_havoc)
 }
 
 ### actions.essences
@@ -425,17 +425,17 @@ AddFunction havocnormalshortcdactions
  unless blade_dance() and spell(death_sweep) or spell(immolation_aura_havoc)
  {
   #eye_beam,if=active_enemies>1&!variable.waiting_for_momentum
-  if enemies(tagged=1) > 1 and not waiting_for_momentum() and { speed() == 0 or buffpresent(movement_allowed_buff) } spell(eye_beam)
+  if enemies(tagged=1) > 1 and not waiting_for_momentum() spell(eye_beam)
 
   unless blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade)
   {
    #eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash
-   if not hastalent(blind_fury_talent) and not waiting_for_dark_slash() and { speed() == 0 or buffpresent(movement_allowed_buff) } spell(eye_beam)
+   if not hastalent(blind_fury_talent) and not waiting_for_dark_slash() spell(eye_beam)
 
    unless { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(chaos_strike)
    {
     #eye_beam,if=talent.blind_fury.enabled
-    if hastalent(blind_fury_talent) and { speed() == 0 or buffpresent(movement_allowed_buff) } spell(eye_beam)
+    if hastalent(blind_fury_talent) spell(eye_beam)
    }
   }
  }
@@ -452,7 +452,7 @@ AddFunction havocnormalcdactions
 
 AddFunction havocnormalcdpostconditions
 {
- not waiting_for_momentum() and enemies(tagged=1) > 3 and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura_havoc) or enemies(tagged=1) > 1 and not waiting_for_momentum() and { speed() == 0 or buffpresent(movement_allowed_buff) } and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or not hastalent(blind_fury_talent) and not waiting_for_dark_slash() and { speed() == 0 or buffpresent(movement_allowed_buff) } and spell(eye_beam) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(chaos_strike) or hastalent(blind_fury_talent) and { speed() == 0 or buffpresent(movement_allowed_buff) } and spell(eye_beam) or spell(demons_bite) or hastalent(demon_blades_talent) and spell(throw_glaive_havoc)
+ not waiting_for_momentum() and enemies(tagged=1) > 3 and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura_havoc) or enemies(tagged=1) > 1 and not waiting_for_momentum() and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or not hastalent(blind_fury_talent) and not waiting_for_dark_slash() and spell(eye_beam) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and spell(chaos_strike) or hastalent(blind_fury_talent) and spell(eye_beam) or spell(demons_bite) or hastalent(demon_blades_talent) and spell(throw_glaive_havoc)
 }
 
 ### actions.precombat
