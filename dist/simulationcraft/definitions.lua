@@ -5,241 +5,128 @@ local pairs = pairs
 local ipairs = ipairs
 local kpairs = pairs
 __exports.interruptsClasses = {
-    ["mind_freeze"] = "DEATHKNIGHT",
-    ["pummel"] = "WARRIOR",
-    ["disrupt"] = "DEMONHUNTER",
-    ["skull_bash"] = "DRUID",
-    ["solar_beam"] = "DRUID",
-    ["rebuke"] = "PALADIN",
-    ["silence"] = "PRIEST",
-    ["mind_bomb"] = "PRIEST",
-    ["kick"] = "ROGUE",
-    ["wind_shear"] = "SHAMAN",
-    ["counter_shot"] = "HUNTER",
-    ["counterspell"] = "MAGE",
-    ["muzzle"] = "HUNTER",
-    ["spear_hand_strike"] = "MONK"
+    mind_freeze = "DEATHKNIGHT",
+    pummel = "WARRIOR",
+    disrupt = "DEMONHUNTER",
+    skull_bash = "DRUID",
+    solar_beam = "DRUID",
+    rebuke = "PALADIN",
+    silence = "PRIEST",
+    mind_bomb = "PRIEST",
+    kick = "ROGUE",
+    wind_shear = "SHAMAN",
+    counter_shot = "HUNTER",
+    counterspell = "MAGE",
+    muzzle = "HUNTER",
+    spear_hand_strike = "MONK"
 }
 __exports.classInfos = {
     DEATHKNIGHT = {
-        ["frost"] = {
+        frost = {
             interrupt = "mind_freeze"
         },
-        ["blood"] = {
+        blood = {
             interrupt = "mind_freeze"
         },
-        ["unholy"] = {
+        unholy = {
             interrupt = "mind_freeze"
         }
     },
     DEMONHUNTER = {
-        ["havoc"] = {
+        havoc = {
             interrupt = "disrupt"
         },
-        ["vengeance"] = {
+        vengeance = {
             interrupt = "disrupt"
         }
     },
     DRUID = {
-        ["guardian"] = {
+        guardian = {
             interrupt = "skull_bash"
         },
-        ["feral"] = {
+        feral = {
             interrupt = "skull_bash"
         },
-        ["balance"] = {
+        balance = {
             interrupt = "solar_beam"
         }
     },
     HUNTER = {
-        ["beast_mastery"] = {
+        beast_mastery = {
             interrupt = "counter_shot"
         },
-        ["survival"] = {
+        survival = {
             interrupt = "muzzle"
         },
-        ["marksmanship"] = {
+        marksmanship = {
             interrupt = "counter_shot"
         }
     },
     MAGE = {
-        ["frost"] = {
+        frost = {
             interrupt = "counterspell"
         },
-        ["fire"] = {
+        fire = {
             interrupt = "counterspell"
         },
-        ["arcane"] = {
+        arcane = {
             interrupt = "counterspell"
         }
     },
     MONK = {
-        ["brewmaster"] = {
+        brewmaster = {
             interrupt = "spear_hand_strike"
         },
-        ["windwalker"] = {
+        windwalker = {
             interrupt = "spear_hand_strike"
         }
     },
     PALADIN = {
-        ["retribution"] = {
+        retribution = {
             interrupt = "rebuke"
         },
-        ["protection"] = {
+        protection = {
             interrupt = "rebuke"
         }
     },
     PRIEST = {
-        ["shadow"] = {
+        shadow = {
             interrupt = "silence"
         }
     },
     ROGUE = {
-        ["assassination"] = {
+        assassination = {
             interrupt = "kick"
         },
-        ["outlaw"] = {
+        outlaw = {
             interrupt = "kick"
         },
-        ["subtlety"] = {
+        subtlety = {
             interrupt = "kick"
         }
     },
     SHAMAN = {
-        ["elemental"] = {
+        elemental = {
             interrupt = "wind_shear"
         },
-        ["enhancement"] = {
+        enhancement = {
             interrupt = "wind_shear"
         }
     },
     WARLOCK = {},
     WARRIOR = {
-        ["fury"] = {
+        fury = {
             interrupt = "pummel"
         },
-        ["protection"] = {
+        protection = {
             interrupt = "pummel"
         },
-        ["arms"] = {
+        arms = {
             interrupt = "pummel"
         }
     }
 }
-__exports.CHARACTER_PROPERTY = {
-    ["active_enemies"] = "Enemies()",
-    ["astral_power"] = "AstralPower()",
-    ["astral_power.deficit"] = "AstralPowerDeficit()",
-    ["blade_dance_worth_using"] = "0",
-    ["buff.arcane_charge.stack"] = "ArcaneCharges()",
-    ["buff.arcane_charge.max_stack"] = "MaxArcaneCharges()",
-    ["buff.movement.up"] = "Speed() > 0",
-    ["buff.out_of_range.up"] = "not target.InRange()",
-    ["bugs"] = "0",
-    ["chi"] = "Chi()",
-    ["chi.max"] = "MaxChi()",
-    ["combo_points"] = "ComboPoints()",
-    ["combo_points.deficit"] = "ComboPointsDeficit()",
-    ["combo_points.max"] = "MaxComboPoints()",
-    ["consecration.remains"] = "BuffRemaining(consecration)",
-    ["consecration.up"] = "BuffPresent(consecration)",
-    ["cooldown.army_of_the_dead.remains"] = "480",
-    ["cp_max_spend"] = "MaxComboPoints()",
-    ["crit_pct_current"] = "SpellCritChance()",
-    ["current_insanity_drain"] = "CurrentInsanityDrain()",
-    ["darkglare_no_de"] = "NotDeDemons(darkglare)",
-    ["death_and_decay.ticking"] = "BuffPresent(death_and_decay)",
-    ["death_sweep_worth_using"] = "0",
-    ["death_knight.disable_aotd"] = "0",
-    ["delay"] = "0",
-    ["demonic_fury"] = "DemonicFury()",
-    ["desired_targets"] = "Enemies(tagged=1)",
-    ["doomguard_no_de"] = "NotDeDemons(doomguard)",
-    ["dreadstalker_no_de"] = "NotDeDemons(dreadstalker)",
-    ["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
-    ["eclipse_change"] = "TimeToEclipse()",
-    ["eclipse_energy"] = "EclipseEnergy()",
-    ["enemies"] = "Enemies()",
-    ["energy"] = "Energy()",
-    ["energy.deficit"] = "EnergyDeficit()",
-    ["energy.max"] = "MaxEnergy()",
-    ["energy.regen"] = "EnergyRegenRate()",
-    ["energy.time_to_max"] = "TimeToMaxEnergy()",
-    ["expected_combat_length"] = "600",
-    ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
-    ["finality"] = "HasArtifactTrait(finality)",
-    ["firestarter.remains"] = "target.TimeToHealthPercent(90)",
-    ["focus"] = "Focus()",
-    ["focus.deficit"] = "FocusDeficit()",
-    ["focus.max"] = "MaxFocus()",
-    ["focus.regen"] = "FocusRegenRate()",
-    ["focus.time_to_max"] = "TimeToMaxFocus()",
-    ["fury"] = "Fury()",
-    ["fury.deficit"] = "FuryDeficit()",
-    ["health"] = "Health()",
-    ["health.deficit"] = "HealthMissing()",
-    ["health.max"] = "MaxHealth()",
-    ["health.pct"] = "HealthPercent()",
-    ["health.percent"] = "HealthPercent()",
-    ["holy_power"] = "HolyPower()",
-    ["incanters_flow_time_to.5.up"] = "StackTimeTo(incanters_flow_buff 5 up)",
-    ["incanters_flow_time_to.5.any"] = "StackTimeTo(incanters_flow_buff 5 any)",
-    ["incanters_flow_time_to.4.down"] = "StackTimeTo(incanters_flow_buff 4 down)",
-    ["infernal_no_de"] = "NotDeDemons(infernal)",
-    ["insanity"] = "Insanity()",
-    ["level"] = "Level()",
-    ["lunar_max"] = "TimeToEclipse(lunar)",
-    ["mana"] = "Mana()",
-    ["mana.deficit"] = "ManaDeficit()",
-    ["mana.max"] = "MaxMana()",
-    ["mana.pct"] = "ManaPercent()",
-    ["mana.time_to_max"] = "TimeToMaxMana()",
-    ["maelstrom"] = "Maelstrom()",
-    ["next_wi_bomb.pheromone"] = "SpellUsable(270323)",
-    ["next_wi_bomb.shrapnel"] = "SpellUsable(270335)",
-    ["next_wi_bomb.volatile"] = "SpellUsable(271045)",
-    ["nonexecute_actors_pct"] = "0",
-    ["pain"] = "Pain()",
-    ["pain.deficit"] = "PainDeficit()",
-    ["pet_count"] = "Demons()",
-    ["pet.apoc_ghoul.active"] = "0",
-    ["rage"] = "Rage()",
-    ["rage.deficit"] = "RageDeficit()",
-    ["rage.max"] = "MaxRage()",
-    ["raid_event.adds.remains"] = "0",
-    ["raid_event.invulnerable.exists"] = "0",
-    ["raw_haste_pct"] = "SpellCastSpeedPercent()",
-    ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
-    ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
-    ["rune.deficit"] = "RuneDeficit()",
-    ["runic_power"] = "RunicPower()",
-    ["runic_power.deficit"] = "RunicPowerDeficit()",
-    ["service_no_de"] = "0",
-    ["shadow_orb"] = "ShadowOrbs()",
-    ["sigil_placed"] = "SigilCharging(flame)",
-    ["solar_max"] = "TimeToEclipse(solar)",
-    ["soul_shard"] = "SoulShards()",
-    ["soul_fragments"] = "SoulFragments()",
-    ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
-    ["stat.mastery_rating"] = "MasteryRating()",
-    ["stealthed"] = "Stealthed()",
-    ["stealthed.all"] = "Stealthed()",
-    ["stealthed.rogue"] = "Stealthed()",
-    ["target.debuff.casting.react"] = "target.Casting(harmful)",
-    ["time"] = "TimeInCombat()",
-    ["time_to_20pct"] = "TimeToHealthPercent(20)",
-    ["time_to_pct_30"] = "TimeToHealthPercent(30)",
-    ["time_to_die"] = "TimeToDie()",
-    ["time_to_die.remains"] = "TimeToDie()",
-    ["time_to_shard"] = "TimeToShard()",
-    ["time_to_sht.4"] = "100",
-    ["time_to_sht.5"] = "100",
-    ["variable.disable_combustion"] = "0",
-    ["wild_imp_count"] = "Demons(wild_imp)",
-    ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
-    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)",
-    ["buff.executioners_precision.stack"] = "0"
-}
+__exports.CHARACTER_PROPERTY = {}
 __exports.KEYWORD = {}
 __exports.MODIFIER_KEYWORD = {
     ["ammo_type"] = true,

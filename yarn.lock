@@ -682,13 +682,13 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.7.0.tgz#d6e4a21ce9dab2d4e61103aea657b5e0267370cd"
-  integrity sha512-2rrn+baOTp/t4yWVXIgHFoTTchgniH6Cs5dbRRxbY3jk3uR0OqxhO4tgGxmJA2ivWYAEeJy19oVyqGInYmZiNQ==
+"@wowts/tstolua@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.8.0.tgz#a5ae83216608b34303808a6b2467fdabe29b2872"
+  integrity sha512-VK9uZO7fjvZqDwljSRdvubc9aE2oiDSAOH5G93R3O1RpSlxKrkoYVpIyt3APLa6YQzA/EcOPKGvtPZD5Wjg9+g==
   dependencies:
     commander "^4.0.0"
-    typescript "^3.7.2"
+    typescript "^3.9.7"
 
 "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.16.0", "@wowts/wow-mock@^1.17.0", "@wowts/wow-mock@^1.6.0":
   version "1.17.0"
@@ -4300,10 +4300,10 @@ typemoq@^2.1.0:
     lodash "^4.17.4"
     postinstall-build "^5.0.1"
 
-typescript@^3.7.2:
-  version "3.7.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
-  integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
+typescript@^3.9.7:
+  version "3.9.7"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
+  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
 
 uglify-js@^3.1.4:
   version "3.7.6"

@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-   <Script file="scripts\ovale_trinkets_mop.lua"/>
    <Script file="scripts\ovale_warrior_spells.lua"/>
    <Script file="scripts\ovale_warlock_spells.lua"/>
    <Script file="scripts\ovale_shaman_spells.lua"/>
@@ -10,7 +9,6 @@
    <Script file="scripts\ovale_mage_spells.lua"/>
    <Script file="scripts\ovale_hunter_spells.lua"/>
    <Script file="scripts\ovale_druid_spells.lua"/>
-   <Script file="scripts\ovale_trinkets_wod.lua"/>
    <Script file="scripts\ovale_demonhunter_spells.lua"/>
    <Script file="scripts\ovale_warrior.lua"/>
    <Script file="scripts\ovale_warlock.lua"/>

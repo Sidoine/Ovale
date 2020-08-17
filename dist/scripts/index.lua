@@ -30,8 +30,6 @@ local __ovale_warrior = LibStub:GetLibrary("ovale/scripts/ovale_warrior")
 local registerWarrior = __ovale_warrior.registerWarrior
 local __ovale_demonhunter_spells = LibStub:GetLibrary("ovale/scripts/ovale_demonhunter_spells")
 local registerDemonHunterSpells = __ovale_demonhunter_spells.registerDemonHunterSpells
-local __ovale_trinkets_wod = LibStub:GetLibrary("ovale/scripts/ovale_trinkets_wod")
-local registerWodTrinkets = __ovale_trinkets_wod.registerWodTrinkets
 local __ovale_druid_spells = LibStub:GetLibrary("ovale/scripts/ovale_druid_spells")
 local registerDruidSpells = __ovale_druid_spells.registerDruidSpells
 local __ovale_hunter_spells = LibStub:GetLibrary("ovale/scripts/ovale_hunter_spells")
@@ -52,8 +50,6 @@ local __ovale_warlock_spells = LibStub:GetLibrary("ovale/scripts/ovale_warlock_s
 local registerWarlockSpells = __ovale_warlock_spells.registerWarlockSpells
 local __ovale_warrior_spells = LibStub:GetLibrary("ovale/scripts/ovale_warrior_spells")
 local registerWarriorSpells = __ovale_warrior_spells.registerWarriorSpells
-local __ovale_trinkets_mop = LibStub:GetLibrary("ovale/scripts/ovale_trinkets_mop")
-local registerMopTrinkets = __ovale_trinkets_mop.registerMopTrinkets
 __exports.registerScripts = function(ovaleScripts)
     registerCommon(ovaleScripts)
     registerDeathKnightSpells(ovaleScripts)
@@ -68,8 +64,6 @@ __exports.registerScripts = function(ovaleScripts)
     registerShamanSpells(ovaleScripts)
     registerWarlockSpells(ovaleScripts)
     registerWarriorSpells(ovaleScripts)
-    registerMopTrinkets(ovaleScripts)
-    registerWodTrinkets(ovaleScripts)
     registerDeathKnight(ovaleScripts)
     registerDemonHunter(ovaleScripts)
     registerDruid(ovaleScripts)

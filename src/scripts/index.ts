@@ -14,7 +14,6 @@ import { registerShaman } from "./ovale_shaman";
 import { registerWarlock } from "./ovale_warlock";
 import { registerWarrior } from "./ovale_warrior";
 import { registerDemonHunterSpells } from "./ovale_demonhunter_spells";
-import { registerWodTrinkets } from "./ovale_trinkets_wod";
 import { registerDruidSpells } from "./ovale_druid_spells";
 import { registerHunterSpells } from "./ovale_hunter_spells";
 import { registerMageSpells } from "./ovale_mage_spells";
@@ -25,9 +24,8 @@ import { registerRogueSpells } from "./ovale_rogue_spells";
 import { registerShamanSpells } from "./ovale_shaman_spells";
 import { registerWarlockSpells } from "./ovale_warlock_spells";
 import { registerWarriorSpells } from "./ovale_warrior_spells";
-import { registerMopTrinkets } from "./ovale_trinkets_mop";
 
-export function registerScripts(ovaleScripts: OvaleScriptsClass){
+export function registerScripts(ovaleScripts: OvaleScriptsClass) {
     registerCommon(ovaleScripts);
     registerDeathKnightSpells(ovaleScripts);
     registerDemonHunterSpells(ovaleScripts);
@@ -41,9 +39,6 @@ export function registerScripts(ovaleScripts: OvaleScriptsClass){
     registerShamanSpells(ovaleScripts);
     registerWarlockSpells(ovaleScripts);
     registerWarriorSpells(ovaleScripts);
-
-    registerMopTrinkets(ovaleScripts);
-    registerWodTrinkets(ovaleScripts);
 
     registerDeathKnight(ovaleScripts);
     registerDemonHunter(ovaleScripts);

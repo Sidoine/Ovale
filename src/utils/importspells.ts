@@ -4,79 +4,91 @@ import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
 import { parseDescription } from "./spellstringparser";
 
+interface AllData {
+    spell_data_t?: unknown[][];
+    specialization_spell_entry_t?: unknown[][];
+    spelleffect_data_t?: unknown[][];
+    spellpower_data_t?: unknown[][];
+    talent_data_t?: unknown[][];
+    azerite_power_entry_t?: unknown[][];
+    azerite_essence_entry_t?: unknown[][];
+    dbc_item_data_t?: unknown[][];
+    spelltext_data_t?: unknown[][];
+}
+
 const enum SpellAttribute {
-  "Ranged Ability" =   1,                  
-  "Tradeskill ability" =   5,              
-  "Passive" =   6,                         
-  "Hidden" =   7,                          
-  "Requires stealth" =   17,                
-  "Stop attacks" =   20,                    
-  "Cannot dodge/parry/block" =   21,        
-  "Cannot be used in combat" =   28,        
-  "Cannot cancel aura" =   31,              
-  "Channeled" =   34,                       
-  "Does not break stealth" =   37,          
-  "Channeled_2" =   38,                       
-  "Cannot crit" =   93,                     
-  "Food buff" =   95,                       
-  "Not a proc" =  105,                      
-  "Requires main-hand weapon" =  106,       
-  "Disable player procs" =  112,            
-  "Disable target procs" =  113,            
-  "Always hits" =  114,                     
-  "Requires off-hand weapon" =  120,        
-  "Treat as periodic" =  121,               
-  "Disable weapon procs" =  151,            
-  "Tick on application" =  169,             
-  "Periodic effect affected by haste"=  173,
-  "Requires line of sight" =  186,          
-  "Disable player multipliers" =  221,      
-  "Periodic effect can crit" =  265,        
-  "Scales with item level" =  354,         
-};
+    "Ranged Ability" = 1,
+    "Tradeskill ability" = 5,
+    "Passive" = 6,
+    "Hidden" = 7,
+    "Requires stealth" = 17,
+    "Stop attacks" = 20,
+    "Cannot dodge/parry/block" = 21,
+    "Cannot be used in combat" = 28,
+    "Cannot cancel aura" = 31,
+    "Channeled" = 34,
+    "Does not break stealth" = 37,
+    "Channeled_2" = 38,
+    "Cannot crit" = 93,
+    "Food buff" = 95,
+    "Not a proc" = 105,
+    "Requires main-hand weapon" = 106,
+    "Disable player procs" = 112,
+    "Disable target procs" = 113,
+    "Always hits" = 114,
+    "Requires off-hand weapon" = 120,
+    "Treat as periodic" = 121,
+    "Disable weapon procs" = 151,
+    "Tick on application" = 169,
+    "Periodic effect affected by haste" = 173,
+    "Requires line of sight" = 186,
+    "Disable player multipliers" = 221,
+    "Periodic effect can crit" = 265,
+    "Scales with item level" = 354,
+}
 
 const specIds = {
-    SPEC_NONE              : 0,
-    SPEC_PET               : 1,
-    PET_FEROCITY           : 535,
-    PET_TENACITY           : 537,
-    PET_CUNNING            : 536,
-    WARRIOR_ARMS           : 71,
-    WARRIOR_FURY           : 72,
-    WARRIOR_PROTECTION     : 73,
-    PALADIN_HOLY           : 65,
-    PALADIN_PROTECTION     : 66,
-    PALADIN_RETRIBUTION    : 70,
-    HUNTER_BEAST_MASTERY   : 253,
-    HUNTER_MARKSMANSHIP    : 254,
-    HUNTER_SURVIVAL        : 255,
-    ROGUE_ASSASSINATION    : 259,
-    ROGUE_OUTLAW           : 260,
-    ROGUE_SUBTLETY         : 261,
-    PRIEST_DISCIPLINE      : 256,
-    PRIEST_HOLY            : 257,
-    PRIEST_SHADOW          : 258,
-    DEATH_KNIGHT_BLOOD     : 250,
-    DEATH_KNIGHT_FROST     : 251,
-    DEATH_KNIGHT_UNHOLY    : 252,
-    SHAMAN_ELEMENTAL       : 262,
-    SHAMAN_ENHANCEMENT     : 263,
-    SHAMAN_RESTORATION     : 264,
-    MAGE_ARCANE            : 62,
-    MAGE_FIRE              : 63,
-    MAGE_FROST             : 64,
-    WARLOCK_AFFLICTION     : 265,
-    WARLOCK_DEMONOLOGY     : 266,
-    WARLOCK_DESTRUCTION    : 267,
-    MONK_BREWMASTER        : 268,
-    MONK_MISTWEAVER        : 270,
-    MONK_WINDWALKER        : 269,
-    DRUID_BALANCE          : 102,
-    DRUID_FERAL            : 103,
-    DRUID_GUARDIAN         : 104,
-    DRUID_RESTORATION      : 105,
-    DEMON_HUNTER_HAVOC     : 577,
-    DEMON_HUNTER_VENGEANCE : 581,
+    SPEC_NONE: 0,
+    SPEC_PET: 1,
+    PET_FEROCITY: 535,
+    PET_TENACITY: 537,
+    PET_CUNNING: 536,
+    WARRIOR_ARMS: 71,
+    WARRIOR_FURY: 72,
+    WARRIOR_PROTECTION: 73,
+    PALADIN_HOLY: 65,
+    PALADIN_PROTECTION: 66,
+    PALADIN_RETRIBUTION: 70,
+    HUNTER_BEAST_MASTERY: 253,
+    HUNTER_MARKSMANSHIP: 254,
+    HUNTER_SURVIVAL: 255,
+    ROGUE_ASSASSINATION: 259,
+    ROGUE_OUTLAW: 260,
+    ROGUE_SUBTLETY: 261,
+    PRIEST_DISCIPLINE: 256,
+    PRIEST_HOLY: 257,
+    PRIEST_SHADOW: 258,
+    DEATH_KNIGHT_BLOOD: 250,
+    DEATH_KNIGHT_FROST: 251,
+    DEATH_KNIGHT_UNHOLY: 252,
+    SHAMAN_ELEMENTAL: 262,
+    SHAMAN_ENHANCEMENT: 263,
+    SHAMAN_RESTORATION: 264,
+    MAGE_ARCANE: 62,
+    MAGE_FIRE: 63,
+    MAGE_FROST: 64,
+    WARLOCK_AFFLICTION: 265,
+    WARLOCK_DEMONOLOGY: 266,
+    WARLOCK_DESTRUCTION: 267,
+    MONK_BREWMASTER: 268,
+    MONK_MISTWEAVER: 270,
+    MONK_WINDWALKER: 269,
+    DRUID_BALANCE: 102,
+    DRUID_FERAL: 103,
+    DRUID_GUARDIAN: 104,
+    DRUID_RESTORATION: 105,
+    DEMON_HUNTER_HAVOC: 577,
+    DEMON_HUNTER_VENGEANCE: 581,
 };
 
 const specIdToName: { [k in keyof typeof specIds]?: SpecializationName } = {
@@ -115,9 +127,8 @@ const specIdToName: { [k in keyof typeof specIds]?: SpecializationName } = {
     WARLOCK_DESTRUCTION: "destruction",
     WARRIOR_ARMS: "arms",
     WARRIOR_FURY: "fury",
-    WARRIOR_PROTECTION: "protection"
-}
-
+    WARRIOR_PROTECTION: "protection",
+};
 
 const specIdToSpecName = new Map<number, SpecializationName>();
 for (const key in specIdToName) {
@@ -131,7 +142,7 @@ export interface SpellPowerData {
     spell_id: number;
     /** Spell id for the aura during which this power type is active */
     aura_id: number;
-    hotfix: number;
+    // hotfix: number;
     power_type: PowerType;
     cost: number;
     cost_max: number;
@@ -329,7 +340,7 @@ export const enum EffectType {
     E_230 = 230,
     E_238 = 238,
     E_243 = 243,
-    E_MAX
+    E_MAX,
 }
 
 export const enum EffectSubtype {
@@ -755,36 +766,36 @@ export const enum EffectSubtype {
     A_470 = 470,
     A_471 = 471,
     A_478 = 478,
-    A_MAX
+    A_MAX,
 }
 
 export const enum PowerType {
-    POWER_HEALTH      = -2,
-  POWER_MANA        = 0,
-  POWER_RAGE        = 1,
-  POWER_FOCUS       = 2,
-  POWER_ENERGY      = 3,
-  POWER_COMBO_POINT = 4,
-  POWER_RUNE        = 5,
-  POWER_RUNIC_POWER = 6,
-  POWER_SOUL_SHARDS = 7,
-  POWER_ASTRAL_POWER = 8,
-  POWER_HOLY_POWER = 9,
-  // Not yet used (MoP Monk deprecated resource #1)
-  // Not yet used
-  POWER_MAELSTROM     = 11,
-  POWER_CHI           = 12,
-  POWER_INSANITY      = 13,
-  POWER_BURNING_EMBER = 14,
-  POWER_DEMONIC_FURY  = 15,
-  POWER_ARCANE_CHARGES = 16,
-  POWER_FURY          = 17,
-  POWER_PAIN          = 18,
+    POWER_HEALTH = -2,
+    POWER_MANA = 0,
+    POWER_RAGE = 1,
+    POWER_FOCUS = 2,
+    POWER_ENERGY = 3,
+    POWER_COMBO_POINT = 4,
+    POWER_RUNE = 5,
+    POWER_RUNIC_POWER = 6,
+    POWER_SOUL_SHARDS = 7,
+    POWER_ASTRAL_POWER = 8,
+    POWER_HOLY_POWER = 9,
+    // Not yet used (MoP Monk deprecated resource #1)
+    // Not yet used
+    POWER_MAELSTROM = 11,
+    POWER_CHI = 12,
+    POWER_INSANITY = 13,
+    POWER_BURNING_EMBER = 14,
+    POWER_DEMONIC_FURY = 15,
+    POWER_ARCANE_CHARGES = 16,
+    POWER_FURY = 17,
+    POWER_PAIN = 18,
 }
 
 export const enum SpellAttributes {
     Channeled = 1 << 34,
-    Channeled2 = 1 << 38
+    Channeled2 = 1 << 38,
 }
 
 export interface SpellData {
@@ -795,7 +806,7 @@ export interface SpellData {
     the first field. The most significant bit
     (0x8000 0000 0000 0000) indicates the presence of hotfixed
     effect data for this spell.*/
-    hotfix: number;
+    //hotfix: number;
     /** 4 Projectile Speed */
     prj_speed: number;
     /** 5 Spell school mask */
@@ -856,19 +867,7 @@ export interface SpellData {
     /** 29 */
     equipped_subclass_mask: number;
     // SpellScaling.dbc
-    /** // 30 Minimum casting time in milliseconds */
-    cast_min: number;
-    /** // 31 Maximum casting time in milliseconds */
-    cast_max: number;
-    /** // 32 A divisor used in the formula for casting time scaling (20 always?) */
-    cast_div: number;
-    /** // 33 A scaling multiplier for level based scaling */
-    c_scaling: number;
-    /** // 34 A scaling divisor for level based scaling */
-    c_scaling_level: number;
     // SpecializationSpells.dbc
-    /** // Not included in hotfixed data, replaces spell with specialization specific spell */
-    replace_spell_id: number;
     // Spell.dbc flags
     /** // 35 Spell.dbc "flags", record field 1..10, note that 12694 added a field here after flags_7 */
     attributes: number[];
@@ -896,11 +895,14 @@ export interface SpellData {
     // SpellIcon.dbc
     /** 45 */
     rank_str: string;
+    cast_time: number;
+    dmg_class: number;
+    max_targets: number;
 
     /** 46 */
     req_max_level: number;
     /** 46 SpellCategories.db2 classification for the spell */
-    dmg_class: number;
+    //dmg_class: number;
 
     spellEffects?: SpellEffectData[];
     spellPowers?: SpellPowerData[];
@@ -912,13 +914,14 @@ export interface SpellData {
     specializationName: SpecializationName[];
     nextRank?: SpellData;
     spellAttributes: SpellAttribute[];
+    replace_spell_id?: number;
 }
 
 export interface SpellEffectData {
     /** 1 Effect id */
     id: number;
     /** 2 Hotfix bitmap */
-    hotfix: number;
+    // hotfix: number;
     //   Each bit points to a field in this struct, starting from
     // the first field
     /** 3 Spell this effect belongs to */
@@ -931,7 +934,7 @@ export interface SpellEffectData {
     subtype: EffectSubtype;
     // SpellScaling.dbc
     /** 7 Effect average spell scaling multiplier */
-    m_avg: number;
+    m_coeff: number;
     /** 8 Effect delta spell scaling multiplier */
     m_delta: number;
     /** 9 Unused effect scaling multiplier */
@@ -975,27 +978,28 @@ export interface SpellEffectData {
     targeting_2: number;
     /** 27 Misc multiplier used for some spells(?) */
     m_value: number;
+    pvp_coeff: number;
 }
 
 export interface TalentData {
     /** Talent name */
-    name: string;        
+    name: string;
     /** Talent id */
-    id: number;          
+    id: number;
     /** Unused for now, 0x00 for all */
-    flags: number;       
+    flags: number;
     /** Class mask */
-    m_class: number;     
+    m_class: number;
     /** Specialization */
-    spec: number;        
+    spec: number;
     /** Talent column */
-    col: number;         
+    col: number;
     /**Talent row */
-    row: number;         
+    row: number;
     /** Talent spell */
-    spell_id: number;    
+    spell_id: number;
     /** Talent replaces the following spell id  */
-    replace_id: number;  
+    replace_id: number;
 
     identifier: string;
     talentId: number;
@@ -1008,7 +1012,7 @@ export interface ItemData {
     flags_2: number;
     type_flags: number;
     /** Ilevel */
-    level: number;                 
+    level: number;
     req_level: number;
     req_skill: number;
     req_skill_level: number;
@@ -1023,23 +1027,26 @@ export interface ItemData {
     race_mask: number;
     class_mask: number;
     /** item_mod_type */
-    stat_type_e: number[];       
-    stat_alloc: number[];
-    stat_socket_mul: number[];
+    // stat_type_e: number[];
+    // stat_alloc: number[];
+    // stat_socket_mul: number[];
     /** item_spell_trigger_type */
-    trigger_spell: number[];
-    id_spell: number[];
-    cooldown_duration: number[];
-    cooldown_group: number[];
-    cooldown_group_duration: number[];
+    // trigger_spell: number[];
+    // id_spell: number[];
+    // cooldown_duration: number[];
+    // cooldown_group: number[];
+    // cooldown_group_duration: number[];
     /**  item_socket_color */
     socket_color: number[];
     gem_properties: number;
     id_socket_bonus: number;
     id_set: number;
-    id_suffix_group: number;
-    id_scaling_distribution: number;
+    // id_suffix_group: number;
+    // id_scaling_distribution: number;
     id_artifact: number;
+    dbc_stats: {}[];
+    dbc_stats_count: number;
+    id_curve: number;
 
     identifier: string;
 }
@@ -1047,7 +1054,7 @@ export interface ItemData {
 export interface AzeriteTrait {
     id: number;
     spellId: number;
-    bonusId: number
+    bonusId: number;
     name: string;
     identifier: string;
 }
@@ -1072,33 +1079,36 @@ export function isFriendlyTarget(targetId: number) {
             return true;
         default:
             return false;
-    }  
+    }
 }
 
 function isSpace(char: string) {
-    return char === ' ' || char === '\r' || char === '\n' || char === '\t';
+    return char === " " || char === "\r" || char === "\n" || char === "\t";
 }
 
 function skipComments(data: string, index: number): number {
     while (isSpace(data[index]) && index < data.length) index++;
-    if (data[index] === '/' && data[index + 1] === '*') {
+    if (data[index] === "/" && data[index + 1] === "*") {
         index += 2;
         while (index < data.length) {
-            while (index < data.length && data[index] !== '*') index++;
-            if (data[index] === '*' && data[index + 1] === '/') {
+            while (index < data.length && data[index] !== "*") index++;
+            if (data[index] === "*" && data[index + 1] === "/") {
                 return skipComments(data, index + 2);
             }
         }
-    } else if (data[index] === '/' && data[index + 1] === '/') {
+    } else if (data[index] === "/" && data[index + 1] === "/") {
         index += 2;
-        while (index < data.length && data[index] !== '\n') index++;
+        while (index < data.length && data[index] !== "\n") index++;
         return skipComments(data, index + 1);
     }
     return index;
 }
 
-function readFile(directory:string, fileName: string, output: { [key: string]: any[][] }) {
-    const spellDataFile = readFileSync(`${directory}/engine/dbc/generated/${fileName}.inc`, { encoding: "utf8" });
+function readFile(directory: string, fileName: string, output: AllData) {
+    const spellDataFile = readFileSync(
+        `${directory}/engine/dbc/generated/${fileName}.inc`,
+        { encoding: "utf8" }
+    );
 
     function getColumns($data: string, start: number): [any[], number] {
         const columns = [];
@@ -1110,7 +1120,7 @@ function readFile(directory:string, fileName: string, output: { [key: string]: a
             if (c === '"') {
                 let start = ++i;
                 while ($data[i] !== '"' && i < $data.length) {
-                    if ($data[i] === '\\') {
+                    if ($data[i] === "\\") {
                         i++;
                     }
                     i++;
@@ -1118,33 +1128,52 @@ function readFile(directory:string, fileName: string, output: { [key: string]: a
                 const text = $data.substring(start, i);
                 i++;
                 columns.push(text);
+            } else if (c === "&") {
+                let start = i++;
+                while ($data[i] !== "," && $data[i]) {
+                    i++;
+                }
+                columns.push($data.substring(start, i));
             } else if (c === "n") {
                 const nullptr = "nullptr";
-                if ($data.substr(i, nullptr.length) !== nullptr) throw Error("Excepted nullptr");
+                if ($data.substr(i, nullptr.length) !== nullptr)
+                    throw Error("Excepted nullptr");
                 i += nullptr.length;
-            } else if (c >= '0' && c <= '9' || c === '-') {
+            } else if ((c >= "0" && c <= "9") || c === "-") {
                 let start = i++;
-                while (($data[i] >= '0' && $data[i] <= '9') || ($data[i] >= 'a' && $data[i] <= 'f')
-                    || $data[i] === 'x' || $data[i] === '.' || $data[i] === 'U') {
+                while (
+                    ($data[i] >= "0" && $data[i] <= "9") ||
+                    ($data[i] >= "a" && $data[i] <= "f") ||
+                    $data[i] === "x" ||
+                    $data[i] === "." ||
+                    $data[i] === "U"
+                ) {
                     i++;
                 }
                 const number = $data.substring(start, i);
                 columns.push(parseFloat(number));
-            } else if (c === '{') {
+            } else if (c === "{") {
                 const innerData = getColumns($data, i + 1);
                 columns.push(<(number | string)[]>innerData[0]);
                 i = innerData[1];
-            } else if (c === '}') {
+            } else if (c === "}") {
                 break;
-            } 
+            }
             // const next = $data.substr(i, 20);
             i = skipComments($data, i);
-            if ($data[i] === ',') {
+            if ($data[i] === ",") {
                 i++;
-            } else if ($data[i] === '}' || $data[i] === undefined) {
+            } else if ($data[i] === "}" || $data[i] === undefined) {
                 break;
             } else {
-                throw new Error(`${fileName}: Unexcepted ${$data[i]} character at ${$data.substr(i - 3, 50)} in ${$data.substr(start, 20)}...`);
+                throw new Error(
+                    `${fileName}: Unexcepted ${
+                        $data[i]
+                    } character at ${$data.substr(i - 3, 50)} in ${$data.substr(
+                        start,
+                        20
+                    )}...`
+                );
             }
         }
         return [columns, i + 1];
@@ -1156,12 +1185,18 @@ function readFile(directory:string, fileName: string, output: { [key: string]: a
         if (index < 0) break;
         const endLine = spellDataFile.indexOf("\n", index);
         const line = spellDataFile.substring(index, endLine);
-        const match = line.match(/struct (\w+)/) || line.match(/constexpr std::array<(\w+)/) || line.match(/unsigned (\w+)/);
+        const match =
+            line.match(/struct (\w+)/) ||
+            line.match(/constexpr std::array<(\w+)/) ||
+            line.match(/unsigned (\w+)/) ||
+            line.match(/static const std::array<(\w+)/) ||
+            line.match(/static std::array<(\w+)/) ||
+            line.match(/static (\w+)/);
         if (match) {
             const name = match[1];
-            console.log(name);
+            console.log(`add ${name} data`);
             const [columns, end] = getColumns(spellDataFile, endLine);
-            output[name] = columns;
+            output[name as keyof AllData] = columns;
             index = end;
         } else {
             index += 6;
@@ -1173,10 +1208,10 @@ function readFile(directory:string, fileName: string, output: { [key: string]: a
     //     let match: RegExpMatchArray;
     //     if (match = $line.match(/static struct (\w+)/)) {
     //         zone = [];
-    //         output[match[1]] = zone;            
+    //         output[match[1]] = zone;
     //     } else if (match = $line.match(/static constexpr std::array<(\w+)/)) {
     //         zone = [];
-    //         output[match[1]] = zone;            
+    //         output[match[1]] = zone;
     //     }
     //     else if (match = $line.match(/{(.*)}/)) {
     //         let $data = match[1];
@@ -1188,11 +1223,18 @@ function readFile(directory:string, fileName: string, output: { [key: string]: a
 
 function getIdentifier(name: string) {
     if (!name) return name;
-    if (typeof (name) !== "string") return name;
-    return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/[-,]/g, "_").replace(/_+/g, '_');
+    if (typeof name !== "string") return name;
+    return name
+        .toLowerCase()
+        .replace(/^potion of (the )?/, "")
+        .replace(/ /g, "_")
+        .replace("!", "_aura")
+        .replace(/[:'()]/g, "")
+        .replace(/[-,]/g, "_")
+        .replace(/_+/g, "_");
 }
 
-const classNames: (ClassId | "PET") [] =  [
+const classNames: (ClassId | "PET")[] = [
     "PET",
     "WARRIOR",
     "PALADIN",
@@ -1205,27 +1247,49 @@ const classNames: (ClassId | "PET") [] =  [
     "WARLOCK",
     "MONK",
     "DRUID",
-    "DEMONHUNTER"
+    "DEMONHUNTER",
 ];
 
 const classBitToNumber: ClassId[] = [];
 for (let i = 1; i < classNames.length; i++) {
     const className = classNames[i];
-    if (className !== "PET") classBitToNumber[1 << (i-1)] = className;
+    if (className !== "PET") classBitToNumber[1 << (i - 1)] = className;
 }
 
 function isRankSpell(spell: SpellData) {
     return spell.rank_str && spell.rank_str.indexOf("Rank") === 0;
 }
 
+function getString(o: unknown): string {
+    if (o === 0) return "";
+    if (typeof o === "string") return o;
+    throw Error(`typeof ${o} is not a string`);
+}
+
+function getNumber(o: unknown): number {
+    if (o === undefined) return 0;
+    if (typeof o === "number") return o;
+    throw Error(`typeof ${o} is not a number`);
+}
+
+function getArrayOfNumbers(o: unknown): number[] {
+    if (o === 0) return [];
+    if (typeof o === "string") return []; // TODO reference to a variable
+    if (o instanceof Array) return o;
+    throw Error(`typeof ${o} is not a number[]`);
+}
+
 export function getSpellData(directory: string) {
-    let output: { [key: string]: any[][] } = {};
+    let output: AllData = {};
     readFile(directory, "sc_spell_data", output);
     readFile(directory, "sc_talent_data", output);
-    readFile(directory, "sc_item_data", output);
+    readFile(directory, "item_data", output);
     readFile(directory, "azerite", output);
-    readFile(directory, "sc_spell_lists", output);
-    
+    readFile(directory, "specialization_spells", output);
+    readFile(directory, "spelltext_data", output);
+    // readFile(directory, "sc_spell_lists", output);
+
+    console.log("Import spells...");
     const identifierById = new Map<number, string>();
     identifierById.set(302917, "reckless_force_counter");
 
@@ -1233,63 +1297,73 @@ export function getSpellData(directory: string) {
     const spellListsByIdentifier = new Map<string, SpellData[]>();
     const spellDataById = new Map<number, SpellData>();
     const spellData: SpellData[] = [];
+    if (!output.spell_data_t) throw Error("No spell_data_t");
     for (const row of output.spell_data_t) {
+        let i = 0;
         const spell: SpellData = {
-            name: row[0],
-            id: row[1],
-            hotfix: row[2],
-            prj_speed: row[3],
-            school: row[4],
-            class_mask: row[5],
-            race_mask: row[6],
-            scaling_type: row[7],
-            max_scaling_level: row[8],
-            spell_level: row[9],
-            max_level: row[10],
-            min_range: row[11],
-            max_range: row[12],
-            cooldown: row[13],
-            gcd: row[14],
-            category_cooldown: row[15],
-            charges: row[16],
-            charge_cooldown: row[17],
-            category: row[18],
-            duration: row[19],
-            max_stack: row[20],
-            proc_chance: row[21],
-            proc_charges: row[22],
-            proc_flags: row[23],
-            internal_cooldown: row[24],
-            rppm: row[25],
-            equipped_class: row[26],
-            equipped_invtype_mask: row[27],
-            equipped_subclass_mask: row[28],
-            cast_min: row[29],
-            cast_max: row[30],
-            cast_div: row[31],
-            c_scaling: row[32],
-            c_scaling_level: row[33],
-            replace_spell_id: row[34],
-            attributes: row[35],
-            class_flags: row[36],
-            class_flags_family: row[37],
-            stance_mask: row[38],
-            mechanic: row[39],
-            power_id: row[40],
-            essence_id: row[41],
-            desc: row[42],
-            tooltip: row[43],
-            desc_vars: row[44],
-            rank_str: row[45],
-            req_max_level: row[46],
-            dmg_class: row[47],
+            name: getString(row[i++]),
+            id: getNumber(row[i++]),
+            school: getNumber(row[i++]),
+            prj_speed: getNumber(row[i++]),
+            race_mask: getNumber(row[i++]),
+            class_mask: getNumber(row[i++]),
+            scaling_type: getNumber(row[i++]),
+            max_scaling_level: getNumber(row[i++]),
+            spell_level: getNumber(row[i++]),
+            max_level: getNumber(row[i++]),
+            req_max_level: getNumber(row[i++]),
+            min_range: getNumber(row[i++]),
+            max_range: getNumber(row[i++]),
+            cooldown: getNumber(row[i++]),
+            gcd: getNumber(row[i++]),
+            category_cooldown: getNumber(row[i++]),
+            charges: getNumber(row[i++]),
+            charge_cooldown: getNumber(row[i++]),
+            category: getNumber(row[i++]),
+            dmg_class: getNumber(row[i++]),
+            max_targets: getNumber(row[i++]),
+            duration: getNumber(row[i++]),
+            max_stack: getNumber(row[i++]),
+            proc_chance: getNumber(row[i++]),
+            proc_charges: getNumber(row[i++]),
+            proc_flags: getNumber(row[i++]),
+            internal_cooldown: getNumber(row[i++]),
+            rppm: getNumber(row[i++]),
+            equipped_class: getNumber(row[i++]),
+            equipped_invtype_mask: getNumber(row[i++]),
+            equipped_subclass_mask: getNumber(row[i++]),
+            cast_time: getNumber(row[i++]),
+            attributes: getArrayOfNumbers(row[i++]),
+            class_flags: getArrayOfNumbers(row[i++]),
+            class_flags_family: getNumber(row[i++]),
+            stance_mask: getNumber(row[i++]),
+            mechanic: getNumber(row[i++]),
+            power_id: getNumber(row[i++]),
+            essence_id: getNumber(row[i++]),
+
+            // cast_min: row[29],
+            // cast_max: row[30],
+            // cast_div: row[31],
+            // c_scaling: row[32],
+            // c_scaling_level: row[33],
+            // replace_spell_id: row[34],
+            // desc: row[42],
+            // tooltip: row[43],
+            // desc_vars: row[44],
+            // rank_str: row[45],
+            // dmg_class: row[47],
+            // hotfix: row[2],
+            desc: "",
+            tooltip: "",
+            desc_vars: "",
+            rank_str: "",
             identifierScore: 0,
             spellAttributes: [],
             specializationName: [],
-            identifier: ""
+            identifier: "",
         };
 
-        for (let i = 0; i < spell.attributes.length ; i++) {
+        for (let i = 0; i < spell.attributes.length; i++) {
             for (let flag = 0; flag < 32; flag++) {
                 if (spell.attributes[i] & (1 << flag)) {
                     spell.spellAttributes.push(i * 32 + flag);
@@ -1308,89 +1382,100 @@ export function getSpellData(directory: string) {
         spellDataById.set(spell.id, spell);
         if (!spell.identifier) continue;
 
-        if (spell.cast_div > 0) spell.identifierScore ++;
+        if (spell.cast_time > 0) spell.identifierScore++;
         if (spell.spell_level > 0) spell.identifierScore++;
         if (spell.equipped_class > 0) spell.identifierScore++;
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
         if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
         if (spell.rank_str === "Passive") spell.identifierScore--;
-        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)  spell.identifierScore--;
+        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)
+            spell.identifierScore--;
     }
 
-    for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {
-        const classData = output.__class_ability_data[classIndex];
-        for (const category of classData) {
-            for (const spellId of category) {
-                const spell = spellDataById.get(spellId);
-                if (spell) {
-                    spell.identifierScore += 10;
-                    spell.className = classNames[classIndex];
-                } else {
-                    console.error(`Unknown spell ${spellId}`);
-                }
+    console.log("Import specializations...");
+    if (!output.specialization_spell_entry_t) {
+        throw Error("specialization_spell_entry_t does not exist");
+    }
+
+    for (const specSpell of output.specialization_spell_entry_t) {
+        const classIndex = getNumber(specSpell[0]);
+        const specIndex = getNumber(specSpell[1]);
+        const spell = spellDataById.get(getNumber(specSpell[2]));
+        if (spell) {
+            spell.identifierScore += 10;
+            const className = classNames[classIndex];
+            spell.className = className;
+            if (specSpell[3]) spell.replace_spell_id = getNumber(specSpell[3]);
+            if (className !== "PET") {
+                const specName =
+                    OVALE_SPECIALIZATION_NAME[className][
+                        <1 | 2 | 3 | 4>(specIndex + 1)
+                    ];
+                if (specName) spell.specializationName.push(specName);
             }
         }
     }
 
-    for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {
-        const specializations = output.__tree_specialization_data[classIndex];
-        for (let specIndex = 0; specIndex < specializations.length; specIndex++) {
-            const specialization = specializations[specIndex];
-            for (const spellId of specialization) {
-                const spell = spellDataById.get(spellId);
-                if (spell) {
-                    spell.identifierScore += 10;
-                    const className = classNames[classIndex];
-                    spell.className = className
-                    if (className !== "PET") {
-                        const specName = OVALE_SPECIALIZATION_NAME[className][<1|2|3|4>(specIndex + 1)]
-                        if (specName) spell.specializationName.push(specName);
-                    }
-                } else {
-                    console.error(`Unknown spell ${spellId}`);
-                }
-            }
+    console.log("Import spell text...");
+    if (!output.spelltext_data_t) throw Error("No spelltext_data_t");
+
+    for (const spellText of output.spelltext_data_t) {
+        const spellId = getNumber(spellText[0]);
+        const spell = spellDataById.get(spellId);
+        if (spell) {
+            spell.desc = getString(spellText[1]);
+            spell.tooltip = getString(spellText[2]);
+            spell.rank_str = getString(spellText[3]);
         }
     }
+
+    console.log("Import spell effects data...");
+    if (!output.spelleffect_data_t) throw Error("No spelleffect_data_t");
 
     for (const row of output.spelleffect_data_t) {
+        let i = 0;
         const spellEffect: SpellEffectData = {
-            id: row[0],
-            hotfix: row[1],
-            spell_id: row[2],
-            index: row[3],
-            type: row[4],
-            subtype: row[5],
-            m_avg: row[6],
-            m_delta: row[7],
-            m_unk: row[8],
-            sp_coeff: row[9],
-            ap_coeff: row[10],
-            amplitude: row[11],
-            radius: row[12],
-            radius_max: row[13],
-            base_value: row[14],
-            misc_value: row[15],
-            misc_value_2: row[16],
-            class_flags: row[17],
-            trigger_spell_id: row[18],
-            m_chain: row[19],
-            pp_combo_points: row[20],
-            real_ppl: row[21],
-            mechanic: row[22],
-            chain_target: row[23],
-            targeting_1: row[24],
-            targeting_2: row[25],
-            m_value: row[26]
-        }
+            id: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            index: getNumber(row[i++]),
+            type: getNumber(row[i++]),
+            subtype: getNumber(row[i++]),
+
+            m_coeff: getNumber(row[i++]),
+            m_delta: getNumber(row[i++]),
+            m_unk: getNumber(row[i++]),
+            sp_coeff: getNumber(row[i++]),
+            ap_coeff: getNumber(row[i++]),
+            amplitude: getNumber(row[i++]),
+            radius: getNumber(row[i++]),
+            radius_max: getNumber(row[i++]),
+            base_value: getNumber(row[i++]),
+            misc_value: getNumber(row[i++]),
+            misc_value_2: getNumber(row[i++]),
+            class_flags: getArrayOfNumbers(row[i++]),
+            trigger_spell_id: getNumber(row[i++]),
+            m_chain: getNumber(row[i++]),
+            pp_combo_points: getNumber(row[i++]),
+            real_ppl: getNumber(row[i++]),
+            mechanic: getNumber(row[i++]),
+            chain_target: getNumber(row[i++]),
+            targeting_1: getNumber(row[i++]),
+            targeting_2: getNumber(row[i++]),
+            m_value: getNumber(row[i++]),
+            pvp_coeff: getNumber(row[i++]),
+        };
         const spell = spellDataById.get(spellEffect.spell_id);
-        if (!spell) continue;
+        if (!spell) throw Error("Unknown spell id");
         if (!spell.spellEffects) spell.spellEffects = [];
         spell.spellEffects.push(spellEffect);
+        if (spell.id === 238147) debugger;
+
         if (spellEffect.trigger_spell_id) {
             // for some weird reason, Azerite Essence are considered buffs instead of spells
             if (spell.rank_str === "Azerite Essence") continue;
-            const triggerSpell = spellDataById.get(spellEffect.trigger_spell_id);
+            const triggerSpell = spellDataById.get(
+                spellEffect.trigger_spell_id
+            );
             if (!triggerSpell) {
                 // console.log(`Can't find spell ${spellEffect.trigger_spell_id}`);
                 continue;
@@ -1398,8 +1483,7 @@ export function getSpellData(directory: string) {
             if (triggerSpell.identifier === spell.identifier) {
                 if (spell.tooltip) {
                     triggerSpell.identifier += "_trigger";
-                }
-                else if (isFriendlyTarget(spellEffect.targeting_1)) {
+                } else if (isFriendlyTarget(spellEffect.targeting_1)) {
                     triggerSpell.identifier += "_buff";
                 } else {
                     triggerSpell.identifier += "_debuff";
@@ -1409,22 +1493,25 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.desc) spell.desc = parseDescription(spell.desc, spell, spellDataById);
+        if (spell.desc)
+            spell.desc = parseDescription(spell.desc, spell, spellDataById);
     }
 
+    if (!output.spellpower_data_t) throw Error("No spellpower_data_t");
+
     for (const row of output.spellpower_data_t) {
+        let i = 0;
         const spellPower: SpellPowerData = {
-            id: row[0],
-            spell_id: row[1],
-            aura_id: row[2],
-            hotfix: row[3],
-            power_type: row[4],
-            cost: row[5],
-            cost_max: row[6],
-            cost_per_tick: row[7],
-            pct_cost: row[8],
-            pct_cost_max: row[9],
-            pct_cost_per_tick: row[10]
+            id: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            aura_id: getNumber(row[i++]),
+            power_type: getNumber(row[i++]),
+            cost: getNumber(row[i++]),
+            cost_max: getNumber(row[i++]),
+            cost_per_tick: getNumber(row[i++]),
+            pct_cost: getNumber(row[i++]),
+            pct_cost_max: getNumber(row[i++]),
+            pct_cost_per_tick: getNumber(row[i++]),
         };
         const spell = spellDataById.get(spellPower.spell_id);
         if (spell) {
@@ -1433,28 +1520,33 @@ export function getSpellData(directory: string) {
         }
     }
 
+    if (!output.talent_data_t) throw Error("No talent_data_t");
     const talentsById = new Map<number, TalentData>();
     for (const row of output.talent_data_t) {
+        let i = 0;
         const talent: TalentData = {
-            name: row[0],
-            id: parseInt(row[1]),
-            flags: row[2],
-            m_class: row[3],
-            spec: row[4],
-            col: row[5],
-            row: row[6],
-            spell_id: row[7],
-            replace_id: row[8],
-            identifier: getIdentifier(row[0]) + "_talent",
-            talentId: 3 * row[6] + row[5] + 1
+            name: getString(row[i++]),
+            id: getNumber(row[i++]),
+            flags: getNumber(row[i++]),
+            m_class: getNumber(row[i++]),
+            spec: getNumber(row[i++]),
+            col: getNumber(row[i++]),
+            row: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            replace_id: getNumber(row[i++]),
+            identifier: "",
+            talentId: 0,
         };
+        (talent.identifier = getIdentifier(talent.name) + "_talent"),
+            (talent.talentId = 3 * talent.row + talent.col + 1);
         if (identifiers[talent.identifier]) {
             if (talent.spec) {
                 const specName = specIdToSpecName.get(talent.spec);
                 talent.identifier += "_" + specName;
             } else {
                 if (classBitToNumber[talent.m_class]) {
-                    talent.identifier += "_" + classBitToNumber[talent.m_class].toLowerCase();
+                    talent.identifier +=
+                        "_" + classBitToNumber[talent.m_class].toLowerCase();
                 } else {
                     talent.identifier += "_unknown";
                 }
@@ -1468,7 +1560,8 @@ export function getSpellData(directory: string) {
                 spell.talent = talent;
                 const spec = specIdToSpecName.get(talent.spec);
                 if (spec) {
-                    if (spell.specializationName.indexOf(spec) < 0) spell.specializationName.push(spec);
+                    if (spell.specializationName.indexOf(spec) < 0)
+                        spell.specializationName.push(spec);
                     spell.identifierScore += 10;
                 }
             }
@@ -1481,9 +1574,16 @@ export function getSpellData(directory: string) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other) {
                 if (other.identifierScore === spell.identifierScore) {
-                    if (other.className === spell.className && spell.specializationName.length > 0) {
-                        spell.identifier += "_" + spell.specializationName[0].toLowerCase();
-                    } else if (spell.className && spell.className !== other.className) {
+                    if (
+                        other.className === spell.className &&
+                        spell.specializationName.length > 0
+                    ) {
+                        spell.identifier +=
+                            "_" + spell.specializationName[0].toLowerCase();
+                    } else if (
+                        spell.className &&
+                        spell.className !== other.className
+                    ) {
                         spell.identifier += "_" + spell.className.toLowerCase();
                     } else {
                         continue;
@@ -1492,7 +1592,7 @@ export function getSpellData(directory: string) {
                     continue;
                 }
             }
-        } 
+        }
         identifiers[spell.identifier] = spell.id;
     }
 
@@ -1509,8 +1609,11 @@ export function getSpellData(directory: string) {
     const spellLists = new Map<string, SpellData[]>();
     for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
         if (spells.length === 1) continue;
-        const max = spells.reduce((a, s) => s.identifierScore > a ? s.identifierScore : a, 0);
-        const filtered = spells.filter(x => x.identifierScore === max);
+        const max = spells.reduce(
+            (a, s) => (s.identifierScore > a ? s.identifierScore : a),
+            0
+        );
+        const filtered = spells.filter((x) => x.identifierScore === max);
         if (filtered.length === 1) continue;
         for (let i = 0; i < filtered.length; i++) {
             filtered[i].identifier += `_${i}`;
@@ -1520,20 +1623,26 @@ export function getSpellData(directory: string) {
 
     for (const spell of spellData) {
         if (isRankSpell(spell) && identifiers[spell.identifier]) {
-            const currentSpell = spellDataById.get(identifiers[spell.identifier]);
+            const currentSpell = spellDataById.get(
+                identifiers[spell.identifier]
+            );
             if (currentSpell) currentSpell.nextRank = spell;
         }
     }
 
+    if (!output.azerite_power_entry_t) throw Error("No azerite_power_entry_t");
+
     const azeriteTraitById = new Map<number, AzeriteTrait>();
     for (const row of output.azerite_power_entry_t) {
+        let i = 0;
         const talent: AzeriteTrait = {
-            id: row[0],
-            spellId: row[1],
-            bonusId: row[2],
-            name: row[3],
-            identifier: getIdentifier(row[3]) + "_trait"
+            id: getNumber(row[i++]),
+            spellId: getNumber(row[i++]),
+            bonusId: getNumber(row[i++]),
+            name: getString(row[i++]),
+            identifier: "",
         };
+        talent.identifier = getIdentifier(talent.name) + "_trait";
         identifiers[talent.identifier] = talent.id;
         azeriteTraitById.set(talent.id, talent);
         if (talent.spellId) {
@@ -1544,63 +1653,84 @@ export function getSpellData(directory: string) {
         }
     }
 
+    console.log("Import azerite essences...");
+    if (!output.azerite_essence_entry_t)
+        throw Error("No azerite_essence_entry_t");
+
     const essenceById = new Map<number, AzeriteEssenceEntry>();
     for (const row of output.azerite_essence_entry_t) {
+        let i = 0;
         const essence: AzeriteEssenceEntry = {
-            id: row[0],
-            category: row[1],
-            name: row[2],
-            identifier: getIdentifier(row[2] + "_essence_id")
+            id: getNumber(row[i++]),
+            category: getNumber(row[i++]),
+            name: getString(row[i++]),
+            identifier: "",
         };
+        essence.identifier = getIdentifier(essence.name + "_essence_id");
         identifiers[essence.identifier] = essence.id;
         essenceById.set(essence.id, essence);
     }
 
+    if (!output.dbc_item_data_t) throw Error("No dbc_item_data_t");
+
+    console.log("Import item data...");
     const itemsById = new Map<number, ItemData>();
-    for (const row of output.item_data_t) {
+    for (const row of output.dbc_item_data_t) {
+        let i = 0;
         const item: ItemData = {
-            id: row[0],
-            name: row[1],
-            flags_1: row[2],
-            flags_2: row[3],
-            type_flags: row[4],
-            level: row[5],
-            req_level: row[6],
-            req_skill: row[7],
-            req_skill_level: row[8],
-            quality: row[9],
-            inventory_type: row[10],
-            item_class: row[11],
-            item_subclass: row[12],
-            bind_type: row[13],
-            delay: row[14],
-            dmg_range: row[15],
-            item_modifier: row[16],
-            race_mask: row[17],
-            class_mask: row[18],
-            stat_type_e: row[19],
-            stat_alloc: row[20],
-            stat_socket_mul: row[21],
-            trigger_spell: row[22],
-            id_spell: row[23],
-            cooldown_duration: row[24],
-            cooldown_group: row[25],
-            cooldown_group_duration: row[26],
-            socket_color: row[27],
-            gem_properties: row[28],
-            id_socket_bonus: row[29],
-            id_set: row[30],
-            id_suffix_group: row[31],
-            id_scaling_distribution: row[32],
-            id_artifact: row[33],
-            identifier: getIdentifier(row[1]) + '_item'
-        }
+            name: getString(row[i++]),
+            id: getNumber(row[i++]),
+            flags_1: getNumber(row[i++]),
+            flags_2: getNumber(row[i++]),
+            type_flags: getNumber(row[i++]),
+            level: getNumber(row[i++]),
+            req_level: getNumber(row[i++]),
+            req_skill: getNumber(row[i++]),
+            req_skill_level: getNumber(row[i++]),
+            quality: getNumber(row[i++]),
+            inventory_type: getNumber(row[i++]),
+            item_class: getNumber(row[i++]),
+            item_subclass: getNumber(row[i++]),
+            bind_type: getNumber(row[i++]),
+            delay: getNumber(row[i++]),
+            dmg_range: getNumber(row[i++]),
+            item_modifier: getNumber(row[i++]),
+            dbc_stats: getArrayOfNumbers(row[i++]),
+            dbc_stats_count: getNumber(row[i++]),
+            class_mask: getNumber(row[i++]),
+            race_mask: getNumber(row[i++]),
+            socket_color: getArrayOfNumbers(row[i++]),
+            gem_properties: getNumber(row[i++]),
+            id_socket_bonus: getNumber(row[i++]),
+            id_set: getNumber(row[i++]),
+            id_curve: getNumber(row[i++]),
+            id_artifact: getNumber(row[i++]),
+
+            identifier: "",
+        };
+        item.identifier = getIdentifier(item.name) + "_item";
         itemsById.set(item.id, item);
         identifiers[item.identifier] = item.id;
     }
 
-    writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), { encoding: "utf8" });
-    writeFileSync("items-data.txt", JSON.stringify(Array.from(itemsById.values()), undefined, 2), { encoding: "utf8"});
+    console.log("Write files...");
+    writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), {
+        encoding: "utf8",
+    });
+    writeFileSync(
+        "items-data.txt",
+        JSON.stringify(Array.from(itemsById.values()), undefined, 2),
+        { encoding: "utf8" }
+    );
 
-    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById, spellLists, essenceById };
+    return {
+        spellData,
+        spellDataById,
+        identifiers,
+        talentsById,
+        itemsById,
+        azeriteTraitById,
+        spellLists,
+        essenceById,
+    };
 }

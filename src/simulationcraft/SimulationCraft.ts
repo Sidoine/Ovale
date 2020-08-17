@@ -5,21 +5,46 @@ import { OvaleClass } from "../Ovale";
 import { AstNode, AstAnnotation, OvaleASTClass } from "../AST";
 import { ResetControls } from "../Controls";
 import { format, gmatch, gsub, lower, match, sub } from "@wowts/string";
-import { ipairs, pairs, tonumber, type, wipe, LuaObj, LuaArray, lualength, truthy, kpairs } from "@wowts/lua";
+import {
+    ipairs,
+    pairs,
+    tonumber,
+    type,
+    wipe,
+    LuaObj,
+    LuaArray,
+    lualength,
+    truthy,
+    kpairs,
+} from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
 import { RAID_CLASS_COLORS, ClassId } from "@wowts/wow-mock";
 import { isLuaArray } from "../tools";
 import { OvaleOptionsClass } from "../Options";
-import { Annotation, Profile, ParseNode, CONSUMABLE_ITEMS, OVALE_TAGS, classInfos } from "./definitions";
+import {
+    Annotation,
+    Profile,
+    ParseNode,
+    CONSUMABLE_ITEMS,
+    OVALE_TAGS,
+    classInfos,
+} from "./definitions";
 import { OvaleDataClass } from "../Data";
 import { Emiter } from "./emiter";
-import { print_r, OvaleFunctionName, OvaleTaggedFunctionName, self_outputPool, LowerSpecialization, CamelCase } from "./text-tools";
+import {
+    print_r,
+    OvaleFunctionName,
+    OvaleTaggedFunctionName,
+    self_outputPool,
+    LowerSpecialization,
+    CamelCase,
+} from "./text-tools";
 import { Parser } from "./parser";
 import { Unparser } from "./unparser";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleCompileClass } from "../Compile";
 import { Splitter } from "./splitter";
-import { Generator, Mark, Sweep} from "./generator";
+import { Generator, Mark, Sweep } from "./generator";
 import { AceModule } from "@wowts/tsaddon";
 
 let self_lastSimC: string = "";
@@ -41,16 +66,24 @@ export class OvaleSimulationCraftClass {
         private ovaleCompile: OvaleCompileClass,
         private splitter: Splitter,
         private generator: Generator,
-        private ovale: OvaleClass) {
+        private ovale: OvaleClass
+    ) {
         this.registerOptions();
-        this.module = ovale.createModule("OvaleSimulationCraft", this.OnInitialize, this.handleDisable);
-        this.tracer = ovaleDebug.create("SimulationCraft")
+        this.module = ovale.createModule(
+            "OvaleSimulationCraft",
+            this.OnInitialize,
+            this.handleDisable
+        );
+        this.tracer = ovaleDebug.create("SimulationCraft");
     }
 
     public AddSymbol(annotation: Annotation, symbol: string) {
-        let symbolTable = annotation.symbolTable || {}
+        let symbolTable = annotation.symbolTable || {};
         let symbolList = annotation.symbolList;
-        if (!symbolTable[symbol] && !this.ovaleData.DEFAULT_SPELL_LIST[symbol]) {
+        if (
+            !symbolTable[symbol] &&
+            !this.ovaleData.DEFAULT_SPELL_LIST[symbol]
+        ) {
             symbolTable[symbol] = true;
             symbolList[lualength(symbolList) + 1] = symbol;
         }
@@ -67,27 +100,27 @@ export class OvaleSimulationCraftClass {
                     let appName = name;
                     AceConfigDialog.SetDefaultSize(appName, 700, 550);
                     AceConfigDialog.Open(appName);
-                }
-            }
-        }
+                },
+            },
+        };
         for (const [k, v] of pairs(actions)) {
             this.ovaleOptions.options.args.actions.args[k] = v;
         }
 
         let defaultDB = {
-            overrideCode: ""
-        }
+            overrideCode: "",
+        };
         for (const [k, v] of pairs(defaultDB)) {
             (<any>this.ovaleOptions.defaultDB.profile)[k] = v;
         }
     }
-    
+
     private OnInitialize = () => {
         this.emiter.InitializeDisambiguation();
         this.CreateOptions();
-    }
+    };
 
-    private handleDisable = () => {}
+    private handleDisable = () => {};
     // DebuggingInfo() {
     //     self_pool.DebuggingInfo();
     //     self_childrenPool.DebuggingInfo();
@@ -129,10 +162,10 @@ export class OvaleSimulationCraftClass {
                 } else if (operator == "+=") {
                     if (type(parsedProfile[key]) != "table") {
                         const oldValue = parsedProfile[key];
-                        (<any>parsedProfile[key]) = {}
-                        insert(<LuaArray<any>> parsedProfile[key], oldValue);
+                        (<any>parsedProfile[key]) = {};
+                        insert(<LuaArray<any>>parsedProfile[key], oldValue);
                     }
-                    insert(<LuaArray<any>> parsedProfile[key], value);
+                    insert(<LuaArray<any>>parsedProfile[key], value);
                 }
             }
         }
@@ -141,22 +174,21 @@ export class OvaleSimulationCraftClass {
                 (<any>parsedProfile)[k] = concat(<any>v);
             }
         }
-        parsedProfile.templates = {}
-        for (const [k, ] of kpairs(parsedProfile)) {
+        parsedProfile.templates = {};
+        for (const [k] of kpairs(parsedProfile)) {
             if (sub(<string>k, 1, 2) == "$(" && sub(<string>k, -1) == ")") {
                 insert(parsedProfile.templates, k);
             }
         }
-        
+
         return parsedProfile as Profile;
     }
 
     ParseProfile(simc: string, dictionary?: LuaObj<number>) {
         const profile = this.readProfile(simc);
-        
+
         let classId: ClassId | undefined = undefined;
         let name: string | undefined = undefined;
-
 
         for (const [className] of kpairs(RAID_CLASS_COLORS)) {
             let lowerClass = <keyof Profile>lower(<string>className);
@@ -170,10 +202,15 @@ export class OvaleSimulationCraftClass {
             return undefined;
         }
 
-        const annotation = new Annotation(this.ovaleData, name, classId, profile.spec);
+        const annotation = new Annotation(
+            this.ovaleData,
+            name,
+            classId,
+            profile.spec
+        );
         if (dictionary) annotation.dictionary = dictionary;
         profile.annotation = annotation;
-        
+
         let ok = true;
 
         // Parse the different "actions" commands in the script. Save them as ParseNode action_list
@@ -186,13 +223,22 @@ export class OvaleSimulationCraftClass {
                 if (!name) {
                     name = "_default";
                 }
-                for (let index = lualength(profile.templates); index >= 1; index += -1) {
+                for (
+                    let index = lualength(profile.templates);
+                    index >= 1;
+                    index += -1
+                ) {
                     let template = profile.templates[index];
                     let variable = sub(template, 3, -2);
                     let pattern = `%$%(${variable}%)`;
                     v = gsub(<string>v, pattern, <string>profile[template]);
                 }
-                const node = this.parser.ParseActionList(name, <string>v, nodeList, annotation);
+                const node = this.parser.ParseActionList(
+                    name,
+                    <string>v,
+                    nodeList,
+                    annotation
+                );
                 if (node) {
                     actionList[lualength(actionList) + 1] = node;
                 } else {
@@ -203,10 +249,14 @@ export class OvaleSimulationCraftClass {
         sort(actionList, function (a, b) {
             return a.name < b.name;
         });
-        
+
         annotation.specialization = profile.spec;
         annotation.level = profile.level;
-        ok = ok && (annotation.classId !== undefined && annotation.specialization !== undefined && annotation.level !== undefined);
+        ok =
+            ok &&
+            annotation.classId !== undefined &&
+            annotation.specialization !== undefined &&
+            annotation.level !== undefined;
         annotation.pet = profile.default_pet;
         let consumables = annotation.consumables;
         for (const [k, v] of pairs(CONSUMABLE_ITEMS)) {
@@ -230,20 +280,23 @@ export class OvaleSimulationCraftClass {
                 annotation.melee = annotation.classId;
             }
         }
-		annotation.position = profile.position;
+        annotation.position = profile.position;
         let taggedFunctionName: LuaObj<boolean> = annotation.taggedFunctionName;
         for (const [, node] of ipairs(actionList)) {
             let fname = OvaleFunctionName(node.name, annotation);
             taggedFunctionName[fname] = true;
             for (const [, tag] of pairs(OVALE_TAGS)) {
-                let [bodyName, conditionName] = OvaleTaggedFunctionName(fname, tag);
+                let [bodyName, conditionName] = OvaleTaggedFunctionName(
+                    fname,
+                    tag
+                );
                 if (bodyName && conditionName) {
                     taggedFunctionName[lower(bodyName)] = true;
                     taggedFunctionName[lower(conditionName)] = true;
                 }
             }
         }
-        annotation.functionTag = {}
+        annotation.functionTag = {};
         profile.actionList = actionList;
         profile.annotation = annotation;
         annotation.nodeList = nodeList;
@@ -257,7 +310,8 @@ export class OvaleSimulationCraftClass {
         let output = self_outputPool.Get();
         if (profile.actionList) {
             for (const [, node] of ipairs(profile.actionList)) {
-                output[lualength(output) + 1] = this.unparser.Unparse(node) || "";
+                output[lualength(output) + 1] =
+                    this.unparser.Unparse(node) || "";
             }
         }
         let s = concat(output, "\n");
@@ -275,23 +329,33 @@ export class OvaleSimulationCraftClass {
             if (annotation.astAnnotation) {
                 annotation.astAnnotation.nodeList = nodeList;
             } else {
-                annotation.astAnnotation = { nodeList: nodeList, definition: annotation.dictionary };
+                annotation.astAnnotation = {
+                    nodeList: nodeList,
+                    definition: annotation.dictionary,
+                };
             }
-            
+
             this.ovaleDebug.ResetTrace();
             let dictionaryAnnotation: AstAnnotation = {
                 nodeList: {},
-                definition: profile.annotation.dictionary
-            }
+                definition: profile.annotation.dictionary,
+            };
             let dictionaryFormat = `
             Include(ovale_common)
-            Include(ovale_trinkets_mop)
-            Include(ovale_trinkets_wod)
             Include(ovale_%s_spells)
             %s
         `;
-            let dictionaryCode = format(dictionaryFormat, lower(annotation.classId), (this.ovaleOptions.db.profile.overrideCode) || "");
-            const [dictionaryAST] = this.ovaleAst.ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation);
+            let dictionaryCode = format(
+                dictionaryFormat,
+                lower(annotation.classId),
+                this.ovaleOptions.db.profile.overrideCode || ""
+            );
+            const [dictionaryAST] = this.ovaleAst.ParseCode(
+                "script",
+                dictionaryCode,
+                dictionaryAnnotation.nodeList,
+                dictionaryAnnotation
+            );
             if (dictionaryAST) {
                 dictionaryAST.annotation = dictionaryAnnotation;
                 annotation.dictionaryAST = dictionaryAST;
@@ -302,20 +366,38 @@ export class OvaleSimulationCraftClass {
                 ResetControls();
                 this.ovaleCompile.EvaluateScript(dictionaryAST, true);
             }
-        
+
             for (const [, node] of ipairs(profile.actionList)) {
-                let addFunctionNode = this.emiter.EmitActionList(node, nodeList, annotation, undefined);
+                let addFunctionNode = this.emiter.EmitActionList(
+                    node,
+                    nodeList,
+                    annotation,
+                    undefined
+                );
                 if (addFunctionNode) {
                     // Add interrupt if not already added
                     if (node.name === "_default" && !annotation.interrupt) {
-                        const defaultInterrupt = classInfos[annotation.classId][annotation.specialization];
+                        const defaultInterrupt =
+                            classInfos[annotation.classId][
+                                annotation.specialization
+                            ];
                         if (defaultInterrupt && defaultInterrupt.interrupt) {
-                            const interruptCall = this.ovaleAst.NewNode(nodeList);
+                            const interruptCall = this.ovaleAst.NewNode(
+                                nodeList
+                            );
                             interruptCall.type = "custom_function";
-                            interruptCall.name = lower(LowerSpecialization(annotation) + "InterruptActions");
+                            interruptCall.name = lower(
+                                LowerSpecialization(annotation) +
+                                    "InterruptActions"
+                            );
                             annotation.interrupt = annotation.classId;
-                            annotation[defaultInterrupt.interrupt] = annotation.classId;
-                            insert(addFunctionNode.child[1].child, 1, interruptCall);
+                            annotation[defaultInterrupt.interrupt] =
+                                annotation.classId;
+                            insert(
+                                addFunctionNode.child[1].child,
+                                1,
+                                interruptCall
+                            );
                         }
                     }
 
@@ -325,7 +407,15 @@ export class OvaleSimulationCraftClass {
                     commentNode.comment = `## actions.${actionListName}`;
                     child[lualength(child) + 1] = commentNode;
                     for (const [, tag] of pairs(OVALE_TAGS)) {
-                        let [bodyNode, conditionNode] = this.splitter.SplitByTag(tag, addFunctionNode, nodeList, annotation);
+                        let [
+                            bodyNode,
+                            conditionNode,
+                        ] = this.splitter.SplitByTag(
+                            tag,
+                            addFunctionNode,
+                            nodeList,
+                            annotation
+                        );
                         if (bodyNode && conditionNode) {
                             child[lualength(child) + 1] = bodyNode;
                             child[lualength(child) + 1] = conditionNode;
@@ -338,12 +428,27 @@ export class OvaleSimulationCraftClass {
             }
         }
         if (ok) {
-            annotation.supportingFunctionCount = this.generator.InsertSupportingFunctions(child, annotation);
-            annotation.supportingInterruptCount = (annotation.interrupt && this.generator.InsertInterruptFunctions(child, annotation)) || undefined;
-            annotation.supportingControlCount = this.generator.InsertSupportingControls(child, annotation);
+            annotation.supportingFunctionCount = this.generator.InsertSupportingFunctions(
+                child,
+                annotation
+            );
+            annotation.supportingInterruptCount =
+                (annotation.interrupt &&
+                    this.generator.InsertInterruptFunctions(
+                        child,
+                        annotation
+                    )) ||
+                undefined;
+            annotation.supportingControlCount = this.generator.InsertSupportingControls(
+                child,
+                annotation
+            );
             // annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
             this.generator.InsertVariables(child, annotation);
-            let [className, specialization] = [annotation.classId, annotation.specialization];
+            let [className, specialization] = [
+                annotation.classId,
+                annotation.specialization,
+            ];
             let lowerclass = lower(className);
             let aoeToggle = `opt_${lowerclass}_${specialization}_aoe`;
             {
@@ -351,8 +456,17 @@ export class OvaleSimulationCraftClass {
                 commentNode.type = "comment";
                 commentNode.comment = `## ${CamelCase(specialization)} icons.`;
                 insert(child, commentNode);
-                let code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization);
-                let [node] = this.ovaleAst.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    "AddCheckBox(%s L(AOE) default specialization=%s)",
+                    aoeToggle,
+                    specialization
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "checkbox",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -362,8 +476,18 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("shortcd", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    aoeToggle,
+                    specialization,
+                    this.generator.GenerateIconBody("shortcd", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -373,8 +497,18 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("shortcd", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    aoeToggle,
+                    specialization,
+                    this.generator.GenerateIconBody("shortcd", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -384,8 +518,17 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, specialization, this.generator.GenerateIconBody("main", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    specialization,
+                    this.generator.GenerateIconBody("main", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -395,8 +538,18 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("main", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    aoeToggle,
+                    specialization,
+                    this.generator.GenerateIconBody("main", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -406,8 +559,18 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("cd", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    aoeToggle,
+                    specialization,
+                    this.generator.GenerateIconBody("cd", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             {
@@ -417,8 +580,18 @@ export class OvaleSimulationCraftClass {
 					%s
 				}
 			`;
-                let code = format(fmt, aoeToggle, specialization, this.generator.GenerateIconBody("cd", profile));
-                let [node] = this.ovaleAst.ParseCode("icon", code, nodeList, annotation.astAnnotation);
+                let code = format(
+                    fmt,
+                    aoeToggle,
+                    specialization,
+                    this.generator.GenerateIconBody("cd", profile)
+                );
+                let [node] = this.ovaleAst.ParseCode(
+                    "icon",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
                 if (node) insert(child, node);
             }
             Mark(ast);
@@ -445,7 +618,9 @@ export class OvaleSimulationCraftClass {
         let specialization = annotation.specialization;
         let output = self_outputPool.Get();
         {
-            output[lualength(output) + 1] = `# Based on SimulationCraft profile ${annotation.name}.`;
+            output[
+                lualength(output) + 1
+            ] = `# Based on SimulationCraft profile ${annotation.name}.`;
             output[lualength(output) + 1] = `#	class=${lowerclass}`;
             output[lualength(output) + 1] = `#	spec=${specialization}`;
             if (profile.talents) {
@@ -461,16 +636,20 @@ export class OvaleSimulationCraftClass {
         {
             output[lualength(output) + 1] = "";
             output[lualength(output) + 1] = "Include(ovale_common)";
-            output[lualength(output) + 1] = "Include(ovale_trinkets_mop)";
-            output[lualength(output) + 1] = "Include(ovale_trinkets_wod)";
-            output[lualength(output) + 1] = format("Include(ovale_%s_spells)", lowerclass);
+            output[lualength(output) + 1] = format(
+                "Include(ovale_%s_spells)",
+                lowerclass
+            );
             const overrideCode = this.ovaleOptions.db.profile.overrideCode;
             if (overrideCode && overrideCode != "") {
                 output[lualength(output) + 1] = "";
                 output[lualength(output) + 1] = "# Overrides.";
                 output[lualength(output) + 1] = overrideCode;
             }
-            if (annotation.supportingControlCount && annotation.supportingControlCount > 0) {
+            if (
+                annotation.supportingControlCount &&
+                annotation.supportingControlCount > 0
+            ) {
                 output[lualength(output) + 1] = "";
             }
         }
@@ -481,8 +660,16 @@ export class OvaleSimulationCraftClass {
             sort(profile.annotation.symbolList);
 
             for (const [, symbol] of ipairs(profile.annotation.symbolList)) {
-                if (!tonumber(symbol) && profile.annotation.dictionary && !profile.annotation.dictionary[symbol] && !this.ovaleData.buffSpellList[symbol]) {
-                    this.tracer.Print("Warning: Symbol '%s' not defined", symbol);
+                if (
+                    !tonumber(symbol) &&
+                    profile.annotation.dictionary &&
+                    !profile.annotation.dictionary[symbol] &&
+                    !this.ovaleData.buffSpellList[symbol]
+                ) {
+                    this.tracer.Print(
+                        "Warning: Symbol '%s' not defined",
+                        symbol
+                    );
                 }
                 output[lualength(output) + 1] = `# ${symbol}`;
             }
@@ -512,7 +699,7 @@ export class OvaleSimulationCraftClass {
                         description: {
                             order: 10,
                             name: `${L["The contents of a SimulationCraft profile."]}\nhttps://code.google.com/p/simulationcraft/source/browse/profiles`,
-                            type: "description"
+                            type: "description",
                         },
                         input: {
                             order: 20,
@@ -531,9 +718,9 @@ export class OvaleSimulationCraftClass {
                                     code = this.Emit(profile);
                                 }
                                 self_lastScript = gsub(code, "\t", "    ");
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 overrides: {
                     order: 20,
@@ -543,7 +730,7 @@ export class OvaleSimulationCraftClass {
                         description: {
                             order: 10,
                             name: L["SIMULATIONCRAFT_OVERRIDES_DESCRIPTION"],
-                            type: "description"
+                            type: "description",
                         },
                         overrides: {
                             order: 20,
@@ -558,16 +745,18 @@ export class OvaleSimulationCraftClass {
                             set: (info: any, value: string) => {
                                 this.ovaleOptions.db.profile.overrideCode = value;
                                 if (self_lastSimC) {
-                                    let profile = this.ParseProfile(self_lastSimC);
+                                    let profile = this.ParseProfile(
+                                        self_lastSimC
+                                    );
                                     let code = "";
                                     if (profile) {
                                         code = this.Emit(profile);
                                     }
                                     self_lastScript = gsub(code, "\t", "    ");
                                 }
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 output: {
                     order: 30,
@@ -576,8 +765,11 @@ export class OvaleSimulationCraftClass {
                     args: {
                         description: {
                             order: 10,
-                            name: L["The script translated from the SimulationCraft profile."],
-                            type: "description"
+                            name:
+                                L[
+                                    "The script translated from the SimulationCraft profile."
+                                ],
+                            type: "description",
                         },
                         output: {
                             order: 20,
@@ -587,14 +779,18 @@ export class OvaleSimulationCraftClass {
                             width: "full",
                             get: function () {
                                 return self_lastScript;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                            },
+                        },
+                    },
+                },
+            },
+        };
         let appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, options);
-        AceConfigDialog.AddToBlizOptions(appName, "SimulationCraft", this.ovale.GetName());
+        AceConfigDialog.AddToBlizOptions(
+            appName,
+            "SimulationCraft",
+            this.ovale.GetName()
+        );
     }
 }

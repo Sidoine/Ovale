@@ -413,7 +413,7 @@ __exports.Emiter = __class(nil, {
                     conditionCode = "pet.Present()"
                 elseif className == "MAGE" and (action == "start_burn_phase" or action == "start_pyro_chain" or action == "stop_burn_phase" or action == "stop_pyro_chain") then
                     local stateAction, stateVariable = match(action, "([^_]+)_(.*)")
-                    local value = (stateAction == "start") and 1 or 0
+                    local value = (stateAction == "start" and 1) or 0
                     if value == 0 then
                         conditionCode = format("GetState(%s) > 0", stateVariable)
                     else
@@ -582,7 +582,7 @@ __exports.Emiter = __class(nil, {
                 elseif action == "pool_resource" then
                     bodyNode = self.ovaleAst:NewNode(nodeList)
                     bodyNode.type = "simc_pool_resource"
-                    bodyNode.for_next = (modifiers.for_next ~= nil)
+                    bodyNode.for_next = modifiers.for_next ~= nil
                     if modifiers.extra_amount then
                         bodyNode.extra_amount = tonumber(self.unparser:Unparse(modifiers.extra_amount))
                     end
@@ -1044,11 +1044,11 @@ __exports.Emiter = __class(nil, {
             end
             local className, specialization = annotation.classId, annotation.specialization
             name = self:Disambiguate(annotation, name, className, specialization)
-            target = target and (target .. ".") or ""
+            target = (target and target .. ".") or ""
             local buffName = name .. "_debuff"
             buffName = self:Disambiguate(annotation, buffName, className, specialization)
-            local prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
-            local buffTarget = (prefix == "Debuff") and "target." or target
+            local prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
+            local buffTarget = (prefix == "Debuff" and "target.") or target
             local talentName = name .. "_talent"
             talentName = self:Disambiguate(annotation, talentName, className, specialization)
             local symbol = name
@@ -1162,8 +1162,8 @@ __exports.Emiter = __class(nil, {
                 name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
                 dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
-                local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
-                target = target and (target .. ".") or ""
+                local prefix = (find(dotName, "_buff$") and "Buff") or "Debuff"
+                target = (target and target .. ".") or ""
                 local code = format("%sCountOnAny(%s)", prefix, dotName)
                 if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
@@ -1248,13 +1248,13 @@ __exports.Emiter = __class(nil, {
                 local buffName = action .. "_debuff"
                 buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
                 local target
-                local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
+                local prefix = (find(buffName, "_buff$") and "Buff") or "Debuff"
                 if prefix == "Debuff" then
                     target = "target."
                 else
                     target = ""
                 end
-                local any = self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
+                local any = (self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1") or ""
                 local code = format("%sRefreshable(%s%s)", target, buffName, any)
                 node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                 self:AddSymbol(annotation, buffName)
@@ -1268,20 +1268,20 @@ __exports.Emiter = __class(nil, {
             if token == "aura" or token == "buff" or token == "debuff" or token == "consumable" then
                 local name = tokenIterator()
                 local property = tokenIterator()
-                if (token == "consumable" and property == nil) then
+                if token == "consumable" and property == nil then
                     property = "remains"
                 end
                 name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
-                local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
+                local buffName = (token == "debuff" and name .. "_debuff") or name .. "_buff"
                 buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
                 local prefix
                 if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
-                    prefix = target == "target" and "Debuff" or "Buff"
+                    prefix = (target == "target" and "Debuff") or "Buff"
                 else
-                    prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
+                    prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
                 end
-                local any = self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
-                target = target and (target .. ".") or ""
+                local any = (self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1") or ""
+                target = (target and target .. ".") or ""
                 if buffName == "dark_transformation_buff" and target == "" then
                     target = "pet."
                 end
@@ -1332,14 +1332,14 @@ __exports.Emiter = __class(nil, {
             local className = annotation.classId
             local specialization = annotation.specialization
             local camelSpecialization = LowerSpecialization(annotation)
-            target = target and (target .. ".") or ""
+            target = (target and target .. ".") or ""
             local code
             if CHARACTER_PROPERTY[operand] then
                 code = target .. CHARACTER_PROPERTY[operand]
             elseif operand == "position_front" then
-                code = annotation.position == "front" and "True(position_front)" or "False(position_front)"
+                code = (annotation.position == "front" and "True(position_front)") or "False(position_front)"
             elseif operand == "position_back" then
-                code = annotation.position == "back" and "True(position_back)" or "False(position_back)"
+                code = (annotation.position == "back" and "True(position_back)") or "False(position_back)"
             elseif className == "MAGE" and operand == "incanters_flow_dir" then
                 local name = "incanters_flow_buff"
                 code = format("BuffDirection(%s)", name)
@@ -1456,7 +1456,7 @@ __exports.Emiter = __class(nil, {
             local token = tokenIterator()
             if token == "disease" then
                 local property = tokenIterator()
-                target = target and (target .. ".") or ""
+                target = (target and target .. ".") or ""
                 local code
                 if property == "max_ticking" then
                     code = target .. "DiseasesAnyTicking()"
@@ -1483,7 +1483,7 @@ __exports.Emiter = __class(nil, {
                 name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
                 dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
-                local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
+                local prefix = (find(dotName, "_buff$") and "Buff") or "Debuff"
                 local target = (prefix == "Debuff" and "target.") or ""
                 local code
                 if property == "remains" then
@@ -1506,8 +1506,8 @@ __exports.Emiter = __class(nil, {
                 name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
                 local dotName = name .. "_debuff"
                 dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
-                local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
-                target = target and (target .. ".") or ""
+                local prefix = (find(dotName, "_buff$") and "Buff") or "Debuff"
+                target = (target and target .. ".") or ""
                 local code
                 if property == "duration" then
                     code = format("%s%sDuration(%s)", target, prefix, dotName)
@@ -1708,7 +1708,7 @@ __exports.Emiter = __class(nil, {
                 local code
                 if race then
                     local raceId = nil
-                    if (race == "blood_elf") then
+                    if race == "blood_elf" then
                         raceId = "BloodElf"
                     elseif race == "troll" then
                         raceId = "Troll"
@@ -1796,7 +1796,7 @@ __exports.Emiter = __class(nil, {
             local node
             local className = annotation.classId
             local specialization = annotation.specialization
-            target = target and (target .. ".") or ""
+            target = (target and target .. ".") or ""
             operand = lower(operand)
             local code
             if className == "DEATHKNIGHT" and operand == "dot.breath_of_sindragosa.ticking" then
@@ -2036,7 +2036,7 @@ __exports.Emiter = __class(nil, {
                 local name = self:Disambiguate(annotation, sub(operand, 10) .. "_item", className, specialization)
                 local itemId = tonumber(name)
                 local itemName = name
-                local item = itemId and tostring(itemId) or itemName
+                local item = (itemId and tostring(itemId)) or itemName
                 code = format("HasEquippedItem(%s)", item)
                 self:AddSymbol(annotation, item)
             elseif operand == "gcd.max" then
@@ -2278,7 +2278,7 @@ __exports.Emiter = __class(nil, {
         local disname, distype = self:GetPerClassSpecialization(self.EMIT_DISAMBIGUATION, name, className, specialization)
         if  not disname then
             if  not annotation.dictionary[name] then
-                local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or (match(name, "_debuff$") and gsub(name, "_debuff$", "")) or gsub(name, "_item$", "")
+                local otherName = (match(name, "_buff$") and gsub(name, "_buff$", "")) or (match(name, "_debuff$") and gsub(name, "_debuff$", "")) or gsub(name, "_item$", "")
                 if annotation.dictionary[otherName] then
                     return otherName, _type
                 end
@@ -2327,115 +2327,6 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
-        self:AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
-        self:AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
-        self:AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
-        self:AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
-        self:AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
-        self:AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
-        self:AddDisambiguation("concentrated_flame_missile", "concentrated_flame")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_focus", "HUNTER")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "MAGE")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_chi", "MONK")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "PRIEST")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "ROGUE")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "SHAMAN")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "WARLOCK")
-        self:AddDisambiguation("arcane_torrent", "arcane_torrent_rage", "WARRIOR")
-        self:AddDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT")
-        self:AddDisambiguation("blood_fury", "blood_fury_ap", "HUNTER")
-        self:AddDisambiguation("blood_fury", "blood_fury_sp", "MAGE")
-        self:AddDisambiguation("blood_fury", "blood_fury_apsp", "MONK")
-        self:AddDisambiguation("blood_fury", "blood_fury_ap", "ROGUE")
-        self:AddDisambiguation("blood_fury", "blood_fury_apsp", "SHAMAN")
-        self:AddDisambiguation("blood_fury", "blood_fury_sp", "WARLOCK")
-        self:AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR")
-        self:AddDisambiguation("137075", "taktheritrixs_shoulderpads", "DEATHKNIGHT")
-        self:AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood")
-        self:AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost")
-        self:AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
-        self:AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
-        self:AddDisambiguation("icy_citadel_buff", "icy_citadel_expires_buff", "DEATHKNIGHT")
-        self:AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
-        self:AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
-        self:AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance")
-        self:AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
-        self:AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance")
-        self:AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration")
-        self:AddDisambiguation("incarnation", "incarnation_chosen_of_elune", "DRUID", "balance")
-        self:AddDisambiguation("incarnation", "incarnation_tree_of_life", "DRUID", "restoration")
-        self:AddDisambiguation("incarnation", "incarnation_king_of_the_jungle", "DRUID", "feral")
-        self:AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian")
-        self:AddDisambiguation("swipe", "swipe_bear", "DRUID", "guardian")
-        self:AddDisambiguation("swipe", "swipe_cat", "DRUID", "feral")
-        self:AddDisambiguation("rake_bleed", "rake_debuff", "DRUID", "feral")
-        self:AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship")
-        self:AddDisambiguation("cat_beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery")
-        self:AddDisambiguation("cat_frenzy", "pet_frenzy", "HUNTER", "beast_mastery")
-        self:AddDisambiguation("kill_command", "kill_command_sv", "HUNTER", "survival")
-        self:AddDisambiguation("kill_command", "kill_command_sv", "HUNTER", "survival")
-        self:AddDisambiguation("mongoose_bite_eagle", "mongoose_bite", "HUNTER", "survival")
-        self:AddDisambiguation("multishot", "multishot_bm", "HUNTER", "beast_mastery")
-        self:AddDisambiguation("multishot", "multishot_mm", "HUNTER", "marksmanship")
-        self:AddDisambiguation("raptor_strike_eagle", "raptor_strike", "HUNTER", "survival")
-        self:AddDisambiguation("serpent_sting", "serpent_sting_mm", "HUNTER", "marksmanship")
-        self:AddDisambiguation("serpent_sting", "serpent_sting_sv", "HUNTER", "survival")
-        self:AddDisambiguation("132410", "shard_of_the_exodar", "MAGE")
-        self:AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire")
-        self:AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
-        self:AddDisambiguation("blink_any", "blink", "MAGE")
-        self:AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
-        self:AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
-        self:AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
-        self:AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
-        self:AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
-        self:AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
-        self:AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
-        self:AddDisambiguation("rushing_jade_wind_buff", "rushing_jade_wind_windwalker_buff", "MONK", "windwalker")
-        self:AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection")
-        self:AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
-        self:AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
-        self:AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy")
-        self:AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy")
-        self:AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
-        self:AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
-        self:AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination")
-        self:AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
-        self:AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
-        self:AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw")
-        self:AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety")
-        self:AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration")
-        self:AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
-        self:AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
-        self:AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
-        self:AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
-        self:AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology")
-        self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
-        self:AddDisambiguation("soul_conduit_talent", "demo_soul_conduit_talent", "WARLOCK", "demonology")
-        self:AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury")
-        self:AddDisambiguation("bounding_stride_talent", "prot_bounding_stride_talent", "WARRIOR", "protection")
-        self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
-        self:AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
-        self:AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection")
-        self:AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
-        self:AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
-        self:AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
-        self:AddDisambiguation("condensed_lifeforce", "condensed_life_force")
-        self:AddDisambiguation("condensed_lifeforce_essence_id", "condensed_life_force_essence_id")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
