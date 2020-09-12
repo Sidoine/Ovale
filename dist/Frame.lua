@@ -31,7 +31,7 @@ local strmatch = match
 local INFINITY = huge
 local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     ToggleOptions = function(self)
-        if (self.content:IsShown()) then
+        if self.content:IsShown() then
             self.content:Hide()
         else
             self.content:Show()
@@ -65,7 +65,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         content:SetHeight(contentheight)
     end,
     OnLayoutFinished = function(self, width, height)
-        if ( not width) then
+        if  not width then
             width = self.content:GetWidth()
         end
         self.content:SetWidth(width)
@@ -107,7 +107,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             if profile.apparence.avecCible and  not UnitExists("target") then
                 self.visible = false
             end
-            if profile.apparence.enCombat and  not self.ovaleFuture:IsInCombat(nil) then
+            if profile.apparence.enCombat and  not self.combat:isInCombat(nil) then
                 self.visible = false
             end
             if profile.apparence.targetHostileOnly and (UnitIsDead("target") or  not UnitCanAttack("player", "target")) then
@@ -123,7 +123,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     OnUpdate = function(self, elapsed)
         self.ovaleFrameModule.module:SendMessage("Ovale_OnUpdate")
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = self.ovaleDebug.trace or (self.visible or self.ovaleSpellFlash:IsSpellFlashEnabled()) and (self.timeSinceLastUpdate > self.ovaleOptions.db.profile.apparence.minFrameRefresh / 1000 and next(self.ovale.refreshNeeded) or self.timeSinceLastUpdate > self.ovaleOptions.db.profile.apparence.maxFrameRefresh / 1000)
+        local refresh = self.ovaleDebug.trace or ((self.visible or self.ovaleSpellFlash:IsSpellFlashEnabled()) and ((self.timeSinceLastUpdate > self.ovaleOptions.db.profile.apparence.minFrameRefresh / 1000 and next(self.ovale.refreshNeeded)) or self.timeSinceLastUpdate > self.ovaleOptions.db.profile.apparence.maxFrameRefresh / 1000))
         if refresh then
             self.ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             self.ovaleState:InitializeState()
@@ -134,7 +134,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             local iconNodes = self.ovaleCompile:GetIconNodes()
             for k, node in ipairs(iconNodes) do
                 if node.namedParams and node.namedParams.target then
-                    self.baseState.current.defaultTarget = node.namedParams.target
+                    self.baseState.current.defaultTarget = (node.namedParams.target)
                 else
                     self.baseState.current.defaultTarget = "target"
                 end
@@ -171,7 +171,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     end,
     UpdateActionIcon = function(self, node, action, element, start, now)
         local profile = self.ovaleOptions.db.profile
-        local icons = action.secure and action.secureIcons or action.icons
+        local icons = (action.secure and action.secureIcons) or action.icons
         now = now or GetTime()
         if element and element.type == "value" then
             local value
@@ -229,7 +229,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     icons[2]:SetPoint("TOPLEFT", self.frame, "TOPLEFT", (action.left + (top + 1) * action.dx) / action.scale, (action.top - (top + 1) * action.dy) / action.scale)
                 end
             end
-            if (node.namedParams.size ~= "small" and  not node.namedParams.nocd and profile.apparence.predictif) then
+            if node.namedParams.size ~= "small" and  not node.namedParams.nocd and profile.apparence.predictif then
                 if start then
                     self.tracer:Log("****Second icon %s", start)
                     local target = self.ovaleGuid:UnitGUID(actionTarget or "target")
@@ -390,7 +390,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             local action = self.actions[k]
             local width, height, newScale
             local nbIcons
-            if (node.namedParams ~= nil and node.namedParams.size == "small") then
+            if node.namedParams ~= nil and node.namedParams.size == "small" then
                 newScale = profile.apparence.smallIconScale
                 width = newScale * 36 + margin
                 height = newScale * 36 + margin
@@ -405,12 +405,12 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     nbIcons = 1
                 end
             end
-            if (top + height > profile.apparence.iconScale * 36 + margin) then
+            if top + height > profile.apparence.iconScale * 36 + margin then
                 top = 0
                 left = maxWidth
             end
             action.scale = newScale
-            if (profile.apparence.vertical) then
+            if profile.apparence.vertical then
                 action.left = top
                 action.top = -left - BARRE - margin
                 action.dx = width
@@ -448,7 +448,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 icon:SetRangeIndicator(profile.apparence.targetText)
                 icon:EnableMouse( not profile.apparence.clickThru)
                 icon.frame:SetAlpha(profile.apparence.alpha)
-                icon.cdShown = (l == 1)
+                icon.cdShown = l == 1
                 if self.skinGroup then
                     self.skinGroup:AddButton(icon.frame)
                 end
@@ -457,15 +457,15 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 end
             end
             top = top + height
-            if (top > maxHeight) then
+            if top > maxHeight then
                 maxHeight = top
             end
-            if (left + width > maxWidth) then
+            if left + width > maxWidth then
                 maxWidth = left + width
             end
         end
         self.content:SetAlpha(profile.apparence.optionsAlpha)
-        if (profile.apparence.vertical) then
+        if profile.apparence.vertical then
             self.barre:SetWidth(maxHeight - margin)
             self.barre:SetHeight(BARRE)
             self.frame:SetWidth(maxHeight + profile.apparence.iconShiftY)
@@ -479,7 +479,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             self.content:SetPoint("TOPLEFT", self.frame, "TOPLEFT", maxWidth + profile.apparence.iconShiftX, profile.apparence.iconShiftY)
         end
     end,
-    constructor = function(self, ovaleState, ovaleFrameModule, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleGuid, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction)
+    constructor = function(self, ovaleState, ovaleFrameModule, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleGuid, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat)
         self.ovaleState = ovaleState
         self.ovaleFrameModule = ovaleFrameModule
         self.ovaleCompile = ovaleCompile
@@ -493,6 +493,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self.ovaleSpellFlash = ovaleSpellFlash
         self.ovaleSpellBook = ovaleSpellBook
         self.ovaleBestAction = ovaleBestAction
+        self.combat = combat
         self.checkBoxWidget = {}
         self.listWidget = {}
         self.visible = true
@@ -529,7 +530,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         newFrame:SetMovable(true)
         newFrame:SetFrameStrata("MEDIUM")
         newFrame:SetScript("OnMouseDown", function()
-            if ( not ovaleOptions.db.profile.apparence.verrouille) then
+            if  not ovaleOptions.db.profile.apparence.verrouille then
                 newFrame:StartMoving()
                 AceGUI:ClearFocus()
             end
@@ -571,7 +572,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     end,
 })
 __exports.OvaleFrameModuleClass = __class(nil, {
-    constructor = function(self, ovaleState, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleGuid, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction)
+    constructor = function(self, ovaleState, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleGuid, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat)
         self.ovaleState = ovaleState
         self.ovaleCompile = ovaleCompile
         self.ovaleFuture = ovaleFuture
@@ -617,6 +618,6 @@ __exports.OvaleFrameModuleClass = __class(nil, {
             self.frame:UpdateVisibility()
         end
         self.module = ovale:createModule("OvaleFrame", self.OnInitialize, self.handleDisable, aceEvent)
-        self.frame = OvaleFrame(self.ovaleState, self, self.ovaleCompile, self.ovaleFuture, self.baseState, self.ovaleEnemies, self.ovale, self.ovaleOptions, self.ovaleDebug, self.ovaleGuid, self.ovaleSpellFlash, self.ovaleSpellBook, self.ovaleBestAction)
+        self.frame = OvaleFrame(self.ovaleState, self, self.ovaleCompile, self.ovaleFuture, self.baseState, self.ovaleEnemies, self.ovale, self.ovaleOptions, self.ovaleDebug, self.ovaleGuid, self.ovaleSpellFlash, self.ovaleSpellBook, self.ovaleBestAction, combat)
     end,
 })

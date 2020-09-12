@@ -8,6 +8,7 @@ local UNARY_OPERATOR = __definitions.UNARY_OPERATOR
 local BINARY_OPERATOR = __definitions.BINARY_OPERATOR
 local checkOptionalSkill = __definitions.checkOptionalSkill
 local CHARACTER_PROPERTY = __definitions.CHARACTER_PROPERTY
+local MISC_OPERAND = __definitions.MISC_OPERAND
 local tonumber = tonumber
 local kpairs = pairs
 local ipairs = ipairs
@@ -1016,6 +1017,8 @@ __exports.Emiter = __class(nil, {
                     node = self.EmitOperandVariable(operand, parseNode, nodeList, annotation, action)
                 elseif token == "ground_aoe" then
                     node = self.EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action)
+                else
+                    node = self:emitMiscOperand(operand, parseNode, nodeList, annotation, action)
                 end
             end
             if  not node then
@@ -2345,5 +2348,34 @@ __exports.Emiter = __class(nil, {
         end
         annotation.symbolTable = symbolTable
         annotation.symbolList = symbolList
+    end,
+    emitMiscOperand = function(self, operand, parseNode, nodeList, annotation, action)
+        local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+        local miscOperand = tokenIterator()
+        local info = MISC_OPERAND[miscOperand]
+        if info then
+            local modifier = tokenIterator()
+            local name = info.name
+            if modifier then
+                if  not info.modifiers then
+                    self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
+                    return nil
+                end
+                local modifierName = info.modifiers[modifier]
+                if modifierName then
+                    if modifierName.before then
+                        name = modifierName.name .. name
+                    else
+                        name = name .. modifierName
+                    end
+                end
+                if tokenIterator() then
+                    self.tracer:Warning("Use of two modifiers on " .. operand .. " is not supported")
+                    return nil
+                end
+            end
+            return self.ovaleAst:newFunction(nodeList, name)
+        end
+        return nil
     end,
 })

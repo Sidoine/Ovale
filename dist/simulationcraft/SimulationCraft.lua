@@ -203,7 +203,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
 )
         annotation.specialization = profile.spec
         annotation.level = profile.level
-        ok = ok and (annotation.classId ~= nil and annotation.specialization ~= nil and annotation.level ~= nil)
+        ok = ok and annotation.classId ~= nil and annotation.specialization ~= nil and annotation.level ~= nil
         annotation.pet = profile.default_pet
         local consumables = annotation.consumables
         for k, v in pairs(CONSUMABLE_ITEMS) do
@@ -284,12 +284,10 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             }
             local dictionaryFormat = [[
             Include(ovale_common)
-            Include(ovale_trinkets_mop)
-            Include(ovale_trinkets_wod)
             Include(ovale_%s_spells)
             %s
         ]]
-            local dictionaryCode = format(dictionaryFormat, lower(annotation.classId), (self.ovaleOptions.db.profile.overrideCode) or "")
+            local dictionaryCode = format(dictionaryFormat, lower(annotation.classId), self.ovaleOptions.db.profile.overrideCode or "")
             local dictionaryAST = self.ovaleAst:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
             if dictionaryAST then
                 dictionaryAST.annotation = dictionaryAnnotation
@@ -472,8 +470,6 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         do
             output[#output + 1] = ""
             output[#output + 1] = "Include(ovale_common)"
-            output[#output + 1] = "Include(ovale_trinkets_mop)"
-            output[#output + 1] = "Include(ovale_trinkets_wod)"
             output[#output + 1] = format("Include(ovale_%s_spells)", lowerclass)
             local overrideCode = self.ovaleOptions.db.profile.overrideCode
             if overrideCode and overrideCode ~= "" then

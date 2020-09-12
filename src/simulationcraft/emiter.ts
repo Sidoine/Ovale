@@ -261,10 +261,36 @@ export class Emiter {
         annotation: Annotation,
         action: string | undefined
     ): AstNode | undefined {
-        const info = MISC_OPERAND[operand];
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const miscOperand = tokenIterator();
+        let info = MISC_OPERAND[miscOperand];
         if (info) {
-            this.AddSymbol(annotation, info);
-            return this.ovaleAst.newFunction(nodeList, info);
+            const modifier = tokenIterator();
+            let name = info.name;
+            if (modifier) {
+                if (!info.modifiers) {
+                    this.tracer.Warning(
+                        `Use of ${modifier} for ${operand} but no modifier has been registered`
+                    );
+                    return undefined;
+                }
+                const modifierName = info.modifiers[modifier];
+                if (modifierName) {
+                    if (modifierName.before) {
+                        name = modifierName.name + name;
+                    } else {
+                        name += modifierName;
+                    }
+                }
+
+                if (tokenIterator()) {
+                    this.tracer.Warning(
+                        `Use of two modifiers on ${operand} is not supported`
+                    );
+                    return undefined;
+                }
+            }
+            return this.ovaleAst.newFunction(nodeList, name);
         }
 
         return undefined;

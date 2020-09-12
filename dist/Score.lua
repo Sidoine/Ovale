@@ -14,10 +14,11 @@ local GetTime = GetTime
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 __exports.OvaleScoreClass = __class(nil, {
-    constructor = function(self, ovale, ovaleFuture, ovaleDebug, ovaleSpellBook)
+    constructor = function(self, ovale, ovaleFuture, ovaleDebug, ovaleSpellBook, combat)
         self.ovale = ovale
         self.ovaleFuture = ovaleFuture
         self.ovaleSpellBook = ovaleSpellBook
+        self.combat = combat
         self.damageMeter = {}
         self.damageMeterMethod = {}
         self.score = 0
@@ -48,7 +49,7 @@ __exports.OvaleScoreClass = __class(nil, {
         self.PLAYER_REGEN_ENABLED = function()
             if self.maxScore > 0 and IsInGroup() then
                 local message = self.module:Serialize("score", self.score, self.maxScore, self.ovale.playerGUID)
-                local channel = IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
+                local channel = (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT") or "RAID"
                 SendAddonMessage(MSG_PREFIX, message, channel)
             end
         end
@@ -93,7 +94,7 @@ __exports.OvaleScoreClass = __class(nil, {
                     local now = GetTime()
                     local spellcast = self.ovaleFuture:GetSpellcast(spell, spellId, lineId, now)
                     if spellcast then
-                        if spellcast.success or ( not spellcast.start) or ( not spellcast.stop) or spellcast.channel then
+                        if spellcast.success or  not spellcast.start or  not spellcast.stop or spellcast.channel then
                             local name = UnitChannelInfo(unitId)
                             if  not name then
                                 self:ScoreSpell(spellId)
@@ -122,7 +123,7 @@ __exports.OvaleScoreClass = __class(nil, {
         self.scoredSpell[spellId] = true
     end,
     ScoreSpell = function(self, spellId)
-        if self.ovaleFuture.current.inCombat and self.scoredSpell[spellId] then
+        if self.combat:isInCombat(nil) and self.scoredSpell[spellId] then
             local scored = 0
             self.tracer:DebugTimestamp("Scored %s for %d.", scored, spellId)
             if scored then

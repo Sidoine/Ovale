@@ -221,6 +221,58 @@ __exports.SPECIAL_ACTION = {
     ["variable"] = true,
     ["wait"] = true
 }
+local powerModifiers = {
+    ["max"] = {
+        name = "max",
+        before = true
+    },
+    ["deficit"] = {
+        name = "deficit"
+    }
+}
+__exports.MISC_OPERAND = {
+    ["active_enemies"] = {
+        name = "enemies"
+    },
+    ["chi"] = {
+        name = "chi",
+        modifiers = powerModifiers
+    },
+    ["energy"] = {
+        name = "energy",
+        modifiers = powerModifiers
+    },
+    ["expected_combat_length"] = {
+        name = "expectedcombatlength"
+    },
+    ["holy_power"] = {
+        name = "holypower",
+        modifiers = powerModifiers
+    },
+    ["focus"] = {
+        name = "focus",
+        modifiers = powerModifiers
+    },
+    ["maelstrom"] = {
+        name = "maelstrom",
+        modifiers = powerModifiers
+    },
+    ["rage"] = {
+        name = "rage",
+        modifiers = powerModifiers
+    },
+    ["runic_power"] = {
+        name = "runicpower",
+        modifiers = powerModifiers
+    },
+    ["soul_shard"] = {
+        name = "souldshards",
+        modifiers = powerModifiers
+    },
+    ["time"] = {
+        name = "timeincombat"
+    }
+}
 __exports.RUNE_OPERAND = {
     ["rune"] = "rune"
 }

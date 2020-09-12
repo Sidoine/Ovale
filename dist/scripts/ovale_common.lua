@@ -5,6 +5,13 @@ __exports.registerCommon = function(OvaleScripts)
     local desc = "[9.0] Ovale: Common spell definitions"
     local code = [[
 
+# Essences
+Define(concentrated_flame_essence 295373)
+    SpellInfo(concentrated_flame_essence cd=30 tag=main)
+    Define(concentrated_flame_burn_debuff 295368)
+    SpellInfo(concentrated_flame_burn_debuff duration=6)
+    SpellAddTargetDebuff(concentrated_flame_essence concentrated_flame_burn_debuff=1)
+
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end

@@ -449,8 +449,34 @@ export let SPECIAL_ACTION: LuaObj<boolean> = {
     ["variable"]: true,
     ["wait"]: true,
 };
-export const MISC_OPERAND: LuaObj<string> = {
-    ["rage"]: "rage",
+
+interface MiscOperandModifier {
+    name: string;
+    before?: boolean;
+}
+
+const powerModifiers: LuaObj<MiscOperandModifier> = {
+    ["max"]: { name: "max", before: true },
+    ["deficit"]: { name: "deficit" },
+};
+
+export interface MiscOperand {
+    name: string;
+    modifiers?: LuaObj<MiscOperandModifier>;
+}
+
+export const MISC_OPERAND: LuaObj<MiscOperand> = {
+    ["active_enemies"]: { name: "enemies" },
+    ["chi"]: { name: "chi", modifiers: powerModifiers },
+    ["energy"]: { name: "energy", modifiers: powerModifiers },
+    ["expected_combat_length"]: { name: "expectedcombatlength" },
+    ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
+    ["focus"]: { name: "focus", modifiers: powerModifiers },
+    ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
+    ["rage"]: { name: "rage", modifiers: powerModifiers },
+    ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
+    ["soul_shard"]: { name: "souldshards", modifiers: powerModifiers },
+    ["time"]: { name: "timeincombat" },
 };
 export let RUNE_OPERAND: LuaObj<string> = {
     ["rune"]: "rune",

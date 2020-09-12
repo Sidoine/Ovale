@@ -32,10 +32,10 @@ __exports.OvaleConditionClass = __class(nil, {
         self.conditions[name] = nil
     end,
     IsCondition = function(self, name)
-        return (self.conditions[name] ~= nil)
+        return self.conditions[name] ~= nil
     end,
     IsSpellBookCondition = function(self, name)
-        return (self.spellBookConditions[name] ~= nil)
+        return self.spellBookConditions[name] ~= nil
     end,
     EvaluateCondition = function(self, name, positionalParams, namedParams, atTime)
         return self.conditions[name](positionalParams, namedParams, atTime)
@@ -83,6 +83,9 @@ end
 __exports.ReturnValue = function(value, origin, rate)
     return 0, INFINITY, value, origin, rate
 end
+__exports.ReturnConstant = function(value)
+    return 0, INFINITY, value, 0, 0
+end
 __exports.TestValue = function(start, ending, value, origin, rate, comparator, limit)
     if value == nil or origin == nil or rate == nil then
         return 
@@ -105,11 +108,11 @@ __exports.TestValue = function(start, ending, value, origin, rate, comparator, l
         end
     elseif (comparator == "less" and rate > 0) or (comparator == "atMost" and rate > 0) or (comparator == "atLeast" and rate < 0) or (comparator == "more" and rate < 0) then
         local t = (limit - value) / rate + origin
-        ending = (ending < t) and ending or t
+        ending = (ending < t and ending) or t
         return start, ending
     elseif (comparator == "less" and rate < 0) or (comparator == "atMost" and rate < 0) or (comparator == "atLeast" and rate > 0) or (comparator == "more" and rate > 0) then
         local t = (limit - value) / rate + origin
-        start = (start > t) and start or t
+        start = (start > t and start) or t
         return start, INFINITY
     end
     return 

@@ -8,8 +8,8 @@ local hooksecurefunc = hooksecurefunc
 local _BigWigsLoader = _G["BigWigsLoader"]
 local _DBM = _G["DBM"]
 __exports.OvaleBossModClass = __class(nil, {
-    constructor = function(self, ovale, ovaleDebug, ovaleProfiler, ovaleFuture)
-        self.ovaleFuture = ovaleFuture
+    constructor = function(self, ovale, ovaleDebug, ovaleProfiler, combat)
+        self.combat = combat
         self.EngagedDBM = nil
         self.EngagedBigWigs = nil
         self.OnInitialize = function()
@@ -41,12 +41,12 @@ __exports.OvaleBossModClass = __class(nil, {
     OnDisable = function(self)
     end,
     IsBossEngaged = function(self, atTime)
-        if  not self.ovaleFuture:IsInCombat(atTime) then
+        if  not self.combat:isInCombat(atTime) then
             return false
         end
-        local dbmEngaged = (_DBM ~= nil and self.EngagedDBM ~= nil and self.EngagedDBM.inCombat)
-        local bigWigsEngaged = (_BigWigsLoader ~= nil and self.EngagedBigWigs ~= nil and self.EngagedBigWigs.isEngaged)
-        local neitherEngaged = (_DBM == nil and _BigWigsLoader == nil and self:ScanTargets())
+        local dbmEngaged = _DBM ~= nil and self.EngagedDBM ~= nil and self.EngagedDBM.inCombat
+        local bigWigsEngaged = _BigWigsLoader ~= nil and self.EngagedBigWigs ~= nil and self.EngagedBigWigs.isEngaged
+        local neitherEngaged = _DBM == nil and _BigWigsLoader == nil and self:ScanTargets()
         if dbmEngaged then
             self.tracer:Debug("DBM Engaged: [name=%s]", self.EngagedDBM.localization.general.name)
         end
@@ -59,7 +59,7 @@ __exports.OvaleBossModClass = __class(nil, {
         self.profiler:StartProfiling("OvaleBossMod:ScanTargets")
         local bossEngaged = false
         if UnitExists("target") then
-            bossEngaged = (UnitClassification("target") == "worldboss") or false
+            bossEngaged = UnitClassification("target") == "worldboss" or false
         end
         self.profiler:StopProfiling("OvaleBossMod:ScanTargets")
         return bossEngaged

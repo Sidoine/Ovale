@@ -3519,13 +3519,9 @@ export class OvaleASTClass {
                                 dictionary &&
                                 dictionary[key]
                             ) {
-                                (<any>(
-                                    parameters[
-                                        dictionary[
-                                            key
-                                        ] as keyof typeof parameters
-                                    ]
-                                )) = flattenValue;
+                                parameters[
+                                    dictionary[key] as keyof typeof parameters
+                                ] = flattenValue as any;
                             } else {
                                 // TODO delete named parameters that are not single values
                                 (<any>parameters[key]) = flattenValue;

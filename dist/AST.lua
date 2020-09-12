@@ -224,7 +224,7 @@ local function isListItemFlattenParameters(key, value)
     return key == "listitem"
 end
 local function isCsvNode(node)
-    return node.type == "comma_separated_values" or node.previousType == "comma_separated_values"
+    return (node.type == "comma_separated_values" or node.previousType == "comma_separated_values")
 end
 local function isVariableNode(node)
     return node.type == "variable" or node.previousType == "variable"
@@ -368,7 +368,7 @@ __exports.OvaleASTClass = __class(nil, {
         self.nodesPool = SelfPool(self)
         self.UnparseAddCheckBox = function(node)
             local s
-            if node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams) then
+            if (node.rawPositionalParams and next(node.rawPositionalParams)) or (node.rawNamedParams and next(node.rawNamedParams)) then
                 s = format("AddCheckBox(%s %s %s)", node.name, self:Unparse(node.description), self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
             else
                 s = format("AddCheckBox(%s %s)", node.name, self:Unparse(node.description))
@@ -519,11 +519,11 @@ __exports.OvaleASTClass = __class(nil, {
             end
         end
         self.UnparseItemInfo = function(node)
-            local identifier = node.name and node.name or node.itemId
+            local identifier = (node.name and node.name) or node.itemId
             return format("ItemInfo(%s %s)", identifier, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseItemRequire = function(node)
-            local identifier = node.name and node.name or node.itemId
+            local identifier = (node.name and node.name) or node.itemId
             return format("ItemRequire(%s %s %s)", identifier, node.property, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseList = function(node)
@@ -566,15 +566,15 @@ __exports.OvaleASTClass = __class(nil, {
             return outputString
         end
         self.UnparseSpellAuraList = function(node)
-            local identifier = node.name and node.name or node.spellId
+            local identifier = (node.name and node.name) or node.spellId
             return format("%s(%s %s)", node.keyword, identifier, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseSpellInfo = function(node)
-            local identifier = node.name and node.name or node.spellId
+            local identifier = (node.name and node.name) or node.spellId
             return format("SpellInfo(%s %s)", identifier, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseSpellRequire = function(node)
-            local identifier = node.name and node.name or node.spellId
+            local identifier = (node.name and node.name) or node.spellId
             return format("SpellRequire(%s %s %s)", identifier, node.property, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
         self.UnparseString = function(node)
@@ -1775,7 +1775,7 @@ __exports.OvaleASTClass = __class(nil, {
         return precedence
     end,
     HasParameters = function(self, node)
-        return node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams)
+        return ((node.rawPositionalParams and next(node.rawPositionalParams)) or (node.rawNamedParams and next(node.rawNamedParams)))
     end,
     Unparse = function(self, node)
         if node.asString then
@@ -2058,6 +2058,12 @@ __exports.OvaleASTClass = __class(nil, {
                 node = self.ParseExpression(tokenStream, nodeList, annotation)
             end
         end
+        return node
+    end,
+    newFunction = function(self, nodeList, name, hasChild)
+        local node = self:NewNode(nodeList, hasChild)
+        node.type = "function"
+        node.name = name
         return node
     end,
     NewNode = function(self, nodeList, hasChild)
@@ -2377,7 +2383,7 @@ __exports.OvaleASTClass = __class(nil, {
             for _, node in ipairs(annotation.parametersReference) do
                 if node.rawNamedParams then
                     for stanceKeyword in kpairs(STANCE_KEYWORD) do
-                        local valueNode = node.rawNamedParams[stanceKeyword]
+                        local valueNode = (node.rawNamedParams[stanceKeyword])
                         if valueNode then
                             if isCsvNode(valueNode) then
                                 valueNode = valueNode.csv[1]

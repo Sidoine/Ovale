@@ -89,9 +89,9 @@ local COLORTABLE = {
     }
 }
 __exports.OvaleSpellFlashClass = __class(nil, {
-    constructor = function(self, ovaleOptions, ovale, ovaleFuture, ovaleData, ovaleSpellBook, ovaleStance)
+    constructor = function(self, ovaleOptions, ovale, combat, ovaleData, ovaleSpellBook, ovaleStance)
         self.ovaleOptions = ovaleOptions
-        self.ovaleFuture = ovaleFuture
+        self.combat = combat
         self.ovaleData = ovaleData
         self.ovaleSpellBook = ovaleSpellBook
         self.ovaleStance = ovaleStance
@@ -149,7 +149,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     type = "toggle",
                     name = L["En combat uniquement"],
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 hasTarget = {
@@ -157,7 +157,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     type = "toggle",
                     name = L["Si cible uniquement"],
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 hasHostileTarget = {
@@ -165,7 +165,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     type = "toggle",
                     name = L["Cacher si cible amicale ou morte"],
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 hideInVehicle = {
@@ -173,7 +173,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     type = "toggle",
                     name = L["Cacher dans les véhicules"],
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 brightness = {
@@ -185,7 +185,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     bigStep = 0.01,
                     isPercent = true,
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 size = {
@@ -197,7 +197,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     bigStep = 0.01,
                     isPercent = true,
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 threshold = {
@@ -210,7 +210,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     step = 1,
                     bigStep = 50,
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end
                 },
                 colors = {
@@ -219,7 +219,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                     name = L["Colors"],
                     inline = true,
                     disabled = function()
-                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                        return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end,
                     get = function(info)
                         local color = self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
@@ -266,12 +266,12 @@ __exports.OvaleSpellFlashClass = __class(nil, {
         return SpellFlashCore ~= nil
     end,
     IsSpellFlashEnabled = function(self)
-        local enabled = (SpellFlashCore ~= nil)
+        local enabled = SpellFlashCore ~= nil
         local db = self.ovaleOptions.db.profile.apparence.spellFlash
         if enabled and  not db.enabled then
             enabled = false
         end
-        if enabled and db.inCombat and  not self.ovaleFuture:IsInCombat(nil) then
+        if enabled and db.inCombat and  not self.combat:isInCombat(nil) then
             enabled = false
         end
         if enabled and db.hideInVehicle and UnitHasVehicleUI("player") then

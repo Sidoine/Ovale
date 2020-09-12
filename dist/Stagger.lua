@@ -9,9 +9,9 @@ local remove = table.remove
 local self_serial = 1
 local MAX_LENGTH = 30
 __exports.OvaleStaggerClass = __class(nil, {
-    constructor = function(self, ovale, ovaleFuture)
+    constructor = function(self, ovale, combat)
         self.ovale = ovale
-        self.ovaleFuture = ovaleFuture
+        self.combat = combat
         self.staggerTicks = {}
         self.OnInitialize = function()
             if self.ovale.playerClass == "MONK" then
@@ -43,7 +43,7 @@ __exports.OvaleStaggerClass = __class(nil, {
     InitializeState = function(self)
     end,
     ResetState = function(self)
-        if  not self.ovaleFuture:IsInCombat(nil) then
+        if  not self.combat:isInCombat(nil) then
             for k in pairs(self.staggerTicks) do
                 self.staggerTicks[k] = nil
             end

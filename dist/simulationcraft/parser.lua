@@ -212,6 +212,8 @@ __exports.Parser = __class(nil, {
                 if modifier and expressionNode then
                     modifiers[modifier] = expressionNode
                     tokenType, token = tokenStream:Peek()
+                else
+                    return nil
                 end
             else
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.", token, action)
@@ -257,7 +259,7 @@ __exports.Parser = __class(nil, {
         local opInfo = UNARY_OPERATOR[token]
         if opInfo then
             local opType, precedence = opInfo[1], opInfo[2]
-            local asType = (opType == "logical") and "boolean" or "value"
+            local asType = (opType == "logical" and "boolean") or "value"
             tokenStream:Consume()
             local operator = token
             local rhsNode = self:ParseExpression(tokenStream, nodeList, annotation, precedence)
@@ -293,7 +295,7 @@ __exports.Parser = __class(nil, {
             local opInfo = BINARY_OPERATOR[token]
             if opInfo then
                 local opType, precedence = opInfo[1], opInfo[2]
-                local asType = (opType == "logical") and "boolean" or "value"
+                local asType = (opType == "logical" and "boolean") or "value"
                 if precedence and precedence > minPrecedence then
                     keepScanning = true
                     tokenStream:Consume()
@@ -442,7 +444,7 @@ __exports.Parser = __class(nil, {
         node.rune = RUNE_OPERAND[name]
         if node.rune then
             local firstCharacter = sub(name, 1, 1)
-            node.includeDeath = (firstCharacter == "B" or firstCharacter == "F" or firstCharacter == "U")
+            node.includeDeath = firstCharacter == "B" or firstCharacter == "F" or firstCharacter == "U"
         end
         annotation.operand = annotation.operand or {}
         annotation.operand[#annotation.operand + 1] = node

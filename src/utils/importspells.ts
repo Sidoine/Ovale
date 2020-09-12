@@ -1158,6 +1158,18 @@ function readFile(directory: string, fileName: string, output: AllData) {
                 i = innerData[1];
             } else if (c === "}") {
                 break;
+            } else if (c === "h") {
+                while (
+                    ($data[i] >= "a" && $data[i] <= "z") ||
+                    $data[i] === ":" ||
+                    $data[i] === "_"
+                ) {
+                    i++;
+                }
+                if ($data[i] === "{" && $data[i + 1] === "}") {
+                    i += 2;
+                }
+                columns.push($data.substring(start, i));
             }
             // const next = $data.substr(i, 20);
             i = skipComments($data, i);
@@ -1464,8 +1476,15 @@ export function getSpellData(directory: string) {
             m_value: getNumber(row[i++]),
             pvp_coeff: getNumber(row[i++]),
         };
+
+        // TODO There seems to be a bug in Simulationcraft
+        if (spellEffect.id === 0) continue;
+
         const spell = spellDataById.get(spellEffect.spell_id);
-        if (!spell) throw Error("Unknown spell id");
+        if (!spell)
+            throw Error(
+                `Unknown spell id ${spellEffect.spell_id} for spell effect ${spellEffect.id}`
+            );
         if (!spell.spellEffects) spell.spellEffects = [];
         spell.spellEffects.push(spellEffect);
         if (spell.id === 238147) debugger;

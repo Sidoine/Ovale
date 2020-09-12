@@ -50,6 +50,7 @@
    <Script file="Enemies.lua"/>
    <Script file="Runes.lua"/>
    <Script file="BaseState.lua"/>
+   <Script file="combat.lua"/>
    <Script file="Cooldown.lua"/>
    <Script file="tools.lua"/>
    <Script file="Data.lua"/>

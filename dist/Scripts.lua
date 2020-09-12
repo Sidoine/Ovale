@@ -21,7 +21,7 @@ local CUSTOM_DESCRIPTION = L["Script personnalisé"]
 local DISABLED_NAME = "Disabled"
 local DISABLED_DESCRIPTION = L["Disabled"]
 __exports.OvaleScriptsClass = __class(nil, {
-    constructor = function(self, ovale, ovaleOptions, ovalePaperDoll)
+    constructor = function(self, ovale, ovaleOptions, ovalePaperDoll, ovaleDebug)
         self.ovale = ovale
         self.ovaleOptions = ovaleOptions
         self.ovalePaperDoll = ovalePaperDoll
@@ -31,14 +31,10 @@ __exports.OvaleScriptsClass = __class(nil, {
             self:RegisterScript(nil, nil, __exports.DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
             self:RegisterScript(self.ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, self.ovaleOptions.db.profile.code, "script")
             self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
-            self.module:RegisterMessage("Ovale_StanceChanged", self.Ovale_StanceChanged)
             self.module:RegisterMessage("Ovale_ScriptChanged", self.InitScriptProfiles)
         end
         self.OnDisable = function()
-            self.module:UnregisterMessage("Ovale_StanceChanged")
             self.module:UnregisterMessage("Ovale_ScriptChanged")
-        end
-        self.Ovale_StanceChanged = function(event, newStance, oldStance)
         end
         self.InitScriptProfiles = function()
             local countSpecializations = GetNumSpecializations(false, false)
@@ -53,6 +49,7 @@ __exports.OvaleScriptsClass = __class(nil, {
             end
         end
         self.module = ovale:createModule("OvaleScripts", self.OnInitialize, self.OnDisable, aceEvent)
+        self.tracer = ovaleDebug:create(self.module:GetName())
         local defaultDB = {
             code = "",
             source = {},
@@ -117,16 +114,19 @@ __exports.OvaleScriptsClass = __class(nil, {
         elseif className == "DEATHKNIGHT" then
             scClassName = "death_knight"
         end
-        if  not name and specialization then
-            name = format("sc_t24_%s_%s", scClassName, specialization)
-        end
-        if  not (name and self.script[name]) then
-            name = DISABLED_NAME
+        if specialization then
+            name = format("sc_t25_%s_%s", scClassName, specialization)
+            if  not self.script[name] then
+                self.tracer:Log("Script " .. name .. " not found")
+                name = DISABLED_NAME
+            end
+        else
+            return DISABLED_NAME
         end
         return name
     end,
     GetScriptName = function(self, name)
-        return (name == __exports.DEFAULT_NAME) and self:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization()) or name
+        return ((name == __exports.DEFAULT_NAME and self:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization())) or name)
     end,
     GetScript = function(self, name)
         name = self:GetScriptName(name)
@@ -136,7 +136,7 @@ __exports.OvaleScriptsClass = __class(nil, {
         return nil
     end,
     GetScriptOrDefault = function(self, name)
-        return self:GetScript(name) or self:GetScript(self:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization()))
+        return (self:GetScript(name) or self:GetScript(self:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization())))
     end,
     getCurrentSpecIdentifier = function(self)
         return self.ovale.playerClass .. "_" .. self.ovalePaperDoll:GetSpecialization()

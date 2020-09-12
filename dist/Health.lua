@@ -45,7 +45,7 @@ __exports.OvaleHealthClass = __class(nil, {
             self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.PLAYER_REGEN_DISABLED)
             self.module:RegisterEvent("PLAYER_REGEN_ENABLED", self.PLAYER_REGEN_ENABLED)
             if self.ovaleOptions.db.profile.apparence.frequentHealthUpdates then
-                self.module:RegisterEvent("UNIT_HEALTH_FREQUENT", self.UpdateHealth)
+                self.module:RegisterEvent("UNIT_HEALTH", self.UpdateHealth)
             else
                 self.module:RegisterEvent("UNIT_HEALTH", self.UpdateHealth)
             end
@@ -63,7 +63,7 @@ __exports.OvaleHealthClass = __class(nil, {
             self.requirement:UnregisterRequirement("target_health_pct")
             self.module:UnregisterEvent("PLAYER_REGEN_ENABLED")
             self.module:UnregisterEvent("PLAYER_TARGET_CHANGED")
-            self.module:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+            self.module:UnregisterEvent("UNIT_HEALTH")
             self.module:UnregisterEvent("UNIT_HEALTH")
             self.module:UnregisterEvent("UNIT_MAXHEALTH")
             self.module:UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
@@ -116,7 +116,7 @@ __exports.OvaleHealthClass = __class(nil, {
             self.profiler:StartProfiling("Ovale_UnitChanged")
             if unitId == "target" or unitId == "focus" then
                 self.tracer:Debug(event, unitId, guid)
-                self.UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
+                self.UpdateHealth("UNIT_HEALTH", unitId)
                 self.UpdateHealth("UNIT_MAXHEALTH", unitId)
                 self.UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId)
                 self.UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId)
@@ -157,7 +157,7 @@ __exports.OvaleHealthClass = __class(nil, {
             self.profiler:StartProfiling("OvaleHealth_UpdateHealth")
             local func
             local db
-            if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_HEALTH" then
+            if event == "UNIT_HEALTH" then
                 func = UnitHealth
                 db = self.health
             elseif event == "UNIT_MAXHEALTH" then
@@ -215,12 +215,12 @@ __exports.OvaleHealthClass = __class(nil, {
                 if maxHealth == 0 then
                     healthPercent = 100
                 else
-                    healthPercent = (health / maxHealth * 100) or 100
+                    healthPercent = (health / maxHealth) * 100 or 100
                 end
-                if  not isBang and healthPercent <= thresholdValue or isBang and healthPercent > thresholdValue then
+                if ( not isBang and healthPercent <= thresholdValue) or (isBang and healthPercent > thresholdValue) then
                     verified = true
                 end
-                local result = verified and "passed" or "FAILED"
+                local result = (verified and "passed") or "FAILED"
                 if isBang then
                     self.tracer:Log("    Require %s health > %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
                 else
@@ -290,7 +290,7 @@ __exports.OvaleHealthClass = __class(nil, {
                     local damage = self.totalDamage[guid] or 0
                     local healing = self.totalHealing[guid] or 0
                     if firstSeen and lastUpdated and lastUpdated > firstSeen and damage > healing then
-                        timeToDie = health * (lastUpdated - firstSeen) / (damage - healing)
+                        timeToDie = (health * (lastUpdated - firstSeen)) / (damage - healing)
                     end
                 end
             end

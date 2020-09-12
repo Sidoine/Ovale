@@ -3,8 +3,8 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 __exports.Variables = __class(nil, {
-    constructor = function(self, ovaleFuture, baseState, ovaleDebug)
-        self.ovaleFuture = ovaleFuture
+    constructor = function(self, combat, baseState, ovaleDebug)
+        self.combat = combat
         self.baseState = baseState
         self.isState = true
         self.isInitialized = false
@@ -15,7 +15,7 @@ __exports.Variables = __class(nil, {
         self.tracer = ovaleDebug:create("Variables")
     end,
     InitializeState = function(self)
-        if  not self.ovaleFuture:IsInCombat(nil) then
+        if  not self.combat:isInCombat(nil) then
             for k in pairs(self.variable) do
                 self.tracer:Log("Resetting state variable '%s'.", k)
                 self.variable[k] = nil
