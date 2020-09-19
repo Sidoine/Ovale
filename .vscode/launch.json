@@ -10,12 +10,8 @@
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/utils/importsimc.js",
             "protocol": "inspector",
-            "args": [
-                "../../simc/", "T24_Warrior_Fury.simc"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
+            "args": ["../../simc/", "T24_Warrior_Fury.simc"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {
             "type": "node",
@@ -23,20 +19,21 @@
             "name": "Launch Program",
             "program": "${workspaceFolder}/src\\Options.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Debug tests",
-            "program": "${workspaceFolder}/../node_modules/ava/profile.js",
-            "args": ["${workspaceFolder}/dist/tests/${fileBasenameNoExtension}.js"],
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ava.cmd",
+            "runtimeArgs": [
+                "--serial",
+                "${workspaceFolder}/dist/${relativeFileDirname}/${fileBasenameNoExtension}.js"
             ],
-            "protocol": "inspector"
-        },
+            "outputCapture": "std",
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "protocol": "inspector",
+            "skipFiles": ["<node_internals>/**/*.js"]
+        }
     ]
 }

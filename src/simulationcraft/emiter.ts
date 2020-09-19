@@ -12,6 +12,12 @@ import {
     checkOptionalSkill,
     CHARACTER_PROPERTY,
     MISC_OPERAND,
+    ActionParseNode,
+    ActionListParseNode,
+    FunctionParseNode,
+    NumberParseNode,
+    OperandParseNode,
+    OperatorParseNode,
 } from "./definitions";
 import {
     LuaArray,
@@ -56,15 +62,15 @@ import { Unparser } from "./unparser";
 
 const OPERAND_TOKEN_PATTERN = "[^.]+";
 
-type EmitVisitor = (
-    parseNode: ParseNode,
+type EmitVisitor<T extends ParseNode> = (
+    parseNode: T,
     nodeList: LuaArray<AstNode>,
     annotation: Annotation,
     action: string | undefined
 ) => AstNode | undefined;
 type EmitOperandVisitor = (
     operand: string,
-    parseNode: ParseNode,
+    parseNode: OperandParseNode,
     nodeList: LuaArray<AstNode>,
     annotation: Annotation,
     action?: string,
@@ -229,7 +235,10 @@ export class Emiter {
         annotation: Annotation,
         action: string | undefined
     ) {
-        let visitor = this.EMIT_VISITOR[parseNode.type];
+        // TODO
+        let visitor = this.EMIT_VISITOR[parseNode.type] as EmitVisitor<
+            ParseNode
+        >;
         if (!visitor) {
             this.tracer.Error(
                 "Unable to emit node of type '%s'.",
@@ -461,7 +470,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         bodyNode: AstNode,
         extraConditionNode: AstNode | undefined,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         annotation: Annotation,
         action: string,
         modifiers: Modifiers
@@ -525,7 +534,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifiers: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string,
         conditionNode?: AstNode
     ) => {
@@ -571,7 +580,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifier: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string
     ) => {
         this.EmitNamedVariable(
@@ -609,7 +618,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifier: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string
     ) => {
         this.EmitNamedVariable(
@@ -647,7 +656,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifiers: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string
     ) => {
         // TODO
@@ -668,7 +677,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifiers: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string
     ) => {
         // TODO
@@ -751,7 +760,7 @@ export class Emiter {
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
         modifier: Modifiers,
-        parseNode: ParseNode,
+        parseNode: ActionParseNode,
         action: string,
         conditionNode?: AstNode
     ) => {
@@ -834,8 +843,8 @@ export class Emiter {
     };
 
     /** Takes a ParseNode of type "action" and transforms it to an AstNode. */
-    private EmitAction: EmitVisitor = (
-        parseNode: ParseNode,
+    private EmitAction: EmitVisitor<ActionParseNode> = (
+        parseNode,
         nodeList,
         annotation
     ) => {
@@ -1371,7 +1380,11 @@ export class Emiter {
         return node;
     };
 
-    public EmitActionList: EmitVisitor = (parseNode, nodeList, annotation) => {
+    public EmitActionList: EmitVisitor<ActionListParseNode> = (
+        parseNode,
+        nodeList,
+        annotation
+    ) => {
         let groupNode = this.ovaleAst.NewNode(nodeList, true);
         groupNode.type = "group";
         let child = groupNode.child;
@@ -1543,7 +1556,7 @@ export class Emiter {
         return node;
     };
 
-    private EmitExpression: EmitVisitor = (
+    private EmitExpression: EmitVisitor<OperatorParseNode> = (
         parseNode,
         nodeList,
         annotation,
@@ -1599,8 +1612,8 @@ export class Emiter {
                 } else if (parseNodeOperator == "%") {
                     operator = "/";
                 } else if (
-                    parseNode.type == "compare" ||
-                    parseNode.type == "arithmetic"
+                    parseNode.operatorType == "compare" ||
+                    parseNode.operatorType == "arithmetic"
                 ) {
                     if (
                         parseNodeOperator !== "~" &&
@@ -1612,10 +1625,10 @@ export class Emiter {
                 if (
                     (parseNode.operator == "=" || parseNode.operator == "!=") &&
                     (parseNode.child[1].name == "target" ||
-                        parseNode.child[1].name == "current_target")
+                        parseNode.child[1].name == "current_target") &&
+                    parseNode.child[2].name
                 ) {
-                    let rhsNode = parseNode.child[2];
-                    let name = rhsNode.name;
+                    let name = parseNode.child[2].name;
                     if (truthy(find(name, "^[%a_]+%."))) {
                         [name] = match(name, "^[%a_]+%.([%a_]+)");
                     }
@@ -1719,7 +1732,7 @@ export class Emiter {
         return node;
     };
 
-    private EmitFunction: EmitVisitor = (
+    private EmitFunction: EmitVisitor<FunctionParseNode> = (
         parseNode,
         nodeList,
         annotation,
@@ -1727,12 +1740,7 @@ export class Emiter {
     ) => {
         let node;
         if (parseNode.name == "ceil" || parseNode.name == "floor") {
-            node = this.EmitExpression(
-                parseNode.child[1],
-                nodeList,
-                annotation,
-                action
-            );
+            node = this.Emit(parseNode.child[1], nodeList, annotation, action);
         } else {
             this.tracer.Print(
                 "Warning: Function '%s' is not implemented.",
@@ -1745,7 +1753,7 @@ export class Emiter {
         return node;
     };
 
-    private EmitNumber: EmitVisitor = (
+    private EmitNumber: EmitVisitor<NumberParseNode> = (
         parseNode,
         nodeList,
         annotation,
@@ -1758,7 +1766,7 @@ export class Emiter {
         node.rate = 0;
         return node;
     };
-    private EmitOperand: EmitVisitor = (
+    private EmitOperand: EmitVisitor<OperandParseNode> = (
         parseNode,
         nodeList,
         annotation,
@@ -1776,7 +1784,7 @@ export class Emiter {
                 annotation,
                 action
             );
-            if (node) {
+            if (!node) {
                 target = token;
                 operand = sub(operand, len(target) + 2);
                 [token] = match(operand, OPERAND_TOKEN_PATTERN);
@@ -4046,10 +4054,8 @@ export class Emiter {
     private EMIT_VISITOR = {
         ["action"]: this.EmitAction,
         ["action_list"]: this.EmitActionList,
-        ["arithmetic"]: this.EmitExpression,
-        ["compare"]: this.EmitExpression,
+        ["operator"]: this.EmitExpression,
         ["function"]: this.EmitFunction,
-        ["logical"]: this.EmitExpression,
         ["number"]: this.EmitNumber,
         ["operand"]: this.EmitOperand,
     };

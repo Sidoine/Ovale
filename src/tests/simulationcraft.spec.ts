@@ -16,13 +16,15 @@ actions=/potion,if=buff.test.stack>=0.1`;
     // Assert
     t.is(result!.actionList![1].type, "action_list");
     t.is(result!.actionList![1].child![1].type, "action");
-    t.is(result!.actionList![1].child![1].modifiers!.if!.type, "compare");
-    t.is(result!.actionList![1].child![1].modifiers!.if!.operator, ">=");
-    t.is(
-        result!.actionList![1].child![1].modifiers!.if!.child[2].type,
-        "number"
-    );
-    t.is(result!.actionList![1].child![1].modifiers!.if!.child[2].value, 0.1);
+    const ifNode = result!.actionList![1].child![1].modifiers!.if!;
+    t.is(ifNode.type, "operator");
+    if (ifNode.type !== "operator") return;
+    t.is(ifNode.operatorType, "compare");
+    t.is(ifNode.operator, ">=");
+    const valueNode = ifNode.child[2];
+    t.is(valueNode.type, "number");
+    if (valueNode.type !== "number") return;
+    t.is(valueNode.value, 0.1);
 });
 
 test("parse sequence", (t) => {

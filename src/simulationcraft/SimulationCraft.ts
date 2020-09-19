@@ -28,6 +28,7 @@ import {
     CONSUMABLE_ITEMS,
     OVALE_TAGS,
     classInfos,
+    ActionListParseNode,
 } from "./definitions";
 import { OvaleDataClass } from "../Data";
 import { Emiter } from "./emiter";
@@ -215,7 +216,7 @@ export class OvaleSimulationCraftClass {
 
         // Parse the different "actions" commands in the script. Save them as ParseNode action_list
         let nodeList: LuaArray<ParseNode> = {};
-        let actionList: LuaArray<ParseNode> = {};
+        let actionList: LuaArray<ActionListParseNode> = {};
         for (const [k, _v] of kpairs(profile)) {
             let v = _v;
             if (ok && truthy(match(k, "^actions"))) {

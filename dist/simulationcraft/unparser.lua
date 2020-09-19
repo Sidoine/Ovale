@@ -7,10 +7,14 @@ local BINARY_OPERATOR = __definitions.BINARY_OPERATOR
 local tostring = tostring
 local pairs = pairs
 local tonumber = tonumber
+local kpairs = pairs
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
 local self_outputPool = __texttools.self_outputPool
 local concat = table.concat
 local function GetPrecedence(node)
+    if node.type ~= "operator" then
+        return 0
+    end
     local precedence = node.precedence
     if  not precedence then
         local operator = node.operator
@@ -29,7 +33,7 @@ __exports.Unparser = __class(nil, {
         self.UnparseAction = function(node)
             local output = self_outputPool:Get()
             output[#output + 1] = node.name
-            for modifier, expressionNode in pairs(node.child) do
+            for modifier, expressionNode in kpairs(node.modifiers) do
                 output[#output + 1] = modifier .. "=" .. self:Unparse(expressionNode)
             end
             local s = concat(output, ",")
@@ -46,7 +50,7 @@ __exports.Unparser = __class(nil, {
             end
             output[#output + 1] = ""
             for i, actionNode in pairs(node.child) do
-                local operator = (tonumber(i) == 1) and "=" or "+=/"
+                local operator = (tonumber(i) == 1 and "=") or "+=/"
                 output[#output + 1] = listName .. operator .. self:Unparse(actionNode)
             end
             local s = concat(output, "\n")
@@ -80,7 +84,7 @@ __exports.Unparser = __class(nil, {
                 if rhsPrecedence and precedence > rhsPrecedence then
                     rhsExpression = "(" .. self:Unparse(rhsNode) .. ")"
                 elseif rhsPrecedence and precedence == rhsPrecedence then
-                    if BINARY_OPERATOR[node.operator][3] == "associative" and node.operator == rhsNode.operator then
+                    if rhsNode.type == "operator" and BINARY_OPERATOR[node.operator][3] == "associative" and node.operator == rhsNode.operator then
                         rhsExpression = self:Unparse(rhsNode)
                     else
                         rhsExpression = "(" .. self:Unparse(rhsNode) .. ")"
@@ -106,10 +110,8 @@ __exports.Unparser = __class(nil, {
         self.UNPARSE_VISITOR = {
             ["action"] = self.UnparseAction,
             ["action_list"] = self.UnparseActionList,
-            ["arithmetic"] = self.UnparseExpression,
-            ["compare"] = self.UnparseExpression,
+            ["operator"] = self.UnparseExpression,
             ["function"] = self.UnparseFunction,
-            ["logical"] = self.UnparseExpression,
             ["number"] = self.UnparseNumber,
             ["operand"] = self.UnparseOperand
         }

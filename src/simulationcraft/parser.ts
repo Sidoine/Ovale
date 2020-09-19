@@ -15,6 +15,13 @@ import {
     MODIFIER_KEYWORD,
     LITTERAL_MODIFIER,
     RUNE_OPERAND,
+    ParseNodeWithChilds,
+    ActionParseNode,
+    ActionListParseNode,
+    OperatorParseNode,
+    FunctionParseNode,
+    OperandParseNode,
+    NumberParseNode,
 } from "./definitions";
 import { gsub, gmatch, sub } from "@wowts/string";
 import { OvaleDebugClass, Tracer } from "../Debug";
@@ -32,7 +39,11 @@ class SelfPool extends OvalePool<ParseNode> {
     }
 
     Clean(node: ParseNode) {
-        if (node.child) {
+        if (
+            node.type !== "number" &&
+            node.type !== "operand" &&
+            node.type !== "action"
+        ) {
             self_childrenPool.Release(node.child);
             delete node.child;
         }
@@ -41,18 +52,24 @@ class SelfPool extends OvalePool<ParseNode> {
 
 let self_pool = new SelfPool();
 
-const NewNode = function (nodeList: LuaArray<ParseNode>, hasChild?: boolean) {
-    let node = self_pool.Get();
-    if (nodeList) {
-        let nodeId = lualength(nodeList) + 1;
-        node.nodeId = nodeId;
-        nodeList[nodeId] = node;
-    }
-    if (hasChild) {
-        node.child = self_childrenPool.Get() as LuaArray<ParseNode>;
-    }
+function NewNode<T extends ParseNode>(nodeList: LuaArray<ParseNode>) {
+    let node = self_pool.Get() as T;
+    let nodeId = lualength(nodeList) + 1;
+    node.nodeId = nodeId;
+    nodeList[nodeId] = node;
     return node;
-};
+}
+
+function newNodeWithChild<T extends ParseNodeWithChilds>(
+    nodeList: LuaArray<ParseNode>
+) {
+    let node = self_pool.Get() as T;
+    let nodeId = lualength(nodeList) + 1;
+    node.nodeId = nodeId;
+    nodeList[nodeId] = node;
+    node.child = self_childrenPool.Get() as typeof node.child;
+    return node;
+}
 
 const TicksRemainTranslationHelper = function (
     p1: string,
@@ -178,7 +195,7 @@ export class Parser {
         action: string,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
-    ): ParseNode | undefined {
+    ): ActionParseNode | undefined {
         let stream = action;
         {
             stream = gsub(stream, "||", "|");
@@ -265,7 +282,6 @@ export class Parser {
             return undefined;
         }
 
-        const child = self_childrenPool.Get() as LuaArray<ParseNode>;
         const modifiers = self_childrenPool.Get() as Modifiers;
 
         [tokenType, token] = tokenStream.Peek();
@@ -290,16 +306,15 @@ export class Parser {
                     token,
                     action
                 );
-                self_childrenPool.Release(child);
+                self_childrenPool.Release(modifiers);
                 return undefined;
             }
         }
         let node: ParseNode;
-        node = NewNode(nodeList);
+        node = NewNode<ActionParseNode>(nodeList);
         node.type = "action";
         node.action = action;
         node.name = name;
-        node.child = child;
         node.modifiers = modifiers;
         annotation.sync = annotation.sync || {};
         annotation.sync[name] = annotation.sync[name] || node;
@@ -313,8 +328,8 @@ export class Parser {
         actionList: string,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
-    ): ParseNode | undefined {
-        let child = self_childrenPool.Get() as LuaArray<ParseNode>;
+    ) {
+        let child = self_childrenPool.Get() as LuaArray<ActionParseNode>;
         for (const action of gmatch(actionList, "[^/]+")) {
             const actionNode = this.ParseAction(action, nodeList, annotation);
             if (!actionNode) {
@@ -349,7 +364,7 @@ export class Parser {
             // }
         }
         let node: ParseNode;
-        node = NewNode(nodeList);
+        node = NewNode<ActionListParseNode>(nodeList);
         node.type = "action_list";
         node.name = name;
         node.child = child;
@@ -363,7 +378,7 @@ export class Parser {
         minPrecedence?: number
     ): ParseNode | undefined {
         minPrecedence = minPrecedence || 0;
-        let node: ParseNode;
+        let node;
 
         let [tokenType, token] = tokenStream.Peek();
         if (!tokenType) return undefined;
@@ -388,8 +403,9 @@ export class Parser {
                 rhsNode.value = -1 * rhsNode.value;
                 node = rhsNode;
             } else {
-                node = NewNode(nodeList, true);
-                node.type = opType;
+                node = newNodeWithChild<OperatorParseNode>(nodeList);
+                node.type = "operator";
+                node.operatorType = opType;
                 node.expressionType = "unary";
                 node.operator = operator;
                 node.precedence = precedence;
@@ -434,14 +450,15 @@ export class Parser {
                     if (!rhsNode) {
                         return undefined;
                     }
-                    node = NewNode(nodeList, true);
-                    node.type = opType;
+                    node = newNodeWithChild<OperatorParseNode>(nodeList);
+                    node.type = "operator";
+                    node.operatorType = opType;
                     node.expressionType = "binary";
                     node.operator = operator;
                     node.precedence = precedence;
                     node.child[1] = lhsNode;
                     node.child[2] = rhsNode;
-                    lhsNode.asType = <"boolean" | "value">asType;
+                    lhsNode.asType = asType;
                     if (!rhsNode) {
                         this.SyntaxError(
                             tokenStream,
@@ -531,7 +548,7 @@ export class Parser {
         }
 
         let node;
-        node = NewNode(nodeList, true);
+        node = newNodeWithChild<FunctionParseNode>(nodeList);
         node.type = "function";
         node.name = name;
         node.child[1] = argumentNode;
@@ -550,7 +567,7 @@ export class Parser {
             );
             return undefined;
         }
-        let node = NewNode(nodeList);
+        let node = NewNode<OperandParseNode>(nodeList);
         node.type = "operand";
         node.name = token;
         annotation.operand = annotation.operand || {};
@@ -621,7 +638,7 @@ export class Parser {
             return undefined;
         }
         let node;
-        node = NewNode(nodeList);
+        node = NewNode<NumberParseNode>(nodeList);
         node.type = "number";
         node.value = value;
         return node;
@@ -657,7 +674,7 @@ export class Parser {
         }
 
         let node: ParseNode;
-        node = NewNode(nodeList);
+        node = NewNode<OperandParseNode>(nodeList);
         node.type = "operand";
         node.name = name;
         node.rune = RUNE_OPERAND[name];
@@ -714,7 +731,7 @@ export class Parser {
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
-    ): ParseNode | undefined {
+    ) {
         let node;
         let [tokenType, token] = tokenStream.Peek();
         if (!token) {

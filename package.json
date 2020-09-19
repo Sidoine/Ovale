@@ -7,7 +7,7 @@
         "test": "tsc && ava",
         "prepare": "tstolua -p tsconfig.lua.json",
         "prepare-tools": "tsc",
-        "simc": "node dist/utils/importsimc.js ../../simc",
+        "simc": "node dist/src/utils/importsimc.js ../../simc",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",
         "watch-test": "ava --watch",
@@ -50,7 +50,7 @@
     },
     "devDependencies": {
         "@wowts/tstolua": "^1.8.0",
-        "ava": "^2.2.0",
+        "ava": "^3.12.1",
         "tslint": "^5.18.0",
         "typemoq": "^2.1.0",
         "nyc": "^12"

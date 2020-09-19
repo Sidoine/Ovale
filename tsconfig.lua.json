@@ -1,17 +1,18 @@
 {
     "compilerOptions": {
-      "target": "es2015",    
-      "module": "commonjs",
-      "noImplicitAny": true,
-      "outDir": "dist",
-      "rootDir": "src",
-      "noUnusedLocals": true,
-      "strict": true
+        "target": "es2015",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "noUnusedLocals": true,
+        "strict": true
     },
     "exclude": [
-      "node_modules",
-      "libs",
-      "src/utils",
-      "src/tests"
+        "node_modules",
+        "libs",
+        "src/utils",
+        "src/tests",
+        "src/**/*.spec.ts"
     ]
-  }
+}

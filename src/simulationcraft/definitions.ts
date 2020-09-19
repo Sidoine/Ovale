@@ -313,27 +313,98 @@ export type SimcBinaryOperatorType =
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
-export interface ParseNode {
+interface BaseParseNode {
+    nodeId: number;
+    asType: NodeType;
+
+    // TODO Used by ActionParseNode, ActionListParseNode, and FunctionParseNode
+    name?: string;
+
+    // TODO: used to add parenthesis around the node
+    // Need to remove that because that's ugly
+    left?: string;
+    right?: string;
+}
+
+export interface ActionParseNode extends BaseParseNode {
+    type: "action";
+    name: string;
+    action: string;
+    modifiers: Modifiers;
+}
+
+interface BaseParseNodeWithChilds<T extends ParseNode> extends BaseParseNode {
+    child: LuaArray<T>;
+}
+
+export interface ActionListParseNode
+    extends BaseParseNodeWithChilds<ActionParseNode> {
+    type: "action_list";
+    name: string;
+}
+
+export interface OperatorParseNode extends BaseParseNode {
+    type: "operator";
+    expressionType: "unary" | "binary";
+    operator: SimcOperatorType;
+    child: LuaArray<ParseNode>;
+    precedence: number;
+    operatorType: "arithmetic" | "compare" | "logical";
+}
+
+export interface FunctionParseNode extends BaseParseNode {
+    type: "function";
     name: string;
     child: LuaArray<ParseNode>;
-    modifiers: Modifiers;
-    rune: string;
-    asType: NodeType;
-    type: ParseNodeType;
-
-    // Not sure
-    value: number;
-    expressionType: "unary" | "binary";
-
-    // Dubious
-    operator: SimcOperatorType;
-    includeDeath: boolean;
-    left: string;
-    right: string;
-    action: string;
-    nodeId: number;
-    precedence: number;
 }
+
+export interface NumberParseNode extends BaseParseNode {
+    type: "number";
+    value: number;
+}
+
+export interface OperandParseNode extends BaseParseNode {
+    type: "operand";
+    name: string;
+    asType: "boolean" | "value";
+    rune?: string;
+    includeDeath?: boolean;
+}
+
+export type ParseNodeWithChilds =
+    | FunctionParseNode
+    | ActionListParseNode
+    | OperatorParseNode;
+
+export type ParseNode =
+    | ActionParseNode
+    | ActionListParseNode
+    | OperatorParseNode
+    | FunctionParseNode
+    | NumberParseNode
+    | OperandParseNode;
+
+// export interface ParseNode {
+//     name: string;
+//     child: LuaArray<ParseNode>;
+//     modifiers: Modifiers;
+//     rune?: string;
+//     asType: NodeType;
+//     type: ParseNodeType;
+
+//     // Not sure
+//     value: number;
+//     expressionType: "unary" | "binary";
+
+//     // Dubious
+//     operator: SimcOperatorType;
+//     includeDeath: boolean;
+//     left: string;
+//     right: string;
+//     action: string;
+//     nodeId: number;
+//     precedence: number;
+// }
 
 export interface ProfileStrings {
     spec?: SpecializationName;
@@ -351,7 +422,7 @@ export interface ProfileLists {
 export interface Profile extends ProfileStrings, ProfileLists {
     templates: LuaArray<keyof Profile>;
     position?: "ranged_back";
-    actionList?: LuaArray<ParseNode>;
+    actionList?: LuaArray<ActionListParseNode>;
     annotation: Annotation;
 }
 
@@ -726,7 +797,7 @@ export class Annotation implements InterruptAnnotation {
     symbolTable?: LuaObj<boolean>;
     operand?: LuaArray<ParseNode>;
 
-    sync?: LuaObj<ParseNode>;
+    sync?: LuaObj<ActionParseNode>;
 
     using_apl?: LuaObj<boolean>;
     currentVariable?: AstNode;

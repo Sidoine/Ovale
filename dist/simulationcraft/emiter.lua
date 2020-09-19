@@ -846,14 +846,13 @@ __exports.Emiter = __class(nil, {
                         operator = "=="
                     elseif parseNodeOperator == "%" then
                         operator = "/"
-                    elseif parseNode.type == "compare" or parseNode.type == "arithmetic" then
+                    elseif parseNode.operatorType == "compare" or parseNode.operatorType == "arithmetic" then
                         if parseNodeOperator ~= "~" and parseNodeOperator ~= "!~" then
                             operator = parseNodeOperator
                         end
                     end
-                    if (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
-                        local rhsNode = parseNode.child[2]
-                        local name = rhsNode.name
+                    if (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") and parseNode.child[2].name then
+                        local name = parseNode.child[2].name
                         if find(name, "^[%a_]+%.") then
                             name = match(name, "^[%a_]+%.([%a_]+)")
                         end
@@ -918,7 +917,7 @@ __exports.Emiter = __class(nil, {
         self.EmitFunction = function(parseNode, nodeList, annotation, action)
             local node
             if parseNode.name == "ceil" or parseNode.name == "floor" then
-                node = self.EmitExpression(parseNode.child[1], nodeList, annotation, action)
+                node = self:Emit(parseNode.child[1], nodeList, annotation, action)
             else
                 self.tracer:Print("Warning: Function '%s' is not implemented.", parseNode.name)
                 node = self.ovaleAst:NewNode(nodeList)
@@ -942,7 +941,7 @@ __exports.Emiter = __class(nil, {
             local target
             if token == "target" then
                 node = self.EmitOperandTarget(operand, parseNode, nodeList, annotation, action)
-                if node then
+                if  not node then
                     target = token
                     operand = sub(operand, len(target) + 2)
                     token = match(operand, OPERAND_TOKEN_PATTERN)
@@ -2259,10 +2258,8 @@ __exports.Emiter = __class(nil, {
         self.EMIT_VISITOR = {
             ["action"] = self.EmitAction,
             ["action_list"] = self.EmitActionList,
-            ["arithmetic"] = self.EmitExpression,
-            ["compare"] = self.EmitExpression,
+            ["operator"] = self.EmitExpression,
             ["function"] = self.EmitFunction,
-            ["logical"] = self.EmitExpression,
             ["number"] = self.EmitNumber,
             ["operand"] = self.EmitOperand
         }

@@ -1,16 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "es2015",    
-    "module": "commonjs",
-    "noImplicitAny": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "inlineSourceMap": true,
-    "noUnusedLocals": true,
-    "strict": true
-  },
-  "exclude": [
-    "node_modules",
-    "libs"
-  ]
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "dist/src",
+        "rootDir": "src",
+        "inlineSourceMap": true,
+        "noUnusedLocals": true,
+        "strict": true
+    },
+    "exclude": ["node_modules", "libs"]
 }

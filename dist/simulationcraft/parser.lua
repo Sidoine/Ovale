@@ -29,26 +29,28 @@ local SelfPool = __class(OvalePool, {
         OvalePool.constructor(self, "OvaleSimulationCraft_pool")
     end,
     Clean = function(self, node)
-        if node.child then
+        if node.type ~= "number" and node.type ~= "operand" and node.type ~= "action" then
             self_childrenPool:Release(node.child)
             node.child = nil
         end
     end,
 })
 local self_pool = SelfPool()
-local NewNode = function(nodeList, hasChild)
+local function NewNode(nodeList)
     local node = self_pool:Get()
-    if nodeList then
-        local nodeId = #nodeList + 1
-        node.nodeId = nodeId
-        nodeList[nodeId] = node
-    end
-    if hasChild then
-        node.child = self_childrenPool:Get()
-    end
+    local nodeId = #nodeList + 1
+    node.nodeId = nodeId
+    nodeList[nodeId] = node
     return node
 end
-
+local function newNodeWithChild(nodeList)
+    local node = self_pool:Get()
+    local nodeId = #nodeList + 1
+    node.nodeId = nodeId
+    nodeList[nodeId] = node
+    node.child = self_childrenPool:Get()
+    return node
+end
 local TicksRemainTranslationHelper = function(p1, p2, p3, p4)
     if p4 then
         return p1 .. p2 .. " < " .. tostring(tonumber(p4) + 1)
@@ -202,7 +204,6 @@ __exports.Parser = __class(nil, {
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.", token, action)
             return nil
         end
-        local child = self_childrenPool:Get()
         local modifiers = self_childrenPool:Get()
         tokenType, token = tokenStream:Peek()
         while tokenType do
@@ -217,7 +218,7 @@ __exports.Parser = __class(nil, {
                 end
             else
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.", token, action)
-                self_childrenPool:Release(child)
+                self_childrenPool:Release(modifiers)
                 return nil
             end
         end
@@ -226,7 +227,6 @@ __exports.Parser = __class(nil, {
         node.type = "action"
         node.action = action
         node.name = name
-        node.child = child
         node.modifiers = modifiers
         annotation.sync = annotation.sync or {}
         annotation.sync[name] = annotation.sync[name] or node
@@ -270,8 +270,9 @@ __exports.Parser = __class(nil, {
                 rhsNode.value = -1 * rhsNode.value
                 node = rhsNode
             else
-                node = NewNode(nodeList, true)
-                node.type = opType
+                node = newNodeWithChild(nodeList)
+                node.type = "operator"
+                node.operatorType = opType
                 node.expressionType = "unary"
                 node.operator = operator
                 node.precedence = precedence
@@ -305,8 +306,9 @@ __exports.Parser = __class(nil, {
                     if  not rhsNode then
                         return nil
                     end
-                    node = NewNode(nodeList, true)
-                    node.type = opType
+                    node = newNodeWithChild(nodeList)
+                    node.type = "operator"
+                    node.operatorType = opType
                     node.expressionType = "binary"
                     node.operator = operator
                     node.precedence = precedence
@@ -363,7 +365,7 @@ __exports.Parser = __class(nil, {
             return nil
         end
         local node
-        node = NewNode(nodeList, true)
+        node = newNodeWithChild(nodeList)
         node.type = "function"
         node.name = name
         node.child[1] = argumentNode
