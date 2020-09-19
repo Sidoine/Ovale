@@ -326,10 +326,10 @@ Define(shadow_crash_debuff_1 342835)
   SpellInfo(shadow_crash_debuff_1 duration=15 channel=15 max_stacks=2 gcd=0 offgcd=1)
   # Damage taken from the Priests' Shadow Crash increased by w2.
   SpellAddTargetDebuff(shadow_crash_debuff_1 shadow_crash_debuff_1=1)
-Define(shadow_word_death 190719)
+Define(shadow_word_death 32379)
+# A word of dark binding that inflicts (125 of Spell Power) Shadow damage to the target. If the target is not killed by Shadow Word: Death, the caster takes damage equal to the damage inflicted upon the target.rnrnDamage increased by s3 to targets below s2 health.?c3[][]?s81749[rnrnDoes not trigger Atonement.][]
 # Rank 2: Shadow Word: Death's cooldown is reduced by m1/-1000 sec.
-  SpellInfo(shadow_word_death channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shadow_word_death shadow_word_death=1)
+  SpellInfo(shadow_word_death cd=30)
 Define(shadow_word_pain 589)
 # A word of darkness that causes (19 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 12 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
 # Rank 2: Increases the duration of Shadow Word: Pain by m1/1000 sec.

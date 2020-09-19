@@ -288,7 +288,7 @@ export class Emiter {
                     if (modifierName.before) {
                         name = modifierName.name + name;
                     } else {
-                        name += modifierName;
+                        name += modifierName.name;
                     }
                 }
 

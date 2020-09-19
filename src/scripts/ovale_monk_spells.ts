@@ -172,7 +172,7 @@ Define(expel_harm_2 322106)
   SpellInfo(expel_harm_2 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(expel_harm_2 expel_harm_2=1)
 Define(expel_harm_3 325214)
-# Expel Harm can be cast during Soothing Mist, and heals the Monk and their Soothing Mist target.
+# Expel Harm can be cast during Soothing Mist, and additionally heals the Soothing Mist target.
   SpellInfo(expel_harm_3 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(expel_harm_3 expel_harm_3=1)
 Define(fireblood_0 265221)
@@ -194,6 +194,7 @@ Define(fists_of_fury 113656)
   SpellAddBuff(fists_of_fury fists_of_fury=1)
 Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
+# Rank 2: Reduces the cooldown of Flying Serpent Kick by abs(s0/1000) sec.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
   SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
 Define(focused_azerite_beam_0 295258)
@@ -216,7 +217,7 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fortifying_brew 243435)
 # Turns your skin to stone, increasing your current and maximum health by s1, and reducing damage taken by s2 for 15 seconds.
-# Rank 2: Cooldown reduced by s1/-600 min.
+# Rank 2: Cooldown reduced by s1/-60000 min.
   SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
   # Maximum health increased by w1.rnDamage taken reduced by w2.?w4>1[rnAbsorbs w4 damage.][]
   SpellAddBuff(fortifying_brew fortifying_brew=1)
@@ -224,11 +225,16 @@ Define(gift_of_the_ox 124502)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
   SpellInfo(gift_of_the_ox channel=0 gcd=0 offgcd=1)
   SpellAddBuff(gift_of_the_ox gift_of_the_ox=1)
-Define(gladiators_badge 277185)
+Define(gladiators_badge_0 277185)
 # Increases primary stat by s1 for 15 seconds.rn
-  SpellInfo(gladiators_badge cd=120 duration=15 channel=15 gcd=0 offgcd=1)
+  SpellInfo(gladiators_badge_0 cd=120 duration=15 channel=15 gcd=0 offgcd=1)
   # Primary stat increased by s4.
-  SpellAddBuff(gladiators_badge gladiators_badge=1)
+  SpellAddBuff(gladiators_badge_0 gladiators_badge_0=1)
+Define(gladiators_badge_1 345228)
+# Increases primary stat by s1 for 15 seconds.rn
+  SpellInfo(gladiators_badge_1 cd=120 duration=15 channel=15 gcd=0 offgcd=1)
+  # Primary stat increased by s1.
+  SpellAddBuff(gladiators_badge_1 gladiators_badge_1=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -315,7 +321,7 @@ Define(purifying_blast_5 299347)
 Define(purifying_brew 119582)
 # Clears s1 of your damage delayed with Stagger.?s322510[rnrnIncreases the absorption of your next Celestial Brew by up to 322510s1, based on your current level of Stagger][]
 # Rank 2: Purifying Brew now has 2 charges.
-  SpellInfo(purifying_brew cd=1 charge_cd=15 gcd=0 offgcd=1)
+  SpellInfo(purifying_brew cd=1 charge_cd=20 gcd=0 offgcd=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -427,7 +433,7 @@ Define(tiger_palm 100780)
   SpellInfo(tiger_palm energy=50 chi=0)
 Define(touch_of_death 322109)
 # You exploit the enemy target's weakest point, instantly killing ?s322113[creatures if they have less health than you.][them.rnrnOnly usable on creatures that have less health than you]?s322113[ Deals damage equal to s3 of your maximum health against players and stronger creatures under s2 health.][.]?s325095[rnrnClears Stagger damage based on 325095s1 of damage dealt.][]
-# Rank 3: Touch of Death increases the Monk's Physical damage by 344361s1 for 8 seconds.
+# Rank 3: Touch of Death increases the Monk's Physical damage by 344361s1 for 10 seconds.
   SpellInfo(touch_of_death cd=180)
 Define(touch_of_karma 122470)
 # Absorbs all damage taken for 10 seconds, up to s3 of your maximum health, and redirects s4 of that amount to the enemy target as Nature damage over 6 seconds.
@@ -470,6 +476,7 @@ SpellList(invoke_niuzao_the_black_ox invoke_niuzao_the_black_ox_0 invoke_niuzao_
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
+SpellList(gladiators_badge gladiators_badge_0 gladiators_badge_1)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
@@ -509,7 +516,7 @@ Define(whirling_dragon_punch_talent 20) #22105
 Define(ashvanes_razor_coral_item 169311)
 Define(cyclotronic_blast_item 167672)
 Define(dribbling_inkpod_item 169319)
-Define(gladiators_medallion_item 111306)
+Define(gladiators_medallion_item 184268)
 Define(lustrous_golden_plumage_item 159617)
 Define(remote_guidance_device_item 169769)
 Define(the_crucible_of_flame_essence_id 12)

@@ -529,6 +529,7 @@ interface MiscOperandModifier {
 const powerModifiers: LuaObj<MiscOperandModifier> = {
     ["max"]: { name: "max", before: true },
     ["deficit"]: { name: "deficit" },
+    ["pct"]: { name: "percent" },
 };
 
 export interface MiscOperand {
@@ -539,15 +540,28 @@ export interface MiscOperand {
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
+    ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
+    ["cp_max_spend"]: { name: "maxcombopoints" },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
     ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
     ["focus"]: { name: "focus", modifiers: powerModifiers },
+    ["fury"]: { name: "fury", modifiers: powerModifiers },
+    ["insanity"]: { name: "insanity", modifiers: powerModifiers },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
+    ["mana"]: { name: "mana", modifiers: powerModifiers },
+    ["pain"]: { name: "pain", modifiers: powerModifiers },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
+    ["rune"]: { name: "rune", modifiers: powerModifiers },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
+    ["soul_framgents"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "souldshards", modifiers: powerModifiers },
+    ["stealthed"]: {
+        name: "stealthed",
+        modifiers: { all: { name: "" }, rogue: { name: "" } },
+    },
     ["time"]: { name: "timeincombat" },
+    ["time_to_shard"]: { name: "timetoshard" },
 };
 export let RUNE_OPERAND: LuaObj<string> = {
     ["rune"]: "rune",

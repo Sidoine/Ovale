@@ -2363,7 +2363,7 @@ __exports.Emiter = __class(nil, {
                     if modifierName.before then
                         name = modifierName.name .. name
                     else
-                        name = name .. modifierName
+                        name = name .. modifierName.name
                     end
                 end
                 if tokenIterator() then

@@ -228,6 +228,9 @@ local powerModifiers = {
     },
     ["deficit"] = {
         name = "deficit"
+    },
+    ["pct"] = {
+        name = "percent"
     }
 }
 __exports.MISC_OPERAND = {
@@ -237,6 +240,13 @@ __exports.MISC_OPERAND = {
     ["chi"] = {
         name = "chi",
         modifiers = powerModifiers
+    },
+    ["combo_points"] = {
+        name = "combopoints",
+        modifiers = powerModifiers
+    },
+    ["cp_max_spend"] = {
+        name = "maxcombopoints"
     },
     ["energy"] = {
         name = "energy",
@@ -253,24 +263,62 @@ __exports.MISC_OPERAND = {
         name = "focus",
         modifiers = powerModifiers
     },
+    ["fury"] = {
+        name = "fury",
+        modifiers = powerModifiers
+    },
+    ["insanity"] = {
+        name = "insanity",
+        modifiers = powerModifiers
+    },
     ["maelstrom"] = {
         name = "maelstrom",
+        modifiers = powerModifiers
+    },
+    ["mana"] = {
+        name = "mana",
+        modifiers = powerModifiers
+    },
+    ["pain"] = {
+        name = "pain",
         modifiers = powerModifiers
     },
     ["rage"] = {
         name = "rage",
         modifiers = powerModifiers
     },
+    ["rune"] = {
+        name = "rune",
+        modifiers = powerModifiers
+    },
     ["runic_power"] = {
         name = "runicpower",
+        modifiers = powerModifiers
+    },
+    ["soul_framgents"] = {
+        name = "soulfragments",
         modifiers = powerModifiers
     },
     ["soul_shard"] = {
         name = "souldshards",
         modifiers = powerModifiers
     },
+    ["stealthed"] = {
+        name = "stealthed",
+        modifiers = {
+            all = {
+                name = ""
+            },
+            rogue = {
+                name = ""
+            }
+        }
+    },
     ["time"] = {
         name = "timeincombat"
+    },
+    ["time_to_shard"] = {
+        name = "timetoshard"
     }
 }
 __exports.RUNE_OPERAND = {

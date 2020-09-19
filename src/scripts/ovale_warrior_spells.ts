@@ -394,9 +394,9 @@ Define(recklessness 1719)
   # Rage generation increased by s5.rnCritical strike chance of all abilities increased by w1.?a202751[rnBloodthirst and Raging Blow upgraded to @spellname335096 and @spellname335097.][]
   SpellAddBuff(recklessness recklessness=1)
 Define(rend 772)
-# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 15 seconds.
+# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 15 seconds.rnrnIncreases critical damage you deal to the enemy by s3.
   SpellInfo(rend rage=30 duration=15 tick=3 talent=rend_talent)
-  # Bleeding for w2 damage every t2 sec.
+  # Bleeding for w2 damage every t2 sec. Taking w3 increased critical damage from @auracaster.
   SpellAddTargetDebuff(rend rend=1)
 Define(revenge 6572)
 # Swing in a wide arc, dealing s1 Physical damage to all enemies in front of you. Deals reduced damage beyond <cap> targets.rnrnYour successful dodges and parries have a chance to make your next Revenge cost no Rage.
@@ -567,7 +567,7 @@ Define(ravager_talent_protection 18) #22401
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
 Define(rend_talent 9) #19138
-# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 15 seconds.
+# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 15 seconds.rnrnIncreases critical damage you deal to the enemy by s3.
 Define(siegebreaker_talent 21) #16037
 # Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 10 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(skullsplitter_talent 3) #22371

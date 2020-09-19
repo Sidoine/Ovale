@@ -117,8 +117,8 @@ Define(cheap_shot 1833)
   # Stunned.
   SpellAddTargetDebuff(cheap_shot cheap_shot=1)
 Define(concealed_blunderbuss 340587)
-# When Saber Slash strikes an additional time, there is a s1 chance that your next Pistol Shot will fire s2 additional times.
-  SpellInfo(concealed_blunderbuss duration=8 gcd=0 offgcd=1)
+# When Sinister Strike hits an additional time, there is a s1 chance that your next Pistol Shot will fire s2 additional times.
+  SpellInfo(concealed_blunderbuss duration=10 gcd=0 offgcd=1)
   # Your next Pistol Shot fires 340088s2 additional times.
   SpellAddBuff(concealed_blunderbuss concealed_blunderbuss=1)
 Define(concentrated_flame_0 295368)
@@ -176,7 +176,7 @@ Define(dispatch 2098)
   SpellInfo(dispatch energy=35 combopoints=1 gcd=1)
   SpellInfo(eviscerate replaced_by=dispatch)
 Define(dreadblades 343142)
-# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][]  Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
+# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
   SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1 talent=dreadblades_talent)
   # Sinister Strike, ?s196937[Ghostly Strike, ][]Ambush, and Pistol Shot will refill all of your combo points when used.
   SpellAddBuff(dreadblades dreadblades=1)
@@ -201,7 +201,6 @@ Define(envenom 32645)
   SpellInfo(eviscerate replaced_by=envenom)
   # Poison application chance increased by s2.?s340081[rnPoison critical strikes generate 340426s1 Energy.][]
   SpellAddBuff(envenom envenom=1)
-
 Define(eviscerate 196819)
 # Finishing move that disembowels the target, causing damage per combo point.?s231716[ Targets with Find Weakness suffer an additional 231716s1 damage as Shadow.][]rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
 # Rank 2: Eviscerate deals an additional s1 damage as Shadow to targets with your Find Weakness active.
@@ -306,7 +305,7 @@ Define(kidney_shot 408)
   # Stunned.
   SpellAddTargetDebuff(kidney_shot kidney_shot=1)
 Define(killing_spree 51690)
-# Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5  nearby enemies for s2 damage.
+# Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5 nearby enemies for s2 damage.
   SpellInfo(killing_spree cd=120 duration=2 gcd=1 tick=0.4 talent=killing_spree_talent)
   # Attacking an enemy every t1 sec.
   SpellAddBuff(killing_spree killing_spree=1)
@@ -344,9 +343,9 @@ Define(opportunity 195627)
   # Your next Pistol Shot costs s1 less Energy and deals s3 increased damage.
   SpellAddBuff(opportunity opportunity=1)
 Define(perforated_veins_buff 341572)
-# Shadowstrike increases the damage of your next Backstab by 341572s1, stacking up to 341572u times.
+# Shadowstrike increases the damage of your next Backstab by |cFFFFFFFFs1|r, stacking up to 341572u times.
   SpellInfo(perforated_veins_buff duration=12 max_stacks=3 gcd=0 offgcd=1)
-  # Backstab damage increased by w1.
+  # Damage of next Backstab increased by w1.
   SpellAddBuff(perforated_veins_buff perforated_veins_buff=1)
 Define(pistol_shot 185763)
 # Draw a concealed pistol and fire a quick shot at an enemy, dealing s1*<CAP>/AP Physical damage and reducing movement speed by s3 for 6 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
@@ -457,7 +456,7 @@ Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1 talent=secret_technique_talent)
 Define(sepsis 328306)
-# Infect the target's blood, dealing o1 Nature damage over 10 seconds. If the target survives its full duration, they suffer an additional s1*s4 damage and you Vanish from sight.rnrnCooldown reduced by s3 sec if Sepsis does not last its full duration.
+# Infect the target's blood, dealing o1 Nature damage over 10 seconds. If the target survives its full duration, they suffer an additional 328306s1 damage and you Vanish from sight.rnrnCooldown reduced by s3 sec if Sepsis does not last its full duration.
   SpellInfo(sepsis gcd=0 offgcd=1)
 Define(serrated_bone_spike_0 324074)
 # Embed a bone spike in the target, dealing s1 Physical damage every t2 sec until they die.rnrnAttacking with Serrated Bone Spike causes all of your active bone spikes to fracture and strike your current target, increasing initial damage by s3 per spike.
@@ -471,7 +470,7 @@ Define(serrated_bone_spike_1 328547)
   SpellAddTargetDebuff(serrated_bone_spike_1 serrated_bone_spike_debuff=1)
   SpellAddTargetDebuff(serrated_bone_spike_1 serrated_bone_spike_1=1)
 Define(serrated_bone_spike_debuff 324073)
-# @spelldesc323737
+# Embed a bone spike in the target, dealing 324073s1 Bleed damage every 324073t1 sec until they die. Deals s1 damage and generates 1 Combo Point per active bone spike.rnrnRefunds 1 charge when target dies or is healed to full.rnrn|cFFFFFFFFAwards 1 combo point.|r
   SpellInfo(serrated_bone_spike_debuff gcd=1 tick=3)
   # Bleeding for w1 every t1 sec.
   SpellAddTargetDebuff(serrated_bone_spike_debuff serrated_bone_spike_debuff=1)
@@ -531,7 +530,7 @@ Define(skull_and_crossbones 199603)
   # Sinister Strike has an additional s1 chance of striking an additional time.
   SpellAddBuff(skull_and_crossbones skull_and_crossbones=1)
 Define(slaughter 323654)
-# Slaughter the target, causing s1 Physical damage.  The target's anima mixes with your lethal poison, coating your weapons for the next 5 minutes.rnrnSlaughter Poison deals Shadow damage over 12 sec. and steals 15 of healing done to the target.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Slaughter the target, dealing s1 Physical damage. The target's anima mixes with your lethal poison, replacing it with a more powerful lethal poison for the next 5 minutes.rnrnSlaughter Poison deals Shadow damage over 12 sec. and steals 15 of healing done to the target.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(slaughter energy=50 gcd=1 combopoints=-2)
 
 Define(slice_and_dice 5171)
@@ -618,7 +617,7 @@ Define(dark_shadow_talent 16) #22335
 Define(deeper_stratagem_talent 8) #19240
 # You may have a maximum of s3 combo points, your finishing moves consume up to s3 combo points, and your finishing moves deal s4 increased damage.
 Define(dreadblades_talent 18) #19250
-# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][]  Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
+# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
 Define(enveloping_shadows_talent 18) #22336
 # Deepening Shadows reduces the remaining cooldown of Shadow Dance by an additional @switch<s3>[s1/10][s1/10.1] sec per combo point spent.rnrnShadow Dance gains s2 additional charge.
 Define(exsanguinate_talent 18) #22344
@@ -632,7 +631,7 @@ Define(hidden_blades_talent 20) #22133
 Define(internal_bleeding_talent 13) #19245
 # Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 6 seconds, based on combo points spent.
 Define(killing_spree_talent 21) #23175
-# Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5  nearby enemies for s2 damage.
+# Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5 nearby enemies for s2 damage.
 Define(marked_for_death_talent 9) #19241
 # Marks the target, instantly generating s1 combo points. Cooldown reset if the target dies within 60 seconds.
 Define(master_assassin_talent 6) #23022

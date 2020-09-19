@@ -1278,7 +1278,7 @@ AddFunction protection_defaultmainactions
  #berserking
  spell(berserking)
  #ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
- if rage[object Object]() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } spell(ignore_pain)
+ if ragedeficit() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } spell(ignore_pain)
  #worldvein_resonance,if=cooldown.avatar.remains<=2
  if spellcooldown(avatar) <= 2 spell(worldvein_resonance)
  #ripple_in_space
@@ -1312,7 +1312,7 @@ AddFunction protection_defaultshortcdactions
   #bag_of_tricks
   spell(bag_of_tricks)
 
-  unless rage[object Object]() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame)
+  unless ragedeficit() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame)
   {
    #avatar
    spell(avatar)
@@ -1330,7 +1330,7 @@ AddFunction protection_defaultshortcdactions
 
 AddFunction protection_defaultshortcdpostconditions
 {
- timeincombat() == 0 and spell(intercept) or spell(berserking) or rage[object Object]() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame) or enemies() >= 3 and protectionaoeshortcdpostconditions() or protectionstshortcdpostconditions()
+ timeincombat() == 0 and spell(intercept) or spell(berserking) or ragedeficit() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame) or enemies() >= 3 and protectionaoeshortcdpostconditions() or protectionstshortcdpostconditions()
 }
 
 AddFunction protection_defaultcdactions
@@ -1360,7 +1360,7 @@ AddFunction protection_defaultcdactions
     #potion,if=buff.avatar.up|target.time_to_die<25
     if { buffpresent(avatar) or target.timetodie() < 25 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
-    unless rage[object Object]() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame)
+    unless ragedeficit() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame)
     {
      #last_stand,if=cooldown.anima_of_death.remains<=2
      if spellcooldown(anima_of_death) <= 2 spell(last_stand)
@@ -1384,7 +1384,7 @@ AddFunction protection_defaultcdactions
 
 AddFunction protection_defaultcdpostconditions
 {
- timeincombat() == 0 and spell(intercept) or spell(berserking) or spell(bag_of_tricks) or rage[object Object]() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame) or spell(avatar) or enemies() >= 3 and protectionaoecdpostconditions() or protectionstcdpostconditions()
+ timeincombat() == 0 and spell(intercept) or spell(berserking) or spell(bag_of_tricks) or ragedeficit() < 25 + 20 * talentpoints(booming_voice_talent) * { spellcooldown(demoralizing_shout) == 0 } and spell(ignore_pain) or spellcooldown(avatar) <= 2 and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { buffexpires(avatar) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 or azeriteessencerank(the_crucible_of_flame_essence_id) < 3 } and spell(concentrated_flame) or spell(avatar) or enemies() >= 3 and protectionaoecdpostconditions() or protectionstcdpostconditions()
 }
 
 ### Protection icons.

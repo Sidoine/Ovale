@@ -91,8 +91,6 @@ AddFunction discipline_defaultmainactions
  if not target.debuffpresent(purge_the_wicked_debuff) spell(purge_the_wicked)
  #shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
  if not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
- #shadow_word_death
- spell(shadow_word_death)
  #schism
  spell(schism)
  #mind_blast
@@ -106,7 +104,7 @@ AddFunction discipline_defaultmainactions
  #power_word_solace
  spell(power_word_solace)
  #divine_star,if=mana.pct>80
- if FIXME_mana.pct > 80 spell(divine_star)
+ if manapercent() > 80 spell(divine_star)
  #smite
  spell(smite)
  #shadow_word_pain
@@ -128,12 +126,18 @@ AddFunction discipline_defaultshortcdactions
   spell(bag_of_tricks)
   #shadow_covenant
   spell(shadow_covenant)
+
+  unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
+  {
+   #shadow_word_death
+   spell(shadow_word_death)
+  }
  }
 }
 
 AddFunction discipline_defaultshortcdpostconditions
 {
- spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or FIXME_mana.pct > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+ spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
 }
 
 AddFunction discipline_defaultcdactions
@@ -164,7 +168,7 @@ AddFunction discipline_defaultcdactions
 
 AddFunction discipline_defaultcdpostconditions
 {
- hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(bag_of_tricks) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or FIXME_mana.pct > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+ hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(bag_of_tricks) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
 }
 
 ### Discipline icons.
@@ -346,13 +350,9 @@ AddFunction shadowmainmainactions
  unless shadowcdsmainpostconditions()
  {
   #devouring_plague,if=talent.legacy_of_the_void.enabled&cooldown.void_eruption.up&insanity=100
-  if hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and FIXME_insanity == 100 spell(devouring_plague)
+  if hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and insanity() == 100 spell(devouring_plague)
   #devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&buff.voidform.down))
-  if { target.refreshable(devouring_plague) or FIXME_insanity > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } spell(devouring_plague)
-  #shadow_word_death,target_if=target.health.pct<20
-  if target.healthpercent() < 20 spell(shadow_word_death)
-  #shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.health.pct>30
-  if FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 spell(shadow_word_death)
+  if { target.refreshable(devouring_plague) or insanity() > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } spell(devouring_plague)
   #mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thoughts.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if enemies() > mind_sear_cutoff() and buffpresent(dark_thoughts) spell(mind_sear)
   #mind_flay,if=buff.dark_thoughts.up&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
@@ -386,7 +386,7 @@ AddFunction shadowmainmainpostconditions
 AddFunction shadowmainshortcdactions
 {
  #void_eruption,if=cooldown.power_infusion.up&insanity>=40&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&dot.devouring_plague.ticking))
- if not spellcooldown(power_infusion) > 0 and FIXME_insanity >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } spell(void_eruption)
+ if not spellcooldown(power_infusion) > 0 and insanity() >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } spell(void_eruption)
 
  unless not target.debuffrefreshable(devouring_plague) and spell(void_bolt)
  {
@@ -398,22 +398,22 @@ AddFunction shadowmainshortcdactions
    #damnation,target_if=!variable.all_dots_up
    if not all_dots_up() spell(damnation)
 
-   unless hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and FIXME_insanity == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or FIXME_insanity > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague) or target.healthpercent() < 20 and spell(shadow_word_death)
+   unless hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and insanity() == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or insanity() > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague)
    {
+    #shadow_word_death,target_if=target.health.pct<20
+    if target.healthpercent() < 20 spell(shadow_word_death)
     #surrender_to_madness,target_if=target.time_to_die<25&buff.voidform.down
     if target.timetodie() < 25 and buffexpires(voidform_buff) spell(surrender_to_madness)
     #mindbender
     spell(mindbender)
     #void_torrent,target_if=variable.all_dots_up&!cooldown.void_eruption.up&target.time_to_die>4
     if all_dots_up() and not { not spellcooldown(void_eruption) > 0 } and target.timetodie() > 4 spell(void_torrent)
-
-    unless FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 and spell(shadow_word_death)
-    {
-     #shadow_crash,if=spell_targets.shadow_crash=1&(cooldown.shadow_crash.charges=3|debuff.shadow_crash_debuff.up|action.shadow_crash.in_flight|target.time_to_die<cooldown.shadow_crash.full_recharge_time)&raid_event.adds.in>30
-     if enemies() == 1 and { spellcharges(shadow_crash) == 3 or target.debuffpresent(shadow_crash_debuff) or inflighttotarget(shadow_crash) or target.timetodie() < spellcooldown(shadow_crash) } and 600 > 30 spell(shadow_crash)
-     #shadow_crash,if=raid_event.adds.in>30&spell_targets.shadow_crash>1
-     if 600 > 30 and enemies() > 1 spell(shadow_crash)
-    }
+    #shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.health.pct>30
+    if FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 spell(shadow_word_death)
+    #shadow_crash,if=spell_targets.shadow_crash=1&(cooldown.shadow_crash.charges=3|debuff.shadow_crash_debuff.up|action.shadow_crash.in_flight|target.time_to_die<cooldown.shadow_crash.full_recharge_time)&raid_event.adds.in>30
+    if enemies() == 1 and { spellcharges(shadow_crash) == 3 or target.debuffpresent(shadow_crash_debuff) or inflighttotarget(shadow_crash) or target.timetodie() < spellcooldown(shadow_crash) } and 600 > 30 spell(shadow_crash)
+    #shadow_crash,if=raid_event.adds.in>30&spell_targets.shadow_crash>1
+    if 600 > 30 and enemies() > 1 spell(shadow_crash)
    }
   }
  }
@@ -421,12 +421,12 @@ AddFunction shadowmainshortcdactions
 
 AddFunction shadowmainshortcdpostconditions
 {
- not target.debuffrefreshable(devouring_plague) and spell(void_bolt) or shadowcdsshortcdpostconditions() or hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and FIXME_insanity == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or FIXME_insanity > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague) or target.healthpercent() < 20 and spell(shadow_word_death) or FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 and spell(shadow_word_death) or enemies() > mind_sear_cutoff() and buffpresent(dark_thoughts) and spell(mind_sear) or buffpresent(dark_thoughts) and dots_up() and spell(mind_flay) or { searing_nightmare_cutoff() and not { not spellcooldown(power_infusion) > 0 } or target.debuffrefreshable(shadow_word_pain) and enemies() > 1 } and spell(searing_nightmare) or dots_up() and spell(mind_blast) or dots_up() and 600 > casttime(mind_blast) + 0.5 and enemies() < 4 and spell(mind_blast) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and hastalent(psychic_link_talent) and enemies() > 2 and spell(shadow_word_pain) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and { not hastalent(psychic_link_talent) or hastalent(psychic_link_talent) and enemies() <= 2 } and spell(shadow_word_pain) or { target.refreshable(vampiric_touch) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain) or buffpresent(unfurling_darkness_buff) } and spell(vampiric_touch) or enemies() > mind_sear_cutoff() and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
+ not target.debuffrefreshable(devouring_plague) and spell(void_bolt) or shadowcdsshortcdpostconditions() or hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and insanity() == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or insanity() > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague) or enemies() > mind_sear_cutoff() and buffpresent(dark_thoughts) and spell(mind_sear) or buffpresent(dark_thoughts) and dots_up() and spell(mind_flay) or { searing_nightmare_cutoff() and not { not spellcooldown(power_infusion) > 0 } or target.debuffrefreshable(shadow_word_pain) and enemies() > 1 } and spell(searing_nightmare) or dots_up() and spell(mind_blast) or dots_up() and 600 > casttime(mind_blast) + 0.5 and enemies() < 4 and spell(mind_blast) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and hastalent(psychic_link_talent) and enemies() > 2 and spell(shadow_word_pain) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and { not hastalent(psychic_link_talent) or hastalent(psychic_link_talent) and enemies() <= 2 } and spell(shadow_word_pain) or { target.refreshable(vampiric_touch) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain) or buffpresent(unfurling_darkness_buff) } and spell(vampiric_touch) or enemies() > mind_sear_cutoff() and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
 }
 
 AddFunction shadowmaincdactions
 {
- unless not spellcooldown(power_infusion) > 0 and FIXME_insanity >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } and spell(void_eruption) or not target.debuffrefreshable(devouring_plague) and spell(void_bolt)
+ unless not spellcooldown(power_infusion) > 0 and insanity() >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } and spell(void_eruption) or not target.debuffrefreshable(devouring_plague) and spell(void_bolt)
  {
   #call_action_list,name=cds
   shadowcdscdactions()
@@ -435,7 +435,7 @@ AddFunction shadowmaincdactions
 
 AddFunction shadowmaincdpostconditions
 {
- not spellcooldown(power_infusion) > 0 and FIXME_insanity >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } and spell(void_eruption) or not target.debuffrefreshable(devouring_plague) and spell(void_bolt) or shadowcdscdpostconditions() or not all_dots_up() and spell(damnation) or hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and FIXME_insanity == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or FIXME_insanity > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague) or target.healthpercent() < 20 and spell(shadow_word_death) or target.timetodie() < 25 and buffexpires(voidform_buff) and spell(surrender_to_madness) or spell(mindbender) or all_dots_up() and not { not spellcooldown(void_eruption) > 0 } and target.timetodie() > 4 and spell(void_torrent) or FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 and spell(shadow_word_death) or enemies() == 1 and { spellcharges(shadow_crash) == 3 or target.debuffpresent(shadow_crash_debuff) or inflighttotarget(shadow_crash) or target.timetodie() < spellcooldown(shadow_crash) } and 600 > 30 and spell(shadow_crash) or 600 > 30 and enemies() > 1 and spell(shadow_crash) or enemies() > mind_sear_cutoff() and buffpresent(dark_thoughts) and spell(mind_sear) or buffpresent(dark_thoughts) and dots_up() and spell(mind_flay) or { searing_nightmare_cutoff() and not { not spellcooldown(power_infusion) > 0 } or target.debuffrefreshable(shadow_word_pain) and enemies() > 1 } and spell(searing_nightmare) or dots_up() and spell(mind_blast) or dots_up() and 600 > casttime(mind_blast) + 0.5 and enemies() < 4 and spell(mind_blast) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and hastalent(psychic_link_talent) and enemies() > 2 and spell(shadow_word_pain) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and { not hastalent(psychic_link_talent) or hastalent(psychic_link_talent) and enemies() <= 2 } and spell(shadow_word_pain) or { target.refreshable(vampiric_touch) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain) or buffpresent(unfurling_darkness_buff) } and spell(vampiric_touch) or enemies() > mind_sear_cutoff() and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
+ not spellcooldown(power_infusion) > 0 and insanity() >= 40 and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and target.debuffpresent(devouring_plague) } and spell(void_eruption) or not target.debuffrefreshable(devouring_plague) and spell(void_bolt) or shadowcdscdpostconditions() or not all_dots_up() and spell(damnation) or hastalent(legacy_of_the_void_talent) and not spellcooldown(void_eruption) > 0 and insanity() == 100 and spell(devouring_plague) or { target.refreshable(devouring_plague) or insanity() > 75 } and not { not spellcooldown(power_infusion) > 0 } and { not hastalent(searing_nightmare_talent) or hastalent(searing_nightmare_talent) and not searing_nightmare_cutoff() } and { not hastalent(legacy_of_the_void_talent) or hastalent(legacy_of_the_void_talent) and buffexpires(voidform_buff) } and spell(devouring_plague) or target.healthpercent() < 20 and spell(shadow_word_death) or target.timetodie() < 25 and buffexpires(voidform_buff) and spell(surrender_to_madness) or spell(mindbender) or all_dots_up() and not { not spellcooldown(void_eruption) > 0 } and target.timetodie() > 4 and spell(void_torrent) or FIXME_runeforge.painbreaker_psalm.equipped and dots_up() and target.healthpercent() > 30 and spell(shadow_word_death) or enemies() == 1 and { spellcharges(shadow_crash) == 3 or target.debuffpresent(shadow_crash_debuff) or inflighttotarget(shadow_crash) or target.timetodie() < spellcooldown(shadow_crash) } and 600 > 30 and spell(shadow_crash) or 600 > 30 and enemies() > 1 and spell(shadow_crash) or enemies() > mind_sear_cutoff() and buffpresent(dark_thoughts) and spell(mind_sear) or buffpresent(dark_thoughts) and dots_up() and spell(mind_flay) or { searing_nightmare_cutoff() and not { not spellcooldown(power_infusion) > 0 } or target.debuffrefreshable(shadow_word_pain) and enemies() > 1 } and spell(searing_nightmare) or dots_up() and spell(mind_blast) or dots_up() and 600 > casttime(mind_blast) + 0.5 and enemies() < 4 and spell(mind_blast) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and hastalent(psychic_link_talent) and enemies() > 2 and spell(shadow_word_pain) or target.refreshable(shadow_word_pain) and target.timetodie() > 4 and not hastalent(misery_talent) and { not hastalent(psychic_link_talent) or hastalent(psychic_link_talent) and enemies() <= 2 } and spell(shadow_word_pain) or { target.refreshable(vampiric_touch) and target.timetodie() > 6 or hastalent(misery_talent) and target.debuffrefreshable(shadow_word_pain) or buffpresent(unfurling_darkness_buff) } and spell(vampiric_touch) or enemies() > mind_sear_cutoff() and spell(mind_sear) or spell(mind_flay) or spell(shadow_word_pain)
 }
 
 ### actions.essences

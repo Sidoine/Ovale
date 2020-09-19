@@ -532,8 +532,6 @@ Define(icecap_talent 19) #22023
 # Your Frost Strike?s207230[, Frostscythe,][] and Obliterate critical strikes reduce the remaining cooldown of Pillar of Frost by <cd> sec.
 Define(obliteration_talent 20) #22109
 # While Pillar of Frost is active, Frost Strike?s194913[, Glacial Advance,][] and Howling Blast always grant Killing Machine and have a s2 chance to generate a Rune.
-Define(ossuary_talent 8) #22134
-# While you have at least s1 Bone Shield charges, the cost of Death Strike is reduced by 219788m1/-10 Runic Power.rnrnAdditionally, your maximum Runic Power is increased by m2/10.
 Define(rapid_decomposition_talent 4) #19218
 # Your Blood Plague and Death and Decay deal damage s2 more often.rnrnAdditionally, your Blood Plague leeches s3 more Health.
 Define(runic_attenuation_talent 4) #22019

@@ -25,24 +25,20 @@ Define(blood_of_the_enemy_2 297971)
 Define(blood_of_the_enemy_3 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_3)
-Define(chaos_nova 179057)
+Define(chaos_nova_0 179057)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
-# Rank 2: Each enemy stunned by Chaos Nova has a 179057s3 chance to generate a Lesser Soul Fragment.
-  SpellInfo(chaos_nova fury=30 cd=60 duration=2)
+  SpellInfo(chaos_nova_0 fury=30 cd=60 duration=2)
   # Stunned.
-  SpellAddTargetDebuff(chaos_nova chaos_nova=1)
-Define(chaos_strike_0 197125)
+  SpellAddTargetDebuff(chaos_nova_0 chaos_nova_0=1)
+Define(chaos_nova_1 320412)
+# Each enemy stunned by Chaos Nova has a 179057s3 chance to generate a Lesser Soul Fragment.
+  SpellInfo(chaos_nova_1 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(chaos_nova_1 chaos_nova_1=1)
+Define(chaos_strike 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(chaos_strike_0 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chaos_strike_0 chaos_strike_0=1)
-Define(chaos_strike_1 320413)
-# Increases the chance that Chaos Strike will refund 193840s1 Fury by s1.
-  SpellInfo(chaos_strike_1 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chaos_strike_1 chaos_strike_1=1)
-Define(chaos_strike_2 343206)
-# Chaos Strike damage increased by s1.
-  SpellInfo(chaos_strike_2 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chaos_strike_2 chaos_strike_2=1)
+# Rank 3: Chaos Strike damage increased by s1.
+  SpellInfo(chaos_strike fury=40)
+
 Define(concentrated_flame_0 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame_0 duration=6 channel=6 gcd=0 offgcd=1 tick=2)
@@ -79,8 +75,8 @@ Define(consume_magic 278326)
 # Rank 2: Consume Magic generates 278326s2 Fury when a beneficial Magic effect is successfully removed from the target.
   SpellInfo(consume_magic cd=10 fury=-20 pain=-20)
 Define(death_sweep 210152)
-# Strike all nearby enemies for 3*210153sw2+210155sw2 Physical damage, and increase your Dodge chance by s2 for 1 second.
-  SpellInfo(death_sweep fury=35 cd=9 duration=1)
+# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
+  SpellInfo(death_sweep fury=35 cd=9)
   # Dodge chance increased by s3.
   SpellAddBuff(death_sweep death_sweep=1)
 Define(demon_spikes 203720)
@@ -88,9 +84,10 @@ Define(demon_spikes 203720)
 # Rank 2: Demon Spikes also increases your Parry chance by 203819s1 for 6 seconds.
   SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
   SpellInfo(vengeful_retreat replaced_by=demon_spikes)
-Define(demons_bite 162243)
+Define(demons_bite 344859)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
-  SpellInfo(demons_bite fury=-25)
+  SpellInfo(demons_bite)
+
 Define(disrupt_0 183752)
 # Interrupts the enemy's spellcasting and locks them from that school of magic for 3 seconds.|cFFFFFFFF?s183782[rnrnGenerates 218903s1 Fury on a successful interrupt.][]|r
   SpellInfo(disrupt_0 cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -115,7 +112,7 @@ Define(fel_barrage 258925)
 Define(fel_devastation 212084)
 # Unleash the fel within you, damaging enemies directly in front of you for 212105s1*(2/t1) Fire damage over 2 seconds.?s320639[ Causing damage also heals you for up to 212106s1*(2/t1) health.][]
 # Rank 2: Fel Devastation damage also heals you for up to 212106s1*(2/t1) health.
-  SpellInfo(fel_devastation fury=50 cd=45 duration=2 channel=2 tick=0.2)
+  SpellInfo(fel_devastation fury=50 cd=60 duration=2 channel=2 tick=0.2)
   SpellAddBuff(fel_devastation fel_devastation=1)
 Define(fel_eruption 211881)
 # Impales the target for s1 Chaos damage and stuns them for 4 seconds.
@@ -137,7 +134,6 @@ Define(fiery_brand 204021)
 # Brand an enemy with a demonic symbol, instantly dealing sw2 Fire damage?s320962[ and 207771s3*8 seconds Fire damage over 8 seconds][]. The enemy's damage done to you is reduced by s1 for 8 seconds.
 # Rank 3: The duration of Fiery Brand is increased by s1/1000 sec.
   SpellInfo(fiery_brand cd=60)
-  SpellInfo(chaos_nova replaced_by=fiery_brand)
   # Dealing s1 less damage to the branding Demon Hunter.
   SpellAddBuff(fiery_brand fiery_brand=1)
 Define(focused_azerite_beam_0 295258)
@@ -404,11 +400,11 @@ Define(throw_glaive 204157)
 # Throw a demonic glaive at the target, dealing s2 Physical damage. The glaive can ricochet to ?s320386[x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
 # Rank 3: Reduces the cooldown of Throw Glaive by abs(s0/1000) sec.
   SpellInfo(throw_glaive cd=9)
-Define(vengeful_retreat 198793)
+Define(vengeful_retreat 344866)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage?s320635[ and have their movement speed reduced by 198813s1 for 3 seconds][].?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
 # Rank 2: Vengeful Retreat reduces the movement speed of all nearby enemies by 198813s1 for 3 seconds.
-  SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0 offgcd=1)
-  SpellAddBuff(vengeful_retreat vengeful_retreat=1)
+  SpellInfo(vengeful_retreat cd=25 gcd=0 offgcd=1)
+
 Define(worldvein_resonance_0 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance_0)
@@ -422,7 +418,7 @@ Define(worldvein_resonance_3 298611)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance_3)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
-SpellList(chaos_strike chaos_strike_0 chaos_strike_1 chaos_strike_2)
+SpellList(chaos_nova chaos_nova_0 chaos_nova_1)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
 SpellList(disrupt disrupt_0 disrupt_1 disrupt_2)
 SpellList(fel_rush fel_rush_0 fel_rush_1)

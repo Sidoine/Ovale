@@ -18,7 +18,7 @@ Define(ancestral_call 274738)
 Define(arcane_shot 185358)
 # A quick shot that causes sw2 Arcane damage.
 # Rank 2: Arcane Shot Focus cost reduced by s1.
-  SpellInfo(arcane_shot focus=30)
+  SpellInfo(arcane_shot focus=40)
 Define(arcane_torrent_0 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent_0 cd=120 gcd=1 energy=-15)
@@ -77,7 +77,7 @@ Define(berserking_buff 200953)
   # Attack speed and critical strike chance increased by s1.
   SpellAddBuff(berserking_buff berserking_buff=1)
 Define(bestial_wrath 19574)
-# Sends you and your pet into a rage, increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
+# Sends you and your pet into a rage, instantly dealing <damage> Physical damage to its target, and increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
 # Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
   SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
@@ -264,8 +264,9 @@ Define(guardian_of_azeroth_buff 303349)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
 # Rank 2: The cooldown of Harpoon is reduced by m1/-1000 sec.
-  SpellInfo(harpoon cd=1 charge_cd=30 gcd=0 offgcd=1)
-
+  SpellInfo(harpoon cd=1 charge_cd=30 duration=3 gcd=0 offgcd=1)
+  # Rooted.
+  SpellAddTargetDebuff(harpoon harpoon=1)
 Define(hunters_mark 257284)
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.rnrnThe cooldown of Hunter's Mark is reset if the target dies.
   SpellInfo(hunters_mark cd=20 gcd=1)

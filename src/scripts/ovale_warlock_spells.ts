@@ -438,7 +438,7 @@ Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
 Define(unstable_affliction 316099)
-# Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals (23 of Spell Power)*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
+# Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
 # Rank 3: Unstable Affliction's duration is increased by 5 seconds.
   SpellInfo(unstable_affliction duration=16 max_stacks=1 tick=2)
   # Suffering w2 Shadow damage every t2 sec. If dispelled, will cause w2*s1/100 damage to the dispeller and silence them for 196364d.
