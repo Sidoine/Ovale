@@ -16,6 +16,7 @@ import {
     ReturnConstant,
 } from "./Condition";
 import { huge } from "@wowts/math";
+import { OneTimeMessage } from "./tools";
 
 export class CombatState {
     inCombat: boolean = false;
@@ -153,7 +154,7 @@ export class Combat extends States<CombatState> implements StateModule {
                 );
             }
         } else {
-            this.ovale.OneTimeMessage(
+            OneTimeMessage(
                 "Warning: requirement '%s' is missing an argument.",
                 requirement
             );

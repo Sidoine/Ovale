@@ -12,6 +12,8 @@ local TestValue = __Condition.TestValue
 local Compare = __Condition.Compare
 local ReturnConstant = __Condition.ReturnConstant
 local huge = math.huge
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 __exports.CombatState = __class(nil, {
     constructor = function(self)
         self.inCombat = false
@@ -64,7 +66,7 @@ __exports.Combat = __class(States, {
                     self.tracer:Log("    Require NOT combat at time=%f: %s", atTime, result)
                 end
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
             end
             return verified, requirement, index
         end

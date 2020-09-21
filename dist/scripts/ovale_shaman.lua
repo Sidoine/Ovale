@@ -734,7 +734,7 @@ AddFunction furyCheck_SS
 
 AddFunction cooldown_sync
 {
- hastalent(ascendance_talent_enhancement) and { buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } or not hastalent(ascendance_talent_enhancement) and { FIXME_feral_spirit.remains > 5 or spellcooldown(feral_spirit) > 50 }
+ hastalent(ascendance_talent_enhancement) and { buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } or not hastalent(ascendance_talent_enhancement) and { message("feral_spirit.remains is not implemented") > 5 or spellcooldown(feral_spirit) > 50 }
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=enhancement)
@@ -1147,7 +1147,7 @@ AddFunction enhancementcdscdactions
   #ancestral_call,if=variable.cooldown_sync
   if cooldown_sync() spell(ancestral_call)
   #potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
-  if { buffpresent(ascendance_enhancement) or not hastalent(ascendance_talent_enhancement) and FIXME_feral_spirit.remains > 5 or target.timetodie() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if { buffpresent(ascendance_enhancement) or not hastalent(ascendance_talent_enhancement) and message("feral_spirit.remains is not implemented") > 5 or target.timetodie() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
   #feral_spirit

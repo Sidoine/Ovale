@@ -3,70 +3,88 @@ import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "./Localization";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
 import { OvaleOptionsClass } from "./Options";
-import { MakeString, OvaleClass } from "./Ovale";
+import { OvaleClass } from "./Ovale";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
 import { format } from "@wowts/string";
 import { pairs, lualength, LuaArray } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
+import { MakeString } from "./tools";
 
 const OVALE_TRACELOG_MAXLINES = 4096;
 
 export class Tracer {
-    constructor(private options: OvaleOptionsClass, private debug: OvaleDebugClass, private name: string) {
+    constructor(
+        private options: OvaleOptionsClass,
+        private debug: OvaleDebugClass,
+        private name: string
+    ) {
         debug.defaultOptions.args.toggles.args[name] = {
             name: name,
-            desc: format(L["Enable debugging messages for the %s module."], name),
-            type: "toggle"
+            desc: format(
+                L["Enable debugging messages for the %s module."],
+                name
+            ),
+            type: "toggle",
         };
     }
 
-    Debug(...__args:any[]) {
+    Debug(...__args: any[]) {
         let name = this.name;
         if (this.options.db.global.debug[name]) {
-            DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, MakeString(...__args)));
+            DEFAULT_CHAT_FRAME.AddMessage(
+                format("|cff33ff99%s|r: %s", name, MakeString(...__args))
+            );
         }
     }
-    DebugTimestamp(...__args:any[]) {
+    DebugTimestamp(...__args: any[]) {
         let name = this.name;
         if (this.options.db.global.debug[name]) {
             let now = GetTime();
             let s = format("|cffffff00%f|r %s", now, MakeString(...__args));
-            DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
+            DEFAULT_CHAT_FRAME.AddMessage(
+                format("|cff33ff99%s|r: %s", name, s)
+            );
         }
     }
-    Log(...__args:any[]) {
+    Log(...__args: any[]) {
         if (this.debug.trace) {
             let N = this.debug.traceLog.Lines();
             if (N < OVALE_TRACELOG_MAXLINES - 1) {
                 this.debug.traceLog.AddLine(MakeString(...__args));
             } else if (N == OVALE_TRACELOG_MAXLINES - 1) {
-                this.debug.traceLog.AddLine("WARNING: Maximum length of trace log has been reached.");
+                this.debug.traceLog.AddLine(
+                    "WARNING: Maximum length of trace log has been reached."
+                );
             }
         }
     }
-    Error(...__args:any[]) {
+    Error(...__args: any[]) {
         const name = this.name;
         let s = MakeString(...__args);
-        DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r:|cffff3333 Error:|r %s", name, s));
+        DEFAULT_CHAT_FRAME.AddMessage(
+            format("|cff33ff99%s|r:|cffff3333 Error:|r %s", name, s)
+        );
         this.debug.bug = s;
     }
-    Warning(...__args:any[]) {
+    Warning(...__args: any[]) {
         const name = this.name;
         let s = MakeString(...__args);
-        DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: |cff999933Warning:|r %s", name, s));
+        DEFAULT_CHAT_FRAME.AddMessage(
+            format("|cff33ff99%s|r: |cff999933Warning:|r %s", name, s)
+        );
         this.debug.warning = s;
     }
-    Print(...__args:any[]) {
+    Print(...__args: any[]) {
         let name = this.name;
         let s = MakeString(...__args);
         DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
-    }            
+    }
 }
 
 export class OvaleDebugClass {
     self_traced = false;
-    
+
     defaultOptions: any = {
         name: `Ovale ${L["Debug"]}`,
         type: "group",
@@ -75,19 +93,24 @@ export class OvaleDebugClass {
                 name: L["Options"],
                 type: "group",
                 order: 10,
-                args: {
-                },
+                args: {},
                 get: (info: LuaArray<string>) => {
-                    const value = this.options.db.global.debug[info[lualength(info)]];
-                    return (value != undefined);
+                    const value = this.options.db.global.debug[
+                        info[lualength(info)]
+                    ];
+                    return value != undefined;
                 },
                 set: (info: LuaArray<string>, value: string) => {
                     if (!value) {
-                        delete this.options.db.global.debug[info[lualength(info)]];
+                        delete this.options.db.global.debug[
+                            info[lualength(info)]
+                        ];
                     } else {
-                        this.options.db.global.debug[info[lualength(info)]] = value;
+                        this.options.db.global.debug[
+                            info[lualength(info)]
+                        ] = value;
                     }
-                }
+                },
             },
             trace: {
                 name: L["Trace"],
@@ -101,7 +124,7 @@ export class OvaleDebugClass {
                         desc: L["Trace the next frame update."],
                         func: () => {
                             this.DoTrace(true);
-                        }
+                        },
                     },
                     traceLog: {
                         order: 20,
@@ -109,12 +132,12 @@ export class OvaleDebugClass {
                         name: L["Show Trace Log"],
                         func: () => {
                             this.DisplayTraceLog();
-                        }
-                    }
-                }
-            }
-        }
-    }
+                        },
+                    },
+                },
+            },
+        },
+    };
 
     traceLog: TextDump;
     bug?: string;
@@ -123,8 +146,17 @@ export class OvaleDebugClass {
     private module: AceModule & AceTimer;
 
     constructor(private ovale: OvaleClass, private options: OvaleOptionsClass) {
-        this.module = ovale.createModule("OvaleDebug", this.OnInitialize, this.OnDisable, aceTimer);
-        this.traceLog = LibTextDump.New(`${this.ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
+        this.module = ovale.createModule(
+            "OvaleDebug",
+            this.OnInitialize,
+            this.OnDisable,
+            aceTimer
+        );
+        this.traceLog = LibTextDump.New(
+            `${this.ovale.GetName()} - ${L["Trace Log"]}`,
+            750,
+            500
+        );
 
         let actions = {
             debug: {
@@ -134,15 +166,15 @@ export class OvaleDebugClass {
                     let appName = this.module.GetName();
                     AceConfigDialog.SetDefaultSize(appName, 800, 550);
                     AceConfigDialog.Open(appName);
-                }
-            }
-        }
+                },
+            },
+        };
 
         for (const [k, v] of pairs(actions)) {
             options.options.args.actions.args[k] = v;
         }
-        options.defaultDB.global = options.defaultDB.global || {}
-        options.defaultDB.global.debug = {}
+        options.defaultDB.global = options.defaultDB.global || {};
+        options.defaultDB.global.debug = {};
         options.RegisterOptions(this);
     }
 
@@ -153,18 +185,22 @@ export class OvaleDebugClass {
     private OnInitialize = () => {
         let appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, this.defaultOptions);
-        AceConfigDialog.AddToBlizOptions(appName, L["Debug"], this.ovale.GetName());
-    
-    }
-    private OnDisable = () => {
-    }
-    
+        AceConfigDialog.AddToBlizOptions(
+            appName,
+            L["Debug"],
+            this.ovale.GetName()
+        );
+    };
+    private OnDisable = () => {};
+
     DoTrace(displayLog: boolean) {
         this.traceLog.Clear();
         this.trace = true;
         DEFAULT_CHAT_FRAME.AddMessage(format("=== Trace @%f", GetTime()));
         if (displayLog) {
-            this.module.ScheduleTimer(() => {this.DisplayTraceLog()}, 0.5);
+            this.module.ScheduleTimer(() => {
+                this.DisplayTraceLog();
+            }, 0.5);
         }
     }
     ResetTrace() {

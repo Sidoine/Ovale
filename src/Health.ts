@@ -17,6 +17,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleOptionsClass } from "./Options";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
 import { Tracer, OvaleDebugClass } from "./Debug";
+import { OneTimeMessage } from "./tools";
 
 let INFINITY = huge;
 let CLEU_DAMAGE_EVENT = {
@@ -50,7 +51,7 @@ export class OvaleHealthClass {
     constructor(
         private ovaleGuid: OvaleGUIDClass,
         private baseState: BaseState,
-        private ovale: OvaleClass,
+        ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
@@ -211,7 +212,7 @@ export class OvaleHealthClass {
             func = UnitGetTotalHealAbsorbs;
             db = this.absorb;
         } else {
-            this.ovale.OneTimeMessage(
+            OneTimeMessage(
                 "Warning: Invalid event (%s) in UpdateAbsorb.",
                 event
             );
@@ -245,7 +246,7 @@ export class OvaleHealthClass {
             func = UnitHealthMax;
             db = this.maxHealth;
         } else {
-            this.ovale.OneTimeMessage(
+            OneTimeMessage(
                 "Warning: Invalid event (%s) in UpdateHealth.",
                 event
             );
@@ -422,7 +423,7 @@ export class OvaleHealthClass {
                 );
             }
         } else {
-            this.ovale.OneTimeMessage(
+            OneTimeMessage(
                 "Warning: requirement '%s' is missing a threshold argument.",
                 requirement
             );

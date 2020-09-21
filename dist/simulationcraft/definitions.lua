@@ -295,7 +295,7 @@ __exports.MISC_OPERAND = {
         name = "runicpower",
         modifiers = powerModifiers
     },
-    ["soul_framgents"] = {
+    ["soul_fragments"] = {
         name = "soulfragments",
         modifiers = powerModifiers
     },

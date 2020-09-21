@@ -25,7 +25,7 @@ import {
     MAX_COMBO_POINTS,
     ClassId,
 } from "@wowts/wow-mock";
-import { isNumber, isLuaArray } from "./tools";
+import { isNumber, isLuaArray, OneTimeMessage } from "./tools";
 import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleFutureClass } from "./Future";
 import { BaseState } from "./BaseState";
@@ -459,7 +459,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            this.ovale.OneTimeMessage(`No spell cost for ${spell}`);
+            OneTimeMessage(`No spell cost for ${spell}`);
         }
         return [undefined, undefined];
     }
@@ -871,14 +871,14 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 verified = true;
             }
         } else {
-            this.ovale.OneTimeMessage(
+            OneTimeMessage(
                 "Warning: requirement '%s' power is missing a cost argument.",
                 requirement
             );
-            this.ovale.OneTimeMessage(tostring(index));
+            OneTimeMessage(tostring(index));
             if (isLuaArray(tokens)) {
                 for (const [k, v] of pairs(tokens)) {
-                    this.ovale.OneTimeMessage(`${k} = ${tostring(v)}`);
+                    OneTimeMessage(`${k} = ${tostring(v)}`);
                 }
             }
         }

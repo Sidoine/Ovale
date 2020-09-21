@@ -2060,10 +2060,20 @@ __exports.OvaleASTClass = __class(nil, {
         end
         return node
     end,
-    newFunction = function(self, nodeList, name, hasChild)
-        local node = self:NewNode(nodeList, hasChild)
+    newFunction = function(self, nodeList, name, hasParameters)
+        local node = self:NewNode(nodeList)
         node.type = "function"
         node.name = name
+        if hasParameters then
+            node.rawNamedParams = self.rawNamedParametersPool:Get()
+            node.rawPositionalParams = self.rawPositionalParametersPool:Get()
+        end
+        return node
+    end,
+    newString = function(self, nodeList, value)
+        local node = self:NewNode(nodeList)
+        node.type = "string"
+        node.value = value
         return node
     end,
     NewNode = function(self, nodeList, hasChild)

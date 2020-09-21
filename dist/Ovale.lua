@@ -7,44 +7,19 @@ local __tsaddon = LibStub:GetLibrary("tsaddon", true)
 local NewAddon = __tsaddon.NewAddon
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
-local pairs = pairs
-local strjoin = strjoin
-local tostring = tostring
-local tostringall = tostringall
 local wipe = wipe
 local _G = _G
-local format = string.format
-local find = string.find
-local len = string.len
 local UnitClass = UnitClass
 local UnitGUID = UnitGUID
-local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local huge = math.huge
-__exports.oneTimeMessages = {}
+local __tools = LibStub:GetLibrary("ovale/tools")
+local ClearOneTimeMessages = __tools.ClearOneTimeMessages
 local MAX_REFRESH_INTERVALS = 500
 local self_refreshIntervals = {}
 local self_refreshIndex = 1
-__exports.MakeString = function(s, ...)
-    if s and len(s) > 0 then
-        if ... then
-            if find(s, "%%%.%d") or find(s, "%%[%w]") then
-                s = format(s, tostringall(...))
-            else
-                s = strjoin(" ", s, tostringall(...))
-            end
-        end
-    else
-        s = tostring(nil)
-    end
-    return s
-end
 local name = "Ovale"
 local OvaleBase = NewAddon(name, aceEvent)
 __exports.MSG_PREFIX = name
-__exports.Print = function(...)
-    local s = __exports.MakeString(...)
-    DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", name, s))
-end
 __exports.OvaleClass = __class(OvaleBase, {
     constructor = function(self)
         self.playerClass = "WARRIOR"
@@ -65,7 +40,7 @@ __exports.OvaleClass = __class(OvaleBase, {
         self.playerClass = classId or "WARRIOR"
         wipe(self_refreshIntervals)
         self_refreshIndex = 1
-        self:ClearOneTimeMessages()
+        ClearOneTimeMessages()
     end,
     needRefresh = function(self)
         if self.playerGUID then
@@ -75,7 +50,7 @@ __exports.OvaleClass = __class(OvaleBase, {
     AddRefreshInterval = function(self, milliseconds)
         if milliseconds < huge then
             self_refreshIntervals[self_refreshIndex] = milliseconds
-            self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) and (self_refreshIndex + 1) or 1
+            self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS and self_refreshIndex + 1) or 1
         end
     end,
     GetRefreshIntervalStatistics = function(self)
@@ -92,25 +67,8 @@ __exports.OvaleClass = __class(OvaleBase, {
                 count = count + 1
             end
         end
-        local avgRefresh = (count > 0) and (sumRefresh / count) or 0
+        local avgRefresh = (count > 0 and sumRefresh / count) or 0
         return avgRefresh, minRefresh, maxRefresh, count
-    end,
-    OneTimeMessage = function(self, ...)
-        local s = __exports.MakeString(...)
-        if  not __exports.oneTimeMessages[s] then
-            __exports.oneTimeMessages[s] = true
-        end
-    end,
-    ClearOneTimeMessages = function(self)
-        wipe(__exports.oneTimeMessages)
-    end,
-    PrintOneTimeMessages = function(self)
-        for s in pairs(__exports.oneTimeMessages) do
-            if __exports.oneTimeMessages[s] ~= "printed" then
-                __exports.Print(s)
-                __exports.oneTimeMessages[s] = "printed"
-            end
-        end
     end,
     createModule = function(self, name, onInitialize, onRelease)
     end,

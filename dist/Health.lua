@@ -11,6 +11,8 @@ local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 local INFINITY = huge
 local CLEU_DAMAGE_EVENT = {
     DAMAGE_SHIELD = true,
@@ -30,7 +32,6 @@ __exports.OvaleHealthClass = __class(nil, {
     constructor = function(self, ovaleGuid, baseState, ovale, ovaleOptions, ovaleDebug, ovaleProfiler, requirement)
         self.ovaleGuid = ovaleGuid
         self.baseState = baseState
-        self.ovale = ovale
         self.ovaleOptions = ovaleOptions
         self.requirement = requirement
         self.health = {}
@@ -137,7 +138,7 @@ __exports.OvaleHealthClass = __class(nil, {
                 func = UnitGetTotalHealAbsorbs
                 db = self.absorb
             else
-                self.ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event)
+                OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event)
                 return 
             end
             local amount = func(unitId)
@@ -164,7 +165,7 @@ __exports.OvaleHealthClass = __class(nil, {
                 func = UnitHealthMax
                 db = self.maxHealth
             else
-                self.ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event)
+                OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event)
                 return 
             end
             local amount = func(unitId)
@@ -227,7 +228,7 @@ __exports.OvaleHealthClass = __class(nil, {
                     self.tracer:Log("    Require %s health <= %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
                 end
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
             end
             return verified, requirement, index
         end

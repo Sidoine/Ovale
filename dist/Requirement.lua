@@ -3,6 +3,7 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
+local OneTimeMessage = __tools.OneTimeMessage
 __exports.getNextToken = function(tokens, index)
     if isLuaArray(tokens) then
         local result = tokens[index]
@@ -11,8 +12,7 @@ __exports.getNextToken = function(tokens, index)
     return tokens, index
 end
 __exports.OvaleRequirement = __class(nil, {
-    constructor = function(self, ovale, baseState, ovaleGuid)
-        self.ovale = ovale
+    constructor = function(self, baseState, ovaleGuid)
         self.baseState = baseState
         self.ovaleGuid = ovaleGuid
         self.nowRequirements = {}
@@ -38,7 +38,7 @@ __exports.OvaleRequirement = __class(nil, {
                     name = tokens[index]
                     index = index + 1
                 else
-                    self.ovale:OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
+                    OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
                     verified = false
                 end
             end

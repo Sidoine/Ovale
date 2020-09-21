@@ -18,6 +18,7 @@ local GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local GetSpellInfo = GetSpellInfo
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isString = __tools.isString
+local OneTimeMessage = __tools.OneTimeMessage
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
 local druidCatForm = GetSpellInfo(768)
@@ -117,17 +118,17 @@ __exports.OvaleStanceClass = __class(States, {
                 end
                 stance = tonumber(stance) or stance
                 local isStance = self:IsStance(stance, atTime)
-                if  not isBang and isStance or isBang and  not isStance then
+                if ( not isBang and isStance) or (isBang and  not isStance) then
                     verified = true
                 end
-                local result = verified and "passed" or "FAILED"
+                local result = (verified and "passed") or "FAILED"
                 if isBang then
                     self.tracer:Log("    Require NOT stance '%s': %s", stance, result)
                 else
                     self.tracer:Log("    Require stance '%s': %s", stance, result)
                 end
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
             end
             return verified, requirement, index
         end

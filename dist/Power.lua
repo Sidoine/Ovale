@@ -26,6 +26,7 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
 local isLuaArray = __tools.isLuaArray
+local OneTimeMessage = __tools.OneTimeMessage
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
 local strlower = lower
@@ -355,7 +356,7 @@ __exports.OvalePowerClass = __class(States, {
                 end
             end
         else
-            self.ovale:OneTimeMessage("No spell cost for " .. spell)
+            OneTimeMessage("No spell cost for " .. spell)
         end
         return nil, nil
     end,
@@ -563,11 +564,11 @@ __exports.OvalePowerClass = __class(States, {
                 verified = true
             end
         else
-            self.ovale:OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
-            self.ovale:OneTimeMessage(tostring(index))
+            OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
+            OneTimeMessage(tostring(index))
             if isLuaArray(tokens) then
                 for k, v in pairs(tokens) do
-                    self.ovale:OneTimeMessage(k .. " = " .. tostring(v))
+                    OneTimeMessage(k .. " = " .. tostring(v))
                 end
             end
         end

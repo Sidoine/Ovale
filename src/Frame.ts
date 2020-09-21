@@ -47,6 +47,7 @@ import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { Combat } from "./combat";
+import { OneTimeMessage, PrintOneTimeMessages } from "./tools";
 
 let strmatch = match;
 let INFINITY = huge;
@@ -243,7 +244,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             wipe(this.ovale.refreshNeeded);
             this.ovaleDebug.UpdateTrace();
-            this.ovale.PrintOneTimeMessages();
+            PrintOneTimeMessages();
             this.timeSinceLastUpdate = 0;
         }
     }
@@ -564,7 +565,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 this.AddChild(widget);
                 this.checkBoxWidget[name] = widget;
             } else {
-                this.ovale.OneTimeMessage(
+                OneTimeMessage(
                     "Warning: checkbox '%s' is used but not defined.",
                     name
                 );
@@ -589,7 +590,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 this.AddChild(widget);
                 this.listWidget[name] = widget;
             } else {
-                this.ovale.OneTimeMessage(
+                OneTimeMessage(
                     "Warning: list '%s' is used but has no items.",
                     name
                 );

@@ -76,3 +76,40 @@ t("emiter target.debuff.casting.react", (t) => {
     // Assert
     t.is(result, expected);
 });
+
+t("emiter unknown function (call one time message instead)", (t) => {
+    // Arrange
+    const parseNode: OperandParseNode = {
+        type: "operand",
+        nodeId: 12,
+        name: "unknown.operand.condition",
+        asType: "value",
+    };
+    const nodeList: LuaArray<AstNode> = {};
+    const expected: AstNode = {} as AstNode;
+    t.context.ast
+        .setup((x) =>
+            x.ParseCode(
+                "expression",
+                "target.IsInterruptible()",
+                nodeList,
+                t.context.annotation.object.astAnnotation
+            )
+        )
+        .returns(() => [
+            expected,
+            nodeList,
+            t.context.annotation.object.astAnnotation,
+        ]);
+
+    // Act
+    const result = t.context.emiter.Emit(
+        parseNode,
+        nodeList,
+        t.context.annotation.object,
+        undefined
+    );
+
+    // Assert
+    t.is(result, expected);
+});

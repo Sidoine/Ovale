@@ -31,8 +31,8 @@ local CamelCase = __texttools.CamelCase
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local __Power = LibStub:GetLibrary("ovale/Power")
 local POOLED_RESOURCE = __Power.POOLED_RESOURCE
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local MakeString = __Ovale.MakeString
+local __tools = LibStub:GetLibrary("ovale/tools")
+local MakeString = __tools.MakeString
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local function IsTotem(name)
     if sub(name, 1, 13) == "efflorescence" then
@@ -1022,9 +1022,8 @@ __exports.Emiter = __class(nil, {
             end
             if  not node then
                 self.tracer:Print("Warning: Variable '%s' is not implemented.", parseNode.name)
-                node = self.ovaleAst:NewNode(nodeList)
-                node.type = "variable"
-                node.name = "FIXME_" .. parseNode.name
+                node = self.ovaleAst:newFunction(nodeList, "message", true)
+                node.rawPositionalParams[1] = self.ovaleAst:newString(nodeList, parseNode.name .. " is not implemented")
             end
             return node
         end

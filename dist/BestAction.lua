@@ -36,6 +36,7 @@ local isNodeType = __AST.isNodeType
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
 local isString = __tools.isString
+local OneTimeMessage = __tools.OneTimeMessage
 local INFINITY = huge
 __exports.OvaleBestActionClass = __class(nil, {
     constructor = function(self, ovaleEquipment, ovaleActionBar, ovaleData, ovaleCooldown, ovaleState, baseState, ovalePaperDoll, ovaleCompile, ovaleCondition, Ovale, OvaleGUID, OvalePower, OvaleFuture, OvaleSpellBook, ovaleProfiler, ovaleDebug, variables, ovaleRunes, OvaleSpells)
@@ -48,7 +49,6 @@ __exports.OvaleBestActionClass = __class(nil, {
         self.ovalePaperDoll = ovalePaperDoll
         self.ovaleCompile = ovaleCompile
         self.ovaleCondition = ovaleCondition
-        self.Ovale = Ovale
         self.OvaleGUID = OvaleGUID
         self.OvalePower = OvalePower
         self.OvaleFuture = OvaleFuture
@@ -227,7 +227,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                 elseif operator == "/" then
                     if B == 0 then
                         if A ~= 0 then
-                            self.Ovale:OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString)
+                            OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString)
                         end
                         B = 0.00001
                     end
@@ -831,7 +831,7 @@ __exports.OvaleBestActionClass = __class(nil, {
         local timeSpan, result
         if element then
             if element.serial == -1 then
-                self.Ovale:OneTimeMessage("Recursive call is not supported. This is a known bug with arcane mage script")
+                OneTimeMessage("Recursive call is not supported. This is a known bug with arcane mage script")
                 return EMPTY_SET, element.result
             elseif element.serial and element.serial >= self.self_serial then
                 timeSpan = element.timeSpan or EMPTY_SET

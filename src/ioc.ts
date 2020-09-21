@@ -136,15 +136,10 @@ export class IoC {
         );
         this.baseState = new BaseState();
         this.guid = new OvaleGUIDClass(this.ovale, this.debug);
-        this.requirement = new OvaleRequirement(
-            this.ovale,
-            this.baseState,
-            this.guid
-        );
+        this.requirement = new OvaleRequirement(this.baseState, this.guid);
         this.data = new OvaleDataClass(
             this.baseState,
             this.guid,
-            this.ovale,
             this.requirement
         );
         this.spellBook = new OvaleSpellBookClass(
@@ -447,7 +442,6 @@ export class IoC {
             this.data,
             this.compile,
             this.paperDoll,
-            this.ovale,
             this.artifact,
             this.azeriteArmor,
             this.azeriteEssence,

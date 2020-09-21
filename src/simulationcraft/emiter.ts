@@ -57,8 +57,8 @@ import {
     OvaleFunctionName,
 } from "./text-tools";
 import { POOLED_RESOURCE } from "../Power";
-import { MakeString } from "../Ovale";
 import { Unparser } from "./unparser";
+import { MakeString } from "../tools";
 
 const OPERAND_TOKEN_PATTERN = "[^.]+";
 
@@ -2065,9 +2065,11 @@ export class Emiter {
                 "Warning: Variable '%s' is not implemented.",
                 parseNode.name
             );
-            node = this.ovaleAst.NewNode(nodeList);
-            node.type = "variable";
-            node.name = `FIXME_${parseNode.name}`;
+            node = this.ovaleAst.newFunction(nodeList, "message", true);
+            node.rawPositionalParams[1] = this.ovaleAst.newString(
+                nodeList,
+                `${parseNode.name} is not implemented`
+            );
         }
         return node;
     };

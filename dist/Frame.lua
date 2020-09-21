@@ -27,6 +27,9 @@ local UIParent = UIParent
 local huge = math.huge
 local __aceguihelpers = LibStub:GetLibrary("ovale/acegui-helpers")
 local AceGUIRegisterAsContainer = __aceguihelpers.AceGUIRegisterAsContainer
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
+local PrintOneTimeMessages = __tools.PrintOneTimeMessages
 local strmatch = match
 local INFINITY = huge
 local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
@@ -165,7 +168,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             end
             wipe(self.ovale.refreshNeeded)
             self.ovaleDebug:UpdateTrace()
-            self.ovale:PrintOneTimeMessages()
+            PrintOneTimeMessages()
             self.timeSinceLastUpdate = 0
         end
     end,
@@ -334,7 +337,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 self:AddChild(widget)
                 self.checkBoxWidget[name] = widget
             else
-                self.ovale:OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
+                OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
             end
         end
         wipe(self.listWidget)
@@ -353,7 +356,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 self:AddChild(widget)
                 self.listWidget[name] = widget
             else
-                self.ovale:OneTimeMessage("Warning: list '%s' is used but has no items.", name)
+                OneTimeMessage("Warning: list '%s' is used but has no items.", name)
             end
         end
     end,

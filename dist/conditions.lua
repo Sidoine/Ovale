@@ -9,6 +9,7 @@ local Compare = __Condition.Compare
 local TestBoolean = __Condition.TestBoolean
 local isComparator = __Condition.isComparator
 local ReturnValue = __Condition.ReturnValue
+local ReturnConstant = __Condition.ReturnConstant
 local ipairs = ipairs
 local pairs = pairs
 local type = type
@@ -48,8 +49,8 @@ local __AST = LibStub:GetLibrary("ovale/AST")
 local isNodeType = __AST.isNodeType
 local lower = string.lower
 local upper = string.upper
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Print = __Ovale.Print
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 local INFINITY = huge
 local function BossArmorDamageReduction(target)
     return 0.3
@@ -240,12 +241,11 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return self.ovaleCondition:ParseCondition(positionalParams, namedParams, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, Ovale, OvaleArtifact, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleArtifact, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.ovaleCondition = ovaleCondition
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
         self.OvalePaperDoll = OvalePaperDoll
-        self.Ovale = Ovale
         self.OvaleArtifact = OvaleArtifact
         self.OvaleAzerite = OvaleAzerite
         self.OvaleAzeriteEssence = OvaleAzeriteEssence
@@ -277,14 +277,14 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleBossMod = OvaleBossMod
         self.OvaleSpells = OvaleSpells
         self.ArmorSetBonus = function(positionalParams, namedParams, atTime)
-            self.Ovale:OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
+            OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
             local value = 0
             return 0, INFINITY, value, 0, 0
         end
         self.ArmorSetParts = function(positionalParams, namedParams, atTime)
             local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = 0
-            self.Ovale:OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
+            OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
             return Compare(value, comparator, limit)
         end
         self.ArtifactTraitRank = function(positionalParams, namedParams, atTime)
@@ -609,7 +609,7 @@ __exports.OvaleConditions = __class(nil, {
                 elseif spellId == "helpful" and self.OvaleSpellBook:IsHelpfulSpell(spellId) then
                     return start, ending
                 elseif spellId == castSpellId then
-                    Print("%f %f %d %s => %d (%f)", start, ending, castSpellId, castSpellName, spellId, self.baseState.next.currentTime)
+                    OneTimeMessage("%f %f %d %s => %d (%f)", start, ending, castSpellId, castSpellName, spellId, self.baseState.next.currentTime)
                     return start, ending
                 elseif type(spellId) == "number" and self.OvaleSpellBook:GetSpellName(spellId) == castSpellName then
                     return start, ending
@@ -1721,7 +1721,7 @@ __exports.OvaleConditions = __class(nil, {
                 comparator, limit = positionalParams[1], positionalParams[2]
                 start = 0
             end
-            self.Ovale:OneTimeMessage("Warning: 'LastSwing()' is not implemented.")
+            OneTimeMessage("Warning: 'LastSwing()' is not implemented.")
             return TestValue(start, INFINITY, 0, start, 1, comparator, limit)
         end
         self.NextSwing = function(positionalParams, namedParams, atTime)
@@ -1735,7 +1735,7 @@ __exports.OvaleConditions = __class(nil, {
                 comparator, limit = positionalParams[1], positionalParams[2]
                 ending = 0
             end
-            self.Ovale:OneTimeMessage("Warning: 'NextSwing()' is not implemented.")
+            OneTimeMessage("Warning: 'NextSwing()' is not implemented.")
             return TestValue(0, ending, 0, ending, -1, comparator, limit)
         end
         self.Talent = function(positionalParams, namedParams, atTime)
@@ -1830,7 +1830,7 @@ __exports.OvaleConditions = __class(nil, {
         self.TimeToEclipse = function(positionalParams, namedParams, atTime)
             local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = 3600 * 24 * 7
-            self.Ovale:OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.")
+            OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.")
             return TestValue(0, INFINITY, value, atTime, -1, comparator, limit)
         end
         self.TimeToEnergy = function(positionalParams, namedParams, atTime)
@@ -1867,7 +1867,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.TimeToSpell = function(positionalParams, namedParams, atTime)
             local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            self.Ovale:OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.")
+            OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.")
             return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit)
         end
         self.TimeWithHaste = function(positionalParams, namedParams, atTime)
@@ -2057,6 +2057,11 @@ __exports.OvaleConditions = __class(nil, {
             local value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1)
             return ReturnValue(value, atTime, -1)
         end
+        self.message = function(positionalParameters)
+            OneTimeMessage(positionalParameters[1])
+            return ReturnConstant(0)
+        end
+        ovaleCondition:RegisterCondition("message", false, self.message)
         ovaleCondition:RegisterCondition("present", false, self.Present)
         ovaleCondition:RegisterCondition("stacktimeto", false, self.stackTimeTo)
         ovaleCondition:RegisterCondition("armorsetbonus", false, self.ArmorSetBonus)

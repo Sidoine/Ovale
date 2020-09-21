@@ -1,9 +1,9 @@
 local __exports = LibStub:NewLibrary("ovale/PoolGC", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Print = __Ovale.Print
 local tostring = tostring
+local __tools = LibStub:GetLibrary("ovale/tools")
+local Print = __tools.Print
 __exports.OvalePoolGC = __class(nil, {
     constructor = function(self, name)
         self.name = "OvalePoolGC"

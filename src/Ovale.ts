@@ -1,51 +1,27 @@
 import { L } from "./Localization";
 import { NewAddon, AceModule } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
-import { format, find, len } from "@wowts/string";
-import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME, ClassId } from "@wowts/wow-mock";
+import { ipairs, wipe, LuaArray, LuaObj, _G } from "@wowts/lua";
+import { UnitClass, UnitGUID, ClassId } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { Library } from "@wowts/tslib";
+import { ClearOneTimeMessages } from "./tools";
 
-export const oneTimeMessages: LuaObj<boolean | "printed"> = {}
 let MAX_REFRESH_INTERVALS = 500;
-let self_refreshIntervals:LuaArray<number> = {}
+let self_refreshIntervals: LuaArray<number> = {};
 let self_refreshIndex = 1;
 
-export type Constructor<T> = new(...args: any[]) => T;
-
-export function MakeString(s?: string, ...__args: any[]) {
-    if (s && len(s) > 0) {
-        if (__args) {
-            if (truthy(find(s, "%%%.%d")) || truthy(find(s, "%%[%w]"))) {
-                s = format(s, ...tostringall(...__args));
-            } else {
-                s = strjoin(" ", s, ...tostringall(...__args));
-            }
-        }
-    } else {
-        s = tostring(undefined);
-    }
-    return s;
-}
+export type Constructor<T> = new (...args: any[]) => T;
 
 const name = "Ovale";
 
 const OvaleBase = NewAddon(name, aceEvent);
 export const MSG_PREFIX = name;
 
-
-export function Print(...__args: any[]) {
-    let s = MakeString(...__args);
-    DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
-}
-
-
 export class OvaleClass extends OvaleBase {
     playerClass: ClassId = "WARRIOR";
     playerGUID: string = "";
-    refreshNeeded:LuaObj<boolean> = {}
-    
+    refreshNeeded: LuaObj<boolean> = {};
 
     constructor() {
         super();
@@ -56,7 +32,6 @@ export class OvaleClass extends OvaleBase {
         _G["BINDING_NAME_OVALE_CHECKBOX2"] = `${toggleCheckBox}(3)`;
         _G["BINDING_NAME_OVALE_CHECKBOX3"] = `${toggleCheckBox}(4)`;
         _G["BINDING_NAME_OVALE_CHECKBOX4"] = `${toggleCheckBox}(5)`;
-    
     }
 
     // OnDisable() {
@@ -72,7 +47,7 @@ export class OvaleClass extends OvaleBase {
         this.playerClass = classId || "WARRIOR";
         wipe(self_refreshIntervals);
         self_refreshIndex = 1;
-        this.ClearOneTimeMessages();
+        ClearOneTimeMessages();
     }
 
     needRefresh() {
@@ -80,11 +55,14 @@ export class OvaleClass extends OvaleBase {
             this.refreshNeeded[this.playerGUID] = true;
         }
     }
-    
+
     AddRefreshInterval(milliseconds: number) {
         if (milliseconds < huge) {
             self_refreshIntervals[self_refreshIndex] = milliseconds;
-            self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) && (self_refreshIndex + 1) || 1;
+            self_refreshIndex =
+                (self_refreshIndex < MAX_REFRESH_INTERVALS &&
+                    self_refreshIndex + 1) ||
+                1;
         }
     }
     GetRefreshIntervalStatistics() {
@@ -101,40 +79,57 @@ export class OvaleClass extends OvaleBase {
                 count = count + 1;
             }
         }
-        let avgRefresh = (count > 0) && (sumRefresh / count) || 0;
+        let avgRefresh = (count > 0 && sumRefresh / count) || 0;
         return [avgRefresh, minRefresh, maxRefresh, count];
     }
-    
-    
-    OneTimeMessage(...__args: any[]) {
-        let s = MakeString(...__args);
-        if (!oneTimeMessages[s]) {
-            oneTimeMessages[s] = true;
-        }
-    }
-    ClearOneTimeMessages() {
-        wipe(oneTimeMessages);
-    }
-    PrintOneTimeMessages() {
-        for (const [s] of pairs(oneTimeMessages)) {
-            if (oneTimeMessages[s] != "printed") {
-                Print(s);
-                oneTimeMessages[s] = "printed";
-            }
-        }
-    }
 
-    createModule(name: string, onInitialize: () => void, onRelease: () => void) : AceModule;
-    createModule<T>(name: string, onInitialize: () => void, onRelease: () => void, dep1: Library<T>) : AceModule & T;
-    createModule<T, U>(name: string, onInitialize: () => void, onRelease: () => void, dep1: Library<T>, dep2: Library<U>) : AceModule & T & U;
-    createModule<T, U, V>(name: string, onInitialize: () => void, onRelease: () => void, dep1: Library<T>, dep2: Library<U>, dep3: Library<V>): AceModule & T & U & V;
-    createModule<T, U, V, W>(name: string, onInitialize: () => void, onRelease: () => void, dep1: Library<T>, dep2: Library<U>, dep3: Library<V>, dep4: Library<W>): AceModule & T & U & V & W;
-    createModule<T, U, V, W>(name: string, onInitialize: () => void, onRelease: () => void, dep1?: Library<T>, dep2?: Library<U>, dep3?: Library<V>, dep4?: Library<W>): AceModule & T & U & V & W {
-        const ret = new (this.NewModule(name, dep1, dep2, dep3, dep4));
+    createModule(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void
+    ): AceModule;
+    createModule<T>(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void,
+        dep1: Library<T>
+    ): AceModule & T;
+    createModule<T, U>(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void,
+        dep1: Library<T>,
+        dep2: Library<U>
+    ): AceModule & T & U;
+    createModule<T, U, V>(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void,
+        dep1: Library<T>,
+        dep2: Library<U>,
+        dep3: Library<V>
+    ): AceModule & T & U & V;
+    createModule<T, U, V, W>(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void,
+        dep1: Library<T>,
+        dep2: Library<U>,
+        dep3: Library<V>,
+        dep4: Library<W>
+    ): AceModule & T & U & V & W;
+    createModule<T, U, V, W>(
+        name: string,
+        onInitialize: () => void,
+        onRelease: () => void,
+        dep1?: Library<T>,
+        dep2?: Library<U>,
+        dep3?: Library<V>,
+        dep4?: Library<W>
+    ): AceModule & T & U & V & W {
+        const ret = new (this.NewModule(name, dep1, dep2, dep3, dep4))();
         ret.OnInitialize = onInitialize;
         // TODO use onRelease
         return ret;
-    }    
+    }
 }
-
-

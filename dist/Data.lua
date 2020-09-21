@@ -11,6 +11,7 @@ local find = string.find
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local isString = __tools.isString
+local OneTimeMessage = __tools.OneTimeMessage
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
     ["DEMONHUNTER"] = true,
@@ -81,10 +82,9 @@ local STAT_USE_NAMES = {
 }
 local tempTokens = {}
 __exports.OvaleDataClass = __class(nil, {
-    constructor = function(self, baseState, ovaleGuid, ovale, requirement)
+    constructor = function(self, baseState, ovaleGuid, requirement)
         self.baseState = baseState
         self.ovaleGuid = ovaleGuid
-        self.ovale = ovale
         self.requirement = requirement
         self.STAT_NAMES = STAT_NAMES
         self.STAT_SHORTNAME = STAT_SHORTNAME
@@ -355,7 +355,7 @@ __exports.OvaleDataClass = __class(nil, {
             if N then
                 data = tonumber(N)
             else
-                self.ovale:OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
+                OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
             end
         elseif value == "extend" then
             local seconds
@@ -366,7 +366,7 @@ __exports.OvaleDataClass = __class(nil, {
             if seconds then
                 data = tonumber(seconds)
             else
-                self.ovale:OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
+                OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
             end
         else
             local asNumber = tonumber(value)
@@ -457,7 +457,7 @@ __exports.OvaleDataClass = __class(nil, {
                             local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                             if verified then
                                 if ratio ~= 0 then
-                                    ratio = ratio * ((tonumber(v) / 100) or 1)
+                                    ratio = ratio * (tonumber(v) / 100 or 1)
                                 else
                                     break
                                 end
@@ -467,7 +467,7 @@ __exports.OvaleDataClass = __class(nil, {
                 end
             end
         end
-        local value = si and si[property] or 0
+        local value = (si and si[property]) or 0
         if ratio ~= 0 then
             local addParam = "add_" .. property
             local addProperty = si and si[addParam]

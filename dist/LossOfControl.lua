@@ -8,9 +8,10 @@ local pairs = pairs
 local insert = table.insert
 local sub = string.sub
 local upper = string.upper
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 __exports.OvaleLossOfControlClass = __class(nil, {
     constructor = function(self, ovale, ovaleDebug, requirement)
-        self.ovale = ovale
         self.requirement = requirement
         self.lossOfControlHistory = {}
         self.OnInitialize = function()
@@ -48,7 +49,7 @@ __exports.OvaleLossOfControlClass = __class(nil, {
                 local hasLoss = self.HasLossOfControl(locType, atTime)
                 verified = (required and hasLoss) or ( not required and  not hasLoss)
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
             end
             return verified, requirement, index
         end
@@ -56,7 +57,7 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             local lowestStartTime = nil
             local highestEndTime = nil
             for _, data in pairs(self.lossOfControlHistory) do
-                if upper(locType) == data.locType and (data.startTime <= atTime and atTime <= data.startTime + data.duration) then
+                if upper(locType) == data.locType and data.startTime <= atTime and atTime <= data.startTime + data.duration then
                     if lowestStartTime == nil or lowestStartTime > data.startTime then
                         lowestStartTime = data.startTime
                     end

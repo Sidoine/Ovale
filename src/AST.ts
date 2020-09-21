@@ -3196,11 +3196,22 @@ export class OvaleASTClass {
     public newFunction(
         nodeList: LuaArray<AstNode>,
         name: string,
-        hasChild?: boolean
+        hasParameters?: boolean
     ) {
-        const node = this.NewNode(nodeList, hasChild);
+        const node = this.NewNode(nodeList);
         node.type = "function";
         node.name = name;
+        if (hasParameters) {
+            node.rawNamedParams = this.rawNamedParametersPool.Get();
+            node.rawPositionalParams = this.rawPositionalParametersPool.Get();
+        }
+        return node;
+    }
+
+    public newString(nodeList: LuaArray<AstNode>, value: string) {
+        const node = this.NewNode(nodeList);
+        node.type = "string";
+        node.value = value;
         return node;
     }
 
@@ -3216,6 +3227,7 @@ export class OvaleASTClass {
         }
         return node;
     }
+
     public NodeToString(node: AstNode) {
         let output = this.print_r(node);
         return concat(output, "\n");

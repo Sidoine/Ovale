@@ -11,6 +11,8 @@ local GetSpellCharges = GetSpellCharges
 local sub = string.sub
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 local GLOBAL_COOLDOWN = 61304
 local COOLDOWN_THRESHOLD = 0.1
 local BASE_GCD = {
@@ -154,11 +156,11 @@ __exports.OvaleCooldownClass = __class(States, {
                     cdSpellId = sub(cdSpellId, 2)
                 end
                 local cd = self:GetCD(tonumber(cdSpellId), atTime)
-                verified =  not isBang and cd.duration > 0 or isBang and cd.duration <= 0
-                local result = verified and "passed" or "FAILED"
-                self.tracer:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang and "OFF" or  not isBang and "ON", atTime, result, cd.duration)
+                verified = ( not isBang and cd.duration > 0) or (isBang and cd.duration <= 0)
+                local result = (verified and "passed") or "FAILED"
+                self.tracer:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, (isBang and "OFF") or ( not isBang and "ON"), atTime, result, cd.duration)
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
             end
             return verified, requirement, index
         end
@@ -176,7 +178,7 @@ __exports.OvaleCooldownClass = __class(States, {
     end,
     IsSharedCooldown = function(self, name)
         local spellTable = self.sharedCooldown[name]
-        return (spellTable and next(spellTable) ~= nil)
+        return spellTable and next(spellTable) ~= nil
     end,
     AddSharedCooldown = function(self, name, spellId)
         self.sharedCooldown[name] = self.sharedCooldown[name] or {}

@@ -9,6 +9,7 @@ import {
     ConditionResult,
     ReturnValue,
     OvaleConditionClass,
+    ReturnConstant,
 } from "./Condition";
 import { SpellInfo, OvaleDataClass } from "./Data";
 import { PowerType, OvalePowerClass } from "./Power";
@@ -51,7 +52,6 @@ import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper } from "@wowts/string";
-import { OvaleClass, Print } from "./Ovale";
 import { OvaleArtifactClass } from "./Artifact";
 import { OvaleAzeriteArmor } from "./AzeriteArmor";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
@@ -80,6 +80,7 @@ import { OvaleBestActionClass } from "./BestAction";
 import { OvaleRunesClass } from "./Runes";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleBossModClass } from "./BossMod";
+import { OneTimeMessage } from "./tools";
 
 let INFINITY = huge;
 
@@ -163,9 +164,7 @@ export class OvaleConditions {
         namedParams: LuaObj<any>,
         atTime: number
     ): ConditionResult => {
-        this.Ovale.OneTimeMessage(
-            "Warning: 'ArmorSetBonus()' is depreciated.  Returns 0"
-        );
+        OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         let value = 0;
         return [0, INFINITY, value, 0, 0];
     };
@@ -196,9 +195,7 @@ export class OvaleConditions {
             positionalParams[3],
         ];
         let value = 0;
-        this.Ovale.OneTimeMessage(
-            "Warning: 'ArmorSetBonus()' is depreciated.  Returns 0"
-        );
+        OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         return Compare(value, comparator, limit);
     };
 
@@ -1274,7 +1271,7 @@ export class OvaleConditions {
             ) {
                 return [start, ending];
             } else if (spellId == castSpellId) {
-                Print(
+                OneTimeMessage(
                     "%f %f %d %s => %d (%f)",
                     start,
                     ending,
@@ -5826,7 +5823,7 @@ l    */
             [comparator, limit] = [positionalParams[1], positionalParams[2]];
             start = 0;
         }
-        this.Ovale.OneTimeMessage("Warning: 'LastSwing()' is not implemented.");
+        OneTimeMessage("Warning: 'LastSwing()' is not implemented.");
         return TestValue(start, INFINITY, 0, start, 1, comparator, limit);
     };
 
@@ -5857,7 +5854,7 @@ l    */
             [comparator, limit] = [positionalParams[1], positionalParams[2]];
             ending = 0;
         }
-        this.Ovale.OneTimeMessage("Warning: 'NextSwing()' is not implemented.");
+        OneTimeMessage("Warning: 'NextSwing()' is not implemented.");
         return TestValue(0, ending, 0, ending, -1, comparator, limit);
     };
 
@@ -6177,9 +6174,7 @@ l    */
             positionalParams[3],
         ];
         let value = 3600 * 24 * 7;
-        this.Ovale.OneTimeMessage(
-            "Warning: 'TimeToEclipse()' is not implemented."
-        );
+        OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.");
         return TestValue(0, INFINITY, value, atTime, -1, comparator, limit);
     };
 
@@ -6447,9 +6442,7 @@ l    */
             return Compare(INFINITY, comparator, limit);
         }
         */
-        this.Ovale.OneTimeMessage(
-            "Warning: 'TimeToSpell()' is not implemented."
-        );
+        OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
         return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit);
     };
     /** Get the time scaled by the specified haste type, defaulting to spell haste.
@@ -6929,6 +6922,11 @@ l    */
         return ReturnValue(value, atTime, -1);
     };
 
+    private message: ConditionFunction = (positionalParameters) => {
+        OneTimeMessage(positionalParameters[1]);
+        return ReturnConstant(0);
+    };
+
     private ParseCondition(
         positionalParams: PositionalParameters,
         namedParams: NamedParameters,
@@ -6946,7 +6944,6 @@ l    */
         private OvaleData: OvaleDataClass,
         private OvaleCompile: OvaleCompileClass,
         private OvalePaperDoll: OvalePaperDollClass,
-        private Ovale: OvaleClass,
         private OvaleArtifact: OvaleArtifactClass,
         private OvaleAzerite: OvaleAzeriteArmor,
         private OvaleAzeriteEssence: OvaleAzeriteEssenceClass,
@@ -6978,6 +6975,8 @@ l    */
         private OvaleBossMod: OvaleBossModClass,
         private OvaleSpells: OvaleSpellsClass
     ) {
+        ovaleCondition.RegisterCondition("message", false, this.message);
+
         ovaleCondition.RegisterCondition("present", false, this.Present);
         ovaleCondition.RegisterCondition(
             "stacktimeto",

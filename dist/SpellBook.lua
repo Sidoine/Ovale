@@ -32,6 +32,7 @@ local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local OneTimeMessage = __tools.OneTimeMessage
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 local ParseHyperlink = function(hyperlink)
     local color, linkType, linkData, text = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d*):?%d?|?h?%[?([^%[%]]*)%]?|?h?|?r?")
@@ -109,7 +110,7 @@ __exports.OvaleSpellBookClass = __class(nil, {
                             else
                                 self.talentPoints[index] = 0
                             end
-                            self.tracer:Debug("    Talent %s (%d) is %s.", name, index, combinedSelected and "enabled" or "disabled")
+                            self.tracer:Debug("    Talent %s (%d) is %s.", name, index, (combinedSelected and "enabled") or "disabled")
                         end
                     end
                 end
@@ -294,16 +295,16 @@ __exports.OvaleSpellBookClass = __class(nil, {
         end
     end,
     IsHarmfulSpell = function(self, spellId)
-        return (spellId and self.isHarmful[spellId]) and true or false
+        return (spellId and self.isHarmful[spellId] and true) or false
     end,
     IsHelpfulSpell = function(self, spellId)
-        return (spellId and self.isHelpful[spellId]) and true or false
+        return (spellId and self.isHelpful[spellId] and true) or false
     end,
     IsKnownSpell = function(self, spellId)
-        return (spellId and self.spell[spellId]) and true or false
+        return (spellId and self.spell[spellId] and true) or false
     end,
     IsKnownTalent = function(self, talentId)
-        return (talentId and self.talentPoints[talentId]) and true or false
+        return (talentId and self.talentPoints[talentId] and true) or false
     end,
     getKnownSpellId = function(self, spell)
         if isNumber(spell) then
@@ -311,7 +312,7 @@ __exports.OvaleSpellBookClass = __class(nil, {
         end
         local spells = self.ovaleData.buffSpellList[spell]
         if  not spells then
-            self.ovale:OneTimeMessage("Unknown spell list " .. spell)
+            OneTimeMessage("Unknown spell list " .. spell)
             return nil
         end
         for spellId in pairs(spells) do

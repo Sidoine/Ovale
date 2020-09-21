@@ -10,12 +10,13 @@ local IsUsableSpell = IsUsableSpell
 local UnitIsFriend = UnitIsFriend
 local __Power = LibStub:GetLibrary("ovale/Power")
 local PRIMARY_POWER = __Power.PRIMARY_POWER
+local __tools = LibStub:GetLibrary("ovale/tools")
+local OneTimeMessage = __tools.OneTimeMessage
 local WARRIOR_INCERCEPT_SPELLID = 198304
 local WARRIOR_HEROICTHROW_SPELLID = 57755
 __exports.OvaleSpellsClass = __class(nil, {
     constructor = function(self, OvaleSpellBook, ovale, ovaleDebug, ovaleProfiler, ovaleData, requirement)
         self.OvaleSpellBook = OvaleSpellBook
-        self.ovale = ovale
         self.ovaleData = ovaleData
         self.requirement = requirement
         self.OnInitialize = function()
@@ -38,7 +39,7 @@ __exports.OvaleSpellsClass = __class(nil, {
                 local actualCount = self:GetSpellCount(spellId)
                 verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
             else
-                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
+                OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
             end
             return verified, requirement, index
         end
@@ -88,7 +89,7 @@ __exports.OvaleSpellsClass = __class(nil, {
                 returnValue = IsSpellInRange(name, unitId)
             end
         end
-        if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
+        if returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID then
             return (UnitIsFriend("player", unitId) or self:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
         end
         if returnValue == 1 then

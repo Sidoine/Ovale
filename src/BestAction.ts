@@ -44,7 +44,7 @@ import { OvaleRunesClass } from "./Runes";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
 import { OvaleSpellsClass } from "./Spells";
-import { isNumber, isString } from "./tools";
+import { isNumber, isString, OneTimeMessage } from "./tools";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./GUID";
@@ -122,7 +122,7 @@ export class OvaleBestActionClass {
         private ovalePaperDoll: OvalePaperDollClass,
         private ovaleCompile: OvaleCompileClass,
         private ovaleCondition: OvaleConditionClass,
-        private Ovale: OvaleClass,
+        Ovale: OvaleClass,
         private OvaleGUID: OvaleGUIDClass,
         private OvalePower: OvalePowerClass,
         private OvaleFuture: OvaleFutureClass,
@@ -748,7 +748,7 @@ export class OvaleBestActionClass {
         let timeSpan: OvaleTimeSpan, result: Element | undefined;
         if (element) {
             if (element.serial == -1) {
-                this.Ovale.OneTimeMessage(
+                OneTimeMessage(
                     "Recursive call is not supported. This is a known bug with arcane mage script"
                 );
                 return [EMPTY_SET, element.result];
@@ -1110,7 +1110,7 @@ export class OvaleBestActionClass {
             } else if (operator == "/") {
                 if (B === 0) {
                     if (A !== 0) {
-                        this.Ovale.OneTimeMessage(
+                        OneTimeMessage(
                             "[%d] Division by 0 in %s",
                             element.nodeId,
                             element.asString
