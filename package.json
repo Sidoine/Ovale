@@ -46,12 +46,12 @@
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
-        "@wowts/wow-mock": "^1.17.0"
+        "@wowts/wow-mock": "^1.19.0"
     },
     "devDependencies": {
         "@wowts/tstolua": "^1.8.0",
         "ava": "^3.12.1",
-        "tslint": "^5.18.0",
+        "eslint": "^7.9.0",
         "typemoq": "^2.1.0",
         "nyc": "^12"
     },

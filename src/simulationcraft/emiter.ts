@@ -756,6 +756,43 @@ export class Emiter {
         annotation.currentVariable = undefined;
     };
 
+    private emitCyclingVariable(
+        nodeList: LuaArray<AstNode>,
+        annotation: Annotation,
+        modifiers: Modifiers,
+        parseNode: ActionParseNode,
+        action: string,
+        conditionNode?: AstNode
+    ) {
+        const op =
+            (modifiers.op && this.unparser.Unparse(modifiers.op)) || "min";
+        if (!modifiers.name) {
+            this.tracer.Error("Modifier name is missing");
+            return;
+        }
+        const name = this.unparser.Unparse(modifiers.name);
+        if (!name) {
+            this.tracer.Error(
+                "Unable to parse name of variable in %s",
+                modifiers.name
+            );
+            return;
+        }
+        if (op === "min") {
+            // TODO
+            this.EmitVariableAdd(
+                name,
+                nodeList,
+                annotation,
+                modifiers,
+                parseNode,
+                action
+            );
+        } else {
+            this.tracer.Error(`Unknown cycling_variable operator {op}`);
+        }
+    }
+
     private EmitVariable = (
         nodeList: LuaArray<AstNode>,
         annotation: Annotation,
@@ -1157,6 +1194,15 @@ export class Emiter {
             } else if (checkOptionalSkill(action, className, specialization)) {
                 annotation[action] = className;
                 conditionCode = `CheckBoxOn(opt_${action})`;
+            } else if (action === "cycling_variable") {
+                this.emitCyclingVariable(
+                    nodeList,
+                    annotation,
+                    modifiers,
+                    parseNode,
+                    action
+                );
+                isSpellAction = false;
             } else if (action == "variable") {
                 this.EmitVariable(
                     nodeList,

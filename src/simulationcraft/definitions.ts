@@ -501,6 +501,7 @@ export let SPECIAL_ACTION: LuaObj<boolean> = {
     ["call_action_list"]: true,
     ["cancel_buff"]: true,
     ["cancel_metamorphosis"]: true,
+    ["cycling_variable"]: true,
     ["exotic_munitions"]: true,
     ["flask"]: true,
     ["food"]: true,
@@ -555,7 +556,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["rune"]: { name: "rune", modifiers: powerModifiers },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
-    ["soul_shard"]: { name: "souldshards", modifiers: powerModifiers },
+    ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
     ["stealthed"]: {
         name: "stealthed",
         modifiers: { all: { name: "" }, rogue: { name: "" } },

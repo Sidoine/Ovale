@@ -376,6 +376,9 @@ Define(shadow_bolt_0 686)
 Define(shadow_bolt_1 288546)
 # Deals s1 Shadow damage.
   SpellInfo(shadow_bolt_1 energy=1 gcd=0 offgcd=1)
+Define(shadow_bolt_2 317791)
+# Deals s1 Shadow damage.
+  SpellInfo(shadow_bolt_2 energy=1 gcd=0 offgcd=1)
 Define(shadow_embrace 32388)
 # ?s198590[Drain Soul][Shadow Bolt] and Haunt apply Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.
   SpellInfo(shadow_embrace channel=0 gcd=0 offgcd=1)
@@ -480,7 +483,7 @@ SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 
 SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
-SpellList(shadow_bolt shadow_bolt_0 shadow_bolt_1)
+SpellList(shadow_bolt shadow_bolt_0 shadow_bolt_1 shadow_bolt_2)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(wild_imp wild_imp_0 wild_imp_1)

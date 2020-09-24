@@ -552,6 +552,9 @@ __exports.Emiter = __class(nil, {
                 elseif checkOptionalSkill(action, className, specialization) then
                     annotation[action] = className
                     conditionCode = "CheckBoxOn(opt_" .. action .. ")"
+                elseif action == "cycling_variable" then
+                    self:emitCyclingVariable(nodeList, annotation, modifiers, parseNode, action)
+                    isSpellAction = false
                 elseif action == "variable" then
                     self.EmitVariable(nodeList, annotation, modifiers, parseNode, action)
                     isSpellAction = false
@@ -2373,5 +2376,22 @@ __exports.Emiter = __class(nil, {
             return self.ovaleAst:newFunction(nodeList, name)
         end
         return nil
+    end,
+    emitCyclingVariable = function(self, nodeList, annotation, modifiers, parseNode, action, conditionNode)
+        local op = (modifiers.op and self.unparser:Unparse(modifiers.op)) or "min"
+        if  not modifiers.name then
+            self.tracer:Error("Modifier name is missing")
+            return 
+        end
+        local name = self.unparser:Unparse(modifiers.name)
+        if  not name then
+            self.tracer:Error("Unable to parse name of variable in %s", modifiers.name)
+            return 
+        end
+        if op == "min" then
+            self.EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode, action)
+        else
+            self.tracer:Error([[Unknown cycling_variable operator {op}]])
+        end
     end,
 })

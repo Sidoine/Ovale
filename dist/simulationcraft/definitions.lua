@@ -202,6 +202,7 @@ __exports.SPECIAL_ACTION = {
     ["call_action_list"] = true,
     ["cancel_buff"] = true,
     ["cancel_metamorphosis"] = true,
+    ["cycling_variable"] = true,
     ["exotic_munitions"] = true,
     ["flask"] = true,
     ["food"] = true,
@@ -300,7 +301,7 @@ __exports.MISC_OPERAND = {
         modifiers = powerModifiers
     },
     ["soul_shard"] = {
-        name = "souldshards",
+        name = "soulshards",
         modifiers = powerModifiers
     },
     ["stealthed"] = {

@@ -100,8 +100,8 @@ Define(disrupt_2 320361)
   SpellInfo(disrupt_2 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(disrupt_2 disrupt_2=1)
 Define(eye_beam 198013)
-# Blasts all enemies in front of you, ?s320415[dealing guaranteed critical strikes][] for up to <dmg> Chaos damage over 2 seconds. Deals reduced damage to secondary targets.
-# Rank 2: Eye Beam deals guaranteed critical strikes.
+# Blasts all enemies in front of you, ?s320415[dealing guaranteed critical strikes][] for up to <dmg> Chaos damage over 2 seconds. Deals reduced damage to secondary targets.?s343311[rnrnWhen Eye Beam finishes fully channeling, your Haste is increased by an additional 343312s1 for 12 seconds.][]
+# Rank 3: When Eye Beam finishes fully channeling, your Haste is increased by an additional 343312s1 for 12 seconds.
   SpellInfo(eye_beam fury=30 cd=30 duration=2 channel=2 tick=0.2)
   SpellAddBuff(eye_beam eye_beam=1)
 Define(fel_barrage 258925)

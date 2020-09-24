@@ -3,7 +3,7 @@ import test, { TestInterface } from "ava";
 import { IMock, Mock } from "typemoq";
 import { AstAnnotation, AstNode, OvaleASTClass } from "../AST";
 import { OvaleDataClass } from "../Data";
-import { OvaleDebugClass } from "../Debug";
+import { OvaleDebugClass, Tracer } from "../Debug";
 import { Annotation, OperandParseNode } from "./definitions";
 import { Emiter } from "./emiter";
 import { Unparser } from "./unparser";
@@ -16,12 +16,17 @@ interface Context {
     emiter: Emiter;
     annotation: IMock<Annotation>;
     astAnnotation: IMock<AstAnnotation>;
+    tracer: IMock<Tracer>;
 }
 
 const t = test as TestInterface<Context>;
 
 t.beforeEach((t) => {
+    t.context.tracer = Mock.ofType<Tracer>();
     t.context.debug = Mock.ofType<OvaleDebugClass>();
+    t.context.debug
+        .setup((x) => x.create("SimulationCraftEmiter"))
+        .returns(() => t.context.tracer.object);
     t.context.ast = Mock.ofType<OvaleASTClass>();
     t.context.data = Mock.ofType<OvaleDataClass>();
     t.context.unparser = Mock.ofType<Unparser>();
@@ -86,21 +91,10 @@ t("emiter unknown function (call one time message instead)", (t) => {
         asType: "value",
     };
     const nodeList: LuaArray<AstNode> = {};
-    const expected: AstNode = {} as AstNode;
+    const expected: AstNode = { rawPositionalParams: {} } as AstNode;
     t.context.ast
-        .setup((x) =>
-            x.ParseCode(
-                "expression",
-                "target.IsInterruptible()",
-                nodeList,
-                t.context.annotation.object.astAnnotation
-            )
-        )
-        .returns(() => [
-            expected,
-            nodeList,
-            t.context.annotation.object.astAnnotation,
-        ]);
+        .setup((x) => x.newFunction(nodeList, "message", true))
+        .returns(() => expected);
 
     // Act
     const result = t.context.emiter.Emit(

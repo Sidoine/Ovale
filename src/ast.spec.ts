@@ -1,11 +1,11 @@
 import test, { TestInterface } from "ava";
 import { Mock, It, IMock } from "typemoq";
-import { OvaleASTClass, AstAnnotation } from "../AST";
-import { OvaleConditionClass } from "../Condition";
-import { OvaleDebugClass, Tracer } from "../Debug";
-import { OvaleProfilerClass, Profiler } from "../Profiler";
-import { OvaleScriptsClass } from "../Scripts";
-import { OvaleSpellBookClass } from "../SpellBook";
+import { OvaleASTClass, AstAnnotation } from "./AST";
+import { OvaleConditionClass } from "./Condition";
+import { OvaleDebugClass, Tracer } from "./Debug";
+import { OvaleProfilerClass, Profiler } from "./Profiler";
+import { OvaleScriptsClass } from "./Scripts";
+import { OvaleSpellBookClass } from "./SpellBook";
 import { format } from "@wowts/string";
 
 interface Context {
@@ -21,32 +21,49 @@ interface Context {
 
 const t = test as TestInterface<Context>;
 
-t.beforeEach(t => {
+t.beforeEach((t) => {
     t.context.ovaleConditionMock = Mock.ofType<OvaleConditionClass>();
     t.context.ovaleDebugMock = Mock.ofType<OvaleDebugClass>();
     const tracer = Mock.ofType<Tracer>();
-    tracer.setup(x => x.Warning(It.isAnyString())).callback(x => {throw Error(x)});
-    tracer.setup(x => x.Warning(It.isAnyString(), It.isAny())).callback((x,y) => {throw Error(format(x, y))});
-    tracer.setup(x => x.Error(It.isAny())).callback(x => t.fail(x));
+    tracer
+        .setup((x) => x.Warning(It.isAnyString()))
+        .callback((x) => {
+            throw Error(x);
+        });
+    tracer
+        .setup((x) => x.Warning(It.isAnyString(), It.isAny()))
+        .callback((x, y) => {
+            throw Error(format(x, y));
+        });
+    tracer.setup((x) => x.Error(It.isAny())).callback((x) => t.fail(x));
     t.context.tracerMock = tracer;
-    t.context.ovaleDebugMock.setup(x => x.create(It.isAnyString())).returns(() => (tracer.object));
+    t.context.ovaleDebugMock
+        .setup((x) => x.create(It.isAnyString()))
+        .returns(() => tracer.object);
     t.context.ovaleProfilerMock = Mock.ofType<OvaleProfilerClass>();
-    t.context.ovaleProfilerMock.setup(x => x.create(It.isAny())).returns(() => Mock.ofType<Profiler>().object);
+    t.context.ovaleProfilerMock
+        .setup((x) => x.create(It.isAny()))
+        .returns(() => Mock.ofType<Profiler>().object);
     t.context.ovaleScriptsMock = Mock.ofType<OvaleScriptsClass>();
     t.context.ovaleSpellbookMock = Mock.ofType<OvaleSpellBookClass>();
     t.context.ast = new OvaleASTClass(
-        t.context.ovaleConditionMock.object, 
+        t.context.ovaleConditionMock.object,
         t.context.ovaleDebugMock.object,
         t.context.ovaleProfilerMock.object,
         t.context.ovaleScriptsMock.object,
-        t.context.ovaleSpellbookMock.object);
+        t.context.ovaleSpellbookMock.object
+    );
     t.context.annotation = { definition: {}, nodeList: {} };
 });
 
-
-t("ast: parse Define", t => {
+t("ast: parse Define", (t) => {
     // Act
-    const [astNode, nodeList, annotation ] = t.context.ast.ParseCode("script", `Define(test 18)`, {}, t.context.annotation);
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode(
+        "script",
+        `Define(test 18)`,
+        {},
+        t.context.annotation
+    );
 
     // Assert
     t.truthy(astNode);
@@ -55,9 +72,14 @@ t("ast: parse Define", t => {
     t.is(annotation!.definition["test"], 18);
 });
 
-t("ast: parse SpellInfo", t => {
+t("ast: parse SpellInfo", (t) => {
     // Act
-    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("script", "SpellInfo(123 cd=30 rage=10)", {}, t.context.annotation);
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode(
+        "script",
+        "SpellInfo(123 cd=30 rage=10)",
+        {},
+        t.context.annotation
+    );
 
     // Assert
     t.truthy(astNode);
@@ -73,15 +95,20 @@ t("ast: parse SpellInfo", t => {
     t.is(spellInfoNode.rawNamedParams.rage!.value, 10);
 });
 
-t("ast: parse expression with a if with SpellInfo", t => {
+t("ast: parse expression with a if with SpellInfo", (t) => {
     // Act
-    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("icon", "AddIcon { if Talent(12) Spell(115) }", {}, t.context.annotation);
-    
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode(
+        "icon",
+        "AddIcon { if Talent(12) Spell(115) }",
+        {},
+        t.context.annotation
+    );
+
     // Assert
     t.truthy(astNode);
     t.truthy(nodeList);
     t.truthy(annotation);
-   // t.is(astNode!.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
+    // t.is(astNode!.asString, "AddIcon\n{\n if talent(12) spell(115)\n}");
     t.is(astNode!.type, "icon");
     const group = astNode!.child[1];
     t.is(group.type, "group");
@@ -96,9 +123,11 @@ t("ast: parse expression with a if with SpellInfo", t => {
     t.is(spellNode.rawPositionalParams[1].value, 115);
 });
 
-t("ast: dedupe nodes", t => {
+t("ast: dedupe nodes", (t) => {
     // Act
-    const astNode = t.context.ast.parseScript("AddIcon { if BuffPresent(12) Spell(15) if BuffPresent(12) Spell(16) }");
+    const astNode = t.context.ast.parseScript(
+        "AddIcon { if BuffPresent(12) Spell(15) if BuffPresent(12) Spell(16) }"
+    );
 
     // Assert
     t.truthy(astNode);
@@ -114,9 +143,14 @@ t("ast: dedupe nodes", t => {
     t.true(firstChild.child[1] === secondChild.child[1]);
 });
 
-t("ast: itemrequire", t => {
+t("ast: itemrequire", (t) => {
     // Act
-    const [astNode, nodeList, annotation] = t.context.ast.ParseCode("script", "ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)", {}, t.context.annotation);
+    const [astNode, nodeList, annotation] = t.context.ast.ParseCode(
+        "script",
+        "ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)",
+        {},
+        t.context.annotation
+    );
 
     // Assert
     t.truthy(astNode);
@@ -126,12 +160,17 @@ t("ast: itemrequire", t => {
     const itemRequire = astNode!.child[1];
     t.is(itemRequire.type, "itemrequire");
     t.is(itemRequire.property, "unusable");
-})
+});
 
-t("ast: addcheckbox", t => {
+t("ast: addcheckbox", (t) => {
     // Act
-    const astNode = t.context.ast.ParseCode("script", "AddCheckBox(opt_interrupt l(interrupt) default specialization=blood)", {}, t.context.annotation);
+    const astNode = t.context.ast.ParseCode(
+        "script",
+        "AddCheckBox(opt_interrupt l(interrupt) default specialization=blood)",
+        {},
+        t.context.annotation
+    );
 
     // Assert
     t.truthy(astNode);
-})
+});

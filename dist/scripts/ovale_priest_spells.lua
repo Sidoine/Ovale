@@ -360,7 +360,7 @@ Define(smite 585)
 # Rank 2: Smite deals s1 increased damage.
   SpellInfo(smite)
 Define(surrender_to_madness 319952)
-# You instantly cast Void Eruption on the target, dealing (95 of Spell Power)*2 Shadow damage and activating Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
+# Deals (95 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
   SpellInfo(surrender_to_madness cd=90 duration=25 talent=surrender_to_madness_talent)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness=1)
@@ -473,7 +473,7 @@ Define(shadow_covenant_talent 15) #19766
 Define(shadow_crash_talent 15) #21755
 # Hurl a bolt of slow-moving, far-reaching Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(surrender_to_madness_talent 21) #21979
-# You instantly cast Void Eruption on the target, dealing (95 of Spell Power)*2 Shadow damage and activating Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
+# Deals (95 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. While channelling, all of your Shadow damage over time effects are refreshed on the target.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
 Define(unbridled_fury_item 169299)

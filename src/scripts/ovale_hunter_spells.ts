@@ -147,7 +147,7 @@ Define(chimaera_shot_marksmanship 342049)
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
 # Rank 2: Cobra Shot deals s1 increased damage.
-  SpellInfo(cobra_shot focus=45)
+  SpellInfo(cobra_shot focus=35)
   SpellInfo(steady_shot replaced_by=cobra_shot)
 Define(concentrated_flame_0 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.

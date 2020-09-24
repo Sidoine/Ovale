@@ -156,7 +156,7 @@ Define(diffuse_magic 122783)
   SpellAddBuff(diffuse_magic diffuse_magic=1)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
-  SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=1 chi=-2 talent=energizing_elixir_talent)
+  SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=0 offgcd=1 chi=-2 talent=energizing_elixir_talent)
   # Generating w1/5 extra Energy per sec.
   SpellAddBuff(energizing_elixir energizing_elixir=1)
 Define(expel_harm_0 322102)

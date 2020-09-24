@@ -4,8 +4,8 @@ import {
     SpellEffectData,
     EffectSubtype,
     EffectType,
-} from "../../utils/importspells";
-import { parseDescription } from "../../utils/spellstringparser";
+} from "./importspells";
+import { parseDescription } from "./spellstringparser";
 
 function createFakeSpell(
     options: { [k in keyof SpellData]?: SpellData[k] }

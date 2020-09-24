@@ -531,10 +531,11 @@ Define(skull_and_crossbones 199603)
   SpellInfo(skull_and_crossbones channel=-0.001 gcd=0 offgcd=1)
   # Sinister Strike has an additional s1 chance of striking an additional time.
   SpellAddBuff(skull_and_crossbones skull_and_crossbones=1)
-Define(slaughter 323654)
-# Slaughter the target, dealing s1 Physical damage. The target's anima mixes with your lethal poison, replacing it with a more powerful lethal poison for the next 5 minutes.rnrnSlaughter Poison deals Shadow damage over 12 sec. and steals 15 of healing done to the target.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(slaughter energy=50 gcd=1 combopoints=-2)
-
+Define(slaughter 253384)
+# Rampage causes the target to bleed for an additional s1 of the direct damage dealt to the target over 4 seconds
+  SpellInfo(slaughter duration=4 gcd=0 offgcd=1 tick=2)
+  # Suffering w1 Physical damage every t sec.
+  SpellAddTargetDebuff(slaughter slaughter=1)
 Define(slice_and_dice 5171)
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by (25 of Spell Power). Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
 # Rank 2: Slice and Dice increases attack speed by an additional s1.

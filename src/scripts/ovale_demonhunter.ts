@@ -53,6 +53,11 @@ AddFunction blade_dance
  hastalent(first_blood_talent) or enemies() >= 3 - talentpoints(trail_of_ruin_talent)
 }
 
+AddFunction reaping_delay
+{
+ if azeriteessenceismajor(breath_of_the_dying_essence_id) target.timetodie()
+}
+
 AddFunction fel_barrage_sync
 {
  if hastalent(fel_barrage_talent) spellcooldown(fel_barrage) == 0 and { { not hastalent(demonic_talent) or buffpresent(metamorphosis_buff) } and not waiting_for_momentum() and 600 > 30 or enemies() > message("desired_targets is not implemented") }
@@ -224,8 +229,6 @@ AddFunction havocessencesmainactions
  if buffpresent(metamorphosis_buff) or fel_barrage_sync() spell(worldvein_resonance)
  #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
  if fury() < 40 and buffpresent(metamorphosis_buff) spell(memory_of_lucid_dreams)
- #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
- if azeriteessenceismajor(breath_of_the_dying_essence_id) spell(cycling_variable)
 }
 
 AddFunction havocessencesmainpostconditions
@@ -241,8 +244,9 @@ AddFunction havocessencesshortcdactions
   #purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
   if enemies() >= 2 or 600 > 60 spell(purifying_blast)
 
-  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams)
   {
+   #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
    #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
    if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } spell(reaping_flames)
   }
@@ -251,7 +255,7 @@ AddFunction havocessencesshortcdactions
 
 AddFunction havocessencesshortcdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) > 45 } and not waiting_for_momentum() and { not hastalent(demonic_talent) or buffpresent(metamorphosis_buff) and not spellcooldown(blade_dance) == 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or hastalent(fel_barrage_talent) and fel_barrage_sync() and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) > 45 } and not waiting_for_momentum() and { not hastalent(demonic_talent) or buffpresent(metamorphosis_buff) and not spellcooldown(blade_dance) == 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or hastalent(fel_barrage_talent) and fel_barrage_sync() and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams)
 }
 
 AddFunction havocessencescdactions
@@ -265,7 +269,7 @@ AddFunction havocessencescdactions
 
 AddFunction havocessencescdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) > 45 } and not waiting_for_momentum() and { not hastalent(demonic_talent) or buffpresent(metamorphosis_buff) and not spellcooldown(blade_dance) == 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or hastalent(fel_barrage_talent) and fel_barrage_sync() and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) > 45 } and not waiting_for_momentum() and { not hastalent(demonic_talent) or buffpresent(metamorphosis_buff) and not spellcooldown(blade_dance) == 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or hastalent(fel_barrage_talent) and fel_barrage_sync() and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { buffpresent(metamorphosis_buff) or fel_barrage_sync() } and spell(worldvein_resonance) or fury() < 40 and buffpresent(metamorphosis_buff) and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.demonic
@@ -577,7 +581,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # conductive_ink_debuff
-# cycling_variable
 # dark_slash
 # dark_slash_debuff
 # dark_slash_talent

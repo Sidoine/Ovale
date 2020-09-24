@@ -1,7 +1,7 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid_spells", 80300)
 if not __exports then return end
 __exports.registerDruidSpells = function(OvaleScripts)
-    local name = "ovale_druid_base_spells"
+    local name = "ovale_druid_spells"
     local desc = "[9.0] Ovale: Druid baseline spells"
     local code = [[Define(bear_form 5487)
 # Shapeshift into Bear Form, increasing armor by m4 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.

@@ -64,6 +64,11 @@ AddFunction skip_cycle_garrote
  checkboxon(opt_priority_rotation) and enemies() > 3 and { target.debuffremaining(garrote) < spellcooldownduration(garrote) or debuffcountonany(rupture_debuff) + debuffcountonany(garrote_debuff) + talent(internal_bleeding_talent) * debuffcountonany(internal_bleeding_debuff) > 5 }
 }
 
+AddFunction reaping_delay
+{
+ if azeriteessenceismajor(breath_of_the_dying_essence_id) target.timetodie()
+}
+
 AddCheckBox(opt_priority_rotation l(opt_priority_rotation) default specialization=assassination)
 AddCheckBox(opt_interrupt l(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=assassination)
@@ -216,8 +221,6 @@ AddFunction assassinationessencesmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
  if energy() < 50 and not { not spellcooldown(vendetta) > 0 } spell(memory_of_lucid_dreams)
- #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
- if azeriteessenceismajor(breath_of_the_dying_essence_id) spell(cycling_variable)
 }
 
 AddFunction assassinationessencesmainpostconditions
@@ -233,8 +236,9 @@ AddFunction assassinationessencesshortcdactions
   #purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if enemies() >= 2 or 600 > 60 spell(purifying_blast)
 
-  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams)
   {
+   #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
    #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
    if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } spell(reaping_flames)
   }
@@ -243,7 +247,7 @@ AddFunction assassinationessencesshortcdactions
 
 AddFunction assassinationessencesshortcdpostconditions
 {
- energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+ energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams)
 }
 
 AddFunction assassinationessencescdactions
@@ -259,7 +263,7 @@ AddFunction assassinationessencescdactions
 
 AddFunction assassinationessencescdpostconditions
 {
- energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and energy() < 70 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and energy() < 70 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.dot
@@ -693,7 +697,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # crimson_tempest
-# cycling_variable
 # deadly_poison_dot_debuff
 # deeper_stratagem_talent
 # disabled_item
@@ -780,6 +783,11 @@ AddFunction ambush_condition
 AddFunction rtb_reroll
 {
  0
+}
+
+AddFunction reaping_delay
+{
+ if azeriteessenceismajor(breath_of_the_dying_essence_id) target.timetodie()
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=outlaw)
@@ -957,8 +965,6 @@ AddFunction outlawessencesmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams,if=energy<45
  if energy() < 45 spell(memory_of_lucid_dreams)
- #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
- if azeriteessenceismajor(breath_of_the_dying_essence_id) spell(cycling_variable)
 }
 
 AddFunction outlawessencesmainpostconditions
@@ -974,8 +980,9 @@ AddFunction outlawessencesshortcdactions
   #purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
   if enemies() >= 2 or 600 > 60 spell(purifying_blast)
 
-  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams)
   {
+   #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
    #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
    if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } spell(reaping_flames)
   }
@@ -984,7 +991,7 @@ AddFunction outlawessencesshortcdactions
 
 AddFunction outlawessencesshortcdpostconditions
 {
- energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+ energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams)
 }
 
 AddFunction outlawessencescdactions
@@ -998,7 +1005,7 @@ AddFunction outlawessencescdactions
 
 AddFunction outlawessencescdpostconditions
 {
- energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and not buffpresent(adrenaline_rush) } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and not buffpresent(adrenaline_rush) } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.cds
@@ -1337,7 +1344,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # conductive_ink_debuff
-# cycling_variable
 # cyclotronic_blast
 # deadshot_buff
 # disabled_item
@@ -1412,6 +1418,11 @@ AddFunction stealth_threshold
 AddFunction use_priority_rotation
 {
  checkboxon(opt_priority_rotation) and enemies() >= 2
+}
+
+AddFunction reaping_delay
+{
+ if azeriteessenceismajor(breath_of_the_dying_essence_id) target.timetodie()
 }
 
 AddFunction shd_combo_points
@@ -1739,8 +1750,6 @@ AddFunction subtletyessencesmainactions
  if spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 spell(worldvein_resonance)
  #memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
  if energy() < 40 and buffpresent(symbols_of_death) spell(memory_of_lucid_dreams)
- #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
- if azeriteessenceismajor(breath_of_the_dying_essence_id) spell(cycling_variable)
 }
 
 AddFunction subtletyessencesmainpostconditions
@@ -1756,8 +1765,9 @@ AddFunction subtletyessencesshortcdactions
   #purifying_blast,if=spell_targets.shuriken_storm>=2|raid_event.adds.in>60
   if enemies() >= 2 or 600 > 60 spell(purifying_blast)
 
-  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+  unless { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams)
   {
+   #cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
    #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
    if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } spell(reaping_flames)
   }
@@ -1766,7 +1776,7 @@ AddFunction subtletyessencesshortcdactions
 
 AddFunction subtletyessencesshortcdpostconditions
 {
- energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable)
+ energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams)
 }
 
 AddFunction subtletyessencescdactions
@@ -1780,7 +1790,7 @@ AddFunction subtletyessencescdactions
 
 AddFunction subtletyessencescdpostconditions
 {
- energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and not { not spellcooldown(symbols_of_death) > 0 } and not buffpresent(symbols_of_death) and energydeficit() >= 30 and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or azeriteessenceismajor(breath_of_the_dying_essence_id) and spell(cycling_variable) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and not { not spellcooldown(symbols_of_death) > 0 } and not buffpresent(symbols_of_death) and energydeficit() >= 30 and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or target.timetodie() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.cds
@@ -2203,7 +2213,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # conductive_ink_debuff
-# cycling_variable
 # dark_shadow_talent
 # deathly_shadows_buff
 # deeper_stratagem_talent
