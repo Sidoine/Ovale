@@ -539,6 +539,7 @@ Define(runic_attenuation_talent 4) #22019
 Define(tombstone_talent 3) #23454
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for 8 seconds.
 Define(dribbling_inkpod_item 169319)
+Define(unbridled_fury_item 169299)
 Define(ashvanes_razor_coral_item 169311)
 Define(corrupted_gladiators_badge_item 172669)
 Define(corrupted_gladiators_medallion_item 184055)
@@ -547,7 +548,6 @@ Define(jes_howler_item 159627)
 Define(lurkers_insidious_gift_item 167866)
 Define(notorious_gladiators_badge_item 167380)
 Define(notorious_gladiators_medallion_item 167377)
-Define(unbridled_fury_item 169299)
 Define(vial_of_animated_blood_item 159625)
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)

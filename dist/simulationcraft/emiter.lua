@@ -2150,6 +2150,8 @@ __exports.Emiter = __class(nil, {
                     code = "target.TimeToDie()"
                 elseif property == "distance" then
                     code = "target.Distance()"
+                elseif property == "is_boss" then
+                    code = "target.classification(worldboss)"
                 elseif property == "health" then
                     local modifier = tokenIterator()
                     if modifier == "pct" then

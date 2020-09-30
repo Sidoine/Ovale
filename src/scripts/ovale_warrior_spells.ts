@@ -96,11 +96,6 @@ Define(blood_of_the_enemy_2 297971)
 Define(blood_of_the_enemy_3 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_3)
-Define(bloodlust 2825)
-# Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
-  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
-  # Haste increased by w1.
-  SpellAddBuff(bloodlust bloodlust=1)
 Define(bloodthirst 23881)
 # Assault the target in a bloodthirsty craze, dealing s1 Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 # Rank 2: Damage increased by s1.
@@ -580,7 +575,6 @@ Define(unstoppable_force_talent 17) #22544
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
-Define(focused_resolve_item 168506)
 Define(unbridled_fury_item 169299)
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)

@@ -49,6 +49,7 @@ export class Combat extends States<CombatState> implements StateModule {
             false,
             this.expectedCombatLength
         );
+        condition.RegisterCondition("fightremains", false, this.fightRemains);
     }
 
     public isInCombat(atTime: number | undefined) {
@@ -211,6 +212,11 @@ export class Combat extends States<CombatState> implements StateModule {
         atTime
     ) => {
         // TODO maybe should depend on the fact that it is a boss fight or not
+        return ReturnConstant(15 * 60);
+    };
+
+    private fightRemains: ConditionFunction = () => {
+        // TODO use enemies health
         return ReturnConstant(15 * 60);
     };
 }

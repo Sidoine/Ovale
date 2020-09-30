@@ -827,7 +827,7 @@ AddFunction outlawgetinmeleerange
 AddFunction outlawstealthmainactions
 {
  #cheap_shot,target_if=min:debuff.prey_on_the_weak.remains,if=talent.prey_on_the_weak.enabled&!target.is_boss
- if hastalent(prey_on_the_weak_talent) and not message("target.is_boss is not implemented") spell(cheap_shot)
+ if hastalent(prey_on_the_weak_talent) and not target.classification(worldboss) spell(cheap_shot)
  #slaughter
  spell(slaughter)
  #ambush
@@ -844,7 +844,7 @@ AddFunction outlawstealthshortcdactions
 
 AddFunction outlawstealthshortcdpostconditions
 {
- hastalent(prey_on_the_weak_talent) and not message("target.is_boss is not implemented") and spell(cheap_shot) or spell(slaughter) or spell(ambush)
+ hastalent(prey_on_the_weak_talent) and not target.classification(worldboss) and spell(cheap_shot) or spell(slaughter) or spell(ambush)
 }
 
 AddFunction outlawstealthcdactions
@@ -853,7 +853,7 @@ AddFunction outlawstealthcdactions
 
 AddFunction outlawstealthcdpostconditions
 {
- hastalent(prey_on_the_weak_talent) and not message("target.is_boss is not implemented") and spell(cheap_shot) or spell(slaughter) or spell(ambush)
+ hastalent(prey_on_the_weak_talent) and not target.classification(worldboss) and spell(cheap_shot) or spell(slaughter) or spell(ambush)
 }
 
 ### actions.precombat

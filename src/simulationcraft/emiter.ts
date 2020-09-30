@@ -3934,6 +3934,8 @@ export class Emiter {
                 code = "target.TimeToDie()";
             } else if (property === "distance") {
                 code = "target.Distance()";
+            } else if (property === "is_boss") {
+                code = "target.classification(worldboss)";
             } else if (property === "health") {
                 const modifier = tokenIterator();
                 if (modifier === "pct") {

@@ -90,9 +90,20 @@ Define(bloodlust 2825)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
+Define(celestial_brew 322507)
+# A swig of strong brew that coalesces purified chi escaping your body into a celestial guard, absorbing <absorb> damage.?s322510[rnrnPurifying Stagger damage increases absorption by up to 322510s1.][]
+# Rank 2: Purifying Brew increases the absorption of your next Celestial Brew by up to s1, based on Stagger purified.
+  SpellInfo(celestial_brew cd=60 duration=8 gcd=1)
+  # Absorbs w1 damage.?w2>0[rnYour self-healing increased by w2.][]
+  SpellAddBuff(celestial_brew celestial_brew=1)
 Define(chi_burst 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
+Define(chi_energy 337571)
+# Whenever you deal damage to a target with Fists of Fury, you gain a stack of Chi Energy up to a maximum of m2 stacks.rnrnUsing Spinning Crane Kick will cause the energy to detonate in a Chi Explosion, dealing 337342m1 damage to all enemies within 337342A1 yards. The damage is increased by 337571m1 for each stack of Chi Energy.
+  SpellInfo(chi_energy duration=45 max_stacks=30 gcd=0 offgcd=1)
+  # Increases the damage done by your next Chi Explosion by s1.rnrnChi Explosion is triggered whenever you use Spinning Crane Kick.
+  SpellAddBuff(chi_energy chi_energy=1)
 Define(chi_wave_0 115098)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
   SpellInfo(chi_wave_0 cd=15 talent=chi_wave_talent)
@@ -137,11 +148,6 @@ Define(conductive_ink_debuff 302597)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink_debuff channel=0 gcd=0 offgcd=1)
 
-Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing a total of o1 Fire damage over D.
-  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
-  # Burning for o1 Fire damage.
-  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1 talent=dampen_harm_talent)
@@ -152,6 +158,11 @@ Define(diffuse_magic 122783)
   SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1 talent=diffuse_magic_talent)
   # Spell damage taken reduced by m1.
   SpellAddBuff(diffuse_magic diffuse_magic=1)
+Define(elusive_brawler 195630)
+# Each time you are hit by a melee attack, or hit with Blackout Kick, you gain stacking (100 of Spell Power).1 increased Dodge chance until your next successful Dodge.rnrnAlso increases your attack power by (100 of Spell Power).1.
+  SpellInfo(elusive_brawler duration=10 max_stacks=100 gcd=0 offgcd=1)
+  # Dodge chance increased by w1.
+  SpellAddBuff(elusive_brawler elusive_brawler=1)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
   SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=0 offgcd=1 chi=-2 talent=energizing_elixir_talent)
@@ -223,16 +234,6 @@ Define(gift_of_the_ox 124502)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
   SpellInfo(gift_of_the_ox channel=0 gcd=0 offgcd=1)
   SpellAddBuff(gift_of_the_ox gift_of_the_ox=1)
-Define(gladiators_badge_0 277185)
-# Increases primary stat by s1 for 15 seconds.rn
-  SpellInfo(gladiators_badge_0 cd=120 duration=15 channel=15 gcd=0 offgcd=1)
-  # Primary stat increased by s4.
-  SpellAddBuff(gladiators_badge_0 gladiators_badge_0=1)
-Define(gladiators_badge_1 345228)
-# Increases primary stat by s1 for 15 seconds.rn
-  SpellInfo(gladiators_badge_1 cd=120 duration=15 channel=15 gcd=0 offgcd=1)
-  # Primary stat increased by s1.
-  SpellAddBuff(gladiators_badge_1 gladiators_badge_1=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -265,6 +266,14 @@ Define(invoke_niuzao_the_black_ox_1 322740)
 # Purifying Stagger damage while Niuzao is active increases the damage of Niuzao's next Stomp by s1 of damage purified, split between all enemies.
   SpellInfo(invoke_niuzao_the_black_ox_1 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(invoke_niuzao_the_black_ox_1 invoke_niuzao_the_black_ox_1=1)
+Define(invoke_xuen_the_white_tiger_0 123904)
+# Summons an effigy of Xuen, the White Tiger for 24 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.?s323999[rnrnEvery 323999s1 sec, Xuen strikes your enemies with Empowered Tiger Lightning dealing 323999s2 of the damage you have dealt to those targets in the last 323999s1 sec.][]
+  SpellInfo(invoke_xuen_the_white_tiger_0 cd=120 duration=24 gcd=1 tick=4)
+  SpellAddBuff(invoke_xuen_the_white_tiger_0 invoke_xuen_the_white_tiger_0=1)
+Define(invoke_xuen_the_white_tiger_1 323999)
+# Xuen strikes your enemies with Empowered Tiger Lightning every s1 sec, dealing s2 of the damage you have dealt to those targets in the last s1 sec.
+  SpellInfo(invoke_xuen_the_white_tiger_1 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(invoke_xuen_the_white_tiger_1 invoke_xuen_the_white_tiger_1=1)
 Define(keg_smash 121253)
 # Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
@@ -362,12 +371,6 @@ Define(reaping_flames_3 311202)
 Define(reaping_flames_4 311947)
   SpellInfo(reaping_flames_4 duration=2 gcd=0 offgcd=1)
   SpellAddTargetDebuff(reaping_flames_4 reaping_flames_4=1)
-Define(reverse_harm_0 287771)
-# Heals a friendly target for m1 of their maximum health, and causes m2 of the amount healed to instantly be dealt to the nearest enemy as Nature damage within 5 yards. rnrn|cFFFFFFFFGenerates s3 Chi.
-  SpellInfo(reverse_harm_0 energy=40 cd=10 gcd=1 chi=-2)
-Define(reverse_harm_1 290461)
-# Heals a friendly target for m1 of their maximum health, and causes m2 of the amount healed to instantly be dealt to the nearest enemy as Nature damage within 5 yards. rnrn|cFFFFFFFFGenerates s3 Chi.
-  SpellInfo(reverse_harm_1 gcd=0 offgcd=1)
 Define(ripple_in_space_0 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space_0)
@@ -389,11 +392,6 @@ Define(rushing_jade_wind 116847)
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent_windwalker)
   # Dealing physical damage to nearby enemies every 116847t1 sec.
   SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
-Define(seething_rage 297126)
-# Increases your critical hit damage by 297126m for 5 seconds.
-  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
-  # Critical strike damage increased by w1.
-  SpellAddBuff(seething_rage seething_rage=1)
 Define(serenity 152173)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
   SpellInfo(serenity cd=90 duration=12 gcd=0 offgcd=1 talent=serenity_talent)
@@ -461,9 +459,6 @@ Define(worldvein_resonance_2 298609)
 Define(worldvein_resonance_3 298611)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance_3)
-Define(worldvein_resonance_buff 295206)
-  SpellInfo(worldvein_resonance_buff channel=0 gcd=0 offgcd=1)
-
 SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arcane_torrent_3 arcane_torrent_4 arcane_torrent_5 arcane_torrent_6 arcane_torrent_7 arcane_torrent_8)
 SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2 blood_fury_3)
 SpellList(chi_wave chi_wave_0 chi_wave_1 chi_wave_2 chi_wave_3)
@@ -474,12 +469,11 @@ SpellList(invoke_niuzao_the_black_ox invoke_niuzao_the_black_ox_0 invoke_niuzao_
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
-SpellList(gladiators_badge gladiators_badge_0 gladiators_badge_1)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
+SpellList(invoke_xuen_the_white_tiger invoke_xuen_the_white_tiger_0 invoke_xuen_the_white_tiger_1)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
-SpellList(reverse_harm reverse_harm_0 reverse_harm_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
@@ -511,15 +505,8 @@ Define(special_delivery_talent 16) #19819
 # Drinking from your Brews has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
-Define(ashvanes_razor_coral_item 169311)
-Define(cyclotronic_blast_item 167672)
-Define(dribbling_inkpod_item 169319)
-Define(gladiators_medallion_item 184268)
-Define(lustrous_golden_plumage_item 159617)
-Define(remote_guidance_device_item 169769)
+Define(unbridled_fury_item 169299)
 Define(the_crucible_of_flame_essence_id 12)
-Define(conflict_and_strife_essence_id 32)
-Define(worldvein_resonance_essence_id 4)
     ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end

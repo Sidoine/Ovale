@@ -67,23 +67,6 @@ Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
   SpellAddBuff(blinding_light blinding_light=1)
-Define(blood_of_the_enemy_0 297969)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_0)
-Define(blood_of_the_enemy_1 297970)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_1)
-Define(blood_of_the_enemy_2 297971)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_2)
-Define(blood_of_the_enemy_3 299039)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_3)
-Define(bloodlust 2825)
-# Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
-  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
-  # Haste increased by w1.
-  SpellAddBuff(bloodlust bloodlust=1)
 Define(concentrated_flame_0 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame_0 duration=6 channel=6 gcd=0 offgcd=1 tick=2)
@@ -140,6 +123,9 @@ Define(divine_purpose 223819)
 Define(divine_storm 53385)
 # Unleashes a whirl of divine energy, dealing s1 Holy damage to up to s2 nearby enemies.
   SpellInfo(divine_storm holypower=3)
+Define(divine_toll 304971)
+# Instantly cast Holy Shock, Avenger's Shield, or Judgment on up to s1 targets within A2 yds (based on your current specialization).
+  SpellInfo(divine_toll cd=60)
 Define(empyrean_power_buff_0 286392)
 # Your attacks have a chance to make your next Divine Storm free and deal s1 additional damage.
   SpellInfo(empyrean_power_buff_0 channel=-0.001 gcd=0 offgcd=1)
@@ -154,6 +140,11 @@ Define(execution_sentence 343527)
   SpellInfo(execution_sentence holypower=3 cd=60 duration=8 tick=8 talent=execution_sentence_talent)
   # Sentenced to suffer w1 Holy damage.
   SpellAddTargetDebuff(execution_sentence execution_sentence=1)
+Define(final_reckoning 343721)
+# Call down a blast of heavenly energy, dealing s2 Holy damage to all targets in the target area and causing them to take s3 increased damage from your Holy Power abilities for 8 seconds.rnrn|cFFFFFFFFPassive:|r While off cooldown, your attacks have a high chance to call down a bolt that deals 343724s1 Holy damage and causes the target to take 343724s2 increased damage from your next Holy Power ability.
+  SpellInfo(final_reckoning cd=60 duration=8 talent=final_reckoning_talent)
+  # Taking w3 increased damage from @auracaster's Holy Power abilities.
+  SpellAddTargetDebuff(final_reckoning final_reckoning=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -162,47 +153,6 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 295258)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
-Define(focused_azerite_beam_1 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_1 cd=90)
-Define(focused_azerite_beam_2 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
-  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
-Define(focused_azerite_beam_3 299338)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
-Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
-  SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
-Define(guardian_of_azeroth_1 295855)
-# Each time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
-  SpellInfo(guardian_of_azeroth_1 duration=60 max_stacks=5 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
-Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
-  SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
-  SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
-Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
-  SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
-  SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
-Define(guardian_of_azeroth_4 300091)
-# Call upon Azeroth to summon a Guardian of Azeroth to aid you in combat for 30 seconds.
-  SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
-Define(guardian_of_azeroth_5 303347)
-  SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
-
 Define(hammer_of_justice 853)
 # Stuns the target for 6 seconds.
   SpellInfo(hammer_of_justice cd=60 duration=6)
@@ -216,6 +166,11 @@ Define(hammer_of_wrath 24275)
 # Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health?s326730[, or during Avenging Wrath][].rnrn|cFFFFFFFFGenerates s2 Holy Power.
 # Rank 2: Hammer of Wrath may be used on any target during Avenging Wrath.
   SpellInfo(hammer_of_wrath cd=7.5 holypower=-1)
+Define(holy_avenger 105809)
+# Your Holy Power generation is tripled for 20 seconds.
+  SpellInfo(holy_avenger cd=180 duration=20 gcd=0 offgcd=1 talent=holy_avenger_talent)
+  # Your Holy Power generation is tripled.
+  SpellAddBuff(holy_avenger holy_avenger=1)
 Define(judgment_0 231663)
 # Judgment causes the target to take s1 increased damage from your next Holy Power ability.
   SpellInfo(judgment_0 channel=0 gcd=0 offgcd=1)
@@ -241,28 +196,6 @@ Define(memory_of_lucid_dreams_1 299302)
 Define(memory_of_lucid_dreams_2 299304)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams_2)
-Define(purifying_blast_0 295337)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_0 cd=60 duration=6)
-Define(purifying_blast_1 295338)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_1 channel=0 gcd=0 offgcd=1)
-Define(purifying_blast_2 295354)
-# When an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.
-  SpellInfo(purifying_blast_2 duration=8 gcd=0 offgcd=1)
-  # Damage dealt increased by s1.
-  SpellAddBuff(purifying_blast_2 purifying_blast_2=1)
-Define(purifying_blast_3 295366)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_3 duration=3 gcd=0 offgcd=1)
-  # Stunned.
-  SpellAddTargetDebuff(purifying_blast_3 purifying_blast_3=1)
-Define(purifying_blast_4 299345)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_4 cd=60 duration=6 channel=6 gcd=1)
-Define(purifying_blast_5 299347)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_5 cd=60 duration=6 gcd=1)
 Define(razor_coral_0 303564)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
   SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
@@ -283,35 +216,9 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
-Define(reaping_flames_0 310690)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
-  SpellInfo(reaping_flames_0 cd=45 channel=0)
-Define(reaping_flames_1 311194)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
-  SpellInfo(reaping_flames_1 cd=45 channel=0)
-Define(reaping_flames_2 311195)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
-  SpellInfo(reaping_flames_2 cd=45 channel=0)
-Define(reaping_flames_3 311202)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
-  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
-  # Damage of next Reaping Flames increased by w1.
-  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
-Define(reaping_flames_4 311947)
-  SpellInfo(reaping_flames_4 duration=2 gcd=0 offgcd=1)
-  SpellAddTargetDebuff(reaping_flames_4 reaping_flames_4=1)
 Define(rebuke 96231)
 # Interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
-Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
-  SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
-Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
   SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
@@ -333,18 +240,11 @@ Define(shield_of_vengeance 184662)
 Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266s1 Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
-Define(the_unbound_force_0 299321)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_0)
-Define(the_unbound_force_1 299322)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_1)
-Define(the_unbound_force_2 299323)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_2)
-Define(the_unbound_force_3 299324)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_3)
+Define(vanquishers_hammer 328204)
+# Throws a hammer at your target dealing (112.00000000000001 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].
+  SpellInfo(vanquishers_hammer holypower=1 cd=30 duration=15)
+  # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous].
+  SpellAddBuff(vanquishers_hammer vanquishers_hammer=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing s1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds. Damage reduced on secondary targets.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-3)
@@ -376,15 +276,8 @@ SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arcane_torrent_3 arcane_torrent_4 arcane_torrent_5 arcane_torrent_6 arcane_torrent_7 arcane_torrent_8)
-SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(crusader_strike crusader_strike_0 crusader_strike_1)
 SpellList(empyrean_power_buff empyrean_power_buff_0 empyrean_power_buff_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
-SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
-SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
-SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
-SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 Define(blessed_hammer_talent 3) #23469
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
 Define(blinding_light_talent 9) #21811
@@ -395,13 +288,13 @@ Define(crusaders_judgment_talent 5) #22604
 # Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
 Define(execution_sentence_talent 3) #23467
 # A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
-Define(righteous_verdict_talent 2) #22557
-# Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 6 seconds.
+Define(final_reckoning_talent 21) #22634
+# Call down a blast of heavenly energy, dealing s2 Holy damage to all targets in the target area and causing them to take s3 increased damage from your Holy Power abilities for 8 seconds.rnrn|cFFFFFFFFPassive:|r While off cooldown, your attacks have a high chance to call down a bolt that deals 343724s1 Holy damage and causes the target to take 343724s2 increased damage from your next Holy Power ability.
+Define(holy_avenger_talent 14) #17599
+# Your Holy Power generation is tripled for 20 seconds.
 Define(seraphim_talent 15) #17601
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(grongs_primal_rage_item 165574)
-Define(unbridled_fury_item 169299)
-Define(focused_resolve_item 168506)
 Define(anima_of_life_and_death_essence_id 7)
 Define(memory_of_lucid_dreams_essence_id 27)
 Define(the_crucible_of_flame_essence_id 12)

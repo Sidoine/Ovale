@@ -119,6 +119,8 @@ AddFunction armsprecombatmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
 }
 
 AddFunction armsprecombatmainpostconditions
@@ -131,7 +133,7 @@ AddFunction armsprecombatshortcdactions
 
 AddFunction armsprecombatshortcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 AddFunction armsprecombatcdactions
@@ -147,14 +149,12 @@ AddFunction armsprecombatcdactions
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
-  #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(focused_resolve_item usable=1)
  }
 }
 
 AddFunction armsprecombatcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 ### actions.hac
@@ -447,8 +447,6 @@ AddFunction arms_defaultcdactions
 
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
-  #potion,if=target.health.pct<21&buff.memory_of_lucid_dreams.up|!essence.memory_of_lucid_dreams.major
-  if { target.healthpercent() < 21 and buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(focused_resolve_item usable=1)
   #blood_fury,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
   if buffremaining(memory_of_lucid_dreams) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) spell(blood_fury)
 
@@ -568,13 +566,13 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # deadly_calm
 # deadly_calm_talent
 # deep_wounds
+# disabled_item
 # dreadnaught_talent
 # execute
 # executioners_precision_buff
 # fervor_of_battle_talent
 # fireblood
 # focused_azerite_beam
-# focused_resolve_item
 # guardian_of_azeroth
 # heroic_leap
 # intimidating_shout
@@ -666,8 +664,6 @@ AddFunction furysingle_targetmainactions
  if buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } spell(rampage)
  #execute
  spell(execute)
- #furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
- if not buffpresent(bloodlust) and buffremaining(furious_slash_buff) < 3 spell(furious_slash)
  #bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
  if not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 spell(bloodthirst)
  #raging_blow,if=charges=2
@@ -676,8 +672,6 @@ AddFunction furysingle_targetmainactions
  spell(bloodthirst)
  #raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
  if hastalent(carnage_talent) or hastalent(massacre_talent) and rage() < 80 or hastalent(frothing_berserker_talent) and rage() < 90 spell(raging_blow)
- #furious_slash,if=talent.furious_slash.enabled
- if hastalent(furious_slash_talent) spell(furious_slash)
  #whirlwind
  spell(whirlwind)
 }
@@ -691,7 +685,7 @@ AddFunction furysingle_targetshortcdactions
  #siegebreaker
  spell(siegebreaker)
 
- unless { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute) or not buffpresent(bloodlust) and buffremaining(furious_slash_buff) < 3 and spell(furious_slash)
+ unless { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute)
  {
   #bladestorm,if=prev_gcd.1.rampage
   if previousgcdspell(rampage) spell(bladestorm)
@@ -706,7 +700,7 @@ AddFunction furysingle_targetshortcdactions
 
 AddFunction furysingle_targetshortcdpostconditions
 {
- { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute) or not buffpresent(bloodlust) and buffremaining(furious_slash_buff) < 3 and spell(furious_slash) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or charges(raging_blow) == 2 and spell(raging_blow) or spell(bloodthirst) or { hastalent(carnage_talent) or hastalent(massacre_talent) and rage() < 80 or hastalent(frothing_berserker_talent) and rage() < 90 } and spell(raging_blow) or hastalent(furious_slash_talent) and spell(furious_slash) or spell(whirlwind)
+ { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or charges(raging_blow) == 2 and spell(raging_blow) or spell(bloodthirst) or { hastalent(carnage_talent) or hastalent(massacre_talent) and rage() < 80 or hastalent(frothing_berserker_talent) and rage() < 90 } and spell(raging_blow) or spell(whirlwind)
 }
 
 AddFunction furysingle_targetcdactions
@@ -715,7 +709,7 @@ AddFunction furysingle_targetcdactions
 
 AddFunction furysingle_targetcdpostconditions
 {
- spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute) or not buffpresent(bloodlust) and buffremaining(furious_slash_buff) < 3 and spell(furious_slash) or previousgcdspell(rampage) and spell(bladestorm) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or spell(bloodthirst) or { hastalent(carnage_talent) or hastalent(massacre_talent) and rage() < 80 or hastalent(frothing_berserker_talent) and rage() < 90 } and spell(raging_blow) or hastalent(furious_slash_talent) and spell(furious_slash) or spell(whirlwind)
+ spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or hastalent(frothing_berserker_talent) or hastalent(carnage_talent) and { enrageremaining() < gcd() or rage() > 90 } or hastalent(massacre_talent) and { enrageremaining() < gcd() or rage() > 90 } } and spell(rampage) or spell(execute) or previousgcdspell(rampage) and spell(bladestorm) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or spell(bloodthirst) or { hastalent(carnage_talent) or hastalent(massacre_talent) and rage() < 80 or hastalent(frothing_berserker_talent) and rage() < 90 } and spell(raging_blow) or spell(whirlwind)
 }
 
 ### actions.precombat
@@ -726,6 +720,8 @@ AddFunction furyprecombatmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
 }
 
 AddFunction furyprecombatmainpostconditions
@@ -743,7 +739,7 @@ AddFunction furyprecombatshortcdactions
 
 AddFunction furyprecombatshortcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 AddFunction furyprecombatcdactions
@@ -759,18 +755,12 @@ AddFunction furyprecombatcdactions
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
-
-  unless spell(recklessness)
-  {
-   #potion
-   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
-  }
  }
 }
 
 AddFunction furyprecombatcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(recklessness)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(recklessness) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 ### actions.movement
@@ -898,37 +888,31 @@ AddFunction fury_defaultcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementcdactions()
 
-  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap)
+  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and spell(rampage) or buffpresent(recklessness) and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
   {
-   #potion,if=buff.guardian_of_azeroth.up|(!essence.condensed_lifeforce.major&target.time_to_die=60)
-   if { buffpresent(guardian_of_azeroth_buff) or not azeriteessenceismajor(condensed_lifeforce_essence_id) and target.timetodie() == 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+   #guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
+   if not buffpresent(recklessness) and { target.timetodie() > 195 or target.healthpercent() < 20 } spell(guardian_of_azeroth)
 
-   unless spellcooldown(recklessness) < 3 and spell(rampage) or buffpresent(recklessness) and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+   unless not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or spellcooldown(blood_of_the_enemy) < gcd() } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind)
    {
-    #guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
-    if not buffpresent(recklessness) and { target.timetodie() > 195 or target.healthpercent() < 20 } spell(guardian_of_azeroth)
+    #use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    if target.timetodie() < 20 or not target.debuffpresent(razor_coral) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) or not target.debuffpresent(conductive_ink_debuff) and buffpresent(memory_of_lucid_dreams) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
+    #blood_fury,if=buff.recklessness.up
+    if buffpresent(recklessness) spell(blood_fury)
 
-    unless not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or spellcooldown(blood_of_the_enemy) < gcd() } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind)
+    unless buffpresent(recklessness) and spell(berserking)
     {
-     #use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-     if target.timetodie() < 20 or not target.debuffpresent(razor_coral) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) or not target.debuffpresent(conductive_ink_debuff) and buffpresent(memory_of_lucid_dreams) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
-     #blood_fury,if=buff.recklessness.up
-     if buffpresent(recklessness) spell(blood_fury)
+     #lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
+     if buffexpires(recklessness) and target.debuffexpires(siegebreaker) spell(lights_judgment)
+     #fireblood,if=buff.recklessness.up
+     if buffpresent(recklessness) spell(fireblood)
+     #ancestral_call,if=buff.recklessness.up
+     if buffpresent(recklessness) spell(ancestral_call)
 
-     unless buffpresent(recklessness) and spell(berserking)
+     unless buffexpires(recklessness) and target.debuffexpires(siegebreaker) and isenraged() and spell(bag_of_tricks)
      {
-      #lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
-      if buffexpires(recklessness) and target.debuffexpires(siegebreaker) spell(lights_judgment)
-      #fireblood,if=buff.recklessness.up
-      if buffpresent(recklessness) spell(fireblood)
-      #ancestral_call,if=buff.recklessness.up
-      if buffpresent(recklessness) spell(ancestral_call)
-
-      unless buffexpires(recklessness) and target.debuffexpires(siegebreaker) and isenraged() and spell(bag_of_tricks)
-      {
-       #run_action_list,name=single_target
-       furysingle_targetcdactions()
-      }
+      #run_action_list,name=single_target
+      furysingle_targetcdactions()
      }
     }
    }
@@ -989,7 +973,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # blood_fury
 # blood_of_the_enemy
 # blood_of_the_enemy_essence_id
-# bloodlust
 # bloodthirst
 # carnage_talent
 # charge
@@ -998,14 +981,12 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
 # conductive_ink_debuff
+# disabled_item
 # dragon_roar
 # execute
 # fireblood
 # focused_azerite_beam
 # frothing_berserker_talent
-# furious_slash
-# furious_slash_buff
-# furious_slash_talent
 # guardian_of_azeroth
 # guardian_of_azeroth_buff
 # heroic_leap
@@ -1029,7 +1010,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # siegebreaker
 # storm_bolt
 # the_unbound_force
-# unbridled_fury_item
 # war_stomp
 # whirlwind
 # worldvein_resonance

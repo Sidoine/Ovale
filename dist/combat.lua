@@ -86,12 +86,16 @@ __exports.Combat = __class(States, {
         self.expectedCombatLength = function(positional, named, atTime)
             return ReturnConstant(15 * 60)
         end
+        self.fightRemains = function()
+            return ReturnConstant(15 * 60)
+        end
         States.constructor(self, __exports.CombatState)
         self.module = ovale:createModule("Combat", self.onInitialize, self.onRelease, aceEvent)
         self.tracer = debug:create("Combat")
         condition:RegisterCondition("incombat", false, self.InCombat)
         condition:RegisterCondition("timeincombat", false, self.TimeInCombat)
         condition:RegisterCondition("expectedcombatlength", false, self.expectedCombatLength)
+        condition:RegisterCondition("fightremains", false, self.fightRemains)
     end,
     isInCombat = function(self, atTime)
         return self:GetState(atTime).inCombat

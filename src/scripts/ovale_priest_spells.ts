@@ -133,6 +133,11 @@ Define(divine_star_1 110745)
 Define(divine_star_2 122128)
 # Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
   SpellInfo(divine_star_2 channel=0 gcd=0 offgcd=1)
+Define(fae_guardians 327661)
+# Call forth three faerie guardians to attend your targets for 20 seconds.rnrn@spellname342132: Direct attacks against the target restore 327703s1/100.1 Mana or 327703s2/100 Insanity. Follows your Shadow Word: Pain.rnrn@spellname327694: Reduces damage taken by 327694s1. Follows your Power Word: Shield.rnrn@spellname327710: Increases the cooldown recovery rate of a major ability by 327710s1. Follows your ?c2[Flash Heal][Shadow Mend].
+  SpellInfo(fae_guardians cd=90 duration=20 max_stacks=1)
+  # Commanding faerie guardians.
+  SpellAddBuff(fae_guardians fae_guardians=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -431,6 +436,14 @@ Define(worldvein_resonance_2 298609)
 Define(worldvein_resonance_3 298611)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance_3)
+Define(wrathful_faerie_0 327703)
+# Call forth three faerie guardians to attend your targets for 20 seconds.rnrn@spellname342132: Direct attacks against the target restore 327703s1/100.1 Mana or 327703s2/100 Insanity. Follows your Shadow Word: Pain.rnrn@spellname327694: Reduces damage taken by 327694s1. Follows your Power Word: Shield.rnrn@spellname327710: Increases the cooldown recovery rate of a major ability by 327710s1. Follows your ?c2[Flash Heal][Shadow Mend].rn
+  SpellInfo(wrathful_faerie_0 gcd=0 offgcd=1 insanity=-300)
+Define(wrathful_faerie_1 342132)
+# Call forth three faerie guardians to attend your targets for 20 seconds.rnrn@spellname342132: Direct attacks against the target restore 327703s1/100.1 Mana or 327703s2/100 Insanity. Follows your Shadow Word: Pain.rnrn@spellname327694: Reduces damage taken by 327694s1. Follows your Power Word: Shield.rnrn@spellname327710: Increases the cooldown recovery rate of a major ability by 327710s1. Follows your ?c2[Flash Heal][Shadow Mend].rn
+  SpellInfo(wrathful_faerie_1 duration=20 gcd=0 offgcd=1)
+  # Direct damage on this target restores 327703s1/100.1 Mana or 327703s2/100 Insanity to @auracaster.rnrnFollows your Shadow Word: Pain.
+  SpellAddTargetDebuff(wrathful_faerie_1 wrathful_faerie_1=1)
 SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arcane_torrent_3 arcane_torrent_4 arcane_torrent_5 arcane_torrent_6 arcane_torrent_7 arcane_torrent_8)
 SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2 blood_fury_3)
 SpellList(divine_star divine_star_0 divine_star_1 divine_star_2)
@@ -448,6 +461,7 @@ SpellList(shadow_crash_debuff shadow_crash_debuff_0 shadow_crash_debuff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(void_bolt void_bolt_0 void_bolt_1)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
+SpellList(wrathful_faerie wrathful_faerie_0 wrathful_faerie_1)
 Define(damnation_talent 16) #21718
 # Instantly afflicts the target with Shadow Word: Pain, Vampiric Touch and Devouring Plague free of cost.
 Define(divine_star_talent 17) #19760

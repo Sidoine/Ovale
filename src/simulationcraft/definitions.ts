@@ -546,6 +546,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
     ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
+    ["fight_remains"]: { name: "fightremains" },
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },

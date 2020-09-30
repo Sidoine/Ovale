@@ -260,6 +260,9 @@ __exports.MISC_OPERAND = {
         name = "holypower",
         modifiers = powerModifiers
     },
+    ["fight_remains"] = {
+        name = "fightremains"
+    },
     ["focus"] = {
         name = "focus",
         modifiers = powerModifiers

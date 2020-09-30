@@ -27,6 +27,9 @@ Define(blood_of_the_enemy_2 297971)
 Define(blood_of_the_enemy_3 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_3)
+Define(bulk_extraction 320341)
+# Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
+  SpellInfo(bulk_extraction cd=90 talent=bulk_extraction_talent)
 Define(chaos_nova_0 179057)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
   SpellInfo(chaos_nova_0 fury=30 cd=60 duration=2)
@@ -101,6 +104,26 @@ Define(disrupt_2 320361)
 # Increases the range of Disrupt to s+183752r yards.
   SpellInfo(disrupt_2 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(disrupt_2 disrupt_2=1)
+Define(elysian_decree_0 306830)
+# Place a Kyrian Sigil at the target location that activates after 2 seconds.rnrnDetonates to deal 307046s1 Arcane damage and shatter up to s3 Lesser Soul Fragments from enemies affected by the sigil.
+  SpellInfo(elysian_decree_0 cd=60 duration=2)
+Define(elysian_decree_1 307046)
+# Place a Kyrian Sigil at the target location that activates after 2 seconds.rnrnDetonates to deal 307046s1 Arcane damage and shatter up to s3 Lesser Soul Fragments from enemies affected by the sigil.
+  SpellInfo(elysian_decree_1 channel=0 gcd=0 offgcd=1)
+
+Define(elysian_decree_2 327839)
+# Place a Kyrian Sigil at your location that activates after 2 seconds.rnrnDetonates to deal 307046s1 Arcane damage and shatter up to s3 Lesser Soul Fragments from enemies affected by the sigil.
+  SpellInfo(elysian_decree_2 cd=60 duration=2)
+Define(elysian_decree_3 339894)
+# Place a Kyrian Sigil at the target location that activates after 2 seconds.rnrnDetonates to deal 307046s1 Arcane damage and shatter up to s3 Lesser Soul Fragments from enemies affected by the sigil.
+  SpellInfo(elysian_decree_3 channel=0 gcd=0 offgcd=1)
+Define(essence_break 258860)
+# Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
+  SpellInfo(essence_break cd=20 talent=essence_break_talent)
+Define(exposed_wound 339229)
+  SpellInfo(exposed_wound duration=10 gcd=0 offgcd=1)
+  # Damage taken from Eye Beam  increased by w1.
+  SpellAddTargetDebuff(exposed_wound exposed_wound=1)
 Define(eye_beam 198013)
 # Blasts all enemies in front of you, ?s320415[dealing guaranteed critical strikes][] for up to <dmg> Chaos damage over 2 seconds. Deals reduced damage to secondary targets.?s343311[rnrnWhen Eye Beam finishes fully channeling, your Haste is increased by an additional 343312s1 for 12 seconds.][]
 # Rank 3: When Eye Beam finishes fully channeling, your Haste is increased by an additional 343312s1 for 12 seconds.
@@ -111,11 +134,11 @@ Define(fel_barrage 258925)
   SpellInfo(fel_barrage cd=60 duration=3 channel=3 tick=0.25 talent=fel_barrage_talent)
   # Unleashing Fel.
   SpellAddBuff(fel_barrage fel_barrage=1)
-Define(fel_devastation 212084)
-# Unleash the fel within you, damaging enemies directly in front of you for 212105s1*(2/t1) Fire damage over 2 seconds.?s320639[ Causing damage also heals you for up to 212106s1*(2/t1) health.][]
-# Rank 2: Fel Devastation damage also heals you for up to 212106s1*(2/t1) health.
-  SpellInfo(fel_devastation fury=50 cd=60 duration=2 channel=2 tick=0.2)
-  SpellAddBuff(fel_devastation fel_devastation=1)
+Define(fel_bombardment 337775)
+# Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage of your next Throw Glaive by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
+  SpellInfo(fel_bombardment channel=0 gcd=0 offgcd=1)
+  # Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage of your next Throw Glaive by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
+  SpellAddBuff(fel_bombardment fel_bombardment=1)
 Define(fel_eruption 211881)
 # Impales the target for s1 Chaos damage and stuns them for 4 seconds.
   SpellInfo(fel_eruption fury=10 pain=10 cd=30 duration=4 talent=fel_eruption_talent)
@@ -156,10 +179,29 @@ Define(focused_azerite_beam_3 299338)
   SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
+Define(fodder_to_the_flame_0 329554)
+# Commission a duel to the death against a Condemned Demon from the Theater of Pain. Vanquishing your foe releases its demon soul and creates a pool of demon blood that lasts for 30 seconds. Fighting within the pool increases your attack speed by 330910s1 and reduces the damage that enemies deal to you by 330874s1.rnrnFleshcraft treats the Condemned Demon as a powerful enemy.
+  SpellInfo(fodder_to_the_flame_0 cd=120)
+
+Define(fodder_to_the_flame_1 330846)
+  SpellInfo(fodder_to_the_flame_1 duration=30 gcd=0 offgcd=1)
+Define(fodder_to_the_flame_2 330874)
+# A pool of demon blood reduces the damage done to the victiorious Demon Hunter by s1.
+  SpellInfo(fodder_to_the_flame_2 gcd=0 offgcd=1)
+  # Damage to the victiorious Demon Hunter reduced by s1.
+  SpellAddTargetDebuff(fodder_to_the_flame_2 fodder_to_the_flame_2=1)
+Define(fodder_to_the_flame_3 330910)
+# The pool of demon blood increases the Demon Hunter's haste by s1.
+  SpellInfo(fodder_to_the_flame_3 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(fodder_to_the_flame_3 fodder_to_the_flame_3=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
   SpellInfo(fracture cd=4.5 fury=-25 talent=fracture_talent)
 
+Define(glaive_tempest 342817)
+# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
+  SpellInfo(glaive_tempest fury=30 cd=20 duration=3 talent=glaive_tempest_talent)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -261,11 +303,6 @@ Define(momentum 206476)
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
   SpellInfo(momentum channel=0 gcd=0 offgcd=1 talent=momentum_talent)
   SpellAddBuff(momentum momentum=1)
-Define(nemesis 208605)
-# Increases damage against Humanoids by s1.
-  SpellInfo(nemesis duration=60 gcd=0 offgcd=1)
-  # Damage against Humanoids increased by s1.
-  SpellAddBuff(nemesis nemesis=1)
 Define(prepared_buff 203650)
 # Reduces the cooldown of Vengeful Retreat by 10 sec, and generates (203650s1/5)*10 seconds Fury over 10 seconds if you damage at least one enemy with Vengeful Retreat.
   SpellInfo(prepared_buff duration=10 gcd=0 offgcd=1)
@@ -377,6 +414,11 @@ Define(sigil_of_silence 202137)
 # Place a Sigil of Silence at the target location that activates after 2 seconds.rnrnSilences all enemies affected by the sigil for 6 seconds.
 # Rank 2: Reduces the cooldown of Sigil of Silence by abs(s0/1000) sec.
   SpellInfo(sigil_of_silence cd=120 duration=2)
+Define(sinful_brand 317009)
+# Brand an enemy with the mark of the Venthyr, reducing their melee attack speed by s3, their casting speed by s2, and inflicting o1 Shadow damage over 8 seconds.rnrnActivating Metamorphosis applies Sinful Brand to all nearby enemies.
+  SpellInfo(sinful_brand cd=60 duration=8 tick=2)
+  # Suffering w1 Shadow damage every t1 sec. Casting speed slowed by w2. Melee attack speed slowed by w3.
+  SpellAddTargetDebuff(sinful_brand sinful_brand=1)
 Define(soul_cleave 228477)
 # Viciously strike 228478s2 enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds?s321021[ and heals you for an additional s5 for each Soul Fragment consumed][].
 # Rank 3: Soul Cleave damage increased by s1.
@@ -386,6 +428,11 @@ Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
   SpellInfo(spirit_bomb fury=30 duration=1.5 talent=spirit_bomb_talent)
   SpellAddBuff(spirit_bomb spirit_bomb=1)
+Define(the_hunt 323639)
+# Charge to your target, striking them for 323802s1 Nature damage, rooting them in place for 1.5 seconds and inflicting 345335s1*6 seconds Nature damage over 6 seconds to up to 345396s2 enemies in your path. rnrnThe pursuit invigorates your soul, healing you for 345422s1 of the damage you deal to your Hunt target for 30 seconds.
+  SpellInfo(the_hunt cd=90)
+
+
 Define(the_unbound_force_0 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_0)
@@ -402,6 +449,13 @@ Define(throw_glaive 204157)
 # Throw a demonic glaive at the target, dealing s2 Physical damage. The glaive can ricochet to ?s320386[x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
 # Rank 3: Reduces the cooldown of Throw Glaive by abs(s0/1000) sec.
   SpellInfo(throw_glaive cd=9)
+Define(unbound_chaos_0 275147)
+# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
+  SpellInfo(unbound_chaos_0 duration=1 gcd=0 offgcd=1)
+Define(unbound_chaos_1 275148)
+# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
+  SpellInfo(unbound_chaos_1 gcd=0 offgcd=1)
+
 Define(vengeful_retreat 344866)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage?s320635[ and have their movement speed reduced by 198813s1 for 3 seconds][].?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
 # Rank 2: Vengeful Retreat reduces the movement speed of all nearby enemies by 198813s1 for 3 seconds.
@@ -423,8 +477,10 @@ SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_
 SpellList(chaos_nova chaos_nova_0 chaos_nova_1)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
 SpellList(disrupt disrupt_0 disrupt_1 disrupt_2)
+SpellList(elysian_decree elysian_decree_0 elysian_decree_1 elysian_decree_2 elysian_decree_3)
 SpellList(fel_rush fel_rush_0 fel_rush_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
+SpellList(fodder_to_the_flame fodder_to_the_flame_0 fodder_to_the_flame_1 fodder_to_the_flame_2 fodder_to_the_flame_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(immolation_aura immolation_aura_0 immolation_aura_1)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
@@ -436,16 +492,19 @@ SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reap
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
+SpellList(unbound_chaos unbound_chaos_0 unbound_chaos_1)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(infernal_strike infernal_strike_0 infernal_strike_1 infernal_strike_2)
 Define(blind_fury_talent 1) #21854
 # Eye Beam generates s3/5 Fury every sec. and its duration is increased by s1.
-Define(charred_flesh_talent 8) #22541
-# Immolation Aura damage increases the duration of your Fiery Brand by s1/1000.2 sec.
+Define(bulk_extraction_talent 21) #21902
+# Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
 Define(demon_blades_talent 6) #22799
 # Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
 Define(demonic_talent 19) #21900
 # Eye Beam causes you to enter demon form for s1/1000 sec after it finishes dealing damage.
+Define(essence_break_talent 15) #21868
+# Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
 Define(fel_barrage_talent 21) #22547
 # Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
 Define(fel_eruption_talent 18) #22767
@@ -456,6 +515,8 @@ Define(first_blood_talent 14) #21867
 # Reduces the Fury cost of Blade Dance by s2 and increases its damage to <firstbloodDmg> against the first target struck.
 Define(fracture_talent 12) #22770
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
+Define(glaive_tempest_talent 9) #21862
+# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
 Define(momentum_talent 20) #21901
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
 Define(sigil_of_chains_talent 15) #22511
@@ -464,6 +525,8 @@ Define(spirit_bomb_talent 9) #22540
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
+Define(unbound_chaos_talent 8) #22494
+# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
 Define(unbridled_fury_item 169299)
 Define(chaotic_transformation_trait 288754)
 Define(eyes_of_rage_trait 278500)
