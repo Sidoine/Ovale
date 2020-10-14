@@ -517,7 +517,13 @@ Define(blood_of_the_enemy_essence_id 23)
 Define(conflict_and_strife_essence_id 32)
     ]]
     code = code .. [[
-SpellInfo(rushing_jade_wind chi=0 spec=brewmaster)
+Define(detox 218164)
+    SpellInfo(detox cd=8)
+Define(healing_elixir 122281)
+    SpellInfo(healing_elixir charge_cd=30 gcd=0 offgcd=1)
+
+    SpellInfo(rushing_jade_wind chi=0 spec=brewmaster)
+
 ## Stagger
 Define(stagger 115069)
 Define(heavy_stagger_debuff 124273)
