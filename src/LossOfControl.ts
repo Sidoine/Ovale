@@ -55,9 +55,10 @@ export class OvaleLossOfControlClass implements StateModule {
     };
     private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
         this.tracer.Debug(
-            "GetEventInfo:",
+            "LOSS_OF_CONTROL_ADDED",
+            "GetActiveLossOfControlData:",
             eventIndex,
-            C_LossOfControl.GetEventInfo(eventIndex)
+            C_LossOfControl.GetActiveLossOfControlData(eventIndex)
         );
         let [
             locType,
@@ -67,7 +68,7 @@ export class OvaleLossOfControlClass implements StateModule {
             startTime,
             ,
             duration,
-        ] = C_LossOfControl.GetEventInfo(eventIndex);
+        ] = C_LossOfControl.GetActiveLossOfControlData(eventIndex);
         let data: LossOfControlEventInfo = {
             locType: upper(locType),
             spellID: spellID,

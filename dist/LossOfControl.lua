@@ -26,8 +26,8 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             self.requirement:UnregisterRequirement("lossofcontrol")
         end
         self.LOSS_OF_CONTROL_ADDED = function(event, eventIndex)
-            self.tracer:Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
-            local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetEventInfo(eventIndex)
+            self.tracer:Debug("LOSS_OF_CONTROL_ADDED", "GetActiveLossOfControlData:", eventIndex, C_LossOfControl.GetActiveLossOfControlData(eventIndex))
+            local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetActiveLossOfControlData(eventIndex)
             local data = {
                 locType = upper(locType),
                 spellID = spellID,
