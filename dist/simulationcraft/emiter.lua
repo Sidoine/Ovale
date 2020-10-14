@@ -2157,7 +2157,7 @@ __exports.Emiter = __class(nil, {
                     if modifier == "pct" then
                         code = "target.HealthPercent()"
                     end
-                else
+                elseif property then
                     local percent = match(property, "^time_to_pct_(%d+)")
                     if percent then
                         code = "target.TimeToHealthPercent(" .. percent .. ")"

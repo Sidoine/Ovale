@@ -260,7 +260,7 @@ Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
 
 Define(invoke_niuzao_the_black_ox_0 132578)
-# Summons an effigy of Niuzao, the Black Ox for 25 seconds. Niuzao attacks your primary target, and frequently Stomps, damaging all nearby enemies?s322740[ for 227291s1 plus 322740s1 of Stagger damage recently purified.][.]rnrnWhile active, s2 of damage delayed by Stagger is instead Staggered by Niuzao.
+# Summons an effigy of Niuzao, the Black Ox for 25 seconds. Niuzao attacks your primary target, and frequently Stomps, damaging all nearby enemies?s322740[ for 227291s1 plus 322740s1 of Stagger damage you have recently purified.][.]rnrnWhile active, s2 of damage delayed by Stagger is instead Staggered by Niuzao.
   SpellInfo(invoke_niuzao_the_black_ox_0 cd=180 duration=25)
   # Niuzao is staggering s2 of the Monk's Stagger damage.
   SpellAddBuff(invoke_niuzao_the_black_ox_0 invoke_niuzao_the_black_ox_0=1)
@@ -277,7 +277,7 @@ Define(invoke_xuen_the_white_tiger_1 323999)
   SpellInfo(invoke_xuen_the_white_tiger_1 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(invoke_xuen_the_white_tiger_1 invoke_xuen_the_white_tiger_1=1)
 Define(keg_smash 121253)
-# Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
+# Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
   # ?w3!=0[Movement speed reduced by w3.rn][]Drenched in brew, vulnerable to Breath of Fire.
   SpellAddTargetDebuff(keg_smash keg_smash=1)
@@ -387,6 +387,7 @@ Define(ripple_in_space_3 299310)
   SpellInfo(ripple_in_space_3)
 Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
+# Rank 2: Rising Sun Kick deals s1 increased damage.rn
   SpellInfo(rising_sun_kick chi=2 cd=10)
 
 Define(rushing_jade_wind 116847)
@@ -394,6 +395,11 @@ Define(rushing_jade_wind 116847)
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent_windwalker)
   # Dealing physical damage to nearby enemies every 116847t1 sec.
   SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  # Critical strike damage increased by w1.
+  SpellAddBuff(seething_rage seething_rage=1)
 Define(serenity 152173)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
   SpellInfo(serenity cd=90 duration=12 gcd=0 offgcd=1 talent=serenity_talent)
@@ -509,6 +515,8 @@ Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(unbridled_fury_item 169299)
 Define(the_crucible_of_flame_essence_id 12)
+Define(blood_of_the_enemy_essence_id 23)
+Define(conflict_and_strife_essence_id 32)
     `;
 // END
     OvaleScripts.RegisterScript("MONK", undefined, name, desc, code, "include");

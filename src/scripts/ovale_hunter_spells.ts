@@ -142,7 +142,7 @@ Define(chimaera_shot 53209)
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
   SpellInfo(chimaera_shot cd=15 talent=chimaera_shot_talent_beast_mastery)
 Define(chimaera_shot_marksmanship 342049)
-# A two-headed shot that hits your primary target and another nearby target, dealing 344120sw1 Nature damage to one and 344121sw1 Frost damage to the other.
+# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for  344121sw1*(s1/100) Frost damage.
   SpellInfo(chimaera_shot_marksmanship focus=20 talent=chimaera_shot_talent)
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
@@ -269,11 +269,6 @@ Define(harpoon 190925)
   SpellInfo(harpoon cd=1 charge_cd=30 duration=3 gcd=0 offgcd=1)
   # Rooted.
   SpellAddTargetDebuff(harpoon harpoon=1)
-Define(hunters_mark 257284)
-# Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.rnrnThe cooldown of Hunter's Mark is reset if the target dies.
-  SpellInfo(hunters_mark cd=20 gcd=1)
-  # Damage taken from @auracaster increased by s1?a339264[ and damage dealt to @auracaster is reduced by 339264s1][].rnrnCan always be seen and tracked by the Hunter.
-  SpellAddTargetDebuff(hunters_mark hunters_mark=1)
 Define(in_the_rhythm 272733)
 # When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
   SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
@@ -469,7 +464,7 @@ Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
 Define(tip_of_the_spear 260285)
-# Kill Command increases the damage of your next Raptor Strike by 260286s1, stacking up to 260286u times.
+# Kill Command increases the damage of your next ?s259387[Mongoose Bite][Raptor Strike] by 260286s1, stacking up to 260286u times.
   SpellInfo(tip_of_the_spear channel=0 gcd=0 offgcd=1 talent=tip_of_the_spear_talent)
   SpellAddBuff(tip_of_the_spear tip_of_the_spear=1)
 Define(trick_shots 257621)
@@ -571,7 +566,7 @@ Define(careful_aim_talent 4) #22495
 Define(chakrams_talent 21) #23105
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
 Define(chimaera_shot_talent 12) #21998
-# A two-headed shot that hits your primary target and another nearby target, dealing 344120sw1 Nature damage to one and 344121sw1 Frost damage to the other.
+# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for  344121sw1*(s1/100) Frost damage.
 Define(chimaera_shot_talent_beast_mastery 6) #22290
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
 Define(dire_beast_talent 3) #22282
@@ -605,7 +600,7 @@ Define(streamline_talent 11) #22286
 Define(terms_of_engagement_talent 2) #22283
 # Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*10 seconds Focus over 10 seconds. Killing an enemy resets the cooldown of Harpoon.
 Define(tip_of_the_spear_talent 16) #22300
-# Kill Command increases the damage of your next Raptor Strike by 260286s1, stacking up to 260286u times.
+# Kill Command increases the damage of your next ?s259387[Mongoose Bite][Raptor Strike] by 260286s1, stacking up to 260286u times.
 Define(vipers_venom_talent 1) #22275
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(volley_talent 21) #22288
@@ -614,6 +609,7 @@ Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(azsharas_font_of_power_item 169314)
 Define(cyclotronic_blast_item 167672)
+Define(unbridled_fury_item 169299)
 Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)

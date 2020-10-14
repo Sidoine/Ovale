@@ -57,10 +57,10 @@ Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
 Define(between_the_eyes 315341)
-# Finishing move that deals damage with your pistol, increasing your critical strike damage against the target by s2.?a235484[ Critical strikes with this ability deal four times normal damage.][]rn   1 point : <damage>*1 damage, 3 secrn   2 points: <damage>*2 damage, 6 secrn   3 points: <damage>*3 damage, 9 secrn   4 points: <damage>*4 damage, 12 secrn   5 points: <damage>*5 damage, 15 sec?s193531[rn   6 points: <damage>*6 damage, 18 sec][]
+# Finishing move that deals damage with your pistol, increasing your critical strike chance against the target by s2.?a235484[ Critical strikes with this ability deal four times normal damage.][]rn   1 point : <damage>*1 damage, 3 secrn   2 points: <damage>*2 damage, 6 secrn   3 points: <damage>*3 damage, 9 secrn   4 points: <damage>*4 damage, 12 secrn   5 points: <damage>*5 damage, 15 sec?s193531[rn   6 points: <damage>*6 damage, 18 sec][]
 # Rank 2: Critical strikes with Between the Eyes deal four times normal damage.rn
   SpellInfo(between_the_eyes energy=25 combopoints=1 cd=45 gcd=1)
-  # Critical strike damage taken from the Rogue increased by s2.
+  # Critical strike chance taken from the Rogue increased by s2.
   SpellAddTargetDebuff(between_the_eyes between_the_eyes=1)
 Define(blade_flurry 13877)
 # ?s331851[Strikes up to nearby 331850i targets for 331850s1 Physical damage, and causes][Causes] your single target attacks to also strike up to s3 nearby enemies for s2 of normal damage for 12 seconds.
@@ -167,8 +167,8 @@ Define(deadshot_buff 272936)
   SpellInfo(deadshot_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(deathly_shadows_buff 341202)
-# Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 10 seconds.
-  SpellInfo(deathly_shadows_buff duration=10 gcd=0 offgcd=1 combopoints=-5)
+# Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 8 seconds.
+  SpellInfo(deathly_shadows_buff duration=8 gcd=0 offgcd=1 combopoints=-5)
   # Damage increased by w1.
   SpellAddBuff(deathly_shadows_buff deathly_shadows_buff=1)
 Define(dispatch 2098)
@@ -181,17 +181,20 @@ Define(dreadblades 343142)
   # Sinister Strike, ?s196937[Ghostly Strike, ][]Ambush, and Pistol Shot will refill all of your combo points when used.
   SpellAddBuff(dreadblades dreadblades=1)
 Define(echoing_reprimand_0 323547)
-# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge deal damage as if they consume s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand_0 energy=0 cd=45 gcd=1 combopoints=-3)
 Define(echoing_reprimand_1 323558)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand_1 duration=45 max_stacks=2 gcd=0 offgcd=1)
   # Rogue's second combo point is Animacharged. rnrnDamaging finishing moves using exactly 2 combo points deal damage as if 7 combo points are consumed.
   SpellAddBuff(echoing_reprimand_1 echoing_reprimand_1=1)
 Define(echoing_reprimand_2 323559)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand_2 duration=45 max_stacks=3 gcd=0 offgcd=1)
   # Rogue's third combo point is Animacharged. rnrnDamaging finishing moves using exactly 3 combo points deal damage as if 7 combo points are consumed.
   SpellAddBuff(echoing_reprimand_2 echoing_reprimand_2=1)
 Define(echoing_reprimand_3 323560)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand_3 duration=45 max_stacks=4 gcd=0 offgcd=1)
   # Rogue's fourth combo point is Animacharged. rnrnDamaging finishing moves using exactly 4 combo points deal damage as if 7 combo points are consumed.
   SpellAddBuff(echoing_reprimand_3 echoing_reprimand_3=1)
@@ -223,6 +226,24 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
+Define(flagellation_0 323654)
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 45 seconds, causing an additional lash for each Combo Point spent.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack up to a maximum of 345569s2/10*345569u for 25 seconds.
+  SpellInfo(flagellation_0 energy=20 cd=5 duration=45 max_stacks=40 gcd=1)
+  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each Combo Point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
+  SpellAddBuff(flagellation_0 flagellation_0=1)
+  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each Combo Point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
+  SpellAddTargetDebuff(flagellation_0 flagellation_0=1)
+Define(flagellation_1 345316)
+# @spelldesc345285
+  SpellInfo(flagellation_1 channel=0 gcd=0 offgcd=1)
+Define(flagellation_2 345390)
+# @spelldesc345285
+  SpellInfo(flagellation_2 channel=0 gcd=0 offgcd=1)
+Define(flagellation_3 345569)
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 45 seconds, causing an additional lash for each Combo Point spent.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack up to a maximum of 345569s2/10*345569u for 25 seconds.
+  SpellInfo(flagellation_3 cd=5 duration=25 max_stacks=40 gcd=0 offgcd=1)
+  # Haste increased by m1.
+  SpellAddBuff(flagellation_3 flagellation_3=1)
 Define(focused_azerite_beam_0 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
@@ -261,7 +282,7 @@ Define(gouge 1776)
   # Incapacitated.
   SpellAddTargetDebuff(gouge gouge=1)
 Define(greenskins_wickers 340573)
-# Between the Eyes has a s1 chance per Combo Point to increase the damage of your next Pistol Shot by 209423s1.
+# Between the Eyes has a s1 chance per Combo Point to increase the damage of your next Pistol Shot by 340573s1.
   SpellInfo(greenskins_wickers duration=15 gcd=0 offgcd=1)
   # Your next Pistol Shot deals s2 increased damage.
   SpellAddBuff(greenskins_wickers greenskins_wickers=1)
@@ -352,6 +373,10 @@ Define(pistol_shot 185763)
   SpellInfo(pistol_shot energy=40 duration=6 gcd=1 combopoints=-1)
   # Movement speed reduced by s3.
   SpellAddTargetDebuff(pistol_shot pistol_shot=1)
+Define(premeditation 343160)
+# After entering Stealth, your next Shadowstrike grants up to s1 sec of Slice and Dice, and generates s2 additional combo points if Slice and Dice is active.
+  SpellInfo(premeditation channel=0 gcd=0 offgcd=1 talent=premeditation_talent)
+  SpellAddTargetDebuff(premeditation premeditation=1)
 Define(purifying_blast_0 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast_0 cd=60 duration=6)
@@ -464,16 +489,9 @@ Define(serrated_bone_spike_0 324074)
   # Bleeding for w2 every t sec.
   SpellAddBuff(serrated_bone_spike_0 serrated_bone_spike_0=1)
 Define(serrated_bone_spike_1 328547)
-# Embed a bone spike in the target, dealing 324073s1 Bleed damage every 324073t1 sec until they die. Deals s1 damage and generates 1 Combo Point per active bone spike.rnrnRefunds 1 charge when target dies or is healed to full.rnrn|cFFFFFFFFAwards 1 combo point.|r
-  SpellInfo(serrated_bone_spike_1 energy=10 cd=30 gcd=1)
-  # Bleeding for w1 every t1 sec.
-  SpellAddTargetDebuff(serrated_bone_spike_1 serrated_bone_spike_debuff=1)
+# Embed a bone spike in the target, dealing s1 damage and 324073s1 Bleed damage every 324073t1 sec until they die. rnrnRefunds a charge when target dies or is healed to full.rnrn|cFFFFFFFFAwards 1 combo point per active bone spike.|r
+  SpellInfo(serrated_bone_spike_1 energy=15 cd=30 gcd=1)
   SpellAddTargetDebuff(serrated_bone_spike_1 serrated_bone_spike_1=1)
-Define(serrated_bone_spike_debuff 324073)
-# Embed a bone spike in the target, dealing 324073s1 Bleed damage every 324073t1 sec until they die. Deals s1 damage and generates 1 Combo Point per active bone spike.rnrnRefunds 1 charge when target dies or is healed to full.rnrn|cFFFFFFFFAwards 1 combo point.|r
-  SpellInfo(serrated_bone_spike_debuff gcd=1 tick=3)
-  # Bleeding for w1 every t1 sec.
-  SpellAddTargetDebuff(serrated_bone_spike_debuff serrated_bone_spike_debuff=1)
 Define(shadow_blades 121471)
 # Draws upon surrounding shadows to empower your weapons, causing your combo point generating abilities to generate s2 additional combo point and deal s1 additional damage as Shadow for 20 seconds.
   SpellInfo(shadow_blades cd=180 duration=20 gcd=0 offgcd=1)
@@ -500,7 +518,7 @@ Define(shadowstep 36554)
   SpellAddBuff(shadowstep shadowstep=1)
 
 Define(shadowstrike 185438)
-# Strike the target, dealing s1 Physical damage.?a231718[rnrnWhile Stealthed, you strike through the shadows and appear behind your target up to 5+245623s1 yds away, dealing 245623s2 additional damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Strike the target, dealing s1 Physical damage.rnrnWhile Stealthed, you strike through the shadows and appear behind your target up to 5+245623s1 yds away, dealing 245623s2 additional damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 # Rank 2: Shadowstrike deals 245623s2 increased damage and will now teleport you to a target up to 245623s1+5 yards away when used while Stealth is active.
   SpellInfo(shadowstrike energy=40 gcd=1 combopoints=-2)
   SpellInfo(ambush replaced_by=shadowstrike)
@@ -529,11 +547,6 @@ Define(skull_and_crossbones 199603)
   SpellInfo(skull_and_crossbones channel=-0.001 gcd=0 offgcd=1)
   # Sinister Strike has an additional s1 chance of striking an additional time.
   SpellAddBuff(skull_and_crossbones skull_and_crossbones=1)
-Define(slaughter 253384)
-# Rampage causes the target to bleed for an additional s1 of the direct damage dealt to the target over 4 seconds
-  SpellInfo(slaughter duration=4 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 Physical damage every t sec.
-  SpellAddTargetDebuff(slaughter slaughter=1)
 Define(slice_and_dice 5171)
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by (25 of Spell Power). Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
 # Rank 2: Slice and Dice increases attack speed by an additional s1.
@@ -554,6 +567,11 @@ Define(symbols_of_death 212283)
   SpellInfo(symbols_of_death cd=30 duration=10 gcd=0 offgcd=1 energy=-40)
   # Damage done increased by s1.
   SpellAddBuff(symbols_of_death symbols_of_death=1)
+Define(the_rotten_buff 341134)
+# For 3 seconds after activating Symbols of Death, your Shadowstrike and ?s200758[Gloomblade][Backstab] generate 341134s1 additional combo points.
+  SpellInfo(the_rotten_buff duration=3 gcd=0 offgcd=1)
+  # Shadowstrike and ?s200758[Gloomblade][Backstab] generate s1 additional combo points.
+  SpellAddBuff(the_rotten_buff the_rotten_buff=1)
 Define(the_unbound_force_0 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_0)
@@ -595,6 +613,7 @@ SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
 SpellList(echoing_reprimand echoing_reprimand_0 echoing_reprimand_1 echoing_reprimand_2 echoing_reprimand_3)
 SpellList(fireblood fireblood_0 fireblood_1)
+SpellList(flagellation flagellation_0 flagellation_1 flagellation_2 flagellation_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
@@ -641,6 +660,8 @@ Define(master_of_shadows_talent 19) #22132
 # Gain 196980s1*3 seconds/196980t1+196980s2 Energy over 3 seconds when you enter Stealth or activate Shadow Dance.
 Define(nightstalker_talent 4) #22331
 # While Stealth?c3[ or Shadow Dance][] is active, you move s1 faster and your abilities deal s2 more damage.
+Define(premeditation_talent 2) #19234
+# After entering Stealth, your next Shadowstrike grants up to s1 sec of Slice and Dice, and generates s2 additional combo points if Slice and Dice is active.
 Define(prey_on_the_weak_talent 15) #22115
 # Enemies disabled by your Cheap Shot?s207777[, Dismantle, ][] or ?s199804[Between the Eyes][Kidney Shot] take s1 increased damage from all sources for 6 seconds.
 Define(quick_draw_talent 2) #22119
@@ -659,6 +680,7 @@ Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
 Define(ashvanes_razor_coral_item 169311)
 Define(azsharas_font_of_power_item 169314)
+Define(unbridled_fury_item 169299)
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
 Define(scent_of_blood_trait 277679)
@@ -669,7 +691,6 @@ Define(keep_your_wits_about_you_trait 288979)
 Define(blade_in_the_shadows_trait 275896)
 Define(inevitability_trait 278683)
 Define(perforate_trait 277673)
-Define(the_first_dance_trait 278681)
 Define(blood_of_the_enemy_essence_id 23)
 Define(breath_of_the_dying_essence_id 35)
 Define(vision_of_perfection_essence_id 22)

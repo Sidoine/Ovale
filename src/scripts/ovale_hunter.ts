@@ -140,8 +140,6 @@ AddFunction beast_masteryprecombatmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
- #potion,dynamic_prepot=1
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
 }
 
 AddFunction beast_masteryprecombatmainpostconditions
@@ -167,7 +165,7 @@ AddFunction beast_masteryprecombatshortcdactions
 
 AddFunction beast_masteryprecombatshortcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
 }
 
 AddFunction beast_masteryprecombatcdactions
@@ -190,6 +188,12 @@ AddFunction beast_masteryprecombatcdactions
    {
     #aspect_of_the_wild,precast_time=1.3,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
     if not hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } spell(aspect_of_the_wild)
+
+    unless hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
+    {
+     #potion,dynamic_prepot=1
+     if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+    }
    }
   }
  }
@@ -197,7 +201,7 @@ AddFunction beast_masteryprecombatcdactions
 
 AddFunction beast_masteryprecombatcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not message("raid_event.invulnerable.exists is not implemented") and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not message("raid_event.invulnerable.exists is not implemented") and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
 }
 
 ### actions.cleave
@@ -286,8 +290,6 @@ AddFunction beast_masterycdsmainactions
 {
  #berserking,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<13
  if buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 spell(berserking)
- #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
- if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #worldvein_resonance,if=(prev_gcd.1.aspect_of_the_wild|cooldown.aspect_of_the_wild.remains<gcd|target.time_to_die<20)|!essence.vision_of_perfection.minor
  if previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) spell(worldvein_resonance)
  #ripple_in_space
@@ -302,7 +304,7 @@ AddFunction beast_masterycdsmainpostconditions
 
 AddFunction beast_masterycdsshortcdactions
 {
- unless { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams)
+ unless { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams)
  {
   #reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
   if target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 spell(reaping_flames)
@@ -311,7 +313,7 @@ AddFunction beast_masterycdsshortcdactions
 
 AddFunction beast_masterycdsshortcdpostconditions
 {
- { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams)
+ { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams)
 }
 
 AddFunction beast_masterycdscdactions
@@ -327,8 +329,10 @@ AddFunction beast_masterycdscdactions
   if buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 spell(blood_fury)
   #lights_judgment,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains>gcd.max|!pet.main.buff.frenzy.up
   if pet.buffpresent(main_frenzy_buff) and pet.buffremaining(main_frenzy_buff) > gcd() or not pet.buffpresent(main_frenzy_buff) spell(lights_judgment)
+  #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
+  if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
-  unless { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance)
+  unless { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance)
   {
    #guardian_of_azeroth,if=cooldown.aspect_of_the_wild.remains<10|target.time_to_die>cooldown+duration|target.time_to_die<30
    if spellcooldown(aspect_of_the_wild) < 10 or target.timetodie() > spellcooldown(guardian_of_azeroth) + baseduration(guardian_of_azeroth) or target.timetodie() < 30 spell(guardian_of_azeroth)
@@ -338,7 +342,7 @@ AddFunction beast_masterycdscdactions
 
 AddFunction beast_masterycdscdpostconditions
 {
- { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames)
+ { buffpresent(aspect_of_the_wild) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance) or spell(ripple_in_space) or spell(memory_of_lucid_dreams) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames)
 }
 
 ### actions.default
@@ -487,7 +491,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # dance_of_death_buff
 # dance_of_death_trait
 # dire_beast
-# disabled_item
 # essence_of_the_focusing_iris_essence_id
 # fireblood
 # focused_azerite_beam
@@ -516,6 +519,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # the_unbound_force
 # trinket_azsharas_font_of_power_cooldown_buff
 # unbridled_fury
+# unbridled_fury_item
 # variable_intensity_gigavolt_oscillating_reactor_item
 # vision_of_perfection_essence_id
 # war_stomp
@@ -716,8 +720,6 @@ AddFunction marksmanshipprecombatmainactions
  spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
- #potion,dynamic_prepot=1
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #aimed_shot,if=active_enemies<3
  if enemies() < 3 spell(aimed_shot)
 }
@@ -738,7 +740,7 @@ AddFunction marksmanshipprecombatshortcdactions
 
 AddFunction marksmanshipprecombatshortcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or enemies() < 3 and spell(aimed_shot)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or enemies() < 3 and spell(aimed_shot)
 }
 
 AddFunction marksmanshipprecombatcdactions
@@ -757,6 +759,8 @@ AddFunction marksmanshipprecombatcdactions
    {
     #trueshot,precast_time=1.5,if=active_enemies>2
     if enemies() > 2 spell(trueshot)
+    #potion,dynamic_prepot=1
+    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
    }
   }
  }
@@ -764,25 +768,21 @@ AddFunction marksmanshipprecombatcdactions
 
 AddFunction marksmanshipprecombatcdpostconditions
 {
- spell(double_tap) or spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or enemies() < 3 and spell(aimed_shot)
+ spell(double_tap) or spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or enemies() < 3 and spell(aimed_shot)
 }
 
 ### actions.cds
 
 AddFunction marksmanshipcdsmainactions
 {
- #hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
- if target.debuffexpires(hunters_mark) and not buffpresent(trueshot) spell(hunters_mark)
- #berserking,if=prev_gcd.1.trueshot&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<13
- if previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 spell(berserking)
+ #berserking,if=buff.trueshot.remains>14&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<13
+ if buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 spell(berserking)
  #worldvein_resonance,if=(trinket.azsharas_font_of_power.cooldown.remains>20|!equipped.azsharas_font_of_power|target.time_to_die<trinket.azsharas_font_of_power.cooldown.duration+34&target.health.pct>20)&(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
  if { buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 20 or not hasequippeditem(azsharas_font_of_power_item) or target.timetodie() < message("trinket.azsharas_font_of_power.cooldown.duration is not implemented") + 34 and target.healthpercent() > 20 } and { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance) + baseduration(worldvein_resonance_buff) } or target.timetodie() < 20 spell(worldvein_resonance)
  #ripple_in_space,if=cooldown.trueshot.remains<7
  if spellcooldown(trueshot) < 7 spell(ripple_in_space)
  #memory_of_lucid_dreams,if=!buff.trueshot.up
  if not buffpresent(trueshot) spell(memory_of_lucid_dreams)
- #potion,if=buff.trueshot.react&buff.bloodlust.react|prev_gcd.1.trueshot&target.health.pct<20|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
- if { buffpresent(trueshot) and buffpresent(bloodlust) or previousgcdspell(trueshot) and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
 }
 
 AddFunction marksmanshipcdsmainpostconditions
@@ -791,36 +791,33 @@ AddFunction marksmanshipcdsmainpostconditions
 
 AddFunction marksmanshipcdsshortcdactions
 {
- unless target.debuffexpires(hunters_mark) and not buffpresent(trueshot) and spell(hunters_mark)
- {
-  #double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
-  if spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 spell(double_tap)
+ #double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
+ if spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 spell(double_tap)
 
-  unless { previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking)
-  {
-   #bag_of_tricks,if=buff.trueshot.down
-   if buffexpires(trueshot) spell(bag_of_tricks)
-   #reaping_flames,if=buff.trueshot.down&(target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30)
-   if buffexpires(trueshot) and { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } spell(reaping_flames)
-  }
+ unless { buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking)
+ {
+  #bag_of_tricks,if=buff.trueshot.down
+  if buffexpires(trueshot) spell(bag_of_tricks)
+  #reaping_flames,if=buff.trueshot.down&(target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30)
+  if buffexpires(trueshot) and { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } spell(reaping_flames)
  }
 }
 
 AddFunction marksmanshipcdsshortcdpostconditions
 {
- target.debuffexpires(hunters_mark) and not buffpresent(trueshot) and spell(hunters_mark) or { previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 20 or not hasequippeditem(azsharas_font_of_power_item) or target.timetodie() < message("trinket.azsharas_font_of_power.cooldown.duration is not implemented") + 34 and target.healthpercent() > 20 } and { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance) + baseduration(worldvein_resonance_buff) } or target.timetodie() < 20 } and spell(worldvein_resonance) or spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams) or { buffpresent(trueshot) and buffpresent(bloodlust) or previousgcdspell(trueshot) and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ { buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 20 or not hasequippeditem(azsharas_font_of_power_item) or target.timetodie() < message("trinket.azsharas_font_of_power.cooldown.duration is not implemented") + 34 and target.healthpercent() > 20 } and { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance) + baseduration(worldvein_resonance_buff) } or target.timetodie() < 20 } and spell(worldvein_resonance) or spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams)
 }
 
 AddFunction marksmanshipcdscdactions
 {
- unless target.debuffexpires(hunters_mark) and not buffpresent(trueshot) and spell(hunters_mark) or { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap) or { previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking)
+ unless { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap) or { buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking)
  {
-  #blood_fury,if=prev_gcd.1.trueshot&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-  if previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(blood_fury)
-  #ancestral_call,if=prev_gcd.1.trueshot&(target.time_to_die>cooldown.ancestral_call.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-  if previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(ancestral_call) + baseduration(ancestral_call) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(ancestral_call)
-  #fireblood,if=prev_gcd.1.trueshot&(target.time_to_die>cooldown.fireblood.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<9
-  if previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(fireblood) + baseduration(fireblood) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 9 spell(fireblood)
+  #blood_fury,if=buff.trueshot.remains>14&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
+  if buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(blood_fury)
+  #ancestral_call,if=buff.trueshot.remains>14&(target.time_to_die>cooldown.ancestral_call.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
+  if buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(ancestral_call) + baseduration(ancestral_call) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 16 spell(ancestral_call)
+  #fireblood,if=buff.trueshot.remains>14&(target.time_to_die>cooldown.fireblood.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<9
+  if buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(fireblood) + baseduration(fireblood) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 9 spell(fireblood)
   #lights_judgment,if=buff.trueshot.down
   if buffexpires(trueshot) spell(lights_judgment)
 
@@ -829,8 +826,10 @@ AddFunction marksmanshipcdscdactions
    #guardian_of_azeroth,if=(ca_active|target.time_to_die>cooldown+30)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<31
    if { message("ca_active is not implemented") or target.timetodie() > spellcooldown(guardian_of_azeroth) + 30 } and { buffpresent(trueshot) or spellcooldown(trueshot) < 16 } or target.timetodie() < 31 spell(guardian_of_azeroth)
 
-   unless spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams) or { buffpresent(trueshot) and buffpresent(bloodlust) or previousgcdspell(trueshot) and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+   unless spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams)
    {
+    #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.remains>14&target.health.pct<20|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
+    if { buffpresent(trueshot) and buffpresent(bloodlust) or buffremaining(trueshot) > 14 and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
     #trueshot,if=buff.trueshot.down&cooldown.rapid_fire.remains|target.time_to_die<15
     if buffexpires(trueshot) and spellcooldown(rapid_fire) > 0 or target.timetodie() < 15 spell(trueshot)
    }
@@ -840,7 +839,7 @@ AddFunction marksmanshipcdscdactions
 
 AddFunction marksmanshipcdscdpostconditions
 {
- target.debuffexpires(hunters_mark) and not buffpresent(trueshot) and spell(hunters_mark) or { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap) or { previousgcdspell(trueshot) and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking) or buffexpires(trueshot) and spell(bag_of_tricks) or buffexpires(trueshot) and { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames) or { { buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 20 or not hasequippeditem(azsharas_font_of_power_item) or target.timetodie() < message("trinket.azsharas_font_of_power.cooldown.duration is not implemented") + 34 and target.healthpercent() > 20 } and { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance) + baseduration(worldvein_resonance_buff) } or target.timetodie() < 20 } and spell(worldvein_resonance) or spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams) or { buffpresent(trueshot) and buffpresent(bloodlust) or previousgcdspell(trueshot) and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ { spellcooldown(rapid_fire) < gcd() or spellcooldown(rapid_fire) < spellcooldown(aimed_shot) or target.timetodie() < 20 } and spell(double_tap) or { buffremaining(trueshot) > 14 and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 20 or not hastalent(careful_aim_talent) } or target.timetodie() < 13 } and spell(berserking) or buffexpires(trueshot) and spell(bag_of_tricks) or buffexpires(trueshot) and { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames) or { { buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 20 or not hasequippeditem(azsharas_font_of_power_item) or target.timetodie() < message("trinket.azsharas_font_of_power.cooldown.duration is not implemented") + 34 and target.healthpercent() > 20 } and { spellcooldown(trueshot) < 3 or azeriteessenceisminor(vision_of_perfection_essence_id) and target.timetodie() > spellcooldown(worldvein_resonance) + baseduration(worldvein_resonance_buff) } or target.timetodie() < 20 } and spell(worldvein_resonance) or spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams)
 }
 
 ### actions.default
@@ -901,14 +900,14 @@ AddFunction marksmanship_defaultcdactions
  if { target.timetodie() > spellcooldown(use_item) + 34 or target.healthpercent() < 20 or target.timetohealthpercent(20) < 15 } and spellcooldown(trueshot) < 15 or target.timetodie() < 35 marksmanshipuseitemactions()
  #use_item,name=lustrous_golden_plumage,if=cooldown.trueshot.remains_guess<5|target.time_to_die<20
  if spellcooldown(trueshot) < 5 or target.timetodie() < 20 marksmanshipuseitemactions()
- #use_item,name=galecallers_boon,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<10
- if previousgcdspell(trueshot) or not hastalent(calling_the_shots_talent) or target.timetodie() < 10 marksmanshipuseitemactions()
- #use_item,name=ashvanes_razor_coral,if=prev_gcd.1.trueshot&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&ca_active)|debuff.razor_coral_debuff.down|target.time_to_die<20
- if previousgcdspell(trueshot) and { buffpresent(guardian_of_azeroth_buff) or not azeriteessenceismajor(condensed_lifeforce_essence_id) and message("ca_active is not implemented") } or target.debuffexpires(razor_coral) or target.timetodie() < 20 marksmanshipuseitemactions()
+ #use_item,name=galecallers_boon,if=buff.trueshot.remains>14|!talent.calling_the_shots.enabled|target.time_to_die<10
+ if buffremaining(trueshot) > 14 or not hastalent(calling_the_shots_talent) or target.timetodie() < 10 marksmanshipuseitemactions()
+ #use_item,name=ashvanes_razor_coral,if=buff.trueshot.remains>14&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&ca_active)|debuff.razor_coral_debuff.down|target.time_to_die<20
+ if buffremaining(trueshot) > 14 and { buffpresent(guardian_of_azeroth_buff) or not azeriteessenceismajor(condensed_lifeforce_essence_id) and message("ca_active is not implemented") } or target.debuffexpires(razor_coral) or target.timetodie() < 20 marksmanshipuseitemactions()
  #use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up|target.time_to_die<5
  if not buffpresent(trueshot) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 5 marksmanshipuseitemactions()
- #use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
- if previousgcdspell(trueshot) or not hastalent(calling_the_shots_talent) or target.timetodie() < 20 marksmanshipuseitemactions()
+ #use_items,if=buff.trueshot.remains>14|!talent.calling_the_shots.enabled|target.time_to_die<20
+ if buffremaining(trueshot) > 14 or not hastalent(calling_the_shots_talent) or target.timetodie() < 20 marksmanshipuseitemactions()
  #call_action_list,name=cds
  marksmanshipcdscdactions()
 
@@ -990,7 +989,6 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
 # counter_shot
-# disabled_item
 # double_tap
 # explosive_shot
 # fireblood
@@ -998,7 +996,6 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # focused_fire_trait
 # guardian_of_azeroth
 # guardian_of_azeroth_buff
-# hunters_mark
 # in_the_rhythm
 # in_the_rhythm_trait
 # kill_shot
@@ -1024,6 +1021,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trinket_azsharas_font_of_power_cooldown_buff
 # trueshot
 # unbridled_fury
+# unbridled_fury_item
 # unerring_vision_buff
 # unerring_vision_trait
 # vision_of_perfection_essence_id
@@ -1242,8 +1240,6 @@ AddFunction survivalprecombatmainactions
 {
  #worldvein_resonance
  spell(worldvein_resonance)
- #potion,dynamic_prepot=1
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #harpoon
  if checkboxon(opt_harpoon) spell(harpoon)
 }
@@ -1260,7 +1256,7 @@ AddFunction survivalprecombatshortcdactions
  #summon_pet
  survivalsummonpet()
 
- unless spell(worldvein_resonance) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless spell(worldvein_resonance)
  {
   #steel_trap
   spell(steel_trap)
@@ -1269,7 +1265,7 @@ AddFunction survivalprecombatshortcdactions
 
 AddFunction survivalprecombatshortcdpostconditions
 {
- spell(worldvein_resonance) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or checkboxon(opt_harpoon) and spell(harpoon)
+ spell(worldvein_resonance) or checkboxon(opt_harpoon) and spell(harpoon)
 }
 
 AddFunction survivalprecombatcdactions
@@ -1281,11 +1277,17 @@ AddFunction survivalprecombatcdactions
  spell(guardian_of_azeroth)
  #coordinated_assault
  spell(coordinated_assault)
+
+ unless spell(worldvein_resonance)
+ {
+  #potion,dynamic_prepot=1
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ }
 }
 
 AddFunction survivalprecombatcdpostconditions
 {
- spell(worldvein_resonance) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or spell(steel_trap) or checkboxon(opt_harpoon) and spell(harpoon)
+ spell(worldvein_resonance) or spell(steel_trap) or checkboxon(opt_harpoon) and spell(harpoon)
 }
 
 ### actions.cleave
@@ -1379,8 +1381,6 @@ AddFunction survivalcdsmainactions
 {
  #berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
  if spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 spell(berserking)
- #potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
- if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #blood_of_the_enemy,if=((raid_event.adds.remains>90|!raid_event.adds.exists)|(active_enemies>1&!talent.birds_of_prey.enabled|active_enemies>2))&focus<focus.max
  if { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() spell(blood_of_the_enemy)
  #ripple_in_space
@@ -1407,7 +1407,7 @@ AddFunction survivalcdsmainpostconditions
 
 AddFunction survivalcdsshortcdactions
 {
- unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
  {
   #aspect_of_the_eagle,if=target.distance>=6
   if target.distance() >= 6 spell(aspect_of_the_eagle)
@@ -1430,7 +1430,7 @@ AddFunction survivalcdsshortcdactions
 
 AddFunction survivalcdsshortcdpostconditions
 {
- { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or spell(ripple_in_space) or spellfullrecharge(concentrated_flame) < 1 * gcd() and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(worldvein_resonance) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.refreshable(serpent_sting) and buffpresent(vipers_venom_buff) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(serpent_sting) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(mongoose_bite) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellfullrecharge(wildfire_bomb) < 1.5 * gcd() and focus() < powercost(mongoose_bite) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(wildfire_bomb) or focus() < powercost(mongoose_bite) and buffpresent(coordinated_assault) and spell(memory_of_lucid_dreams)
+ { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or spell(ripple_in_space) or spellfullrecharge(concentrated_flame) < 1 * gcd() and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(worldvein_resonance) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.refreshable(serpent_sting) and buffpresent(vipers_venom_buff) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(serpent_sting) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(mongoose_bite) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellfullrecharge(wildfire_bomb) < 1.5 * gcd() and focus() < powercost(mongoose_bite) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(wildfire_bomb) or focus() < powercost(mongoose_bite) and buffpresent(coordinated_assault) and spell(memory_of_lucid_dreams)
 }
 
 AddFunction survivalcdscdactions
@@ -1444,26 +1444,32 @@ AddFunction survivalcdscdactions
  #lights_judgment
  spell(lights_judgment)
 
- unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or target.distance() >= 6 and spell(aspect_of_the_eagle)
+ unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
  {
-  #use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up&target.time_to_die<cooldown.memory_of_lucid_dreams.remains+15|buff.guardian_of_azeroth.stack=5&target.time_to_die<cooldown.guardian_of_azeroth.remains+20|debuff.razor_coral_debuff.down|target.time_to_die<21|buff.worldvein_resonance.remains&target.time_to_die<cooldown.worldvein_resonance.remains+18|!talent.birds_of_prey.enabled&target.time_to_die<cooldown.coordinated_assault.remains+20&buff.coordinated_assault.remains
-  if buffpresent(memory_of_lucid_dreams) and target.timetodie() < spellcooldown(memory_of_lucid_dreams) + 15 or buffstacks(guardian_of_azeroth_buff) == 5 and target.timetodie() < spellcooldown(guardian_of_azeroth) + 20 or target.debuffexpires(razor_coral) or target.timetodie() < 21 or buffpresent(worldvein_resonance_buff) and target.timetodie() < spellcooldown(worldvein_resonance) + 18 or not hastalent(birds_of_prey_talent) and target.timetodie() < spellcooldown(coordinated_assault) + 20 and buffpresent(coordinated_assault) survivaluseitemactions()
-  #use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
-  if spellcooldown(memory_of_lucid_dreams) > 0 or hastalent(wildfire_infusion_talent) and spellcooldown(coordinated_assault) > 0 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellcooldown(coordinated_assault) > 0 survivaluseitemactions()
-  #use_item,name=azsharas_font_of_power
-  survivaluseitemactions()
+  #potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
+  if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
-  unless { 600 > 90 and focus() < maxfocus() - 25 or { enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and { buffpresent(blur_of_talons_buff) and buffremaining(blur_of_talons_buff) > 3 * gcd() or not buffpresent(blur_of_talons_buff) } } and spell(focused_azerite_beam) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or { message("raid_event.adds.remains is not implemented") > 60 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(purifying_blast)
+  unless target.distance() >= 6 and spell(aspect_of_the_eagle)
   {
-   #guardian_of_azeroth
-   spell(guardian_of_azeroth)
+   #use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up&target.time_to_die<cooldown.memory_of_lucid_dreams.remains+15|buff.guardian_of_azeroth.stack=5&target.time_to_die<cooldown.guardian_of_azeroth.remains+20|debuff.razor_coral_debuff.down|target.time_to_die<21|buff.worldvein_resonance.remains&target.time_to_die<cooldown.worldvein_resonance.remains+18|!talent.birds_of_prey.enabled&target.time_to_die<cooldown.coordinated_assault.remains+20&buff.coordinated_assault.remains
+   if buffpresent(memory_of_lucid_dreams) and target.timetodie() < spellcooldown(memory_of_lucid_dreams) + 15 or buffstacks(guardian_of_azeroth_buff) == 5 and target.timetodie() < spellcooldown(guardian_of_azeroth) + 20 or target.debuffexpires(razor_coral) or target.timetodie() < 21 or buffpresent(worldvein_resonance_buff) and target.timetodie() < spellcooldown(worldvein_resonance) + 18 or not hastalent(birds_of_prey_talent) and target.timetodie() < spellcooldown(coordinated_assault) + 20 and buffpresent(coordinated_assault) survivaluseitemactions()
+   #use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
+   if spellcooldown(memory_of_lucid_dreams) > 0 or hastalent(wildfire_infusion_talent) and spellcooldown(coordinated_assault) > 0 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellcooldown(coordinated_assault) > 0 survivaluseitemactions()
+   #use_item,name=azsharas_font_of_power
+   survivaluseitemactions()
+
+   unless { 600 > 90 and focus() < maxfocus() - 25 or { enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and { buffpresent(blur_of_talons_buff) and buffremaining(blur_of_talons_buff) > 3 * gcd() or not buffpresent(blur_of_talons_buff) } } and spell(focused_azerite_beam) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or { message("raid_event.adds.remains is not implemented") > 60 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(purifying_blast)
+   {
+    #guardian_of_azeroth
+    spell(guardian_of_azeroth)
+   }
   }
  }
 }
 
 AddFunction survivalcdscdpostconditions
 {
- { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or target.distance() >= 6 and spell(aspect_of_the_eagle) or { 600 > 90 and focus() < maxfocus() - 25 or { enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and { buffpresent(blur_of_talons_buff) and buffremaining(blur_of_talons_buff) > 3 * gcd() or not buffpresent(blur_of_talons_buff) } } and spell(focused_azerite_beam) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or { message("raid_event.adds.remains is not implemented") > 60 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(purifying_blast) or spell(ripple_in_space) or spellfullrecharge(concentrated_flame) < 1 * gcd() and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(worldvein_resonance) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.refreshable(serpent_sting) and buffpresent(vipers_venom_buff) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(serpent_sting) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(mongoose_bite) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellfullrecharge(wildfire_bomb) < 1.5 * gcd() and focus() < powercost(mongoose_bite) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(wildfire_bomb) or focus() < powercost(mongoose_bite) and buffpresent(coordinated_assault) and spell(memory_of_lucid_dreams)
+ { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or target.distance() >= 6 and spell(aspect_of_the_eagle) or { 600 > 90 and focus() < maxfocus() - 25 or { enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and { buffpresent(blur_of_talons_buff) and buffremaining(blur_of_talons_buff) > 3 * gcd() or not buffpresent(blur_of_talons_buff) } } and spell(focused_azerite_beam) or { message("raid_event.adds.remains is not implemented") > 90 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(blood_of_the_enemy) or { message("raid_event.adds.remains is not implemented") > 60 or not false(raid_event_adds_exists) or enemies() > 1 and not hastalent(birds_of_prey_talent) or enemies() > 2 } and focus() < maxfocus() and spell(purifying_blast) or spell(ripple_in_space) or spellfullrecharge(concentrated_flame) < 1 * gcd() and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or spell(worldvein_resonance) or { target.healthpercent() > 80 or target.healthpercent() <= 20 or target.timetohealthpercent(20) > 30 } and spell(reaping_flames) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.refreshable(serpent_sting) and buffpresent(vipers_venom_buff) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(serpent_sting) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(mongoose_bite) or azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and spellfullrecharge(wildfire_bomb) < 1.5 * gcd() and focus() < powercost(mongoose_bite) and not spellcooldown(memory_of_lucid_dreams) > 0 and spell(wildfire_bomb) or focus() < powercost(mongoose_bite) and buffpresent(coordinated_assault) and spell(memory_of_lucid_dreams)
 }
 
 ### actions.apwfi
@@ -1861,7 +1867,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # concentrated_flame
 # condensed_lifeforce_essence_id
 # coordinated_assault
-# disabled_item
 # fireblood
 # flanking_strike
 # focused_azerite_beam
@@ -1895,6 +1900,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # the_unbound_force
 # tip_of_the_spear
 # unbridled_fury
+# unbridled_fury_item
 # vipers_venom_buff
 # vipers_venom_talent
 # war_stomp

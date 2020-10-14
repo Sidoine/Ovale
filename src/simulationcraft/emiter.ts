@@ -3941,7 +3941,7 @@ export class Emiter {
                 if (modifier === "pct") {
                     code = "target.HealthPercent()";
                 }
-            } else {
+            } else if (property) {
                 const [percent] = match(property, "^time_to_pct_(%d+)");
                 if (percent) {
                     code = `target.TimeToHealthPercent(${percent})`;

@@ -448,9 +448,9 @@
     typescript "^3.9.7"
 
 "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.16.0", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.6.0":
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.19.0.tgz#df6b1f43ccaf20ff4d80ef4f77e6c133b7d153ff"
-  integrity sha512-Dr0eL9oH1HT8XQcYT5BVpuwUvJQ2FYl2/NARhuS7wF07NXisFuEWb7Pyn6byw5VKNUuDKcENKa8kec2ZlE8kCQ==
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.20.0.tgz#8bbaf0145e90d95dda793c29d6f8cf77f41c1c7a"
+  integrity sha512-EYZymr0bCHyOBdyzSc39p+8E8OiuSNWc4BTY+wP9ljdxy6SfVkbpPJJiW+V95KcERpDawAr/Xc37Z60kMjPyrA==
   dependencies:
     "@wowts/lua" "^1.3.2"
 

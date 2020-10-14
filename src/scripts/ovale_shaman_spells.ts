@@ -88,14 +88,14 @@ Define(earth_elemental_1 198103)
 # Calls forth a Greater Earth Elemental to protect you and your allies for 60 seconds.
   SpellInfo(earth_elemental_1 cd=300)
 Define(fae_transfusion_0 328923)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (140 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
   SpellInfo(fae_transfusion_0 cd=120 duration=3 channel=3 tick=0.5)
   SpellAddBuff(fae_transfusion_0 fae_transfusion_0=1)
 Define(fae_transfusion_1 328928)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (140 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
   SpellInfo(fae_transfusion_1 gcd=0 offgcd=1)
 Define(fae_transfusion_2 328930)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (140 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
   SpellInfo(fae_transfusion_2)
 Define(feral_lunge 196884)
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
@@ -117,6 +117,11 @@ Define(flame_shock 188389)
   SpellInfo(flame_shock cd=6 duration=18 tick=2)
   # Suffering w2 Fire damage every t2 sec.
   SpellAddTargetDebuff(flame_shock flame_shock=1)
+Define(flametongue_weapon 318038)
+# Imbue your ?s33757[off-hand ][]weapon with the element of Fire for 3600 seconds, causing each of your ?s33757[off-hand ][]attacks to deal max((<coeff>*AP),1) additional Fire damage.
+  SpellInfo(flametongue_weapon)
+  # Each of your ?s33757[off-hand ][]weapon attacks causes up to max((<coeff>*AP),1) additional Fire damage.
+  SpellAddBuff(flametongue_weapon flametongue_weapon=1)
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds.?s33757[rnrnFrost Shock shares a cooldown with Flame Shock.][]
   SpellInfo(frost_shock duration=6)
@@ -140,6 +145,15 @@ Define(lightning_bolt 188196)
 # Hurls a bolt of lightning at the target, dealing (95 of Spell Power) Nature damage.?a343725[rnrn|cFFFFFFFFGenerates 343725s1 Maelstrom.|r][]
 # Rank 2: Reduces the cast time of Lightning Bolt by m1/-1000.1 sec.
   SpellInfo(lightning_bolt)
+Define(lightning_shield 192106)
+# Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (3.5999999999999996 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
+  SpellInfo(lightning_shield duration=1800 channel=1800)
+  # Chance to deal 192109s1 Nature damage when you take melee damage.
+  SpellAddBuff(lightning_shield lightning_shield=1)
+Define(maelstrom_weapon 187880)
+# When you deal damage with a melee weapon, you have a chance to gain Maelstrom Weapon, stacking up to 344179u times. Each stack of Maelstrom Weapon reduces the cast time of your next damage or healing spell by 187881s1 and increase the damage or healing of your next spell by 187881s3. A maximum of s2 stacks of Maelstrom Weapon can be consumed at a time.
+  SpellInfo(maelstrom_weapon channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(maelstrom_weapon maelstrom_weapon=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -180,6 +194,9 @@ Define(war_stomp 20549)
 Define(wind_shear 57994)
 # Disrupts the target's concentration with a burst of wind, interrupting spellcasting and preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(wind_shear cd=12 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(windfury_weapon 33757)
+# Imbue your main-hand weapon with the element of Wind for 3600 seconds. Each main-hand attack has a 319773h chance to trigger two extra attacks, dealing 25504sw1 Physical damage each.
+  SpellInfo(windfury_weapon)
 Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike cd=9)

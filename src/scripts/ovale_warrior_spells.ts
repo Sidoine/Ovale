@@ -9,18 +9,6 @@ export function registerWarriorSpells(OvaleScripts: OvaleScriptsClass) {
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(anima_of_death_0 294926)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
-  SpellInfo(anima_of_death_0 cd=150)
-Define(anima_of_death_1 294946)
-# Heal for s1 of your maximum health.
-  SpellInfo(anima_of_death_1 gcd=0 offgcd=1)
-Define(anima_of_death_2 300002)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to 294945s1 of your maximum health.
-  SpellInfo(anima_of_death_2 cd=120 gcd=1)
-Define(anima_of_death_3 300003)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1+294945s2 of your maximum health per enemy hit, up to 294945s1*2 of your maximum health.
-  SpellInfo(anima_of_death_3 cd=120 gcd=1)
 Define(arcane_torrent_0 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent_0 cd=120 gcd=1 energy=-15)
@@ -158,15 +146,6 @@ Define(deep_wounds 115768)
 # Your ?s236279[Devastator][Devastate] and Revenge also cause the enemy to bleed for 115767o1 Physical damage over 15 seconds.
   SpellInfo(deep_wounds channel=0 gcd=0 offgcd=1)
 
-Define(demoralizing_shout 1160)
-# ?s199023[Demoralizes all enemies within A2 yards, reducing the damage they do by s2 for 8 seconds.][Demoralizes all enemies within A2 yards, reducing the damage they deal to you by s1 for 8 seconds.]?s202743[rnrn|cFFFFFFFFGenerates m5/10 Rage.|r][]
-# Rank 2: Reduces the damage enemies deal  to you by an additional s1.
-  SpellInfo(demoralizing_shout cd=45 duration=8 rage=0)
-  # ?s199023[Demoralized, dealing w2 less damage.][Demoralized, dealing w1 less damage to @auracaster.]
-  SpellAddTargetDebuff(demoralizing_shout demoralizing_shout=1)
-Define(devastate 20243)
-# A direct strike, dealing s1 Physical damage.
-  SpellInfo(devastate max_stacks=3)
 Define(dragon_roar 118000)
 # Roar explosively, dealing s1 Physical damage to all enemies within A1 yds. Dragon Roar critically strikes for 3 times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(dragon_roar cd=30 rage=-10 talent=dragon_roar_talent_protection)
@@ -233,15 +212,6 @@ Define(guardian_of_azeroth_buff 303349)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?c3[, and resetting the remaining cooldown on Taunt][].
   SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
-Define(ignore_pain 190456)
-# Fight through the pain, ignoring s2 of damage taken, up to <absorb> total damage prevented.
-# Rank 2: Cooldown reduced by s1/-1000 sec.
-  SpellInfo(ignore_pain rage=40 cd=12 duration=12 gcd=0 offgcd=1)
-  # Ignoring s2 of damage taken, preventing w1 total damage.
-  SpellAddBuff(ignore_pain ignore_pain=1)
-Define(intercept 198304)
-# Run at high speed toward an enemy or ally.rnrnWhen targeting an enemy, deals 126664s2 Physical damage and roots the target for 1 second.rnrnWhen targeting an ally, intercepts the next melee or ranged attack against them within 6 seconds while the ally remains within 147833A2 yards.rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(intercept cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-15)
 Define(intimidating_shout_0 5246)
 # ?s275338[Causes the targeted enemy and up to s1 additional enemies within 5246A3 yards to cower in fear.][Causes the targeted enemy to cower in fear, and up to s1 additional enemies within 5246A3 yards to flee.] Targets are disoriented for 8 seconds.
   SpellInfo(intimidating_shout_0 cd=90 duration=8)
@@ -253,11 +223,6 @@ Define(intimidating_shout_1 316593)
 
   # Disoriented.
   SpellAddTargetDebuff(intimidating_shout_1 intimidating_shout_1=1)
-Define(last_stand 12975)
-# Increases maximum health by s1 for 15 seconds, and instantly heals you for that amount.
-  SpellInfo(last_stand cd=180 duration=15 gcd=0 offgcd=1)
-  # Maximum health increased by s1.
-  SpellAddBuff(last_stand last_stand=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -279,6 +244,13 @@ Define(mortal_strike 12294)
 # A vicious strike that deals s1 Physical damage and reduces the effectiveness of healing on the target by 115804s1 for 10 seconds.
 # Rank 2: Damage increased by s1.
   SpellInfo(mortal_strike rage=30 cd=6)
+Define(noxious_venom 267410)
+  SpellInfo(noxious_venom duration=4 channel=4 max_stacks=3 gcd=0 offgcd=1 tick=1)
+  # Inflicts w1 Nature damage every t1 sec.
+  SpellAddTargetDebuff(noxious_venom noxious_venom=1)
+Define(onslaught 315720)
+# Brutally attack an enemy for s1 Physical damage. Requires Enrage.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(onslaught cd=12 rage=-15 talent=onslaught_talent)
 Define(overpower 7384)
 # Overpower the enemy, dealing s1 Physical damage. Cannot be blocked, dodged, or parried.?s316440&s845[rnrnIncreases the damage of your next Mortal Strike or Cleave by s2]?s316440[rnrnIncreases the damage of your next Mortal Strike by s2][]?(s316440&!s316441)[.][]?s316441[, stacking up to u times.][]
 # Rank 3: Overpower's bonus to Mortal Strike can stack up to s1+1 times.
@@ -331,11 +303,6 @@ Define(ravager 152277)
   SpellInfo(ravager cd=45 duration=12 tick=2 talent=ravager_talent)
   # Ravager is currently active.
   SpellAddBuff(ravager ravager=1)
-Define(ravager_protection 228920)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
-  SpellInfo(ravager_protection cd=45 duration=12 tick=2 talent=ravager_talent_protection)
-  # Ravager is currently active.
-  SpellAddBuff(ravager_protection ravager_protection=1)
 Define(razor_coral_0 303564)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
   SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
@@ -393,9 +360,6 @@ Define(rend 772)
   SpellInfo(rend rage=30 duration=15 tick=3 talent=rend_talent)
   # Bleeding for w2 damage every t2 sec. Taking w3 increased critical damage from @auracaster.
   SpellAddTargetDebuff(rend rend=1)
-Define(revenge 6572)
-# Swing in a wide arc, dealing s1 Physical damage to all enemies in front of you. Deals reduced damage beyond <cap> targets.rnrnYour successful dodges and parries have a chance to make your next Revenge cost no Rage.
-  SpellInfo(revenge rage=20)
 Define(ripple_in_space_0 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space_0)
@@ -408,22 +372,6 @@ Define(ripple_in_space_2 299309)
 Define(ripple_in_space_3 299310)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space_3)
-Define(shield_block 2565)
-# Raise your shield, blocking all melee attacks against you for 6 seconds.?s76857[ These blocks can be critical blocks.][]?c3[ Increases Shield Slam damage by 132404s2 while active.][]
-# Rank 2: Shield Block has s1+1 charges.
-  SpellInfo(shield_block rage=30 cd=1 charge_cd=16 gcd=0 offgcd=1)
-Define(shield_slam_0 231834)
-# Devastate, Thunder Clap, Revenge, and Execute have a s1 chance to reset the remaining cooldown on Shield Slam.
-  SpellInfo(shield_slam_0 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shield_slam_0 shield_slam_0=1)
-Define(shield_slam_1 316523)
-# Shield Slam generates s1/10 Rage.
-  SpellInfo(shield_slam_1 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shield_slam_1 shield_slam_1=1)
-Define(shield_slam_2 316790)
-# Damage increased by s1.
-  SpellInfo(shield_slam_2 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shield_slam_2 shield_slam_2=1)
 Define(shockwave 46968)
 # Sends a wave of force in a frontal cone, causing s2 damage and stunning all enemies within a1 yards for 2 seconds.
   SpellInfo(shockwave cd=40)
@@ -443,11 +391,6 @@ Define(slam_1 316534)
 # Damage increased by s1.
   SpellInfo(slam_1 channel=0 gcd=0 offgcd=1)
   SpellAddBuff(slam_1 slam_1=1)
-Define(stone_heart 225947)
-# Your attacks have a chance to make your next Execute cost no ?s12712[initial ][]Rage?s12712[, consume no extra Rage,][] and be usable on any target, regardless of health level.
-  SpellInfo(stone_heart duration=10 channel=10 gcd=0 offgcd=1)
-  # Execute costs no Rage and can be used on any target.
-  SpellAddBuff(stone_heart stone_heart=1)
 Define(storm_bolt 107570)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
   SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
@@ -479,12 +422,6 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
-Define(thunder_clap 6343)
-# Blasts all enemies within 6343A1 yards for s1 Physical damage?(s316414&s199045)[, rooting them for 1 second and reducing their movement speed by s2 for 10 seconds.]?s199045[ and roots them for 1 second.]?s316414[ and reduces their movement speed by s2 for 10 seconds.][.] Deals reduced damage beyond s5 targets.rnrn|cFFFFFFFFGenerates s4/10 Rage.|r
-# Rank 2: Thunder Clap reduces the movement speed of enemies by 6343s2 for 10 seconds.
-  SpellInfo(thunder_clap cd=6 duration=10 rage=-5)
-  # Movement speed reduced by s2.
-  SpellAddTargetDebuff(thunder_clap thunder_clap=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -529,38 +466,28 @@ SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 
 SpellList(slam slam_0 slam_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
-SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
-SpellList(shield_slam shield_slam_0 shield_slam_1 shield_slam_2)
-Define(anger_management_talent 19) #21204
-# Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar and Shield Wall] by 1 sec.
 Define(avatar_talent 17) #22397
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
 Define(bladestorm_talent 18) #22400
 # Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
-Define(booming_voice_talent 8) #22626
-# Demoralizing Shout also generates m1/10 Rage, and increases damage you deal to affected targets by s2.
 Define(cleave_talent 15) #22362
 # Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
 Define(deadly_calm_talent 18) #22399
 # Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.
 Define(dragon_roar_talent_protection 9) #23260
 # Roar explosively, dealing s1 Physical damage to all enemies within A1 yds. Dragon Roar critically strikes for 3 times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
-Define(dreadnaught_talent 20) #22407
-# Overpower has 1+s1 charges and causes a seismic wave, dealing 315961s1 damage to up to 315961s2 enemies in a 315961A1 yd line.
 Define(fervor_of_battle_talent 8) #22489
 # Whirlwind also Slams your primary target.
-Define(frothing_berserker_talent 14) #22393
-# Rampage has a h chance to immediately refund 215572s1/10 Rage.
-Define(massacre_talent 7) #22379
-# ?a317320[Condemn][Execute] is now usable on targets below s2 health, and its cooldown is reduced by s3/1000.1 sec.
 Define(massacre_talent_arms 7) #22380
 # ?a317320[Condemn][Execute] is now usable on targets below s2 health.
 Define(meat_cleaver_talent 16) #22396
 # Whirlwind deals s1 more damage and now affects your next s2+s3 single-target melee attacks, instead of the next s3 attacks.
-Define(ravager_talent_protection 18) #22401
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
+Define(onslaught_talent 9) #23372
+# Brutally attack an enemy for s1 Physical damage. Requires Enrage.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
+Define(reckless_abandon_talent 20) #22402
+# Recklessness generates s1/10 Rage and greatly empowers Bloodthirst and Raging Blow.
 Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 15 seconds.rnrnIncreases critical damage you deal to the enemy by s3.
 Define(siegebreaker_talent 21) #16037
@@ -571,17 +498,12 @@ Define(storm_bolt_talent_fury 6) #23093
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
 Define(sudden_death_talent 2) #22360
 # Your attacks have a chance to make your next ?a317320[Condemn][Execute] cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
-Define(unstoppable_force_talent 17) #22544
-# Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
-Define(unbridled_fury_item 169299)
-Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
 Define(memory_of_lucid_dreams_essence_id 27)
 Define(blood_of_the_enemy_essence_id 23)
-Define(the_crucible_of_flame_essence_id 12)
     `;
 // END
     OvaleScripts.RegisterScript(

@@ -166,6 +166,8 @@ Include(ovale_shaman_spells)
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=enhancement)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=enhancement)
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=enhancement)
+AddCheckBox(opt_bloodlust spellname(bloodlust) specialization=enhancement)
 
 AddFunction enhancementinterruptactions
 {
@@ -177,6 +179,15 @@ AddFunction enhancementinterruptactions
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
   if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
+ }
+}
+
+AddFunction enhancementbloodlust
+{
+ if checkboxon(opt_bloodlust) and debuffexpires(burst_haste_debuff any=1)
+ {
+  spell(bloodlust)
+  spell(heroism)
  }
 }
 
@@ -193,6 +204,17 @@ AddFunction enhancementgetinmeleerange
 
 AddFunction enhancementprecombatmainactions
 {
+ #flask
+ #food
+ #augmentation
+ #lightning_shield
+ spell(lightning_shield)
+ #windfury_weapon
+ spell(windfury_weapon)
+ #flametongue_weapon
+ spell(flametongue_weapon)
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
 }
 
 AddFunction enhancementprecombatmainpostconditions
@@ -205,6 +227,7 @@ AddFunction enhancementprecombatshortcdactions
 
 AddFunction enhancementprecombatshortcdpostconditions
 {
+ spell(lightning_shield) or spell(windfury_weapon) or spell(flametongue_weapon) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 AddFunction enhancementprecombatcdactions
@@ -213,14 +236,23 @@ AddFunction enhancementprecombatcdactions
 
 AddFunction enhancementprecombatcdpostconditions
 {
+ spell(lightning_shield) or spell(windfury_weapon) or spell(flametongue_weapon) or checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
 }
 
 ### actions.default
 
 AddFunction enhancement_defaultmainactions
 {
+ #potion,if=expected_combat_length-time<60
+ if expectedcombatlength() - timeincombat() < 60 and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #windstrike
  spell(windstrike)
+ #crash_lightning,if=spell_targets.chain_lightning>1
+ if enemies() > 1 spell(crash_lightning)
+ #chain_lightning,if=spell_targets.chain_lightning>1&&buff.maelstrom_weapon.stack>=5
+ if enemies() > 1 and buffstacks(maelstrom_weapon) >= 5 spell(chain_lightning)
+ #lightning_bolt,if=buff.maelstrom_weapon.stack>=5
+ if buffstacks(maelstrom_weapon) >= 5 spell(lightning_bolt)
  #earth_elemental
  spell(earth_elemental)
  #lava_lash
@@ -233,10 +265,6 @@ AddFunction enhancement_defaultmainactions
  spell(flame_shock)
  #frost_shock
  spell(frost_shock)
- #lightning_bolt
- spell(lightning_bolt)
- #chain_lightning
- spell(chain_lightning)
 }
 
 AddFunction enhancement_defaultmainpostconditions
@@ -245,30 +273,39 @@ AddFunction enhancement_defaultmainpostconditions
 
 AddFunction enhancement_defaultshortcdactions
 {
- #auto_attack
- enhancementgetinmeleerange()
+ unless expectedcombatlength() - timeincombat() < 60 and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ {
+  #auto_attack
+  enhancementgetinmeleerange()
+ }
 }
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(windstrike) or spell(earth_elemental) or spell(lava_lash) or spell(stormstrike) or spell(crash_lightning) or spell(flame_shock) or spell(frost_shock) or spell(lightning_bolt) or spell(chain_lightning)
+ expectedcombatlength() - timeincombat() < 60 and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or spell(windstrike) or enemies() > 1 and spell(crash_lightning) or enemies() > 1 and buffstacks(maelstrom_weapon) >= 5 and spell(chain_lightning) or buffstacks(maelstrom_weapon) >= 5 and spell(lightning_bolt) or spell(earth_elemental) or spell(lava_lash) or spell(stormstrike) or spell(crash_lightning) or spell(flame_shock) or spell(frost_shock)
 }
 
 AddFunction enhancement_defaultcdactions
 {
- #wind_shear
- enhancementinterruptactions()
+ #bloodlust
+ enhancementbloodlust()
 
- unless spell(windstrike)
+ unless expectedcombatlength() - timeincombat() < 60 and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
  {
-  #feral_spirit
-  spell(feral_spirit)
+  #wind_shear
+  enhancementinterruptactions()
+
+  unless spell(windstrike) or enemies() > 1 and spell(crash_lightning) or enemies() > 1 and buffstacks(maelstrom_weapon) >= 5 and spell(chain_lightning) or buffstacks(maelstrom_weapon) >= 5 and spell(lightning_bolt)
+  {
+   #feral_spirit
+   spell(feral_spirit)
+  }
  }
 }
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(windstrike) or spell(earth_elemental) or spell(lava_lash) or spell(stormstrike) or spell(crash_lightning) or spell(flame_shock) or spell(frost_shock) or spell(lightning_bolt) or spell(chain_lightning)
+ expectedcombatlength() - timeincombat() < 60 and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or spell(windstrike) or enemies() > 1 and spell(crash_lightning) or enemies() > 1 and buffstacks(maelstrom_weapon) >= 5 and spell(chain_lightning) or buffstacks(maelstrom_weapon) >= 5 and spell(lightning_bolt) or spell(earth_elemental) or spell(lava_lash) or spell(stormstrike) or spell(crash_lightning) or spell(flame_shock) or spell(frost_shock)
 }
 
 ### Enhancement icons.
@@ -312,22 +349,29 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 }
 
 ### Required symbols
+# bloodlust
 # capacitor_totem
 # chain_lightning
 # crash_lightning
+# disabled_item
 # earth_elemental
 # feral_lunge
 # feral_spirit
 # flame_shock
+# flametongue_weapon
 # frost_shock
+# heroism
 # hex
 # lava_lash
 # lightning_bolt
+# lightning_shield
+# maelstrom_weapon
 # quaking_palm
 # stormstrike
 # sundering
 # war_stomp
 # wind_shear
+# windfury_weapon
 # windstrike
 `
 	OvaleScripts.RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
