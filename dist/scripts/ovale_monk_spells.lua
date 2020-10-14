@@ -516,5 +516,8 @@ Define(the_crucible_of_flame_essence_id 12)
 Define(blood_of_the_enemy_essence_id 23)
 Define(conflict_and_strife_essence_id 32)
     ]]
+    code = code .. [[
+SpellInfo(rushing_jade_wind chi=0 spec=brewmaster)
+    ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end
