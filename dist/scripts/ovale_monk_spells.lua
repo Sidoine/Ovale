@@ -522,6 +522,7 @@ Define(detox 218164)
 Define(healing_elixir 122281)
     SpellInfo(healing_elixir charge_cd=30 gcd=0 offgcd=1)
 
+    SpellInfo(rising_sun_kick chi=0 spec=mistweaver)
     SpellInfo(rushing_jade_wind chi=0 spec=brewmaster)
 
 ## Stagger
