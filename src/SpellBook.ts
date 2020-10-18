@@ -203,7 +203,7 @@ export class OvaleSpellBookClass {
         wipe(this.isHarmful);
         wipe(this.isHelpful);
         wipe(this.texture);
-        for (let tab = 1; tab <= 2; tab += 1) {
+        for (let tab = 1; tab <= 3; tab += 1) {
             let [name, , offset, numSpells] = GetSpellTabInfo(tab);
             if (name) {
                 this.ScanSpellBook(BOOKTYPE_SPELL, numSpells, offset);
