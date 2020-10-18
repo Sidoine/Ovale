@@ -314,6 +314,38 @@ Define(seraphim_talent 15) #17601
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
     `;
 // END
+    code += `
+Define(blinding_light 115750)
+    SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
+    SpellAddBuff(blinding_light blinding_light=1)
+Define(blinding_light_talent 9)
+Define(divine_shield 642)
+	SpellInfo(divine_shield cd=300 duration=8)
+	SpellInfo(divine_shield add_cd=-90 talent=unbreakable_spirit_talent)
+	SpellAddBuff(divine_shield divine_shield=1)
+	SpellRequire(divine_shield unusable 1=debuff,forbearance_debuff)
+Define(forbearance_debuff 25771)
+    SpellInfo(forbearance_debuff duration=30)
+#hammer_of_wrath
+    SpellInfo(hammer_of_wrath target_health_pct=20)
+Define(lay_on_hands 633)
+    SpellInfo(lay_on_hands cd=600)
+    SpellInfo(lay_on_hands add_cd=-180 talent=unbreakable_spirit_talent)
+    SpellRequire(lay_on_hands unusable 1=target_debuff,forbearance_debuff)
+    SpellAddTargetDebuff(lay_on_hands forbearance_debuff=1)
+Define(shield_of_the_righteous 53600)
+    SpellInfo(shield_of_the_righteous holypower=3)
+    SpellAddBuff(shield_of_the_righteous shield_of_the_righteous_buff=1)
+    SpellRequire(shield_of_the_righteous holypower_percent 0=buff,divine_purpose)
+    SpellAddBuff(shield_of_the_righteous divine_purpose=0)
+Define(shield_of_the_righteous_buff 132403)
+    SpellInfo(shield_of_the_righteous_buff duration=4.5)
+Define(unbreakable_spirit_talent 10)
+Define(word_of_glory 85673)
+    SpellInfo(word_of_glory holypower=3)
+    SpellRequire(word_of_glory holypower_percent 0=buff,divine_purpose)
+    SpellAddBuff(word_of_glory divine_purpose=0)
+    `;
     OvaleScripts.RegisterScript(
         "PALADIN",
         undefined,
