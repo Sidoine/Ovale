@@ -3,7 +3,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { C_LossOfControl, GetTime } from "@wowts/wow-mock";
 import { LuaArray, pairs } from "@wowts/lua";
 import { insert } from "@wowts/table";
-import { sub, upper } from "@wowts/string";
+import { sub, upper, format } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "./Ovale";
 import { OvaleDebugClass, Tracer } from "./Debug";
@@ -55,24 +55,16 @@ export class OvaleLossOfControlClass implements StateModule {
     };
     private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
         this.tracer.Debug(
-            "GetEventInfo:",
-            eventIndex,
-            C_LossOfControl.GetEventInfo(eventIndex)
+            "LOSS_OF_CONTROL_ADDED",
+            format("C_LossOfControl.GetActiveLossOfControlData(%d)", eventIndex),
+            C_LossOfControl.GetActiveLossOfControlData(eventIndex)
         );
-        let [
-            locType,
-            spellID,
-            ,
-            ,
-            startTime,
-            ,
-            duration,
-        ] = C_LossOfControl.GetEventInfo(eventIndex);
+        let lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(eventIndex);
         let data: LossOfControlEventInfo = {
-            locType: upper(locType),
-            spellID: spellID,
-            startTime: startTime || GetTime(),
-            duration: duration || 10,
+            locType: upper(lossOfControlData.locType),
+            spellID: lossOfControlData.spellID,
+            startTime: lossOfControlData.startTime || GetTime(),
+            duration: lossOfControlData.duration || 10,
         };
         insert(this.lossOfControlHistory, data);
     };

@@ -519,5 +519,31 @@ Define(blood_of_the_enemy_essence_id 23)
 Define(conflict_and_strife_essence_id 32)
     `;
 // END
+    code += `
+Define(detox 218164)
+    SpellInfo(detox cd=8)
+Define(healing_elixir 122281)
+    SpellInfo(healing_elixir charge_cd=30 gcd=0 offgcd=1)
+
+    SpellInfo(rising_sun_kick chi=0 spec=!windwalker)
+    SpellInfo(rushing_jade_wind chi=0 spec=!windwalker)
+
+## Stagger
+Define(stagger 115069)
+Define(heavy_stagger_debuff 124273)
+	SpellInfo(heavy_stagger_debuff duration=10 tick=1)
+	SpellInfo(heavy_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
+Define(light_stagger_debuff 124275)
+	SpellInfo(light_stagger_debuff duration=10 tick=1)
+	SpellInfo(light_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
+Define(moderate_stagger_debuff 124274)
+	SpellInfo(moderate_stagger_debuff duration=10 tick=1)
+	SpellInfo(moderate_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
+SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_stagger_debuff)
+SpellInfo(purifying_brew unusable=1)
+SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
+
+Define(bob_and_weave_talent 13)
+    `;
     OvaleScripts.RegisterScript("MONK", undefined, name, desc, code, "include");
 }

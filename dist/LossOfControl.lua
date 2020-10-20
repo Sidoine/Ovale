@@ -8,6 +8,7 @@ local pairs = pairs
 local insert = table.insert
 local sub = string.sub
 local upper = string.upper
+local format = string.format
 local __tools = LibStub:GetLibrary("ovale/tools")
 local OneTimeMessage = __tools.OneTimeMessage
 __exports.OvaleLossOfControlClass = __class(nil, {
@@ -26,13 +27,13 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             self.requirement:UnregisterRequirement("lossofcontrol")
         end
         self.LOSS_OF_CONTROL_ADDED = function(event, eventIndex)
-            self.tracer:Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
-            local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetEventInfo(eventIndex)
+            self.tracer:Debug("LOSS_OF_CONTROL_ADDED", format("C_LossOfControl.GetActiveLossOfControlData(%d)", eventIndex), C_LossOfControl.GetActiveLossOfControlData(eventIndex))
+            local lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(eventIndex)
             local data = {
-                locType = upper(locType),
-                spellID = spellID,
-                startTime = startTime or GetTime(),
-                duration = duration or 10
+                locType = upper(lossOfControlData.locType),
+                spellID = lossOfControlData.spellID,
+                startTime = lossOfControlData.startTime or GetTime(),
+                duration = lossOfControlData.duration or 10
             }
             insert(self.lossOfControlHistory, data)
         end

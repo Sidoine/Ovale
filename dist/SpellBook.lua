@@ -125,7 +125,7 @@ __exports.OvaleSpellBookClass = __class(nil, {
             wipe(self.isHarmful)
             wipe(self.isHelpful)
             wipe(self.texture)
-            for tab = 1, 2, 1 do
+            for tab = 1, 3, 1 do
                 local name, _, offset, numSpells = GetSpellTabInfo(tab)
                 if name then
                     self:ScanSpellBook(BOOKTYPE_SPELL, numSpells, offset)
