@@ -447,10 +447,17 @@
     commander "^4.0.0"
     typescript "^3.9.7"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.16.0", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.6.0":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.16.0", "@wowts/wow-mock@^1.6.0":
   version "1.20.0"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.20.0.tgz#8bbaf0145e90d95dda793c29d6f8cf77f41c1c7a"
   integrity sha512-EYZymr0bCHyOBdyzSc39p+8E8OiuSNWc4BTY+wP9ljdxy6SfVkbpPJJiW+V95KcERpDawAr/Xc37Z60kMjPyrA==
+  dependencies:
+    "@wowts/lua" "^1.3.2"
+
+"@wowts/wow-mock@^1.21.0":
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.21.0.tgz#ab9f82042ef52666f903c69fc114bd62df1b98c4"
+  integrity sha512-TWPn7soWEjGPfzmud6iJh5aEYqp627GX+9F2Q2yzNDTJx1TP0rld45JscnZY5+cXhDwx4vTnO4zma5QZLRQWnw==
   dependencies:
     "@wowts/lua" "^1.3.2"
 

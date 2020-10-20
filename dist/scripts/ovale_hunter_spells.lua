@@ -281,7 +281,7 @@ Define(kill_command_1 259489)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
   SpellInfo(kill_command_1 cd=6 channel=0 focus=-15)
 
-Define(kill_shot 53351)
+Define(kill_shot 320976)
 # You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
 # Rank 2: Kill Shot's critical damage is increased by s1.
   SpellInfo(kill_shot focus=10 cd=10)

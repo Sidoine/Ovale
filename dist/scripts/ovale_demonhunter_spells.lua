@@ -91,17 +91,10 @@ Define(demons_bite 344859)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
   SpellInfo(demons_bite)
 
-Define(disrupt_0 183752)
+Define(disrupt 183752)
 # Interrupts the enemy's spellcasting and locks them from that school of magic for 3 seconds.|cFFFFFFFF?s183782[rnrnGenerates 218903s1 Fury on a successful interrupt.][]|r
-  SpellInfo(disrupt_0 cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
-Define(disrupt_1 183782)
-# Disrupt generates 218903s1 Fury on a successful interrupt.
-  SpellInfo(disrupt_1 channel=0 gcd=0 offgcd=1)
-
-Define(disrupt_2 320361)
-# Increases the range of Disrupt to s+183752r yards.
-  SpellInfo(disrupt_2 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(disrupt_2 disrupt_2=1)
+# Rank 3: Increases the range of Disrupt to s+183752r yards.
+  SpellInfo(disrupt cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(elysian_decree_0 306830)
 # Place a Kyrian Sigil at the target location that activates after 2 seconds.rnrnDetonates to deal 307046s1 Arcane damage and shatter up to s3 Lesser Soul Fragments from enemies affected by the sigil.
   SpellInfo(elysian_decree_0 cd=60 duration=2)
@@ -132,10 +125,10 @@ Define(fel_barrage 258925)
   SpellInfo(fel_barrage cd=60 duration=3 channel=3 tick=0.25 talent=fel_barrage_talent)
   # Unleashing Fel.
   SpellAddBuff(fel_barrage fel_barrage=1)
-Define(fel_bombardment 337775)
-# Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage of your next Throw Glaive by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
-  SpellInfo(fel_bombardment channel=0 gcd=0 offgcd=1)
-  # Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage of your next Throw Glaive by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
+Define(fel_bombardment 337849)
+# Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage that your next Throw Glaive deals to your primary target by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
+  SpellInfo(fel_bombardment max_stacks=5 gcd=0 offgcd=1)
+  # Throw Glaive damage to your primary target increased by w1 and s2 additional Lglaive:glaives; Lis:are; thrown at La:; nearby Lenemy:enemies;.
   SpellAddBuff(fel_bombardment fel_bombardment=1)
 Define(fel_eruption 211881)
 # Impales the target for s1 Chaos damage and stuns them for 4 seconds.
@@ -444,9 +437,10 @@ Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
 Define(throw_glaive 204157)
-# Throw a demonic glaive at the target, dealing s2 Physical damage. The glaive can ricochet to ?s320386[x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
+# Throw a demonic glaive at the target, dealing 346665s1 Physical damage. The glaive can ricochet to ?s320386[346665x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
 # Rank 3: Reduces the cooldown of Throw Glaive by abs(s0/1000) sec.
   SpellInfo(throw_glaive cd=9)
+
 Define(unbound_chaos_0 275147)
 # Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
   SpellInfo(unbound_chaos_0 duration=1 gcd=0 offgcd=1)
@@ -474,7 +468,6 @@ Define(worldvein_resonance_3 298611)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(chaos_nova chaos_nova_0 chaos_nova_1)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
-SpellList(disrupt disrupt_0 disrupt_1 disrupt_2)
 SpellList(elysian_decree elysian_decree_0 elysian_decree_1 elysian_decree_2 elysian_decree_3)
 SpellList(fel_rush fel_rush_0 fel_rush_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)

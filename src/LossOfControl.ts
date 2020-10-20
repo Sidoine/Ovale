@@ -56,17 +56,24 @@ export class OvaleLossOfControlClass implements StateModule {
     private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
         this.tracer.Debug(
             "LOSS_OF_CONTROL_ADDED",
-            format("C_LossOfControl.GetActiveLossOfControlData(%d)", eventIndex),
+            format(
+                "C_LossOfControl.GetActiveLossOfControlData(%d)",
+                eventIndex
+            ),
             C_LossOfControl.GetActiveLossOfControlData(eventIndex)
         );
-        let lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(eventIndex);
-        let data: LossOfControlEventInfo = {
-            locType: upper(lossOfControlData.locType),
-            spellID: lossOfControlData.spellID,
-            startTime: lossOfControlData.startTime || GetTime(),
-            duration: lossOfControlData.duration || 10,
-        };
-        insert(this.lossOfControlHistory, data);
+        let lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(
+            eventIndex
+        );
+        if (lossOfControlData) {
+            let data: LossOfControlEventInfo = {
+                locType: upper(lossOfControlData.locType),
+                spellID: lossOfControlData.spellID,
+                startTime: lossOfControlData.startTime || GetTime(),
+                duration: lossOfControlData.duration || 10,
+            };
+            insert(this.lossOfControlHistory, data);
+        }
     };
     RequireLossOfControlHandler = (
         spellId: number,

@@ -27,15 +27,17 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             self.requirement:UnregisterRequirement("lossofcontrol")
         end
         self.LOSS_OF_CONTROL_ADDED = function(event, eventIndex)
-            self.tracer:Debug("LOSS_OF_CONTROL_ADDED", format("C_LossOfControl.GetActiveLossOfControlData(%d)", eventIndex), C_LossOfControl.GetActiveLossOfControlData(eventIndex))
-            local lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(eventIndex)
-            local data = {
-                locType = upper(lossOfControlData.locType),
-                spellID = lossOfControlData.spellID,
-                startTime = lossOfControlData.startTime or GetTime(),
-                duration = lossOfControlData.duration or 10
-            }
-            insert(self.lossOfControlHistory, data)
+            self.tracer:Debug("LOSS_OF_CONTROL_ADDED", format("C_LossOfControl.GetActiveLossOfControlData(%d)", eventIndex), C_LossOfControl:GetActiveLossOfControlData(eventIndex))
+            local lossOfControlData = C_LossOfControl:GetActiveLossOfControlData(eventIndex)
+            if lossOfControlData then
+                local data = {
+                    locType = upper(lossOfControlData.locType),
+                    spellID = lossOfControlData.spellID,
+                    startTime = lossOfControlData.startTime or GetTime(),
+                    duration = lossOfControlData.duration or 10
+                }
+                insert(self.lossOfControlHistory, data)
+            end
         end
         self.RequireLossOfControlHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false

@@ -16,11 +16,6 @@ Define(backdraft 196406)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(berserking_buff 200953)
-# Rampage and Execute have a chance to activate Berserking, increasing your attack speed and critical strike chance by 200953s1 every 200951t1 sec for 12 seconds.
-  SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
-  # Attack speed and critical strike chance increased by s1.
-  SpellAddBuff(berserking_buff berserking_buff=1)
 Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6 talent=bilescourge_bombers_talent)
@@ -118,6 +113,11 @@ Define(dark_soul_instability 113858)
   SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 gcd=0 offgcd=1 talent=dark_soul_instability_talent)
   # Critical strike chance increased by w1.
   SpellAddBuff(dark_soul_instability dark_soul_instability=1)
+Define(dark_soul_misery 113860)
+# Infuses your soul with the misery of fallen foes, increasing haste by (25 of Spell Power) for 20 seconds.
+  SpellInfo(dark_soul_misery cd=120 duration=20 gcd=0 offgcd=1 talent=dark_soul_misery_talent)
+  # Haste increased by s1.
+  SpellAddBuff(dark_soul_misery dark_soul_misery=1)
 Define(demonbolt 264178)
 # Send the fiery soul of a fallen demon at the enemy, causing (73.4 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
@@ -449,6 +449,8 @@ Define(channel_demonfire_talent 20) #23144
 # Launches s1 bolts of felfire over 3 seconds at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals (19.36 of Spell Power) Fire damage to the target and (7.7 of Spell Power) Fire damage to nearby enemies.
 Define(dark_soul_instability_talent 21) #23092
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
+Define(dark_soul_misery_talent 21) #19293
+# Infuses your soul with the misery of fallen foes, increasing haste by (25 of Spell Power) for 20 seconds.
 Define(demonic_consumption_talent 20) #22479
 # Your Demon Commander now drains 267971s2 of the life from your demon servants to empower himself.
 Define(demonic_strength_talent 3) #23138
@@ -460,7 +462,7 @@ Define(drain_soul_talent 3) #23141
 Define(eradication_talent 2) #22090
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
 Define(fire_and_brimstone_talent 11) #22043
-# Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard Fragment for each additional enemy hit.
+# Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard LFragment:Fragments; for each additional enemy hit.
 Define(flashover_talent 1) #22038
 # Conflagrate deals s3 increased damage and grants an additional charge of Backdraft.
 Define(grimoire_of_sacrifice_talent 18) #19295

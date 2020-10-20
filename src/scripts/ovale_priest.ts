@@ -85,8 +85,12 @@ AddFunction disciplinebooncdpostconditions
 
 AddFunction discipline_defaultmainactions
 {
+ #mindbender,if=talent.mindbender.enabled
+ if hastalent(mindbender_talent) spell(mindbender)
  #berserking
  spell(berserking)
+ #shadow_covenant
+ spell(shadow_covenant)
  #purge_the_wicked,if=!ticking
  if not target.debuffpresent(purge_the_wicked_debuff) spell(purge_the_wicked)
  #shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
@@ -117,17 +121,12 @@ AddFunction discipline_defaultmainpostconditions
 
 AddFunction discipline_defaultshortcdactions
 {
- #mindbender,if=talent.mindbender.enabled
- if hastalent(mindbender_talent) spell(mindbender)
-
- unless spell(berserking)
+ unless hastalent(mindbender_talent) and spell(mindbender) or spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
-  #shadow_covenant
-  spell(shadow_covenant)
 
-  unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
+  unless spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
   {
    #shadow_word_death
    spell(shadow_word_death)
@@ -137,7 +136,7 @@ AddFunction discipline_defaultshortcdactions
 
 AddFunction discipline_defaultshortcdpostconditions
 {
- spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+ hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
 }
 
 AddFunction discipline_defaultcdactions
@@ -247,7 +246,7 @@ AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 # Based on SimulationCraft profile "T25_Priest_Shadow".
 #	class=priest
 #	spec=shadow
-#	talents=3111111
+#	talents=1123122
 
 Include(ovale_common)
 Include(ovale_priest_spells)

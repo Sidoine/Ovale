@@ -59,6 +59,8 @@ import {
 import { POOLED_RESOURCE } from "../Power";
 import { Unparser } from "./unparser";
 import { MakeString } from "../tools";
+import { ClassId } from "@wowts/wow-mock";
+import { SpecializationName } from "../PaperDoll";
 
 const OPERAND_TOKEN_PATTERN = "[^.]+";
 
@@ -110,8 +112,8 @@ export class Emiter {
     private AddDisambiguation(
         name: string,
         info: string,
-        className?: string,
-        specialization?: string,
+        className?: ClassId,
+        specialization?: SpecializationName,
         _type?: string
     ) {
         this.AddPerClassSpecialization(
@@ -127,8 +129,8 @@ export class Emiter {
     private Disambiguate(
         annotation: Annotation,
         name: string,
-        className: string,
-        specialization: string,
+        className: ClassId | "ALL_CLASSES",
+        specialization: SpecializationName | "ALL_SPECIALIZATIONS",
         _type?: string
     ): [string, string | undefined] {
         if (className && annotation.dictionary[`${name}_${className}`]) {
@@ -173,8 +175,8 @@ export class Emiter {
         tbl: Disambiguations,
         name: string,
         info: string,
-        className: string | undefined,
-        specialization: string | undefined,
+        className: ClassId | "ALL_CLASSES" | undefined,
+        specialization: SpecializationName | "ALL_SPECIALIZATIONS" | undefined,
         _type: string | undefined
     ) {
         className = className || "ALL_CLASSES";
@@ -189,8 +191,8 @@ export class Emiter {
     private GetPerClassSpecialization(
         tbl: Disambiguations,
         name: string,
-        className: string,
-        specialization: string
+        className: ClassId | "ALL_CLASSES",
+        specialization: SpecializationName | "ALL_SPECIALIZATIONS"
     ) {
         let info;
         while (!info) {
@@ -222,6 +224,13 @@ export class Emiter {
 
     public InitializeDisambiguation() {
         this.AddDisambiguation("none", "none");
+
+        this.AddDisambiguation(
+            "dark_soul",
+            "dark_soul_misery",
+            "WARLOCK",
+            "affliction"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -1267,6 +1276,9 @@ export class Emiter {
                     (modifiers.name && this.unparser.Unparse(modifiers.name)) ||
                     annotation.consumables["potion"];
                 if (name) {
+                    if (name === "disabled") {
+                        return undefined;
+                    }
                     [name] = this.Disambiguate(
                         annotation,
                         `${name}_item`,

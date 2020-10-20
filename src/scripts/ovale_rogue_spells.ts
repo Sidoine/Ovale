@@ -8,7 +8,7 @@ export function registerRogueSpells(OvaleScripts: OvaleScriptsClass) {
     let code = `Define(adrenaline_rush 13750)
 # Increases your Energy regeneration rate by s1, your maximum Energy by s4, and your attack speed by s2 for 20 seconds.
   SpellInfo(adrenaline_rush cd=180 duration=20 gcd=0 offgcd=1)
-  # Energy regeneration increased by w1 and maximum Energy increased by w4.rnAttack speed increased by w2.rn?w5>0[Damage increased by w5.][]
+  # Energy regeneration increased by w1.rnMaximum Energy increased by w4.rnAttack speed increased by w2.rn?w5>0[Damage increased by w5.][]
   SpellAddBuff(adrenaline_rush adrenaline_rush=1)
 Define(ambush 8676)
 # Ambush the target, causing s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
@@ -169,8 +169,8 @@ Define(deadshot_buff 272936)
   SpellInfo(deadshot_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(deathly_shadows_buff 341202)
-# Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 8 seconds.
-  SpellInfo(deathly_shadows_buff duration=8 gcd=0 offgcd=1 combopoints=-5)
+# Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 12 seconds.
+  SpellInfo(deathly_shadows_buff duration=12 gcd=0 offgcd=1 combopoints=-5)
   # Damage increased by w1.
   SpellAddBuff(deathly_shadows_buff deathly_shadows_buff=1)
 Define(dispatch 2098)
@@ -244,7 +244,7 @@ Define(flagellation_2 345390)
 Define(flagellation_3 345569)
 # Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 45 seconds, causing an additional lash for each Combo Point spent.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack up to a maximum of 345569s2/10*345569u for 25 seconds.
   SpellInfo(flagellation_3 cd=5 duration=25 max_stacks=40 gcd=0 offgcd=1)
-  # Haste increased by m1.
+  # Haste increased by s1/10.1.
   SpellAddBuff(flagellation_3 flagellation_3=1)
 Define(focused_azerite_beam_0 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
@@ -471,7 +471,7 @@ Define(ripple_in_space_3 299310)
   SpellInfo(ripple_in_space_3)
 Define(roll_the_bones 315508)
 # Roll the dice of fate, providing a random combat enhancement for 30 seconds.
-  SpellInfo(roll_the_bones energy=50 cd=45 duration=30 channel=30 gcd=1)
+  SpellInfo(roll_the_bones energy=25 cd=45 duration=30 channel=30 gcd=1)
   # Gained a random combat enhancement.
   SpellAddBuff(roll_the_bones roll_the_bones=1)
 Define(rupture 1943)
@@ -506,7 +506,7 @@ Define(shadow_blades_buff 255857)
 
 Define(shadow_dance 185313)
 # Allows use of all Stealth abilities and grants all the combat benefits of Stealth for 8 seconds, and increases damage by s2. Effect not broken from taking damage or attacking. ?s14062[Movement speed while active is increased by 1784s3 and damage dealt is increased by 1784s4. ]?s108209[Abilities cost 112942s1 less while active. ][]?s31223[Attacks from Shadow Dance and for 31223s1 sec after deal 31665s1 more damage.  ][]
-  SpellInfo(shadow_dance cd=60 duration=8 gcd=0 offgcd=1 tick=1)
+  SpellInfo(shadow_dance cd=8 charge_cd=60 duration=8 gcd=0 offgcd=1 tick=1)
   SpellAddBuff(shadow_dance shadow_dance=1)
 Define(shadowmeld 58984)
 # Activate to slip into the shadows, reducing the chance for enemies to detect your presence. Lasts until cancelled or upon moving. Any threat is restored versus enemies still in combat upon cancellation of this effect.
@@ -528,13 +528,10 @@ Define(shiv 5938)
 # Attack with your ?s319032[your poisoned blades][off-hand], dealing sw1 Physical damage, and applying a concentrated form of your ?a3408[Crippling Poison, reducing movement speed by 115196s1 for 5 seconds.]?a5761[Numbing Poison, dispelling all enrage effects.][]?(!a3408&!a5761)[active Non-Lethal poison.][]rn?s319032[rnYour Nature damage done against the target is increased by 319504s1 for 9 seconds.rn][]rn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
 # Rank 2: Shiv now also increases your Nature damage done against the target by 319033s1 for 9 seconds.
   SpellInfo(shiv energy=20 cd=25 gcd=1 combopoints=-1)
-Define(shuriken_storm_0 197835)
+Define(shuriken_storm 197835)
 # Sprays shurikens at up to s4 targets within A1 yards, dealing s1*<CAP>/AP Physical damage.?s319951[rnrnCritical strikes with Shuriken Storm apply Find Weakness for 319949s1 sec.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points; per target hit?a121471[ plus an additional 121471s2][].|r
-  SpellInfo(shuriken_storm_0 energy=35 gcd=1)
-Define(shuriken_storm_1 319951)
-# Shuriken Storm critical strikes apply Find Weakness for s1 sec.
-  SpellInfo(shuriken_storm_1 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shuriken_storm_1 shuriken_storm_1=1)
+# Rank 2: Shuriken Storm critical strikes apply Find Weakness for s1 sec.
+  SpellInfo(shuriken_storm energy=35 gcd=1)
 Define(shuriken_tornado 277925)
 # Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
   SpellInfo(shuriken_tornado energy=60 cd=60 duration=4 gcd=1 tick=1 talent=shuriken_tornado_talent)
@@ -551,7 +548,7 @@ Define(skull_and_crossbones 199603)
   SpellAddBuff(skull_and_crossbones skull_and_crossbones=1)
 Define(slice_and_dice 5171)
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by (25 of Spell Power). Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
-# Rank 2: Slice and Dice increases attack speed by an additional s1.
+# Rank 2: Slice and Dice increases Energy regeneration by s1.
   SpellInfo(slice_and_dice energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
   # Attack speed increased by w1.rnEnergy regeneration increased by w3.?w2!=0[rnRegaining w2 Energy every t2 sec.][]
   SpellAddBuff(slice_and_dice slice_and_dice=1)
@@ -570,9 +567,9 @@ Define(symbols_of_death 212283)
   # Damage done increased by s1.
   SpellAddBuff(symbols_of_death symbols_of_death=1)
 Define(the_rotten_buff 341134)
-# For 3 seconds after activating Symbols of Death, your Shadowstrike and ?s200758[Gloomblade][Backstab] generate 341134s1 additional combo points.
-  SpellInfo(the_rotten_buff duration=3 gcd=0 offgcd=1)
-  # Shadowstrike and ?s200758[Gloomblade][Backstab] generate s1 additional combo points.
+# After activating Symbols of Death, your next Shadowstrike or ?s200758[Gloomblade][Backstab] deals 341134s3 increased damage and generates 341134s1 additional combo points.
+  SpellInfo(the_rotten_buff duration=30 gcd=0 offgcd=1)
+  # Your next Shadowstrike or ?s200758[Gloomblade][Backstab] deals s3 increased damage and generates s1 additional combo points.
   SpellAddBuff(the_rotten_buff the_rotten_buff=1)
 Define(the_unbound_force_0 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
@@ -586,11 +583,16 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
-Define(vanish 11327)
+Define(vanish_0 1856)
 # Allows you to vanish from sight, entering stealth while in combat. For the first 3 seconds after vanishing, damage and harmful effects received will not break stealth. Also breaks movement impairing effects.
-  SpellInfo(vanish duration=3 gcd=0 offgcd=1)
+  SpellInfo(vanish_0 cd=120 channel=0 gcd=0 offgcd=1 combopoints=0)
+  # Improved stealth.
+  SpellAddBuff(vanish_0 vanish_0=1)
+Define(vanish_1 11327)
+# Allows you to vanish from sight, entering stealth while in combat. For the first 3 seconds after vanishing, damage and harmful effects received will not break stealth. Also breaks movement impairing effects.
+  SpellInfo(vanish_1 duration=3 gcd=0 offgcd=1)
   # Improved stealth.?w3!=0[rnMovement speed increased by w3.][]?w4!=0[rnDamage increased by w4.][]
-  SpellAddBuff(vanish vanish=1)
+  SpellAddBuff(vanish_1 vanish_1=1)
 Define(vendetta 79140)
 # Marks an enemy for death for 20 seconds, increasing the damage your abilities and auto attacks deal to the target by s1, and making the target visible to you even through concealments such as stealth and invisibility.rnrnGenerates 256495s1*3 seconds/5 Energy over 3 seconds.
   SpellInfo(vendetta cd=120 duration=20 gcd=0 offgcd=1)
@@ -626,8 +628,8 @@ SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(serrated_bone_spike serrated_bone_spike_0 serrated_bone_spike_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
+SpellList(vanish vanish_0 vanish_1)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
-SpellList(shuriken_storm shuriken_storm_0 shuriken_storm_1)
 Define(alacrity_talent 17) #19249
 # Your finishing moves have a s2 chance per combo point to grant 193538s1 Haste for 20 seconds, stacking up to 193538u times.
 Define(blade_rush_talent 20) #23075

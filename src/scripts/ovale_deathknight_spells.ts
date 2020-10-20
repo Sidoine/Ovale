@@ -323,9 +323,9 @@ Define(obliterate 49020)
   SpellInfo(obliterate runes=2 runicpower=-20)
 
 Define(pillar_of_frost 51271)
-# The power of frost increases your Strength by s1 for 15 seconds.rnrnEach Rune spent while active increases your Strength by an additional s2.
+# The power of frost increases your Strength by s1 for 12 seconds.rnrnEach Rune spent while active increases your Strength by an additional s2.
 # Rank 2: Increases Strength by s1.
-  SpellInfo(pillar_of_frost cd=45 duration=15 gcd=0 offgcd=1)
+  SpellInfo(pillar_of_frost cd=60 duration=12 gcd=0 offgcd=1)
   # Strength increased by w1.
   SpellAddBuff(pillar_of_frost pillar_of_frost=1)
 Define(purifying_blast_0 295337)
@@ -370,14 +370,11 @@ Define(razor_coral_3 303570)
 Define(razor_coral_4 303572)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
-Define(razorice_0 50401)
+Define(razorice 51714)
 # Engrave your weapon with a rune that causes 50401s1 extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 51714s1, stacking up to 51714u times. ?a332944[][rnrnModifying your rune requires a Runeforge in Ebon Hold.]
-  SpellInfo(razorice_0 gcd=0 offgcd=1)
-Define(razorice_1 51714)
-# Engrave your weapon with a rune that causes 50401s1 extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 51714s1, stacking up to 51714u times. ?a332944[][rnrnModifying your rune requires a Runeforge in Ebon Hold.]
-  SpellInfo(razorice_1 duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)
+  SpellInfo(razorice duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)
   # Frost damage taken from the Death Knight's abilities increased by s1.
-  SpellAddTargetDebuff(razorice_1 razorice_1=1)
+  SpellAddTargetDebuff(razorice razorice=1)
 Define(reaping_flames_0 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames_0 cd=45 channel=0)
@@ -498,7 +495,6 @@ SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 foc
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(ineffable_truth )
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
-SpellList(razorice razorice_0 razorice_1)
 SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)

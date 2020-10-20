@@ -183,22 +183,22 @@ Define(guardian_of_azeroth_5 303347)
 
 Define(heart_of_the_wild_0 108291)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-  SpellInfo(heart_of_the_wild_0 cd=300 duration=45 gcd=0 offgcd=1)
+  SpellInfo(heart_of_the_wild_0 cd=300 duration=45)
   # Damage of your Balance spells increased by s1, and Starsurge is instant.
   SpellAddBuff(heart_of_the_wild_0 heart_of_the_wild_0=1)
 Define(heart_of_the_wild_1 108292)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-  SpellInfo(heart_of_the_wild_1 cd=300 duration=45 gcd=0 offgcd=1)
+  SpellInfo(heart_of_the_wild_1 cd=300 duration=45)
   # Damage of your Feral abilities increased by s1, and critical strikes with attacks that generate a combo point generate an additional combo point.
   SpellAddBuff(heart_of_the_wild_1 heart_of_the_wild_1=1)
 Define(heart_of_the_wild_2 108293)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-  SpellInfo(heart_of_the_wild_2 cd=300 duration=45 gcd=0 offgcd=1)
+  SpellInfo(heart_of_the_wild_2 cd=300 duration=45)
   # Bear Form gives an additional s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration gains an extra charge.
   SpellAddBuff(heart_of_the_wild_2 heart_of_the_wild_2=1)
 Define(heart_of_the_wild_3 108294)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-  SpellInfo(heart_of_the_wild_3 cd=300 duration=45 gcd=0 offgcd=1)
+  SpellInfo(heart_of_the_wild_3 cd=300 duration=45)
   # Healing of your Restoration spells increased by s1, and mana costs reduced by s3.
   SpellAddBuff(heart_of_the_wild_3 heart_of_the_wild_3=1)
 Define(heart_of_the_wild_4 319454)
@@ -289,7 +289,7 @@ Define(oath_of_the_elder_druid 338643)
   # You have recently gained Heart of the Wild from Oath of the Elder Druid.
   SpellAddBuff(oath_of_the_elder_druid oath_of_the_elder_druid=1)
 Define(primal_wrath 285381)
-# Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for 4 secrn   2 points: s1*3 plus Rip for 6 secrn   3 points: s3*4 plus Rip for 8 secrn   4 points: s4*5 plus Rip for 10 secrn   5 points: s5*6 plus Rip for 12 sec
+# Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
   SpellInfo(primal_wrath energy=20 combopoints=1 gcd=1 talent=primal_wrath_talent)
 Define(prowl_0 5215)
 # Shift into Cat Form and enter stealth.
@@ -310,7 +310,7 @@ Define(prowl_2 102547)
   SpellAddBuff(prowl_2 prowl_2=1)
 Define(pulverize 80313)
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage and reduce the damage they deal to you by s2 for 10 seconds.
-  SpellInfo(pulverize cd=30 duration=10 talent=pulverize_talent)
+  SpellInfo(pulverize cd=45 duration=10 talent=pulverize_talent)
   # Dealing w2 reduced damage to @auracaster.
   SpellAddTargetDebuff(pulverize pulverize=1)
 Define(purifying_blast_0 295337)
@@ -347,14 +347,14 @@ Define(rake_debuff 155722)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
 Define(ravenous_frenzy_0 323546)
-# For 15 seconds, Druid spells you cast increase your damage, healing, and haste by s1, stacking.rnrnIf you spend s9/10.1 sec idle, the Frenzy overcomes you, consuming s3 of your health per stack, stunning you for 1 second, and ending.
-  SpellInfo(ravenous_frenzy_0 cd=180 duration=15 max_stacks=99 gcd=0 offgcd=1 tick=0.1)
-  # Damage, healing, and haste increased by ?<w6<1>[w1.rnrnIf you spend s9~/10.1 sec idle, the Frenzy consumes w3 of your health and ends.][w6.]
+# For 20 seconds, Druid spells you cast increase your damage and healing by s1, and haste by s3, stacking.rnrnIf you spend s9/10 sec idle, the Frenzy overcomes you, consuming s3 of your health per stack, stunning you for 1 second, and ending.
+  SpellInfo(ravenous_frenzy_0 cd=180 duration=20 max_stacks=99 gcd=0 offgcd=1 tick=0.1)
+  # ?<w6<1>[Damage and healing increased by w1 and haste increased by w3.rnrnIf you spend s9~/10 sec idle, the Frenzy consumes w3 of your health and ends.][Damage and healing increased by w6 and haste increased by w8.]
   SpellAddBuff(ravenous_frenzy_0 ravenous_frenzy_0=1)
-  # Damage, healing, and haste increased by ?<w6<1>[w1.rnrnIf you spend s9~/10.1 sec idle, the Frenzy consumes w3 of your health and ends.][w6.]
+  # ?<w6<1>[Damage and healing increased by w1 and haste increased by w3.rnrnIf you spend s9~/10 sec idle, the Frenzy consumes w3 of your health and ends.][Damage and healing increased by w6 and haste increased by w8.]
   SpellAddTargetDebuff(ravenous_frenzy_0 ravenous_frenzy_0=1)
 Define(ravenous_frenzy_1 323557)
-# For 15 seconds, Druid spells you cast increase your damage, healing, and haste by s1, stacking.rnrnIf you spend s9/10.1 sec idle, the Frenzy overcomes you, consuming s3 of your health per stack, stunning you for 1 second, and ending.
+# For 20 seconds, Druid spells you cast increase your damage and healing by s1, and haste by s3, stacking.rnrnIf you spend s9/10 sec idle, the Frenzy overcomes you, consuming s3 of your health per stack, stunning you for 1 second, and ending.
   SpellInfo(ravenous_frenzy_1 duration=1 gcd=0 offgcd=1)
   # Stunned.
   SpellAddBuff(ravenous_frenzy_1 ravenous_frenzy_1=1)
@@ -491,22 +491,12 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
-Define(thorns_0 236696)
-# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals up to 203728s2 of the attackers total health in Nature damage.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
+Define(thorns 305496)
+# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals (120 of Spell Power) Nature damage back to the attacker.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
 # Rank 1: When struck in combat you have a chance to inflict 15438s1 Arcane damage to the attacker.
-  SpellInfo(thorns_0 cd=45 duration=12 gcd=1)
-  # Melee attackers take Nature damage when hit and their movement speed is slowed by 232559s1 for 232559d.
-  SpellAddBuff(thorns_0 thorns_0=1)
-Define(thorns_1 305496)
-# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals (120 of Spell Power) Nature damage back to the attacker.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
-  SpellInfo(thorns_1 cd=0.5 channel=0 gcd=0 offgcd=1)
+  SpellInfo(thorns cd=0.5 channel=0 gcd=0 offgcd=1)
   # Deals Nature damage to attackers when hit by melee attacks and reduces their movement speed.
-  SpellAddBuff(thorns_1 thorns_1=1)
-Define(thorns_2 305497)
-# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals (120 of Spell Power) Nature damage back to the attacker.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
-  SpellInfo(thorns_2 cd=45 duration=12 gcd=1)
-  # Melee attackers take Nature damage when hit and their movement speed is slowed by 232559s1 for 232559d.
-  SpellAddBuff(thorns_2 thorns_2=1)
+  SpellAddBuff(thorns thorns=1)
 Define(tigers_fury 5217)
 # Instantly restores s2 Energy, and increases the damage of all your attacks by s1 for their full duration. Lasts 10 seconds.
 # Rank 2: Tiger's Fury generates an additional s1 energy.
@@ -575,7 +565,6 @@ SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(shred shred_0 shred_1 shred_2)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
-SpellList(thorns thorns_0 thorns_1 thorns_2)
 SpellList(wild_charge wild_charge_0 wild_charge_1 wild_charge_2 wild_charge_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(empower_bond empower_bond_0 empower_bond_1 empower_bond_2)
@@ -606,7 +595,7 @@ Define(lunar_inspiration_talent 3) #22365
 Define(mighty_bash_talent 10) #21778
 # Invokes the spirit of Ursoc to stun the target for 4 seconds. Usable in all shapeshift forms.
 Define(primal_wrath_talent 18) #22370
-# Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for 4 secrn   2 points: s1*3 plus Rip for 6 secrn   3 points: s3*4 plus Rip for 8 secrn   4 points: s4*5 plus Rip for 10 secrn   5 points: s5*6 plus Rip for 12 sec
+# Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
 Define(pulverize_talent 21) #22425
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage and reduce the damage they deal to you by s2 for 10 seconds.
 Define(sabertooth_talent 2) #22364
@@ -614,7 +603,7 @@ Define(sabertooth_talent 2) #22364
 Define(savage_roar_talent 14) #18579
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
 Define(starlord_talent 14) #21706
-# Starsurge and Starfall grant you 279709s1 Haste for 20 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
+# Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
 Define(stellar_drift_talent 16) #22389
 # Increases Starfall's duration by s1/1000 sec, its damage by s2, and allows you to cast while moving while it is active.
 Define(wild_fleshrending_trait 279527)
