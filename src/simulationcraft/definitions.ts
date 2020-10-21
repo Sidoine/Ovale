@@ -309,7 +309,8 @@ export type SimcBinaryOperatorType =
     | "*"
     | "-"
     | ">?"
-    | "<?";
+    | "<?"
+    | "%%";
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
@@ -540,6 +541,7 @@ export interface MiscOperand {
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
+    ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
     ["cp_max_spend"]: { name: "maxcombopoints" },
@@ -686,6 +688,10 @@ export let BINARY_OPERATOR: {
         1: "arithmetic",
         2: 25,
         3: "associative",
+    },
+    ["%%"]: {
+        1: "arithmetic",
+        2: 40,
     },
 };
 

@@ -8,9 +8,9 @@
             "type": "node",
             "request": "launch",
             "name": "SimulationCraft",
-            "program": "${workspaceFolder}/dist/utils/importsimc.js",
+            "program": "${workspaceFolder}/dist/src/utils/importsimc.js",
             "protocol": "inspector",
-            "args": ["../../simc/", "T24_Warrior_Fury.simc"],
+            "args": ["../../simc/", "T25_Druid_Balance.simc"],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {

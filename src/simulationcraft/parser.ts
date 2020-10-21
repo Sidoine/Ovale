@@ -142,10 +142,14 @@ const MATCHES: LuaArray<TokenizerDefinition> = {
         2: Tokenize,
     },
     11: {
-        1: "^.",
+        1: "^%%%%",
         2: Tokenize,
     },
     12: {
+        1: "^.",
+        2: Tokenize,
+    },
+    13: {
         1: "^$",
         2: NoToken,
     },

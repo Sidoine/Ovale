@@ -238,6 +238,10 @@ __exports.MISC_OPERAND = {
     ["active_enemies"] = {
         name = "enemies"
     },
+    ["astral_power"] = {
+        name = "astralpower",
+        modifiers = powerModifiers
+    },
     ["chi"] = {
         name = "chi",
         modifiers = powerModifiers
@@ -438,6 +442,10 @@ __exports.BINARY_OPERATOR = {
         [1] = "arithmetic",
         [2] = 25,
         [3] = "associative"
+    },
+    ["%%"] = {
+        [1] = "arithmetic",
+        [2] = 40
     }
 }
 __exports.OPTIONAL_SKILLS = {

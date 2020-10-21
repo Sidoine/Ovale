@@ -776,7 +776,7 @@ export class Emiter {
         const op =
             (modifiers.op && this.unparser.Unparse(modifiers.op)) || "min";
         if (!modifiers.name) {
-            this.tracer.Error("Modifier name is missing");
+            this.tracer.Error("Modifier name is missing in %s", action);
             return;
         }
         const name = this.unparser.Unparse(modifiers.name);
@@ -812,7 +812,7 @@ export class Emiter {
     ) => {
         let op = (modifier.op && this.unparser.Unparse(modifier.op)) || "set";
         if (!modifier.name) {
-            this.tracer.Error("Modifier name is missing");
+            this.tracer.Error("Modifier name is missing in %s", action);
             return;
         }
         let name = this.unparser.Unparse(modifier.name);
@@ -1669,6 +1669,8 @@ export class Emiter {
                     operator = "==";
                 } else if (parseNodeOperator == "%") {
                     operator = "/";
+                } else if (parseNodeOperator === "%%") {
+                    operator = "%";
                 } else if (
                     parseNode.operatorType == "compare" ||
                     parseNode.operatorType == "arithmetic"

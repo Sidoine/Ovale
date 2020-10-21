@@ -328,7 +328,7 @@ __exports.Emiter = __class(nil, {
         self.EmitVariable = function(nodeList, annotation, modifier, parseNode, action, conditionNode)
             local op = (modifier.op and self.unparser:Unparse(modifier.op)) or "set"
             if  not modifier.name then
-                self.tracer:Error("Modifier name is missing")
+                self.tracer:Error("Modifier name is missing in %s", action)
                 return 
             end
             local name = self.unparser:Unparse(modifier.name)
@@ -852,6 +852,8 @@ __exports.Emiter = __class(nil, {
                         operator = "=="
                     elseif parseNodeOperator == "%" then
                         operator = "/"
+                    elseif parseNodeOperator == "%%" then
+                        operator = "%"
                     elseif parseNode.operatorType == "compare" or parseNode.operatorType == "arithmetic" then
                         if parseNodeOperator ~= "~" and parseNodeOperator ~= "!~" then
                             operator = parseNodeOperator
@@ -2386,7 +2388,7 @@ __exports.Emiter = __class(nil, {
     emitCyclingVariable = function(self, nodeList, annotation, modifiers, parseNode, action, conditionNode)
         local op = (modifiers.op and self.unparser:Unparse(modifiers.op)) or "min"
         if  not modifiers.name then
-            self.tracer:Error("Modifier name is missing")
+            self.tracer:Error("Modifier name is missing in %s", action)
             return 
         end
         local name = self.unparser:Unparse(modifiers.name)

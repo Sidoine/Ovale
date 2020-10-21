@@ -62,6 +62,11 @@ Define(cat_form 768)
   SpellInfo(cat_form)
   # Autoattack damage increased by w4.rnImmune to Polymorph effects.rnMovement speed increased by 113636s1 and falling damage reduced.
   SpellAddBuff(cat_form cat_form=1)
+Define(celestial_alignment 194223)
+# Celestial bodies align, maintaining both Eclipses and granting s1 haste for 20 seconds.
+  SpellInfo(celestial_alignment cd=180 duration=20 gcd=0 offgcd=1)
+  # Both Eclipses active. Haste increased by w1.
+  SpellAddBuff(celestial_alignment celestial_alignment=1)
 Define(clearcasting_0 79684)
 # For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.?a321758[rnrnArcane Missiles fires 321758s2 additional missile.][]
   SpellInfo(clearcasting_0 channel=0 gcd=0 offgcd=1)
@@ -154,6 +159,23 @@ Define(focused_azerite_beam_3 299338)
   SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
+Define(force_of_nature 205636)
+# Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
+  SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
+  # Granting s5/10*d Astral Power over d.
+  SpellAddBuff(force_of_nature force_of_nature=1)
+
+Define(full_moon_0 202771)
+# Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
+  SpellInfo(full_moon_0 cd=15 lunarpower=-40)
+Define(full_moon_1 274283)
+# Deals m1 Astral damage to the target and nearby enemies, and resets Full Moon to become New Moon. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
+  SpellInfo(full_moon_1 cd=25 lunarpower=-40)
+Define(fury_of_elune 202770)
+# Calls down a beam of pure celestial energy that follows the enemy, dealing up to <dmg> Astral damage over 8 seconds within its area. Damage reduced on secondary targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
+  SpellInfo(fury_of_elune cd=60 duration=8 tick=0.5 talent=fury_of_elune_talent)
+  # Generating m3/10/t3*d Astral Power over d.
+  SpellAddBuff(fury_of_elune fury_of_elune=1)
 Define(galactic_guardian 203964)
 # Your damage has a h chance to trigger a free automatic Moonfire on that target. rnrnWhen this occurs, the next Moonfire you cast generates 213708m1/10 Rage, and deals 213708s3 increased direct damage.
   SpellInfo(galactic_guardian channel=0 gcd=0 offgcd=1 talent=galactic_guardian_talent)
@@ -181,6 +203,12 @@ Define(guardian_of_azeroth_4 300091)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
 
+Define(half_moon_0 202768)
+# Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+  SpellInfo(half_moon_0 cd=15 lunarpower=-20)
+Define(half_moon_1 274282)
+# Deals (150 of Spell Power) Astral damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+  SpellInfo(half_moon_1 cd=25 lunarpower=-20)
 Define(heart_of_the_wild_0 108291)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
   SpellInfo(heart_of_the_wild_0 cd=300 duration=45)
@@ -238,6 +266,10 @@ Define(ironfur 192081)
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
   # Armor increased by w1*AGI/100.
   SpellAddBuff(ironfur ironfur=1)
+Define(kindred_spirits 56315)
+# Increases your maximum Focus and your pet's maximum Focus by (25 of Spell Power).
+  SpellInfo(kindred_spirits channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(kindred_spirits kindred_spirits=1)
 Define(lunar_inspiration 155580)
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
   SpellInfo(lunar_inspiration channel=0 gcd=0 offgcd=1 talent=lunar_inspiration_talent)
@@ -283,14 +315,32 @@ Define(moonkin_form 24858)
   SpellInfo(moonkin_form)
   # Spell damage increased by s9.rnImmune to Polymorph effects.?w3>0[rnArmor increased by w3.][]
   SpellAddBuff(moonkin_form moonkin_form=1)
+Define(new_moon 274281)
+# Deals m1 Astral damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+  SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10 talent=new_moon_talent)
 Define(oath_of_the_elder_druid 338643)
 # Effects of Thick Hide, Astral Influence, Feline Swiftness, and Ysera's Gift increased by s1.rnrnWhen you shift into your Affinity's form, you gain Heart of the Wild for s2 sec, once every 60 seconds.
   SpellInfo(oath_of_the_elder_druid duration=60 gcd=0 offgcd=1)
   # You have recently gained Heart of the Wild from Oath of the Elder Druid.
   SpellAddBuff(oath_of_the_elder_druid oath_of_the_elder_druid=1)
+Define(oneths_clear_vision 339797)
+# Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
+  SpellInfo(oneths_clear_vision duration=30 gcd=0 offgcd=1)
+  # Your next Starsurge costs no Astral Power.
+  SpellAddBuff(oneths_clear_vision oneths_clear_vision=1)
+Define(oneths_perception 339800)
+# Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
+  SpellInfo(oneths_perception duration=30 gcd=0 offgcd=1)
+  # Your next Starfall costs no Astral Power.
+  SpellAddBuff(oneths_perception oneths_perception=1)
 Define(primal_wrath 285381)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
   SpellInfo(primal_wrath energy=20 combopoints=1 gcd=1 talent=primal_wrath_talent)
+Define(primordial_arcanic_pulsar 338825)
+# Every s1 Astral Power spent grants Celestial Alignment for s2 sec.
+  SpellInfo(primordial_arcanic_pulsar max_stacks=10 gcd=0 offgcd=1)
+  # w1~ Arcane Power collected by Primordial Arcanic Pulsar.
+  SpellAddBuff(primordial_arcanic_pulsar primordial_arcanic_pulsar=1)
 Define(prowl_0 5215)
 # Shift into Cat Form and enter stealth.
   SpellInfo(prowl_0 cd=6 gcd=0 offgcd=1)
@@ -457,6 +507,17 @@ Define(solar_beam 78675)
   # Silenced.
   SpellAddBuff(solar_beam solar_beam=1)
 
+Define(solstice_buff 343648)
+# During the first 6 seconds of every Eclipse, Shooting Stars fall 343648s1 more often.
+  SpellInfo(solstice_buff duration=6 gcd=0 offgcd=1)
+  # Shooting Stars fall w1 more often.
+  SpellAddBuff(solstice_buff solstice_buff=1)
+Define(starfall 191034)
+# Calls down waves of falling stars upon enemies within 50286A1 yds, dealing <damage> Astral damage over 8 seconds.?s327541[rnrnExtends the duration of active Moonfires and Sunfires by 327541s1 sec.][]
+# Rank 2: Casting Starfall extends the duration of active Moonfires and Sunfires by s1 sec.
+  SpellInfo(starfall lunarpower=50 duration=8 tick=8)
+  # Calling down falling stars on nearby enemies.
+  SpellAddBuff(starfall starfall=1)
 Define(starfire 194153)
 # Call down a burst of energy, causing (76.5 of Spell Power) Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(starfire lunarpower=-8)
@@ -464,6 +525,11 @@ Define(starsurge 78674)
 # Launch a surge of stellar energies at the target, dealing (206.99999999999997 of Spell Power) Astral damage, and empowering the damage bonus of any active Eclipse for its duration.
 # Rank 2: Starsurge further empowers the damage bonus of any active Eclipse.
   SpellInfo(starsurge lunarpower=30)
+Define(stellar_flare 202347)
+# Burns the target for (12.5 of Spell Power) Astral damage, and then an additional o2 damage over 24 seconds.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+  SpellInfo(stellar_flare duration=24 lunarpower=-8 tick=2 talent=stellar_flare_talent)
+  # Suffering w2 Astral damage every t2 sec.
+  SpellAddTargetDebuff(stellar_flare stellar_flare=1)
 Define(sudden_ambush_buff 340698)
 # Finishing moves have a |cFFFFFFFFs1.1|r chance per combo point spent to make your next Rake or Shred deal damage as though you were stealthed. 
   SpellInfo(sudden_ambush_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
@@ -517,6 +583,11 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(warrior_of_elune 202425)
+# Your next n Starfires are instant cast and generate s2 increased Astral Power.
+  SpellInfo(warrior_of_elune cd=45 channel=-0.001 gcd=0 offgcd=1 talent=warrior_of_elune_talent)
+  # Starfire is instant cast and generates s2 increased Astral Power.
+  SpellAddBuff(warrior_of_elune warrior_of_elune=1)
 Define(wild_charge_0 16979)
 # Charge to an enemy, immobilizing them for 4 seconds.
   SpellInfo(wild_charge_0 cd=15 gcd=0 offgcd=1)
@@ -550,6 +621,9 @@ Define(worldvein_resonance_3 298611)
 Define(wrath 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath lunarpower=0)
+SpellList(full_moon full_moon_0 full_moon_1)
+SpellList(half_moon half_moon_0 half_moon_1)
+SpellList(ravenous_frenzy ravenous_frenzy_0 ravenous_frenzy_1)
 SpellList(berserk berserk_0 berserk_1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(clearcasting clearcasting_0 clearcasting_1 clearcasting_2)
@@ -569,7 +643,6 @@ SpellList(wild_charge wild_charge_0 wild_charge_1 wild_charge_2 wild_charge_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(empower_bond empower_bond_0 empower_bond_1 empower_bond_2)
 SpellList(heart_of_the_wild heart_of_the_wild_0 heart_of_the_wild_1 heart_of_the_wild_2 heart_of_the_wild_3 heart_of_the_wild_4)
-SpellList(ravenous_frenzy ravenous_frenzy_0 ravenous_frenzy_1)
 Define(balance_affinity_talent 7) #22163
 # You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628rn@spellicon197630 @spellname197630rn@spellicon132469@spellname132469
 Define(bloodtalons_talent 20) #21649
@@ -582,6 +655,10 @@ Define(feral_affinity_talent_guardian 8) #22156
 # You gain:rnrn@spellicon131768 @spellname131768rnIncreases your movement speed by (25 of Spell Power).rnrnYou also learn:rnrn@spellicon1822 @spellname1822rn@spellicon1079 @spellname1079rn@spellicon22570 @spellname22570rnrnYour energy regeneration is increased by s2.
 Define(feral_frenzy_talent 21) #21653
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
+Define(force_of_nature_talent 3) #22387
+# Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
+Define(fury_of_elune_talent 20) #21193
+# Calls down a beam of pure celestial energy that follows the enemy, dealing up to <dmg> Astral damage over 8 seconds within its area. Damage reduced on secondary targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
 Define(galactic_guardian_talent 14) #21707
 # Your damage has a h chance to trigger a free automatic Moonfire on that target. rnrnWhen this occurs, the next Moonfire you cast generates 213708m1/10 Rage, and deals 213708s3 increased direct damage.
 Define(heart_of_the_wild_talent 12) #18577
@@ -594,6 +671,8 @@ Define(lunar_inspiration_talent 3) #22365
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
 Define(mighty_bash_talent 10) #21778
 # Invokes the spirit of Ursoc to stun the target for 4 seconds. Usable in all shapeshift forms.
+Define(new_moon_talent 21) #21655
+# Deals m1 Astral damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(primal_wrath_talent 18) #22370
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
 Define(pulverize_talent 21) #22425
@@ -602,10 +681,18 @@ Define(sabertooth_talent 2) #22364
 # Ferocious Bite deals s1 increased damage and increases the duration of Rip on your target by s2 sec per combo point spent.
 Define(savage_roar_talent 14) #18579
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
+Define(soul_of_the_forest_talent 13) #18580
+# Eclipse increases Wrath's Astral power generation s1, and increases Starfire's area effect damage by s2.
 Define(starlord_talent 14) #21706
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
 Define(stellar_drift_talent 16) #22389
 # Increases Starfall's duration by s1/1000 sec, its damage by s2, and allows you to cast while moving while it is active.
+Define(stellar_flare_talent 18) #22165
+# Burns the target for (12.5 of Spell Power) Astral damage, and then an additional o2 damage over 24 seconds.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+Define(twin_moons_talent 17) #21712
+# Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
+Define(warrior_of_elune_talent 2) #22386
+# Your next n Starfires are instant cast and generate s2 increased Astral Power.
 Define(wild_fleshrending_trait 279527)
     `;
 // END
