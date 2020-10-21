@@ -533,6 +533,8 @@ Define(healing_elixir 122281)
 
     SpellInfo(rising_sun_kick chi=0 spec=!windwalker)
     SpellInfo(rushing_jade_wind chi=0 spec=!windwalker)
+    
+    SpellRequire(storm_earth_and_fire unusable 1=buff,storm_earth_and_fire)
 
 ## Stagger
 Define(stagger 115069)
