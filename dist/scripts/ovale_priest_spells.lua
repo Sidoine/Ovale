@@ -71,7 +71,7 @@ Define(bloodlust 2825)
   # Haste increased by w1.
   SpellAddBuff(bloodlust bloodlust=1)
 Define(devouring_plague 335467)
-# Afflicts the target with a disease that instantly causes (85 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
+# Afflicts the target with a disease that instantly causes (76.5 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
   SpellInfo(devouring_plague insanity=5000 duration=6 tick=3)
   # Suffering s2 damage every t2 sec.
   SpellAddTargetDebuff(devouring_plague devouring_plague=1)
@@ -140,7 +140,7 @@ Define(quaking_palm 107079)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(schism 214621)
-# Attack the enemy's soul with a surge of Shadow energy, dealing (129 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
+# Attack the enemy's soul with a surge of Shadow energy, dealing (150 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
   SpellInfo(schism cd=24 duration=9 talent=schism_talent)
   # Taking s2 increased damage from the Priest.
   SpellAddTargetDebuff(schism schism=1)
@@ -159,9 +159,9 @@ Define(shadow_word_pain 589)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain=1)
 Define(shadowfiend 34433)
-# Summons a shadowy fiend to attack the target for 10 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
+# Summons a shadowy fiend to attack the target for 15 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
 # Rank 2: Your Shadowfiend now restores m1 mana to you whenever it attacks.
-  SpellInfo(shadowfiend cd=180 duration=10)
+  SpellInfo(shadowfiend cd=180 duration=15)
   # 343726
   SpellAddBuff(shadowfiend shadowfiend=1)
 Define(shadowform 232698)
@@ -210,7 +210,7 @@ Define(power_word_solace_talent 9) #19755
 Define(purge_the_wicked_talent 16) #22161
 # Cleanses the target with fire, causing (24.8 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
 Define(schism_talent 3) #22329
-# Attack the enemy's soul with a surge of Shadow energy, dealing (129 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
+# Attack the enemy's soul with a surge of Shadow energy, dealing (150 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
 Define(shadow_covenant_talent 15) #19766
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
 Define(unbridled_fury_item 169299)

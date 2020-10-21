@@ -594,6 +594,9 @@ __exports.Emiter = __class(nil, {
                 elseif action == "potion" then
                     local name = (modifiers.name and self.unparser:Unparse(modifiers.name)) or annotation.consumables["potion"]
                     if name then
+                        if name == "disabled" then
+                            return nil
+                        end
                         name = self:Disambiguate(annotation, name .. "_item", className, specialization, "item")
                         bodyCode = format("Item(%s usable=1)", name)
                         conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
@@ -2331,6 +2334,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

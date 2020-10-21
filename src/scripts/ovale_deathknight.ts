@@ -48,12 +48,16 @@ AddFunction bloodstandardmainactions
 {
  #death_strike,if=runic_power.deficit<=10
  if runicpowerdeficit() <= 10 spell(death_strike)
+ #blooddrinker,if=!buff.dancing_rune_weapon.up
+ if not buffpresent(dancing_rune_weapon) spell(blooddrinker)
  #marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
  if { buffremaining(bone_shield) <= timetorunes(3) or buffremaining(bone_shield) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield) < 3 } and runicpowerdeficit() >= 20 spell(marrowrend)
  #blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
  if charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } spell(blood_boil)
  #marrowrend,if=buff.bone_shield.stack<5&runic_power.deficit>=15
  if buffstacks(bone_shield) < 5 and runicpowerdeficit() >= 15 spell(marrowrend)
+ #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
+ if runicpower() >= 100 and not buffpresent(dancing_rune_weapon) spell(bonestorm)
  #death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.1.time_to_die<10
  if runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 spell(death_strike)
  #death_and_decay,if=spell_targets.death_and_decay>=3
@@ -64,6 +68,8 @@ AddFunction bloodstandardmainactions
  if buffpresent(dancing_rune_weapon) spell(blood_boil)
  #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
  if buffpresent(crimson_scourge) or hastalent(rapid_decomposition_talent) or enemies() >= 2 spell(death_and_decay)
+ #consumption
+ spell(consumption)
  #blood_boil
  spell(blood_boil)
  #heart_strike,if=rune.time_to_3<gcd|buff.bone_shield.stack>6
@@ -76,28 +82,11 @@ AddFunction bloodstandardmainpostconditions
 
 AddFunction bloodstandardshortcdactions
 {
- unless runicpowerdeficit() <= 10 and spell(death_strike)
- {
-  #blooddrinker,if=!buff.dancing_rune_weapon.up
-  if not buffpresent(dancing_rune_weapon) spell(blooddrinker)
-
-  unless { buffremaining(bone_shield) <= timetorunes(3) or buffremaining(bone_shield) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield) < 5 and runicpowerdeficit() >= 15 and spell(marrowrend)
-  {
-   #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
-   if runicpower() >= 100 and not buffpresent(dancing_rune_weapon) spell(bonestorm)
-
-   unless { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike) or enemies() >= 3 and spell(death_and_decay) or { buffpresent(dancing_rune_weapon) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon) and spell(blood_boil) or { buffpresent(crimson_scourge) or hastalent(rapid_decomposition_talent) or enemies() >= 2 } and spell(death_and_decay)
-   {
-    #consumption
-    spell(consumption)
-   }
-  }
- }
 }
 
 AddFunction bloodstandardshortcdpostconditions
 {
- runicpowerdeficit() <= 10 and spell(death_strike) or { buffremaining(bone_shield) <= timetorunes(3) or buffremaining(bone_shield) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield) < 5 and runicpowerdeficit() >= 15 and spell(marrowrend) or { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike) or enemies() >= 3 and spell(death_and_decay) or { buffpresent(dancing_rune_weapon) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon) and spell(blood_boil) or { buffpresent(crimson_scourge) or hastalent(rapid_decomposition_talent) or enemies() >= 2 } and spell(death_and_decay) or spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield) > 6 } and spell(heart_strike)
+ runicpowerdeficit() <= 10 and spell(death_strike) or not buffpresent(dancing_rune_weapon) and spell(blooddrinker) or { buffremaining(bone_shield) <= timetorunes(3) or buffremaining(bone_shield) <= gcd() + { spellcooldown(blooddrinker) == 0 } * talentpoints(blooddrinker_talent) * 2 or buffstacks(bone_shield) < 3 } and runicpowerdeficit() >= 20 and spell(marrowrend) or charges(blood_boil count=0) >= 1.8 and { buffstacks(hemostasis_buff) <= 5 - enemies() or enemies() > 2 } and spell(blood_boil) or buffstacks(bone_shield) < 5 and runicpowerdeficit() >= 15 and spell(marrowrend) or runicpower() >= 100 and not buffpresent(dancing_rune_weapon) and spell(bonestorm) or { runicpowerdeficit() <= 15 + buffpresent(dancing_rune_weapon) * 5 + enemies() * talentpoints(heartbreaker_talent) * 2 or target.timetodie() < 10 } and spell(death_strike) or enemies() >= 3 and spell(death_and_decay) or { buffpresent(dancing_rune_weapon) or timetorunes(4) < gcd() } and spell(heart_strike) or buffpresent(dancing_rune_weapon) and spell(blood_boil) or { buffpresent(crimson_scourge) or hastalent(rapid_decomposition_talent) or enemies() >= 2 } and spell(death_and_decay) or spell(consumption) or spell(blood_boil) or { timetorunes(3) < gcd() or buffstacks(bone_shield) > 6 } and spell(heart_strike)
 }
 
 AddFunction bloodstandardcdactions
@@ -199,6 +188,8 @@ AddFunction blood_defaultmainactions
 {
  #berserking
  spell(berserking)
+ #tombstone,if=buff.bone_shield.stack>=7
+ if buffstacks(bone_shield) >= 7 spell(tombstone)
  #call_action_list,name=essences
  bloodessencesmainactions()
 
@@ -225,22 +216,24 @@ AddFunction blood_defaultshortcdactions
   spell(bag_of_tricks)
   #vampiric_blood
   spell(vampiric_blood)
-  #tombstone,if=buff.bone_shield.stack>=7
-  if buffstacks(bone_shield) >= 7 spell(tombstone)
-  #call_action_list,name=essences
-  bloodessencesshortcdactions()
 
-  unless bloodessencesshortcdpostconditions()
+  unless buffstacks(bone_shield) >= 7 and spell(tombstone)
   {
-   #call_action_list,name=standard
-   bloodstandardshortcdactions()
+   #call_action_list,name=essences
+   bloodessencesshortcdactions()
+
+   unless bloodessencesshortcdpostconditions()
+   {
+    #call_action_list,name=standard
+    bloodstandardshortcdactions()
+   }
   }
  }
 }
 
 AddFunction blood_defaultshortcdpostconditions
 {
- spell(berserking) or bloodessencesshortcdpostconditions() or bloodstandardshortcdpostconditions()
+ spell(berserking) or buffstacks(bone_shield) >= 7 and spell(tombstone) or bloodessencesshortcdpostconditions() or bloodstandardshortcdpostconditions()
 }
 
 AddFunction blood_defaultcdactions
@@ -455,6 +448,8 @@ AddFunction froststandardmainactions
  if runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 spell(obliterate)
  #frost_strike
  spell(frost_strike)
+ #horn_of_winter
+ spell(horn_of_winter)
 }
 
 AddFunction froststandardmainpostconditions
@@ -463,16 +458,11 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless spell(remorseless_winter) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or hastalent(icecap_talent) and buffpresent(pillar_of_frost) and azeritetraitrank(icy_citadel_trait) >= 2 and spell(obliterate) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
- {
-  #horn_of_winter
-  spell(horn_of_winter)
- }
 }
 
 AddFunction froststandardshortcdpostconditions
 {
- spell(remorseless_winter) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or hastalent(icecap_talent) and buffpresent(pillar_of_frost) and azeritetraitrank(icy_citadel_trait) >= 2 and spell(obliterate) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
+ spell(remorseless_winter) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or hastalent(icecap_talent) and buffpresent(pillar_of_frost) and azeritetraitrank(icy_citadel_trait) >= 2 and spell(obliterate) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 AddFunction froststandardcdactions
@@ -651,6 +641,8 @@ AddFunction frostcooldownsmainactions
 {
  #berserking,if=buff.pillar_of_frost.up
  if buffpresent(pillar_of_frost) spell(berserking)
+ #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
+ if spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 spell(breath_of_sindragosa)
  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
  if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } frostcold_heartmainactions()
 }
@@ -668,14 +660,18 @@ AddFunction frostcooldownsshortcdactions
   if buffpresent(pillar_of_frost) and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and enemies() == 1 or buffpresent(seething_rage) and enemies() == 1 spell(bag_of_tricks)
   #pillar_of_frost,if=(cooldown.empower_rune_weapon.remains|talent.icecap.enabled)&!buff.pillar_of_frost.up
   if { spellcooldown(empower_rune_weapon) > 0 or hastalent(icecap_talent) } and not buffpresent(pillar_of_frost) spell(pillar_of_frost)
-  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
-  if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } frostcold_heartshortcdactions()
+
+  unless spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 and spell(breath_of_sindragosa)
+  {
+   #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
+   if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } frostcold_heartshortcdactions()
+  }
  }
 }
 
 AddFunction frostcooldownsshortcdpostconditions
 {
- buffpresent(pillar_of_frost) and spell(berserking) or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } and frostcold_heartshortcdpostconditions()
+ buffpresent(pillar_of_frost) and spell(berserking) or spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 and spell(breath_of_sindragosa) or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } and frostcold_heartshortcdpostconditions()
 }
 
 AddFunction frostcooldownscdactions
@@ -718,10 +714,8 @@ AddFunction frostcooldownscdactions
   #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
   if buffremaining(pillar_of_frost) <= 8 and buffpresent(empower_rune_weapon) spell(fireblood)
 
-  unless { buffpresent(pillar_of_frost) and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and enemies() == 1 or buffpresent(seething_rage) and enemies() == 1 } and spell(bag_of_tricks) or { spellcooldown(empower_rune_weapon) > 0 or hastalent(icecap_talent) } and not buffpresent(pillar_of_frost) and spell(pillar_of_frost)
+  unless { buffpresent(pillar_of_frost) and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and enemies() == 1 or buffpresent(seething_rage) and enemies() == 1 } and spell(bag_of_tricks) or { spellcooldown(empower_rune_weapon) > 0 or hastalent(icecap_talent) } and not buffpresent(pillar_of_frost) and spell(pillar_of_frost) or spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 and spell(breath_of_sindragosa)
   {
-   #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-   if spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 spell(breath_of_sindragosa)
    #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.obliteration.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
    if spellcooldown(pillar_of_frost) == 0 and hastalent(obliteration_talent) and timetorunes(5) > gcd() and runicpowerdeficit() >= 10 or target.timetodie() < 20 spell(empower_rune_weapon)
    #empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.1.time_to_die<20)&talent.breath_of_sindragosa.enabled&runic_power>60
@@ -746,7 +740,7 @@ AddFunction frostcooldownscdactions
 
 AddFunction frostcooldownscdpostconditions
 {
- buffpresent(pillar_of_frost) and spell(berserking) or { buffpresent(pillar_of_frost) and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and enemies() == 1 or buffpresent(seething_rage) and enemies() == 1 } and spell(bag_of_tricks) or { spellcooldown(empower_rune_weapon) > 0 or hastalent(icecap_talent) } and not buffpresent(pillar_of_frost) and spell(pillar_of_frost) or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } and frostcold_heartcdpostconditions()
+ buffpresent(pillar_of_frost) and spell(berserking) or { buffpresent(pillar_of_frost) and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and enemies() == 1 or buffpresent(seething_rage) and enemies() == 1 } and spell(bag_of_tricks) or { spellcooldown(empower_rune_weapon) > 0 or hastalent(icecap_talent) } and not buffpresent(pillar_of_frost) and spell(pillar_of_frost) or spellcooldown(empower_rune_weapon) > 0 and spellcooldown(pillar_of_frost) > 0 and spell(breath_of_sindragosa) or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and target.debuffstacks(razorice) == 5 or target.timetodie() <= gcd() } and frostcold_heartcdpostconditions()
 }
 
 ### actions.cold_heart
@@ -811,6 +805,8 @@ AddFunction frostbos_tickingmainactions
  if timetorunes(5) < gcd() or runicpower() <= 45 spell(obliterate)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2
  if buffpresent(killing_machine_buff) and enemies() >= 2 spell(frostscythe)
+ #horn_of_winter,if=runic_power.deficit>=32&rune.time_to_3>gcd
+ if runicpowerdeficit() >= 32 and timetorunes(3) > gcd() spell(horn_of_winter)
  #remorseless_winter
  spell(remorseless_winter)
  #frostscythe,if=spell_targets.frostscythe>=2
@@ -827,16 +823,11 @@ AddFunction frostbos_tickingmainpostconditions
 
 AddFunction frostbos_tickingshortcdactions
 {
- unless { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpower() <= 32 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpower() <= 32 and spell(obliterate) or hastalent(gathering_storm_talent) and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and timetorunes(5) < gcd() or runicpower() <= 45 and not hastalent(frostscythe_talent) } and spell(obliterate) or { timetorunes(5) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe)
- {
-  #horn_of_winter,if=runic_power.deficit>=32&rune.time_to_3>gcd
-  if runicpowerdeficit() >= 32 and timetorunes(3) > gcd() spell(horn_of_winter)
- }
 }
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpower() <= 32 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpower() <= 32 and spell(obliterate) or hastalent(gathering_storm_talent) and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and timetorunes(5) < gcd() or runicpower() <= 45 and not hastalent(frostscythe_talent) } and spell(obliterate) or { timetorunes(5) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or spell(remorseless_winter) or enemies() >= 2 and spell(frostscythe) or { { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() > 25 or runecount() > 3 and not hastalent(frostscythe_talent) } and spell(obliterate) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
+ { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpower() <= 32 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpower() <= 32 and spell(obliterate) or hastalent(gathering_storm_talent) and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and timetorunes(5) < gcd() or runicpower() <= 45 and not hastalent(frostscythe_talent) } and spell(obliterate) or { timetorunes(5) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 32 and timetorunes(3) > gcd() and spell(horn_of_winter) or spell(remorseless_winter) or enemies() >= 2 and spell(frostscythe) or { { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() > 25 or runecount() > 3 and not hastalent(frostscythe_talent) } and spell(obliterate) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
 }
 
 AddFunction frostbos_tickingcdactions
@@ -943,6 +934,8 @@ AddFunction frostaoemainactions
  if { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and not hastalent(frostscythe_talent) spell(frost_strike)
  #frost_strike
  spell(frost_strike)
+ #horn_of_winter
+ spell(horn_of_winter)
 }
 
 AddFunction frostaoemainpostconditions
@@ -951,16 +944,11 @@ AddFunction frostaoemainpostconditions
 
 AddFunction frostaoeshortcdactions
 {
- unless { hastalent(gathering_storm_talent) or azeritetraitrank(frozen_tempest_trait) and enemies() >= 3 and not buffpresent(rime_buff) } and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and not hastalent(frostscythe_talent) and spell(frost_strike) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(frost_strike)
- {
-  #horn_of_winter
-  spell(horn_of_winter)
- }
 }
 
 AddFunction frostaoeshortcdpostconditions
 {
- { hastalent(gathering_storm_talent) or azeritetraitrank(frozen_tempest_trait) and enemies() >= 3 and not buffpresent(rime_buff) } and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and not hastalent(frostscythe_talent) and spell(frost_strike) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(frost_strike)
+ { hastalent(gathering_storm_talent) or azeritetraitrank(frozen_tempest_trait) and enemies() >= 3 and not buffpresent(rime_buff) } and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and not hastalent(frostscythe_talent) and spell(frost_strike) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and not hastalent(frostscythe_talent) and spell(obliterate) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 10 } and not hastalent(frostscythe_talent) and spell(frost_strike) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 AddFunction frostaoecdactions

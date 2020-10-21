@@ -102,7 +102,7 @@ Define(chi_burst 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
 Define(chi_energy 337571)
-# Whenever you deal damage to a target with Fists of Fury, you gain a stack of Chi Energy up to a maximum of m2 stacks.rnrnUsing Spinning Crane Kick will cause the energy to detonate in a Chi Explosion, dealing 337342m1 damage to all enemies within 337342A1 yards. The damage is increased by 337571m1 for each stack of Chi Energy.
+# Whenever you deal damage to a target with Fists of Fury, you gain a stack of Chi Energy up to a maximum of m2 stacks.rnrnUsing Spinning Crane Kick will cause the energy to detonate in a Chi Explosion, dealing 337342s1 damage to all enemies within 337342A1 yards. The damage is increased by 337571m1 for each stack of Chi Energy.
   SpellInfo(chi_energy duration=45 max_stacks=30 gcd=0 offgcd=1)
   # Increases the damage done by your next Chi Explosion by s1.rnrnChi Explosion is triggered whenever you use Spinning Crane Kick.
   SpellAddBuff(chi_energy chi_energy=1)
@@ -259,23 +259,17 @@ Define(guardian_of_azeroth_4 300091)
 Define(guardian_of_azeroth_5 303347)
   SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
 
-Define(invoke_niuzao_the_black_ox_0 132578)
+Define(invoke_niuzao_the_black_ox 132578)
 # Summons an effigy of Niuzao, the Black Ox for 25 seconds. Niuzao attacks your primary target, and frequently Stomps, damaging all nearby enemies?s322740[ for 227291s1 plus 322740s1 of Stagger damage you have recently purified.][.]rnrnWhile active, s2 of damage delayed by Stagger is instead Staggered by Niuzao.
-  SpellInfo(invoke_niuzao_the_black_ox_0 cd=180 duration=25)
+# Rank 2: Purifying Stagger damage while Niuzao is active increases the damage of Niuzao's next Stomp by s1 of damage purified, split between all enemies.
+  SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=25)
   # Niuzao is staggering s2 of the Monk's Stagger damage.
-  SpellAddBuff(invoke_niuzao_the_black_ox_0 invoke_niuzao_the_black_ox_0=1)
-Define(invoke_niuzao_the_black_ox_1 322740)
-# Purifying Stagger damage while Niuzao is active increases the damage of Niuzao's next Stomp by s1 of damage purified, split between all enemies.
-  SpellInfo(invoke_niuzao_the_black_ox_1 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(invoke_niuzao_the_black_ox_1 invoke_niuzao_the_black_ox_1=1)
-Define(invoke_xuen_the_white_tiger_0 123904)
+  SpellAddBuff(invoke_niuzao_the_black_ox invoke_niuzao_the_black_ox=1)
+Define(invoke_xuen_the_white_tiger 123904)
 # Summons an effigy of Xuen, the White Tiger for 24 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.?s323999[rnrnEvery 323999s1 sec, Xuen strikes your enemies with Empowered Tiger Lightning dealing 323999s2 of the damage you have dealt to those targets in the last 323999s1 sec.][]
-  SpellInfo(invoke_xuen_the_white_tiger_0 cd=120 duration=24 gcd=1 tick=4)
-  SpellAddBuff(invoke_xuen_the_white_tiger_0 invoke_xuen_the_white_tiger_0=1)
-Define(invoke_xuen_the_white_tiger_1 323999)
-# Xuen strikes your enemies with Empowered Tiger Lightning every s1 sec, dealing s2 of the damage you have dealt to those targets in the last s1 sec.
-  SpellInfo(invoke_xuen_the_white_tiger_1 channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(invoke_xuen_the_white_tiger_1 invoke_xuen_the_white_tiger_1=1)
+# Rank 2: Xuen strikes your enemies with Empowered Tiger Lightning every s1 sec, dealing s2 of the damage you have dealt to those targets in the last s1 sec.
+  SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=24 gcd=1 tick=4)
+  SpellAddBuff(invoke_xuen_the_white_tiger invoke_xuen_the_white_tiger=1)
 Define(keg_smash 121253)
 # Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
@@ -408,12 +402,19 @@ Define(serenity 152173)
 Define(spear_hand_strike 116705)
 # Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
   SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
-Define(spinning_crane_kick 322729)
+Define(spinning_crane_kick_0 322700)
+# Dealing damage with Spinning Crane Kick grants Shuffle for s1 sec, and causes your Gift of the Ox healing spheres to travel towards your location.
+  SpellInfo(spinning_crane_kick_0 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(spinning_crane_kick_0 spinning_crane_kick_0=1)
+Define(spinning_crane_kick_1 322729)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
-# Rank 2: Spinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.
-  SpellInfo(spinning_crane_kick energy=25 duration=1.5 channel=1.5 tick=0.5)
+  SpellInfo(spinning_crane_kick_1 energy=25 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
-  SpellAddBuff(spinning_crane_kick spinning_crane_kick=1)
+  SpellAddBuff(spinning_crane_kick_1 spinning_crane_kick_1=1)
+Define(spinning_crane_kick_2 343730)
+# Spinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.
+  SpellInfo(spinning_crane_kick_2 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(spinning_crane_kick_2 spinning_crane_kick_2=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
 # Rank 2: Storm, Earth, and Fire has s1+1 charges.
@@ -435,10 +436,18 @@ Define(the_unbound_force_3 299324)
 Define(tiger_palm 100780)
 # Strike with the palm of your hand, dealing s1 Physical damage.?a137384[rnrnTiger Palm has an 137384m1 chance to make your next Blackout Kick cost no Chi.][]?a137023[rnrnReduces the remaining cooldown on your Brews by s3 sec.][]?a137025[rnrn|cFFFFFFFFGenerates s2 Chi.][]
   SpellInfo(tiger_palm energy=50 chi=0)
-Define(touch_of_death 322109)
-# You exploit the enemy target's weakest point, instantly killing ?s322113[creatures if they have less health than you.][them.rnrnOnly usable on creatures that have less health than you]?s322113[ Deals damage equal to s3 of your maximum health against players and stronger creatures under s2 health.][.]?s325095[rnrnClears Stagger damage based on 325095s1 of damage dealt.][]
-# Rank 3: Touch of Death increases the Monk's Physical damage by 344361s1 for 10 seconds.
-  SpellInfo(touch_of_death cd=180)
+Define(touch_of_death_0 325095)
+# Touch of Death reduces delayed Stagger damage by s1 of damage dealt.
+  SpellInfo(touch_of_death_0 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(touch_of_death_0 touch_of_death_0=1)
+Define(touch_of_death_1 325215)
+# Touch of Death spawns s1 Chi Spheres, granting 1 Chi when you walk through them.
+  SpellInfo(touch_of_death_1 channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(touch_of_death_1 touch_of_death_1=1)
+Define(touch_of_death_2 344360)
+# Touch of Death increases the Monk's Physical damage by 344361s1 for 10 seconds.
+  SpellInfo(touch_of_death_2 channel=0 gcd=0 offgcd=1)
+
 Define(touch_of_karma 122470)
 # Absorbs all damage taken for 10 seconds, up to s3 of your maximum health, and redirects s4 of that amount to the enemy target as Nature damage over 6 seconds.
   SpellInfo(touch_of_karma cd=90 duration=10 gcd=0 offgcd=1)
@@ -473,17 +482,17 @@ SpellList(chi_wave chi_wave_0 chi_wave_1 chi_wave_2 chi_wave_3)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
 SpellList(expel_harm expel_harm_0 expel_harm_1 expel_harm_2 expel_harm_3)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(invoke_niuzao_the_black_ox invoke_niuzao_the_black_ox_0 invoke_niuzao_the_black_ox_1)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
+SpellList(spinning_crane_kick spinning_crane_kick_0 spinning_crane_kick_1 spinning_crane_kick_2)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(invoke_xuen_the_white_tiger invoke_xuen_the_white_tiger_0 invoke_xuen_the_white_tiger_1)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
+SpellList(touch_of_death touch_of_death_0 touch_of_death_1 touch_of_death_2)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 Define(black_ox_brew_talent 9) #19992
 # Chug some Black Ox Brew, which instantly refills your Energy, Purifying Brew charges, and resets the cooldown of Celestial Brew.

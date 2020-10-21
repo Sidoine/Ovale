@@ -30,7 +30,6 @@ AddFunction convoke_desync
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=balance)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=balance)
 
 AddFunction balanceinterruptactions
 {
@@ -102,8 +101,6 @@ AddFunction balance_defaultmainactions
  #variable,name=is_cleave,value=spell_targets.starfire>1
  #berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.up
  if { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) spell(berserking)
- #potion,if=buff.ca_inc.up
- if buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #run_action_list,name=aoe,if=variable.is_aoe
  if is_aoe() balanceaoeactions()
  #run_action_list,name=dreambinder,if=runeforge.timeworn_dreambinder.equipped
@@ -120,7 +117,7 @@ AddFunction balance_defaultmainpostconditions
 
 AddFunction balance_defaultshortcdactions
 {
- unless { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
  {
   #run_action_list,name=aoe,if=variable.is_aoe
   if is_aoe() balanceaoeactions()
@@ -135,15 +132,16 @@ AddFunction balance_defaultshortcdactions
 
 AddFunction balance_defaultshortcdpostconditions
 {
- { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
 }
 
 AddFunction balance_defaultcdactions
 {
  balanceinterruptactions()
 
- unless { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
  {
+  #potion,if=buff.ca_inc.up
   #use_items
   balanceuseitemactions()
   #heart_essence,if=level=50
@@ -161,7 +159,7 @@ AddFunction balance_defaultcdactions
 
 AddFunction balance_defaultcdpostconditions
 {
- { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ { not message("covenant.night_fae is not implemented") or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
 }
 
 ### Balance icons.
@@ -209,7 +207,6 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # ca_inc_buff
 # concentrated_flame_essence
 # convoke_the_spirits
-# disabled_item
 # incarnation_talent
 # mighty_bash
 # moonkin_form
@@ -270,7 +267,6 @@ AddFunction _4cp_bite
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=feral)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=feral)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=feral)
 
 AddFunction feralinterruptactions
 {
@@ -478,20 +474,12 @@ AddFunction feralessencemainactions
  if buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) spell(memory_of_lucid_dreams)
  #blood_of_the_enemy,if=buff.tigers_fury.up&combo_points=5
  if buffpresent(tigers_fury) and combopoints() == 5 spell(blood_of_the_enemy)
- #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
- if enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 spell(focused_azerite_beam)
- #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
- if enemies() > message("desired_targets is not implemented") or 600 > 60 spell(purifying_blast)
- #guardian_of_azeroth,if=buff.tigers_fury.up
- if buffpresent(tigers_fury) spell(guardian_of_azeroth)
  #concentrated_flame,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(concentrated_flame)
  #ripple_in_space,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(ripple_in_space)
  #worldvein_resonance,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(worldvein_resonance)
- #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
- if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 spell(reaping_flames)
 }
 
 AddFunction feralessencemainpostconditions
@@ -500,38 +488,49 @@ AddFunction feralessencemainpostconditions
 
 AddFunction feralessenceshortcdactions
 {
+ unless { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy)
+ {
+  #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
+  if enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 spell(focused_azerite_beam)
+  #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
+  if enemies() > message("desired_targets is not implemented") or 600 > 60 spell(purifying_blast)
+
+  unless buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance)
+  {
+   #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
+   if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 spell(reaping_flames)
+  }
+ }
 }
 
 AddFunction feralessenceshortcdpostconditions
 {
- { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(guardian_of_azeroth) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
+ { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance)
 }
 
 AddFunction feralessencecdactions
 {
+ unless { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast)
+ {
+  #guardian_of_azeroth,if=buff.tigers_fury.up
+  if buffpresent(tigers_fury) spell(guardian_of_azeroth)
+ }
 }
 
 AddFunction feralessencecdpostconditions
 {
- { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(guardian_of_azeroth) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
+ { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
 }
 
 ### actions.cooldown
 
 AddFunction feralcooldownmainactions
 {
- #berserk,if=buff.prowl.down
- if buffexpires(prowl) spell(berserk)
  #incarnation,if=buff.prowl.down
  if buffexpires(prowl) spell(incarnation)
- #tigers_fury,if=energy.deficit>55|buff.berserk_cat.remains<13|buff.incarnation_king_of_the_jungle.remains<13
- if energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 spell(tigers_fury)
- #shadowmeld,if=buff.tigers_fury.up&buff.berserk_cat.down&buff.incarnation_king_of_the_jungle.down&buff.prowl.down&combo_points<4&dot.rake.pmultiplier<1.6&energy>40
- if buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 spell(shadowmeld)
  #berserking,if=buff.tigers_fury.up|buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
  if buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) spell(berserking)
  #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
- if { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #call_action_list,name=essence
  feralessencemainactions()
 }
@@ -543,38 +542,55 @@ AddFunction feralcooldownmainpostconditions
 
 AddFunction feralcooldownshortcdactions
 {
- unless buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless buffexpires(prowl) and spell(incarnation)
  {
-  #call_action_list,name=essence
-  feralessenceshortcdactions()
+  #tigers_fury,if=energy.deficit>55|buff.berserk_cat.remains<13|buff.incarnation_king_of_the_jungle.remains<13
+  if energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 spell(tigers_fury)
+
+  unless { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
+  {
+   #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
+   #call_action_list,name=essence
+   feralessenceshortcdactions()
+  }
  }
 }
 
 AddFunction feralcooldownshortcdpostconditions
 {
- buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or feralessenceshortcdpostconditions()
+ buffexpires(prowl) and spell(incarnation) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessenceshortcdpostconditions()
 }
 
 AddFunction feralcooldowncdactions
 {
- unless buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
- {
-  #call_action_list,name=essence
-  feralessencecdactions()
+ #berserk,if=buff.prowl.down
+ if buffexpires(prowl) spell(berserk)
 
-  unless feralessencecdpostconditions()
+ unless buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury)
+ {
+  #shadowmeld,if=buff.tigers_fury.up&buff.berserk_cat.down&buff.incarnation_king_of_the_jungle.down&buff.prowl.down&combo_points<4&dot.rake.pmultiplier<1.6&energy>40
+  if buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 spell(shadowmeld)
+
+  unless { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
   {
-   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
-   if target.debuffexpires(razor_coral) or target.debuffpresent(conductive_ink_debuff) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
-   #use_items,if=buff.tigers_fury.up|target.time_to_die<20
-   if buffpresent(tigers_fury) or target.timetodie() < 20 feraluseitemactions()
+   #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
+   #call_action_list,name=essence
+   feralessencecdactions()
+
+   unless feralessencecdpostconditions()
+   {
+    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
+    if target.debuffexpires(razor_coral) or target.debuffpresent(conductive_ink_debuff) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
+    #use_items,if=buff.tigers_fury.up|target.time_to_die<20
+    if buffpresent(tigers_fury) or target.timetodie() < 20 feraluseitemactions()
+   }
   }
  }
 }
 
 AddFunction feralcooldowncdpostconditions
 {
- buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or feralessencecdpostconditions()
+ buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessencecdpostconditions()
 }
 
 ### actions.bloodtalons
@@ -832,7 +848,6 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # clearcasting
 # concentrated_flame
 # conductive_ink_debuff
-# disabled_item
 # feral_frenzy
 # ferocious_bite
 # focused_azerite_beam
@@ -895,7 +910,6 @@ Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt l(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=guardian)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=guardian)
 
 AddFunction guardianinterruptactions
 {
@@ -940,8 +954,6 @@ AddFunction guardianprecombatmainactions
  if message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) spell(moonkin_form)
  #bear_form,if=!druid.catweave_bear&!druid.owlweave_bear
  if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") spell(bear_form)
- #heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&druid.owlweave_bear
- if hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") spell(heart_of_the_wild)
  #wrath,if=druid.owlweave_bear
  if message("druid.owlweave_bear is not implemented") spell(wrath)
 }
@@ -956,16 +968,21 @@ AddFunction guardianprecombatshortcdactions
 
 AddFunction guardianprecombatshortcdpostconditions
 {
- message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(wrath)
+ message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or message("druid.owlweave_bear is not implemented") and spell(wrath)
 }
 
 AddFunction guardianprecombatcdactions
 {
+ unless message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form)
+ {
+  #heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&druid.owlweave_bear
+  if hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") spell(heart_of_the_wild)
+ }
 }
 
 AddFunction guardianprecombatcdpostconditions
 {
- message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(wrath)
+ message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or message("druid.owlweave_bear is not implemented") and spell(wrath)
 }
 
 ### actions.owlweave
@@ -974,10 +991,6 @@ AddFunction guardianowlweavemainactions
 {
  #moonkin_form,if=!buff.moonkin_form.up
  if not buffpresent(moonkin_form) spell(moonkin_form)
- #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
- if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
- #convoke_the_spirits,if=druid.owlweave_bear
- if message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
  #adaptive_swarm,target_if=refreshable
  if target.refreshable(adaptive_swarm) spell(adaptive_swarm)
  #moonfire,target_if=refreshable|buff.galactic_guardian.up
@@ -998,7 +1011,7 @@ AddFunction guardianowlweavemainpostconditions
 
 AddFunction guardianowlweaveshortcdactions
 {
- unless not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild)
+ unless not buffpresent(moonkin_form) and spell(moonkin_form)
  {
   #empower_bond,if=druid.owlweave_bear
   if message("druid.owlweave_bear is not implemented") spell(empower_bond)
@@ -1007,16 +1020,27 @@ AddFunction guardianowlweaveshortcdactions
 
 AddFunction guardianowlweaveshortcdpostconditions
 {
- not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(convoke_the_spirits) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
+ not buffpresent(moonkin_form) and spell(moonkin_form) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
 }
 
 AddFunction guardianowlweavecdactions
 {
+ unless not buffpresent(moonkin_form) and spell(moonkin_form)
+ {
+  #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
+
+  unless message("druid.owlweave_bear is not implemented") and spell(empower_bond)
+  {
+   #convoke_the_spirits,if=druid.owlweave_bear
+   if message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
+  }
+ }
 }
 
 AddFunction guardianowlweavecdpostconditions
 {
- not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(empower_bond) or message("druid.owlweave_bear is not implemented") and spell(convoke_the_spirits) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
+ not buffpresent(moonkin_form) and spell(moonkin_form) or message("druid.owlweave_bear is not implemented") and spell(empower_bond) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
 }
 
 ### actions.lycarao
@@ -1087,10 +1111,6 @@ AddFunction guardiancatweavemainactions
  if not buffpresent(cat_form) spell(cat_form)
  #rake,if=buff.prowl.up
  if buffpresent(prowl) spell(rake)
- #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
- if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
- #convoke_the_spirits,if=druid.catweave_bear
- if message("druid.catweave_bear is not implemented") spell(convoke_the_spirits)
  #rip,if=dot.rip.refreshable&combo_points>=4
  if target.debuffrefreshable(rip) and combopoints() >= 4 spell(rip)
  #ferocious_bite,if=combo_points>=4
@@ -1109,7 +1129,7 @@ AddFunction guardiancatweavemainpostconditions
 
 AddFunction guardiancatweaveshortcdactions
 {
- unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild)
+ unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake)
  {
   #empower_bond,if=druid.catweave_bear
   if message("druid.catweave_bear is not implemented") spell(empower_bond)
@@ -1118,16 +1138,27 @@ AddFunction guardiancatweaveshortcdactions
 
 AddFunction guardiancatweaveshortcdpostconditions
 {
- not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.catweave_bear is not implemented") and spell(convoke_the_spirits) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
+ not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
 }
 
 AddFunction guardiancatweavecdactions
 {
+ unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake)
+ {
+  #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
+
+  unless message("druid.catweave_bear is not implemented") and spell(empower_bond)
+  {
+   #convoke_the_spirits,if=druid.catweave_bear
+   if message("druid.catweave_bear is not implemented") spell(convoke_the_spirits)
+  }
+ }
 }
 
 AddFunction guardiancatweavecdpostconditions
 {
- not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.catweave_bear is not implemented") and spell(empower_bond) or message("druid.catweave_bear is not implemented") and spell(convoke_the_spirits) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
+ not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or message("druid.catweave_bear is not implemented") and spell(empower_bond) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
 }
 
 ### actions.bear
@@ -1136,16 +1167,10 @@ AddFunction guardianbearmainactions
 {
  #bear_form,if=!buff.bear_form.up
  if not buffpresent(bear_form) spell(bear_form)
- #potion,if=((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear))
- if { buffpresent(berserk_bear_buff) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
- #convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
- if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
  #berserk_bear,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
  if buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") spell(berserk_bear)
  #incarnation,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
  if buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") spell(incarnation)
- #barkskin,if=(talent.brambles.enabled)&(buff.bear_form.up)
- if hastalent(brambles_talent) and buffpresent(bear_form) spell(barkskin)
  #ironfur,if=buff.ironfur.remains<0.5
  if buffremaining(ironfur) < 0.5 spell(ironfur)
  #adaptive_swarm,target_if=refreshable
@@ -1172,6 +1197,8 @@ AddFunction guardianbearmainactions
  if buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 spell(moonfire)
  #mangle,if=(rage<80)&active_enemies<4
  if rage() < 80 and enemies() < 4 spell(mangle)
+ #pulverize,target_if=dot.thrash_bear.stack>2
+ if target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) spell(pulverize)
  #thrash_bear
  spell(thrash_bear)
  #maul
@@ -1186,36 +1213,35 @@ AddFunction guardianbearmainpostconditions
 
 AddFunction guardianbearshortcdactions
 {
- unless not buffpresent(bear_form) and spell(bear_form) or { buffpresent(berserk_bear_buff) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(convoke_the_spirits) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation)
+ unless not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation)
  {
   #empower_bond,if=(!druid.catweave_bear&!druid.owlweave_bear)|active_enemies>=2
   if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 spell(empower_bond)
-
-  unless hastalent(brambles_talent) and buffpresent(bear_form) and spell(barkskin) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle)
-  {
-   #pulverize,target_if=dot.thrash_bear.stack>2
-   if target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) spell(pulverize)
-  }
+  #barkskin,if=(talent.brambles.enabled)&(buff.bear_form.up)
+  if hastalent(brambles_talent) and buffpresent(bear_form) spell(barkskin)
  }
 }
 
 AddFunction guardianbearshortcdpostconditions
 {
- not buffpresent(bear_form) and spell(bear_form) or { buffpresent(berserk_bear_buff) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(convoke_the_spirits) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or hastalent(brambles_talent) and buffpresent(bear_form) and spell(barkskin) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
+ not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) and spell(pulverize) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
 }
 
 AddFunction guardianbearcdactions
 {
- unless not buffpresent(bear_form) and spell(bear_form) or { buffpresent(berserk_bear_buff) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless not buffpresent(bear_form) and spell(bear_form)
  {
+  #potion,if=((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear))
   #ravenous_frenzy
   spell(ravenous_frenzy)
+  #convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
+  if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
  }
 }
 
 AddFunction guardianbearcdpostconditions
 {
- not buffpresent(bear_form) and spell(bear_form) or { buffpresent(berserk_bear_buff) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(convoke_the_spirits) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or { not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 } and spell(empower_bond) or hastalent(brambles_talent) and buffpresent(bear_form) and spell(barkskin) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) and spell(pulverize) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
+ not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or { not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 } and spell(empower_bond) or hastalent(brambles_talent) and buffpresent(bear_form) and spell(barkskin) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) and spell(pulverize) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
 }
 
 ### actions.default
@@ -1223,7 +1249,6 @@ AddFunction guardianbearcdpostconditions
 AddFunction guardian_defaultmainactions
 {
  #potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear))
- if hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(disabled_item usable=1)
  #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
  if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweavemainactions()
 
@@ -1261,32 +1286,29 @@ AddFunction guardian_defaultshortcdactions
 {
  #auto_attack
  guardiangetinmeleerange()
+ #potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear))
+ #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
+ if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweaveshortcdactions()
 
- unless hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweaveshortcdpostconditions()
  {
-  #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
-  if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweaveshortcdactions()
+  #run_action_list,name=owlweave,if=druid.owlweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&rage<20&buff.incarnation.down&buff.berserk_bear.down)|(buff.moonkin_form.up&dot.sunfire.refreshable)|(buff.moonkin_form.up&buff.heart_of_the_wild.up)|(buff.moonkin_form.up&(buff.eclipse_lunar.up|buff.eclipse_solar.up)&!runeforge.oath_of_the_elder_druid.equipped)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up)|(covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
+  if message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardianowlweaveshortcdactions()
 
-  unless message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweaveshortcdpostconditions()
+  unless message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweaveshortcdpostconditions()
   {
-   #run_action_list,name=owlweave,if=druid.owlweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&rage<20&buff.incarnation.down&buff.berserk_bear.down)|(buff.moonkin_form.up&dot.sunfire.refreshable)|(buff.moonkin_form.up&buff.heart_of_the_wild.up)|(buff.moonkin_form.up&(buff.eclipse_lunar.up|buff.eclipse_solar.up)&!runeforge.oath_of_the_elder_druid.equipped)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up)|(covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
-   if message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardianowlweaveshortcdactions()
+   #run_action_list,name=lycarao,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.balance_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
+   if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraoshortcdactions()
 
-   unless message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweaveshortcdpostconditions()
+   unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraoshortcdpostconditions()
    {
-    #run_action_list,name=lycarao,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.balance_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
-    if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraoshortcdactions()
+    #run_action_list,name=lycarac,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.feral_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
+    if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaracshortcdactions()
 
-    unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraoshortcdpostconditions()
+    unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaracshortcdpostconditions()
     {
-     #run_action_list,name=lycarac,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.feral_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
-     if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaracshortcdactions()
-
-     unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaracshortcdpostconditions()
-     {
-      #run_action_list,name=bear
-      guardianbearshortcdactions()
-     }
+     #run_action_list,name=bear
+     guardianbearshortcdactions()
     }
    }
   }
@@ -1295,7 +1317,7 @@ AddFunction guardian_defaultshortcdactions
 
 AddFunction guardian_defaultshortcdpostconditions
 {
- hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweaveshortcdpostconditions() or message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweaveshortcdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraoshortcdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaracshortcdpostconditions() or guardianbearshortcdpostconditions()
+ message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweaveshortcdpostconditions() or message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweaveshortcdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraoshortcdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaracshortcdpostconditions() or guardianbearshortcdpostconditions()
 }
 
 AddFunction guardian_defaultcdactions
@@ -1303,32 +1325,29 @@ AddFunction guardian_defaultcdactions
  guardianinterruptactions()
  #use_items
  guardianuseitemactions()
+ #potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear))
+ #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
+ if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweavecdactions()
 
- unless hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1)
+ unless message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweavecdpostconditions()
  {
-  #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
-  if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweavecdactions()
+  #run_action_list,name=owlweave,if=druid.owlweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&rage<20&buff.incarnation.down&buff.berserk_bear.down)|(buff.moonkin_form.up&dot.sunfire.refreshable)|(buff.moonkin_form.up&buff.heart_of_the_wild.up)|(buff.moonkin_form.up&(buff.eclipse_lunar.up|buff.eclipse_solar.up)&!runeforge.oath_of_the_elder_druid.equipped)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up)|(covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
+  if message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardianowlweavecdactions()
 
-  unless message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweavecdpostconditions()
+  unless message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweavecdpostconditions()
   {
-   #run_action_list,name=owlweave,if=druid.owlweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&rage<20&buff.incarnation.down&buff.berserk_bear.down)|(buff.moonkin_form.up&dot.sunfire.refreshable)|(buff.moonkin_form.up&buff.heart_of_the_wild.up)|(buff.moonkin_form.up&(buff.eclipse_lunar.up|buff.eclipse_solar.up)&!runeforge.oath_of_the_elder_druid.equipped)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up)|(covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
-   if message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardianowlweavecdactions()
+   #run_action_list,name=lycarao,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.balance_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
+   if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraocdactions()
 
-   unless message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweavecdpostconditions()
+   unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraocdpostconditions()
    {
-    #run_action_list,name=lycarao,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.balance_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
-    if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraocdactions()
+    #run_action_list,name=lycarac,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.feral_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
+    if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraccdactions()
 
-    unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraocdpostconditions()
+    unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraccdpostconditions()
     {
-     #run_action_list,name=lycarac,if=((runeforge.lycaras_fleeting_glimpse.equipped)&(talent.feral_affinity.enabled)&(buff.lycaras_fleeting_glimpse.up)&(buff.lycaras_fleeting_glimpse.remains<=2))
-     if message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 guardianlycaraccdactions()
-
-     unless message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraccdpostconditions()
-     {
-      #run_action_list,name=bear
-      guardianbearcdactions()
-     }
+     #run_action_list,name=bear
+     guardianbearcdactions()
     }
    }
   }
@@ -1337,7 +1356,7 @@ AddFunction guardian_defaultcdactions
 
 AddFunction guardian_defaultcdpostconditions
 {
- hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(disabled_item usable=1) or message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweavecdpostconditions() or message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweavecdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraocdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraccdpostconditions() or guardianbearcdpostconditions()
+ message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardiancatweavecdpostconditions() or message("druid.owlweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and rage() < 20 and buffexpires(incarnation) and buffexpires(berserk_bear_buff) or buffpresent(moonkin_form) and target.debuffrefreshable(sunfire) or buffpresent(moonkin_form) and buffpresent(heart_of_the_wild) or buffpresent(moonkin_form) and { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and not message("runeforge.oath_of_the_elder_druid.equipped is not implemented") or message("runeforge.oath_of_the_elder_druid.equipped is not implemented") and not buffpresent(oath_of_the_elder_druid) or message("covenant.night_fae is not implemented") and spellcooldown(convoke_the_spirits) <= 1 or message("covenant.kyrian is not implemented") and spellcooldown(empower_bond) <= 1 and enemies() < 2 } and guardianowlweavecdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(balance_affinity_talent) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraocdpostconditions() or message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") and hastalent(feral_affinity_talent_guardian) and buffpresent(lycaras_fleeting_glimpse) and buffremaining(lycaras_fleeting_glimpse) <= 2 and guardianlycaraccdpostconditions() or guardianbearcdpostconditions()
 }
 
 ### Guardian icons.
@@ -1390,7 +1409,6 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # brambles_talent
 # cat_form
 # convoke_the_spirits
-# disabled_item
 # eclipse_lunar
 # eclipse_solar
 # empower_bond

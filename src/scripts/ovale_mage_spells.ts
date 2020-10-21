@@ -174,7 +174,7 @@ Define(fingers_of_frost 112965)
   SpellAddBuff(fingers_of_frost fingers_of_frost=1)
   SpellAddTargetDebuff(fingers_of_frost fingers_of_frost=1)
 Define(fire_blast 108853)
-# Blasts the enemy for (72 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
+# Blasts the enemy for (79.2 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
 # Rank 2: Fire Blast always deals a critical strike.
   SpellInfo(fire_blast cd=0.5 charge_cd=12 gcd=0 offgcd=1)
 Define(fireblood_0 265221)
@@ -214,14 +214,14 @@ Define(freezing_rain_buff 270232)
   SpellAddBuff(freezing_rain_buff freezing_rain_buff=1)
 Define(freezing_winds 327478)
 # While Frozen Orb is active, you gain Fingers of Frost every 327478t1 sec
-  SpellInfo(freezing_winds duration=30 gcd=0 offgcd=1 tick=3)
+  SpellInfo(freezing_winds duration=30 gcd=0 offgcd=1 tick=2)
   # Gaining Fingers of Frost every t1 sec.
   SpellAddBuff(freezing_winds freezing_winds=1)
 Define(frost_nova 122)
 # Blasts enemies within A2 yds of you for (4.4775 of Spell Power) Frost damage and freezes them in place for 8 seconds. Damage may interrupt the freeze effect.
 # Rank 2: Frost Nova duration is increased by s1/1000 sec.
   SpellInfo(frost_nova cd=30 duration=8)
-  # Frozen in place?a333393[ and damage taken from @auracaster increased by 333393s2][].
+  # Frozen in place?a333393[ and damage taken from @auracaster's Arcane and Fire spells increased by 333393s2][].
   SpellAddTargetDebuff(frost_nova frost_nova=1)
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
