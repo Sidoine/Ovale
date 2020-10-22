@@ -52,7 +52,7 @@ Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 3 seconds.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
 Define(chain_harvest 320674)
-# Send a wave of anima at the target, which then jumps to additional nearby targets. Deals (310 of Spell Power) Shadow damage to up to 5 enemies, and restores (315 of Spell Power) health to up to 5 allies.rnrnFor each target critically struck, the cooldown of Chain Harvest is reduced by 5 sec.
+# Send a wave of anima at the target, which then jumps to additional nearby targets. Deals (204.99999999999997 of Spell Power) Shadow damage to up to 5 enemies, and restores (315 of Spell Power) health to up to 5 allies.rnrnFor each target critically struck, the cooldown of Chain Harvest is reduced by 5 sec.
   SpellInfo(chain_harvest cd=90)
 Define(chain_lightning_0 231722)
 # Chain Lightning jumps to s1 additional targets.

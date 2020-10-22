@@ -28,7 +28,7 @@ Define(arcane_torrent_5 129597)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137025[s2 Chi][]?s137024[s3 of your mana][]?s137023[s4 Energy][].
   SpellInfo(arcane_torrent_5 cd=120 gcd=1 chi=-1 energy=-15)
 Define(arcane_torrent_6 155145)
-# Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137027[s2 Holy Power][s3 of your mana].
+# Remove s1 beneficial effect from all enemies within A1 yards and restore s2 Holy Power.
   SpellInfo(arcane_torrent_6 cd=120 holypower=-1)
 Define(arcane_torrent_7 202719)
 # Remove s1 beneficial effect from all enemies within A1 yards and generate ?s203513[m3/10 Pain][m2 Fury].

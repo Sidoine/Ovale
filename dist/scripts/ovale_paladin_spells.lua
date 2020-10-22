@@ -22,7 +22,7 @@ Define(arcane_torrent_5 129597)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137025[s2 Chi][]?s137024[s3 of your mana][]?s137023[s4 Energy][].
   SpellInfo(arcane_torrent_5 cd=120 gcd=1 chi=-1 energy=-15)
 Define(arcane_torrent_6 155145)
-# Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137027[s2 Holy Power][s3 of your mana].
+# Remove s1 beneficial effect from all enemies within A1 yards and restore s2 Holy Power.
   SpellInfo(arcane_torrent_6 cd=120 holypower=-1)
 Define(arcane_torrent_7 202719)
 # Remove s1 beneficial effect from all enemies within A1 yards and generate ?s203513[m3/10 Pain][m2 Fury].
@@ -261,7 +261,7 @@ Define(the_unbound_force_3 299324)
   SpellInfo(the_unbound_force_3)
 Define(vanquishers_hammer 328204)
 # Throws a hammer at your target dealing (170 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].
-  SpellInfo(vanquishers_hammer holypower=1 cd=30 duration=15)
+  SpellInfo(vanquishers_hammer holypower=1 cd=30 duration=20)
   # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous].
   SpellAddBuff(vanquishers_hammer vanquishers_hammer=1)
 Define(wake_of_ashes 255937)
@@ -310,6 +310,7 @@ Define(holy_avenger_talent 14) #17599
 # Your Holy Power generation is tripled for 20 seconds.
 Define(seraphim_talent 15) #17601
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
+Define(condensed_lifeforce_essence_id 14)
     ]]
     code = code .. [[
 Define(blinding_light 115750)

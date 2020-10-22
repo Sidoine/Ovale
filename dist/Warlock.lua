@@ -40,6 +40,9 @@ local demonData = {
     },
     [17252] = {
         duration = 15
+    },
+    [135816] = {
+        duration = 15
     }
 }
 local self_demons = {}
@@ -151,7 +154,7 @@ __exports.OvaleWarlockClass = __class(nil, {
         local tickTime = 2 / self.ovalePaperDoll:GetHasteMultiplier("spell", self.ovalePaperDoll.next)
         local activeAgonies = self.ovaleAura:AuraCount(980, "HARMFUL", true, nil, now, nil)
         if activeAgonies > 0 then
-            value = 1 / (0.184 * pow(activeAgonies, -2 / 3)) * tickTime / activeAgonies
+            value = ((1 / (0.184 * pow(activeAgonies, -2 / 3))) * tickTime) / activeAgonies
             if self.ovaleSpellBook:IsKnownTalent(creepingDeathTalent) then
                 value = value * 0.85
             end

@@ -1104,9 +1104,707 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 
 Include(ovale_common)
 Include(ovale_mage_spells)
+
+
+AddFunction phoenix_pooling
+{
+ not disable_combustion() and time_to_combustion() < spellfullrecharge(phoenix_flames) and time_to_combustion() < target.timetodie() or message("runeforge.sun_kings_blessing.equipped is not implemented")
+}
+
+AddFunction fire_blast_pooling
+{
+ not disable_combustion() and time_to_combustion() < spellfullrecharge(fire_blast) - shifting_power_reduction() * { spellcooldown(shifting_power) < time_to_combustion() } and time_to_combustion() < target.timetodie() or message("runeforge.sun_kings_blessing.equipped is not implemented") and charges(fire_blast count=0) < spellmaxcharges(fire_blast) - 0.5 and { spellcooldown(shifting_power) > 15 or not message("covenant.night_fae.enabled is not implemented") }
+}
+
+AddFunction ignite_min
+{
+ target.tickvalue(debuff)
+}
+
+AddFunction time_to_combustion
+{
+ talentpoints(firestarter_talent) * message("firestarter.remains is not implemented") + spellcooldown(combustion) * { 1 - kindling_reduction() * talentpoints(kindling_talent) } * { not { spellcooldown(combustion) == 0 } * buffexpires(combustion) }
+}
+
+AddFunction extended_combustion_remains
+{
+ buffremaining(combustion) + baseduration(combustion) * { spellcooldown(combustion) < buffremaining(combustion) }
+}
+
+AddFunction font_of_power_precombat_channel
+{
+ if font_double_on_use() and not hastalent(firestarter_talent) and 0 == 0 18
+}
+
+AddFunction font_double_on_use
+{
+ hasequippeditem(azsharas_font_of_power_item) and combustion_on_use()
+}
+
+AddFunction combustion_on_use
+{
+ hasequippeditem(manifesto_of_madness_item) or hasequippeditem(gladiators_badge) or hasequippeditem(gladiators_medallion_item) or hasequippeditem(ignition_mages_fuse_item) or hasequippeditem(tzanes_barkspines_item) or hasequippeditem(azurethos_singed_plumage_item) or hasequippeditem(ancient_knot_of_wisdom_item) or hasequippeditem(shockbiters_fang_item) or hasequippeditem(neural_synapse_enhancer_item) or hasequippeditem(balefire_branch_item)
+}
+
+AddFunction shifting_power_reduction
+{
+ if message("covenant.night_fae.enabled is not implemented") casttime(shifting_power) / currentticktime(shifting_power) * 3
+}
+
+AddFunction combustion_flamestrike
+{
+ if 0 == 0 3 * talentpoints(flame_patch_talent) + 6 * hastalent(flame_patch_talent no)
+}
+
+AddFunction hard_cast_flamestrike
+{
+ if 0 == 0 2 * talentpoints(flame_patch_talent) + 3 * hastalent(flame_patch_talent no)
+}
+
+AddFunction hot_streak_flamestrike
+{
+ if 0 == 0 2 * talentpoints(flame_patch_talent) + 3 * hastalent(flame_patch_talent no)
+}
+
+AddCheckBox(opt_interrupt l(interrupt) default specialization=fire)
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=fire)
+
+AddFunction fireinterruptactions
+{
+ if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
+ {
+  if target.inrange(counterspell) and target.isinterruptible() spell(counterspell)
+  if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
+ }
+}
+
+AddFunction fireuseitemactions
+{
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
+}
+
+### actions.standard_rotation
+
+AddFunction firestandard_rotationmainactions
+{
+ #flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+ if enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) spell(flamestrike)
+ #pyroblast,if=buff.firestorm.react
+ if buffpresent(firestorm_buff) spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
+ if buffpresent(hot_streak) and buffremaining(hot_streak) < executetime(fireball) spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight)
+ if buffpresent(hot_streak) and { previousgcdspell(fireball) or talent(firestarter_talent) and target.healthpercent() >= 90 or inflighttotarget(pyroblast) } spell(pyroblast)
+ #pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power.enabled)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
+ if buffpresent(sun_kings_blessing_ready_buff) and { spellcooldown(rune_of_power) + executetime(rune_of_power) + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) or not hastalent(rune_of_power_talent) } and time_to_combustion() + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
+ if buffpresent(hot_streak) and target.healthpercent() <= 30 and hastalent(searing_touch_talent) spell(pyroblast)
+ #pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&(buff.pyroclasm.react=buff.pyroclasm.max_stack|buff.pyroclasm.remains<cast_time+action.fireball.execute_time|buff.alexstraszas_fury.up|!runeforge.sun_kings_blessing.equipped)
+ if buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } spell(pyroblast)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
+ if not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not fire_blast_pooling() and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } spell(fire_blast)
+ #pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+ if previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } spell(pyroblast)
+ #phoenix_flames,if=!variable.phoenix_pooling&(!talent.from_the_ashes.enabled|active_enemies>1)&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
+ if not phoenix_pooling() and { not hastalent(from_the_ashes_talent) or enemies() > 1 } and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } spell(phoenix_flames)
+ #call_action_list,name=active_talents
+ fireactive_talentsmainactions()
+
+ unless fireactive_talentsmainpostconditions()
+ {
+  #dragons_breath,if=active_enemies>1
+  if enemies() > 1 and target.distance(less 12) spell(dragons_breath)
+  #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  if target.healthpercent() <= 30 and hastalent(searing_touch_talent) spell(scorch)
+  #flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
+  if enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } spell(flamestrike)
+  #fireball
+  spell(fireball)
+  #scorch
+  spell(scorch)
+ }
+}
+
+AddFunction firestandard_rotationmainpostconditions
+{
+ fireactive_talentsmainpostconditions()
+}
+
+AddFunction firestandard_rotationshortcdactions
+{
+ unless enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and buffremaining(hot_streak) < executetime(fireball) and spell(pyroblast) or buffpresent(hot_streak) and { previousgcdspell(fireball) or talent(firestarter_talent) and target.healthpercent() >= 90 or inflighttotarget(pyroblast) } and spell(pyroblast) or buffpresent(sun_kings_blessing_ready_buff) and { spellcooldown(rune_of_power) + executetime(rune_of_power) + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) or not hastalent(rune_of_power_talent) } and time_to_combustion() + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) and spell(pyroblast) or buffpresent(hot_streak) and target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(pyroblast) or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not fire_blast_pooling() and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and { not hastalent(from_the_ashes_talent) or enemies() > 1 } and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames)
+ {
+  #call_action_list,name=active_talents
+  fireactive_talentsshortcdactions()
+ }
+}
+
+AddFunction firestandard_rotationshortcdpostconditions
+{
+ enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and buffremaining(hot_streak) < executetime(fireball) and spell(pyroblast) or buffpresent(hot_streak) and { previousgcdspell(fireball) or talent(firestarter_talent) and target.healthpercent() >= 90 or inflighttotarget(pyroblast) } and spell(pyroblast) or buffpresent(sun_kings_blessing_ready_buff) and { spellcooldown(rune_of_power) + executetime(rune_of_power) + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) or not hastalent(rune_of_power_talent) } and time_to_combustion() + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) and spell(pyroblast) or buffpresent(hot_streak) and target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(pyroblast) or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not fire_blast_pooling() and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and { not hastalent(from_the_ashes_talent) or enemies() > 1 } and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames) or fireactive_talentsshortcdpostconditions() or enemies() > 1 and target.distance(less 12) and spell(dragons_breath) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch) or enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and spell(flamestrike) or spell(fireball) or spell(scorch)
+}
+
+AddFunction firestandard_rotationcdactions
+{
+ unless enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and buffremaining(hot_streak) < executetime(fireball) and spell(pyroblast) or buffpresent(hot_streak) and { previousgcdspell(fireball) or talent(firestarter_talent) and target.healthpercent() >= 90 or inflighttotarget(pyroblast) } and spell(pyroblast) or buffpresent(sun_kings_blessing_ready_buff) and { spellcooldown(rune_of_power) + executetime(rune_of_power) + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) or not hastalent(rune_of_power_talent) } and time_to_combustion() + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) and spell(pyroblast) or buffpresent(hot_streak) and target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(pyroblast) or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not fire_blast_pooling() and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and { not hastalent(from_the_ashes_talent) or enemies() > 1 } and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames)
+ {
+  #call_action_list,name=active_talents
+  fireactive_talentscdactions()
+ }
+}
+
+AddFunction firestandard_rotationcdpostconditions
+{
+ enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and buffremaining(hot_streak) < executetime(fireball) and spell(pyroblast) or buffpresent(hot_streak) and { previousgcdspell(fireball) or talent(firestarter_talent) and target.healthpercent() >= 90 or inflighttotarget(pyroblast) } and spell(pyroblast) or buffpresent(sun_kings_blessing_ready_buff) and { spellcooldown(rune_of_power) + executetime(rune_of_power) + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) or not hastalent(rune_of_power_talent) } and time_to_combustion() + casttime(pyroblast) > buffremaining(sun_kings_blessing_ready_buff) and spell(pyroblast) or buffpresent(hot_streak) and target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(pyroblast) or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not fire_blast_pooling() and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and { not hastalent(from_the_ashes_talent) or enemies() > 1 } and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames) or fireactive_talentscdpostconditions() or enemies() > 1 and target.distance(less 12) and spell(dragons_breath) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch) or enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and spell(flamestrike) or spell(fireball) or spell(scorch)
+}
+
+### actions.rop_phase
+
+AddFunction firerop_phasemainactions
+{
+ #flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+ if enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) spell(flamestrike)
+ #pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+ if buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) spell(pyroblast)
+ #pyroblast,if=buff.firestorm.react
+ if buffpresent(firestorm_buff) spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react
+ if buffpresent(hot_streak) spell(pyroblast)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
+ if buffexpires(sun_kings_blessing_ready_buff) and not { enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(heating_up) and not buffpresent(hot_streak) and not previousoffgcdspell(fire_blast) and { charges(fire_blast) >= 2 or hastalent(alexstraszas_fury_talent) and spellcooldown(dragons_breath) == 0 or hastalent(searing_touch_talent) and target.healthpercent() <= 30 } spell(fire_blast)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
+ if not { talent(firestarter_talent) and target.healthpercent() >= 90 } and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } spell(fire_blast)
+ #call_action_list,name=active_talents
+ fireactive_talentsmainactions()
+
+ unless fireactive_talentsmainpostconditions()
+ {
+  #pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&cast_time<buff.rune_of_power.remains&(buff.pyroclasm.react=buff.pyroclasm.max_stack|buff.pyroclasm.remains<cast_time+action.fireball.execute_time|buff.alexstraszas_fury.up|!runeforge.sun_kings_blessing.equipped)
+  if buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and casttime(pyroblast) < totemremaining(rune_of_power) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } spell(pyroblast)
+  #pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+  if previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } spell(pyroblast)
+  #phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
+  if not phoenix_pooling() and buffpresent(heating_up) and not buffpresent(hot_streak) and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } spell(phoenix_flames)
+  #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  if target.healthpercent() <= 30 and hastalent(searing_touch_talent) spell(scorch)
+  #dragons_breath,if=active_enemies>2
+  if enemies() > 2 and target.distance(less 12) spell(dragons_breath)
+  #flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+  if enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } spell(flamestrike)
+  #fireball
+  spell(fireball)
+ }
+}
+
+AddFunction firerop_phasemainpostconditions
+{
+ fireactive_talentsmainpostconditions()
+}
+
+AddFunction firerop_phaseshortcdactions
+{
+ unless enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and spell(pyroblast) or buffexpires(sun_kings_blessing_ready_buff) and not { enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(heating_up) and not buffpresent(hot_streak) and not previousoffgcdspell(fire_blast) and { charges(fire_blast) >= 2 or hastalent(alexstraszas_fury_talent) and spellcooldown(dragons_breath) == 0 or hastalent(searing_touch_talent) and target.healthpercent() <= 30 } and spell(fire_blast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast)
+ {
+  #call_action_list,name=active_talents
+  fireactive_talentsshortcdactions()
+ }
+}
+
+AddFunction firerop_phaseshortcdpostconditions
+{
+ enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and spell(pyroblast) or buffexpires(sun_kings_blessing_ready_buff) and not { enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(heating_up) and not buffpresent(hot_streak) and not previousoffgcdspell(fire_blast) and { charges(fire_blast) >= 2 or hastalent(alexstraszas_fury_talent) and spellcooldown(dragons_breath) == 0 or hastalent(searing_touch_talent) and target.healthpercent() <= 30 } and spell(fire_blast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or fireactive_talentsshortcdpostconditions() or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and casttime(pyroblast) < totemremaining(rune_of_power) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and buffpresent(heating_up) and not buffpresent(hot_streak) and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch) or enemies() > 2 and target.distance(less 12) and spell(dragons_breath) or enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and spell(flamestrike) or spell(fireball)
+}
+
+AddFunction firerop_phasecdactions
+{
+ unless enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and spell(pyroblast) or buffexpires(sun_kings_blessing_ready_buff) and not { enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(heating_up) and not buffpresent(hot_streak) and not previousoffgcdspell(fire_blast) and { charges(fire_blast) >= 2 or hastalent(alexstraszas_fury_talent) and spellcooldown(dragons_breath) == 0 or hastalent(searing_touch_talent) and target.healthpercent() <= 30 } and spell(fire_blast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast)
+ {
+  #call_action_list,name=active_talents
+  fireactive_talentscdactions()
+ }
+}
+
+AddFunction firerop_phasecdpostconditions
+{
+ enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and buffpresent(hot_streak) and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(hot_streak) and spell(pyroblast) or buffexpires(sun_kings_blessing_ready_buff) and not { enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(heating_up) and not buffpresent(hot_streak) and not previousoffgcdspell(fire_blast) and { charges(fire_blast) >= 2 or hastalent(alexstraszas_fury_talent) and spellcooldown(dragons_breath) == 0 or hastalent(searing_touch_talent) and target.healthpercent() <= 30 } and spell(fire_blast) or not { talent(firestarter_talent) and target.healthpercent() >= 90 } and { { executetime(fireball) > 0 or executetime(pyroblast) > 0 } and buffpresent(heating_up) or hastalent(searing_touch_talent) and target.healthpercent() <= 30 and { buffpresent(heating_up) and not executetime(scorch) > 0 or not buffpresent(hot_streak) and not buffpresent(heating_up) and executetime(scorch) > 0 and not message("hot_streak_spells_in_flight is not implemented") } } and spell(fire_blast) or fireactive_talentscdpostconditions() or buffpresent(pyroclasm) and casttime(pyroblast) < buffremaining(pyroclasm) and casttime(pyroblast) < totemremaining(rune_of_power) and { buffstacks(pyroclasm) == spelldata(pyroclasm max_stacks) or buffremaining(pyroclasm) < casttime(pyroblast) + executetime(fireball) or buffpresent(alexstraszas_fury) or not message("runeforge.sun_kings_blessing.equipped is not implemented") } and spell(pyroblast) or previousgcdspell(scorch) and buffpresent(heating_up) and hastalent(searing_touch_talent) and target.healthpercent() <= 30 and not { enemies() >= hot_streak_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } } and spell(pyroblast) or not phoenix_pooling() and buffpresent(heating_up) and not buffpresent(hot_streak) and { debuffcountonany(ignite) < 2 or enemies() >= hard_cast_flamestrike() or enemies() >= hot_streak_flamestrike() } and spell(phoenix_flames) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch) or enemies() > 2 and target.distance(less 12) and spell(dragons_breath) or enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and spell(flamestrike) or spell(fireball)
+}
+
+### actions.precombat
+
+AddFunction fireprecombatmainactions
+{
+ #flask
+ #food
+ #augmentation
+ #arcane_intellect
+ spell(arcane_intellect)
+ #pyroblast
+ spell(pyroblast)
+}
+
+AddFunction fireprecombatmainpostconditions
+{
+}
+
+AddFunction fireprecombatshortcdactions
+{
+}
+
+AddFunction fireprecombatshortcdpostconditions
+{
+ spell(arcane_intellect) or spell(pyroblast)
+}
+
+AddFunction fireprecombatcdactions
+{
+ unless spell(arcane_intellect)
+ {
+  #variable,name=disable_combustion,op=reset
+  #variable,name=hot_streak_flamestrike,op=set,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch.enabled+3*!talent.flame_patch.enabled
+  #variable,name=hard_cast_flamestrike,op=set,if=variable.hard_cast_flamestrike=0,value=2*talent.flame_patch.enabled+3*!talent.flame_patch.enabled
+  #variable,name=combustion_flamestrike,op=set,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch.enabled+6*!talent.flame_patch.enabled
+  #variable,name=delay_flamestrike,default=0,op=reset
+  #variable,name=kindling_reduction,default=0.2,op=reset
+  #variable,name=shifting_power_reduction,op=set,value=action.shifting_power.cast_time%action.shifting_power.tick_time*3,if=covenant.night_fae.enabled
+  #variable,name=combustion_on_use,op=set,value=equipped.manifesto_of_madness|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.ignition_mages_fuse|equipped.tzanes_barkspines|equipped.azurethos_singed_plumage|equipped.ancient_knot_of_wisdom|equipped.shockbiters_fang|equipped.neural_synapse_enhancer|equipped.balefire_branch
+  #variable,name=font_double_on_use,op=set,value=equipped.azsharas_font_of_power&variable.combustion_on_use
+  #variable,name=font_of_power_precombat_channel,op=set,value=18,if=variable.font_double_on_use&!talent.firestarter.enabled&variable.font_of_power_precombat_channel=0
+  #snapshot_stats
+  #use_item,name=azsharas_font_of_power,if=!variable.disable_combustion
+  if not disable_combustion() fireuseitemactions()
+  #mirror_image
+  spell(mirror_image)
+ }
+}
+
+AddFunction fireprecombatcdpostconditions
+{
+ spell(arcane_intellect) or spell(pyroblast)
+}
+
+### actions.combustion_phase
+
+AddFunction firecombustion_phasemainactions
+{
+ #living_bomb,if=active_enemies>1&buff.combustion.down
+ if enemies() > 1 and buffexpires(combustion) spell(living_bomb)
+ #blood_of_the_enemy
+ spell(blood_of_the_enemy)
+ #memory_of_lucid_dreams
+ spell(memory_of_lucid_dreams)
+ #worldvein_resonance
+ spell(worldvein_resonance)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&charges>=1&((action.fire_blast.charges_fractional+(buff.combustion.remains-buff.blaster_master.duration)%cooldown.fire_blast.duration-(buff.combustion.remains)%(buff.blaster_master.duration-0.5))>=0|!azerite.blaster_master.enabled|!talent.flame_on.enabled|buff.combustion.remains<=buff.blaster_master.duration|buff.blaster_master.remains<0.5|equipped.hyperthread_wristwraps&cooldown.hyperthread_wristwraps_300142.remains<5)&buff.combustion.up&(!action.scorch.executing&!action.pyroblast.in_flight&buff.heating_up.up|action.scorch.executing&buff.hot_streak.down&(buff.heating_up.down|azerite.blaster_master.enabled)|azerite.blaster_master.enabled&talent.flame_on.enabled&action.pyroblast.in_flight&buff.heating_up.down&buff.hot_streak.down)
+ if hasazeritetrait(blaster_master_trait) and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { buffremaining(combustion) - baseduration(blaster_master_buff) } / spellcooldownduration(fire_blast) - buffremaining(combustion) / { baseduration(blaster_master_buff) - 0.5 } >= 0 or not hasazeritetrait(blaster_master_trait) or not hastalent(flame_on_talent) or buffremaining(combustion) <= baseduration(blaster_master_buff) or buffremaining(blaster_master_buff) < 0.5 or hasequippeditem(hyperthread_wristwraps_item) and spellcooldown(hyperthread_wristwraps_300142) < 5 } and buffpresent(combustion) and { not executetime(scorch) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(scorch) > 0 and buffexpires(hot_streak) and { buffexpires(heating_up) or hasazeritetrait(blaster_master_trait) } or hasazeritetrait(blaster_master_trait) and hastalent(flame_on_talent) and inflighttotarget(pyroblast) and buffexpires(heating_up) and buffexpires(hot_streak) } spell(fire_blast)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=!azerite.blaster_master.enabled&(active_enemies<=active_dot.ignite|!cooldown.phoenix_flames.ready)&conduit.infernal_cascade.enabled&charges>=1&((action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration-variable.extended_combustion_remains%(buff.infernal_cascade.duration-0.5))>=0|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.remains<0.5)&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
+ if not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { extended_combustion_remains() - baseduration(infernal_cascade) } / spellcooldownduration(fire_blast) - extended_combustion_remains() / { baseduration(infernal_cascade) - 0.5 } >= 0 or extended_combustion_remains() <= baseduration(infernal_cascade) or buffremaining(infernal_cascade) < 0.5 } and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 spell(fire_blast)
+ #fire_blast,use_off_gcd=1,use_while_casting=1,if=!azerite.blaster_master.enabled&(active_enemies<=active_dot.ignite|!cooldown.phoenix_flames.ready)&!conduit.infernal_cascade.enabled&charges>=1&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
+ if not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and not message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 spell(fire_blast)
+ #arcane_explosion,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
+ if message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 spell(arcane_explosion)
+ #frostbolt,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_frost.down
+ if message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_frost_buff) spell(frostbolt)
+ #call_action_list,name=active_talents
+ fireactive_talentsmainactions()
+
+ unless fireactive_talentsmainpostconditions()
+ {
+  #berserking,if=buff.combustion.last_expire<=action.combustion.last_used
+  if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") spell(berserking)
+  #flamestrike,if=buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike
+  if buffpresent(hot_streak) and enemies() >= combustion_flamestrike() spell(flamestrike)
+  #pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  if buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) spell(pyroblast)
+  #pyroblast,if=buff.firestorm.react
+  if buffpresent(firestorm_buff) spell(pyroblast)
+  #pyroblast,if=buff.pyroclasm.react&buff.pyroclasm.remains>cast_time&(buff.combustion.remains>cast_time|buff.combustion.down)
+  if buffpresent(pyroclasm) and buffremaining(pyroclasm) > casttime(pyroblast) and { buffremaining(combustion) > casttime(pyroblast) or buffexpires(combustion) } spell(pyroblast)
+  #pyroblast,if=buff.hot_streak.react&buff.combustion.up
+  if buffpresent(hot_streak) and buffpresent(combustion) spell(pyroblast)
+  #pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react
+  if previousgcdspell(scorch) and buffpresent(heating_up) spell(pyroblast)
+  #phoenix_flames,if=buff.combustion.up
+  if buffpresent(combustion) spell(phoenix_flames)
+  #fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&!conduit.flame_accretion.enabled
+  if buffexpires(combustion) and spellcooldown(combustion) < casttime(fireball) and not message("conduit.flame_accretion.enabled is not implemented") spell(fireball)
+  #scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down&cooldown.combustion.remains<cast_time
+  if buffremaining(combustion) > casttime(scorch) and buffpresent(combustion) or buffexpires(combustion) and spellcooldown(combustion) < casttime(scorch) spell(scorch)
+  #living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
+  if buffremaining(combustion) < gcd() and enemies() > 1 spell(living_bomb)
+  #dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
+  if buffremaining(combustion) < gcd() and buffpresent(combustion) and target.distance(less 12) spell(dragons_breath)
+  #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  if target.healthpercent() <= 30 and hastalent(searing_touch_talent) spell(scorch)
+ }
+}
+
+AddFunction firecombustion_phasemainpostconditions
+{
+ fireactive_talentsmainpostconditions()
+}
+
+AddFunction firecombustion_phaseshortcdactions
+{
+ #variable,name=extended_combustion_remains,op=set,value=buff.combustion.remains+buff.combustion.duration*(cooldown.combustion.remains<buff.combustion.remains)
+ #variable,name=extended_combustion_remains,op=add,value=6,if=buff.sun_kings_blessing_ready.up|variable.extended_combustion_remains>1.5*gcd.max*(buff.sun_kings_blessing.max_stack-buff.sun_kings_blessing.stack)
+ #bag_of_tricks,if=buff.combustion.down
+ if buffexpires(combustion) spell(bag_of_tricks)
+
+ unless enemies() > 1 and buffexpires(combustion) and spell(living_bomb)
+ {
+  #mirrors_of_torment,if=buff.combustion.down&buff.rune_of_power.down
+  if buffexpires(combustion) and buffexpires(rune_of_power) spell(mirrors_of_torment)
+
+  unless spell(blood_of_the_enemy) or spell(memory_of_lucid_dreams) or spell(worldvein_resonance) or hasazeritetrait(blaster_master_trait) and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { buffremaining(combustion) - baseduration(blaster_master_buff) } / spellcooldownduration(fire_blast) - buffremaining(combustion) / { baseduration(blaster_master_buff) - 0.5 } >= 0 or not hasazeritetrait(blaster_master_trait) or not hastalent(flame_on_talent) or buffremaining(combustion) <= baseduration(blaster_master_buff) or buffremaining(blaster_master_buff) < 0.5 or hasequippeditem(hyperthread_wristwraps_item) and spellcooldown(hyperthread_wristwraps_300142) < 5 } and buffpresent(combustion) and { not executetime(scorch) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(scorch) > 0 and buffexpires(hot_streak) and { buffexpires(heating_up) or hasazeritetrait(blaster_master_trait) } or hasazeritetrait(blaster_master_trait) and hastalent(flame_on_talent) and inflighttotarget(pyroblast) and buffexpires(heating_up) and buffexpires(hot_streak) } and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { extended_combustion_remains() - baseduration(infernal_cascade) } / spellcooldownduration(fire_blast) - extended_combustion_remains() / { baseduration(infernal_cascade) - 0.5 } >= 0 or extended_combustion_remains() <= baseduration(infernal_cascade) or buffremaining(infernal_cascade) < 0.5 } and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and not message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_frost_buff) and spell(frostbolt)
+  {
+   #call_action_list,name=active_talents
+   fireactive_talentsshortcdactions()
+  }
+ }
+}
+
+AddFunction firecombustion_phaseshortcdpostconditions
+{
+ enemies() > 1 and buffexpires(combustion) and spell(living_bomb) or spell(blood_of_the_enemy) or spell(memory_of_lucid_dreams) or spell(worldvein_resonance) or hasazeritetrait(blaster_master_trait) and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { buffremaining(combustion) - baseduration(blaster_master_buff) } / spellcooldownduration(fire_blast) - buffremaining(combustion) / { baseduration(blaster_master_buff) - 0.5 } >= 0 or not hasazeritetrait(blaster_master_trait) or not hastalent(flame_on_talent) or buffremaining(combustion) <= baseduration(blaster_master_buff) or buffremaining(blaster_master_buff) < 0.5 or hasequippeditem(hyperthread_wristwraps_item) and spellcooldown(hyperthread_wristwraps_300142) < 5 } and buffpresent(combustion) and { not executetime(scorch) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(scorch) > 0 and buffexpires(hot_streak) and { buffexpires(heating_up) or hasazeritetrait(blaster_master_trait) } or hasazeritetrait(blaster_master_trait) and hastalent(flame_on_talent) and inflighttotarget(pyroblast) and buffexpires(heating_up) and buffexpires(hot_streak) } and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { extended_combustion_remains() - baseduration(infernal_cascade) } / spellcooldownduration(fire_blast) - extended_combustion_remains() / { baseduration(infernal_cascade) - 0.5 } >= 0 or extended_combustion_remains() <= baseduration(infernal_cascade) or buffremaining(infernal_cascade) < 0.5 } and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and not message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_frost_buff) and spell(frostbolt) or fireactive_talentsshortcdpostconditions() or message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") and spell(berserking) or buffpresent(hot_streak) and enemies() >= combustion_flamestrike() and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(pyroclasm) and buffremaining(pyroclasm) > casttime(pyroblast) and { buffremaining(combustion) > casttime(pyroblast) or buffexpires(combustion) } and spell(pyroblast) or buffpresent(hot_streak) and buffpresent(combustion) and spell(pyroblast) or previousgcdspell(scorch) and buffpresent(heating_up) and spell(pyroblast) or buffpresent(combustion) and spell(phoenix_flames) or buffexpires(combustion) and spellcooldown(combustion) < casttime(fireball) and not message("conduit.flame_accretion.enabled is not implemented") and spell(fireball) or { buffremaining(combustion) > casttime(scorch) and buffpresent(combustion) or buffexpires(combustion) and spellcooldown(combustion) < casttime(scorch) } and spell(scorch) or buffremaining(combustion) < gcd() and enemies() > 1 and spell(living_bomb) or buffremaining(combustion) < gcd() and buffpresent(combustion) and target.distance(less 12) and spell(dragons_breath) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch)
+}
+
+AddFunction firecombustion_phasecdactions
+{
+ #lights_judgment,if=buff.combustion.down
+ if buffexpires(combustion) spell(lights_judgment)
+
+ unless buffexpires(combustion) and spell(bag_of_tricks) or enemies() > 1 and buffexpires(combustion) and spell(living_bomb) or buffexpires(combustion) and buffexpires(rune_of_power) and spell(mirrors_of_torment)
+ {
+  #use_item,name=hyperthread_wristwraps,if=buff.combustion.up&action.fire_blast.charges=0&action.fire_blast.recharge_time>gcd.max
+  if buffpresent(combustion) and charges(fire_blast) == 0 and spellchargecooldown(fire_blast) > gcd() fireuseitemactions()
+
+  unless spell(blood_of_the_enemy) or spell(memory_of_lucid_dreams) or spell(worldvein_resonance) or hasazeritetrait(blaster_master_trait) and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { buffremaining(combustion) - baseduration(blaster_master_buff) } / spellcooldownduration(fire_blast) - buffremaining(combustion) / { baseduration(blaster_master_buff) - 0.5 } >= 0 or not hasazeritetrait(blaster_master_trait) or not hastalent(flame_on_talent) or buffremaining(combustion) <= baseduration(blaster_master_buff) or buffremaining(blaster_master_buff) < 0.5 or hasequippeditem(hyperthread_wristwraps_item) and spellcooldown(hyperthread_wristwraps_300142) < 5 } and buffpresent(combustion) and { not executetime(scorch) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(scorch) > 0 and buffexpires(hot_streak) and { buffexpires(heating_up) or hasazeritetrait(blaster_master_trait) } or hasazeritetrait(blaster_master_trait) and hastalent(flame_on_talent) and inflighttotarget(pyroblast) and buffexpires(heating_up) and buffexpires(hot_streak) } and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { extended_combustion_remains() - baseduration(infernal_cascade) } / spellcooldownduration(fire_blast) - extended_combustion_remains() / { baseduration(infernal_cascade) - 0.5 } >= 0 or extended_combustion_remains() <= baseduration(infernal_cascade) or buffremaining(infernal_cascade) < 0.5 } and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and not message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast)
+  {
+   #counterspell,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
+   if message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 fireinterruptactions()
+
+   unless message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_frost_buff) and spell(frostbolt)
+   {
+    #call_action_list,name=active_talents
+    fireactive_talentscdactions()
+
+    unless fireactive_talentscdpostconditions()
+    {
+     #combustion,use_off_gcd=1,use_while_casting=1,if=buff.combustion.down&(runeforge.disciplinary_command.equipped=buff.disciplinary_command.up)&(action.meteor.in_flight&action.meteor.in_flight_remains<=0.5|action.scorch.executing&action.scorch.execute_remains<0.5|action.fireball.executing&action.fireball.execute_remains<0.5|action.pyroblast.executing&action.pyroblast.execute_remains<0.5)
+     if buffexpires(combustion) and message("runeforge.disciplinary_command.equipped is not implemented") == buffpresent(disciplinary_command) and { inflighttotarget(meteor) and 0 <= 0.5 or executetime(scorch) > 0 and executetime(scorch) < 0.5 or executetime(fireball) > 0 and executetime(fireball) < 0.5 or executetime(pyroblast) > 0 and executetime(pyroblast) < 0.5 } spell(combustion)
+     #potion,if=buff.combustion.last_expire<=action.combustion.last_used
+     if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_intellect_item usable=1)
+     #blood_fury,if=buff.combustion.last_expire<=action.combustion.last_used
+     if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") spell(blood_fury)
+
+     unless message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") and spell(berserking)
+     {
+      #fireblood,if=buff.combustion.last_expire<=action.combustion.last_used
+      if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") spell(fireblood)
+      #ancestral_call,if=buff.combustion.last_expire<=action.combustion.last_used
+      if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") spell(ancestral_call)
+      #use_items,if=buff.combustion.last_expire<=action.combustion.last_used
+      if message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") fireuseitemactions()
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction firecombustion_phasecdpostconditions
+{
+ buffexpires(combustion) and spell(bag_of_tricks) or enemies() > 1 and buffexpires(combustion) and spell(living_bomb) or buffexpires(combustion) and buffexpires(rune_of_power) and spell(mirrors_of_torment) or spell(blood_of_the_enemy) or spell(memory_of_lucid_dreams) or spell(worldvein_resonance) or hasazeritetrait(blaster_master_trait) and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { buffremaining(combustion) - baseduration(blaster_master_buff) } / spellcooldownduration(fire_blast) - buffremaining(combustion) / { baseduration(blaster_master_buff) - 0.5 } >= 0 or not hasazeritetrait(blaster_master_trait) or not hastalent(flame_on_talent) or buffremaining(combustion) <= baseduration(blaster_master_buff) or buffremaining(blaster_master_buff) < 0.5 or hasequippeditem(hyperthread_wristwraps_item) and spellcooldown(hyperthread_wristwraps_300142) < 5 } and buffpresent(combustion) and { not executetime(scorch) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(scorch) > 0 and buffexpires(hot_streak) and { buffexpires(heating_up) or hasazeritetrait(blaster_master_trait) } or hasazeritetrait(blaster_master_trait) and hastalent(flame_on_talent) and inflighttotarget(pyroblast) and buffexpires(heating_up) and buffexpires(hot_streak) } and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and { charges(fire_blast count=0) + { extended_combustion_remains() - baseduration(infernal_cascade) } / spellcooldownduration(fire_blast) - extended_combustion_remains() / { baseduration(infernal_cascade) - 0.5 } >= 0 or extended_combustion_remains() <= baseduration(infernal_cascade) or buffremaining(infernal_cascade) < 0.5 } and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or not hasazeritetrait(blaster_master_trait) and { enemies() <= debuffcountonany(ignite) or not spellcooldown(phoenix_flames) == 0 } and not message("conduit.infernal_cascade.enabled is not implemented") and charges(fire_blast) >= 1 and buffpresent(combustion) and not buffpresent(firestorm_buff) and not buffpresent(hot_streak) and message("hot_streak_spells_in_flight is not implemented") + buffstacks(heating_up) < 2 and spell(fire_blast) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(buff_disciplinary_command) == 0 and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and buffexpires(disciplinary_command) and buffexpires(disciplinary_command_frost_buff) and spell(frostbolt) or fireactive_talentscdpostconditions() or message("buff.combustion.last_expire is not implemented") <= message("action.combustion.last_used is not implemented") and spell(berserking) or buffpresent(hot_streak) and enemies() >= combustion_flamestrike() and spell(flamestrike) or buffpresent(sun_kings_blessing_ready_buff) and buffremaining(sun_kings_blessing_ready_buff) > casttime(pyroblast) and spell(pyroblast) or buffpresent(firestorm_buff) and spell(pyroblast) or buffpresent(pyroclasm) and buffremaining(pyroclasm) > casttime(pyroblast) and { buffremaining(combustion) > casttime(pyroblast) or buffexpires(combustion) } and spell(pyroblast) or buffpresent(hot_streak) and buffpresent(combustion) and spell(pyroblast) or previousgcdspell(scorch) and buffpresent(heating_up) and spell(pyroblast) or buffpresent(combustion) and spell(phoenix_flames) or buffexpires(combustion) and spellcooldown(combustion) < casttime(fireball) and not message("conduit.flame_accretion.enabled is not implemented") and spell(fireball) or { buffremaining(combustion) > casttime(scorch) and buffpresent(combustion) or buffexpires(combustion) and spellcooldown(combustion) < casttime(scorch) } and spell(scorch) or buffremaining(combustion) < gcd() and enemies() > 1 and spell(living_bomb) or buffremaining(combustion) < gcd() and buffpresent(combustion) and target.distance(less 12) and spell(dragons_breath) or target.healthpercent() <= 30 and hastalent(searing_touch_talent) and spell(scorch)
+}
+
+### actions.active_talents
+
+AddFunction fireactive_talentsmainactions
+{
+ #living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0|variable.disable_combustion)
+ if enemies() > 1 and buffexpires(combustion) and { time_to_combustion() > spellcooldownduration(living_bomb) or time_to_combustion() <= 0 or disable_combustion() } spell(living_bomb)
+ #dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react)
+ if hastalent(alexstraszas_fury_talent) and buffexpires(combustion) and not buffpresent(hot_streak) and target.distance(less 12) spell(dragons_breath)
+}
+
+AddFunction fireactive_talentsmainpostconditions
+{
+}
+
+AddFunction fireactive_talentsshortcdactions
+{
+ unless enemies() > 1 and buffexpires(combustion) and { time_to_combustion() > spellcooldownduration(living_bomb) or time_to_combustion() <= 0 or disable_combustion() } and spell(living_bomb)
+ {
+  #meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(cooldown.meteor.duration<variable.time_to_combustion&!talent.rune_of_power.enabled)|talent.rune_of_power.enabled&buff.rune_of_power.up&variable.time_to_combustion>action.meteor.cooldown|target.time_to_die<variable.time_to_combustion|variable.disable_combustion
+  if not disable_combustion() and time_to_combustion() <= 0 or spellcooldownduration(meteor) < time_to_combustion() and not hastalent(rune_of_power_talent) or hastalent(rune_of_power_talent) and buffpresent(rune_of_power) and time_to_combustion() > spellcooldown(meteor) or target.timetodie() < time_to_combustion() or disable_combustion() spell(meteor)
+ }
+}
+
+AddFunction fireactive_talentsshortcdpostconditions
+{
+ enemies() > 1 and buffexpires(combustion) and { time_to_combustion() > spellcooldownduration(living_bomb) or time_to_combustion() <= 0 or disable_combustion() } and spell(living_bomb) or hastalent(alexstraszas_fury_talent) and buffexpires(combustion) and not buffpresent(hot_streak) and target.distance(less 12) and spell(dragons_breath)
+}
+
+AddFunction fireactive_talentscdactions
+{
+}
+
+AddFunction fireactive_talentscdpostconditions
+{
+ enemies() > 1 and buffexpires(combustion) and { time_to_combustion() > spellcooldownduration(living_bomb) or time_to_combustion() <= 0 or disable_combustion() } and spell(living_bomb) or { not disable_combustion() and time_to_combustion() <= 0 or spellcooldownduration(meteor) < time_to_combustion() and not hastalent(rune_of_power_talent) or hastalent(rune_of_power_talent) and buffpresent(rune_of_power) and time_to_combustion() > spellcooldown(meteor) or target.timetodie() < time_to_combustion() or disable_combustion() } and spell(meteor) or hastalent(alexstraszas_fury_talent) and buffexpires(combustion) and not buffpresent(hot_streak) and target.distance(less 12) and spell(dragons_breath)
+}
+
+### actions.default
+
+AddFunction fire_defaultmainactions
+{
+ #concentrated_flame
+ spell(concentrated_flame)
+ #ripple_in_space
+ spell(ripple_in_space)
+ #the_unbound_force
+ spell(the_unbound_force)
+ #arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+ if message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) spell(arcane_explosion)
+ #frostbolt,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+ if message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_frost_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) spell(frostbolt)
+ #rune_of_power,if=buff.rune_of_power.down&(variable.time_to_combustion>buff.rune_of_power.duration&variable.time_to_combustion>action.fire_blast.full_recharge_time|variable.time_to_combustion>target.time_to_die|variable.disable_combustion)
+ if buffexpires(rune_of_power) and { time_to_combustion() > baseduration(rune_of_power) and time_to_combustion() > spellfullrecharge(fire_blast) or time_to_combustion() > target.timetodie() or disable_combustion() } spell(rune_of_power)
+ #call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
+ if not disable_combustion() and time_to_combustion() <= 0 firecombustion_phasemainactions()
+
+ unless not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phasemainpostconditions()
+ {
+  #variable,name=fire_blast_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time-variable.shifting_power_reduction*(cooldown.shifting_power.remains<variable.time_to_combustion)&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped&action.fire_blast.charges_fractional<action.fire_blast.max_charges-0.5&(cooldown.shifting_power.remains>15|!covenant.night_fae.enabled)
+  #call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
+  if buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } firerop_phasemainactions()
+
+  unless buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phasemainpostconditions()
+  {
+   #variable,name=phoenix_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.phoenix_flames.full_recharge_time&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped
+   #fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(variable.time_to_combustion>0|variable.disable_combustion)&(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&!buff.hot_streak.react
+   if not fire_blast_pooling() and { time_to_combustion() > 0 or disable_combustion() } and enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(hot_streak) spell(fire_blast)
+   #fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&charges>=1&!variable.fire_blast_pooling&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.react|action.fireball.executing&!buff.hot_streak.react|action.pyroblast.in_flight&buff.heating_up.react&!buff.hot_streak.react)
+   if talent(firestarter_talent) and target.healthpercent() >= 90 and charges(fire_blast) >= 1 and not fire_blast_pooling() and { not executetime(fireball) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(fireball) > 0 and not buffpresent(hot_streak) or inflighttotarget(pyroblast) and buffpresent(heating_up) and not buffpresent(hot_streak) } spell(fire_blast)
+   #call_action_list,name=standard_rotation,if=(variable.time_to_combustion>0|variable.disable_combustion)&buff.rune_of_power.down
+   if { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) firestandard_rotationmainactions()
+  }
+ }
+}
+
+AddFunction fire_defaultmainpostconditions
+{
+ not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phasemainpostconditions() or buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phasemainpostconditions() or { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) and firestandard_rotationmainpostconditions()
+}
+
+AddFunction fire_defaultshortcdactions
+{
+ #variable,name=time_to_combustion,op=set,value=talent.firestarter.enabled*firestarter.remains+(cooldown.combustion.remains*(1-variable.kindling_reduction*talent.kindling.enabled))*!cooldown.combustion.ready*buff.combustion.down
+ #cycling_variable,name=ignite_min,op=min,value=dot.ignite.tick_dmg
+ #shifting_power,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains>0&(cooldown.rune_of_power.remains>0|!talent.rune_of_power.enabled)
+ if buffexpires(combustion) and buffexpires(rune_of_power) and spellcooldown(combustion) > 0 and { spellcooldown(rune_of_power) > 0 or not hastalent(rune_of_power_talent) } spell(shifting_power)
+ #radiant_spark,if=(buff.combustion.down&buff.rune_of_power.down&(cooldown.combustion.remains<execute_time|cooldown.combustion.remains>cooldown.radiant_spark.duration))|(buff.rune_of_power.up&cooldown.combustion.remains>30)
+ if buffexpires(combustion) and buffexpires(rune_of_power) and { spellcooldown(combustion) < executetime(radiant_spark) or spellcooldown(combustion) > spellcooldownduration(radiant_spark) } or buffpresent(rune_of_power) and spellcooldown(combustion) > 30 spell(radiant_spark)
+
+ unless spell(concentrated_flame)
+ {
+  #reaping_flames
+  spell(reaping_flames)
+  #focused_azerite_beam
+  spell(focused_azerite_beam)
+  #purifying_blast
+  spell(purifying_blast)
+
+  unless spell(ripple_in_space) or spell(the_unbound_force) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_frost_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(frostbolt) or buffexpires(rune_of_power) and { time_to_combustion() > baseduration(rune_of_power) and time_to_combustion() > spellfullrecharge(fire_blast) or time_to_combustion() > target.timetodie() or disable_combustion() } and spell(rune_of_power)
+  {
+   #call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
+   if not disable_combustion() and time_to_combustion() <= 0 firecombustion_phaseshortcdactions()
+
+   unless not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phaseshortcdpostconditions()
+   {
+    #variable,name=fire_blast_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time-variable.shifting_power_reduction*(cooldown.shifting_power.remains<variable.time_to_combustion)&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped&action.fire_blast.charges_fractional<action.fire_blast.max_charges-0.5&(cooldown.shifting_power.remains>15|!covenant.night_fae.enabled)
+    #call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
+    if buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } firerop_phaseshortcdactions()
+
+    unless buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phaseshortcdpostconditions() or not fire_blast_pooling() and { time_to_combustion() > 0 or disable_combustion() } and enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(hot_streak) and spell(fire_blast) or talent(firestarter_talent) and target.healthpercent() >= 90 and charges(fire_blast) >= 1 and not fire_blast_pooling() and { not executetime(fireball) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(fireball) > 0 and not buffpresent(hot_streak) or inflighttotarget(pyroblast) and buffpresent(heating_up) and not buffpresent(hot_streak) } and spell(fire_blast)
+    {
+     #call_action_list,name=standard_rotation,if=(variable.time_to_combustion>0|variable.disable_combustion)&buff.rune_of_power.down
+     if { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) firestandard_rotationshortcdactions()
+    }
+   }
+  }
+ }
+}
+
+AddFunction fire_defaultshortcdpostconditions
+{
+ spell(concentrated_flame) or spell(ripple_in_space) or spell(the_unbound_force) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_frost_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(frostbolt) or buffexpires(rune_of_power) and { time_to_combustion() > baseduration(rune_of_power) and time_to_combustion() > spellfullrecharge(fire_blast) or time_to_combustion() > target.timetodie() or disable_combustion() } and spell(rune_of_power) or not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phaseshortcdpostconditions() or buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phaseshortcdpostconditions() or not fire_blast_pooling() and { time_to_combustion() > 0 or disable_combustion() } and enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(hot_streak) and spell(fire_blast) or talent(firestarter_talent) and target.healthpercent() >= 90 and charges(fire_blast) >= 1 and not fire_blast_pooling() and { not executetime(fireball) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(fireball) > 0 and not buffpresent(hot_streak) or inflighttotarget(pyroblast) and buffpresent(heating_up) and not buffpresent(hot_streak) } and spell(fire_blast) or { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) and firestandard_rotationshortcdpostconditions()
+}
+
+AddFunction fire_defaultcdactions
+{
+ #counterspell,if=!runeforge.disciplinary_command.equipped
+ if not message("runeforge.disciplinary_command.equipped is not implemented") fireinterruptactions()
+
+ unless buffexpires(combustion) and buffexpires(rune_of_power) and spellcooldown(combustion) > 0 and { spellcooldown(rune_of_power) > 0 or not hastalent(rune_of_power_talent) } and spell(shifting_power) or { buffexpires(combustion) and buffexpires(rune_of_power) and { spellcooldown(combustion) < executetime(radiant_spark) or spellcooldown(combustion) > spellcooldownduration(radiant_spark) } or buffpresent(rune_of_power) and spellcooldown(combustion) > 30 } and spell(radiant_spark)
+ {
+  #deathborne,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains<execute_time
+  if buffexpires(combustion) and buffexpires(rune_of_power) and spellcooldown(combustion) < executetime(deathborne) spell(deathborne)
+  #mirror_image,if=buff.combustion.down&debuff.radiant_spark_vulnerability.down
+  if buffexpires(combustion) and target.debuffexpires(radiant_spark_vulnerability) spell(mirror_image)
+  #use_item,name=azsharas_font_of_power,if=variable.time_to_combustion<=5+15*variable.font_double_on_use&variable.time_to_combustion>0&!variable.disable_combustion
+  if time_to_combustion() <= 5 + 15 * font_double_on_use() and time_to_combustion() > 0 and not disable_combustion() fireuseitemactions()
+  #guardian_of_azeroth,if=(variable.time_to_combustion<10|target.time_to_die<variable.time_to_combustion)&!variable.disable_combustion
+  if { time_to_combustion() < 10 or target.timetodie() < time_to_combustion() } and not disable_combustion() spell(guardian_of_azeroth)
+
+  unless spell(concentrated_flame) or spell(reaping_flames) or spell(focused_azerite_beam) or spell(purifying_blast) or spell(ripple_in_space) or spell(the_unbound_force)
+  {
+   #counterspell,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+   if message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) fireinterruptactions()
+
+   unless message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_frost_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(frostbolt) or buffexpires(rune_of_power) and { time_to_combustion() > baseduration(rune_of_power) and time_to_combustion() > spellfullrecharge(fire_blast) or time_to_combustion() > target.timetodie() or disable_combustion() } and spell(rune_of_power)
+   {
+    #call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
+    if not disable_combustion() and time_to_combustion() <= 0 firecombustion_phasecdactions()
+
+    unless not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phasecdpostconditions()
+    {
+     #variable,name=fire_blast_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time-variable.shifting_power_reduction*(cooldown.shifting_power.remains<variable.time_to_combustion)&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped&action.fire_blast.charges_fractional<action.fire_blast.max_charges-0.5&(cooldown.shifting_power.remains>15|!covenant.night_fae.enabled)
+     #call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
+     if buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } firerop_phasecdactions()
+
+     unless buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phasecdpostconditions() or not fire_blast_pooling() and { time_to_combustion() > 0 or disable_combustion() } and enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(hot_streak) and spell(fire_blast) or talent(firestarter_talent) and target.healthpercent() >= 90 and charges(fire_blast) >= 1 and not fire_blast_pooling() and { not executetime(fireball) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(fireball) > 0 and not buffpresent(hot_streak) or inflighttotarget(pyroblast) and buffpresent(heating_up) and not buffpresent(hot_streak) } and spell(fire_blast)
+     {
+      #call_action_list,name=standard_rotation,if=(variable.time_to_combustion>0|variable.disable_combustion)&buff.rune_of_power.down
+      if { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) firestandard_rotationcdactions()
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction fire_defaultcdpostconditions
+{
+ buffexpires(combustion) and buffexpires(rune_of_power) and spellcooldown(combustion) > 0 and { spellcooldown(rune_of_power) > 0 or not hastalent(rune_of_power_talent) } and spell(shifting_power) or { buffexpires(combustion) and buffexpires(rune_of_power) and { spellcooldown(combustion) < executetime(radiant_spark) or spellcooldown(combustion) > spellcooldownduration(radiant_spark) } or buffpresent(rune_of_power) and spellcooldown(combustion) > 30 } and spell(radiant_spark) or spell(concentrated_flame) or spell(reaping_flames) or spell(focused_azerite_beam) or spell(purifying_blast) or spell(ripple_in_space) or spell(the_unbound_force) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_frost_buff) and spellcooldown(combustion) > 30 and not buffpresent(disciplinary_command) and spell(frostbolt) or buffexpires(rune_of_power) and { time_to_combustion() > baseduration(rune_of_power) and time_to_combustion() > spellfullrecharge(fire_blast) or time_to_combustion() > target.timetodie() or disable_combustion() } and spell(rune_of_power) or not disable_combustion() and time_to_combustion() <= 0 and firecombustion_phasecdpostconditions() or buffpresent(rune_of_power) and { time_to_combustion() > 0 or disable_combustion() } and firerop_phasecdpostconditions() or not fire_blast_pooling() and { time_to_combustion() > 0 or disable_combustion() } and enemies() >= hard_cast_flamestrike() and { timeincombat() - message("buff.combustion.last_expire is not implemented") > delay_flamestrike() or disable_combustion() } and not { talent(firestarter_talent) and target.healthpercent() >= 90 } and not buffpresent(hot_streak) and spell(fire_blast) or talent(firestarter_talent) and target.healthpercent() >= 90 and charges(fire_blast) >= 1 and not fire_blast_pooling() and { not executetime(fireball) > 0 and not inflighttotarget(pyroblast) and buffpresent(heating_up) or executetime(fireball) > 0 and not buffpresent(hot_streak) or inflighttotarget(pyroblast) and buffpresent(heating_up) and not buffpresent(hot_streak) } and spell(fire_blast) or { time_to_combustion() > 0 or disable_combustion() } and buffexpires(rune_of_power) and firestandard_rotationcdpostconditions()
+}
+
 ### Fire icons.
 
 AddCheckBox(opt_mage_fire_aoe l(aoe) default specialization=fire)
+
+AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
+{
+ if not incombat() fireprecombatshortcdactions()
+ fire_defaultshortcdactions()
+}
+
+AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
+{
+ if not incombat() fireprecombatshortcdactions()
+ fire_defaultshortcdactions()
+}
+
+AddIcon enemies=1 help=main specialization=fire
+{
+ if not incombat() fireprecombatmainactions()
+ fire_defaultmainactions()
+}
+
+AddIcon checkbox=opt_mage_fire_aoe help=aoe specialization=fire
+{
+ if not incombat() fireprecombatmainactions()
+ fire_defaultmainactions()
+}
+
+AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=cd specialization=fire
+{
+ if not incombat() fireprecombatcdactions()
+ fire_defaultcdactions()
+}
+
+AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
+{
+ if not incombat() fireprecombatcdactions()
+ fire_defaultcdactions()
+}
+
+### Required symbols
+# alexstraszas_fury
+# alexstraszas_fury_talent
+# ancestral_call
+# ancient_knot_of_wisdom_item
+# arcane_explosion
+# arcane_intellect
+# azsharas_font_of_power_item
+# azurethos_singed_plumage_item
+# bag_of_tricks
+# balefire_branch_item
+# berserking
+# blaster_master_buff
+# blaster_master_trait
+# blood_fury
+# blood_of_the_enemy
+# buff_disciplinary_command
+# combustion
+# concentrated_flame
+# counterspell
+# deathborne
+# disciplinary_command
+# disciplinary_command_arcane_buff
+# disciplinary_command_frost_buff
+# dragons_breath
+# fire_blast
+# fireball
+# fireblood
+# firestarter_talent
+# firestorm_buff
+# flame_on_talent
+# flame_patch_talent
+# flamestrike
+# focused_azerite_beam
+# from_the_ashes_talent
+# frostbolt
+# gladiators_badge
+# gladiators_medallion_item
+# guardian_of_azeroth
+# heating_up
+# hot_streak
+# hyperthread_wristwraps_300142
+# hyperthread_wristwraps_item
+# ignite
+# ignition_mages_fuse_item
+# infernal_cascade
+# kindling_talent
+# lights_judgment
+# living_bomb
+# manifesto_of_madness_item
+# memory_of_lucid_dreams
+# meteor
+# mirror_image
+# mirrors_of_torment
+# neural_synapse_enhancer_item
+# phoenix_flames
+# purifying_blast
+# pyroblast
+# pyroclasm
+# quaking_palm
+# radiant_spark
+# radiant_spark_vulnerability
+# reaping_flames
+# ripple_in_space
+# rune_of_power
+# rune_of_power_talent
+# scorch
+# searing_touch_talent
+# shifting_power
+# shockbiters_fang_item
+# sun_kings_blessing_ready_buff
+# superior_battle_potion_of_intellect_item
+# the_unbound_force
+# tzanes_barkspines_item
+# worldvein_resonance
 `
 	OvaleScripts.RegisterScript("MAGE", "fire", name, desc, code, "script")
 }
@@ -1150,20 +1848,14 @@ AddFunction froststmainactions
  if { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and { previousgcdspell(radiant_spark) or previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) or { target.debuffpresent(mirrors_of_torment) or buffpresent(expanded_potential_buff) or buffpresent(freezing_winds) } and buffstacks(fingers_of_frost) == 0 } } spell(flurry)
  #blizzard,if=buff.freezing_rain.up|active_enemies>=3|active_enemies>=2&!runeforge.cold_front.equipped
  if buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") spell(blizzard)
- #ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
- if message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) spell(ray_of_frost)
  #glacial_spike,if=remaining_winters_chill&debuff.winters_chill.remains>cast_time+travel_time
  if message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) spell(glacial_spike)
  #ice_lance,if=remaining_winters_chill&remaining_winters_chill>buff.fingers_of_frost.react&debuff.winters_chill.remains>travel_time
  if message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) spell(ice_lance)
- #comet_storm
- spell(comet_storm)
  #ice_nova
  spell(ice_nova)
  #ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
  if buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) spell(ice_lance)
- #ebonbolt
- spell(ebonbolt)
  #arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
  if message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) spell(arcane_explosion)
  #fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
@@ -1185,23 +1877,37 @@ AddFunction froststshortcdactions
   #frozen_orb
   spell(frozen_orb)
 
-  unless { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard) or message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) and spell(ray_of_frost) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance) or spell(comet_storm) or spell(ice_nova)
+  unless { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard)
   {
-   #radiant_spark,if=buff.freezing_winds.up&active_enemies=1
-   if buffpresent(freezing_winds) and enemies() == 1 spell(radiant_spark)
+   #ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
+   if message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) spell(ray_of_frost)
 
-   unless { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance) or spell(ebonbolt)
+   unless message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance)
    {
-    #radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&(buff.brain_freeze.react|soulbind.combat_meditation.enabled)
-    if { not message("runeforge.freezing_winds.equipped is not implemented") or enemies() >= 2 } and { buffpresent(brain_freeze) or message("soulbind.combat_meditation.enabled is not implemented") } spell(radiant_spark)
-    #shifting_power,if=active_enemies>=3
-    if enemies() >= 3 spell(shifting_power)
-    #shifting_power,line_cd=60,if=(soulbind.field_of_blossoms.enabled|soulbind.grove_invigoration.enabled)&(!talent.rune_of_power.enabled|buff.rune_of_power.down&cooldown.rune_of_power.remains>16)
-    if timesincepreviousspell(shifting_power) > 60 and { message("soulbind.field_of_blossoms.enabled is not implemented") or message("soulbind.grove_invigoration.enabled is not implemented") } and { not hastalent(rune_of_power_talent) or buffexpires(rune_of_power) and spellcooldown(rune_of_power) > 16 } spell(shifting_power)
-    #mirrors_of_torment
-    spell(mirrors_of_torment)
-    #frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-    if message("runeforge.grisly_icicle.equipped is not implemented") and message("target.level is not implemented") <= message("level is not implemented") and target.debuffexpires(frozen) spell(frost_nova)
+    #comet_storm
+    spell(comet_storm)
+
+    unless spell(ice_nova)
+    {
+     #radiant_spark,if=buff.freezing_winds.up&active_enemies=1
+     if buffpresent(freezing_winds) and enemies() == 1 spell(radiant_spark)
+
+     unless { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance)
+     {
+      #ebonbolt
+      spell(ebonbolt)
+      #radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&(buff.brain_freeze.react|soulbind.combat_meditation.enabled)
+      if { not message("runeforge.freezing_winds.equipped is not implemented") or enemies() >= 2 } and { buffpresent(brain_freeze) or message("soulbind.combat_meditation.enabled is not implemented") } spell(radiant_spark)
+      #shifting_power,if=active_enemies>=3
+      if enemies() >= 3 spell(shifting_power)
+      #shifting_power,line_cd=60,if=(soulbind.field_of_blossoms.enabled|soulbind.grove_invigoration.enabled)&(!talent.rune_of_power.enabled|buff.rune_of_power.down&cooldown.rune_of_power.remains>16)
+      if timesincepreviousspell(shifting_power) > 60 and { message("soulbind.field_of_blossoms.enabled is not implemented") or message("soulbind.grove_invigoration.enabled is not implemented") } and { not hastalent(rune_of_power_talent) or buffexpires(rune_of_power) and spellcooldown(rune_of_power) > 16 } spell(shifting_power)
+      #mirrors_of_torment
+      spell(mirrors_of_torment)
+      #frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
+      if message("runeforge.grisly_icicle.equipped is not implemented") and level() <= level() and target.debuffexpires(frozen) spell(frost_nova)
+     }
+    }
    }
   }
  }
@@ -1209,7 +1915,7 @@ AddFunction froststshortcdactions
 
 AddFunction froststshortcdpostconditions
 {
- { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and { previousgcdspell(radiant_spark) or previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) or { target.debuffpresent(mirrors_of_torment) or buffpresent(expanded_potential_buff) or buffpresent(freezing_winds) } and buffstacks(fingers_of_frost) == 0 } } and spell(flurry) or { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard) or message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) and spell(ray_of_frost) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance) or spell(comet_storm) or spell(ice_nova) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance) or spell(ebonbolt) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze) and spell(glacial_spike) or spell(frostbolt)
+ { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and { previousgcdspell(radiant_spark) or previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) or { target.debuffpresent(mirrors_of_torment) or buffpresent(expanded_potential_buff) or buffpresent(freezing_winds) } and buffstacks(fingers_of_frost) == 0 } } and spell(flurry) or { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance) or spell(ice_nova) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze) and spell(glacial_spike) or spell(frostbolt)
 }
 
 AddFunction froststcdactions
@@ -1218,7 +1924,7 @@ AddFunction froststcdactions
 
 AddFunction froststcdpostconditions
 {
- { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and { previousgcdspell(radiant_spark) or previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) or { target.debuffpresent(mirrors_of_torment) or buffpresent(expanded_potential_buff) or buffpresent(freezing_winds) } and buffstacks(fingers_of_frost) == 0 } } and spell(flurry) or spell(frozen_orb) or { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard) or message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) and spell(ray_of_frost) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance) or spell(comet_storm) or spell(ice_nova) or buffpresent(freezing_winds) and enemies() == 1 and spell(radiant_spark) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance) or spell(ebonbolt) or { not message("runeforge.freezing_winds.equipped is not implemented") or enemies() >= 2 } and { buffpresent(brain_freeze) or message("soulbind.combat_meditation.enabled is not implemented") } and spell(radiant_spark) or enemies() >= 3 and spell(shifting_power) or timesincepreviousspell(shifting_power) > 60 and { message("soulbind.field_of_blossoms.enabled is not implemented") or message("soulbind.grove_invigoration.enabled is not implemented") } and { not hastalent(rune_of_power_talent) or buffexpires(rune_of_power) and spellcooldown(rune_of_power) > 16 } and spell(shifting_power) or spell(mirrors_of_torment) or message("runeforge.grisly_icicle.equipped is not implemented") and message("target.level is not implemented") <= message("level is not implemented") and target.debuffexpires(frozen) and spell(frost_nova) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze) and spell(glacial_spike) or spell(frostbolt)
+ { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and { previousgcdspell(radiant_spark) or previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) or { target.debuffpresent(mirrors_of_torment) or buffpresent(expanded_potential_buff) or buffpresent(freezing_winds) } and buffstacks(fingers_of_frost) == 0 } } and spell(flurry) or spell(frozen_orb) or { buffpresent(freezing_rain_buff) or enemies() >= 3 or enemies() >= 2 and not message("runeforge.cold_front.equipped is not implemented") } and spell(blizzard) or message("remaining_winters_chill is not implemented") == 1 and target.debuffpresent(winters_chill) and spell(ray_of_frost) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or message("remaining_winters_chill is not implemented") and message("remaining_winters_chill is not implemented") > buffstacks(fingers_of_frost) and target.debuffremaining(winters_chill) > traveltime(ice_lance) and spell(ice_lance) or spell(comet_storm) or spell(ice_nova) or buffpresent(freezing_winds) and enemies() == 1 and spell(radiant_spark) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) } and spell(ice_lance) or spell(ebonbolt) or { not message("runeforge.freezing_winds.equipped is not implemented") or enemies() >= 2 } and { buffpresent(brain_freeze) or message("soulbind.combat_meditation.enabled is not implemented") } and spell(radiant_spark) or enemies() >= 3 and spell(shifting_power) or timesincepreviousspell(shifting_power) > 60 and { message("soulbind.field_of_blossoms.enabled is not implemented") or message("soulbind.grove_invigoration.enabled is not implemented") } and { not hastalent(rune_of_power_talent) or buffexpires(rune_of_power) and spellcooldown(rune_of_power) > 16 } and spell(shifting_power) or spell(mirrors_of_torment) or message("runeforge.grisly_icicle.equipped is not implemented") and level() <= level() and target.debuffexpires(frozen) and spell(frost_nova) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze) and spell(glacial_spike) or spell(frostbolt)
 }
 
 ### actions.precombat
@@ -1436,16 +2142,12 @@ AddFunction frostaoemainactions
  if { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } spell(flurry)
  #ice_nova
  spell(ice_nova)
- #comet_storm
- spell(comet_storm)
  #ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
  if buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) spell(ice_lance)
  #fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
  if message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) spell(fire_blast)
  #arcane_explosion,if=mana.pct>30&!runeforge.cold_front.equipped&(!runeforge.freezing_winds.equipped|buff.freezing_winds.up)
  if manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } spell(arcane_explosion)
- #ebonbolt
- spell(ebonbolt)
  #frostbolt
  spell(frostbolt)
 }
@@ -1459,22 +2161,34 @@ AddFunction frostaoeshortcdactions
  #frozen_orb
  spell(frozen_orb)
 
- unless spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance)
+ unless spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova)
  {
-  #radiant_spark
-  spell(radiant_spark)
-  #shifting_power
-  spell(shifting_power)
-  #mirrors_of_torment
-  spell(mirrors_of_torment)
-  #frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-  if message("runeforge.grisly_icicle.equipped is not implemented") and message("target.level is not implemented") <= message("level is not implemented") and target.debuffexpires(frozen) spell(frost_nova)
+  #comet_storm
+  spell(comet_storm)
+
+  unless { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance)
+  {
+   #radiant_spark
+   spell(radiant_spark)
+   #shifting_power
+   spell(shifting_power)
+   #mirrors_of_torment
+   spell(mirrors_of_torment)
+   #frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
+   if message("runeforge.grisly_icicle.equipped is not implemented") and level() <= level() and target.debuffexpires(frozen) spell(frost_nova)
+
+   unless message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } and spell(arcane_explosion)
+   {
+    #ebonbolt
+    spell(ebonbolt)
+   }
+  }
  }
 }
 
 AddFunction frostaoeshortcdpostconditions
 {
- spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } and spell(arcane_explosion) or spell(ebonbolt) or spell(frostbolt)
+ spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } and spell(arcane_explosion) or spell(frostbolt)
 }
 
 AddFunction frostaoecdactions
@@ -1483,7 +2197,7 @@ AddFunction frostaoecdactions
 
 AddFunction frostaoecdpostconditions
 {
- spell(frozen_orb) or spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance) or spell(radiant_spark) or spell(shifting_power) or spell(mirrors_of_torment) or message("runeforge.grisly_icicle.equipped is not implemented") and message("target.level is not implemented") <= message("level is not implemented") and target.debuffexpires(frozen) and spell(frost_nova) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } and spell(arcane_explosion) or spell(ebonbolt) or spell(frostbolt)
+ spell(frozen_orb) or spell(blizzard) or { message("remaining_winters_chill is not implemented") == 0 or target.debuffexpires(winters_chill) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze) and buffstacks(fingers_of_frost) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost) or target.debuffremaining(frozen) > traveltime(ice_lance) or message("remaining_winters_chill is not implemented") and target.debuffremaining(winters_chill) > traveltime(ice_lance) } and spell(ice_lance) or spell(radiant_spark) or spell(shifting_power) or spell(mirrors_of_torment) or message("runeforge.grisly_icicle.equipped is not implemented") and level() <= level() and target.debuffexpires(frozen) and spell(frost_nova) or message("runeforge.disciplinary_command.equipped is not implemented") and spellcooldown(buff_disciplinary_command) == 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and not message("runeforge.cold_front.equipped is not implemented") and { not message("runeforge.freezing_winds.equipped is not implemented") or buffpresent(freezing_winds) } and spell(arcane_explosion) or spell(ebonbolt) or spell(frostbolt)
 }
 
 ### actions.default

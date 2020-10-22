@@ -1280,53 +1280,63 @@ __exports.Emiter = __class(nil, {
                 if token == "consumable" and property == nil then
                     property = "remains"
                 end
-                name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
-                local buffName = (token == "debuff" and name .. "_debuff") or name .. "_buff"
-                buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
-                local prefix
-                if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
-                    prefix = (target == "target" and "Debuff") or "Buff"
-                else
-                    prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
-                end
-                local any = (self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1") or ""
-                target = (target and target .. ".") or ""
-                if buffName == "dark_transformation_buff" and target == "" then
-                    target = "pet."
-                end
-                if buffName == "pet_beast_cleave_buff" and target == "" then
-                    target = "pet."
-                end
-                if buffName == "pet_frenzy_buff" and target == "" then
-                    target = "pet."
-                end
                 local code
-                if property == "cooldown_remains" then
-                    code = format("SpellCooldown(%s)", name)
-                elseif property == "down" then
-                    code = format("%s%sExpires(%s%s)", target, prefix, buffName, any)
-                elseif property == "duration" then
-                    code = format("BaseDuration(%s)", buffName)
-                elseif property == "max_stack" then
-                    code = format("SpellData(%s max_stacks)", buffName)
-                elseif property == "react" or property == "stack" then
-                    if parseNode.asType == "boolean" then
-                        code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
-                    else
-                        code = format("%s%sStacks(%s%s)", target, prefix, buffName, any)
+                local buffName
+                if self:isDaemon(name) then
+                    buffName = name
+                    if property == "remains" then
+                        code = "demonduration(" .. buffName .. ")"
+                    elseif property == "stack" then
+                        code = "demons(" .. buffName .. ")"
                     end
-                elseif property == "remains" then
-                    if parseNode.asType == "boolean" then
-                        code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+                else
+                    name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
+                    buffName = (token == "debuff" and name .. "_debuff") or name .. "_buff"
+                    buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
+                    local prefix
+                    if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
+                        prefix = (target == "target" and "Debuff") or "Buff"
                     else
-                        code = format("%s%sRemaining(%s%s)", target, prefix, buffName, any)
+                        prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
                     end
-                elseif property == "up" then
-                    code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
-                elseif property == "improved" then
-                    code = format("%sImproved(%s%s)", prefix, buffName)
-                elseif property == "value" then
-                    code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
+                    local any = (self.ovaleData.DEFAULT_SPELL_LIST[buffName] and " any=1") or ""
+                    target = (target and target .. ".") or ""
+                    if buffName == "dark_transformation_buff" and target == "" then
+                        target = "pet."
+                    end
+                    if buffName == "pet_beast_cleave_buff" and target == "" then
+                        target = "pet."
+                    end
+                    if buffName == "pet_frenzy_buff" and target == "" then
+                        target = "pet."
+                    end
+                    if property == "cooldown_remains" then
+                        code = format("SpellCooldown(%s)", name)
+                    elseif property == "down" then
+                        code = format("%s%sExpires(%s%s)", target, prefix, buffName, any)
+                    elseif property == "duration" then
+                        code = format("BaseDuration(%s)", buffName)
+                    elseif property == "max_stack" then
+                        code = format("SpellData(%s max_stacks)", buffName)
+                    elseif property == "react" or property == "stack" then
+                        if parseNode.asType == "boolean" then
+                            code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+                        else
+                            code = format("%s%sStacks(%s%s)", target, prefix, buffName, any)
+                        end
+                    elseif property == "remains" then
+                        if parseNode.asType == "boolean" then
+                            code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+                        else
+                            code = format("%s%sRemaining(%s%s)", target, prefix, buffName, any)
+                        end
+                    elseif property == "up" then
+                        code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+                    elseif property == "improved" then
+                        code = format("%sImproved(%s%s)", prefix, buffName)
+                    elseif property == "value" then
+                        code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
+                    end
                 end
                 if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
@@ -2336,6 +2346,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("dummon_demonic_tyrant", "summon_demonic_tyrant", "WARLOCK", "demonology")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
@@ -2401,5 +2412,8 @@ __exports.Emiter = __class(nil, {
         else
             self.tracer:Error([[Unknown cycling_variable operator {op}]])
         end
+    end,
+    isDaemon = function(self, name)
+        return name == "vilefiend" or name == "wild_imps"
     end,
 })

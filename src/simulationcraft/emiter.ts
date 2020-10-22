@@ -226,6 +226,12 @@ export class Emiter {
         this.AddDisambiguation("none", "none");
 
         this.AddDisambiguation(
+            "dummon_demonic_tyrant",
+            "summon_demonic_tyrant",
+            "WARLOCK",
+            "demonology"
+        );
+        this.AddDisambiguation(
             "dark_soul",
             "dark_soul_misery",
             "WARLOCK",
@@ -2503,6 +2509,10 @@ export class Emiter {
         return node;
     };
 
+    private isDaemon(name: string) {
+        return name === "vilefiend" || name === "wild_imps";
+    }
+
     private EmitOperandBuff: EmitOperandVisitor = (
         operand,
         parseNode,
@@ -2526,64 +2536,110 @@ export class Emiter {
                 property = "remains";
             }
 
-            // buffname
-            [name] = this.Disambiguate(
-                annotation,
-                name,
-                annotation.classId,
-                annotation.specialization
-            );
-            let buffName =
-                (token == "debuff" && `${name}_debuff`) || `${name}_buff`;
-            [buffName] = this.Disambiguate(
-                annotation,
-                buffName,
-                annotation.classId,
-                annotation.specialization
-            );
-            let prefix;
-            if (
-                !truthy(find(buffName, "_debuff$")) &&
-                !truthy(find(buffName, "_debuff$"))
-            ) {
-                prefix = (target == "target" && "Debuff") || "Buff";
-            } else {
-                prefix =
-                    (truthy(find(buffName, "_debuff$")) && "Debuff") || "Buff";
-            }
-
-            let any =
-                (this.ovaleData.DEFAULT_SPELL_LIST[buffName] && " any=1") || "";
-
-            // target
-            target = (target && `${target}.`) || "";
-            if (buffName == "dark_transformation_buff" && target == "") {
-                target = "pet.";
-            }
-            if (buffName == "pet_beast_cleave_buff" && target == "") {
-                target = "pet.";
-            }
-            if (buffName == "pet_frenzy_buff" && target == "") {
-                target = "pet.";
-            }
-
             let code;
-            if (property == "cooldown_remains") {
-                code = format("SpellCooldown(%s)", name);
-            } else if (property == "down") {
-                code = format(
-                    "%s%sExpires(%s%s)",
-                    target,
-                    prefix,
-                    buffName,
-                    any
+            let buffName;
+            if (this.isDaemon(name)) {
+                buffName = name;
+                if (property === "remains") {
+                    code = `demonduration(${buffName})`;
+                } else if (property === "stack") {
+                    code = `demons(${buffName})`;
+                }
+            } else {
+                // buffname
+                [name] = this.Disambiguate(
+                    annotation,
+                    name,
+                    annotation.classId,
+                    annotation.specialization
                 );
-            } else if (property == "duration") {
-                code = format("BaseDuration(%s)", buffName);
-            } else if (property == "max_stack") {
-                code = format("SpellData(%s max_stacks)", buffName);
-            } else if (property == "react" || property == "stack") {
-                if (parseNode.asType == "boolean") {
+                buffName =
+                    (token == "debuff" && `${name}_debuff`) || `${name}_buff`;
+                [buffName] = this.Disambiguate(
+                    annotation,
+                    buffName,
+                    annotation.classId,
+                    annotation.specialization
+                );
+                let prefix;
+                if (
+                    !truthy(find(buffName, "_debuff$")) &&
+                    !truthy(find(buffName, "_debuff$"))
+                ) {
+                    prefix = (target == "target" && "Debuff") || "Buff";
+                } else {
+                    prefix =
+                        (truthy(find(buffName, "_debuff$")) && "Debuff") ||
+                        "Buff";
+                }
+
+                let any =
+                    (this.ovaleData.DEFAULT_SPELL_LIST[buffName] && " any=1") ||
+                    "";
+
+                // target
+                target = (target && `${target}.`) || "";
+                if (buffName == "dark_transformation_buff" && target == "") {
+                    target = "pet.";
+                }
+                if (buffName == "pet_beast_cleave_buff" && target == "") {
+                    target = "pet.";
+                }
+                if (buffName == "pet_frenzy_buff" && target == "") {
+                    target = "pet.";
+                }
+
+                if (property == "cooldown_remains") {
+                    code = format("SpellCooldown(%s)", name);
+                } else if (property == "down") {
+                    code = format(
+                        "%s%sExpires(%s%s)",
+                        target,
+                        prefix,
+                        buffName,
+                        any
+                    );
+                } else if (property == "duration") {
+                    code = format("BaseDuration(%s)", buffName);
+                } else if (property == "max_stack") {
+                    code = format("SpellData(%s max_stacks)", buffName);
+                } else if (property == "react" || property == "stack") {
+                    if (parseNode.asType == "boolean") {
+                        code = format(
+                            "%s%sPresent(%s%s)",
+                            target,
+                            prefix,
+                            buffName,
+                            any
+                        );
+                    } else {
+                        code = format(
+                            "%s%sStacks(%s%s)",
+                            target,
+                            prefix,
+                            buffName,
+                            any
+                        );
+                    }
+                } else if (property == "remains") {
+                    if (parseNode.asType == "boolean") {
+                        code = format(
+                            "%s%sPresent(%s%s)",
+                            target,
+                            prefix,
+                            buffName,
+                            any
+                        );
+                    } else {
+                        code = format(
+                            "%s%sRemaining(%s%s)",
+                            target,
+                            prefix,
+                            buffName,
+                            any
+                        );
+                    }
+                } else if (property == "up") {
                     code = format(
                         "%s%sPresent(%s%s)",
                         target,
@@ -2591,51 +2647,17 @@ export class Emiter {
                         buffName,
                         any
                     );
-                } else {
+                } else if (property == "improved") {
+                    code = format("%sImproved(%s%s)", prefix, buffName);
+                } else if (property == "value") {
                     code = format(
-                        "%s%sStacks(%s%s)",
+                        "%s%sAmount(%s%s)",
                         target,
                         prefix,
                         buffName,
                         any
                     );
                 }
-            } else if (property == "remains") {
-                if (parseNode.asType == "boolean") {
-                    code = format(
-                        "%s%sPresent(%s%s)",
-                        target,
-                        prefix,
-                        buffName,
-                        any
-                    );
-                } else {
-                    code = format(
-                        "%s%sRemaining(%s%s)",
-                        target,
-                        prefix,
-                        buffName,
-                        any
-                    );
-                }
-            } else if (property == "up") {
-                code = format(
-                    "%s%sPresent(%s%s)",
-                    target,
-                    prefix,
-                    buffName,
-                    any
-                );
-            } else if (property == "improved") {
-                code = format("%sImproved(%s%s)", prefix, buffName);
-            } else if (property == "value") {
-                code = format(
-                    "%s%sAmount(%s%s)",
-                    target,
-                    prefix,
-                    buffName,
-                    any
-                );
             }
             if (code) {
                 annotation.astAnnotation = annotation.astAnnotation || {};

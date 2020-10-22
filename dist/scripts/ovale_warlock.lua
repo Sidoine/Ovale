@@ -29,8 +29,6 @@ AddFunction afflictionprecombatmainactions
  #augmentation
  #summon_pet
  if not pet.present() spell(summon_imp)
- #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
- if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
  #seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
  if enemies() >= 3 and not hasequippeditem(169314) spell(seed_of_corruption)
  #haunt
@@ -45,11 +43,16 @@ AddFunction afflictionprecombatmainpostconditions
 
 AddFunction afflictionprecombatshortcdactions
 {
+ unless not pet.present() and spell(summon_imp)
+ {
+  #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+  if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
+ }
 }
 
 AddFunction afflictionprecombatshortcdpostconditions
 {
- not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
+ not pet.present() and spell(summon_imp) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
 }
 
 AddFunction afflictionprecombatcdactions
@@ -74,8 +77,6 @@ AddFunction afflictiondarkglare_prepmainactions
 {
  #vile_taint
  spell(vile_taint)
- #dark_soul
- spell(dark_soul_misery)
  #berserking
  spell(berserking)
 }
@@ -90,13 +91,15 @@ AddFunction afflictiondarkglare_prepshortcdactions
 
 AddFunction afflictiondarkglare_prepshortcdpostconditions
 {
- spell(vile_taint) or spell(dark_soul_misery) or spell(berserking)
+ spell(vile_taint) or spell(berserking)
 }
 
 AddFunction afflictiondarkglare_prepcdactions
 {
- unless spell(vile_taint) or spell(dark_soul_misery)
+ unless spell(vile_taint)
  {
+  #dark_soul
+  spell(dark_soul_misery)
   #potion
   #use_items
   afflictionuseitemactions()
@@ -115,7 +118,7 @@ AddFunction afflictiondarkglare_prepcdactions
 
 AddFunction afflictiondarkglare_prepcdpostconditions
 {
- spell(vile_taint) or spell(dark_soul_misery) or spell(berserking)
+ spell(vile_taint) or spell(berserking)
 }
 
 ### actions.cooldowns
@@ -176,8 +179,6 @@ AddFunction afflictioncooldownscdpostconditions
 
 AddFunction affliction_defaultmainactions
 {
- #phantom_singularity
- spell(phantom_singularity)
  #vile_taint,if=soul_shard>1
  if soulshards() > 1 spell(vile_taint)
  #siphon_life,if=refreshable
@@ -195,8 +196,6 @@ AddFunction affliction_defaultmainactions
 
  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
  {
-  #dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
-  if spellcooldown(summon_darkglare) > target.timetodie() spell(dark_soul_misery)
   #call_action_list,name=cooldowns
   afflictioncooldownsmainactions()
 
@@ -223,12 +222,15 @@ AddFunction affliction_defaultmainpostconditions
 
 AddFunction affliction_defaultshortcdactions
 {
- unless spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt)
+ #phantom_singularity
+ spell(phantom_singularity)
+
+ unless soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt)
  {
   #call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
   if spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
 
-  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or spellcooldown(summon_darkglare) > target.timetodie() and spell(dark_soul_misery)
+  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
   {
    #call_action_list,name=cooldowns
    afflictioncooldownsshortcdactions()
@@ -238,7 +240,7 @@ AddFunction affliction_defaultshortcdactions
 
 AddFunction affliction_defaultshortcdpostconditions
 {
- spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or spellcooldown(summon_darkglare) > target.timetodie() and spell(dark_soul_misery) or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 AddFunction affliction_defaultcdactions
@@ -248,8 +250,10 @@ AddFunction affliction_defaultcdactions
   #call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
   if spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
 
-  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or spellcooldown(summon_darkglare) > target.timetodie() and spell(dark_soul_misery)
+  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
   {
+   #dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
+   if spellcooldown(summon_darkglare) > target.timetodie() spell(dark_soul_misery)
    #call_action_list,name=cooldowns
    afflictioncooldownscdactions()
   }
@@ -258,7 +262,7 @@ AddFunction affliction_defaultcdactions
 
 AddFunction affliction_defaultcdpostconditions
 {
- spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or spellcooldown(summon_darkglare) > target.timetodie() and spell(dark_soul_misery) or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction) and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### Affliction icons.
@@ -374,14 +378,6 @@ AddFunction demonologytyrant_prepmainactions
 {
  #doom,line_cd=30
  if timesincepreviousspell(doom) > 30 spell(doom)
- #demonic_strength,if=!talent.demonic_consumption.enabled
- if not hastalent(demonic_consumption_talent) spell(demonic_strength)
- #nether_portal
- spell(nether_portal)
- #grimoire_felguard
- spell(grimoire_felguard)
- #summon_vilefiend
- spell(summon_vilefiend)
  #call_dreadstalkers
  spell(call_dreadstalkers)
  #demonbolt,if=buff.demonic_core.up&soul_shard<4&(talent.demonic_consumption.enabled|buff.nether_portal.down)
@@ -399,20 +395,34 @@ AddFunction demonologytyrant_prepmainpostconditions
 
 AddFunction demonologytyrant_prepshortcdactions
 {
+ unless timesincepreviousspell(doom) > 30 and spell(doom)
+ {
+  #demonic_strength,if=!talent.demonic_consumption.enabled
+  if not hastalent(demonic_consumption_talent) spell(demonic_strength)
+  #summon_vilefiend
+  spell(summon_vilefiend)
+ }
 }
 
 AddFunction demonologytyrant_prepshortcdpostconditions
 {
- timesincepreviousspell(doom) > 30 and spell(doom) or not hastalent(demonic_consumption_talent) and spell(demonic_strength) or spell(nether_portal) or spell(grimoire_felguard) or spell(summon_vilefiend) or spell(call_dreadstalkers) or buffpresent(demonic_core) and soulshards() < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and spell(demonbolt) or soulshards() < 5 - 4 * buffpresent(nether_portal) and spell(shadow_bolt) or spell(hand_of_guldan)
+ timesincepreviousspell(doom) > 30 and spell(doom) or spell(call_dreadstalkers) or buffpresent(demonic_core) and soulshards() < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and spell(demonbolt) or soulshards() < 5 - 4 * buffpresent(nether_portal) and spell(shadow_bolt) or spell(hand_of_guldan)
 }
 
 AddFunction demonologytyrant_prepcdactions
 {
+ unless timesincepreviousspell(doom) > 30 and spell(doom) or not hastalent(demonic_consumption_talent) and spell(demonic_strength)
+ {
+  #nether_portal
+  spell(nether_portal)
+  #grimoire_felguard
+  spell(grimoire_felguard)
+ }
 }
 
 AddFunction demonologytyrant_prepcdpostconditions
 {
- timesincepreviousspell(doom) > 30 and spell(doom) or not hastalent(demonic_consumption_talent) and spell(demonic_strength) or spell(nether_portal) or spell(grimoire_felguard) or spell(summon_vilefiend) or spell(call_dreadstalkers) or buffpresent(demonic_core) and soulshards() < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and spell(demonbolt) or soulshards() < 5 - 4 * buffpresent(nether_portal) and spell(shadow_bolt) or spell(hand_of_guldan)
+ timesincepreviousspell(doom) > 30 and spell(doom) or not hastalent(demonic_consumption_talent) and spell(demonic_strength) or spell(summon_vilefiend) or spell(call_dreadstalkers) or buffpresent(demonic_core) and soulshards() < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and spell(demonbolt) or soulshards() < 5 - 4 * buffpresent(nether_portal) and spell(shadow_bolt) or spell(hand_of_guldan)
 }
 
 ### actions.summon_tyrant
@@ -430,9 +440,9 @@ AddFunction demonologysummon_tyrantmainactions
  #hand_of_guldan
  spell(hand_of_guldan)
  #demonbolt,if=buff.demonic_core.up&buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
- if buffpresent(demonic_core) and buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } spell(demonbolt)
+ if buffpresent(demonic_core) and buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } spell(demonbolt)
  #shadow_bolt,if=buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
- if buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } spell(shadow_bolt)
+ if buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } spell(shadow_bolt)
  #shadow_bolt
  spell(shadow_bolt)
 }
@@ -443,7 +453,7 @@ AddFunction demonologysummon_tyrantmainpostconditions
 
 AddFunction demonologysummon_tyrantshortcdactions
 {
- unless soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt)
+ unless soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt)
  {
   #variable,name=tyrant_ready,value=!cooldown.summon_demonic_tyrant.ready
   #summon_demonic_tyrant
@@ -453,7 +463,7 @@ AddFunction demonologysummon_tyrantshortcdactions
 
 AddFunction demonologysummon_tyrantshortcdpostconditions
 {
- soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt) or spell(shadow_bolt)
+ soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt) or spell(shadow_bolt)
 }
 
 AddFunction demonologysummon_tyrantcdactions
@@ -462,7 +472,7 @@ AddFunction demonologysummon_tyrantcdactions
 
 AddFunction demonologysummon_tyrantcdpostconditions
 {
- soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { buffremaining(vilefiend_buff) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt) or spell(summon_demonic_tyrant) or spell(shadow_bolt)
+ soulshards() == 5 and timesincepreviousspell(hand_of_guldan) > 20 and spell(hand_of_guldan) or buffpresent(demonic_core) and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(demonbolt) > 20 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) + message("incoming_imps is not implemented") < 4 and { hastalent(demonic_consumption_talent) or buffexpires(nether_portal) } and timesincepreviousspell(shadow_bolt) > 20 and spell(shadow_bolt) or spell(call_dreadstalkers) or spell(hand_of_guldan) or buffpresent(demonic_core) and buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(demonbolt) or buffpresent(nether_portal) and { demonduration(vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and { buffremaining(grimoire_felguard) > 5 or buffexpires(grimoire_felguard) } and spell(shadow_bolt) or spell(summon_demonic_tyrant) or spell(shadow_bolt)
 }
 
 ### actions.precombat
@@ -620,26 +630,16 @@ AddFunction demonology_defaultmainactions
 
     unless tyrant_ready() and demonologysummon_tyrantmainpostconditions()
     {
-     #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
-     if spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 spell(summon_vilefiend)
      #call_dreadstalkers
      spell(call_dreadstalkers)
      #doom,if=refreshable
      if target.refreshable(doom) spell(doom)
-     #demonic_strength
-     spell(demonic_strength)
-     #bilescourge_bombers
-     spell(bilescourge_bombers)
      #hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
      if soulshards() == 5 or buffpresent(nether_portal) spell(hand_of_guldan)
      #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains>20&(cooldown.summon_vilefiend.remains>5|!talent.summon_vilefiend.enabled)&cooldown.call_dreadstalkers.remains>2
      if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 spell(hand_of_guldan)
      #demonbolt,if=buff.demonic_core.react&soul_shard<4
      if buffpresent(demonic_core) and soulshards() < 4 spell(demonbolt)
-     #grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.dummon_demonic_tyrant.remains+15
-     if spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(dummon_demonic_tyrant) + 15 spell(grimoire_felguard)
-     #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
-     if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 spell(power_siphon)
      #soul_strike
      spell(soul_strike)
      #shadow_bolt
@@ -674,6 +674,26 @@ AddFunction demonology_defaultshortcdactions
    {
     #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
     if tyrant_ready() demonologysummon_tyrantshortcdactions()
+
+    unless tyrant_ready() and demonologysummon_tyrantshortcdpostconditions()
+    {
+     #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
+     if spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 spell(summon_vilefiend)
+
+     unless spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom)
+     {
+      #demonic_strength
+      spell(demonic_strength)
+      #bilescourge_bombers
+      spell(bilescourge_bombers)
+
+      unless { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
+      {
+       #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
+       if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 spell(power_siphon)
+      }
+     }
+    }
    }
   }
  }
@@ -681,7 +701,7 @@ AddFunction demonology_defaultshortcdactions
 
 AddFunction demonology_defaultshortcdpostconditions
 {
- demonologyoff_gcdshortcdpostconditions() or demonologyessencesshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions() or tyrant_ready() and demonologysummon_tyrantshortcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or { spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(dummon_demonic_tyrant) + 15 } and spell(grimoire_felguard) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or spell(soul_strike) or spell(shadow_bolt)
+ demonologyoff_gcdshortcdpostconditions() or demonologyessencesshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions() or tyrant_ready() and demonologysummon_tyrantshortcdpostconditions() or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or spell(soul_strike) or spell(shadow_bolt)
 }
 
 AddFunction demonology_defaultcdactions
@@ -704,8 +724,10 @@ AddFunction demonology_defaultcdactions
     #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
     if tyrant_ready() demonologysummon_tyrantcdactions()
 
-    unless tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or { spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(dummon_demonic_tyrant) + 15 } and spell(grimoire_felguard)
+    unless tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
     {
+     #grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.dummon_demonic_tyrant.remains+15
+     if spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 15 spell(grimoire_felguard)
      #use_items
      demonologyuseitemactions()
     }
@@ -716,7 +738,7 @@ AddFunction demonology_defaultcdactions
 
 AddFunction demonology_defaultcdpostconditions
 {
- demonologyoff_gcdcdpostconditions() or demonologyessencescdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepcdpostconditions() or tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or { spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(dummon_demonic_tyrant) + 15 } and spell(grimoire_felguard) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or spell(soul_strike) or spell(shadow_bolt)
+ demonologyoff_gcdcdpostconditions() or demonologyessencescdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepcdpostconditions() or tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or spell(soul_strike) or spell(shadow_bolt)
 }
 
 ### Demonology icons.
@@ -771,7 +793,6 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # demonic_core
 # demonic_strength
 # doom
-# dummon_demonic_tyrant
 # fireblood
 # focused_azerite_beam
 # grimoire_felguard
@@ -793,7 +814,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # summon_vilefiend
 # summon_vilefiend_talent
 # the_unbound_force
-# vilefiend_buff
+# vilefiend
 # wild_imp
 # wild_imp_inner_demons
 # worldvein_resonance
@@ -833,12 +854,6 @@ AddFunction destructionprecombatmainactions
  #augmentation
  #summon_pet
  if not pet.present() spell(summon_imp)
- #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
- if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
- #snapshot_stats
- #potion
- #soul_fire
- spell(soul_fire)
  #incinerate,if=!talent.soul_fire.enabled
  if not hastalent(soul_fire_talent) spell(incinerate)
 }
@@ -849,11 +864,20 @@ AddFunction destructionprecombatmainpostconditions
 
 AddFunction destructionprecombatshortcdactions
 {
+ unless not pet.present() and spell(summon_imp)
+ {
+  #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+  if hastalent(grimoire_of_sacrifice_talent) and pet.present() spell(grimoire_of_sacrifice)
+  #snapshot_stats
+  #potion
+  #soul_fire
+  spell(soul_fire)
+ }
 }
 
 AddFunction destructionprecombatshortcdpostconditions
 {
- not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or spell(soul_fire) or not hastalent(soul_fire_talent) and spell(incinerate)
+ not pet.present() and spell(summon_imp) or not hastalent(soul_fire_talent) and spell(incinerate)
 }
 
 AddFunction destructionprecombatcdactions
@@ -871,8 +895,6 @@ AddFunction destructionhavocmainactions
 {
  #conflagrate,if=buff.backdraft.down&soul_shard>=1&soul_shard<=4
  if buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 spell(conflagrate)
- #soul_fire
- spell(soul_fire)
  #immolate,if=talent.internal_combustion.enabled&remains<duration*0.5|!talent.internal_combustion.enabled&refreshable
  if hastalent(internal_combustion_talent) and buffremaining(immolate) < baseduration(immolate) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate) spell(immolate)
  #chaos_bolt,if=cast_time<havoc_remains
@@ -889,11 +911,16 @@ AddFunction destructionhavocmainpostconditions
 
 AddFunction destructionhavocshortcdactions
 {
+ unless buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate)
+ {
+  #soul_fire
+  spell(soul_fire)
+ }
 }
 
 AddFunction destructionhavocshortcdpostconditions
 {
- buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or spell(soul_fire) or { hastalent(internal_combustion_talent) and buffremaining(immolate) < baseduration(immolate) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
+ buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or { hastalent(internal_combustion_talent) and buffremaining(immolate) < baseduration(immolate) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
 }
 
 AddFunction destructionhavoccdactions
@@ -963,8 +990,6 @@ AddFunction destructionessencescdpostconditions
 
 AddFunction destructioncdsmainactions
 {
- #dark_soul_instability
- spell(dark_soul_instability)
  #potion,if=pet.infernal.active
  #berserking,if=pet.infernal.active
  if demonduration(infernal) > 0 spell(berserking)
@@ -980,15 +1005,17 @@ AddFunction destructioncdsshortcdactions
 
 AddFunction destructioncdsshortcdpostconditions
 {
- spell(dark_soul_instability) or demonduration(infernal) > 0 and spell(berserking)
+ demonduration(infernal) > 0 and spell(berserking)
 }
 
 AddFunction destructioncdscdactions
 {
  #summon_infernal
  spell(summon_infernal)
+ #dark_soul_instability
+ spell(dark_soul_instability)
 
- unless spell(dark_soul_instability) or demonduration(infernal) > 0 and spell(berserking)
+ unless demonduration(infernal) > 0 and spell(berserking)
  {
   #blood_fury,if=pet.infernal.active
   if demonduration(infernal) > 0 spell(blood_fury)
@@ -1001,7 +1028,7 @@ AddFunction destructioncdscdactions
 
 AddFunction destructioncdscdpostconditions
 {
- spell(dark_soul_instability) or demonduration(infernal) > 0 and spell(berserking)
+ demonduration(infernal) > 0 and spell(berserking)
 }
 
 ### actions.aoe
@@ -1028,8 +1055,6 @@ AddFunction destructionaoemainactions
    spell(rain_of_fire)
    #incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
    if hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() spell(incinerate)
-   #soul_fire
-   spell(soul_fire)
    #conflagrate,if=buff.backdraft.down
    if buffexpires(backdraft) spell(conflagrate)
    #shadowburn,if=target.health.pct<20
@@ -1066,6 +1091,12 @@ AddFunction destructionaoeshortcdactions
     {
      #havoc,cycle_targets=1,if=!(self.target=target)
      if not message("self.target is not implemented") == message("target is not implemented") and enemies() > 1 spell(havoc)
+
+     unless hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate)
+     {
+      #soul_fire
+      spell(soul_fire)
+     }
     }
    }
   }
@@ -1074,7 +1105,7 @@ AddFunction destructionaoeshortcdactions
 
 AddFunction destructionaoeshortcdpostconditions
 {
- demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate) > casttime(channel_demonfire) and spell(channel_demonfire) or buffremaining(immolate) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(rain_of_fire) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
+ demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate) > casttime(channel_demonfire) and spell(channel_demonfire) or buffremaining(immolate) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(rain_of_fire) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
 }
 
 AddFunction destructionaoecdactions
@@ -1106,15 +1137,11 @@ AddFunction destruction_defaultmainactions
 
  unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions()
  {
-  #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1
-  if not { demonduration(infernal) > 0 and target.debuffremaining(immolate) + 1 > demonduration(infernal) } or enemies() > 1 spell(cataclysm)
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoemainactions()
 
   unless enemies() > 2 and destructionaoemainpostconditions()
   {
-   #soul_fire,cycle_targets=1,if=refreshable&soul_shard<=4&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
-   if target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } spell(soul_fire)
    #immolate,cycle_targets=1,if=refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
    if target.refreshable(immolate) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } spell(immolate)
    #immolate,if=talent.internal_combustion.enabled&action.chaos_bolt.in_flight&remains<duration*0.5
@@ -1164,25 +1191,33 @@ AddFunction destruction_defaultshortcdactions
  #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
  if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocshortcdactions()
 
- unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm)
+ unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions()
  {
+  #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1
+  if not { demonduration(infernal) > 0 and target.debuffremaining(immolate) + 1 > demonduration(infernal) } or enemies() > 1 spell(cataclysm)
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoeshortcdactions()
 
-  unless enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and buffremaining(immolate) < baseduration(immolate) * 0.5 and spell(immolate)
+  unless enemies() > 2 and destructionaoeshortcdpostconditions()
   {
-   #call_action_list,name=cds
-   destructioncdsshortcdactions()
+   #soul_fire,cycle_targets=1,if=refreshable&soul_shard<=4&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
+   if target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } spell(soul_fire)
 
-   unless destructioncdsshortcdpostconditions()
+   unless target.refreshable(immolate) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and buffremaining(immolate) < baseduration(immolate) * 0.5 and spell(immolate)
    {
-    #call_action_list,name=essences
-    destructionessencesshortcdactions()
+    #call_action_list,name=cds
+    destructioncdsshortcdactions()
 
-    unless destructionessencesshortcdpostconditions() or spell(channel_demonfire)
+    unless destructioncdsshortcdpostconditions()
     {
-     #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)
-     if not false(target_is_target) and { target.debuffremaining(immolate) > target.debuffduration(immolate) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 spell(havoc)
+     #call_action_list,name=essences
+     destructionessencesshortcdactions()
+
+     unless destructionessencesshortcdpostconditions() or spell(channel_demonfire)
+     {
+      #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)
+      if not false(target_is_target) and { target.debuffremaining(immolate) > target.debuffduration(immolate) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 spell(havoc)
+     }
     }
    }
   }
@@ -1191,7 +1226,7 @@ AddFunction destruction_defaultshortcdactions
 
 AddFunction destruction_defaultshortcdpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and buffremaining(immolate) < baseduration(immolate) * 0.5 and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(channel_demonfire) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(immolate) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and buffremaining(immolate) < baseduration(immolate) * 0.5 and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(channel_demonfire) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 AddFunction destruction_defaultcdactions

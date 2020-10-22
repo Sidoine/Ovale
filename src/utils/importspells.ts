@@ -1686,6 +1686,9 @@ export function getSpellData(directory: string) {
             identifier: "",
         };
         essence.identifier = getIdentifier(essence.name + "_essence_id");
+        if (essence.identifier === "condensed_life_force_essence_id") {
+            essence.identifier = "condensed_lifeforce_essence_id";
+        }
         identifiers[essence.identifier] = essence.id;
         essenceById.set(essence.id, essence);
     }

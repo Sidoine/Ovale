@@ -26,7 +26,7 @@ Define(arcane_torrent_5 129597)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137025[s2 Chi][]?s137024[s3 of your mana][]?s137023[s4 Energy][].
   SpellInfo(arcane_torrent_5 cd=120 gcd=1 chi=-1 energy=-15)
 Define(arcane_torrent_6 155145)
-# Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137027[s2 Holy Power][s3 of your mana].
+# Remove s1 beneficial effect from all enemies within A1 yards and restore s2 Holy Power.
   SpellInfo(arcane_torrent_6 cd=120 holypower=-1)
 Define(arcane_torrent_7 202719)
 # Remove s1 beneficial effect from all enemies within A1 yards and generate ?s203513[m3/10 Pain][m2 Fury].
@@ -500,6 +500,7 @@ Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
+Define(condensed_lifeforce_essence_id 14)
 Define(memory_of_lucid_dreams_essence_id 27)
 Define(blood_of_the_enemy_essence_id 23)
     ]]

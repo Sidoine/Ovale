@@ -228,6 +228,7 @@ export interface Modifiers {
     cooldown_stddev?: ParseNode;
     cycle_targets?: ParseNode;
     damage?: ParseNode;
+    default?: ParseNode;
     delay?: ParseNode;
     dynamic_prepot?: ParseNode;
     early_chain_if?: ParseNode;
@@ -249,10 +250,12 @@ export interface Modifiers {
     moving?: ParseNode;
     name?: ParseNode;
     nonlethal?: ParseNode;
+    only_cwc?: ParseNode;
     op?: ParseNode;
     pct_health?: ParseNode;
     precombat?: ParseNode;
     precombat_seconds?: ParseNode; //todo
+    precombat_time?: ParseNode;
     precast_time?: ParseNode; //todo
     range?: ParseNode;
     sec?: ParseNode;
@@ -276,7 +279,6 @@ export interface Modifiers {
     wait?: ParseNode;
     wait_on_ready?: ParseNode;
     weapon?: ParseNode;
-    precombat_time?: ParseNode;
 }
 
 export type Modifier = keyof Modifiers;
@@ -441,6 +443,7 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["cycle_targets"]: true,
     ["damage"]: true,
     ["delay"]: true,
+    default: true,
     ["dynamic_prepot"]: true,
     ["early_chain_if"]: true,
     ["effect_name"]: true,
@@ -462,9 +465,11 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["name"]: true,
     ["nonlethal"]: true,
     ["op"]: true,
+    only_cwc: true,
     ["pct_health"]: true,
     ["precombat"]: true,
     ["precombat_seconds"]: true, //todo
+    precombat_time: true,
     ["precast_time"]: true, //todo
     ["range"]: true,
     ["sec"]: true,
@@ -552,6 +557,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
+    ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
     ["mana"]: { name: "mana", modifiers: powerModifiers },
     ["pain"]: { name: "pain", modifiers: powerModifiers },

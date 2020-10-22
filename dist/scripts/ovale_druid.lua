@@ -118,16 +118,12 @@ AddFunction balanceaoemainactions
  if target.refreshable(sunfire) and target.timetodie() > 14 - enemies() + buffremaining(sunfire) and astralpower() >= astralpowercost(sunfire) and message("eclipse.in_any is not implemented") spell(sunfire)
  #moonfire,target_if=refreshable&target.time_to_die>(14+(spell_targets.starfire*1.5))%spell_targets+remains,if=(cooldown.ca_inc.ready|spell_targets.starfire<3|(eclipse.in_solar|eclipse.in_both|eclipse.in_lunar&!talent.soul_of_the_forest.enabled)&(spell_targets.starfire<10*(1+talent.twin_moons.enabled))&astral_power>50-buff.starfall.remains*6)&!buff.kindred_empowerment_energize.up&ap_check
  if target.refreshable(moonfire) and target.timetodie() > { 14 + enemies() * 1.5 } / enemies() + buffremaining(moonfire) and { spellcooldown(ca_inc) == 0 or enemies() < 3 or { message("eclipse.in_solar is not implemented") or message("eclipse.in_both is not implemented") or message("eclipse.in_lunar is not implemented") and not hastalent(soul_of_the_forest_talent) } and enemies() < 10 * { 1 + talentpoints(twin_moons_talent) } and astralpower() > 50 - buffremaining(starfall) * 6 } and not buffpresent(kindred_empowerment_energize_buff) and astralpower() >= astralpowercost(moonfire) spell(moonfire)
- #force_of_nature,if=ap_check
- if astralpower() >= astralpowercost(force_of_nature) spell(force_of_nature)
  #incarnation,if=(buff.starfall.up|astral_power>50)&!buff.solstice.up&!buff.ca_inc.up&(interpolated_fight_remains<cooldown.convoke_the_spirits.remains+7|interpolated_fight_remains%%180<32|cooldown.convoke_the_spirits.up|!covenant.night_fae)
  if { buffpresent(starfall) or astralpower() > 50 } and not buffpresent(solstice_buff) and not buffpresent(ca_inc_buff) and { message("interpolated_fight_remains is not implemented") < spellcooldown(convoke_the_spirits) + 7 or message("interpolated_fight_remains is not implemented") % 180 < 32 or not spellcooldown(convoke_the_spirits) > 0 or not message("covenant.night_fae is not implemented") } spell(incarnation)
  #kindred_spirits,if=interpolated_fight_remains<15|(buff.primordial_arcanic_pulsar.value<250|buff.primordial_arcanic_pulsar.value>=250)&buff.starfall.up&cooldown.ca_inc.remains>50
  if message("interpolated_fight_remains is not implemented") < 15 or { buffamount(primordial_arcanic_pulsar) < 250 or buffamount(primordial_arcanic_pulsar) >= 250 } and buffpresent(starfall) and spellcooldown(ca_inc) > 50 spell(kindred_spirits)
  #stellar_flare,target_if=refreshable&time_to_die>15,if=spell_targets.starfire<4&ap_check&(buff.ca_inc.remains>10|!buff.ca_inc.up)
  if target.refreshable(stellar_flare) and target.timetodie() > 15 and enemies() < 4 and astralpower() >= astralpowercost(stellar_flare) and { buffremaining(ca_inc_buff) > 10 or not buffpresent(ca_inc_buff) } spell(stellar_flare)
- #fury_of_elune,if=eclipse.in_any&ap_check&buff.primordial_arcanic_pulsar.value<250&(dot.adaptive_swarm_damage.ticking|!covenant.necrolord|spell_targets>2)
- if message("eclipse.in_any is not implemented") and astralpower() >= astralpowercost(fury_of_elune) and buffamount(primordial_arcanic_pulsar) < 250 and { target.debuffpresent(adaptive_swarm_damage_debuff) or not message("covenant.necrolord is not implemented") or enemies() > 2 } spell(fury_of_elune)
  #adaptive_swarm,target_if=!ticking,if=spell_targets.starfall<9
  if not buffpresent(adaptive_swarm) and enemies() < 9 spell(adaptive_swarm)
  #starfall,if=buff.oneths_perception.up&(buff.starfall.refreshable|astral_power>90)
@@ -145,8 +141,6 @@ AddFunction balanceaoemainactions
  if { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(half_moon) == 2 and spellchargecooldown(half_moon) < 5 or charges(half_moon) == 3 } and astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) spell(half_moon)
  #full_moon,if=(eclipse.in_any&cooldown.ca_inc.remains>50|(charges=2&recharge_time<5)|charges=3)&ap_check
  if { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(full_moon) == 2 and spellchargecooldown(full_moon) < 5 or charges(full_moon) == 3 } and astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) spell(full_moon)
- #warrior_of_elune
- spell(warrior_of_elune)
  #variable,name=starfire_in_solar,value=spell_targets.starfire>8+floor(mastery_value%20)+floor(buff.starsurge_empowerment.stack%4)
  #wrath,if=eclipse.lunar_next|eclipse.any_next&variable.is_cleave|eclipse.in_solar&!variable.starfire_in_solar|buff.ca_inc.remains<action.starfire.execute_time&!variable.is_cleave&buff.ca_inc.remains<execute_time&buff.ca_inc.up|buff.ravenous_frenzy.up&spell_haste>0.6|!variable.is_cleave&buff.ca_inc.remains>execute_time
  if message("eclipse.lunar_next is not implemented") or message("eclipse.any_next is not implemented") and is_cleave() or message("eclipse.in_solar is not implemented") and not starfire_in_solar() or buffremaining(ca_inc_buff) < executetime(starfire) and not is_cleave() and buffremaining(ca_inc_buff) < executetime(wrath) and buffpresent(ca_inc_buff) or buffpresent(ravenous_frenzy) and 100 / { 100 + spellcastspeedpercent() } > 0.6 or not is_cleave() and buffremaining(ca_inc_buff) > executetime(wrath) spell(wrath)
@@ -162,16 +156,34 @@ AddFunction balanceaoemainpostconditions
 
 AddFunction balanceaoeshortcdactions
 {
- unless message("buff.starfall.refreshable is not implemented") and { not message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") or timeincombat() % 45 > buffremaining(starfall) + 2 } and spell(starfall) or target.refreshable(sunfire) and target.timetodie() > 14 - enemies() + buffremaining(sunfire) and astralpower() >= astralpowercost(sunfire) and message("eclipse.in_any is not implemented") and spell(sunfire) or target.refreshable(moonfire) and target.timetodie() > { 14 + enemies() * 1.5 } / enemies() + buffremaining(moonfire) and { spellcooldown(ca_inc) == 0 or enemies() < 3 or { message("eclipse.in_solar is not implemented") or message("eclipse.in_both is not implemented") or message("eclipse.in_lunar is not implemented") and not hastalent(soul_of_the_forest_talent) } and enemies() < 10 * { 1 + talentpoints(twin_moons_talent) } and astralpower() > 50 - buffremaining(starfall) * 6 } and not buffpresent(kindred_empowerment_energize_buff) and astralpower() >= astralpowercost(moonfire) and spell(moonfire) or astralpower() >= astralpowercost(force_of_nature) and spell(force_of_nature) or { buffpresent(starfall) or astralpower() > 50 } and not buffpresent(solstice_buff) and not buffpresent(ca_inc_buff) and { message("interpolated_fight_remains is not implemented") < spellcooldown(convoke_the_spirits) + 7 or message("interpolated_fight_remains is not implemented") % 180 < 32 or not spellcooldown(convoke_the_spirits) > 0 or not message("covenant.night_fae is not implemented") } and spell(incarnation) or { message("interpolated_fight_remains is not implemented") < 15 or { buffamount(primordial_arcanic_pulsar) < 250 or buffamount(primordial_arcanic_pulsar) >= 250 } and buffpresent(starfall) and spellcooldown(ca_inc) > 50 } and spell(kindred_spirits) or target.refreshable(stellar_flare) and target.timetodie() > 15 and enemies() < 4 and astralpower() >= astralpowercost(stellar_flare) and { buffremaining(ca_inc_buff) > 10 or not buffpresent(ca_inc_buff) } and spell(stellar_flare) or message("eclipse.in_any is not implemented") and astralpower() >= astralpowercost(fury_of_elune) and buffamount(primordial_arcanic_pulsar) < 250 and { target.debuffpresent(adaptive_swarm_damage_debuff) or not message("covenant.necrolord is not implemented") or enemies() > 2 } and spell(fury_of_elune) or not buffpresent(adaptive_swarm) and enemies() < 9 and spell(adaptive_swarm) or buffpresent(oneths_perception) and { message("buff.starfall.refreshable is not implemented") or astralpower() > 90 } and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 50 } and message("buff.starfall.refreshable is not implemented") and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 30 } and buffpresent(starfall) and spell(starsurge) or { buffpresent(oneths_clear_vision) or not message("starfire.ap_check is not implemented") or { buffremaining(ca_inc_buff) < 5 and buffpresent(ca_inc_buff) or buffremaining(ravenous_frenzy) < gcd() * { astralpower() / 30 } and buffpresent(ravenous_frenzy) } and starfall_wont_fall_off() and enemies() < 3 } and spell(starsurge) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(new_moon) == 2 and spellchargecooldown(new_moon) < 5 or charges(new_moon) == 3 } and astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(half_moon) == 2 and spellchargecooldown(half_moon) < 5 or charges(half_moon) == 3 } and astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(full_moon) == 2 and spellchargecooldown(full_moon) < 5 or charges(full_moon) == 3 } and astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon) or spell(warrior_of_elune) or { message("eclipse.lunar_next is not implemented") or message("eclipse.any_next is not implemented") and is_cleave() or message("eclipse.in_solar is not implemented") and not starfire_in_solar() or buffremaining(ca_inc_buff) < executetime(starfire) and not is_cleave() and buffremaining(ca_inc_buff) < executetime(wrath) and buffpresent(ca_inc_buff) or buffpresent(ravenous_frenzy) and 100 / { 100 + spellcastspeedpercent() } > 0.6 or not is_cleave() and buffremaining(ca_inc_buff) > executetime(wrath) } and spell(wrath) or spell(starfire)
+ unless message("buff.starfall.refreshable is not implemented") and { not message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") or timeincombat() % 45 > buffremaining(starfall) + 2 } and spell(starfall) or target.refreshable(sunfire) and target.timetodie() > 14 - enemies() + buffremaining(sunfire) and astralpower() >= astralpowercost(sunfire) and message("eclipse.in_any is not implemented") and spell(sunfire) or target.refreshable(moonfire) and target.timetodie() > { 14 + enemies() * 1.5 } / enemies() + buffremaining(moonfire) and { spellcooldown(ca_inc) == 0 or enemies() < 3 or { message("eclipse.in_solar is not implemented") or message("eclipse.in_both is not implemented") or message("eclipse.in_lunar is not implemented") and not hastalent(soul_of_the_forest_talent) } and enemies() < 10 * { 1 + talentpoints(twin_moons_talent) } and astralpower() > 50 - buffremaining(starfall) * 6 } and not buffpresent(kindred_empowerment_energize_buff) and astralpower() >= astralpowercost(moonfire) and spell(moonfire)
  {
-  #run_action_list,name=fallthru
-  balancefallthruactions()
+  #force_of_nature,if=ap_check
+  if astralpower() >= astralpowercost(force_of_nature) spell(force_of_nature)
+
+  unless { buffpresent(starfall) or astralpower() > 50 } and not buffpresent(solstice_buff) and not buffpresent(ca_inc_buff) and { message("interpolated_fight_remains is not implemented") < spellcooldown(convoke_the_spirits) + 7 or message("interpolated_fight_remains is not implemented") % 180 < 32 or not spellcooldown(convoke_the_spirits) > 0 or not message("covenant.night_fae is not implemented") } and spell(incarnation) or { message("interpolated_fight_remains is not implemented") < 15 or { buffamount(primordial_arcanic_pulsar) < 250 or buffamount(primordial_arcanic_pulsar) >= 250 } and buffpresent(starfall) and spellcooldown(ca_inc) > 50 } and spell(kindred_spirits) or target.refreshable(stellar_flare) and target.timetodie() > 15 and enemies() < 4 and astralpower() >= astralpowercost(stellar_flare) and { buffremaining(ca_inc_buff) > 10 or not buffpresent(ca_inc_buff) } and spell(stellar_flare)
+  {
+   #fury_of_elune,if=eclipse.in_any&ap_check&buff.primordial_arcanic_pulsar.value<250&(dot.adaptive_swarm_damage.ticking|!covenant.necrolord|spell_targets>2)
+   if message("eclipse.in_any is not implemented") and astralpower() >= astralpowercost(fury_of_elune) and buffamount(primordial_arcanic_pulsar) < 250 and { target.debuffpresent(adaptive_swarm_damage_debuff) or not message("covenant.necrolord is not implemented") or enemies() > 2 } spell(fury_of_elune)
+
+   unless not buffpresent(adaptive_swarm) and enemies() < 9 and spell(adaptive_swarm) or buffpresent(oneths_perception) and { message("buff.starfall.refreshable is not implemented") or astralpower() > 90 } and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 50 } and message("buff.starfall.refreshable is not implemented") and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 30 } and buffpresent(starfall) and spell(starsurge) or { buffpresent(oneths_clear_vision) or not message("starfire.ap_check is not implemented") or { buffremaining(ca_inc_buff) < 5 and buffpresent(ca_inc_buff) or buffremaining(ravenous_frenzy) < gcd() * { astralpower() / 30 } and buffpresent(ravenous_frenzy) } and starfall_wont_fall_off() and enemies() < 3 } and spell(starsurge) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(new_moon) == 2 and spellchargecooldown(new_moon) < 5 or charges(new_moon) == 3 } and astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(half_moon) == 2 and spellchargecooldown(half_moon) < 5 or charges(half_moon) == 3 } and astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(full_moon) == 2 and spellchargecooldown(full_moon) < 5 or charges(full_moon) == 3 } and astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon)
+   {
+    #warrior_of_elune
+    spell(warrior_of_elune)
+
+    unless { message("eclipse.lunar_next is not implemented") or message("eclipse.any_next is not implemented") and is_cleave() or message("eclipse.in_solar is not implemented") and not starfire_in_solar() or buffremaining(ca_inc_buff) < executetime(starfire) and not is_cleave() and buffremaining(ca_inc_buff) < executetime(wrath) and buffpresent(ca_inc_buff) or buffpresent(ravenous_frenzy) and 100 / { 100 + spellcastspeedpercent() } > 0.6 or not is_cleave() and buffremaining(ca_inc_buff) > executetime(wrath) } and spell(wrath) or spell(starfire)
+    {
+     #run_action_list,name=fallthru
+     balancefallthruactions()
+    }
+   }
+  }
  }
 }
 
 AddFunction balanceaoeshortcdpostconditions
 {
- message("buff.starfall.refreshable is not implemented") and { not message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") or timeincombat() % 45 > buffremaining(starfall) + 2 } and spell(starfall) or target.refreshable(sunfire) and target.timetodie() > 14 - enemies() + buffremaining(sunfire) and astralpower() >= astralpowercost(sunfire) and message("eclipse.in_any is not implemented") and spell(sunfire) or target.refreshable(moonfire) and target.timetodie() > { 14 + enemies() * 1.5 } / enemies() + buffremaining(moonfire) and { spellcooldown(ca_inc) == 0 or enemies() < 3 or { message("eclipse.in_solar is not implemented") or message("eclipse.in_both is not implemented") or message("eclipse.in_lunar is not implemented") and not hastalent(soul_of_the_forest_talent) } and enemies() < 10 * { 1 + talentpoints(twin_moons_talent) } and astralpower() > 50 - buffremaining(starfall) * 6 } and not buffpresent(kindred_empowerment_energize_buff) and astralpower() >= astralpowercost(moonfire) and spell(moonfire) or astralpower() >= astralpowercost(force_of_nature) and spell(force_of_nature) or { buffpresent(starfall) or astralpower() > 50 } and not buffpresent(solstice_buff) and not buffpresent(ca_inc_buff) and { message("interpolated_fight_remains is not implemented") < spellcooldown(convoke_the_spirits) + 7 or message("interpolated_fight_remains is not implemented") % 180 < 32 or not spellcooldown(convoke_the_spirits) > 0 or not message("covenant.night_fae is not implemented") } and spell(incarnation) or { message("interpolated_fight_remains is not implemented") < 15 or { buffamount(primordial_arcanic_pulsar) < 250 or buffamount(primordial_arcanic_pulsar) >= 250 } and buffpresent(starfall) and spellcooldown(ca_inc) > 50 } and spell(kindred_spirits) or target.refreshable(stellar_flare) and target.timetodie() > 15 and enemies() < 4 and astralpower() >= astralpowercost(stellar_flare) and { buffremaining(ca_inc_buff) > 10 or not buffpresent(ca_inc_buff) } and spell(stellar_flare) or message("eclipse.in_any is not implemented") and astralpower() >= astralpowercost(fury_of_elune) and buffamount(primordial_arcanic_pulsar) < 250 and { target.debuffpresent(adaptive_swarm_damage_debuff) or not message("covenant.necrolord is not implemented") or enemies() > 2 } and spell(fury_of_elune) or not buffpresent(adaptive_swarm) and enemies() < 9 and spell(adaptive_swarm) or buffpresent(oneths_perception) and { message("buff.starfall.refreshable is not implemented") or astralpower() > 90 } and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 50 } and message("buff.starfall.refreshable is not implemented") and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 30 } and buffpresent(starfall) and spell(starsurge) or { buffpresent(oneths_clear_vision) or not message("starfire.ap_check is not implemented") or { buffremaining(ca_inc_buff) < 5 and buffpresent(ca_inc_buff) or buffremaining(ravenous_frenzy) < gcd() * { astralpower() / 30 } and buffpresent(ravenous_frenzy) } and starfall_wont_fall_off() and enemies() < 3 } and spell(starsurge) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(new_moon) == 2 and spellchargecooldown(new_moon) < 5 or charges(new_moon) == 3 } and astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(half_moon) == 2 and spellchargecooldown(half_moon) < 5 or charges(half_moon) == 3 } and astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(full_moon) == 2 and spellchargecooldown(full_moon) < 5 or charges(full_moon) == 3 } and astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon) or spell(warrior_of_elune) or { message("eclipse.lunar_next is not implemented") or message("eclipse.any_next is not implemented") and is_cleave() or message("eclipse.in_solar is not implemented") and not starfire_in_solar() or buffremaining(ca_inc_buff) < executetime(starfire) and not is_cleave() and buffremaining(ca_inc_buff) < executetime(wrath) and buffpresent(ca_inc_buff) or buffpresent(ravenous_frenzy) and 100 / { 100 + spellcastspeedpercent() } > 0.6 or not is_cleave() and buffremaining(ca_inc_buff) > executetime(wrath) } and spell(wrath) or spell(starfire)
+ message("buff.starfall.refreshable is not implemented") and { not message("runeforge.lycaras_fleeting_glimpse.equipped is not implemented") or timeincombat() % 45 > buffremaining(starfall) + 2 } and spell(starfall) or target.refreshable(sunfire) and target.timetodie() > 14 - enemies() + buffremaining(sunfire) and astralpower() >= astralpowercost(sunfire) and message("eclipse.in_any is not implemented") and spell(sunfire) or target.refreshable(moonfire) and target.timetodie() > { 14 + enemies() * 1.5 } / enemies() + buffremaining(moonfire) and { spellcooldown(ca_inc) == 0 or enemies() < 3 or { message("eclipse.in_solar is not implemented") or message("eclipse.in_both is not implemented") or message("eclipse.in_lunar is not implemented") and not hastalent(soul_of_the_forest_talent) } and enemies() < 10 * { 1 + talentpoints(twin_moons_talent) } and astralpower() > 50 - buffremaining(starfall) * 6 } and not buffpresent(kindred_empowerment_energize_buff) and astralpower() >= astralpowercost(moonfire) and spell(moonfire) or { buffpresent(starfall) or astralpower() > 50 } and not buffpresent(solstice_buff) and not buffpresent(ca_inc_buff) and { message("interpolated_fight_remains is not implemented") < spellcooldown(convoke_the_spirits) + 7 or message("interpolated_fight_remains is not implemented") % 180 < 32 or not spellcooldown(convoke_the_spirits) > 0 or not message("covenant.night_fae is not implemented") } and spell(incarnation) or { message("interpolated_fight_remains is not implemented") < 15 or { buffamount(primordial_arcanic_pulsar) < 250 or buffamount(primordial_arcanic_pulsar) >= 250 } and buffpresent(starfall) and spellcooldown(ca_inc) > 50 } and spell(kindred_spirits) or target.refreshable(stellar_flare) and target.timetodie() > 15 and enemies() < 4 and astralpower() >= astralpowercost(stellar_flare) and { buffremaining(ca_inc_buff) > 10 or not buffpresent(ca_inc_buff) } and spell(stellar_flare) or not buffpresent(adaptive_swarm) and enemies() < 9 and spell(adaptive_swarm) or buffpresent(oneths_perception) and { message("buff.starfall.refreshable is not implemented") or astralpower() > 90 } and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 50 } and message("buff.starfall.refreshable is not implemented") and spell(starfall) or message("covenant.night_fae is not implemented") and convoke_condition() and spellcooldown(convoke_the_spirits) < gcd() * { astralpower() / 30 } and buffpresent(starfall) and spell(starsurge) or { buffpresent(oneths_clear_vision) or not message("starfire.ap_check is not implemented") or { buffremaining(ca_inc_buff) < 5 and buffpresent(ca_inc_buff) or buffremaining(ravenous_frenzy) < gcd() * { astralpower() / 30 } and buffpresent(ravenous_frenzy) } and starfall_wont_fall_off() and enemies() < 3 } and spell(starsurge) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(new_moon) == 2 and spellchargecooldown(new_moon) < 5 or charges(new_moon) == 3 } and astralpower() >= astralpowercost(new_moon) and not spellknown(half_moon) and not spellknown(full_moon) and spell(new_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(half_moon) == 2 and spellchargecooldown(half_moon) < 5 or charges(half_moon) == 3 } and astralpower() >= astralpowercost(half_moon) and spellknown(half_moon) and spell(half_moon) or { message("eclipse.in_any is not implemented") and spellcooldown(ca_inc) > 50 or charges(full_moon) == 2 and spellchargecooldown(full_moon) < 5 or charges(full_moon) == 3 } and astralpower() >= astralpowercost(full_moon) and spellknown(full_moon) and spell(full_moon) or { message("eclipse.lunar_next is not implemented") or message("eclipse.any_next is not implemented") and is_cleave() or message("eclipse.in_solar is not implemented") and not starfire_in_solar() or buffremaining(ca_inc_buff) < executetime(starfire) and not is_cleave() and buffremaining(ca_inc_buff) < executetime(wrath) and buffpresent(ca_inc_buff) or buffpresent(ravenous_frenzy) and 100 / { 100 + spellcastspeedpercent() } > 0.6 or not is_cleave() and buffremaining(ca_inc_buff) > executetime(wrath) } and spell(wrath) or spell(starfire)
 }
 
 AddFunction balanceaoecdactions
@@ -264,7 +276,7 @@ AddFunction balance_defaultcdactions
   #use_items
   balanceuseitemactions()
   #heart_essence,if=level=50
-  if message("level is not implemented") == 50 balanceuseheartessence()
+  if level() == 50 balanceuseheartessence()
   #run_action_list,name=aoe,if=variable.is_aoe
   if is_aoe() balanceaoecdactions()
 
@@ -623,20 +635,12 @@ AddFunction feralessencemainactions
  if buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) spell(memory_of_lucid_dreams)
  #blood_of_the_enemy,if=buff.tigers_fury.up&combo_points=5
  if buffpresent(tigers_fury) and combopoints() == 5 spell(blood_of_the_enemy)
- #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
- if enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 spell(focused_azerite_beam)
- #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
- if enemies() > message("desired_targets is not implemented") or 600 > 60 spell(purifying_blast)
- #guardian_of_azeroth,if=buff.tigers_fury.up
- if buffpresent(tigers_fury) spell(guardian_of_azeroth)
  #concentrated_flame,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(concentrated_flame)
  #ripple_in_space,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(ripple_in_space)
  #worldvein_resonance,if=buff.tigers_fury.up
  if buffpresent(tigers_fury) spell(worldvein_resonance)
- #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
- if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 spell(reaping_flames)
 }
 
 AddFunction feralessencemainpostconditions
@@ -645,34 +649,46 @@ AddFunction feralessencemainpostconditions
 
 AddFunction feralessenceshortcdactions
 {
+ unless { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy)
+ {
+  #focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
+  if enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 spell(focused_azerite_beam)
+  #purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
+  if enemies() > message("desired_targets is not implemented") or 600 > 60 spell(purifying_blast)
+
+  unless buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance)
+  {
+   #reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
+   if target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 spell(reaping_flames)
+  }
+ }
 }
 
 AddFunction feralessenceshortcdpostconditions
 {
- { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(guardian_of_azeroth) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
+ { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance)
 }
 
 AddFunction feralessencecdactions
 {
+ unless { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast)
+ {
+  #guardian_of_azeroth,if=buff.tigers_fury.up
+  if buffpresent(tigers_fury) spell(guardian_of_azeroth)
+ }
 }
 
 AddFunction feralessencecdpostconditions
 {
- { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(guardian_of_azeroth) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
+ { enemies() > message("desired_targets is not implemented") or 600 > 45 } and spell(thorns) or { buffpresent(reckless_force_buff) or buffpresent(tigers_fury) } and spell(the_unbound_force) or { buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(memory_of_lucid_dreams) or buffpresent(tigers_fury) and combopoints() == 5 and spell(blood_of_the_enemy) or { enemies() > message("desired_targets is not implemented") or 600 > 90 and energydeficit() >= 50 } and spell(focused_azerite_beam) or { enemies() > message("desired_targets is not implemented") or 600 > 60 } and spell(purifying_blast) or buffpresent(tigers_fury) and spell(concentrated_flame) or buffpresent(tigers_fury) and spell(ripple_in_space) or buffpresent(tigers_fury) and spell(worldvein_resonance) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and reaping_delay() > 29 or target.timetohealthpercent(20) > 30 and reaping_delay() > 44 } and spell(reaping_flames)
 }
 
 ### actions.cooldown
 
 AddFunction feralcooldownmainactions
 {
- #berserk,if=buff.prowl.down
- if buffexpires(prowl) spell(berserk)
  #incarnation,if=buff.prowl.down
  if buffexpires(prowl) spell(incarnation)
- #tigers_fury,if=energy.deficit>55|buff.berserk_cat.remains<13|buff.incarnation_king_of_the_jungle.remains<13
- if energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 spell(tigers_fury)
- #shadowmeld,if=buff.tigers_fury.up&buff.berserk_cat.down&buff.incarnation_king_of_the_jungle.down&buff.prowl.down&combo_points<4&dot.rake.pmultiplier<1.6&energy>40
- if buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 spell(shadowmeld)
  #berserking,if=buff.tigers_fury.up|buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
  if buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) spell(berserking)
  #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
@@ -687,40 +703,55 @@ AddFunction feralcooldownmainpostconditions
 
 AddFunction feralcooldownshortcdactions
 {
- unless buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
+ unless buffexpires(prowl) and spell(incarnation)
  {
-  #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
-  #call_action_list,name=essence
-  feralessenceshortcdactions()
+  #tigers_fury,if=energy.deficit>55|buff.berserk_cat.remains<13|buff.incarnation_king_of_the_jungle.remains<13
+  if energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 spell(tigers_fury)
+
+  unless { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
+  {
+   #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
+   #call_action_list,name=essence
+   feralessenceshortcdactions()
+  }
  }
 }
 
 AddFunction feralcooldownshortcdpostconditions
 {
- buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessenceshortcdpostconditions()
+ buffexpires(prowl) and spell(incarnation) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessenceshortcdpostconditions()
 }
 
 AddFunction feralcooldowncdactions
 {
- unless buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
- {
-  #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
-  #call_action_list,name=essence
-  feralessencecdactions()
+ #berserk,if=buff.prowl.down
+ if buffexpires(prowl) spell(berserk)
 
-  unless feralessencecdpostconditions()
+ unless buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury)
+ {
+  #shadowmeld,if=buff.tigers_fury.up&buff.berserk_cat.down&buff.incarnation_king_of_the_jungle.down&buff.prowl.down&combo_points<4&dot.rake.pmultiplier<1.6&energy>40
+  if buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 spell(shadowmeld)
+
+  unless { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking)
   {
-   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
-   if target.debuffexpires(razor_coral) or target.debuffpresent(conductive_ink_debuff) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
-   #use_items,if=buff.tigers_fury.up|target.time_to_die<20
-   if buffpresent(tigers_fury) or target.timetodie() < 20 feraluseitemactions()
+   #potion,if=buff.berserk_cat.up|buff.incarnation_king_of_the_jungle.up
+   #call_action_list,name=essence
+   feralessencecdactions()
+
+   unless feralessencecdpostconditions()
+   {
+    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
+    if target.debuffexpires(razor_coral) or target.debuffpresent(conductive_ink_debuff) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
+    #use_items,if=buff.tigers_fury.up|target.time_to_die<20
+    if buffpresent(tigers_fury) or target.timetodie() < 20 feraluseitemactions()
+   }
   }
  }
 }
 
 AddFunction feralcooldowncdpostconditions
 {
- buffexpires(prowl) and spell(berserk) or buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or buffpresent(tigers_fury) and buffexpires(berserk_cat_buff) and buffexpires(incarnation_king_of_the_jungle) and buffexpires(prowl) and combopoints() < 4 and target.debuffpersistentmultiplier(rake_debuff) < 1.6 and energy() > 40 and spell(shadowmeld) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessencecdpostconditions()
+ buffexpires(prowl) and spell(incarnation) or { energydeficit() > 55 or buffremaining(berserk_cat_buff) < 13 or buffremaining(incarnation_king_of_the_jungle) < 13 } and spell(tigers_fury) or { buffpresent(tigers_fury) or buffpresent(berserk_cat_buff) or buffpresent(incarnation_king_of_the_jungle) } and spell(berserking) or feralessencecdpostconditions()
 }
 
 ### actions.bloodtalons
@@ -802,8 +833,6 @@ AddFunction feral_defaultmainactions
      {
       #rake,target_if=refreshable|persistent_multiplier>dot.rake.pmultiplier
       if target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) spell(rake)
-      #feral_frenzy,if=combo_points=0
-      if combopoints() == 0 spell(feral_frenzy)
       #moonfire_cat,target_if=refreshable
       if target.refreshable(moonfire_cat_debuff) spell(moonfire_cat)
       #thrash_cat,if=refreshable&druid.thrash_cat.ticks_gained_on_refresh>variable.thrash_ticks
@@ -857,10 +886,16 @@ AddFunction feral_defaultshortcdactions
       #run_action_list,name=bloodtalons,if=talent.bloodtalons.enabled&(buff.bloodtalons.down|active_bt_triggers=2)
       if hastalent(bloodtalons_talent) and { buffexpires(bloodtalons) or message("active_bt_triggers is not implemented") == 2 } feralbloodtalonsshortcdactions()
 
-      unless hastalent(bloodtalons_talent) and { buffexpires(bloodtalons) or message("active_bt_triggers is not implemented") == 2 } and feralbloodtalonsshortcdpostconditions() or { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and spell(rake) or combopoints() == 0 and spell(feral_frenzy) or target.refreshable(moonfire_cat_debuff) and spell(moonfire_cat) or target.refreshable(thrash_cat_debuff) and message("druid.thrash_cat.ticks_gained_on_refresh is not implemented") > thrash_ticks() and spell(thrash_cat) or buffpresent(tigers_fury) and 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies() * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and spell(brutal_slash) or enemies() > 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred)
+      unless hastalent(bloodtalons_talent) and { buffexpires(bloodtalons) or message("active_bt_triggers is not implemented") == 2 } and feralbloodtalonsshortcdpostconditions() or { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and spell(rake)
       {
-       #call_action_list,name=filler,if=energy.time_to_max<1
-       if energy() < 1 feralfillershortcdactions()
+       #feral_frenzy,if=combo_points=0
+       if combopoints() == 0 spell(feral_frenzy)
+
+       unless target.refreshable(moonfire_cat_debuff) and spell(moonfire_cat) or target.refreshable(thrash_cat_debuff) and message("druid.thrash_cat.ticks_gained_on_refresh is not implemented") > thrash_ticks() and spell(thrash_cat) or buffpresent(tigers_fury) and 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies() * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and spell(brutal_slash) or enemies() > 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred)
+       {
+        #call_action_list,name=filler,if=energy.time_to_max<1
+        if energy() < 1 feralfillershortcdactions()
+       }
       }
      }
     }
@@ -871,7 +906,7 @@ AddFunction feral_defaultshortcdactions
 
 AddFunction feral_defaultshortcdpostconditions
 {
- buffexpires(cat_form) and spell(cat_form) or spell(prowl) or feralcooldownshortcdpostconditions() or combopoints() >= 5 - 4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(berserk_cat_buff) or buffpresent(incarnation) or buffpresent(shadowmeld) or buffpresent(sudden_ambush_buff) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energy() + 40 * buffpresent(clearcasting) >= 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and message("active_bt_triggers is not implemented") == 0 } and { hastalent(bloodtalons_talent) and { buffexpires(bloodtalons) or message("active_bt_triggers is not implemented") == 2 } and feralbloodtalonsshortcdpostconditions() or { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and spell(rake) or combopoints() == 0 and spell(feral_frenzy) or target.refreshable(moonfire_cat_debuff) and spell(moonfire_cat) or target.refreshable(thrash_cat_debuff) and message("druid.thrash_cat.ticks_gained_on_refresh is not implemented") > thrash_ticks() and spell(thrash_cat) or buffpresent(tigers_fury) and 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies() * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and spell(brutal_slash) or enemies() > 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or energy() < 1 and feralfillershortcdpostconditions() }
+ buffexpires(cat_form) and spell(cat_form) or spell(prowl) or feralcooldownshortcdpostconditions() or combopoints() >= 5 - 4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(berserk_cat_buff) or buffpresent(incarnation) or buffpresent(shadowmeld) or buffpresent(sudden_ambush_buff) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energy() + 40 * buffpresent(clearcasting) >= 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and message("active_bt_triggers is not implemented") == 0 } and { hastalent(bloodtalons_talent) and { buffexpires(bloodtalons) or message("active_bt_triggers is not implemented") == 2 } and feralbloodtalonsshortcdpostconditions() or { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and spell(rake) or target.refreshable(moonfire_cat_debuff) and spell(moonfire_cat) or target.refreshable(thrash_cat_debuff) and message("druid.thrash_cat.ticks_gained_on_refresh is not implemented") > thrash_ticks() and spell(thrash_cat) or buffpresent(tigers_fury) and 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies() * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and spell(brutal_slash) or enemies() > 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or energy() < 1 and feralfillershortcdpostconditions() }
 }
 
 AddFunction feral_defaultcdactions
@@ -1084,8 +1119,6 @@ AddFunction guardianprecombatmainactions
  if message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) spell(moonkin_form)
  #bear_form,if=!druid.catweave_bear&!druid.owlweave_bear
  if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") spell(bear_form)
- #heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&druid.owlweave_bear
- if hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") spell(heart_of_the_wild)
  #wrath,if=druid.owlweave_bear
  if message("druid.owlweave_bear is not implemented") spell(wrath)
 }
@@ -1100,16 +1133,21 @@ AddFunction guardianprecombatshortcdactions
 
 AddFunction guardianprecombatshortcdpostconditions
 {
- message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(wrath)
+ message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or message("druid.owlweave_bear is not implemented") and spell(wrath)
 }
 
 AddFunction guardianprecombatcdactions
 {
+ unless message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form)
+ {
+  #heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&druid.owlweave_bear
+  if hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") spell(heart_of_the_wild)
+ }
 }
 
 AddFunction guardianprecombatcdpostconditions
 {
- message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or hastalent(heart_of_the_wild_talent) and message("druid.owlweave_bear is not implemented") and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(wrath)
+ message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(cat_form) or message("druid.catweave_bear is not implemented") and hastalent(feral_affinity_talent_guardian) and spell(prowl) or message("druid.owlweave_bear is not implemented") and hastalent(balance_affinity_talent) and spell(moonkin_form) or not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and spell(bear_form) or message("druid.owlweave_bear is not implemented") and spell(wrath)
 }
 
 ### actions.owlweave
@@ -1118,10 +1156,6 @@ AddFunction guardianowlweavemainactions
 {
  #moonkin_form,if=!buff.moonkin_form.up
  if not buffpresent(moonkin_form) spell(moonkin_form)
- #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
- if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
- #empower_bond,if=druid.owlweave_bear
- if message("druid.owlweave_bear is not implemented") spell(empower_bond)
  #adaptive_swarm,target_if=refreshable
  if target.refreshable(adaptive_swarm) spell(adaptive_swarm)
  #moonfire,target_if=refreshable|buff.galactic_guardian.up
@@ -1142,25 +1176,36 @@ AddFunction guardianowlweavemainpostconditions
 
 AddFunction guardianowlweaveshortcdactions
 {
+ unless not buffpresent(moonkin_form) and spell(moonkin_form)
+ {
+  #empower_bond,if=druid.owlweave_bear
+  if message("druid.owlweave_bear is not implemented") spell(empower_bond)
+ }
 }
 
 AddFunction guardianowlweaveshortcdpostconditions
 {
- not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(empower_bond) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
+ not buffpresent(moonkin_form) and spell(moonkin_form) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
 }
 
 AddFunction guardianowlweavecdactions
 {
- unless not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(empower_bond)
+ unless not buffpresent(moonkin_form) and spell(moonkin_form)
  {
-  #convoke_the_spirits,if=druid.owlweave_bear
-  if message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
+  #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
+
+  unless message("druid.owlweave_bear is not implemented") and spell(empower_bond)
+  {
+   #convoke_the_spirits,if=druid.owlweave_bear
+   if message("druid.owlweave_bear is not implemented") spell(convoke_the_spirits)
+  }
  }
 }
 
 AddFunction guardianowlweavecdpostconditions
 {
- not buffpresent(moonkin_form) and spell(moonkin_form) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.owlweave_bear is not implemented") and spell(empower_bond) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
+ not buffpresent(moonkin_form) and spell(moonkin_form) or message("druid.owlweave_bear is not implemented") and spell(empower_bond) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or { target.refreshable(moonfire) or buffpresent(galactic_guardian) } and spell(moonfire) or target.refreshable(sunfire) and spell(sunfire) or { buffpresent(eclipse_lunar) or buffpresent(eclipse_solar) } and spell(starsurge) or { message("eclipse.in_lunar is not implemented") or message("eclipse.solar_next is not implemented") or message("eclipse.in_lunar is not implemented") and buffpresent(starsurge_empowerment_buff) } and spell(starfire) or spell(wrath)
 }
 
 ### actions.lycarao
@@ -1231,10 +1276,6 @@ AddFunction guardiancatweavemainactions
  if not buffpresent(cat_form) spell(cat_form)
  #rake,if=buff.prowl.up
  if buffpresent(prowl) spell(rake)
- #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
- if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
- #empower_bond,if=druid.catweave_bear
- if message("druid.catweave_bear is not implemented") spell(empower_bond)
  #rip,if=dot.rip.refreshable&combo_points>=4
  if target.debuffrefreshable(rip) and combopoints() >= 4 spell(rip)
  #ferocious_bite,if=combo_points>=4
@@ -1253,25 +1294,36 @@ AddFunction guardiancatweavemainpostconditions
 
 AddFunction guardiancatweaveshortcdactions
 {
+ unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake)
+ {
+  #empower_bond,if=druid.catweave_bear
+  if message("druid.catweave_bear is not implemented") spell(empower_bond)
+ }
 }
 
 AddFunction guardiancatweaveshortcdpostconditions
 {
- not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.catweave_bear is not implemented") and spell(empower_bond) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
+ not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
 }
 
 AddFunction guardiancatweavecdactions
 {
- unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.catweave_bear is not implemented") and spell(empower_bond)
+ unless not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake)
  {
-  #convoke_the_spirits,if=druid.catweave_bear
-  if message("druid.catweave_bear is not implemented") spell(convoke_the_spirits)
+  #heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  if hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) spell(heart_of_the_wild)
+
+  unless message("druid.catweave_bear is not implemented") and spell(empower_bond)
+  {
+   #convoke_the_spirits,if=druid.catweave_bear
+   if message("druid.catweave_bear is not implemented") spell(convoke_the_spirits)
+  }
  }
 }
 
 AddFunction guardiancatweavecdpostconditions
 {
- not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or hastalent(heart_of_the_wild_talent) and not buffpresent(heart_of_the_wild) and spell(heart_of_the_wild) or message("druid.catweave_bear is not implemented") and spell(empower_bond) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
+ not buffpresent(cat_form) and spell(cat_form) or buffpresent(prowl) and spell(rake) or message("druid.catweave_bear is not implemented") and spell(empower_bond) or target.debuffrefreshable(rip) and combopoints() >= 4 and spell(rip) or combopoints() >= 4 and spell(ferocious_bite) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or target.debuffrefreshable(rake_debuff) and combopoints() < 4 and spell(rake) or spell(shred)
 }
 
 ### actions.bear
@@ -1284,10 +1336,6 @@ AddFunction guardianbearmainactions
  if buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") spell(berserk_bear)
  #incarnation,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
  if buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") spell(incarnation)
- #empower_bond,if=(!druid.catweave_bear&!druid.owlweave_bear)|active_enemies>=2
- if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 spell(empower_bond)
- #barkskin,if=(talent.brambles.enabled)&(buff.bear_form.up)
- if hastalent(brambles_talent) and buffpresent(bear_form) spell(barkskin)
  #ironfur,if=buff.ironfur.remains<0.5
  if buffremaining(ironfur) < 0.5 spell(ironfur)
  #adaptive_swarm,target_if=refreshable
@@ -1314,8 +1362,6 @@ AddFunction guardianbearmainactions
  if buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 spell(moonfire)
  #mangle,if=(rage<80)&active_enemies<4
  if rage() < 80 and enemies() < 4 spell(mangle)
- #pulverize,target_if=dot.thrash_bear.stack>2
- if target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) spell(pulverize)
  #thrash_bear
  spell(thrash_bear)
  #maul
@@ -1330,11 +1376,24 @@ AddFunction guardianbearmainpostconditions
 
 AddFunction guardianbearshortcdactions
 {
+ unless not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation)
+ {
+  #empower_bond,if=(!druid.catweave_bear&!druid.owlweave_bear)|active_enemies>=2
+  if not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 spell(empower_bond)
+  #barkskin,if=(talent.brambles.enabled)&(buff.bear_form.up)
+  if hastalent(brambles_talent) and buffpresent(bear_form) spell(barkskin)
+
+  unless buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle)
+  {
+   #pulverize,target_if=dot.thrash_bear.stack>2
+   if target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) spell(pulverize)
+  }
+ }
 }
 
 AddFunction guardianbearshortcdpostconditions
 {
- not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or { not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") or enemies() >= 2 } and spell(empower_bond) or hastalent(brambles_talent) and buffpresent(bear_form) and spell(barkskin) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or target.debuffstacks(thrash_bear_debuff) > 2 and target.debuffgain(thrash_bear_debuff) <= baseduration(thrash_bear_debuff) and spell(pulverize) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
+ not buffpresent(bear_form) and spell(bear_form) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(berserk_bear) or { buffpresent(ravenous_frenzy) or not message("covenant.venthyr is not implemented") } and spell(incarnation) or buffremaining(ironfur) < 0.5 and spell(ironfur) or target.refreshable(adaptive_swarm) and spell(adaptive_swarm) or buffpresent(galactic_guardian) and message("druid.owlweave_bear is not implemented") and enemies() <= 3 and spell(moonfire) or { target.refreshable(thrash_bear_debuff) or target.debuffstacks(thrash_bear_debuff) < 3 or target.debuffstacks(thrash_bear_debuff) < 4 and message("runeforge.luffainfused_embrace.equipped is not implemented") or enemies() > 5 } and spell(thrash_bear) or buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk_bear_buff) and enemies() >= 4 and spell(swipe) or buffpresent(incarnation) and enemies() < 2 and spell(maul) or buffstacks(savage_combatant_buff) >= 1 and buffpresent(tooth_and_claw_buff) and buffpresent(incarnation) and enemies() == 2 and spell(maul) or buffpresent(incarnation) and enemies() <= 3 and spell(mangle) or target.refreshable(moonfire) and enemies() <= 3 and spell(moonfire) or { buffstacks(tooth_and_claw_buff) >= 2 or buffpresent(tooth_and_claw_buff) and buffremaining(tooth_and_claw_buff) < 1.5 or buffstacks(savage_combatant_buff) >= 3 } and spell(maul) or enemies() > 1 and spell(thrash_bear) or { buffpresent(galactic_guardian) and message("druid.catweave_bear is not implemented") and enemies() <= 3 or buffpresent(galactic_guardian) and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and enemies() <= 3 } and spell(moonfire) or rage() < 80 and enemies() < 4 and spell(mangle) or spell(thrash_bear) or spell(maul) or spell(swipe_bear)
 }
 
 AddFunction guardianbearcdactions

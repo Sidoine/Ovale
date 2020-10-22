@@ -40,7 +40,7 @@ Define(arcane_torrent_5 129597)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137025[s2 Chi][]?s137024[s3 of your mana][]?s137023[s4 Energy][].
   SpellInfo(arcane_torrent_5 cd=120 gcd=1 chi=-1 energy=-15)
 Define(arcane_torrent_6 155145)
-# Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137027[s2 Holy Power][s3 of your mana].
+# Remove s1 beneficial effect from all enemies within A1 yards and restore s2 Holy Power.
   SpellInfo(arcane_torrent_6 cd=120 holypower=-1)
 Define(arcane_torrent_7 202719)
 # Remove s1 beneficial effect from all enemies within A1 yards and generate ?s203513[m3/10 Pain][m2 Fury].
@@ -182,24 +182,9 @@ Define(dreadblades 343142)
   SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1 talent=dreadblades_talent)
   # Sinister Strike, ?s196937[Ghostly Strike, ][]Ambush, and Pistol Shot will refill all of your combo points when used.
   SpellAddBuff(dreadblades dreadblades=1)
-Define(echoing_reprimand_0 323547)
+Define(echoing_reprimand 323547)
 # Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
-  SpellInfo(echoing_reprimand_0 energy=0 cd=45 gcd=1 combopoints=-3)
-Define(echoing_reprimand_1 323558)
-# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
-  SpellInfo(echoing_reprimand_1 duration=45 max_stacks=2 gcd=0 offgcd=1)
-  # Rogue's second combo point is Animacharged. rnrnDamaging finishing moves using exactly 2 combo points deal damage as if 7 combo points are consumed.
-  SpellAddBuff(echoing_reprimand_1 echoing_reprimand_1=1)
-Define(echoing_reprimand_2 323559)
-# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
-  SpellInfo(echoing_reprimand_2 duration=45 max_stacks=3 gcd=0 offgcd=1)
-  # Rogue's third combo point is Animacharged. rnrnDamaging finishing moves using exactly 3 combo points deal damage as if 7 combo points are consumed.
-  SpellAddBuff(echoing_reprimand_2 echoing_reprimand_2=1)
-Define(echoing_reprimand_3 323560)
-# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
-  SpellInfo(echoing_reprimand_3 duration=45 max_stacks=4 gcd=0 offgcd=1)
-  # Rogue's fourth combo point is Animacharged. rnrnDamaging finishing moves using exactly 4 combo points deal damage as if 7 combo points are consumed.
-  SpellAddBuff(echoing_reprimand_3 echoing_reprimand_3=1)
+  SpellInfo(echoing_reprimand energy=0 cd=45 gcd=1 combopoints=-2)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
   SpellInfo(envenom energy=35 combopoints=1 duration=1 gcd=1)
@@ -229,21 +214,21 @@ Define(fireblood_1 265226)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
 Define(flagellation_0 323654)
-# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 45 seconds, causing an additional lash for each Combo Point spent.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack up to a maximum of 345569s2/10*345569u for 25 seconds.
-  SpellInfo(flagellation_0 energy=20 cd=5 duration=45 max_stacks=40 gcd=1)
-  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each Combo Point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 20 seconds, receiving an additional lash for each combo point you spend.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack, up to a maximum of 345569s2/10*345569u Haste for 20 seconds.
+  SpellInfo(flagellation_0 energy=20 cd=90 duration=20 max_stacks=30 gcd=1)
+  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each combo point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
   SpellAddBuff(flagellation_0 flagellation_0=1)
-  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each Combo Point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
+  # ?W2>0[Nearby Rogue is tormenting the target, dealing s1 Shadow damage for each combo point spent.][Combo points spent deal s1 Shadow damage to the Rogue's tormented target.]
   SpellAddTargetDebuff(flagellation_0 flagellation_0=1)
 Define(flagellation_1 345316)
-# @spelldesc345285
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 20 seconds, receiving an additional lash for each combo point you spend.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack, up to a maximum of 345569s2/10*345569u Haste for 20 seconds.
   SpellInfo(flagellation_1 channel=0 gcd=0 offgcd=1)
 Define(flagellation_2 345390)
-# @spelldesc345285
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 20 seconds, receiving an additional lash for each combo point you spend.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack, up to a maximum of 345569s2/10*345569u Haste for 20 seconds.
   SpellInfo(flagellation_2 channel=0 gcd=0 offgcd=1)
 Define(flagellation_3 345569)
-# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 45 seconds, causing an additional lash for each Combo Point spent.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack up to a maximum of 345569s2/10*345569u for 25 seconds.
-  SpellInfo(flagellation_3 cd=5 duration=25 max_stacks=40 gcd=0 offgcd=1)
+# Lash the target s2 times, dealing s1 Shadow damage and adding a stack of Flagellation for each lash. The target remains tormented for 20 seconds, receiving an additional lash for each combo point you spend.rnrnReactivating Flagellation cleanses their torment, increasing your Haste by 345569s2/10.1 per stack, up to a maximum of 345569s2/10*345569u Haste for 20 seconds.
+  SpellInfo(flagellation_3 cd=5 duration=20 max_stacks=30 gcd=0 offgcd=1)
   # Haste increased by s1/10.1.
   SpellAddBuff(flagellation_3 flagellation_3=1)
 Define(focused_azerite_beam_0 295258)
@@ -366,9 +351,9 @@ Define(opportunity 195627)
   # Your next Pistol Shot costs s1 less Energy and deals s3 increased damage.
   SpellAddBuff(opportunity opportunity=1)
 Define(perforated_veins_buff 341572)
-# Shadowstrike increases the damage of your next Backstab by |cFFFFFFFFs1|r, stacking up to 341572u times.
-  SpellInfo(perforated_veins_buff duration=12 max_stacks=3 gcd=0 offgcd=1)
-  # Damage of next Backstab increased by w1.
+# Shadowstrike increases the damage of your next ?s200758[Gloomblade][Backstab] by |cFFFFFFFFs1|r, stacking up to 341572u times.
+  SpellInfo(perforated_veins_buff duration=12 max_stacks=6 gcd=0 offgcd=1)
+  # Damage of your next ?s200758[Gloomblade][Backstab] increased by w1.
   SpellAddBuff(perforated_veins_buff perforated_veins_buff=1)
 Define(pistol_shot 185763)
 # Draw a concealed pistol and fire a quick shot at an enemy, dealing s1*<CAP>/AP Physical damage and reducing movement speed by s3 for 6 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
@@ -483,7 +468,7 @@ Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1 talent=secret_technique_talent)
 Define(sepsis 328306)
-# Infect the target's blood, dealing o1 Nature damage over 10 seconds. If the target survives its full duration, they suffer an additional 328306s1 damage and you Vanish from sight.rnrnCooldown reduced by s3 sec if Sepsis does not last its full duration.
+# Infect the target's blood, dealing o1 Nature damage over 10 seconds. If the target survives its full duration, they suffer an additional 328306s1 damage and you gain s6 use of any Stealth ability for 5 seconds.rnrnCooldown reduced by s3 sec if Sepsis does not last its full duration.rnrn|cFFFFFFFFAwards s7 combo lpoint:points;.|r
   SpellInfo(sepsis gcd=0 offgcd=1)
 Define(serrated_bone_spike_0 324074)
 # Embed a bone spike in the target, dealing s1 Physical damage every t2 sec until they die.rnrnAttacking with Serrated Bone Spike causes all of your active bone spikes to fracture and strike your current target, increasing initial damage by s3 per spike.
@@ -615,7 +600,6 @@ SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arca
 SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2 blood_fury_3)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
-SpellList(echoing_reprimand echoing_reprimand_0 echoing_reprimand_1 echoing_reprimand_2 echoing_reprimand_3)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(flagellation flagellation_0 flagellation_1 flagellation_2 flagellation_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)

@@ -367,7 +367,7 @@ Define(summon_darkglare 205180)
 Define(summon_demonic_tyrant 265187)
 # Summon a Demonic Tyrant to increase the duration of all of your current lesser demons by 265273m3/1000 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.?s334585[rnrn|cFFFFFFFFGenerates s2/10 Soul Shards.|r][]
 # Rank 2: Summoning your Demonic Tyrant instantly generates s1 Soul Shards.
-  SpellInfo(summon_demonic_tyrant cd=90 duration=15 soulshards=-5)
+  SpellInfo(summon_demonic_tyrant cd=90 duration=15 soulshards=0)
 Define(summon_felguard 30146)
 # Summons a Felguard under your command as a powerful melee combatant.
   SpellInfo(summon_felguard soulshards=1)
@@ -496,5 +496,8 @@ Define(summon_vilefiend_talent 12) #23160
 Define(vile_taint_talent 12) #22046
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
     ]]
+    code = code .. [[
+Define(vilefiend 135816)
+  ]]
     OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "include")
 end
