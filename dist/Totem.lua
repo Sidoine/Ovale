@@ -14,6 +14,7 @@ local TOTEM_CLASS = {
     DRUID = true,
     MAGE = true,
     MONK = true,
+    PALADIN = true,
     SHAMAN = true
 }
 local TotemData = __class(nil, {

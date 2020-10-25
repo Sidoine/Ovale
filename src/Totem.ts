@@ -17,6 +17,7 @@ let TOTEM_CLASS: LuaObj<boolean> = {
     DRUID: true,
     MAGE: true,
     MONK: true,
+    PALADIN: true,
     SHAMAN: true
 }
 
