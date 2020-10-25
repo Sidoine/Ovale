@@ -306,11 +306,13 @@ export class IoC {
         );
         this.totem = new OvaleTotemClass(
             this.ovale,
+            this.state,
             this.profiler,
             this.data,
             this.future,
             this.aura,
-            this.spellBook
+            this.spellBook,
+            this.debug
         );
         this.variables = new Variables(combat, this.baseState, this.debug);
         this.warlock = new OvaleWarlockClass(

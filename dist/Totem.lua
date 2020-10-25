@@ -22,7 +22,7 @@ local TotemData = __class(nil, {
     end
 })
 __exports.OvaleTotemClass = __class(States, {
-    constructor = function(self, ovale, ovaleProfiler, ovaleData, ovaleFuture, ovaleAura, ovaleSpellBook)
+    constructor = function(self, ovale, ovaleState, ovaleProfiler, ovaleData, ovaleFuture, ovaleAura, ovaleSpellBook, ovaleDebug)
         self.ovale = ovale
         self.ovaleData = ovaleData
         self.ovaleFuture = ovaleFuture
@@ -30,10 +30,13 @@ __exports.OvaleTotemClass = __class(States, {
         self.ovaleSpellBook = ovaleSpellBook
         self.OnInitialize = function()
             if TOTEM_CLASS[self.ovale.playerClass] then
+                self.debug:DebugTimestamp("Initialzing OvaleTotem for class %s", self.ovale.playerClass)
                 self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.Update)
                 self.module:RegisterEvent("PLAYER_TALENT_UPDATE", self.Update)
                 self.module:RegisterEvent("PLAYER_TOTEM_UPDATE", self.Update)
                 self.module:RegisterEvent("UPDATE_SHAPESHIFT_FORM", self.Update)
+            else
+                self.debug:DebugTimestamp("Class %s is not a TOTEM_CLASS!", self.ovale.playerClass)
             end
         end
         self.OnDisable = function()
@@ -49,8 +52,10 @@ __exports.OvaleTotemClass = __class(States, {
             self.ovale:needRefresh()
         end
         States.constructor(self, TotemData)
+        self.debug = ovaleDebug:create("OvaleTotem")
         self.module = ovale:createModule("OvaleTotem", self.OnInitialize, self.OnDisable, aceEvent)
         self.profiler = ovaleProfiler:create(self.module:GetName())
+        ovaleState:RegisterState(self)
     end,
     InitializeState = function(self)
         self.next.totems = {}
@@ -76,6 +81,7 @@ __exports.OvaleTotemClass = __class(States, {
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         self.profiler:StartProfiling("OvaleTotem_ApplySpellAfterCast")
         if TOTEM_CLASS[self.ovale.playerClass] then
+            self.debug:Log("OvaleTotem_ApplySpellAfterCast: spellId %s, endCast %s", spellId, endCast)
             local si = self.ovaleData.spellInfo[spellId]
             if si and si.totem then
                 self:SummonTotem(spellId, endCast)
@@ -119,6 +125,7 @@ __exports.OvaleTotemClass = __class(States, {
         local count = 0
         local si = self.ovaleData.spellInfo[spellId]
         if si and si.totem then
+            self.debug:Log("Spell %s is a totem spell", spellId)
             local buffPresent = (self.ovaleFuture.next.lastGCDSpellId == spellId)
             if  not buffPresent and si.buff_totem then
                 local aura = self.ovaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
@@ -143,6 +150,8 @@ __exports.OvaleTotemClass = __class(States, {
                     end
                 end
             end
+        else
+            self.debug:Log("Spell %s is NOT a totem spell", spellId)
         end
         return count, start, ending
     end,
