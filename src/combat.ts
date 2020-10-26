@@ -41,7 +41,7 @@ export class OvaleCombatClass extends States<CombatState> implements StateModule
             this.onRelease,
             aceEvent
         );
-        this.tracer = debug.create("Combat");
+        this.tracer = debug.create("OvaleCombat");
         condition.RegisterCondition("incombat", false, this.InCombat);
         condition.RegisterCondition("timeincombat", false, this.TimeInCombat);
         condition.RegisterCondition(
