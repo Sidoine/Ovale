@@ -21,10 +21,11 @@ __exports.CombatState = __class(nil, {
     end
 })
 __exports.OvaleCombatClass = __class(States, {
-    constructor = function(self, ovale, debug, ovaleSpellBook, requirement, condition)
+    constructor = function(self, ovale, debug, ovaleSpellBook, requirement, condition, ovaleState)
         self.ovale = ovale
         self.ovaleSpellBook = ovaleSpellBook
         self.requirement = requirement
+        self.ovaleState = ovaleState
         self.onInitialize = function()
             self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.handlePlayerRegenDisabled)
             self.module:RegisterEvent("PLAYER_REGEN_ENABLED", self.handlePlayerRegenEnabled)
@@ -92,6 +93,7 @@ __exports.OvaleCombatClass = __class(States, {
         States.constructor(self, __exports.CombatState)
         self.module = ovale:createModule("Combat", self.onInitialize, self.onRelease, aceEvent)
         self.tracer = debug:create("OvaleCombat")
+        self.ovaleState:RegisterState(self)
         condition:RegisterCondition("incombat", false, self.InCombat)
         condition:RegisterCondition("timeincombat", false, self.TimeInCombat)
         condition:RegisterCondition("expectedcombatlength", false, self.expectedCombatLength)

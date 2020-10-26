@@ -244,7 +244,8 @@ export class IoC {
             this.debug,
             this.spellBook,
             this.requirement,
-            this.condition
+            this.condition,
+            this.state
         );
         this.scripts = new OvaleScriptsClass(
             this.ovale,

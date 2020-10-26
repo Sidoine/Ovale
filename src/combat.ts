@@ -1,4 +1,4 @@
-import { States, StateModule } from "./State";
+import { OvaleStateClass, States, StateModule } from "./State";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -32,7 +32,8 @@ export class OvaleCombatClass extends States<CombatState> implements StateModule
         debug: OvaleDebugClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private requirement: OvaleRequirement,
-        condition: OvaleConditionClass
+        condition: OvaleConditionClass,
+        private ovaleState: OvaleStateClass
     ) {
         super(CombatState);
         this.module = ovale.createModule(
@@ -42,6 +43,7 @@ export class OvaleCombatClass extends States<CombatState> implements StateModule
             aceEvent
         );
         this.tracer = debug.create("OvaleCombat");
+        this.ovaleState.RegisterState(this);
         condition.RegisterCondition("incombat", false, this.InCombat);
         condition.RegisterCondition("timeincombat", false, this.TimeInCombat);
         condition.RegisterCondition(
