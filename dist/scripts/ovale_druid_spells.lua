@@ -695,6 +695,14 @@ Define(wild_fleshrending_trait 279527)
     ]]
     code = code .. [[
     SpellInfo(berserk_0 replaced_by=incarnation_guardian_of_ursoc talent=incarnation_guardian_of_ursoc_talent specialization=guardian)
+Define(frenzied_regeneration 22842)
+    SpellInfo(frenzied_regeneration duration=3)
+    SpellInfo(frenzied_regeneration max_charges=2 charge_cd=30 specialization=guardian)
+    SpellInfo(frenzied_regeneration cd=30 specialization=!guardian)
+    SpellAddBuff(frenzied_regeneration frenzied_regeneration=1)
+    SpellRequire(frenzied_regeneration unusable 1=stance,!druid_bear_form)
+    
+    SpellRequire(incapacitating_roar unusable 1=stance,!druid_bear_form)
 Define(thrash_bear 77758)
     SpellAddBuff(thrash_bear earthwarden_buff=1 talent=earthwarden_talent)
     SpellAddTargetDebuff(thrash_bear thrash_bear_debuff=1)
