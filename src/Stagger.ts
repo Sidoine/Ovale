@@ -5,7 +5,7 @@ import { insert, remove } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "./Ovale";
 import { StateModule } from "./State";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 let self_serial = 1;
 let MAX_LENGTH = 30;
@@ -13,7 +13,7 @@ export class OvaleStaggerClass implements StateModule {
     staggerTicks: LuaArray<number> = {};
     private module: AceModule & AceEvent;
 
-    constructor(private ovale: OvaleClass, private combat: Combat) {
+    constructor(private ovale: OvaleClass, private combat: OvaleCombatClass) {
         this.module = ovale.createModule(
             "OvaleStagger",
             this.OnInitialize,

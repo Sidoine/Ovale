@@ -46,7 +46,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 import { OneTimeMessage, PrintOneTimeMessages } from "./tools";
 
 let strmatch = match;
@@ -791,7 +791,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
-        private combat: Combat
+        private combat: OvaleCombatClass
     ) {
         super();
         let hider = CreateFrame(
@@ -930,7 +930,7 @@ export class OvaleFrameModuleClass {
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
-        combat: Combat
+        combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
             "OvaleFrame",

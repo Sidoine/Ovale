@@ -54,7 +54,7 @@ import { Generator } from "./simulationcraft/generator";
 import { Unparser } from "./simulationcraft/unparser";
 import { Splitter } from "./simulationcraft/splitter";
 import { OvaleRequirement } from "./Requirement";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -239,7 +239,7 @@ export class IoC {
             this.debug
         );
         this.condition = new OvaleConditionClass(this.baseState);
-        const combat = new Combat(
+        const combat = new OvaleCombatClass(
             this.ovale,
             this.debug,
             this.spellBook,

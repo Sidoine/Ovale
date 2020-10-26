@@ -20,7 +20,7 @@ __exports.CombatState = __class(nil, {
         self.combatStartTime = 0
     end
 })
-__exports.Combat = __class(States, {
+__exports.OvaleCombatClass = __class(States, {
     constructor = function(self, ovale, debug, ovaleSpellBook, requirement, condition)
         self.ovale = ovale
         self.ovaleSpellBook = ovaleSpellBook

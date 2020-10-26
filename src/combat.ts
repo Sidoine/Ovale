@@ -23,7 +23,7 @@ export class CombatState {
     combatStartTime: number = 0;
 }
 
-export class Combat extends States<CombatState> implements StateModule {
+export class OvaleCombatClass extends States<CombatState> implements StateModule {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
