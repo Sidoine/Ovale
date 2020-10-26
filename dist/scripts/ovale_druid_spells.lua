@@ -693,5 +693,15 @@ Define(warrior_of_elune_talent 2) #22386
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
 Define(wild_fleshrending_trait 279527)
     ]]
+    code = code .. [[
+    SpellInfo(berserk_0 replaced_by=incarnation_guardian_of_ursoc talent=incarnation_guardian_of_ursoc_talent specialization=guardian)
+Define(thrash_bear 77758)
+    SpellAddBuff(thrash_bear earthwarden_buff=1 talent=earthwarden_talent)
+    SpellAddTargetDebuff(thrash_bear thrash_bear_debuff=1)
+Define(thrash_bear_debuff 192090)
+    SpellInfo(thrash_bear_debuff duration=15 max_stacks=3)
+    SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
+    SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
+    ]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
