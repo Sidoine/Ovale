@@ -2346,6 +2346,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian")
         self:AddDisambiguation("dummon_demonic_tyrant", "summon_demonic_tyrant", "WARLOCK", "demonology")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
     end,
