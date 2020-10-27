@@ -189,10 +189,6 @@ export class IoC {
             this.data,
             this.requirement
         );
-        this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
-            this.aura,
-            this.ovale
-        );
         this.enemies = new OvaleEnemiesClass(
             this.guid,
             this.ovale,
@@ -336,7 +332,8 @@ export class IoC {
         this.spellDamage = new OvaleSpellDamageClass(this.ovale, this.profiler);
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
-            this.ovale
+            this.ovale,
+            this.requirement
         );
         this.runes = new OvaleRunesClass(
             this.ovale,

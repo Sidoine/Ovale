@@ -29,7 +29,6 @@
    <Script file="Stagger.lua"/>
    <Script file="SpellDamage.lua"/>
    <Script file="Recount.lua"/>
-   <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="DemonHunterSigils.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="acegui-helpers.lua"/>
@@ -53,6 +52,7 @@
    <Script file="PoolGC.lua"/>
    <Script file="LossOfControl.lua"/>
    <Script file="Health.lua"/>
+   <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="Data.lua"/>
    <Script file="Requirement.lua"/>
    <Script file="combat.lua"/>
