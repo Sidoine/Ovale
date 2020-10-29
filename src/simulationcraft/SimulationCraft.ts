@@ -146,9 +146,8 @@ export class OvaleSimulationCraftClass {
                 }
                 delete annotation[key];
             }
-            delete profile.annotation;
         }
-        delete profile.actionList;
+        wipe(profile);
     }
 
     private readProfile(simc: string) {
@@ -675,7 +674,7 @@ export class OvaleSimulationCraftClass {
                 output[lualength(output) + 1] = `# ${symbol}`;
             }
         }
-        delete annotation.dictionary;
+        annotation.dictionary = {};
         if (annotation.dictionaryAST) {
             this.ovaleAst.Release(annotation.dictionaryAST);
         }

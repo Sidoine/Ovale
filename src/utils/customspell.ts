@@ -18,8 +18,8 @@ export interface CustomAura {
 }
 
 export interface CustomAuras {
-    player: CustomAura[];
-    target: CustomAura[];
+    player?: CustomAura[];
+    target?: CustomAura[];
 }
 
 export interface CustomSpellDataIf {
@@ -172,22 +172,23 @@ export function convertFromSpellData(
         spellInfo.tick = tick;
     }
 
-    const auras: CustomAuras = { player: [], target: [] };
     let buffAdded = false;
     let debuffAdded = false;
     if (spell.name === "Executioner's precision") {
         debug;
     }
+    const playerAuras: CustomAura[] = [];
+    const targetAuras: CustomAura[] = [];
     if (spell.spellEffects) {
         for (const effect of spell.spellEffects) {
             if (effect.trigger_spell_id) {
                 if (isFriendlyTarget(effect.targeting_1)) {
-                    auras.player.push({
+                    playerAuras.push({
                         id: effect.trigger_spell_id,
                         stacks: 1,
                     });
                 } else {
-                    auras.target.push({
+                    targetAuras.push({
                         id: effect.trigger_spell_id,
                         stacks: 1,
                     });
@@ -196,22 +197,23 @@ export function convertFromSpellData(
                 if (isFriendlyTarget(effect.targeting_1)) {
                     if (!buffAdded) {
                         buffAdded = true;
-                        auras.player.push({ id: spell.id, stacks: 1 });
+                        playerAuras.push({ id: spell.id, stacks: 1 });
                     }
                 } else if (!debuffAdded) {
                     debuffAdded = true;
-                    auras.target.push({ id: spell.id, stacks: 1 });
+                    targetAuras.push({ id: spell.id, stacks: 1 });
                 }
             }
         }
     }
 
     if (!buffAdded && !debuffAdded && spell.tooltip) {
-        auras.player.push({ id: spell.id, stacks: 1 });
+        playerAuras.push({ id: spell.id, stacks: 1 });
     }
 
-    if (auras.player.length === 0) delete auras.player;
-    if (auras.target.length === 0) delete auras.target;
+    const auras: CustomAuras = {};
+    if (playerAuras.length > 0) auras.player = playerAuras;
+    if (targetAuras.length > 0) auras.target = targetAuras;
 
     const conditions: ConditionNamedParameters = {};
     let hasConditions = false;

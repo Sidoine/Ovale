@@ -56,10 +56,10 @@ __exports.OvaleAzeriteArmor = __class(nil, {
                 self:UpdateTraits()
             end
         end
-        self.AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED = function(event, itemSlot)
+        self.AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED = function()
             self:UpdateTraits()
         end
-        self.PLAYER_ENTERING_WORLD = function(event)
+        self.PLAYER_ENTERING_WORLD = function()
             self:UpdateTraits()
         end
         self.module = ovale:createModule("OvaleAzeriteArmor", self.OnInitialize, self.OnDisable, aceEvent)
@@ -97,7 +97,7 @@ __exports.OvaleAzeriteArmor = __class(nil, {
         end
     end,
     HasTrait = function(self, spellId)
-        return (self.self_traits[spellId]) and true or false
+        return (self.self_traits[spellId] and true) or false
     end,
     TraitRank = function(self, spellId)
         if  not self.self_traits[spellId] then

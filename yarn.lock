@@ -252,15 +252,15 @@
     "@wowts/lua" "^1.3.0"
     "@wowts/tslib" "^1.1.0"
 
-"@wowts/ace_event-3.0@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_event-3.0/-/ace_event-3.0-1.1.0.tgz#edd79f9028320e7500cb18e2920e240ef6f38f81"
-  integrity sha512-z8G+Zz32hO5/y9H6+aCjaTk2/7smCtFJB4bicmr55rK1LwBmQXjHtfZpHWLqkuyazPHDo16tHZNDmgqoViQYLg==
+"@wowts/ace_event-3.0@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_event-3.0/-/ace_event-3.0-1.2.0.tgz#16446039b448ecb20c268a445d21f00d49cb33f7"
+  integrity sha512-lCiZINNRXEvIMa/poJ/v1eO65M8xCaFq9lZgpSa/STp02e5TYnnZ1bCH5G+qsxwt7M4EiSDlRYh+wKmgNZ8sBA==
   dependencies:
-    "@wowts/lua" "^1.0.3"
-    "@wowts/tsaddon" "^1.0.0"
-    "@wowts/tslib" "^1.0.0"
-    "@wowts/wow-mock" "^1.16.0"
+    "@wowts/lua" "^1.4.1"
+    "@wowts/tsaddon" "^1.2.1"
+    "@wowts/tslib" "^1.1.0"
+    "@wowts/wow-mock" "^1.19.0"
 
 "@wowts/ace_gui-3.0@^1.2.0":
   version "1.2.0"
@@ -439,20 +439,28 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.8.0.tgz#a5ae83216608b34303808a6b2467fdabe29b2872"
-  integrity sha512-VK9uZO7fjvZqDwljSRdvubc9aE2oiDSAOH5G93R3O1RpSlxKrkoYVpIyt3APLa6YQzA/EcOPKGvtPZD5Wjg9+g==
+"@wowts/tstolua@^1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.9.0.tgz#5e7a2b6e3a9c2a0818bdd49b4a919462f0ff463e"
+  integrity sha512-D5yyt3xgE7Wj+E91XoseYcXVOF/WPQf7xcQBOYFDDJyyZxDayO71dbIeK6P4nAKhfbIa7G7ovRttbVY/RDFzGg==
   dependencies:
     commander "^4.0.0"
-    typescript "^3.9.7"
+    typescript "^4.0.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.16.0", "@wowts/wow-mock@^1.21.1", "@wowts/wow-mock@^1.6.0":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0":
   version "1.21.1"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.21.1.tgz#d1343430a0debcfc15ea2dbb0baddb8be4340ac7"
   integrity sha512-71aAJ49p1zozeCGmnZXDnuqX7QQpAbqm+8YHRkSbqxWKO2Ui9734iYMzl1tvBrpiSqGOCi94p5FHETABT1krrg==
   dependencies:
     "@wowts/lua" "^1.3.2"
+
+"@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.22.1":
+  version "1.22.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.22.1.tgz#c320dabb65b21f70a13d6778096d92a00671daf3"
+  integrity sha512-uxvZH7HZiCrVarT01ilgtdJHA/spJ7bq8mLC1vAnIu2VJ6r/dMHb7DgtvIiHv+XgSWSUL3NRmvtz76zcuNphpQ==
+  dependencies:
+    "@wowts/lua" "^1.3.2"
+    "@wowts/table" "^1.0.1"
 
 acorn-jsx@^5.2.0:
   version "5.3.1"
@@ -3957,10 +3965,10 @@ typemoq@^2.1.0:
     lodash "^4.17.4"
     postinstall-build "^5.0.1"
 
-typescript@^3.9.7:
-  version "3.9.7"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
-  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
+typescript@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.3.tgz#153bbd468ef07725c1df9c77e8b453f8d36abba5"
+  integrity sha512-tEu6DGxGgRJPb/mVPIZ48e69xCn2yRmCgYmDugAVwmJ6o+0u1RI18eO7E7WBTLYLaEVVOhwQmcdhQHweux/WPg==
 
 uglify-js@^3.1.4:
   version "3.7.6"

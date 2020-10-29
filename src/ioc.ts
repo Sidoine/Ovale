@@ -135,7 +135,8 @@ export class IoC {
             this.lastSpell
         );
         this.baseState = new BaseState();
-        this.guid = new OvaleGUIDClass(this.ovale, this.debug);
+        this.condition = new OvaleConditionClass(this.baseState);
+        this.guid = new OvaleGUIDClass(this.ovale, this.debug, this.condition);
         this.requirement = new OvaleRequirement(this.baseState, this.guid);
         this.data = new OvaleDataClass(
             this.baseState,
@@ -238,7 +239,6 @@ export class IoC {
             this.ovale,
             this.debug
         );
-        this.condition = new OvaleConditionClass(this.baseState);
         const combat = new Combat(
             this.ovale,
             this.debug,

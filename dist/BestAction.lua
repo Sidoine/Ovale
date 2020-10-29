@@ -210,6 +210,10 @@ __exports.OvaleBestActionClass = __class(nil, {
                 local t = atTime
                 self.tracer:Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z)
                 local l, m, n
+                if isString(a) or isString(x) then
+                    self.tracer:Error("[%d] Operands of arithmetic operators must be numbers", element.nodeId)
+                    return timeSpan, element
+                end
                 local A = a + (t - b) * c
                 local B = x + (t - y) * z
                 if operator == "+" then
@@ -295,6 +299,12 @@ __exports.OvaleBestActionClass = __class(nil, {
             else
                 local operator = element.operator
                 self.tracer:Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z)
+                if isString(a) or isString(x) then
+                    if (operator == "==" and a ~= b) or (operator == "!=" and a == b) then
+                        wipe(timeSpan)
+                    end
+                    return timeSpan, element
+                end
                 local A = a - b * c
                 local B = x - y * z
                 if c == z then

@@ -5,7 +5,18 @@ import { PositionalParameters, NamedParameters } from "./AST";
 import { AuraType } from "./Data";
 let INFINITY = huge;
 
-export type ConditionResult = [number?, number?, number?, number?, number?];
+export type ConditionResult = [
+    /** If defined, the value is defined only after this time in seconds */
+    start?: number,
+    /** If defined, the value is defined only before this time in seconds */
+    end?: number,
+    /** The value */
+    value?: number | string,
+    /** If defined, the time at which the value is defined, otherwise, the value is a constant */
+    origin?: number,
+    /** If defined, the rate at which each second the value change, otherwise, the value is a constant */
+    rate?: number
+];
 export type ConditionFunction = (
     positionalParams: PositionalParameters,
     namedParams: NamedParameters,
@@ -14,7 +25,7 @@ export type ConditionFunction = (
 
 export type ComparatorId = "atLeast" | "atMost" | "equal" | "less" | "more";
 
-const COMPARATOR: LuaObj<boolean> = {
+const COMPARATOR: { [k in ComparatorId]: boolean } = {
     atLeast: true,
     atMost: true,
     equal: true,
@@ -23,7 +34,7 @@ const COMPARATOR: LuaObj<boolean> = {
 };
 
 export function isComparator(token: string): token is ComparatorId {
-    return COMPARATOR[token] !== undefined;
+    return COMPARATOR[token as ComparatorId] !== undefined;
 }
 
 export class OvaleConditionClass {
@@ -123,7 +134,9 @@ export function ReturnValue(
     return [0, INFINITY, value, origin, rate];
 }
 
-export function ReturnConstant(value: number): ConditionResult {
+export function ReturnConstant(
+    value: number | string | undefined
+): ConditionResult {
     return [0, INFINITY, value, 0, 0];
 }
 

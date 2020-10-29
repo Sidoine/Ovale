@@ -925,6 +925,7 @@ export class Emiter {
         ) {
         } else if (action == "snapshot_stats") {
         } else {
+            // Most of this code is obsolete and should be cleaned or dispatched in the correct function
             let bodyCode, conditionCode;
             const expressionType = "expression";
             const modifiers = parseNode.modifiers;
@@ -1842,7 +1843,7 @@ export class Emiter {
         let operand = parseNode.name;
         let [token] = match(operand, OPERAND_TOKEN_PATTERN);
         let target: string | undefined;
-        if (token == "target") {
+        if (token == "target" || token === "self") {
             node = this.EmitOperandTarget(
                 operand,
                 parseNode,
@@ -3948,53 +3949,57 @@ export class Emiter {
     ) => {
         let node: AstNode | undefined;
         let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
-        if (token == "target") {
-            let property = tokenIterator();
-            let howMany = 1;
-            if (tonumber(property)) {
-                howMany = tonumber(property);
-                property = tokenIterator();
+        let target = tokenIterator();
+        if (target === "self") target = "player";
+        let property = tokenIterator();
+        let howMany = 1;
+        if (tonumber(property)) {
+            howMany = tonumber(property);
+            property = tokenIterator();
+        }
+        if (howMany > 1) {
+            this.tracer.Print(
+                "Warning: target.%d.%property has not been implemented for multiple targets. (%s)",
+                operand
+            );
+        }
+        let code;
+        //OvaleSimulationCraft.Print(token, property, operand);
+        if (!property) {
+            code = `${target}.guid()`;
+        } else if (property == "adds") {
+            code = "Enemies()-1";
+        } else if (property === "target") {
+            code = `${target}.targetguid()`;
+        } else if (property == "time_to_die") {
+            code = `${target}.TimeToDie()`;
+        } else if (property === "distance") {
+            code = `${target}.Distance()`;
+        } else if (property === "is_boss") {
+            code = `${target}.classification(worldboss)`;
+        } else if (property === "health") {
+            const modifier = tokenIterator();
+            if (modifier === "pct") {
+                code = `${target}.HealthPercent()`;
             }
-            if (howMany > 1) {
-                this.tracer.Print(
-                    "Warning: target.%d.%property has not been implemented for multiple targets. (%s)",
-                    operand
-                );
+        } else if (property) {
+            const [percent] = match(property, "^time_to_pct_(%d+)");
+            if (percent) {
+                code = `${target}.TimeToHealthPercent(${percent})`;
             }
-            let code;
-            //OvaleSimulationCraft.Print(token, property, operand);
-            if (property == "adds") {
-                code = "Enemies()-1";
-            } else if (property == "time_to_die") {
-                code = "target.TimeToDie()";
-            } else if (property === "distance") {
-                code = "target.Distance()";
-            } else if (property === "is_boss") {
-                code = "target.classification(worldboss)";
-            } else if (property === "health") {
-                const modifier = tokenIterator();
-                if (modifier === "pct") {
-                    code = "target.HealthPercent()";
-                }
-            } else if (property) {
-                const [percent] = match(property, "^time_to_pct_(%d+)");
-                if (percent) {
-                    code = `target.TimeToHealthPercent(${percent})`;
-                }
-            }
-            if (code) {
-                [node] = this.ovaleAst.ParseCode(
-                    "expression",
-                    code,
-                    nodeList,
-                    annotation.astAnnotation
-                );
-            }
+        }
+        if (code) {
+            [node] = this.ovaleAst.ParseCode(
+                "expression",
+                code,
+                nodeList,
+                annotation.astAnnotation
+            );
         }
 
         return node;
     };
+
     private EmitOperandTotem: EmitOperandVisitor = (
         operand,
         parseNode,

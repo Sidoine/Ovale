@@ -13,6 +13,7 @@ local GetItemStats = GetItemStats
 local GetItemInfoInstant = GetItemInfoInstant
 local GetInventorySlotInfo = GetInventorySlotInfo
 local INVSLOT_FIRST_EQUIPPED = INVSLOT_FIRST_EQUIPPED
+local INVSLOT_LAST_EQUIPPED = INVSLOT_LAST_EQUIPPED
 local concat = table.concat
 local insert = table.insert
 local __tools = LibStub:GetLibrary("ovale/tools")
