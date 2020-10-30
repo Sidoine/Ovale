@@ -4,7 +4,7 @@
     "description": "",
     "main": "dist/index.js",
     "scripts": {
-        "test": "tsc && ava",
+        "test": "ava",
         "prepare": "tstolua -p tsconfig.lua.json",
         "prepare-tools": "tsc",
         "simc": "node dist/src/utils/importsimc.js ../../simc",
@@ -23,7 +23,7 @@
         "@wowts/ace_console-3.0": "^1.0.0",
         "@wowts/ace_db-3.0": "^1.2.0",
         "@wowts/ace_db_options-3.0": "^1.1.0",
-        "@wowts/ace_event-3.0": "^1.1.0",
+        "@wowts/ace_event-3.0": "^1.2.0",
         "@wowts/ace_gui-3.0": "^1.2.0",
         "@wowts/ace_locale-3.0": "^1.0.0",
         "@wowts/ace_serializer-3.0": "^1.1.0",
@@ -46,10 +46,10 @@
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
-        "@wowts/wow-mock": "^1.21.1"
+        "@wowts/wow-mock": "^1.22.1"
     },
     "devDependencies": {
-        "@wowts/tstolua": "^1.8.0",
+        "@wowts/tstolua": "^1.9.0",
         "ava": "^3.12.1",
         "eslint": "^7.9.0",
         "typemoq": "^2.1.0",

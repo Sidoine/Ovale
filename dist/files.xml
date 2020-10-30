@@ -40,6 +40,7 @@
    <Script file="Controls.lua"/>
    <Script file="AzeriteArmor.lua"/>
    <Script file="Condition.lua"/>
+   <Script file="GUID.lua"/>
    <Script file="Queue.lua"/>
    <Script file="Lexer.lua"/>
    <Script file="State.lua"/>
@@ -47,18 +48,17 @@
    <Script file="Enemies.lua"/>
    <Script file="Runes.lua"/>
    <Script file="BaseState.lua"/>
-   <Script file="GUID.lua"/>
    <Script file="tools.lua"/>
    <Script file="PoolGC.lua"/>
    <Script file="LossOfControl.lua"/>
    <Script file="Health.lua"/>
    <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="Data.lua"/>
-   <Script file="Requirement.lua"/>
    <Script file="combat.lua"/>
    <Script file="Cooldown.lua"/>
    <Script file="PaperDoll.lua"/>
    <Script file="Equipment.lua"/>
+   <Script file="Requirement.lua"/>
    <Script file="TimeSpan.lua"/>
    <Script file="Pool.lua"/>
    <Script file="simulationcraft\parser.lua"/>

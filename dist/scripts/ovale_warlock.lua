@@ -1090,7 +1090,7 @@ AddFunction destructionaoeshortcdactions
     unless spell(rain_of_fire)
     {
      #havoc,cycle_targets=1,if=!(self.target=target)
-     if not message("self.target is not implemented") == message("target is not implemented") and enemies() > 1 spell(havoc)
+     if not player.guid() == target.guid() and enemies() > 1 spell(havoc)
 
      unless hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate)
      {
@@ -1125,7 +1125,7 @@ AddFunction destructionaoecdactions
 
 AddFunction destructionaoecdpostconditions
 {
- demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate) > casttime(channel_demonfire) and spell(channel_demonfire) or buffremaining(immolate) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not message("self.target is not implemented") == message("target is not implemented") and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
+ demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate) > casttime(channel_demonfire) and spell(channel_demonfire) or buffremaining(immolate) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(immolate) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not player.guid() == target.guid() and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
 }
 
 ### actions.default

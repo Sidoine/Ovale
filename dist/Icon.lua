@@ -177,7 +177,7 @@ __exports.OvaleIcon = __class(nil, {
             local red = false
             if  not red and startTime > now and profile.apparence.highlightIcon then
                 local lag = 0.6
-                local newShouldClick = (startTime < now + lag)
+                local newShouldClick = startTime < now + lag
                 if self.shouldClick ~= newShouldClick then
                     if newShouldClick then
                         self.frame:SetChecked(true)
@@ -295,7 +295,7 @@ __exports.OvaleIcon = __class(nil, {
                     if self.actionType == "spell" then
                         actionHelp = self.ovaleSpellBook:GetSpellName(self.actionId) or "Unknown spell"
                     elseif self.actionType == "value" then
-                        actionHelp = (self.value < INFINITY) and tostring(self.value) or "infinity"
+                        actionHelp = (self.value < INFINITY and tostring(self.value)) or "infinity"
                     else
                         actionHelp = format("%s %s", self.actionType, tostring(self.actionId))
                     end

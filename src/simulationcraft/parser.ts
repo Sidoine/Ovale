@@ -1,5 +1,12 @@
 import { OvaleLexer, Tokenizer, TokenizerDefinition } from "../Lexer";
-import { LuaArray, tostring, tonumber, lualength, ipairs } from "@wowts/lua";
+import {
+    LuaArray,
+    tostring,
+    tonumber,
+    lualength,
+    ipairs,
+    wipe,
+} from "@wowts/lua";
 import {
     ParseNode,
     Annotation,
@@ -45,8 +52,8 @@ class SelfPool extends OvalePool<ParseNode> {
             node.type !== "action"
         ) {
             self_childrenPool.Release(node.child);
-            delete node.child;
         }
+        wipe(node);
     }
 }
 

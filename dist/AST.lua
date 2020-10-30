@@ -337,12 +337,11 @@ local SelfPool = __class(OvalePool, {
     Clean = function(self, node)
         if node.child then
             self.ovaleAst.childrenPool:Release(node.child)
-            node.child = nil
         end
         if node.postOrder then
             self.ovaleAst.postOrderPool:Release(node.postOrder)
-            node.postOrder = nil
         end
+        wipe(node)
     end,
 })
 local function isAstNode(a)
@@ -2133,8 +2132,8 @@ __exports.OvaleASTClass = __class(nil, {
     Release = function(self, ast)
         if ast.annotation then
             self:ReleaseAnnotation(ast.annotation)
-            ast.annotation = nil
         end
+        wipe(ast)
         self.nodesPool:Release(ast)
     end,
     ParseCode = function(self, nodeType, code, nodeList, annotation)

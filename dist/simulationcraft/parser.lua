@@ -6,6 +6,7 @@ local OvaleLexer = __Lexer.OvaleLexer
 local tostring = tostring
 local tonumber = tonumber
 local ipairs = ipairs
+local wipe = wipe
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
 local KEYWORD = __definitions.KEYWORD
 local SPECIAL_ACTION = __definitions.SPECIAL_ACTION
@@ -31,8 +32,8 @@ local SelfPool = __class(OvalePool, {
     Clean = function(self, node)
         if node.type ~= "number" and node.type ~= "operand" and node.type ~= "action" then
             self_childrenPool:Release(node.child)
-            node.child = nil
         end
+        wipe(node)
     end,
 })
 local self_pool = SelfPool()

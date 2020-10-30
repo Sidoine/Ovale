@@ -947,7 +947,7 @@ __exports.Emiter = __class(nil, {
             local operand = parseNode.name
             local token = match(operand, OPERAND_TOKEN_PATTERN)
             local target
-            if token == "target" then
+            if token == "target" or token == "self" then
                 node = self.EmitOperandTarget(operand, parseNode, nodeList, annotation, action)
                 if  not node then
                     target = token
@@ -2147,40 +2147,45 @@ __exports.Emiter = __class(nil, {
         self.EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
             local node
             local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
-            local token = tokenIterator()
-            if token == "target" then
-                local property = tokenIterator()
-                local howMany = 1
-                if tonumber(property) then
-                    howMany = tonumber(property)
-                    property = tokenIterator()
+            local target = tokenIterator()
+            if target == "self" then
+                target = "player"
+            end
+            local property = tokenIterator()
+            local howMany = 1
+            if tonumber(property) then
+                howMany = tonumber(property)
+                property = tokenIterator()
+            end
+            if howMany > 1 then
+                self.tracer:Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
+            end
+            local code
+            if  not property then
+                code = target .. ".guid()"
+            elseif property == "adds" then
+                code = "Enemies()-1"
+            elseif property == "target" then
+                code = target .. ".targetguid()"
+            elseif property == "time_to_die" then
+                code = target .. ".TimeToDie()"
+            elseif property == "distance" then
+                code = target .. ".Distance()"
+            elseif property == "is_boss" then
+                code = target .. ".classification(worldboss)"
+            elseif property == "health" then
+                local modifier = tokenIterator()
+                if modifier == "pct" then
+                    code = target .. ".HealthPercent()"
                 end
-                if howMany > 1 then
-                    self.tracer:Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
+            elseif property then
+                local percent = match(property, "^time_to_pct_(%d+)")
+                if percent then
+                    code = target .. ".TimeToHealthPercent(" .. percent .. ")"
                 end
-                local code
-                if property == "adds" then
-                    code = "Enemies()-1"
-                elseif property == "time_to_die" then
-                    code = "target.TimeToDie()"
-                elseif property == "distance" then
-                    code = "target.Distance()"
-                elseif property == "is_boss" then
-                    code = "target.classification(worldboss)"
-                elseif property == "health" then
-                    local modifier = tokenIterator()
-                    if modifier == "pct" then
-                        code = "target.HealthPercent()"
-                    end
-                elseif property then
-                    local percent = match(property, "^time_to_pct_(%d+)")
-                    if percent then
-                        code = "target.TimeToHealthPercent(" .. percent .. ")"
-                    end
-                end
-                if code then
-                    node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                end
+            end
+            if code then
+                node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
             end
             return node
         end

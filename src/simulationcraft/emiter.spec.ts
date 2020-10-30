@@ -1,5 +1,5 @@
 import { LuaArray } from "@wowts/lua";
-import test, { TestInterface } from "ava";
+import test, { ExecutionContext, TestInterface } from "ava";
 import { IMock, Mock } from "typemoq";
 import { AstAnnotation, AstNode, OvaleASTClass } from "../AST";
 import { OvaleDataClass } from "../Data";
@@ -45,12 +45,16 @@ t.beforeEach((t) => {
     );
 });
 
-t("emiter target.debuff.casting.react", (t) => {
+function testOperand(
+    t: ExecutionContext<Context>,
+    operand: string,
+    expectedExpression: string
+) {
     // Arrange
     const parseNode: OperandParseNode = {
         type: "operand",
         nodeId: 12,
-        name: "target.debuff.casting.react",
+        name: operand,
         asType: "value",
     };
     const nodeList: LuaArray<AstNode> = {};
@@ -59,7 +63,7 @@ t("emiter target.debuff.casting.react", (t) => {
         .setup((x) =>
             x.ParseCode(
                 "expression",
-                "target.IsInterruptible()",
+                expectedExpression,
                 nodeList,
                 t.context.annotation.object.astAnnotation
             )
@@ -80,6 +84,18 @@ t("emiter target.debuff.casting.react", (t) => {
 
     // Assert
     t.is(result, expected);
+}
+
+t("emiter target.debuff.casting.react", (t) => {
+    testOperand(t, "target.debuff.casting.react", "target.IsInterruptible()");
+});
+
+t("emiter self.target", (t) => {
+    testOperand(t, "self.target", "player.target()");
+});
+
+t("emiter target", (t) => {
+    testOperand(t, "target", "target.targetguid()");
 });
 
 t("emiter unknown function (call one time message instead)", (t) => {

@@ -12,6 +12,8 @@ local remove = table.remove
 local GetTime = GetTime
 local UnitGUID = UnitGUID
 local UnitName = UnitName
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local ReturnConstant = __Condition.ReturnConstant
 local PET_UNIT = {}
 do
     PET_UNIT["player"] = "pet"
@@ -120,7 +122,7 @@ local CompareUnit = function(a, b)
 end
 
 __exports.OvaleGUIDClass = __class(nil, {
-    constructor = function(self, ovale, ovaleDebug)
+    constructor = function(self, ovale, ovaleDebug, condition)
         self.ovale = ovale
         self.unitGUID = {}
         self.guidUnit = {}
@@ -130,6 +132,12 @@ __exports.OvaleGUIDClass = __class(nil, {
         self.nameGUID = {}
         self.petGUID = {}
         self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
+        self.getGuid = function(_, namedParameters)
+            return ReturnConstant(self:UnitGUID(namedParameters.target or "target"))
+        end
+        self.getTargetGuid = function(_, namedParameters)
+            return ReturnConstant(self:UnitGUID((namedParameters.target or "target") .. "target"))
+        end
         self.OnInitialize = function()
             self.module:RegisterEvent("ARENA_OPPONENT_UPDATE", self.ARENA_OPPONENT_UPDATE)
             self.module:RegisterEvent("GROUP_ROSTER_UPDATE", self.GROUP_ROSTER_UPDATE)
@@ -205,6 +213,8 @@ __exports.OvaleGUIDClass = __class(nil, {
         end
         self.module = ovale:createModule("OvaleGUID", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())
+        condition:RegisterCondition("guid", false, self.getGuid)
+        condition:RegisterCondition("targetguid", false, self.getTargetGuid)
     end,
     UpdateAllUnits = function(self)
         for _, unitId in ipairs(UNIT_AURA_UNITS) do
@@ -280,7 +290,7 @@ __exports.OvaleGUIDClass = __class(nil, {
     end,
     IsPlayerPet = function(self, guid)
         local atTime = self.petGUID[guid]
-        return ( not  not atTime), atTime
+        return  not  not atTime, atTime
     end,
     UnitGUID = function(self, unitId)
         return self.unitGUID[unitId] or UnitGUID(unitId)

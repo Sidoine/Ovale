@@ -11,7 +11,7 @@ import {
     select,
 } from "@wowts/lua";
 import { len, find, format } from "@wowts/string";
-import { DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
+import { DEFAULT_CHAT_FRAME, UIFrame } from "@wowts/wow-mock";
 
 export function isString(s: any): s is string {
     return type(s) === "string";
@@ -76,3 +76,10 @@ export function PrintOneTimeMessages() {
         }
     }
 }
+
+export type AceEventHandler<E> = E extends (
+    x: UIFrame,
+    ...args: infer P
+) => infer R
+    ? (...args: P) => R
+    : never;

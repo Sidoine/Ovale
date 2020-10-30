@@ -118,9 +118,8 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 end
                 annotation[key] = nil
             end
-            profile.annotation = nil
         end
-        profile.actionList = nil
+        wipe(profile)
     end,
     readProfile = function(self, simc)
         local parsedProfile = {}
@@ -493,7 +492,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 output[#output + 1] = "# " .. symbol
             end
         end
-        annotation.dictionary = nil
+        annotation.dictionary = {}
         if annotation.dictionaryAST then
             self.ovaleAst:Release(annotation.dictionaryAST)
         end

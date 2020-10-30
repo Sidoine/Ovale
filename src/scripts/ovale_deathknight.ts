@@ -1301,10 +1301,6 @@ AddFunction unholygetinmeleerange
 
 AddFunction unholyprecombatmainactions
 {
- #raise_dead
- spell(raise_dead)
- #army_of_the_dead,precombat_time=2
- spell(army_of_the_dead)
 }
 
 AddFunction unholyprecombatmainpostconditions
@@ -1317,7 +1313,6 @@ AddFunction unholyprecombatshortcdactions
 
 AddFunction unholyprecombatshortcdpostconditions
 {
- spell(raise_dead) or spell(army_of_the_dead)
 }
 
 AddFunction unholyprecombatcdactions
@@ -1328,17 +1323,16 @@ AddFunction unholyprecombatcdactions
  #snapshot_stats
  #potion
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
-
- unless spell(raise_dead)
- {
-  #use_item,name=azsharas_font_of_power
-  unholyuseitemactions()
- }
+ #raise_dead
+ spell(raise_dead)
+ #use_item,name=azsharas_font_of_power
+ unholyuseitemactions()
+ #army_of_the_dead,precombat_time=2
+ spell(army_of_the_dead)
 }
 
 AddFunction unholyprecombatcdpostconditions
 {
- spell(raise_dead) or spell(army_of_the_dead)
 }
 
 ### actions.generic
@@ -1451,24 +1445,10 @@ AddFunction unholyessencescdpostconditions
 
 AddFunction unholycooldownsmainactions
 {
- #army_of_the_dead
- spell(army_of_the_dead)
- #apocalypse,if=debuff.festering_wound.stack>=4&(active_enemies>=2|!essence.vision_of_perfection.enabled|!azerite.magus_of_the_dead.enabled|essence.vision_of_perfection.enabled&(talent.unholy_assault.enabled&cooldown.unholy_assault.remains<=3|!talent.unholy_assault.enabled))
- if target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } spell(apocalypse)
- #dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
- if not false(raid_event_adds_exists) or 600 > 15 spell(dark_transformation)
- #summon_gargoyle,if=runic_power.deficit<14
- if runicpowerdeficit() < 14 spell(summon_gargoyle)
- #unholy_assault,if=essence.vision_of_perfection.enabled&pet.apoc_ghoul.active|debuff.festering_wound.stack<4&!essence.vision_of_perfection.enabled&(!azerite.magus_of_the_dead.enabled|azerite.magus_of_the_dead.enabled&pet.apoc_ghoul.active)
- if azeriteessenceisenabled(vision_of_perfection_essence_id) and pet.present() or target.debuffstacks(festering_wound) < 4 and not azeriteessenceisenabled(vision_of_perfection_essence_id) and { not hasazeritetrait(magus_of_the_dead_trait) or hasazeritetrait(magus_of_the_dead_trait) and pet.present() } spell(unholy_assault)
- #unholy_assault,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
- if enemies() >= 2 and { spellcooldown(death_and_decay) <= gcd() and not hastalent(defile_talent) or spellcooldown(defile) <= gcd() and hastalent(defile_talent) } spell(unholy_assault)
  #soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4
  if target.timetodie() < 8 and target.timetodie() > 4 spell(soul_reaper)
  #soul_reaper,if=(!raid_event.adds.exists|raid_event.adds.in>20)&rune<=(1-buff.unholy_assault.up)
  if { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) spell(soul_reaper)
- #unholy_blight
- spell(unholy_blight)
 }
 
 AddFunction unholycooldownsmainpostconditions
@@ -1477,20 +1457,42 @@ AddFunction unholycooldownsmainpostconditions
 
 AddFunction unholycooldownsshortcdactions
 {
+ #apocalypse,if=debuff.festering_wound.stack>=4&(active_enemies>=2|!essence.vision_of_perfection.enabled|!azerite.magus_of_the_dead.enabled|essence.vision_of_perfection.enabled&(talent.unholy_assault.enabled&cooldown.unholy_assault.remains<=3|!talent.unholy_assault.enabled))
+ if target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } spell(apocalypse)
+ #dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
+ if not false(raid_event_adds_exists) or 600 > 15 spell(dark_transformation)
+ #unholy_assault,if=essence.vision_of_perfection.enabled&pet.apoc_ghoul.active|debuff.festering_wound.stack<4&!essence.vision_of_perfection.enabled&(!azerite.magus_of_the_dead.enabled|azerite.magus_of_the_dead.enabled&pet.apoc_ghoul.active)
+ if azeriteessenceisenabled(vision_of_perfection_essence_id) and pet.present() or target.debuffstacks(festering_wound) < 4 and not azeriteessenceisenabled(vision_of_perfection_essence_id) and { not hasazeritetrait(magus_of_the_dead_trait) or hasazeritetrait(magus_of_the_dead_trait) and pet.present() } spell(unholy_assault)
+ #unholy_assault,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
+ if enemies() >= 2 and { spellcooldown(death_and_decay) <= gcd() and not hastalent(defile_talent) or spellcooldown(defile) <= gcd() and hastalent(defile_talent) } spell(unholy_assault)
+
+ unless target.timetodie() < 8 and target.timetodie() > 4 and spell(soul_reaper) or { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) and spell(soul_reaper)
+ {
+  #unholy_blight
+  spell(unholy_blight)
+ }
 }
 
 AddFunction unholycooldownsshortcdpostconditions
 {
- spell(army_of_the_dead) or target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } and spell(apocalypse) or { not false(raid_event_adds_exists) or 600 > 15 } and spell(dark_transformation) or runicpowerdeficit() < 14 and spell(summon_gargoyle) or { azeriteessenceisenabled(vision_of_perfection_essence_id) and pet.present() or target.debuffstacks(festering_wound) < 4 and not azeriteessenceisenabled(vision_of_perfection_essence_id) and { not hasazeritetrait(magus_of_the_dead_trait) or hasazeritetrait(magus_of_the_dead_trait) and pet.present() } } and spell(unholy_assault) or enemies() >= 2 and { spellcooldown(death_and_decay) <= gcd() and not hastalent(defile_talent) or spellcooldown(defile) <= gcd() and hastalent(defile_talent) } and spell(unholy_assault) or target.timetodie() < 8 and target.timetodie() > 4 and spell(soul_reaper) or { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) and spell(soul_reaper) or spell(unholy_blight)
+ target.timetodie() < 8 and target.timetodie() > 4 and spell(soul_reaper) or { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) and spell(soul_reaper)
 }
 
 AddFunction unholycooldownscdactions
 {
+ #army_of_the_dead
+ spell(army_of_the_dead)
+
+ unless target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } and spell(apocalypse) or { not false(raid_event_adds_exists) or 600 > 15 } and spell(dark_transformation)
+ {
+  #summon_gargoyle,if=runic_power.deficit<14
+  if runicpowerdeficit() < 14 spell(summon_gargoyle)
+ }
 }
 
 AddFunction unholycooldownscdpostconditions
 {
- spell(army_of_the_dead) or target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } and spell(apocalypse) or { not false(raid_event_adds_exists) or 600 > 15 } and spell(dark_transformation) or runicpowerdeficit() < 14 and spell(summon_gargoyle) or { azeriteessenceisenabled(vision_of_perfection_essence_id) and pet.present() or target.debuffstacks(festering_wound) < 4 and not azeriteessenceisenabled(vision_of_perfection_essence_id) and { not hasazeritetrait(magus_of_the_dead_trait) or hasazeritetrait(magus_of_the_dead_trait) and pet.present() } } and spell(unholy_assault) or enemies() >= 2 and { spellcooldown(death_and_decay) <= gcd() and not hastalent(defile_talent) or spellcooldown(defile) <= gcd() and hastalent(defile_talent) } and spell(unholy_assault) or target.timetodie() < 8 and target.timetodie() > 4 and spell(soul_reaper) or { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) and spell(soul_reaper) or spell(unholy_blight)
+ target.debuffstacks(festering_wound) >= 4 and { enemies() >= 2 or not azeriteessenceisenabled(vision_of_perfection_essence_id) or not hasazeritetrait(magus_of_the_dead_trait) or azeriteessenceisenabled(vision_of_perfection_essence_id) and { hastalent(unholy_assault_talent) and spellcooldown(unholy_assault) <= 3 or not hastalent(unholy_assault_talent) } } and spell(apocalypse) or { not false(raid_event_adds_exists) or 600 > 15 } and spell(dark_transformation) or { azeriteessenceisenabled(vision_of_perfection_essence_id) and pet.present() or target.debuffstacks(festering_wound) < 4 and not azeriteessenceisenabled(vision_of_perfection_essence_id) and { not hasazeritetrait(magus_of_the_dead_trait) or hasazeritetrait(magus_of_the_dead_trait) and pet.present() } } and spell(unholy_assault) or enemies() >= 2 and { spellcooldown(death_and_decay) <= gcd() and not hastalent(defile_talent) or spellcooldown(defile) <= gcd() and hastalent(defile_talent) } and spell(unholy_assault) or target.timetodie() < 8 and target.timetodie() > 4 and spell(soul_reaper) or { not false(raid_event_adds_exists) or 600 > 20 } and runecount() <= 1 - buffpresent(unholy_assault) and spell(soul_reaper) or spell(unholy_blight)
 }
 
 ### actions.aoe

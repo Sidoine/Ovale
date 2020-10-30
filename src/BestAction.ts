@@ -57,20 +57,22 @@ import { Variables } from "./Variables";
 
 const INFINITY = huge;
 
+export type ActionType = "item" | "spell" | "texture" | "macro" | "value";
+
 type ActionInfo = [
-    string?,
-    boolean?,
-    number?,
-    number?,
-    boolean?,
-    string?,
-    boolean?,
-    boolean?,
-    string?,
-    (string | number)?,
-    string?,
-    number?,
-    number?
+    texture?: string,
+    inRange?: boolean,
+    cooldownStart?: number,
+    cooldownDuration?: number,
+    usable?: boolean,
+    shortcut?: string,
+    isCurrent?: boolean,
+    enable?: boolean,
+    type?: ActionType,
+    id?: string | number,
+    target?: string,
+    resourceExtend?: number,
+    charges?: number
 ];
 
 export interface Element extends AstNode {
@@ -86,7 +88,7 @@ export interface Element extends AstNode {
     actionShortcut?: string;
     actionIsCurrent?: boolean;
     actionEnable?: boolean;
-    actionType?: string;
+    actionType?: ActionType;
     actionId?: string | number;
     actionTarget?: string;
     actionResourceExtend?: number;
@@ -152,7 +154,7 @@ export class OvaleBestActionClass {
 
     private SetValue(
         node: AstNode,
-        value?: number,
+        value?: number | string,
         origin?: number,
         rate?: number
     ): Element {
@@ -172,10 +174,15 @@ export class OvaleBestActionClass {
         atTime: number,
         timeSpan?: OvaleTimeSpan,
         node?: AstNode
-    ): [number, number, number, OvaleTimeSpan] {
-        let value: number, origin: number, rate: number;
+    ): [
+        value: number | string,
+        origin: number,
+        rate: number,
+        timeSpan: OvaleTimeSpan
+    ] {
+        let value: number | string, origin: number, rate: number;
         if (node && isNodeType(node, "value")) {
-            value = <number>node.value;
+            value = node.value;
             origin = node.origin;
             rate = node.rate;
             timeSpan = timeSpan || UNIVERSE;
@@ -216,7 +223,7 @@ export class OvaleBestActionClass {
             actionShortcut,
             actionIsCurrent,
             actionEnable,
-            actionType,
+            actionType: ActionType,
             actionId;
         let itemId = element.positionalParams[1];
         if (!isNumber(itemId)) {
@@ -288,7 +295,7 @@ export class OvaleBestActionClass {
             actionShortcut,
             actionIsCurrent,
             actionEnable,
-            actionType,
+            actionType: ActionType,
             actionId;
         let macro = <string>element.positionalParams[1];
         let action = this.ovaleActionBar.GetForMacro(macro);
@@ -371,7 +378,7 @@ export class OvaleBestActionClass {
             actionShortcut,
             actionIsCurrent,
             actionEnable,
-            actionType,
+            actionType: ActionType,
             actionId,
             actionResourceExtend,
             actionCharges;
@@ -544,7 +551,7 @@ export class OvaleBestActionClass {
         let actionUsable = true;
         let actionShortcut = undefined;
         let actionIsCurrent = false;
-        let actionType = "texture";
+        const actionType = "texture";
         let actionId = actionTexture;
         this.profiler.StopProfiling("OvaleBestAction_GetActionTextureInfo");
         return [
@@ -1093,6 +1100,13 @@ export class OvaleBestActionClass {
                 z
             );
             let l, m, n; // The new value, origin, and rate
+            if (isString(a) || isString(x)) {
+                this.tracer.Error(
+                    "[%d] Operands of arithmetic operators must be numbers",
+                    element.nodeId
+                );
+                return [timeSpan, element];
+            }
             let A = a + (t - b) * c; // the A value at time t
             let B = x + (t - y) * z; // The B value at time t
             if (operator == "+") {
@@ -1208,6 +1222,15 @@ export class OvaleBestActionClass {
                 y,
                 z
             );
+            if (isString(a) || isString(x)) {
+                if (
+                    (operator === "==" && a !== b) ||
+                    (operator === "!=" && a === b)
+                ) {
+                    wipe(timeSpan);
+                }
+                return [timeSpan, element];
+            }
             let A = a - b * c;
             let B = x - y * z;
             if (c == z) {

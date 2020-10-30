@@ -1,11 +1,23 @@
 import { L } from "./Localization";
 import { format, find, sub } from "@wowts/string";
 import { next, tostring, _G, kpairs } from "@wowts/lua";
-import { GetTime, PlaySoundFile, UIFrame, UIFontString, UITexture, UICooldown, UICheckButton, CreateFrame, GameTooltip, UIPosition } from "@wowts/wow-mock";
+import {
+    GetTime,
+    PlaySoundFile,
+    UIFrame,
+    UIFontString,
+    UITexture,
+    UICooldown,
+    UICheckButton,
+    CreateFrame,
+    GameTooltip,
+    UIPosition,
+} from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { NamedParameters, PositionalParameters, AstNode } from "./AST";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleSpellBookClass } from "./SpellBook";
+import { ActionType } from "./BestAction";
 let INFINITY = huge;
 let COOLDOWN_THRESHOLD = 0.1;
 
@@ -13,13 +25,13 @@ interface IconParent {
     checkBoxWidget: any;
     listWidget: any;
     frame: UIFrame;
-    ToggleOptions(): void; 
+    ToggleOptions(): void;
 }
 
 export class OvaleIcon {
     actionHelp: string | undefined;
     actionId: any;
-    actionType: any;
+    actionType: ActionType | undefined;
     actionButton: boolean = false;
     namedParams: any;
     positionalParams: any;
@@ -45,15 +57,33 @@ export class OvaleIcon {
     frame: UICheckButton;
 
     HasScriptControls() {
-        return (next(this.parent.checkBoxWidget) != undefined || next(this.parent.listWidget) != undefined);
+        return (
+            next(this.parent.checkBoxWidget) != undefined ||
+            next(this.parent.listWidget) != undefined
+        );
     }
 
-    constructor(name: string, private parent: IconParent, secure: boolean, private ovaleOptions: OvaleOptionsClass, private ovaleSpellBook: OvaleSpellBookClass) {
+    constructor(
+        name: string,
+        private parent: IconParent,
+        secure: boolean,
+        private ovaleOptions: OvaleOptionsClass,
+        private ovaleSpellBook: OvaleSpellBookClass
+    ) {
         if (!secure) {
-            this.frame = CreateFrame("CheckButton", name, parent.frame, "ActionButtonTemplate");
-        }        
-        else{
-            this.frame = CreateFrame("CheckButton", name, parent.frame, "SecureActionButtonTemplate, ActionButtonTemplate");
+            this.frame = CreateFrame(
+                "CheckButton",
+                name,
+                parent.frame,
+                "ActionButtonTemplate"
+            );
+        } else {
+            this.frame = CreateFrame(
+                "CheckButton",
+                name,
+                parent.frame,
+                "SecureActionButtonTemplate, ActionButtonTemplate"
+            );
         }
         const profile = this.ovaleOptions.db.profile;
         this.icone = _G[`${name}Icon`];
@@ -121,7 +151,22 @@ export class OvaleIcon {
         }
         this.frame.Show();
     }
-    Update(element?: AstNode, startTime?: number, actionTexture?: string, actionInRange?: boolean, actionCooldownStart?: number, actionCooldownDuration?: number, actionUsable?: boolean, actionShortcut?: string, actionIsCurrent?: boolean, actionEnable?: boolean, actionType?: string, actionId?: string | number, actionTarget?: string, actionResourceExtend?: number) {
+    Update(
+        element?: AstNode,
+        startTime?: number,
+        actionTexture?: string,
+        actionInRange?: boolean,
+        actionCooldownStart?: number,
+        actionCooldownDuration?: number,
+        actionUsable?: boolean,
+        actionShortcut?: string,
+        actionIsCurrent?: boolean,
+        actionEnable?: boolean,
+        actionType?: ActionType,
+        actionId?: string | number,
+        actionTarget?: string,
+        actionResourceExtend?: number
+    ) {
         this.actionType = actionType;
         this.actionId = actionId;
         this.value = undefined;
@@ -132,19 +177,38 @@ export class OvaleIcon {
             let resetCooldown = false;
             if (startTime > now) {
                 let duration = cd.GetCooldownDuration();
-                if (duration == 0 && this.texture == actionTexture && this.cooldownStart && this.cooldownEnd) {
+                if (
+                    duration == 0 &&
+                    this.texture == actionTexture &&
+                    this.cooldownStart &&
+                    this.cooldownEnd
+                ) {
                     resetCooldown = true;
                 }
-                if (this.texture != actionTexture || !this.cooldownStart || !this.cooldownEnd) {
+                if (
+                    this.texture != actionTexture ||
+                    !this.cooldownStart ||
+                    !this.cooldownEnd
+                ) {
                     this.cooldownStart = now;
                     this.cooldownEnd = startTime;
                     resetCooldown = true;
-                } else if (startTime < this.cooldownEnd - COOLDOWN_THRESHOLD || startTime > this.cooldownEnd + COOLDOWN_THRESHOLD) {
-                    if (startTime - this.cooldownEnd > 0.25 || startTime - this.cooldownEnd < -0.25) {
+                } else if (
+                    startTime < this.cooldownEnd - COOLDOWN_THRESHOLD ||
+                    startTime > this.cooldownEnd + COOLDOWN_THRESHOLD
+                ) {
+                    if (
+                        startTime - this.cooldownEnd > 0.25 ||
+                        startTime - this.cooldownEnd < -0.25
+                    ) {
                         this.cooldownStart = now;
                     } else {
-                        let oldCooldownProgressPercent = (now - this.cooldownStart) / (this.cooldownEnd - this.cooldownStart);
-                        this.cooldownStart = (now - oldCooldownProgressPercent * startTime) / (1 - oldCooldownProgressPercent);
+                        let oldCooldownProgressPercent =
+                            (now - this.cooldownStart) /
+                            (this.cooldownEnd - this.cooldownStart);
+                        this.cooldownStart =
+                            (now - oldCooldownProgressPercent * startTime) /
+                            (1 - oldCooldownProgressPercent);
                     }
                     this.cooldownEnd = startTime;
                     resetCooldown = true;
@@ -154,7 +218,12 @@ export class OvaleIcon {
                 this.cooldownStart = undefined;
                 this.cooldownEnd = undefined;
             }
-            if (this.cdShown && profile.apparence.flashIcon && this.cooldownStart && this.cooldownEnd) {
+            if (
+                this.cdShown &&
+                profile.apparence.flashIcon &&
+                this.cooldownStart &&
+                this.cooldownEnd
+            ) {
                 let [start, ending] = [this.cooldownStart, this.cooldownEnd];
                 let duration = ending - start;
                 if (resetCooldown && duration > COOLDOWN_THRESHOLD) {
@@ -175,7 +244,11 @@ export class OvaleIcon {
             }
 
             if (element) {
-                if (element.namedParams.nored != 1 && actionResourceExtend && actionResourceExtend > 0) {
+                if (
+                    element.namedParams.nored != 1 &&
+                    actionResourceExtend &&
+                    actionResourceExtend > 0
+                ) {
                     this.icone.SetVertexColor(0.75, 0.2, 0.2);
                 } else {
                     this.icone.SetVertexColor(1, 1, 1);
@@ -196,7 +269,7 @@ export class OvaleIcon {
             let red = false; // TODO This value is not set anymore, find why
             if (!red && startTime > now && profile.apparence.highlightIcon) {
                 let lag = 0.6;
-                let newShouldClick = (startTime < now + lag);
+                let newShouldClick = startTime < now + lag;
                 if (this.shouldClick != newShouldClick) {
                     if (newShouldClick) {
                         this.frame.SetChecked(true);
@@ -209,7 +282,11 @@ export class OvaleIcon {
                 this.shouldClick = false;
                 this.frame.SetChecked(false);
             }
-            if ((profile.apparence.numeric || this.namedParams.text == "always") && startTime > now) {
+            if (
+                (profile.apparence.numeric ||
+                    this.namedParams.text == "always") &&
+                startTime > now
+            ) {
                 this.remains.SetFormattedText("%.1f", startTime - now);
                 this.remains.Show();
             } else {
@@ -222,14 +299,14 @@ export class OvaleIcon {
                 this.shortcut.Hide();
             }
             if (actionInRange === undefined) {
-                this.rangeIndicator.Hide();   
+                this.rangeIndicator.Hide();
             } else if (actionInRange) {
                 this.rangeIndicator.SetVertexColor(0.6, 0.6, 0.6);
                 this.rangeIndicator.Show();
             } else {
                 this.rangeIndicator.SetVertexColor(1.0, 0.1, 0.1);
                 this.rangeIndicator.Show();
-            } 
+            }
             if (element && element.namedParams.text) {
                 this.focusText.SetText(tostring(element.namedParams.text));
                 this.focusText.Show();
@@ -261,7 +338,11 @@ export class OvaleIcon {
     SetHelp(help: string | undefined) {
         this.help = help;
     }
-    SetParams(positionalParams: PositionalParameters, namedParams: NamedParameters, secure?: boolean) {
+    SetParams(
+        positionalParams: PositionalParameters,
+        namedParams: NamedParameters,
+        secure?: boolean
+    ) {
         this.positionalParams = positionalParams;
         this.namedParams = namedParams;
         this.actionButton = false;
@@ -272,24 +353,47 @@ export class OvaleIcon {
                     let prefix = sub(k, 1, index - 1);
                     let suffix = sub(k, index + 5);
                     this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
-                    this.frame.SetAttribute("unit", this.namedParams.target || "target");
-                    this.frame.SetAttribute(k, this.ovaleSpellBook.GetSpellName(<number>v) || "Unknown spell");
+                    this.frame.SetAttribute(
+                        "unit",
+                        this.namedParams.target || "target"
+                    );
+                    this.frame.SetAttribute(
+                        k,
+                        this.ovaleSpellBook.GetSpellName(<number>v) ||
+                            "Unknown spell"
+                    );
                     this.actionButton = true;
                 }
             }
         }
     }
-    SetRemainsFont(color: {r: number, g: number; b: number }) {
+    SetRemainsFont(color: { r: number; g: number; b: number }) {
         this.remains.SetTextColor(color.r, color.g, color.b, 1.0);
         this.remains.SetJustifyH("left");
         this.remains.SetPoint("BOTTOMLEFT", 2, 2);
     }
     SetFontScale(scale: number) {
         this.fontScale = scale;
-        this.remains.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
-        this.shortcut.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
-        this.rangeIndicator.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
-        this.focusText.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
+        this.remains.SetFont(
+            this.fontName,
+            this.fontHeight * this.fontScale,
+            this.fontFlags
+        );
+        this.shortcut.SetFont(
+            this.fontName,
+            this.fontHeight * this.fontScale,
+            this.fontFlags
+        );
+        this.rangeIndicator.SetFont(
+            this.fontName,
+            this.fontHeight * this.fontScale,
+            this.fontFlags
+        );
+        this.focusText.SetFont(
+            this.fontName,
+            this.fontHeight * this.fontScale,
+            this.fontFlags
+        );
     }
     SetRangeIndicator(text: string) {
         this.rangeIndicator.SetText(text);
@@ -309,21 +413,33 @@ export class OvaleIcon {
             if (this.actionType) {
                 let actionHelp: string;
                 if (this.actionHelp) {
-                    actionHelp = this.actionHelp
-                }
-                else {
+                    actionHelp = this.actionHelp;
+                } else {
                     if (this.actionType == "spell") {
-                        actionHelp = this.ovaleSpellBook.GetSpellName(this.actionId) || "Unknown spell";
+                        actionHelp =
+                            this.ovaleSpellBook.GetSpellName(this.actionId) ||
+                            "Unknown spell";
                     } else if (this.actionType == "value") {
-                        actionHelp = (this.value < INFINITY) && tostring(this.value) || "infinity";
+                        actionHelp =
+                            (this.value < INFINITY && tostring(this.value)) ||
+                            "infinity";
                     } else {
-                        actionHelp = format("%s %s", this.actionType, tostring(this.actionId));
+                        actionHelp = format(
+                            "%s %s",
+                            this.actionType,
+                            tostring(this.actionId)
+                        );
                     }
                 }
                 GameTooltip.AddLine(actionHelp, 0.5, 1, 0.75);
             }
             if (this.HasScriptControls()) {
-                GameTooltip.AddLine(L["Cliquer pour afficher/cacher les options"], 1, 1, 1);
+                GameTooltip.AddLine(
+                    L["Cliquer pour afficher/cacher les options"],
+                    1,
+                    1,
+                    1
+                );
             }
             GameTooltip.Show();
         }
@@ -333,11 +449,17 @@ export class OvaleIcon {
             GameTooltip.Hide();
         }
     }
-    SetPoint(anchor: UIPosition, reference: UIFrame, refAnchor: UIPosition, x:number, y: number) {
+    SetPoint(
+        anchor: UIPosition,
+        reference: UIFrame,
+        refAnchor: UIPosition,
+        x: number,
+        y: number
+    ) {
         this.frame.SetPoint(anchor, reference, refAnchor, x, y);
     }
 
-    Show(){
+    Show() {
         this.frame.Show();
     }
 
@@ -349,7 +471,7 @@ export class OvaleIcon {
         this.frame.SetScale(scale);
     }
 
-    EnableMouse(enabled: boolean){
+    EnableMouse(enabled: boolean) {
         this.frame.EnableMouse(enabled);
     }
 }

@@ -553,12 +553,11 @@ class SelfPool extends OvalePool<AstNode> {
     Clean(node: AstNode): void {
         if (node.child) {
             this.ovaleAst.childrenPool.Release(node.child);
-            delete node.child;
         }
         if (node.postOrder) {
             this.ovaleAst.postOrderPool.Release(node.postOrder);
-            delete node.postOrder;
         }
+        wipe(node);
     }
 }
 
@@ -3277,8 +3276,8 @@ export class OvaleASTClass {
     public Release(ast: AstNode) {
         if (ast.annotation) {
             this.ReleaseAnnotation(ast.annotation);
-            delete ast.annotation;
         }
+        wipe(ast);
         this.nodesPool.Release(ast);
     }
     public ParseCode(
