@@ -226,6 +226,12 @@ export class Emiter {
         this.AddDisambiguation("none", "none");
 
         this.AddDisambiguation(
+            "berserk_bear",
+            "berserk",
+            "DRUID",
+            "guardian"
+        );
+        this.AddDisambiguation(
             "dummon_demonic_tyrant",
             "summon_demonic_tyrant",
             "WARLOCK",

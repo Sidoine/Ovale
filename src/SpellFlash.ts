@@ -16,7 +16,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleDataClass } from "./Data";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStanceClass } from "./Stance";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 interface SpellFlashCoreClass {
     FlashForm: (
@@ -119,7 +119,7 @@ export class OvaleSpellFlashClass {
     constructor(
         private ovaleOptions: OvaleOptionsClass,
         ovale: OvaleClass,
-        private combat: Combat,
+        private combat: OvaleCombatClass,
         private ovaleData: OvaleDataClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleStance: OvaleStanceClass

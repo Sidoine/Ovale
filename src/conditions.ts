@@ -51,7 +51,7 @@ import {
 import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
-import { lower, upper } from "@wowts/string";
+import { lower, upper, sub } from "@wowts/string";
 import { OvaleArtifactClass } from "./Artifact";
 import { OvaleAzeriteArmor } from "./AzeriteArmor";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
@@ -88,6 +88,12 @@ let INFINITY = huge;
 function BossArmorDamageReduction(target: string) {
     return 0.3;
 }
+// Return a Capitalized word
+function Capitalize(word: string): string 
+{
+    if (!word) return word;
+    return upper(sub(word, 1, 1)) + lower(sub(word, 2));
+}
 
 const AMPLIFICATION = 146051;
 const INCREASED_CRIT_EFFECT_3_PERCENT = 44797;
@@ -105,6 +111,8 @@ const MODERATE_STAGGER = 124274;
 const HEAVY_STAGGER = 124273;
 
 export class OvaleConditions {
+    
+    
     /**
      * Return the value of a parameter from the named spell's information.  If the value is the name of a
      * in the script, then return the compute the value of that instead.
@@ -1488,6 +1496,7 @@ export class OvaleConditions {
             <string>positionalParams[1],
             <"yes" | "no">positionalParams[2],
         ];
+        name = Capitalize(name)
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let family = UnitCreatureFamily(target);
         let lookupTable =
@@ -1521,7 +1530,8 @@ export class OvaleConditions {
             LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
         if (lookupTable) {
             for (const [, name] of ipairs<string>(positionalParams)) {
-                if (creatureType == lookupTable[name]) {
+                let capitalizedName: string = Capitalize(name)
+                if (creatureType == lookupTable[capitalizedName]) {
                     return [0, INFINITY];
                 }
             }

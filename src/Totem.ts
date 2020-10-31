@@ -2,7 +2,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { StateModule, States } from "./State";
+import { OvaleStateClass, StateModule, States } from "./State";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "./Ovale";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
@@ -10,12 +10,14 @@ import { OvaleDataClass } from "./Data";
 import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleSpellBookClass } from "./SpellBook";
+import { OvaleDebugClass, Tracer } from "./Debug";
 
 let self_serial = 0;
 let TOTEM_CLASS: LuaObj<boolean> = {
     DRUID: true,
     MAGE: true,
     MONK: true,
+    PALADIN: true,
     SHAMAN: true
 }
 
@@ -35,19 +37,35 @@ class TotemData {
 export class OvaleTotemClass extends States<TotemData> implements StateModule {
     private module: AceModule & AceEvent;
     private profiler: Profiler;
+    private debug: Tracer;
 
-    constructor(private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, private ovaleData: OvaleDataClass, private ovaleFuture: OvaleFutureClass, private ovaleAura: OvaleAuraClass, private ovaleSpellBook: OvaleSpellBookClass) {
+    constructor(
+        private ovale: OvaleClass, 
+        ovaleState: OvaleStateClass,
+        ovaleProfiler: OvaleProfilerClass, 
+        private ovaleData: OvaleDataClass, 
+        private ovaleFuture: OvaleFutureClass, 
+        private ovaleAura: OvaleAuraClass, 
+        private ovaleSpellBook: OvaleSpellBookClass, 
+        ovaleDebug: OvaleDebugClass
+    ) {
         super(TotemData);
+        this.debug = ovaleDebug.create("OvaleTotem");
         this.module = ovale.createModule("OvaleTotem", this.OnInitialize, this.OnDisable, aceEvent);
         this.profiler = ovaleProfiler.create(this.module.GetName());
+        ovaleState.RegisterState(this);
     }
 
     private OnInitialize = () => {
         if (TOTEM_CLASS[this.ovale.playerClass]) {
+            this.debug.DebugTimestamp("Initialzing OvaleTotem for class %s", this.ovale.playerClass);
             this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Update);
             this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.Update);
             this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.Update);
             this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.Update);
+        } 
+        else {
+            this.debug.DebugTimestamp("Class %s is not a TOTEM_CLASS!", this.ovale.playerClass);
         }
     }
     private OnDisable = () => {
@@ -85,6 +103,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         this.profiler.StartProfiling("OvaleTotem_ApplySpellAfterCast");
         if (TOTEM_CLASS[this.ovale.playerClass]) {
+            this.debug.Log("OvaleTotem_ApplySpellAfterCast: spellId %s, endCast %s", spellId, endCast);
             let si = this.ovaleData.spellInfo[spellId];
             if (si && si.totem) {
                 this.SummonTotem(spellId, endCast);
@@ -129,6 +148,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         let count = 0;
         let si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
+            this.debug.Log("Spell %s is a totem spell", spellId)
             // it can take a while for the buffs to appear
             // so if the previous GCD spell is our totem, we assume the buffs are up
             let buffPresent = (this.ovaleFuture.next.lastGCDSpellId == spellId);
@@ -155,6 +175,9 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                     }
                 }
             }
+        }
+        else {
+            this.debug.Log("Spell %s is NOT a totem spell", spellId)
         }
         return [count, start, ending];
     }

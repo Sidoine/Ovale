@@ -524,5 +524,14 @@ Define(eyes_of_rage_trait 278500)
 Define(revolving_blades_trait 279581)
 Define(breath_of_the_dying_essence_id 35)
     ]]
+    code = code .. [[
+Define(arcane_torrent 202719)
+    SpellInfo(arcane_torrent cd=120 fury=-15)
+Define(frailty_debuff 247456)
+    SpellInfo(frailty_debuff duration=20)
+#spirit_bomb
+    SpellRequire(spirit_bomb unusable 1=soulfragments_max,0)
+	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
+    ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", nil, name, desc, code, "include")
 end

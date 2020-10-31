@@ -4,7 +4,7 @@ import { OvaleClass } from "./Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
 let _DBM = _G["DBM"];
 export class OvaleBossModClass {
@@ -19,7 +19,7 @@ export class OvaleBossModClass {
         ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
-        private combat: Combat
+        private combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
             "BossMod",

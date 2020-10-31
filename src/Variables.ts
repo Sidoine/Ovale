@@ -2,7 +2,7 @@ import { LuaObj, pairs } from "@wowts/lua";
 import { StateModule } from "./State";
 import { BaseState } from "./BaseState";
 import { OvaleDebugClass, Tracer } from "./Debug";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 export class Variables implements StateModule {
     isState = true;
@@ -14,7 +14,7 @@ export class Variables implements StateModule {
     private tracer: Tracer;
 
     constructor(
-        private combat: Combat,
+        private combat: OvaleCombatClass,
         private baseState: BaseState,
         ovaleDebug: OvaleDebugClass
     ) {

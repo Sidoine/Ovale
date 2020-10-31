@@ -49,11 +49,18 @@ local __AST = LibStub:GetLibrary("ovale/AST")
 local isNodeType = __AST.isNodeType
 local lower = string.lower
 local upper = string.upper
+local sub = string.sub
 local __tools = LibStub:GetLibrary("ovale/tools")
 local OneTimeMessage = __tools.OneTimeMessage
 local INFINITY = huge
 local function BossArmorDamageReduction(target)
     return 0.3
+end
+local function Capitalize(word)
+    if  not word then
+        return word
+    end
+    return upper(sub(word, 1, 1)) .. lower(sub(word, 2))
 end
 local AMPLIFICATION = 146051
 local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
@@ -676,6 +683,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.CreatureFamily = function(positionalParams, namedParams, atTime)
             local name, yesno = positionalParams[1], positionalParams[2]
+            name = Capitalize(name)
             local target = self:ParseCondition(positionalParams, namedParams)
             local family = UnitCreatureFamily(target)
             local lookupTable = LibBabbleCreatureType and LibBabbleCreatureType:GetLookupTable()
@@ -688,7 +696,8 @@ __exports.OvaleConditions = __class(nil, {
             local lookupTable = LibBabbleCreatureType and LibBabbleCreatureType:GetLookupTable()
             if lookupTable then
                 for _, name in ipairs(positionalParams) do
-                    if creatureType == lookupTable[name] then
+                    local capitalizedName = Capitalize(name)
+                    if creatureType == lookupTable[capitalizedName] then
                         return 0, INFINITY
                     end
                 end

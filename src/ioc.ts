@@ -54,7 +54,7 @@ import { Generator } from "./simulationcraft/generator";
 import { Unparser } from "./simulationcraft/unparser";
 import { Splitter } from "./simulationcraft/splitter";
 import { OvaleRequirement } from "./Requirement";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -190,10 +190,6 @@ export class IoC {
             this.data,
             this.requirement
         );
-        this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
-            this.aura,
-            this.ovale
-        );
         this.enemies = new OvaleEnemiesClass(
             this.guid,
             this.ovale,
@@ -239,12 +235,13 @@ export class IoC {
             this.ovale,
             this.debug
         );
-        const combat = new Combat(
+        const combat = new OvaleCombatClass(
             this.ovale,
             this.debug,
             this.spellBook,
             this.requirement,
-            this.condition
+            this.condition,
+            this.state
         );
         this.scripts = new OvaleScriptsClass(
             this.ovale,
@@ -306,11 +303,13 @@ export class IoC {
         );
         this.totem = new OvaleTotemClass(
             this.ovale,
+            this.state,
             this.profiler,
             this.data,
             this.future,
             this.aura,
-            this.spellBook
+            this.spellBook,
+            this.debug
         );
         this.variables = new Variables(combat, this.baseState, this.debug);
         this.warlock = new OvaleWarlockClass(
@@ -333,7 +332,8 @@ export class IoC {
         this.spellDamage = new OvaleSpellDamageClass(this.ovale, this.profiler);
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
-            this.ovale
+            this.ovale,
+            this.requirement
         );
         this.runes = new OvaleRunesClass(
             this.ovale,

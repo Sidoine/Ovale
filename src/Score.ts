@@ -14,7 +14,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "./Future";
 import { Tracer, OvaleDebugClass } from "./Debug";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 export type ScoreCallback = (
     name: string,
@@ -37,7 +37,7 @@ export class OvaleScoreClass {
         private ovaleFuture: OvaleFutureClass,
         ovaleDebug: OvaleDebugClass,
         private ovaleSpellBook: OvaleSpellBookClass,
-        private combat: Combat
+        private combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
             "OvaleScore",

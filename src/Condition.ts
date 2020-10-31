@@ -23,11 +23,11 @@ export type ConditionFunction = (
     atTime: number
 ) => ConditionResult;
 
-export type ComparatorId = "atLeast" | "atMost" | "equal" | "less" | "more";
+export type ComparatorId = "atleast" | "atmost" | "equal" | "less" | "more";
 
 const COMPARATOR: { [k in ComparatorId]: boolean } = {
-    atLeast: true,
-    atMost: true,
+    atleast: true,
+    atmost: true,
     equal: true,
     less: true,
     more: true,
@@ -167,17 +167,17 @@ export function TestValue(
     } else if (rate == 0) {
         if (
             (comparator == "less" && value < limit) ||
-            (comparator == "atMost" && value <= limit) ||
+            (comparator == "atmost" && value <= limit) ||
             (comparator == "equal" && value == limit) ||
-            (comparator == "atLeast" && value >= limit) ||
+            (comparator == "atleast" && value >= limit) ||
             (comparator == "more" && value > limit)
         ) {
             return [start, ending];
         }
     } else if (
         (comparator == "less" && rate > 0) ||
-        (comparator == "atMost" && rate > 0) ||
-        (comparator == "atLeast" && rate < 0) ||
+        (comparator == "atmost" && rate > 0) ||
+        (comparator == "atleast" && rate < 0) ||
         (comparator == "more" && rate < 0)
     ) {
         let t = (limit - value) / rate + origin;
@@ -185,8 +185,8 @@ export function TestValue(
         return [start, ending];
     } else if (
         (comparator == "less" && rate < 0) ||
-        (comparator == "atMost" && rate < 0) ||
-        (comparator == "atLeast" && rate > 0) ||
+        (comparator == "atmost" && rate < 0) ||
+        (comparator == "atleast" && rate > 0) ||
         (comparator == "more" && rate > 0)
     ) {
         let t = (limit - value) / rate + origin;

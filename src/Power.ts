@@ -37,7 +37,7 @@ import { States, StateModule } from "./State";
 import { OvaleProfilerClass, Profiler } from "./Profiler";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { Combat } from "./combat";
+import { OvaleCombatClass } from "./combat";
 
 let strlower = lower;
 
@@ -122,7 +122,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         private ovalePaperDoll: OvalePaperDollClass,
         private requirement: OvaleRequirement,
         private ovaleSpellBook: OvaleSpellBookClass,
-        private combat: Combat
+        private combat: OvaleCombatClass
     ) {
         super(PowerState);
         this.module = ovale.createModule(
