@@ -38,7 +38,7 @@ __exports.OvaleActionBarClass = __class(nil, {
                         type = "input",
                         multiline = 25,
                         width = "full",
-                        get = function(info)
+                        get = function()
                             return self:DebugActions()
                         end
                     }
@@ -82,9 +82,9 @@ __exports.OvaleActionBarClass = __class(nil, {
                 end
             elseif slot then
                 local bonus = tonumber(GetBonusBarIndex()) * 12
-                local bonusStart = (bonus > 0) and (bonus - 11) or 1
+                local bonusStart = (bonus > 0 and bonus - 11) or 1
                 local isBonus = slot >= bonusStart and slot < bonusStart + 12
-                if isBonus or slot > 12 and slot < 73 then
+                if isBonus or (slot > 12 and slot < 73) then
                     self:UpdateActionSlot(slot)
                 end
             end

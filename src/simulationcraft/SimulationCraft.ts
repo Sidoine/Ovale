@@ -47,6 +47,7 @@ import { OvaleCompileClass } from "../Compile";
 import { Splitter } from "./splitter";
 import { Generator, Mark, Sweep } from "./generator";
 import { AceModule } from "@wowts/tsaddon";
+import { OptionUiAll } from "../acegui-helpers";
 
 let self_lastSimC: string = "";
 let self_lastScript: string = "";
@@ -93,7 +94,7 @@ export class OvaleSimulationCraftClass {
     }
 
     private registerOptions() {
-        let actions = {
+        let actions: LuaObj<OptionUiAll> = {
             simc: {
                 name: "SimulationCraft",
                 type: "execute",
@@ -105,7 +106,7 @@ export class OvaleSimulationCraftClass {
             },
         };
         for (const [k, v] of pairs(actions)) {
-            this.ovaleOptions.options.args.actions.args[k] = v;
+            this.ovaleOptions.actions.args[k] = v;
         }
 
         let defaultDB = {

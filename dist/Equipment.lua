@@ -137,7 +137,7 @@ __exports.OvaleEquipmentClass = __class(nil, {
         return self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]
     end,
     HasEquippedItem = function(self, itemId)
-        return self.equippedItemById[itemId] and true or false
+        return (self.equippedItemById[itemId] and true) or false
     end,
     HasMainHandWeapon = function(self, handedness)
         if  not self.mainHandItemType then
@@ -150,7 +150,7 @@ __exports.OvaleEquipmentClass = __class(nil, {
                 return self.mainHandItemType == "INVTYPE_2HWEAPON"
             end
         else
-            return OVALE_ONE_HANDED_WEAPON[self.mainHandItemType] or self.mainHandItemType == "INVTYPE_2HWEAPON"
+            return (OVALE_ONE_HANDED_WEAPON[self.mainHandItemType] or self.mainHandItemType == "INVTYPE_2HWEAPON")
         end
         return false
     end,
@@ -165,7 +165,7 @@ __exports.OvaleEquipmentClass = __class(nil, {
                 return self.offHandItemType == "INVTYPE_2HWEAPON"
             end
         else
-            return OVALE_ONE_HANDED_WEAPON[self.offHandItemType] or self.offHandItemType == "INVTYPE_2HWEAPON"
+            return (OVALE_ONE_HANDED_WEAPON[self.offHandItemType] or self.offHandItemType == "INVTYPE_2HWEAPON")
         end
         return false
     end,
@@ -173,13 +173,13 @@ __exports.OvaleEquipmentClass = __class(nil, {
         return self.offHandItemType == "INVTYPE_SHIELD"
     end,
     HasRangedWeapon = function(self)
-        return self.mainHandItemType and OVALE_RANGED_WEAPON[self.mainHandItemType]
+        return (self.mainHandItemType and OVALE_RANGED_WEAPON[self.mainHandItemType])
     end,
     HasTrinket = function(self, itemId)
         return self:HasEquippedItem(itemId)
     end,
     HasTwoHandedWeapon = function(self)
-        return self.mainHandItemType == "INVTYPE_2HWEAPON" or self.offHandItemType == "INVTYPE_2HWEAPON"
+        return (self.mainHandItemType == "INVTYPE_2HWEAPON" or self.offHandItemType == "INVTYPE_2HWEAPON")
     end,
     HasOneHandedWeapon = function(self, slotId)
         if slotId and  not isNumber(slotId) then
@@ -187,12 +187,12 @@ __exports.OvaleEquipmentClass = __class(nil, {
         end
         if slotId then
             if slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"] then
-                return self.mainHandItemType and OVALE_ONE_HANDED_WEAPON[self.mainHandItemType]
+                return (self.mainHandItemType and OVALE_ONE_HANDED_WEAPON[self.mainHandItemType])
             elseif slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"] then
-                return self.offHandItemType and OVALE_ONE_HANDED_WEAPON[self.offHandItemType]
+                return (self.offHandItemType and OVALE_ONE_HANDED_WEAPON[self.offHandItemType])
             end
         else
-            return self.mainHandItemType and OVALE_ONE_HANDED_WEAPON[self.mainHandItemType] or self.offHandItemType and OVALE_ONE_HANDED_WEAPON[self.offHandItemType]
+            return ((self.mainHandItemType and OVALE_ONE_HANDED_WEAPON[self.mainHandItemType]) or (self.offHandItemType and OVALE_ONE_HANDED_WEAPON[self.offHandItemType]))
         end
         return false
     end,

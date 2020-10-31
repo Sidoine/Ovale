@@ -8,7 +8,7 @@ import {
     setMockOptions,
 } from "@wowts/wow-mock";
 import { registerScripts } from "../scripts/index";
-import { OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
+import { OVALE_SPECIALIZATION_NAME } from "../states/PaperDoll";
 
 const mainIoC = new IoC();
 registerScripts(mainIoC.scripts);

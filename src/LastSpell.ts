@@ -1,7 +1,7 @@
 import { OvalePool } from "./Pool";
 import { lualength, LuaObj, LuaArray, pairs } from "@wowts/lua";
 import { remove, insert } from "@wowts/table";
-import { Powers } from "./Power";
+import { Powers } from "./states/Power";
 
 export interface SpellCast extends PaperDollSnapshot {
     stop: number;
@@ -17,25 +17,25 @@ export interface SpellCast extends PaperDollSnapshot {
     auraGUID?: string;
     channel?: boolean;
     caster?: string;
-    offgcd?:boolean;
+    offgcd?: boolean;
     damageMultiplier?: number;
     combopoints?: number;
 }
 
 export function createSpellCast(): SpellCast {
-    return { 
-        spellId: 0, 
-        stop: 0, 
+    return {
+        spellId: 0,
+        stop: 0,
         start: 0,
-        queued: 0, 
-        hastePercent: 0, 
+        queued: 0,
+        hastePercent: 0,
         meleeAttackSpeedPercent: 0,
-        rangedAttackSpeedPercent: 0, 
-        spellCastSpeedPercent: 0, 
+        rangedAttackSpeedPercent: 0,
+        spellCastSpeedPercent: 0,
         masteryEffect: 0,
         target: "unknown",
         targetName: "target",
-        spellName: "Unknown spell"
+        spellName: "Unknown spell",
     };
 }
 
@@ -78,18 +78,21 @@ export interface PaperDollSnapshot extends Powers {
 
 export interface SpellCastModule {
     CopySpellcastInfo: (spellcast: SpellCast, dest: SpellCast) => void;
-    SaveSpellcastInfo: (spellcast: SpellCast, atTime: number, future?: PaperDollSnapshot) => void;
+    SaveSpellcastInfo: (
+        spellcast: SpellCast,
+        atTime: number,
+        future?: PaperDollSnapshot
+    ) => void;
 }
 
 export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
-
 export class LastSpell {
     lastSpellcast: SpellCast | undefined = undefined;
     lastGCDSpellcast: SpellCast = createSpellCast();
-    queue: LuaArray<SpellCast> = {}
-    modules: LuaObj<SpellCastModule> = {}
-    
+    queue: LuaArray<SpellCast> = {};
+    modules: LuaObj<SpellCastModule> = {};
+
     LastInFlightSpell() {
         let spellcast: SpellCast | undefined = undefined;
         if (this.lastGCDSpellcast.success) {
@@ -98,7 +101,10 @@ export class LastSpell {
         for (let i = lualength(this.queue); i >= 1; i += -1) {
             let sc = this.queue[i];
             if (sc.success) {
-                if (spellcast === undefined || (spellcast.success! < sc.success)) {
+                if (
+                    spellcast === undefined ||
+                    spellcast.success! < sc.success
+                ) {
                     spellcast = sc;
                 }
                 break;
@@ -137,11 +143,20 @@ export class LastSpell {
         for (let i = lualength(this.queue); i >= 1; i += -1) {
             let sc = this.queue[i];
             if (sc.success) {
-                if (!spellcast || (spellcast.success && spellcast.success < sc.success) || (!spellcast.success && spellcast.queued && spellcast.queued < sc.success)) {
+                if (
+                    !spellcast ||
+                    (spellcast.success && spellcast.success < sc.success) ||
+                    (!spellcast.success &&
+                        spellcast.queued &&
+                        spellcast.queued < sc.success)
+                ) {
                     spellcast = sc;
                 }
             } else if (!sc.start && !sc.stop && sc.queued) {
-                if (!spellcast || (spellcast.success && spellcast.success < sc.queued)) {
+                if (
+                    !spellcast ||
+                    (spellcast.success && spellcast.success < sc.queued)
+                ) {
                     spellcast = sc;
                 } else if (spellcast.queued && spellcast.queued < sc.queued) {
                     spellcast = sc;

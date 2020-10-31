@@ -1,7 +1,10 @@
 import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
-import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
+import {
+    SpecializationName,
+    OVALE_SPECIALIZATION_NAME,
+} from "../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
 
 interface AllData {

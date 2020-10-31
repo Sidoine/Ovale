@@ -12,9 +12,13 @@ import {
     ReturnConstant,
 } from "./Condition";
 import { SpellInfo, OvaleDataClass } from "./Data";
-import { PowerType, OvalePowerClass } from "./Power";
-import { HasteType, PaperDollData, OvalePaperDollClass } from "./PaperDoll";
-import { Aura, OvaleAuraClass } from "./Aura";
+import { PowerType, OvalePowerClass } from "./states/Power";
+import {
+    HasteType,
+    PaperDollData,
+    OvalePaperDollClass,
+} from "./states/PaperDoll";
+import { Aura, OvaleAuraClass } from "./states/Aura";
 import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import {
     GetBuildInfo,
@@ -52,34 +56,33 @@ import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
-import { OvaleArtifactClass } from "./Artifact";
-import { OvaleAzeriteArmor } from "./AzeriteArmor";
-import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
+import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
+import { OvaleAzeriteEssenceClass } from "./states/AzeriteEssence";
 import { BaseState } from "./BaseState";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "./Frame";
 import { OvaleGUIDClass } from "./GUID";
-import { OvaleDamageTakenClass } from "./DamageTaken";
-import { OvaleWarlockClass } from "./Warlock";
-import { OvaleEnemiesClass } from "./Enemies";
-import { OvaleCooldownClass } from "./Cooldown";
+import { OvaleDamageTakenClass } from "./states/DamageTaken";
+import { OvaleWarlockClass } from "./states/Warlock";
+import { OvaleEnemiesClass } from "./states/Enemies";
+import { OvaleCooldownClass } from "./states/Cooldown";
 import { OvaleCompileClass } from "./Compile";
-import { Variables } from "./Variables";
+import { Variables } from "./states/Variables";
 import { LastSpell } from "./LastSpell";
 import { OvaleEquipmentClass } from "./Equipment";
-import { OvaleHealthClass } from "./Health";
+import { OvaleHealthClass } from "./states/Health";
 import { OvaleOptionsClass } from "./Options";
-import { OvaleLossOfControlClass } from "./LossOfControl";
-import { OvaleSpellDamageClass } from "./SpellDamage";
-import { OvaleStaggerClass } from "./Stagger";
-import { OvaleTotemClass } from "./Totem";
-import { OvaleDemonHunterSoulFragmentsClass } from "./DemonHunterSoulFragments";
-import { OvaleSigilClass } from "./DemonHunterSigils";
+import { OvaleLossOfControlClass } from "./states/LossOfControl";
+import { OvaleSpellDamageClass } from "./states/SpellDamage";
+import { OvaleStaggerClass } from "./states/Stagger";
+import { OvaleTotemClass } from "./states/Totem";
+import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
+import { OvaleSigilClass } from "./states/DemonHunterSigils";
 import { OvaleBestActionClass } from "./BestAction";
-import { OvaleRunesClass } from "./Runes";
-import { OvaleStanceClass } from "./Stance";
-import { OvaleBossModClass } from "./BossMod";
+import { OvaleRunesClass } from "./states/Runes";
+import { OvaleStanceClass } from "./states/Stance";
+import { OvaleBossModClass } from "./states/BossMod";
 import { OneTimeMessage } from "./tools";
 
 let INFINITY = huge;
@@ -205,29 +208,6 @@ export class OvaleConditions {
         let value = 0;
         OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         return Compare(value, comparator, limit);
-    };
-
-    private ArtifactTraitRank = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.OvaleArtifact.TraitRank(spellId);
-        return Compare(value, comparator, limit);
-    };
-    private HasArtifactTrait = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
-        let value = this.OvaleArtifact.HasTrait(spellId);
-        return TestBoolean(value, yesno);
     };
 
     private AzeriteTraitRank = (
@@ -6954,7 +6934,6 @@ l    */
         private OvaleData: OvaleDataClass,
         private OvaleCompile: OvaleCompileClass,
         private OvalePaperDoll: OvalePaperDollClass,
-        private OvaleArtifact: OvaleArtifactClass,
         private OvaleAzerite: OvaleAzeriteArmor,
         private OvaleAzeriteEssence: OvaleAzeriteEssenceClass,
         private OvaleAura: OvaleAuraClass,
@@ -7002,16 +6981,6 @@ l    */
             "armorsetparts",
             false,
             this.ArmorSetParts
-        );
-        ovaleCondition.RegisterCondition(
-            "hasartifacttrait",
-            false,
-            this.HasArtifactTrait
-        );
-        ovaleCondition.RegisterCondition(
-            "artifacttraitrank",
-            false,
-            this.ArtifactTraitRank
         );
         ovaleCondition.RegisterCondition(
             "hasazeritetrait",

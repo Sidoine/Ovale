@@ -22,7 +22,7 @@ __exports.Profiler = __class(nil, {
         self.profiler = profiler
         self.timestamp = debugprofilestop()
         self.enabled = false
-        local args = profiler.options.args.profiling.args.modules.args
+        local args = profiler.moduleOptions
         args[name] = {
             name = name,
             desc = format(L["Enable profiling for the %s module."], name),
@@ -89,6 +89,7 @@ __exports.OvaleProfilerClass = __class(nil, {
                 end
             }
         }
+        self.moduleOptions = {}
         self.options = {
             name = self.ovale:GetName() .. " " .. L["Profiling"],
             type = "group",
@@ -102,7 +103,7 @@ __exports.OvaleProfilerClass = __class(nil, {
                             type = "group",
                             inline = true,
                             order = 10,
-                            args = {},
+                            args = self.moduleOptions,
                             get = function(info)
                                 local name = info[#info]
                                 local value = self.ovaleOptions.db.global.profiler[name]
@@ -155,7 +156,7 @@ __exports.OvaleProfilerClass = __class(nil, {
         end
         self.array = {}
         for k, v in pairs(self.actions) do
-            ovaleOptions.options.args.actions.args[k] = v
+            ovaleOptions.actions.args[k] = v
         end
         ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global or {}
         ovaleOptions.defaultDB.global.profiler = {}

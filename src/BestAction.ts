@@ -39,21 +39,21 @@ import {
     IsUsableItem,
 } from "@wowts/wow-mock";
 import { AstNode, isNodeType } from "./AST";
-import { OvaleCooldownClass } from "./Cooldown";
-import { OvaleRunesClass } from "./Runes";
-import { OvalePaperDollClass } from "./PaperDoll";
+import { OvaleCooldownClass } from "./states/Cooldown";
+import { OvaleRunesClass } from "./states/Runes";
+import { OvalePaperDollClass } from "./states/PaperDoll";
 import { BaseState } from "./BaseState";
 import { OvaleSpellsClass } from "./Spells";
 import { isNumber, isString, OneTimeMessage } from "./tools";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./GUID";
-import { OvalePowerClass } from "./Power";
+import { OvalePowerClass } from "./states/Power";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
 import { OvaleDebugClass, Tracer } from "./Debug";
-import { Variables } from "./Variables";
+import { Variables } from "./states/Variables";
 
 const INFINITY = huge;
 

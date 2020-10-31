@@ -227,14 +227,22 @@ __exports.SPECIAL_ACTION = {
 }
 local powerModifiers = {
     ["max"] = {
-        name = "max",
-        before = true
+        type = 1
     },
     ["deficit"] = {
-        name = "deficit"
+        type = 0
     },
     ["pct"] = {
-        name = "percent"
+        name = "percent",
+        type = 0
+    },
+    ["regen"] = {
+        name = "regenrate",
+        type = 0
+    },
+    ["time_to_max"] = {
+        name = "timetomax",
+        type = 1
     }
 }
 __exports.MISC_OPERAND = {
@@ -252,6 +260,15 @@ __exports.MISC_OPERAND = {
     ["combo_points"] = {
         name = "combopoints",
         modifiers = powerModifiers
+    },
+    ["covenant"] = {
+        name = "covenant",
+        modifiers = {
+            enabled = {
+                type = 3
+            }
+        },
+        symbol = 0
     },
     ["cp_max_spend"] = {
         name = "maxcombopoints"
@@ -321,10 +338,12 @@ __exports.MISC_OPERAND = {
         name = "stealthed",
         modifiers = {
             all = {
-                name = ""
+                name = "",
+                type = 3
             },
             rogue = {
-                name = ""
+                name = "",
+                type = 3
             }
         }
     },

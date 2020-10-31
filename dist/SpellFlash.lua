@@ -106,21 +106,21 @@ __exports.OvaleSpellFlashClass = __class(nil, {
         end
         self.Ovale_OptionChanged = function()
             local db = self.ovaleOptions.db.profile.apparence.spellFlash
-            colorMain.r = db.colorMain.r
-            colorMain.g = db.colorMain.g
-            colorMain.b = db.colorMain.b
-            colorCd.r = db.colorCd.r
-            colorCd.g = db.colorCd.g
-            colorCd.b = db.colorCd.b
-            colorShortCd.r = db.colorShortCd.r
-            colorShortCd.g = db.colorShortCd.g
-            colorShortCd.b = db.colorShortCd.b
-            colorInterrupt.r = db.colorInterrupt.r
-            colorInterrupt.g = db.colorInterrupt.g
-            colorInterrupt.b = db.colorInterrupt.b
+            colorMain.r = db.colors.colorMain.r
+            colorMain.g = db.colors.colorMain.g
+            colorMain.b = db.colors.colorMain.b
+            colorCd.r = db.colors.colorCd.r
+            colorCd.g = db.colors.colorCd.g
+            colorCd.b = db.colors.colorCd.b
+            colorShortCd.r = db.colors.colorShortCd.r
+            colorShortCd.g = db.colors.colorShortCd.g
+            colorShortCd.b = db.colors.colorShortCd.b
+            colorInterrupt.r = db.colors.colorInterrupt.r
+            colorInterrupt.g = db.colors.colorInterrupt.g
+            colorInterrupt.b = db.colors.colorInterrupt.b
         end
         self.module = ovale:createModule("OvaleSpellFlash", self.OnInitialize, self.OnDisable, aceEvent)
-        self.ovaleOptions.options.args.apparence.args.spellFlash = self:getSpellFlashOptions()
+        self.ovaleOptions.apparence.args.spellFlash = self:getSpellFlashOptions()
     end,
     getSpellFlashOptions = function(self)
         return {
@@ -222,11 +222,11 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                         return ( not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled)
                     end,
                     get = function(info)
-                        local color = self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
+                        local color = self.ovaleOptions.db.profile.apparence.spellFlash.colors[info[#info]]
                         return color.r, color.g, color.b, 1
                     end,
                     set = function(info, r, g, b, a)
-                        local color = self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
+                        local color = self.ovaleOptions.db.profile.apparence.spellFlash.colors[info[#info]]
                         color.r = r
                         color.g = g
                         color.b = b

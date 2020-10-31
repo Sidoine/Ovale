@@ -7,7 +7,7 @@ import { OvaleConditionClass } from "./Condition";
 import { OvaleLexer, LexerFilter } from "./Lexer";
 import { OvaleScriptsClass } from "./Scripts";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { STANCE_NAME } from "./Stance";
+import { STANCE_NAME } from "./states/Stance";
 import {
     LuaArray,
     LuaObj,
@@ -26,7 +26,7 @@ import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
 import { isLuaArray, isNumber, isString, checkToken } from "./tools";
 import { SpellInfo } from "./Data";
-import { HasteType } from "./PaperDoll";
+import { HasteType } from "./states/PaperDoll";
 import { Result } from "./simulationcraft/definitions";
 
 const KEYWORD: LuaObj<boolean> = {
@@ -3210,6 +3210,13 @@ export class OvaleASTClass {
     public newString(nodeList: LuaArray<AstNode>, value: string) {
         const node = this.NewNode(nodeList);
         node.type = "string";
+        node.value = value;
+        return node;
+    }
+
+    public newValue(nodeList: LuaArray<AstNode>, value: string | number) {
+        const node = this.NewNode(nodeList);
+        node.type = "value";
         node.value = value;
         return node;
     }

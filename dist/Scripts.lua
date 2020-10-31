@@ -70,7 +70,7 @@ __exports.OvaleScriptsClass = __class(nil, {
             (ovaleOptions.defaultDB.profile)[k] = v
         end
         for k, v in pairs(actions) do
-            ovaleOptions.options.args.actions.args[k] = v
+            ovaleOptions.actions.args[k] = v
         end
         ovaleOptions:RegisterOptions(self)
     end,

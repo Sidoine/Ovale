@@ -86,6 +86,12 @@ end
 __exports.ReturnConstant = function(value)
     return 0, INFINITY, value, 0, 0
 end
+__exports.ReturnBoolean = function(value)
+    if value then
+        return 0, INFINITY
+    end
+    return 
+end
 __exports.TestValue = function(start, ending, value, origin, rate, comparator, limit)
     if value == nil or origin == nil or rate == nil then
         return 

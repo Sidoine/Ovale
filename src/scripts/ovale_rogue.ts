@@ -24,7 +24,7 @@ AddFunction single_target
 
 AddFunction energy_regen_combined
 {
- energy() + { debuffcountonany(rupture_debuff) + debuffcountonany(garrote_debuff) + talent(internal_bleeding_talent) * debuffcountonany(internal_bleeding_debuff) } * 7 / { 2 * { 100 / { 100 + spellcastspeedpercent() } } }
+ energyregenrate() + { debuffcountonany(rupture_debuff) + debuffcountonany(garrote_debuff) + talent(internal_bleeding_talent) * debuffcountonany(internal_bleeding_debuff) } * 7 / { 2 * { 100 / { 100 + spellcastspeedpercent() } } }
 }
 
 AddFunction ss_vanish_condition
@@ -210,7 +210,7 @@ AddFunction assassinationprecombatcdpostconditions
 AddFunction assassinationessencesmainactions
 {
  #concentrated_flame,if=energy.time_to_max>1&!debuff.vendetta.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
- if energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
+ if timetomaxenergy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
  #blood_of_the_enemy,if=debuff.vendetta.up&(exsanguinated.garrote|debuff.shiv.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
  if target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 spell(blood_of_the_enemy)
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -229,7 +229,7 @@ AddFunction assassinationessencesmainpostconditions
 
 AddFunction assassinationessencesshortcdactions
 {
- unless energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy)
  {
   #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
   if enemies() >= 2 or 600 > 60 and energy() < 70 spell(focused_azerite_beam)
@@ -247,12 +247,12 @@ AddFunction assassinationessencesshortcdactions
 
 AddFunction assassinationessencesshortcdpostconditions
 {
- energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams)
+ timetomaxenergy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams)
 }
 
 AddFunction assassinationessencescdactions
 {
- unless energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy)
  {
   #guardian_of_azeroth,if=cooldown.vendetta.remains<3|debuff.vendetta.up|target.time_to_die<30
   if spellcooldown(vendetta) < 3 or target.debuffpresent(vendetta) or target.timetodie() < 30 spell(guardian_of_azeroth)
@@ -263,7 +263,7 @@ AddFunction assassinationessencescdactions
 
 AddFunction assassinationessencescdpostconditions
 {
- energy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and energy() < 70 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ timetomaxenergy() > 1 and not target.debuffpresent(vendetta) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { target.debuffpresent(vendetta) and { message("exsanguinated.garrote is not implemented") or target.debuffpresent(shiv) and combopointsdeficit() <= 1 or target.debuffremaining(vendetta) <= 10 } or target.timetodie() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and energy() < 70 } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 50 and not { not spellcooldown(vendetta) > 0 } and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.dot
@@ -942,7 +942,7 @@ AddFunction outlawfinishcdpostconditions
 AddFunction outlawessencesmainactions
 {
  #concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
- if energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
+ if timetomaxenergy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
  #blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&(spell_targets.blade_flurry>=2|raid_event.adds.in>45)
  if blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } spell(blood_of_the_enemy)
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -961,7 +961,7 @@ AddFunction outlawessencesmainpostconditions
 
 AddFunction outlawessencesshortcdactions
 {
- unless energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy)
  {
   #focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
   if enemies() >= 2 or 600 > 60 and not buffpresent(adrenaline_rush) spell(focused_azerite_beam)
@@ -979,12 +979,12 @@ AddFunction outlawessencesshortcdactions
 
 AddFunction outlawessencesshortcdpostconditions
 {
- energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams)
+ timetomaxenergy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams)
 }
 
 AddFunction outlawessencescdactions
 {
- unless energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy)
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
@@ -993,7 +993,7 @@ AddFunction outlawessencescdactions
 
 AddFunction outlawessencescdpostconditions
 {
- energy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and not buffpresent(adrenaline_rush) } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ timetomaxenergy() > 1 and not buffpresent(blade_flurry) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or blade_flurry_sync() and not spellcooldown(between_the_eyes) > 0 and { enemies() >= 2 or 600 > 45 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 and not buffpresent(adrenaline_rush) } and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or spell(worldvein_resonance) or energy() < 45 and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.cds
@@ -1044,7 +1044,7 @@ AddFunction outlawcdsshortcdactions
    #ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
    if combopointsdeficit() >= 1 + buffpresent(broadside) spell(ghostly_strike)
    #blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
-   if blade_flurry_sync() and energy() > 2 spell(blade_rush)
+   if blade_flurry_sync() and timetomaxenergy() > 2 spell(blade_rush)
    #dreadblades,if=!stealthed.all&combo_points<=1
    if not stealthed() and combopoints() <= 1 spell(dreadblades)
   }
@@ -1069,9 +1069,9 @@ AddFunction outlawcdscdactions
   unless { buffremaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and spell(roll_the_bones) or false(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 } and spell(marked_for_death) or 600 > 30 - 10 and not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 and spell(marked_for_death) or enemies() >= 2 and not buffpresent(blade_flurry) and { not false(raid_event_adds_exists) or message("raid_event.adds.remains is not implemented") > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry) or enemies() == 1 and 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 and checkboxon(opt_blade_flurry) and spell(blade_flurry) or combopointsdeficit() >= 1 + buffpresent(broadside) and spell(ghostly_strike)
   {
    #killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
-   if blade_flurry_sync() and energy() > 2 spell(killing_spree)
+   if blade_flurry_sync() and timetomaxenergy() > 2 spell(killing_spree)
 
-   unless blade_flurry_sync() and energy() > 2 and spell(blade_rush)
+   unless blade_flurry_sync() and timetomaxenergy() > 2 and spell(blade_rush)
    {
     #vanish,if=!stealthed.all&variable.ambush_condition
     if not stealthed() and ambush_condition() spell(vanish)
@@ -1095,7 +1095,7 @@ AddFunction outlawcdscdactions
        #ancestral_call
        spell(ancestral_call)
        #use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
-       if not stealthed() and buffexpires(adrenaline_rush) and buffexpires(memory_of_lucid_dreams) and energy() > 4 and buffcount(roll_the_bones_buff) < 5 outlawuseitemactions()
+       if not stealthed() and buffexpires(adrenaline_rush) and buffexpires(memory_of_lucid_dreams) and timetomaxenergy() > 4 and buffcount(roll_the_bones_buff) < 5 outlawuseitemactions()
        #use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
        if not buffpresent(adrenaline_rush) and not buffpresent(blade_flurry) and spellcooldown(adrenaline_rush) < 15 outlawuseitemactions()
        #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
@@ -1112,7 +1112,7 @@ AddFunction outlawcdscdactions
 
 AddFunction outlawcdscdpostconditions
 {
- not stealthed() and outlawessencescdpostconditions() or spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse) or { buffremaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and spell(roll_the_bones) or false(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 } and spell(marked_for_death) or 600 > 30 - 10 and not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 and spell(marked_for_death) or enemies() >= 2 and not buffpresent(blade_flurry) and { not false(raid_event_adds_exists) or message("raid_event.adds.remains is not implemented") > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry) or enemies() == 1 and 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 and checkboxon(opt_blade_flurry) and spell(blade_flurry) or combopointsdeficit() >= 1 + buffpresent(broadside) and spell(ghostly_strike) or blade_flurry_sync() and energy() > 2 and spell(blade_rush) or not stealthed() and combopoints() <= 1 and spell(dreadblades) or not stealthed() and spell(sepsis) or spell(berserking)
+ not stealthed() and outlawessencescdpostconditions() or spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse) or { buffremaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and spell(roll_the_bones) or false(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 } and spell(marked_for_death) or 600 > 30 - 10 and not stealthed() and combopointsdeficit() >= maxcombopoints() - 1 and spell(marked_for_death) or enemies() >= 2 and not buffpresent(blade_flurry) and { not false(raid_event_adds_exists) or message("raid_event.adds.remains is not implemented") > 8 or 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 } and checkboxon(opt_blade_flurry) and spell(blade_flurry) or enemies() == 1 and 600 > { 2 - spellcharges(blade_flurry count=0) } * 25 and checkboxon(opt_blade_flurry) and spell(blade_flurry) or combopointsdeficit() >= 1 + buffpresent(broadside) and spell(ghostly_strike) or blade_flurry_sync() and timetomaxenergy() > 2 and spell(blade_rush) or not stealthed() and combopoints() <= 1 and spell(dreadblades) or not stealthed() and spell(sepsis) or spell(berserking)
 }
 
 ### actions.build
@@ -1260,7 +1260,7 @@ AddFunction outlaw_defaultcdactions
      unless outlawbuildcdpostconditions()
      {
       #arcane_torrent,if=energy.deficit>=15+energy.regen
-      if energydeficit() >= 15 + energy() spell(arcane_torrent)
+      if energydeficit() >= 15 + energyregenrate() spell(arcane_torrent)
       #arcane_pulse
       spell(arcane_pulse)
       #lights_judgment
@@ -1726,7 +1726,7 @@ AddFunction subtletyfinishcdpostconditions
 AddFunction subtletyessencesmainactions
 {
  #concentrated_flame,if=energy.time_to_max>1&!buff.symbols_of_death.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
- if energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
+ if timetomaxenergy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } spell(concentrated_flame)
  #blood_of_the_enemy,if=!cooldown.shadow_blades.up&cooldown.symbols_of_death.up|fight_remains<=10
  if not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 spell(blood_of_the_enemy)
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -1745,7 +1745,7 @@ AddFunction subtletyessencesmainpostconditions
 
 AddFunction subtletyessencesshortcdactions
 {
- unless energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy)
  {
   #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
   if { enemies() >= 2 or 600 > 60 } and not { not spellcooldown(symbols_of_death) > 0 } and not buffpresent(symbols_of_death) and energydeficit() >= 30 spell(focused_azerite_beam)
@@ -1763,12 +1763,12 @@ AddFunction subtletyessencesshortcdactions
 
 AddFunction subtletyessencesshortcdpostconditions
 {
- energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or fightremains() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams)
+ timetomaxenergy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or fightremains() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams)
 }
 
 AddFunction subtletyessencescdactions
 {
- unless energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy)
+ unless timetomaxenergy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy)
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
@@ -1777,7 +1777,7 @@ AddFunction subtletyessencescdactions
 
 AddFunction subtletyessencescdpostconditions
 {
- energy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and not { not spellcooldown(symbols_of_death) > 0 } and not buffpresent(symbols_of_death) and energydeficit() >= 30 and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or fightremains() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
+ timetomaxenergy() > 1 and not buffpresent(symbols_of_death) and { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or { not { not spellcooldown(shadow_blades) > 0 } and not spellcooldown(symbols_of_death) > 0 or fightremains() <= 10 } and spell(blood_of_the_enemy) or { enemies() >= 2 or 600 > 60 } and not { not spellcooldown(symbols_of_death) > 0 } and not buffpresent(symbols_of_death) and energydeficit() >= 30 and spell(focused_azerite_beam) or { enemies() >= 2 or 600 > 60 } and spell(purifying_blast) or { buffpresent(reckless_force_buff) or buffstacks(reckless_force_counter) < 10 } and spell(the_unbound_force) or spell(ripple_in_space) or { spellcooldown(symbols_of_death) < 5 or fightremains() < 18 } and spell(worldvein_resonance) or energy() < 40 and buffpresent(symbols_of_death) and spell(memory_of_lucid_dreams) or { target.timetodie() < 1.5 or { target.healthpercent() > 80 or target.healthpercent() <= 20 } and { enemies() == 1 or reaping_delay() > 29 } or target.timetohealthpercent(20) > 30 and { enemies() == 1 or reaping_delay() > 44 } } and spell(reaping_flames)
 }
 
 ### actions.cds
@@ -1818,7 +1818,7 @@ AddFunction subtletycdsshortcdactions
   #symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
   if buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 spell(symbols_of_death)
   #flagellation,if=variable.snd_condition&!stealthed.mantle
-  if snd_condition() and not stealthed() spell(flagellation)
+  if snd_condition() and not message("stealthed.mantle is not implemented") spell(flagellation)
 
   unless { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse)
   {
@@ -1859,7 +1859,7 @@ AddFunction subtletycdsshortcdpostconditions
 
 AddFunction subtletycdscdactions
 {
- unless not buffpresent(shadow_dance) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not stealthed() and spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse)
+ unless not buffpresent(shadow_dance) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not message("stealthed.mantle is not implemented") and spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse)
  {
   #vanish,if=(runeforge.mark_of_the_master_assassin.equipped&combo_points.deficit<=3|runeforge.deathly_shadows.equipped&combo_points<1)&buff.symbols_of_death.up&buff.shadow_dance.up&master_assassin_remains=0&buff.deathly_shadows.down
   if { message("runeforge.mark_of_the_master_assassin.equipped is not implemented") and combopointsdeficit() <= 3 or message("runeforge.deathly_shadows.equipped is not implemented") and combopoints() < 1 } and buffpresent(symbols_of_death) and buffpresent(shadow_dance) and buffremaining(master_assassin_buff) == 0 and buffexpires(deathly_shadows_buff) spell(vanish)
@@ -1909,7 +1909,7 @@ AddFunction subtletycdscdactions
 
 AddFunction subtletycdscdpostconditions
 {
- not buffpresent(shadow_dance) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not stealthed() and spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse) or { not stealthed() and snd_condition() or azeriteessenceismajor(breath_of_the_dying_essence_id) and timeincombat() >= 2 } and subtletyessencescdpostconditions() or not { not hastalent(shadow_focus_talent) } and { energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 and spell(shuriken_tornado) or { snd_condition() and not target.debuffpresent(serrated_bone_spike_dot_debuff) or fightremains() <= 5 } and spell(serrated_bone_spike) or snd_condition() and not { not spellcooldown(shadow_blades) > 0 } and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } and { not message("runeforge.the_rotten.equipped is not implemented") or combopoints() <= 2 } and { not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(blood_of_the_enemy) > 2 } and spell(symbols_of_death) or false(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not stealthed() and combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or snd_condition() and combopointsdeficit() >= 3 and enemies() <= 4 and spell(echoing_reprimand) or hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) and spell(shuriken_tornado) or not buffpresent(shadow_dance) and fightremains() <= 8 + talentpoints(subterfuge_talent) and spell(shadow_dance) or buffpresent(symbols_of_death) and spell(berserking) }
+ not buffpresent(shadow_dance) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not message("stealthed.mantle is not implemented") and spell(flagellation) or { target.debuffremaining(flagellation) < 2 or target.debuffstacks(flagellation) >= 40 } and spell(flagellation_cleanse) or { not stealthed() and snd_condition() or azeriteessenceismajor(breath_of_the_dying_essence_id) and timeincombat() >= 2 } and subtletyessencescdpostconditions() or not { not hastalent(shadow_focus_talent) } and { energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 and spell(shuriken_tornado) or { snd_condition() and not target.debuffpresent(serrated_bone_spike_dot_debuff) or fightremains() <= 5 } and spell(serrated_bone_spike) or snd_condition() and not { not spellcooldown(shadow_blades) > 0 } and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } and { not message("runeforge.the_rotten.equipped is not implemented") or combopoints() <= 2 } and { not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(blood_of_the_enemy) > 2 } and spell(symbols_of_death) or false(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not stealthed() and combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or snd_condition() and combopointsdeficit() >= 3 and enemies() <= 4 and spell(echoing_reprimand) or hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) and spell(shuriken_tornado) or not buffpresent(shadow_dance) and fightremains() <= 8 + talentpoints(subterfuge_talent) and spell(shadow_dance) or buffpresent(symbols_of_death) and spell(berserking) }
 }
 
 ### actions.build
@@ -2159,7 +2159,7 @@ AddFunction subtlety_defaultcdactions
            unless energydeficit() <= stealth_threshold() and subtletybuildcdpostconditions()
            {
             #arcane_torrent,if=energy.deficit>=15+energy.regen
-            if energydeficit() >= 15 + energy() spell(arcane_torrent)
+            if energydeficit() >= 15 + energyregenrate() spell(arcane_torrent)
             #arcane_pulse
             spell(arcane_pulse)
             #lights_judgment

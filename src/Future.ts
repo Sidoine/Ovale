@@ -1,7 +1,7 @@
-import { OvaleAuraClass } from "./Aura";
+import { OvaleAuraClass } from "./states/Aura";
 import { OvaleDataClass } from "./Data";
 import { OvaleGUIDClass } from "./GUID";
-import { OvalePaperDollClass, HasteType } from "./PaperDoll";
+import { OvalePaperDollClass, HasteType } from "./states/PaperDoll";
 import { LastSpell, SpellCast, self_pool, createSpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -27,7 +27,7 @@ import {
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { OvaleStateClass, States } from "./State";
-import { OvaleCooldownClass } from "./Cooldown";
+import { OvaleCooldownClass } from "./states/Cooldown";
 import { BaseState } from "./BaseState";
 import { isLuaArray } from "./tools";
 import { OvaleRequirement } from "./Requirement";
@@ -35,7 +35,7 @@ import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, OvaleDebugClass } from "./Debug";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
-import { OvaleStanceClass } from "./Stance";
+import { OvaleStanceClass } from "./states/Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
 
 let strsub = sub;

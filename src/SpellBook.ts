@@ -10,6 +10,7 @@ import {
     wipe,
     lualength,
     LuaArray,
+    LuaObj,
 } from "@wowts/lua";
 import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
@@ -34,6 +35,7 @@ import {
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDataClass } from "./Data";
 import { isNumber, OneTimeMessage } from "./tools";
+import { OptionUiAll } from "./acegui-helpers";
 
 let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
 
@@ -80,7 +82,7 @@ export class OvaleSpellBookClass {
         ovaleDebug: OvaleDebugClass,
         private ovaleData: OvaleDataClass
     ) {
-        let debugOptions = {
+        let debugOptions: LuaObj<OptionUiAll> = {
             spellbook: {
                 name: L["Spellbook"],
                 type: "group",

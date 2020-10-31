@@ -18,6 +18,8 @@ import {
     NumberParseNode,
     OperandParseNode,
     OperatorParseNode,
+    MiscOperandModifierType,
+    MiscOperandSymbolType,
 } from "./definitions";
 import {
     LuaArray,
@@ -56,11 +58,11 @@ import {
     CamelCase,
     OvaleFunctionName,
 } from "./text-tools";
-import { POOLED_RESOURCE } from "../Power";
+import { POOLED_RESOURCE } from "../states/Power";
 import { Unparser } from "./unparser";
 import { MakeString } from "../tools";
 import { ClassId } from "@wowts/wow-mock";
-import { SpecializationName } from "../PaperDoll";
+import { SpecializationName } from "../states/PaperDoll";
 
 const OPERAND_TOKEN_PATTERN = "[^.]+";
 
@@ -131,7 +133,7 @@ export class Emiter {
         name: string,
         className: ClassId | "ALL_CLASSES",
         specialization: SpecializationName | "ALL_SPECIALIZATIONS",
-        _type?: string
+        _type?: "spell" | "item"
     ): [string, string | undefined] {
         if (className && annotation.dictionary[`${name}_${className}`]) {
             return [`${name}_${className}`, _type];
@@ -295,30 +297,66 @@ export class Emiter {
         const miscOperand = tokenIterator();
         let info = MISC_OPERAND[miscOperand];
         if (info) {
-            const modifier = tokenIterator();
+            let modifier = tokenIterator();
             let name = info.name;
-            if (modifier) {
-                if (!info.modifiers) {
+            let parameter: AstNode | undefined;
+            while (modifier) {
+                if (!info.modifiers && info.symbol === undefined) {
                     this.tracer.Warning(
                         `Use of ${modifier} for ${operand} but no modifier has been registered`
                     );
                     return undefined;
                 }
-                const modifierName = info.modifiers[modifier];
-                if (modifierName) {
-                    if (modifierName.before) {
-                        name = modifierName.name + name;
-                    } else {
-                        name += modifierName.name;
+                const modifierParameters =
+                    info.modifiers && info.modifiers[modifier];
+                if (modifierParameters) {
+                    const modifierName = modifierParameters.name || modifier;
+                    if (
+                        modifierParameters.type ===
+                        MiscOperandModifierType.Prefix
+                    ) {
+                        name = modifierName + name;
+                    } else if (
+                        modifierParameters.type ===
+                        MiscOperandModifierType.Suffix
+                    ) {
+                        name += modifierName;
+                    } else if (
+                        modifierParameters.type ===
+                        MiscOperandModifierType.Parameter
+                    ) {
+                        parameter = this.ovaleAst.newValue(
+                            nodeList,
+                            modifierName
+                        );
                     }
-                }
-
-                if (tokenIterator()) {
+                } else if (info.symbol !== undefined) {
+                    if (info.symbol === MiscOperandSymbolType.Buff) {
+                        modifier = `${modifier}_buff`;
+                    } else if (info.symbol === MiscOperandSymbolType.Debuff) {
+                        modifier = `${modifier}_debuff`;
+                    }
+                    [modifier] = this.Disambiguate(
+                        annotation,
+                        modifier,
+                        annotation.classId,
+                        annotation.specialization
+                    );
+                    this.AddSymbol(annotation, modifier);
+                    parameter = this.ovaleAst.newValue(nodeList, modifier);
+                } else {
                     this.tracer.Warning(
-                        `Use of two modifiers on ${operand} is not supported`
+                        `Modifier parameters not found for ${modifier} in ${name}`
                     );
                     return undefined;
                 }
+
+                modifier = tokenIterator();
+            }
+            if (parameter) {
+                const result = this.ovaleAst.newFunction(nodeList, name, true);
+                result.rawPositionalParams[1] = parameter;
+                return result;
             }
             return this.ovaleAst.newFunction(nodeList, name);
         }
@@ -917,7 +955,7 @@ export class Emiter {
             canonicalizedName,
             className,
             specialization,
-            "Spell"
+            "spell"
         );
         let bodyNode: AstNode | undefined;
         let conditionNode: AstNode | undefined;
@@ -1941,15 +1979,6 @@ export class Emiter {
                     action,
                     target
                 );
-            } else if (token == "artifact") {
-                node = this.EmitOperandArtifact(
-                    operand,
-                    parseNode,
-                    nodeList,
-                    annotation,
-                    action,
-                    target
-                );
             } else if (token == "azerite") {
                 node = this.EmitOperandAzerite(
                     operand,
@@ -2356,40 +2385,6 @@ export class Emiter {
                     annotation.astAnnotation
                 );
                 this.AddSymbol(annotation, dotName);
-            }
-        }
-        return node;
-    };
-
-    private EmitOperandArtifact: EmitOperandVisitor = (
-        operand,
-        parseNode,
-        nodeList,
-        annotation,
-        action,
-        target
-    ) => {
-        let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
-        if (token == "artifact") {
-            let code;
-            let name = tokenIterator();
-            let property = tokenIterator();
-            if (property == "rank") {
-                code = format("ArtifactTraitRank(%s)", name);
-            } else if (property == "enabled") {
-                code = format("HasArtifactTrait(%s)", name);
-            }
-            if (code) {
-                annotation.astAnnotation = annotation.astAnnotation || {};
-                [node] = this.ovaleAst.ParseCode(
-                    "expression",
-                    code,
-                    nodeList,
-                    annotation.astAnnotation
-                );
-                this.AddSymbol(annotation, name);
             }
         }
         return node;
@@ -2805,7 +2800,7 @@ export class Emiter {
                 name,
                 annotation.classId,
                 annotation.specialization,
-                "Spell"
+                "spell"
             );
             let code;
             if (property == "execute_time") {

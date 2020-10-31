@@ -29,8 +29,8 @@ local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
 local LowerSpecialization = __texttools.LowerSpecialization
 local CamelCase = __texttools.CamelCase
 local OvaleFunctionName = __texttools.OvaleFunctionName
-local __Power = LibStub:GetLibrary("ovale/Power")
-local POOLED_RESOURCE = __Power.POOLED_RESOURCE
+local __statesPower = LibStub:GetLibrary("ovale/states/Power")
+local POOLED_RESOURCE = __statesPower.POOLED_RESOURCE
 local __tools = LibStub:GetLibrary("ovale/tools")
 local MakeString = __tools.MakeString
 local OPERAND_TOKEN_PATTERN = "[^.]+"
@@ -363,7 +363,7 @@ __exports.Emiter = __class(nil, {
             local specialization = annotation.specialization
             local camelSpecialization = LowerSpecialization(annotation)
             local role = annotation.role
-            local action, type = self:Disambiguate(annotation, canonicalizedName, className, specialization, "Spell")
+            local action, type = self:Disambiguate(annotation, canonicalizedName, className, specialization, "spell")
             local bodyNode
             local conditionNode
             if action == "auto_attack" and  not annotation.melee then
@@ -979,8 +979,6 @@ __exports.Emiter = __class(nil, {
                     node = self.EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "aura" then
                     node = self.EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
-                elseif token == "artifact" then
-                    node = self.EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "azerite" then
                     node = self.EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target)
                 elseif token == "buff" then
@@ -1177,27 +1175,6 @@ __exports.Emiter = __class(nil, {
                 if code then
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     self:AddSymbol(annotation, dotName)
-                end
-            end
-            return node
-        end
-        self.EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action, target)
-            local node
-            local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
-            local token = tokenIterator()
-            if token == "artifact" then
-                local code
-                local name = tokenIterator()
-                local property = tokenIterator()
-                if property == "rank" then
-                    code = format("ArtifactTraitRank(%s)", name)
-                elseif property == "enabled" then
-                    code = format("HasArtifactTrait(%s)", name)
-                end
-                if code then
-                    annotation.astAnnotation = annotation.astAnnotation or {}
-                    node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    self:AddSymbol(annotation, name)
                 end
             end
             return node
@@ -1433,7 +1410,7 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 local property = tokenIterator()
                 local prefix
-                name, prefix = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization, "Spell")
+                name, prefix = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization, "spell")
                 local code
                 if property == "execute_time" then
                     code = format("ExecuteTime(%s)", name)
@@ -2380,23 +2357,41 @@ __exports.Emiter = __class(nil, {
         if info then
             local modifier = tokenIterator()
             local name = info.name
-            if modifier then
-                if  not info.modifiers then
+            local parameter
+            while modifier do
+                if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
                     return nil
                 end
-                local modifierName = info.modifiers[modifier]
-                if modifierName then
-                    if modifierName.before then
-                        name = modifierName.name .. name
-                    else
-                        name = name .. modifierName.name
+                local modifierParameters = info.modifiers and info.modifiers[modifier]
+                if modifierParameters then
+                    local modifierName = modifierParameters.name or modifier
+                    if modifierParameters.type == 1 then
+                        name = modifierName .. name
+                    elseif modifierParameters.type == 0 then
+                        name = name .. modifierName
+                    elseif modifierParameters.type == 2 then
+                        parameter = self.ovaleAst:newValue(nodeList, modifierName)
                     end
-                end
-                if tokenIterator() then
-                    self.tracer:Warning("Use of two modifiers on " .. operand .. " is not supported")
+                elseif info.symbol ~= nil then
+                    if info.symbol == 1 then
+                        modifier = modifier .. "_buff"
+                    elseif info.symbol == 2 then
+                        modifier = modifier .. "_debuff"
+                    end
+                    modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
+                    self:AddSymbol(annotation, modifier)
+                    parameter = self.ovaleAst:newValue(nodeList, modifier)
+                else
+                    self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. name)
                     return nil
                 end
+                modifier = tokenIterator()
+            end
+            if parameter then
+                local result = self.ovaleAst:newFunction(nodeList, name, true)
+                result.rawPositionalParams[1] = parameter
+                return result
             end
             return self.ovaleAst:newFunction(nodeList, name)
         end

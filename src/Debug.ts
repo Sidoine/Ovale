@@ -6,10 +6,11 @@ import { OvaleOptionsClass } from "./Options";
 import { OvaleClass } from "./Ovale";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
 import { format } from "@wowts/string";
-import { pairs, lualength, LuaArray } from "@wowts/lua";
+import { pairs, lualength, LuaArray, LuaObj } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { MakeString } from "./tools";
+import { OptionUiExecute, OptionUiGroup } from "./acegui-helpers";
 
 const OVALE_TRACELOG_MAXLINES = 4096;
 
@@ -19,7 +20,8 @@ export class Tracer {
         private debug: OvaleDebugClass,
         private name: string
     ) {
-        debug.defaultOptions.args.toggles.args[name] = {
+        const toggles = debug.defaultOptions.args.toggles as OptionUiGroup;
+        toggles.args[name] = {
             name: name,
             desc: format(
                 L["Enable debugging messages for the %s module."],
@@ -85,7 +87,7 @@ export class Tracer {
 export class OvaleDebugClass {
     self_traced = false;
 
-    defaultOptions: any = {
+    defaultOptions: OptionUiGroup = {
         name: `Ovale ${L["Debug"]}`,
         type: "group",
         args: {
@@ -100,7 +102,7 @@ export class OvaleDebugClass {
                     ];
                     return value != undefined;
                 },
-                set: (info: LuaArray<string>, value: string) => {
+                set: (info: LuaArray<string>, value: boolean) => {
                     if (!value) {
                         delete this.options.db.global.debug[
                             info[lualength(info)]
@@ -158,7 +160,7 @@ export class OvaleDebugClass {
             500
         );
 
-        let actions = {
+        let actions: LuaObj<OptionUiExecute> = {
             debug: {
                 name: L["Debug"],
                 type: "execute",
@@ -171,7 +173,7 @@ export class OvaleDebugClass {
         };
 
         for (const [k, v] of pairs(actions)) {
-            options.options.args.actions.args[k] = v;
+            options.actions.args[k] = v;
         }
         options.defaultDB.global = options.defaultDB.global || {};
         options.defaultDB.global.debug = {};

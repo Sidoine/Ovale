@@ -3,8 +3,8 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __AST = LibStub:GetLibrary("ovale/AST")
 local PARAMETER_KEYWORD = __AST.PARAMETER_KEYWORD
-local __Power = LibStub:GetLibrary("ovale/Power")
-local POWER_TYPES = __Power.POWER_TYPES
+local __statesPower = LibStub:GetLibrary("ovale/states/Power")
+local POWER_TYPES = __statesPower.POWER_TYPES
 local __Controls = LibStub:GetLibrary("ovale/Controls")
 local checkBoxes = __Controls.checkBoxes
 local lists = __Controls.lists
@@ -85,7 +85,7 @@ __exports.OvaleCompileClass = __class(nil, {
         self.TestConditionEquipped = function(value)
             local item, required = self:RequireValue(value)
             local hasItemEquipped = self.ovaleEquipment:HasEquippedItem(item)
-            return (required and hasItemEquipped and true) or ( not required and  not hasItemEquipped)
+            return ((required and hasItemEquipped and true) or ( not required and  not hasItemEquipped))
         end
         self.TestConditionTrait = function(value)
             local trait, required = self:RequireNumber(value)
@@ -166,7 +166,7 @@ __exports.OvaleCompileClass = __class(nil, {
         end
     end,
     RequireValue = function(self, value)
-        local required = (sub(tostring(value), 1, 1) ~= "!")
+        local required = sub(tostring(value), 1, 1) ~= "!"
         if  not required then
             value = sub(value, 2)
             if match(value, NUMBER_PATTERN) then
@@ -179,7 +179,7 @@ __exports.OvaleCompileClass = __class(nil, {
         if isNumber(value) then
             return value, true
         end
-        local required = (sub(tostring(value), 1, 1) ~= "!")
+        local required = sub(tostring(value), 1, 1) ~= "!"
         if  not required then
             value = sub(value, 2)
             return tonumber(value), required
@@ -207,7 +207,7 @@ __exports.OvaleCompileClass = __class(nil, {
         end
         if boolean and namedParams.itemset and namedParams.itemcount then
             local equippedCount = self.ovaleEquipment:GetArmorSetCount(namedParams.itemset)
-            boolean = (equippedCount >= namedParams.itemcount)
+            boolean = equippedCount >= namedParams.itemcount
         end
         if boolean and namedParams.checkbox then
             local profile = self.ovaleOptions.db.profile
@@ -233,7 +233,7 @@ __exports.OvaleCompileClass = __class(nil, {
                 }
                 control.triggerEvaluation = true
                 lists[name] = control
-                local isSelected = (profile.list[name] == item)
+                local isSelected = profile.list[name] == item
                 boolean = (required and isSelected) or ( not required and  not isSelected)
                 if  not boolean then
                     break
@@ -406,7 +406,7 @@ __exports.OvaleCompileClass = __class(nil, {
                 else
                     auraTable = si.aura.player
                 end
-                local filter = find(node.keyword, "Debuff") and "HARMFUL" or "HELPFUL"
+                local filter = (find(node.keyword, "Debuff") and "HARMFUL") or "HELPFUL"
                 local tbl = auraTable[filter] or {}
                 local count = 0
                 for k, v in kpairs(namedParams) do

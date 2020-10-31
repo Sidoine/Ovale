@@ -1,51 +1,49 @@
 import { OvaleClass } from "./Ovale";
 import { OvaleScriptsClass } from "./Scripts";
 import { OvaleOptionsClass } from "./Options";
-import { OvalePaperDollClass } from "./PaperDoll";
+import { OvalePaperDollClass } from "./states/PaperDoll";
 import { OvaleActionBarClass } from "./ActionBar";
-import { OvaleArtifactClass } from "./Artifact";
 import { OvaleASTClass } from "./AST";
-import { OvaleAuraClass } from "./Aura";
-import { OvaleAzeriteArmor } from "./AzeriteArmor";
-import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
+import { OvaleAuraClass } from "./states/Aura";
+import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
+import { OvaleAzeriteEssenceClass } from "./states/AzeriteEssence";
 import { BaseState } from "./BaseState";
 import { OvaleBestActionClass } from "./BestAction";
-import { OvaleBossModClass } from "./BossMod";
+import { OvaleBossModClass } from "./states/BossMod";
 import { OvaleCompileClass } from "./Compile";
 import { OvaleConditionClass } from "./Condition";
-import { OvaleCooldownClass } from "./Cooldown";
-import { CooldownState } from "./CooldownState";
-import { OvaleDamageTakenClass } from "./DamageTaken";
+import { OvaleCooldownClass } from "./states/Cooldown";
+import { OvaleDamageTakenClass } from "./states/DamageTaken";
 import { OvaleDataClass } from "./Data";
 import { OvaleDataBrokerClass } from "./DataBroker";
 import { OvaleDebugClass } from "./Debug";
-import { OvaleDemonHunterDemonicClass } from "./DemonHunterDemonic";
-import { OvaleDemonHunterSoulFragmentsClass } from "./DemonHunterSoulFragments";
-import { OvaleSigilClass } from "./DemonHunterSigils";
-import { OvaleEnemiesClass } from "./Enemies";
+import { OvaleDemonHunterDemonicClass } from "./states/DemonHunterDemonic";
+import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
+import { OvaleSigilClass } from "./states/DemonHunterSigils";
+import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleEquipmentClass } from "./Equipment";
 import { OvaleFrameModuleClass } from "./Frame";
 import { OvaleFutureClass } from "./Future";
 import { OvaleGUIDClass } from "./GUID";
-import { OvaleHealthClass } from "./Health";
+import { OvaleHealthClass } from "./states/Health";
 import { LastSpell } from "./LastSpell";
-import { OvaleLossOfControlClass } from "./LossOfControl";
-import { OvalePowerClass } from "./Power";
+import { OvaleLossOfControlClass } from "./states/LossOfControl";
+import { OvalePowerClass } from "./states/Power";
 import { OvaleProfilerClass } from "./Profiler";
 import { OvaleRecountClass } from "./Recount";
-import { OvaleRunesClass } from "./Runes";
+import { OvaleRunesClass } from "./states/Runes";
 import { OvaleScoreClass } from "./Score";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleSpellDamageClass } from "./SpellDamage";
+import { OvaleSpellDamageClass } from "./states/SpellDamage";
 import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleSpellsClass } from "./Spells";
-import { OvaleStaggerClass } from "./Stagger";
-import { OvaleStanceClass } from "./Stance";
+import { OvaleStaggerClass } from "./states/Stagger";
+import { OvaleStanceClass } from "./states/Stance";
 import { OvaleStateClass } from "./State";
-import { OvaleTotemClass } from "./Totem";
-import { Variables } from "./Variables";
+import { OvaleTotemClass } from "./states/Totem";
+import { Variables } from "./states/Variables";
 import { OvaleVersionClass } from "./Version";
-import { OvaleWarlockClass } from "./Warlock";
+import { OvaleWarlockClass } from "./states/Warlock";
 import { OvaleConditions } from "./conditions";
 import { OvaleSimulationCraftClass } from "./simulationcraft/SimulationCraft";
 import { Emiter } from "./simulationcraft/emiter";
@@ -54,12 +52,12 @@ import { Generator } from "./simulationcraft/generator";
 import { Unparser } from "./simulationcraft/unparser";
 import { Splitter } from "./simulationcraft/splitter";
 import { OvaleRequirement } from "./Requirement";
-import { OvaleCombatClass } from "./combat";
+import { OvaleCombatClass } from "./states/combat";
+import { Covenant } from "./states/covenant";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
     public actionBar: OvaleActionBarClass;
-    public artifact: OvaleArtifactClass;
     public ast: OvaleASTClass;
     public aura: OvaleAuraClass;
     public azeriteArmor: OvaleAzeriteArmor;
@@ -71,7 +69,6 @@ export class IoC {
     public condition: OvaleConditionClass;
     public conditions: OvaleConditions;
     public cooldown: OvaleCooldownClass;
-    public cooldownState: CooldownState;
     public damageTaken: OvaleDamageTakenClass;
     public data: OvaleDataClass;
     public dataBroker: OvaleDataBrokerClass;
@@ -114,6 +111,7 @@ export class IoC {
     public variables: Variables;
     public version: OvaleVersionClass;
     public warlock: OvaleWarlockClass;
+    public covenant: Covenant;
 
     constructor() {
         // TODO créer configuration avec la partie GUI et rajouter une méthode register à appeler ici comme pour les states
@@ -157,11 +155,6 @@ export class IoC {
             this.profiler,
             this.spellBook,
             this.requirement
-        );
-        this.cooldownState = new CooldownState(
-            this.cooldown,
-            this.profiler,
-            this.debug
         );
         this.demonHunterSigils = new OvaleSigilClass(
             this.paperDoll,
@@ -323,7 +316,6 @@ export class IoC {
             this.options,
             this.debug
         );
-        this.artifact = new OvaleArtifactClass(this.debug);
         this.damageTaken = new OvaleDamageTakenClass(
             this.ovale,
             this.profiler,
@@ -332,8 +324,7 @@ export class IoC {
         this.spellDamage = new OvaleSpellDamageClass(this.ovale, this.profiler);
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
-            this.ovale,
-            this.requirement
+            this.ovale
         );
         this.runes = new OvaleRunesClass(
             this.ovale,
@@ -437,12 +428,12 @@ export class IoC {
             this.ovale
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
+        this.covenant = new Covenant(this.ovale, this.condition, this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
             this.data,
             this.compile,
             this.paperDoll,
-            this.artifact,
             this.azeriteArmor,
             this.azeriteEssence,
             this.aura,
@@ -474,7 +465,7 @@ export class IoC {
             this.spells
         );
 
-        this.state.RegisterState(this.cooldownState);
+        this.state.RegisterState(this.cooldown);
         this.state.RegisterState(this.paperDoll);
         this.state.RegisterState(this.baseState);
         this.state.RegisterState(this.demonHunterSigils);

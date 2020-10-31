@@ -140,6 +140,11 @@ export function ReturnConstant(
     return [0, INFINITY, value, 0, 0];
 }
 
+export function ReturnBoolean(value: boolean): ConditionResult {
+    if (value) return [0, INFINITY];
+    return [];
+}
+
 export function TestValue(
     start: number,
     ending: number,

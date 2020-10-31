@@ -1,5 +1,5 @@
 import { ClassId } from "@wowts/wow-mock";
-import { SpecializationName } from "../PaperDoll";
+import { SpecializationName } from "../states/PaperDoll";
 import { LuaObj, LuaArray, pairs, lualength, ipairs, kpairs } from "@wowts/lua";
 import { AstNode, NodeType, AstAnnotation } from "../AST";
 import { TypeCheck } from "../tools";
@@ -528,20 +528,39 @@ export let SPECIAL_ACTION: LuaObj<boolean> = {
     ["wait"]: true,
 };
 
+export const enum MiscOperandModifierType {
+    Suffix,
+    Prefix,
+    Parameter,
+    Remove,
+}
+
+export const enum MiscOperandSymbolType {
+    Unmodified,
+    Buff,
+    Debuff,
+}
+
 interface MiscOperandModifier {
-    name: string;
-    before?: boolean;
+    name?: string;
+    type: MiscOperandModifierType;
 }
 
 const powerModifiers: LuaObj<MiscOperandModifier> = {
-    ["max"]: { name: "max", before: true },
-    ["deficit"]: { name: "deficit" },
-    ["pct"]: { name: "percent" },
+    ["max"]: { type: MiscOperandModifierType.Prefix },
+    ["deficit"]: { type: MiscOperandModifierType.Suffix },
+    ["pct"]: { name: "percent", type: MiscOperandModifierType.Suffix },
+    ["regen"]: { name: "regenrate", type: MiscOperandModifierType.Suffix },
+    ["time_to_max"]: {
+        name: "timetomax",
+        type: MiscOperandModifierType.Prefix,
+    },
 };
 
 export interface MiscOperand {
     name: string;
     modifiers?: LuaObj<MiscOperandModifier>;
+    symbol?: MiscOperandSymbolType;
 }
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
@@ -549,6 +568,11 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
+    ["covenant"]: {
+        name: "covenant",
+        modifiers: { enabled: { type: MiscOperandModifierType.Remove } },
+        symbol: MiscOperandSymbolType.Unmodified,
+    },
     ["cp_max_spend"]: { name: "maxcombopoints" },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
@@ -568,7 +592,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
     ["stealthed"]: {
         name: "stealthed",
-        modifiers: { all: { name: "" }, rogue: { name: "" } },
+        modifiers: {
+            all: { name: "", type: MiscOperandModifierType.Remove },
+            rogue: { name: "", type: MiscOperandModifierType.Remove },
+        },
     },
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },

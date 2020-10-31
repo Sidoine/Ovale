@@ -14,7 +14,7 @@ import { OvaleClass } from "./Ovale";
 import { Tracer, OvaleDebugClass } from "./Debug";
 import { OvaleProfilerClass, Profiler } from "./Profiler";
 import { OvaleDataClass } from "./Data";
-import { PRIMARY_POWER, PowerType } from "./Power";
+import { PRIMARY_POWER, PowerType } from "./states/Power";
 import { StateModule } from "./State";
 import { OneTimeMessage } from "./tools";
 

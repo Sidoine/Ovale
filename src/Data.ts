@@ -14,8 +14,8 @@ import {
 import { find } from "@wowts/string";
 import { BaseState } from "./BaseState";
 import { isLuaArray, isString, OneTimeMessage } from "./tools";
-import { HasteType } from "./PaperDoll";
-import { Powers } from "./Power";
+import { HasteType } from "./states/PaperDoll";
+import { Powers } from "./states/Power";
 
 const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,

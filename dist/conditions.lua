@@ -248,12 +248,11 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return self.ovaleCondition:ParseCondition(positionalParams, namedParams, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleArtifact, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.ovaleCondition = ovaleCondition
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
         self.OvalePaperDoll = OvalePaperDoll
-        self.OvaleArtifact = OvaleArtifact
         self.OvaleAzerite = OvaleAzerite
         self.OvaleAzeriteEssence = OvaleAzeriteEssence
         self.OvaleAura = OvaleAura
@@ -293,16 +292,6 @@ __exports.OvaleConditions = __class(nil, {
             local value = 0
             OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
             return Compare(value, comparator, limit)
-        end
-        self.ArtifactTraitRank = function(positionalParams, namedParams, atTime)
-            local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleArtifact:TraitRank(spellId)
-            return Compare(value, comparator, limit)
-        end
-        self.HasArtifactTrait = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
-            local value = self.OvaleArtifact:HasTrait(spellId)
-            return TestBoolean(value, yesno)
         end
         self.AzeriteTraitRank = function(positionalParams, namedParams, atTime)
             local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
@@ -2075,8 +2064,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("stacktimeto", false, self.stackTimeTo)
         ovaleCondition:RegisterCondition("armorsetbonus", false, self.ArmorSetBonus)
         ovaleCondition:RegisterCondition("armorsetparts", false, self.ArmorSetParts)
-        ovaleCondition:RegisterCondition("hasartifacttrait", false, self.HasArtifactTrait)
-        ovaleCondition:RegisterCondition("artifacttraitrank", false, self.ArtifactTraitRank)
         ovaleCondition:RegisterCondition("hasazeritetrait", false, self.HasAzeriteTrait)
         ovaleCondition:RegisterCondition("azeritetraitrank", false, self.AzeriteTraitRank)
         ovaleCondition:RegisterCondition("azeriteessenceismajor", false, self.AzeriteEssenceIsMajor)

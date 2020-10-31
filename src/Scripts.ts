@@ -1,7 +1,7 @@
 import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "./Localization";
-import { SpecializationName, OvalePaperDollClass } from "./PaperDoll";
+import { SpecializationName, OvalePaperDollClass } from "./states/PaperDoll";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { format, gsub, lower } from "@wowts/string";
 import { pairs, LuaObj, kpairs } from "@wowts/lua";
@@ -12,6 +12,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "./Ovale";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleDebugClass, Tracer } from "./Debug";
+import { OptionUiAll } from "./acegui-helpers";
 
 export let DEFAULT_NAME = "Ovale";
 let DEFAULT_DESCRIPTION = L["Script défaut"];
@@ -55,7 +56,7 @@ export class OvaleScriptsClass {
             source: {},
             showHiddenScripts: false,
         };
-        let actions = {
+        let actions: LuaObj<OptionUiAll> = {
             code: {
                 name: L["Code"],
                 type: "execute",
@@ -70,7 +71,7 @@ export class OvaleScriptsClass {
             (<any>ovaleOptions.defaultDB.profile)[k] = v;
         }
         for (const [k, v] of pairs(actions)) {
-            ovaleOptions.options.args.actions.args[k] = v;
+            ovaleOptions.actions.args[k] = v;
         }
         ovaleOptions.RegisterOptions(this);
     }

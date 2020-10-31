@@ -10,11 +10,12 @@ import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { insert, sort, concat } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { Print } from "./tools";
+import { OptionUiAll, OptionUiGroup } from "./acegui-helpers";
 
 export class Profiler {
     private timestamp = debugprofilestop();
     constructor(name: string, private profiler: OvaleProfilerClass) {
-        const args = profiler.options.args.profiling.args.modules.args as any;
+        const args = profiler.moduleOptions;
         args[name] = {
             name: name,
             desc: format(L["Enable profiling for the %s module."], name),
@@ -71,7 +72,7 @@ export class OvaleProfilerClass {
     profilingOutput: TextDump;
     profiles: LuaObj<{ enabled: boolean }> = {};
 
-    actions = {
+    actions: LuaObj<OptionUiAll> = {
         profiling: {
             name: L["Profiling"],
             type: "execute",
@@ -83,7 +84,9 @@ export class OvaleProfilerClass {
         },
     };
 
-    options = {
+    moduleOptions: LuaObj<OptionUiAll> = {};
+
+    options: OptionUiGroup = {
         name: `${this.ovale.GetName()} ${L["Profiling"]}`,
         type: "group",
         args: {
@@ -96,7 +99,7 @@ export class OvaleProfilerClass {
                         type: "group",
                         inline: true,
                         order: 10,
-                        args: {},
+                        args: this.moduleOptions,
                         get: (info: any) => {
                             let name = info[lualength(info)];
                             const value = this.ovaleOptions.db.global.profiler[
@@ -149,7 +152,7 @@ export class OvaleProfilerClass {
         private ovale: OvaleClass
     ) {
         for (const [k, v] of pairs(this.actions)) {
-            ovaleOptions.options.args.actions.args[k] = v;
+            ovaleOptions.actions.args[k] = v;
         }
         ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global || {};
         ovaleOptions.defaultDB.global.profiler = {};

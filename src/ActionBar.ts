@@ -6,14 +6,32 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
 import { gsub, len, match, upper } from "@wowts/string";
 import { concat, sort, insert } from "@wowts/table";
-import { tonumber, wipe, pairs, tostring, ipairs, lualength, _G, LuaArray, LuaObj } from "@wowts/lua";
-import { GetActionInfo, GetActionText, GetBindingKey, GetBonusBarIndex, GetMacroItem, GetMacroSpell } from "@wowts/wow-mock";
+import {
+    tonumber,
+    wipe,
+    pairs,
+    tostring,
+    ipairs,
+    lualength,
+    _G,
+    LuaArray,
+    LuaObj,
+} from "@wowts/lua";
+import {
+    GetActionInfo,
+    GetActionText,
+    GetBindingKey,
+    GetBonusBarIndex,
+    GetMacroItem,
+    GetMacroSpell,
+} from "@wowts/wow-mock";
 import ElvUI from "@wowts/libactionbutton-1.0-elvui";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "./Ovale";
+import { OptionUiAll } from "./acegui-helpers";
 
 export class OvaleActionBarClass {
-    private debugOptions = {
+    private debugOptions: LuaObj<OptionUiAll> = {
         actionbar: {
             name: L["Action bar"],
             type: "group",
@@ -23,25 +41,36 @@ export class OvaleActionBarClass {
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: (info: string) => {
+                    get: () => {
                         return this.DebugActions();
-                    }
-                }
-            }
-        }
-    }
-    action: LuaArray<number | string> = {}
-    keybind: LuaObj<string> = {}
-    spell: LuaArray<number> = {}
-    macro: LuaObj<number> = {}
-    item: LuaObj<number> = {}
+                    },
+                },
+            },
+        },
+    };
+    action: LuaArray<number | string> = {};
+    keybind: LuaObj<string> = {};
+    spell: LuaArray<number> = {};
+    macro: LuaObj<number> = {};
+    item: LuaObj<number> = {};
 
     private module: AceModule & AceEvent & AceTimer;
     private debug: Tracer;
     private profiler: Profiler;
 
-    constructor(ovaleDebug: OvaleDebugClass, ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, private ovaleSpellBook: OvaleSpellBookClass){
-        this.module = ovale.createModule("OvaleActionBar", this.OnInitialize, this.OnDisable, aceEvent, aceTimer);
+    constructor(
+        ovaleDebug: OvaleDebugClass,
+        ovale: OvaleClass,
+        ovaleProfiler: OvaleProfilerClass,
+        private ovaleSpellBook: OvaleSpellBookClass
+    ) {
+        this.module = ovale.createModule(
+            "OvaleActionBar",
+            this.OnInitialize,
+            this.OnDisable,
+            aceEvent,
+            aceTimer
+        );
         this.debug = ovaleDebug.create("OvaleActionBar");
         this.profiler = ovaleProfiler.create(this.module.GetName());
         for (const [k, v] of pairs(this.debugOptions)) {
@@ -50,14 +79,29 @@ export class OvaleActionBarClass {
     }
 
     private OnInitialize = () => {
-        this.module.RegisterEvent("ACTIONBAR_SLOT_CHANGED", this.ACTIONBAR_SLOT_CHANGED);
-        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateActionSlots);
+        this.module.RegisterEvent(
+            "ACTIONBAR_SLOT_CHANGED",
+            this.ACTIONBAR_SLOT_CHANGED
+        );
+        this.module.RegisterEvent(
+            "PLAYER_ENTERING_WORLD",
+            this.UpdateActionSlots
+        );
         this.module.RegisterEvent("UPDATE_BINDINGS", this.UPDATE_BINDINGS);
-        this.module.RegisterEvent("UPDATE_BONUS_ACTIONBAR", this.UpdateActionSlots);
+        this.module.RegisterEvent(
+            "UPDATE_BONUS_ACTIONBAR",
+            this.UpdateActionSlots
+        );
         this.module.RegisterEvent("SPELLS_CHANGED", this.UpdateActionSlots);
-        this.module.RegisterMessage("Ovale_StanceChanged", this.UpdateActionSlots);
-        this.module.RegisterMessage("Ovale_TalentsChanged", this.UpdateActionSlots);
-    }
+        this.module.RegisterMessage(
+            "Ovale_StanceChanged",
+            this.UpdateActionSlots
+        );
+        this.module.RegisterMessage(
+            "Ovale_TalentsChanged",
+            this.UpdateActionSlots
+        );
+    };
 
     GetKeyBinding(slot: number) {
         let name;
@@ -88,13 +132,16 @@ export class OvaleActionBarClass {
             key = gsub(key, "MINUS", "-");
             key = gsub(key, "MULTIPLY", "*");
             key = gsub(key, "DIVIDE", "/");
-            key = gsub(key, "BUTTON", "B")
+            key = gsub(key, "BUTTON", "B");
         }
         return key;
     }
 
     ParseHyperlink(hyperlink: string) {
-        let [color, linkType, linkData, text] = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?");
+        let [color, linkType, linkData, text] = match(
+            hyperlink,
+            "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?"
+        );
         return [color, linkType, linkData, text];
     }
 
@@ -106,38 +153,38 @@ export class OvaleActionBarClass {
         this.module.UnregisterEvent("SPELLS_CHANGED");
         this.module.UnregisterMessage("Ovale_StanceChanged");
         this.module.UnregisterMessage("Ovale_TalentsChanged");
-    }
+    };
 
     private ACTIONBAR_SLOT_CHANGED = (event: string, slot: number) => {
         slot = tonumber(slot);
         if (slot == 0) {
             this.UpdateActionSlots(event);
-		} else if (ElvUI) {
-			let elvUIButtons = ElvUI.buttonRegistry;
-			for (const [btn] of pairs(elvUIButtons)) {
-				let s = btn.GetAttribute("action");
-				if (s == slot) {
-					this.UpdateActionSlot(slot);
-				}
-			}
+        } else if (ElvUI) {
+            let elvUIButtons = ElvUI.buttonRegistry;
+            for (const [btn] of pairs(elvUIButtons)) {
+                let s = btn.GetAttribute("action");
+                if (s == slot) {
+                    this.UpdateActionSlot(slot);
+                }
+            }
         } else if (slot) {
             let bonus = tonumber(GetBonusBarIndex()) * 12;
-            let bonusStart = (bonus > 0) && (bonus - 11) || 1;
+            let bonusStart = (bonus > 0 && bonus - 11) || 1;
             let isBonus = slot >= bonusStart && slot < bonusStart + 12;
-            if (isBonus || slot > 12 && slot < 73) {
+            if (isBonus || (slot > 12 && slot < 73)) {
                 this.UpdateActionSlot(slot);
             }
         }
-    }
-    
+    };
+
     private UPDATE_BINDINGS = (event: string) => {
         this.debug.Debug("%s: Updating key bindings.", event);
         this.UpdateKeyBindings();
-    }
+    };
     private TimerUpdateActionSlots = () => {
         this.UpdateActionSlots("TimerUpdateActionSlots");
-    }
-    
+    };
+
     private UpdateActionSlots = (event: string) => {
         this.profiler.StartProfiling("OvaleActionBar_UpdateActionSlots");
         this.debug.Debug("%s: Updating all action slot mappings.", event);
@@ -146,29 +193,29 @@ export class OvaleActionBarClass {
         wipe(this.macro);
         wipe(this.spell);
         if (ElvUI) {
-			let elvUIButtons = ElvUI.buttonRegistry;
-			for (const [btn] of pairs(elvUIButtons)) {
-				let s = btn.GetAttribute("action");
-				this.UpdateActionSlot(s);
-			}
-		} else {
-			let start = 1;
-			let bonus = tonumber(GetBonusBarIndex()) * 12;
-			if (bonus > 0) {
-				start = 13;
-				for (let slot = bonus - 11; slot <= bonus; slot += 1) {
-					this.UpdateActionSlot(slot);
-				}
-			}
-			for (let slot = start; slot <= 72; slot += 1) {
-				this.UpdateActionSlot(slot);
-			}
-		}
+            let elvUIButtons = ElvUI.buttonRegistry;
+            for (const [btn] of pairs(elvUIButtons)) {
+                let s = btn.GetAttribute("action");
+                this.UpdateActionSlot(s);
+            }
+        } else {
+            let start = 1;
+            let bonus = tonumber(GetBonusBarIndex()) * 12;
+            if (bonus > 0) {
+                start = 13;
+                for (let slot = bonus - 11; slot <= bonus; slot += 1) {
+                    this.UpdateActionSlot(slot);
+                }
+            }
+            for (let slot = start; slot <= 72; slot += 1) {
+                this.UpdateActionSlot(slot);
+            }
+        }
         if (event != "TimerUpdateActionSlots") {
             this.module.ScheduleTimer(this.TimerUpdateActionSlots, 1);
         }
         this.profiler.StopProfiling("OvaleActionBar_UpdateActionSlots");
-    }
+    };
     private UpdateActionSlot(slot: number) {
         this.profiler.StartProfiling("OvaleActionBar_UpdateActionSlot");
         const action = this.action[slot];
@@ -202,12 +249,18 @@ export class OvaleActionBarClass {
             if (id) {
                 let actionText = GetActionText(slot);
                 if (actionText) {
-                    if (!this.macro[actionText] || slot < this.macro[actionText]) {
+                    if (
+                        !this.macro[actionText] ||
+                        slot < this.macro[actionText]
+                    ) {
                         this.macro[actionText] = slot;
                     }
                     let spellId = GetMacroSpell(id);
                     if (spellId) {
-                        if (!this.spell[spellId] || slot < this.spell[spellId]) {
+                        if (
+                            !this.spell[spellId] ||
+                            slot < this.spell[spellId]
+                        ) {
                             this.spell[spellId] = slot;
                         }
                         this.action[slot] = spellId;
@@ -218,7 +271,10 @@ export class OvaleActionBarClass {
                             let itemIdText = gsub(linkData, ":.*", "");
                             const itemId = tonumber(itemIdText);
                             if (itemId) {
-                                if (!this.item[itemId] || slot < this.item[itemId]) {
+                                if (
+                                    !this.item[itemId] ||
+                                    slot < this.item[itemId]
+                                ) {
                                     this.item[itemId] = slot;
                                 }
                                 this.action[slot] = itemId;
@@ -232,7 +288,11 @@ export class OvaleActionBarClass {
             }
         }
         if (this.action[slot]) {
-            this.debug.Debug("Mapping button %s to %s.", slot, this.action[slot]);
+            this.debug.Debug(
+                "Mapping button %s to %s.",
+                slot,
+                this.action[slot]
+            );
         } else {
             this.debug.Debug("Clearing mapping for button %s.", slot);
         }
@@ -259,15 +319,20 @@ export class OvaleActionBarClass {
         return this.keybind[slot];
     }
 
-    output: LuaArray<string> = {}
+    output: LuaArray<string> = {};
     OutputTableValues(output: string, tbl: any) {}
 
     DebugActions() {
         wipe(this.output);
-        let array: LuaArray<string> = {}
-        
+        let array: LuaArray<string> = {};
+
         for (const [k, v] of pairs(this.spell)) {
-            insert(array, `${tostring(this.GetKeyBinding(v))}: ${tostring(k)} ${tostring(this.ovaleSpellBook.GetSpellName(k))}`);
+            insert(
+                array,
+                `${tostring(this.GetKeyBinding(v))}: ${tostring(k)} ${tostring(
+                    this.ovaleSpellBook.GetSpellName(k)
+                )}`
+            );
         }
         sort(array);
         for (const [, v] of ipairs(array)) {

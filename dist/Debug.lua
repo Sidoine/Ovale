@@ -19,7 +19,8 @@ __exports.Tracer = __class(nil, {
         self.options = options
         self.debug = debug
         self.name = name
-        debug.defaultOptions.args.toggles.args[name] = {
+        local toggles = debug.defaultOptions.args.toggles
+        toggles.args[name] = {
             name = name,
             desc = format(L["Enable debugging messages for the %s module."], name),
             type = "toggle"
@@ -141,7 +142,7 @@ __exports.OvaleDebugClass = __class(nil, {
             }
         }
         for k, v in pairs(actions) do
-            options.options.args.actions.args[k] = v
+            options.actions.args[k] = v
         end
         options.defaultDB.global = options.defaultDB.global or {}
         options.defaultDB.global.debug = {}

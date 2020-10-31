@@ -8,7 +8,7 @@ import {
 } from "./importspells";
 import { writeFileSync } from "fs";
 import { SpellInfo } from "../Data";
-import { PowerType as OvalePowerType } from "../Power";
+import { PowerType as OvalePowerType } from "../states/Power";
 import { ConditionNamedParameters } from "../AST";
 import { debug } from "console";
 

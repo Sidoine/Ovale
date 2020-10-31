@@ -3,7 +3,6 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Queue = LibStub:GetLibrary("ovale/Queue")
 local OvaleQueue = __Queue.OvaleQueue
-local self_stateAddons = OvaleQueue("OvaleState_stateAddons")
 __exports.States = __class(nil, {
     constructor = function(self, c)
         self.current = c()
@@ -18,33 +17,33 @@ __exports.States = __class(nil, {
 })
 __exports.OvaleStateClass = __class(nil, {
     RegisterState = function(self, stateAddon)
-        self_stateAddons:Insert(stateAddon)
+        self.self_stateAddons:Insert(stateAddon)
     end,
     UnregisterState = function(self, stateAddon)
         local stateModules = OvaleQueue("OvaleState_stateModules")
-        while self_stateAddons:Size() > 0 do
-            local addon = self_stateAddons:Remove()
+        while self.self_stateAddons:Size() > 0 do
+            local addon = self.self_stateAddons:Remove()
             if stateAddon ~= addon then
                 stateModules:Insert(addon)
             end
         end
-        self_stateAddons = stateModules
+        self.self_stateAddons = stateModules
         stateAddon:CleanState()
     end,
     InitializeState = function(self)
-        local iterator = self_stateAddons:Iterator()
+        local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             iterator.value:InitializeState()
         end
     end,
     ResetState = function(self)
-        local iterator = self_stateAddons:Iterator()
+        local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             iterator.value:ResetState()
         end
     end,
     ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)
-        local iterator = self_stateAddons:Iterator()
+        local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellStartCast then
                 iterator.value:ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
@@ -52,7 +51,7 @@ __exports.OvaleStateClass = __class(nil, {
         end
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)
-        local iterator = self_stateAddons:Iterator()
+        local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellAfterCast then
                 iterator.value:ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
@@ -60,11 +59,14 @@ __exports.OvaleStateClass = __class(nil, {
         end
     end,
     ApplySpellOnHit = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)
-        local iterator = self_stateAddons:Iterator()
+        local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellOnHit then
                 iterator.value:ApplySpellOnHit(spellId, targetGUID, startCast, endCast, channel, spellcast)
             end
         end
     end,
+    constructor = function(self)
+        self.self_stateAddons = OvaleQueue("OvaleState_stateAddons")
+    end
 })

@@ -8,7 +8,7 @@ import { OvaleCompileClass } from "./Compile";
 import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleStateClass } from "./State";
 import { OvaleIcon } from "./Icon";
-import { OvaleEnemiesClass } from "./Enemies";
+import { OvaleEnemiesClass } from "./states/Enemies";
 import { lists, checkBoxes } from "./Controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -46,7 +46,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleCombatClass } from "./combat";
+import { OvaleCombatClass } from "./states/combat";
 import { OneTimeMessage, PrintOneTimeMessages } from "./tools";
 
 let strmatch = match;

@@ -32,7 +32,7 @@ __exports.LastSpell = __class(nil, {
         for i = #self.queue, 1, -1 do
             local sc = self.queue[i]
             if sc.success then
-                if spellcast == nil or (spellcast.success < sc.success) then
+                if spellcast == nil or spellcast.success < sc.success then
                     spellcast = sc
                 end
                 break

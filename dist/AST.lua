@@ -7,8 +7,8 @@ local __Pool = LibStub:GetLibrary("ovale/Pool")
 local OvalePool = __Pool.OvalePool
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
 local OvaleLexer = __Lexer.OvaleLexer
-local __Stance = LibStub:GetLibrary("ovale/Stance")
-local STANCE_NAME = __Stance.STANCE_NAME
+local __statesStance = LibStub:GetLibrary("ovale/states/Stance")
+local STANCE_NAME = __statesStance.STANCE_NAME
 local ipairs = ipairs
 local next = next
 local pairs = pairs
@@ -2072,6 +2072,12 @@ __exports.OvaleASTClass = __class(nil, {
     newString = function(self, nodeList, value)
         local node = self:NewNode(nodeList)
         node.type = "string"
+        node.value = value
+        return node
+    end,
+    newValue = function(self, nodeList, value)
+        local node = self:NewNode(nodeList)
+        node.type = "value"
         node.value = value
         return node
     end,

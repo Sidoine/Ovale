@@ -145,7 +145,7 @@ __exports.OvaleDataBrokerClass = __class(nil, {
             self.ovaleOptions.defaultDB.profile.apparence[k] = v
         end
         for k, v in pairs(options) do
-            self.ovaleOptions.options.args.apparence.args[k] = v
+            self.ovaleOptions.apparence.args[k] = v
         end
         self.ovaleOptions:RegisterOptions(self)
     end,

@@ -12,6 +12,12 @@ Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_burn_debuff duration=6)
     SpellAddTargetDebuff(concentrated_flame_essence concentrated_flame_burn_debuff=1)
 
+# Covenants
+Define(kyrian 1)
+Define(venthyr 2)
+Define(night_fae 3)
+Define(necrolord 4)
+
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end

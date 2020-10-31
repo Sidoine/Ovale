@@ -439,10 +439,10 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.9.0.tgz#5e7a2b6e3a9c2a0818bdd49b4a919462f0ff463e"
-  integrity sha512-D5yyt3xgE7Wj+E91XoseYcXVOF/WPQf7xcQBOYFDDJyyZxDayO71dbIeK6P4nAKhfbIa7G7ovRttbVY/RDFzGg==
+"@wowts/tstolua@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.10.1.tgz#45efdc8463e23eabf840cb9dd47b46c4dbaf8877"
+  integrity sha512-rCw4iclXJSmwybQsTo/M6HFoj9E8cKGIYopazRcG0bxtRFhuEisVPXfWOp6d25mMTSJ4wWTYJOw4Y60WGDaPcg==
   dependencies:
     commander "^4.0.0"
     typescript "^4.0.3"

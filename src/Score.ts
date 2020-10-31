@@ -14,7 +14,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "./Future";
 import { Tracer, OvaleDebugClass } from "./Debug";
-import { OvaleCombatClass } from "./combat";
+import { OvaleCombatClass } from "./states/combat";
 
 export type ScoreCallback = (
     name: string,

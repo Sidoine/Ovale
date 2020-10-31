@@ -15,8 +15,9 @@ import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDataClass } from "./Data";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleStanceClass } from "./Stance";
-import { OvaleCombatClass } from "./combat";
+import { OvaleStanceClass } from "./states/Stance";
+import { OvaleCombatClass } from "./states/combat";
+import { OptionUiGroup } from "./acegui-helpers";
 
 interface SpellFlashCoreClass {
     FlashForm: (
@@ -130,17 +131,17 @@ export class OvaleSpellFlashClass {
             this.OnDisable,
             aceEvent
         );
-        this.ovaleOptions.options.args.apparence.args.spellFlash = this.getSpellFlashOptions();
+        this.ovaleOptions.apparence.args.spellFlash = this.getSpellFlashOptions();
     }
 
-    private getSpellFlashOptions() {
+    private getSpellFlashOptions(): OptionUiGroup {
         return {
             type: "group",
             name: "SpellFlash",
             disabled: () => {
                 return !this.isEnabled();
             },
-            get: (info: LuaArray<keyof SpellFlashOptions>) => {
+            get: <T extends keyof SpellFlashOptions>(info: LuaArray<T>) => {
                 return this.ovaleOptions.db.profile.apparence.spellFlash[
                     info[lualength(info)]
                 ];
@@ -286,7 +287,7 @@ export class OvaleSpellFlashClass {
                         >
                     ) => {
                         const color = this.ovaleOptions.db.profile.apparence
-                            .spellFlash[info[lualength(info)]];
+                            .spellFlash.colors[info[lualength(info)]];
                         return [color.r, color.g, color.b, 1.0];
                     },
                     set: (
@@ -302,7 +303,7 @@ export class OvaleSpellFlashClass {
                         a: number
                     ) => {
                         const color = this.ovaleOptions.db.profile.apparence
-                            .spellFlash[info[lualength(info)]];
+                            .spellFlash.colors[info[lualength(info)]];
                         color.r = r;
                         color.g = g;
                         color.b = b;
@@ -357,18 +358,18 @@ export class OvaleSpellFlashClass {
     };
     private Ovale_OptionChanged = () => {
         const db = this.ovaleOptions.db.profile.apparence.spellFlash;
-        colorMain.r = db.colorMain.r;
-        colorMain.g = db.colorMain.g;
-        colorMain.b = db.colorMain.b;
-        colorCd.r = db.colorCd.r;
-        colorCd.g = db.colorCd.g;
-        colorCd.b = db.colorCd.b;
-        colorShortCd.r = db.colorShortCd.r;
-        colorShortCd.g = db.colorShortCd.g;
-        colorShortCd.b = db.colorShortCd.b;
-        colorInterrupt.r = db.colorInterrupt.r;
-        colorInterrupt.g = db.colorInterrupt.g;
-        colorInterrupt.b = db.colorInterrupt.b;
+        colorMain.r = db.colors.colorMain.r;
+        colorMain.g = db.colors.colorMain.g;
+        colorMain.b = db.colors.colorMain.b;
+        colorCd.r = db.colors.colorCd.r;
+        colorCd.g = db.colors.colorCd.g;
+        colorCd.b = db.colors.colorCd.b;
+        colorShortCd.r = db.colors.colorShortCd.r;
+        colorShortCd.g = db.colors.colorShortCd.g;
+        colorShortCd.b = db.colors.colorShortCd.b;
+        colorInterrupt.r = db.colors.colorInterrupt.r;
+        colorInterrupt.g = db.colors.colorInterrupt.g;
+        colorInterrupt.b = db.colors.colorInterrupt.b;
     };
     IsSpellFlashEnabled() {
         let enabled = SpellFlashCore != undefined;

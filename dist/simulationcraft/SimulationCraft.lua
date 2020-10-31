@@ -90,7 +90,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             }
         }
         for k, v in pairs(actions) do
-            self.ovaleOptions.options.args.actions.args[k] = v
+            self.ovaleOptions.actions.args[k] = v
         end
         local defaultDB = {
             overrideCode = ""
