@@ -77,7 +77,7 @@ AddFunction brewmasterprecombatcdactions
  #augmentation
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
 }
 
 AddFunction brewmasterprecombatcdpostconditions
@@ -182,7 +182,7 @@ AddFunction brewmaster_defaultcdactions
   #use_items
   brewmasteruseitemactions()
   #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
   #blood_fury
   spell(blood_fury)
 
@@ -304,7 +304,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # the_crucible_of_flame_essence_id
 # tiger_palm
 # touch_of_death
-# unbridled_fury_item
+# unbridled_fury
 # war_stomp
 ]]
         OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
@@ -506,7 +506,7 @@ AddFunction windwalkerprecombatcdactions
  #augmentation
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
 }
 
 AddFunction windwalkerprecombatcdpostconditions
@@ -907,7 +907,7 @@ AddFunction windwalker_defaultcdactions
  if target.isinterruptible() windwalkerinterruptactions()
  #variable,name=hold_xuen,op=set,value=cooldown.invoke_xuen_the_white_tiger.remains>fight_remains|fight_remains<120&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>10
  #potion,if=(buff.serenity.up|buff.storm_earth_and_fire.up)&pet.xuen_the_white_tiger.active|fight_remains<=60
- if { { buffpresent(serenity) or buffpresent(storm_earth_and_fire) } and pet.present() or fightremains() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if { { buffpresent(serenity) or buffpresent(storm_earth_and_fire) } and pet.present() or fightremains() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
  #call_action_list,name=serenity,if=buff.serenity.up
  if buffpresent(serenity) windwalkerserenitycdactions()
 
@@ -1039,7 +1039,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # tiger_palm
 # touch_of_death
 # touch_of_karma
-# unbridled_fury_item
+# unbridled_fury
 # war_stomp
 # whirling_dragon_punch
 # whirling_dragon_punch_talent
@@ -1244,7 +1244,7 @@ AddFunction windwalkerprecombatcdactions
  #augmentation
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
 }
 
 AddFunction windwalkerprecombatcdpostconditions
@@ -1645,7 +1645,7 @@ AddFunction windwalker_defaultcdactions
  if target.isinterruptible() windwalkerinterruptactions()
  #variable,name=hold_xuen,op=set,value=cooldown.invoke_xuen_the_white_tiger.remains>fight_remains|fight_remains<120&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>10
  #potion,if=(buff.serenity.up|buff.storm_earth_and_fire.up)&pet.xuen_the_white_tiger.active|fight_remains<=60
- if { { buffpresent(serenity) or buffpresent(storm_earth_and_fire) } and pet.present() or fightremains() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if { { buffpresent(serenity) or buffpresent(storm_earth_and_fire) } and pet.present() or fightremains() <= 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
  #call_action_list,name=serenity,if=buff.serenity.up
  if buffpresent(serenity) windwalkerserenitycdactions()
 
@@ -1777,7 +1777,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # tiger_palm
 # touch_of_death
 # touch_of_karma
-# unbridled_fury_item
+# unbridled_fury
 # war_stomp
 # whirling_dragon_punch
 # whirling_dragon_punch_talent

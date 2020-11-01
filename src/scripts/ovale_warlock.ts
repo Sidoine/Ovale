@@ -102,7 +102,7 @@ AddFunction afflictiondarkglare_prepcdactions
  unless spell(vile_taint) or spell(dark_soul_misery)
  {
   #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
   #fireblood
   spell(fireblood)
   #blood_fury
@@ -354,7 +354,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # summon_darkglare
 # summon_imp
 # the_unbound_force
-# unbridled_fury
+# unbridled_fury_item
 # unstable_affliction
 # vile_taint
 # worldvein_resonance
@@ -552,7 +552,7 @@ AddFunction demonologyoff_gcdcdactions
  unless demonduration(demonic_tyrant) > 0 and spell(berserking)
  {
   #potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
-  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
   #blood_fury,if=pet.demonic_tyrant.active
   if demonduration(demonic_tyrant) > 0 spell(blood_fury)
   #fireblood,if=pet.demonic_tyrant.active
@@ -821,7 +821,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # summon_vilefiend
 # summon_vilefiend_talent
 # the_unbound_force
-# unbridled_fury
+# unbridled_fury_item
 # vilefiend
 # wild_imp
 # wild_imp_inner_demons
@@ -1022,7 +1022,7 @@ AddFunction destructioncdscdactions
  unless spell(dark_soul_instability)
  {
   #potion,if=pet.infernal.active
-  if demonduration(infernal) > 0 and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if demonduration(infernal) > 0 and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
   unless demonduration(infernal) > 0 and spell(berserking)
   {
@@ -1339,7 +1339,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # summon_imp
 # summon_infernal
 # the_unbound_force
-# unbridled_fury
+# unbridled_fury_item
 # worldvein_resonance
 `
 	OvaleScripts.RegisterScript("WARLOCK", "destruction", name, desc, code, "script")

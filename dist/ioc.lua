@@ -115,6 +115,8 @@ local __statescovenant = LibStub:GetLibrary("ovale/states/covenant")
 local Covenant = __statescovenant.Covenant
 local __statesruneforge = LibStub:GetLibrary("ovale/states/runeforge")
 local Runeforge = __statesruneforge.Runeforge
+local __statesconduit = LibStub:GetLibrary("ovale/states/conduit")
+local Conduit = __statesconduit.Conduit
 __exports.IoC = __class(nil, {
     constructor = function(self)
         self.ovale = OvaleClass()
@@ -173,6 +175,7 @@ __exports.IoC = __class(nil, {
         self.recount = OvaleRecountClass(self.ovale, self.score)
         local covenant = Covenant(self.ovale, self.debug)
         local runeforge = Runeforge(self.debug)
+        local conduit = Conduit(self.debug)
         self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.warlock, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.lossOfControl, self.spellDamage, self.stagger, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
         self.state:RegisterState(self.cooldown)
         self.state:RegisterState(self.paperDoll)
@@ -193,5 +196,6 @@ __exports.IoC = __class(nil, {
         runeforge:registerConditions(self.condition)
         covenant:registerConditions(self.condition)
         combat:registerConditions(self.condition)
+        conduit:registerConditions(self.condition)
     end,
 })

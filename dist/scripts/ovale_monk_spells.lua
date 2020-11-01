@@ -453,6 +453,11 @@ Define(touch_of_karma 122470)
   SpellAddBuff(touch_of_karma touch_of_karma=1)
   # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
   SpellAddTargetDebuff(touch_of_karma touch_of_karma=1)
+Define(unbridled_fury 300714)
+# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
+  SpellInfo(unbridled_fury duration=60 gcd=0 offgcd=1)
+  # Chance to deal an extra 300717s1 Fire damage to your current target.
+  SpellAddBuff(unbridled_fury unbridled_fury=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)

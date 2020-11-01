@@ -529,6 +529,7 @@ Define(revolving_blades_trait 279581)
 Define(breath_of_the_dying_essence_id 35)
 Define(burning_wound_runeforge 7219)
 Define(razelikhs_defilement_runeforge 7046)
+Define(serrated_glaive_conduit 152)
     ]]
     code = code .. [[
 Define(arcane_torrent 202719)

@@ -495,6 +495,10 @@ Define(unholy_pact_talent 17) #22534
 # Dark Transformation creates an unholy pact between you and your pet, igniting flaming chains that deal 319236s1*s2 Shadow damage over s2 sec to enemies between you and your pet. rnrnWhile active, your strength is increased by 319255s1.
 Define(biting_cold_runeforge 6945)
 Define(deadliest_coil_runeforge 6952)
+Define(eradicating_blow_conduit 83)
+Define(everfrost_conduit 91)
+Define(unleashed_frenzy_conduit 122)
+Define(convocation_of_the_dead_conduit 124)
     ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")
 end

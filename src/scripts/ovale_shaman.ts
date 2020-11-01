@@ -391,11 +391,6 @@ AddFunction enhancementinterruptactions
  }
 }
 
-AddFunction enhancementuseheartessence
-{
- spell(concentrated_flame_essence)
-}
-
 AddFunction enhancementuseitemactions
 {
  item(trinket0slot text=13 usable=1)
@@ -792,7 +787,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # capacitor_totem
 # chain_harvest
 # chain_lightning
-# concentrated_flame_essence
 # crash_lightning
 # earth_elemental
 # earthen_spike

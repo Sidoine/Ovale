@@ -496,8 +496,14 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
 Define(unholy_pact_talent 17) #22534
 # Dark Transformation creates an unholy pact between you and your pet, igniting flaming chains that deal 319236s1*s2 Shadow damage over s2 sec to enemies between you and your pet. rnrnWhile active, your strength is increased by 319255s1.
+Define(dribbling_inkpod_item 169319)
+Define(potion_of_unbridled_fury_item 169299)
 Define(biting_cold_runeforge 6945)
 Define(deadliest_coil_runeforge 6952)
+Define(eradicating_blow_conduit 83)
+Define(everfrost_conduit 91)
+Define(unleashed_frenzy_conduit 122)
+Define(convocation_of_the_dead_conduit 124)
     `;
 // END
 

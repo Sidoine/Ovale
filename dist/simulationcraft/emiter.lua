@@ -2357,7 +2357,7 @@ __exports.Emiter = __class(nil, {
         if info then
             local modifier = tokenIterator()
             local name = info.name or miscOperand
-            local parameter
+            local parameters = {}
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
@@ -2371,7 +2371,10 @@ __exports.Emiter = __class(nil, {
                     elseif modifierParameters.type == 0 then
                         name = name .. modifierName
                     elseif modifierParameters.type == 2 then
-                        parameter = self.ovaleAst:newValue(nodeList, modifierName)
+                        insert(parameters, self.ovaleAst:newValue(nodeList, modifierName))
+                    end
+                    if modifierParameters.extraParameter then
+                        insert(parameters, self.ovaleAst:newValue(nodeList, modifierParameters.extraParameter))
                     end
                 elseif info.symbol ~= nil then
                     if info.symbol ~= "" then
@@ -2379,16 +2382,18 @@ __exports.Emiter = __class(nil, {
                     end
                     modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
                     self:AddSymbol(annotation, modifier)
-                    parameter = self.ovaleAst:newValue(nodeList, modifier)
+                    insert(parameters, self.ovaleAst:newValue(nodeList, modifier))
                 else
                     self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. name)
                     return nil
                 end
                 modifier = tokenIterator()
             end
-            if parameter then
+            if #parameters > 0 then
                 local result = self.ovaleAst:newFunction(nodeList, name, true)
-                result.rawPositionalParams[1] = parameter
+                for k, v in ipairs(parameters) do
+                    result.rawPositionalParams[k] = v
+                end
                 return result
             end
             return self.ovaleAst:newFunction(nodeList, name)

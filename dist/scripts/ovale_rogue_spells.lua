@@ -680,6 +680,9 @@ Define(dashing_scoundrel_runeforge 7115)
 Define(mark_of_the_master_assassin_runeforge_subtlety 7111)
 Define(akaaris_soul_fragment_runeforge 7124)
 Define(deathly_shadows_runeforge 7126)
+Define(ambidexterity_conduit 242)
+Define(deeper_daggers_conduit 245)
+Define(perforated_veins_conduit 248)
     ]]
     OvaleScripts:RegisterScript("ROGUE", nil, name, desc, code, "include")
 end

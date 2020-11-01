@@ -538,6 +538,7 @@ export const enum MiscOperandModifierType {
 interface MiscOperandModifier {
     name?: string;
     type: MiscOperandModifierType;
+    extraParameter?: number;
 }
 
 const powerModifiers: LuaObj<MiscOperandModifier> = {
@@ -545,6 +546,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
     ["deficit"]: { type: MiscOperandModifierType.Suffix },
     ["pct"]: { name: "percent", type: MiscOperandModifierType.Suffix },
     ["regen"]: { name: "regenrate", type: MiscOperandModifierType.Suffix },
+    ["time_to_50"]: {
+        name: "timeto",
+        type: MiscOperandModifierType.Prefix,
+        extraParameter: 50,
+    },
     ["time_to_max"]: {
         name: "timetomax",
         type: MiscOperandModifierType.Prefix,
@@ -562,18 +568,34 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
+    ["conduit"]: {
+        symbol: "conduit",
+        modifiers: {
+            enabled: { type: MiscOperandModifierType.Remove },
+            rank: { type: MiscOperandModifierType.Suffix },
+        },
+    },
     ["covenant"]: {
         name: "covenant",
-        modifiers: { enabled: { type: MiscOperandModifierType.Remove } },
+        modifiers: {
+            enabled: { type: MiscOperandModifierType.Remove },
+        },
         symbol: "",
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
+    ["exsanguinated"]: {
+        name: "targetdebuffremaining",
+        symbol: "exsanguinated",
+    },
     ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
     ["fight_remains"]: { name: "fightremains" },
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
+    ["health"]: {
+        modifiers: { max: { type: MiscOperandModifierType.Prefix } },
+    },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
     ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },

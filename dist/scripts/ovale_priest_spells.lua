@@ -384,6 +384,11 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
+Define(unbridled_fury 300714)
+# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
+  SpellInfo(unbridled_fury duration=60 gcd=0 offgcd=1)
+  # Chance to deal an extra 300717s1 Fire damage to your current target.
+  SpellAddBuff(unbridled_fury unbridled_fury=1)
 Define(unfurling_darkness_buff 341282)
 # After casting Vampiric Touch on a target, your next Vampiric Touch within 8 seconds is instant cast and deals (105.4 of Spell Power) Shadow damage immediately.rnrnThis effect cannot occur more than once every 15 seconds.
   SpellInfo(unfurling_darkness_buff duration=8 gcd=0 offgcd=1)
@@ -496,6 +501,7 @@ Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
 Define(painbreaker_psalm_runeforge 6981)
 Define(shadowflame_prism_runeforge 6982)
+Define(dissonant_echoes_conduit 115)
     ]]
     OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
 end

@@ -252,6 +252,10 @@ Define(focused_azerite_beam_3 299338)
   SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
+Define(focused_resolve 298614)
+  SpellInfo(focused_resolve duration=25 channel=25 max_stacks=20 gcd=0 offgcd=1)
+  # Increased chance to critically strike this creature by w1.
+  SpellAddTargetDebuff(focused_resolve focused_resolve=1)
 Define(freezing_rain_buff 270232)
 # Frozen Orb makes Blizzard instant cast and increases its damage done by 270232s2 for 12 seconds.
   SpellInfo(freezing_rain_buff duration=12 gcd=0 offgcd=1)
@@ -627,8 +631,18 @@ Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 18) #22474
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
+Define(ancient_knot_of_wisdom_item 166793)
+Define(azsharas_font_of_power_item 169314)
+Define(azurethos_singed_plumage_item 161377)
+Define(balefire_branch_item 159630)
 Define(gladiators_medallion_item 184269)
+Define(hyperthread_wristwraps_item 168989)
+Define(ignition_mages_fuse_item 159615)
 Define(manifesto_of_madness_item 174103)
+Define(neural_synapse_enhancer_item 168973)
+Define(shockbiters_fang_item 169318)
+Define(superior_battle_potion_of_intellect_item 168498)
+Define(tzanes_barkspines_item 161411)
 Define(arcane_pummeling_trait 270669)
 Define(blaster_master_trait 274596)
 Define(vision_of_perfection_essence_id 22)
@@ -641,6 +655,9 @@ Define(sun_kings_blessing_runeforge 6934)
 Define(cold_front_runeforge 6828)
 Define(freezing_winds_runeforge 6829)
 Define(glacial_fragments_runeforge 6830)
+Define(arcane_prodigy_conduit 34)
+Define(flame_accretion_conduit 53)
+Define(infernal_cascade_conduit 30)
     `;
 // END
     OvaleScripts.RegisterScript("MAGE", undefined, name, desc, code, "include");

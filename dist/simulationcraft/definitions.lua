@@ -240,6 +240,11 @@ local powerModifiers = {
         name = "regenrate",
         type = 0
     },
+    ["time_to_50"] = {
+        name = "timeto",
+        type = 1,
+        extraParameter = 50
+    },
     ["time_to_max"] = {
         name = "timetomax",
         type = 1
@@ -260,6 +265,17 @@ __exports.MISC_OPERAND = {
     ["combo_points"] = {
         name = "combopoints",
         modifiers = powerModifiers
+    },
+    ["conduit"] = {
+        symbol = "conduit",
+        modifiers = {
+            enabled = {
+                type = 3
+            },
+            rank = {
+                type = 0
+            }
+        }
     },
     ["covenant"] = {
         name = "covenant",
@@ -294,6 +310,13 @@ __exports.MISC_OPERAND = {
     ["fury"] = {
         name = "fury",
         modifiers = powerModifiers
+    },
+    ["health"] = {
+        modifiers = {
+            max = {
+                type = 1
+            }
+        }
     },
     ["insanity"] = {
         name = "insanity",

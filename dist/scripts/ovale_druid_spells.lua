@@ -726,6 +726,7 @@ Define(balance_of_all_things_runeforge 7107)
 Define(lycaras_fleeting_glimpse_runeforge_restoration 7110)
 Define(primordial_arcanic_pulsar_runeforge 7088)
 Define(timeworn_dreambinder_runeforge 7108)
+Define(precise_alignment_conduit 262)
     ]]
     code = code .. [[
     SpellInfo(berserk_0 replaced_by=incarnation_guardian_of_ursoc talent=incarnation_guardian_of_ursoc_talent specialization=guardian)
