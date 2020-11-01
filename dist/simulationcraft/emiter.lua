@@ -2356,7 +2356,7 @@ __exports.Emiter = __class(nil, {
         local info = MISC_OPERAND[miscOperand]
         if info then
             local modifier = tokenIterator()
-            local name = info.name
+            local name = info.name or miscOperand
             local parameter
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
@@ -2374,10 +2374,8 @@ __exports.Emiter = __class(nil, {
                         parameter = self.ovaleAst:newValue(nodeList, modifierName)
                     end
                 elseif info.symbol ~= nil then
-                    if info.symbol == 1 then
-                        modifier = modifier .. "_buff"
-                    elseif info.symbol == 2 then
-                        modifier = modifier .. "_debuff"
+                    if info.symbol ~= "" then
+                        modifier = modifier .. "_" .. info.symbol
                     end
                     modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
                     self:AddSymbol(annotation, modifier)

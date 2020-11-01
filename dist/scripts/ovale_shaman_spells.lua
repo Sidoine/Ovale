@@ -377,6 +377,7 @@ Define(stormkeeper_talent 20) #22153
 # Charge yourself with lightning, causing your next n Lightning Bolts to deal s2 more damage, and also causes your next n Lightning Bolts or Chain Lightnings to be instant cast and trigger an Elemental Overload on every target.
 Define(sundering_talent 18) #22351
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
+Define(echoes_of_great_sundering_runeforge 6991)
     ]]
     code = code .. [[Define(hex 51514)]]
     OvaleScripts:RegisterScript("SHAMAN", nil, name, desc, code, "include")

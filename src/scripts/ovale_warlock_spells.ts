@@ -18,6 +18,11 @@ Define(backdraft 196406)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
+Define(berserking_buff 200953)
+# Rampage and Execute have a chance to activate Berserking, increasing your attack speed and critical strike chance by 200953s1 every 200951t1 sec for 12 seconds.
+  SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
+  # Attack speed and critical strike chance increased by s1.
+  SpellAddBuff(berserking_buff berserking_buff=1)
 Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6 talent=bilescourge_bombers_talent)
@@ -55,6 +60,10 @@ Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
 # Rank 2: Reduces the cast time of Call Dreadstalkers by 0.5 sec, and teaches your Dreadstalkers how to pursue targets faster.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
+Define(cascading_calamity_buff 275376)
+# Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
+  SpellInfo(cascading_calamity_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
   SpellInfo(cataclysm cd=30 talent=cataclysm_talent)
@@ -151,6 +160,12 @@ Define(eradication 196412)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
   SpellInfo(eradication channel=0 gcd=0 offgcd=1 talent=eradication_talent)
 
+Define(explosive_potential 275398)
+# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
+  SpellInfo(explosive_potential duration=15 channel=15 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(explosive_potential explosive_potential=1)
+
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -227,6 +242,9 @@ Define(havoc 80240)
 Define(immolate 348)
 # Burns the enemy, causing (40 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
   SpellInfo(immolate)
+Define(implosion 196277)
+# Demonic forces suck all of your Wild Imps toward the target, and then cause them to violently explode, dealing 196278s2 Shadowflame damage to all enemies within 196278A3 yards.
+  SpellInfo(implosion)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
@@ -396,6 +414,11 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
+Define(unbridled_fury 300714)
+# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
+  SpellInfo(unbridled_fury duration=60 gcd=0 offgcd=1)
+  # Chance to deal an extra 300717s1 Fire damage to your current target.
+  SpellAddBuff(unbridled_fury unbridled_fury=1)
 Define(unstable_affliction 316099)
 # Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
 # Rank 3: Unstable Affliction's duration is increased by 5 seconds.
@@ -493,10 +516,14 @@ Define(soul_fire_talent 3) #22040
 # Burns the enemy's soul, dealing (420 of Spell Power) Fire damage and applying Immolate.rnrn|cFFFFFFFFGenerates 281490s1/10 Soul Shard.|r
 Define(soul_strike_talent 11) #22042
 # Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+Define(sow_the_seeds_talent 10) #19279
+# Seed of Corruption now @switch<s2>[][consumes a Soul Shard, if available, to ]embeds demon seeds into s1 additional nearby enemies.
 Define(summon_vilefiend_talent 12) #23160
 # Summon a Vilefiend to fight for you for the next 15 seconds.
 Define(vile_taint_talent 12) #22046
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+Define(cascading_calamity_trait 275372)
+Define(explosive_potential_trait 275395)
     `;
 // END
 

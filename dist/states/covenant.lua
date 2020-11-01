@@ -10,7 +10,7 @@ local unpack = unpack
 local concat = table.concat
 local insert = table.insert
 __exports.Covenant = __class(nil, {
-    constructor = function(self, ovale, condition, debug)
+    constructor = function(self, ovale, debug)
         self.debugOptions = {
             type = "group",
             name = "Covenants",
@@ -39,6 +39,7 @@ __exports.Covenant = __class(nil, {
             self.covenantId = C_Covenants.GetActiveCovenantID()
         end
         self.onDisable = function()
+            self.module:UnregisterEvent("COVENANT_CHOSEN")
         end
         self.onCovenantChosen = function(_, covenantId)
             self.covenantId = covenantId
@@ -48,7 +49,9 @@ __exports.Covenant = __class(nil, {
             return ReturnBoolean(self.covenantId == covenantId)
         end
         self.module = ovale:createModule("Covenant", self.onInitialize, self.onDisable, aceEvent)
-        condition:RegisterCondition("iscovenant", false, self.isCovenant)
         debug.defaultOptions.args["covenant"] = self.debugOptions
+    end,
+    registerConditions = function(self, condition)
+        condition:RegisterCondition("iscovenant", false, self.isCovenant)
     end,
 })

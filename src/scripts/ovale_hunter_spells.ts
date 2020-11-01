@@ -130,7 +130,7 @@ Define(butchery 212436)
 # Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
   SpellInfo(butchery focus=30 cd=9 talent=butchery_talent)
 Define(carve 187708)
-# A sweeping attack that strikes up to I enemies in front of you for s1 Physical damage.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.][]
+# A sweeping attack that strikes up to I enemies in front of you for s1 Physical damage.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
 # Rank 2: Carve reduces the remaining cooldown on Wildfire Bomb by 187708s2/1000 sec for each target hit, up to 187708s3.
   SpellInfo(carve focus=35 cd=6)
 Define(chakrams 259391)
@@ -443,6 +443,10 @@ Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=120 duration=12 channel=12 talent=stampede_talent)
   SpellAddBuff(stampede stampede=1)
+Define(steady_focus 193533)
+# Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
+  SpellInfo(steady_focus channel=0 gcd=0 offgcd=1 talent=steady_focus_talent)
+  SpellAddBuff(steady_focus steady_focus=1)
 Define(steady_shot 56641)
 # A steady shot that causes s1 Physical damage.rnrnUsable while moving.?s321018[rnrn|cFFFFFFFFGenerates s2 Focus.][]
 # Rank 2: Steady Shot now generates s1 Focus.
@@ -589,10 +593,14 @@ Define(mongoose_bite_talent 17) #22278
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
 Define(one_with_the_pack_talent 5) #22266
 # Wild Call has a s1 increased chance to reset the cooldown of Barbed Shot.
+Define(scent_of_blood_talent_beast_mastery 4) #22500
+# Activating Bestial Wrath grants s1 charges of Barbed Shot.
 Define(serpent_sting_talent 2) #22501
 # Fire a shot that poisons your target, causing them to take s1 Nature damage instantly and an additional o2 Nature damage over 18 seconds.
 Define(stampede_talent 18) #23044
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
+Define(steady_focus_talent 10) #22267
+# Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
 Define(steel_trap_talent 11) #19361
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
 Define(streamline_talent 11) #22286
@@ -607,10 +615,6 @@ Define(volley_talent 21) #22288
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
 Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
-Define(azsharas_font_of_power_item 169314)
-Define(cyclotronic_blast_item 167672)
-Define(unbridled_fury_item 169299)
-Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
 Define(rapid_reload_trait 278530)

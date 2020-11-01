@@ -32,6 +32,16 @@ Define(arcane_torrent_7 202719)
 Define(arcane_torrent_8 232633)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137033[s3/100 Insanity][s2 of your mana].
   SpellInfo(arcane_torrent_8 cd=120 insanity=-1500)
+Define(ashen_hallow 316958)
+# Hallow the target area for 30 seconds. Enemies in the area suffer up to (55.00000000000001 of Spell Power)*30 seconds/t2 Shadow damage, and allies are healed for up to (42 of Spell Power)*30 seconds/t2, reduced if there are more than s1 targets.rnrnWithin the Hallow, you may use Hammer of Wrath on any target, and its damage is increased by 330382s2.
+  SpellInfo(ashen_hallow cd=240 duration=30 tick=2)
+  SpellAddBuff(ashen_hallow ashen_hallow=1)
+Define(avengers_shield 31935)
+# Hurls your shield at an enemy target, dealing s1 Holy damage?a231665[, interrupting and silencing the non-Player target for 3 seconds][], and then jumping to x1-1 additional nearby enemies.rnrn|cFFFFFFFFGenerates s4 Holy Power?s337261[, and 337270s1 additional when it damages a target for the first time][].
+# Rank 2: Avenger's Shield interrupts and silences the main target for 3 seconds if it is not a player.
+  SpellInfo(avengers_shield cd=15 duration=3 interrupt=1 holypower=-1)
+  # Silenced.
+  SpellAddTargetDebuff(avengers_shield avengers_shield=1)
 Define(avenging_wrath 31884)
 # Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds.
 # Rank 3: Effects increased s1.
@@ -42,6 +52,13 @@ Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2 Holy Power.|r
 # Rank 2: Generates s1 additional Holy Power.
   SpellInfo(blade_of_justice cd=12 holypower=-1)
+Define(blessed_hammer 204019)
+# Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
+  SpellInfo(blessed_hammer cd=6 duration=5 holypower=-1 talent=blessed_hammer_talent)
+Define(blinding_light 115750)
+# Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
+  SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
+  SpellAddBuff(blinding_light blinding_light=1)
 Define(consecration_0 327980)
 # Cooldown reduced by s1.
   SpellInfo(consecration_0 channel=0 gcd=0 offgcd=1)
@@ -147,6 +164,10 @@ Define(hammer_of_justice 853)
   SpellInfo(hammer_of_justice cd=60 duration=6)
   # Stunned.
   SpellAddTargetDebuff(hammer_of_justice hammer_of_justice=1)
+Define(hammer_of_the_righteous 53595)
+# Hammers the current target for 53595sw1 Physical damage.?s26573&s203785[rnrnHammer of the Righteous also causes a wave of light that hits all other targets within 88263A1 yds for 88263sw1 Holy damage.]?s26573[rnrnWhile you are standing in your Consecration, Hammer of the Righteous also causes a wave of light that hits all other targets within 88263A1 yds for 88263sw1 Holy damage.][]rnrn|cFFFFFFFFGenerates s2 Holy Power.
+# Rank 2: Hammer of the Righteous now has s1+1 charges.
+  SpellInfo(hammer_of_the_righteous cd=6 holypower=-1)
 Define(hammer_of_wrath 24275)
 # Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health?s326730[, or during Avenging Wrath][].rnrn|cFFFFFFFFGenerates s2 Holy Power.
 # Rank 2: Hammer of Wrath may be used on any target during Avenging Wrath.
@@ -177,6 +198,11 @@ Define(memory_of_lucid_dreams_1 299302)
 Define(memory_of_lucid_dreams_2 299304)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams_2)
+Define(moment_of_glory 327193)
+# Reset the cooldown of Avenger's Shield. Your next n Avenger's Shields have no cooldown and deal s2 additional damage.
+  SpellInfo(moment_of_glory cd=90 duration=15 gcd=0 offgcd=1 talent=moment_of_glory_talent)
+  # Your next n Avenger's Shields have no cooldown and deal w2 additional damage.
+  SpellAddBuff(moment_of_glory moment_of_glory=1)
 Define(purifying_blast_0 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast_0 cd=60 duration=6)
@@ -241,6 +267,9 @@ Define(seraphim 152262)
   SpellInfo(seraphim holypower=3 cd=45 duration=15 talent=seraphim_talent)
   # Haste, Critical Strike, and Versatility increased by s1, and Mastery increased by ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1].
   SpellAddBuff(seraphim seraphim=1)
+Define(shield_of_the_righteous 53600)
+# Slams enemies in front of you with your shield, causing s1 Holy damage, and increasing your Armor by ?c1[132403s1*INT/100][132403s1*STR/100] for 4.5 seconds.
+  SpellInfo(shield_of_the_righteous holypower=3 cd=1 gcd=0 offgcd=1)
 Define(shield_of_vengeance 184662)
 # Creates a barrier of holy light that absorbs <shield> damage for 15 seconds.rnrnWhen the shield expires, it bursts to inflict Holy damage equal to the total amount absorbed, divided among all nearby enemies.
   SpellInfo(shield_of_vengeance cd=120 duration=15)
@@ -266,6 +295,10 @@ Define(vanquishers_hammer 328204)
   SpellInfo(vanquishers_hammer holypower=1 cd=30 duration=20)
   # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous].
   SpellAddBuff(vanquishers_hammer vanquishers_hammer=1)
+Define(vengeful_shock 340006)
+# Avenger's Shield causes your target to take |cFFFFFFFFs1.1|r increased Holy damage from you for 5 seconds.
+  SpellInfo(vengeful_shock channel=0 gcd=0 offgcd=1)
+
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing s1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds. Damage reduced on secondary targets.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-3)
@@ -276,6 +309,10 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(word_of_glory 85673)
+# Calls down the Light to heal a friendly target for 130551s1.?a315921&!a315924[rnrn|cFFFFFFFFProtection:|r If cast on yourself, healing increased by up to 315921s1 based on your missing health.][]?a315924[rnrn|cFFFFFFFFProtection:|r Healing increased by up to 315921s1 based on the target's missing health.][]
+# Rank 2: When you cast Word of Glory on yourself, it is increased by up to s1 based on your missing health.
+  SpellInfo(word_of_glory holypower=3)
 Define(worldvein_resonance_0 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance_0)
@@ -290,35 +327,45 @@ Define(worldvein_resonance_3 298611)
   SpellInfo(worldvein_resonance_3)
 SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arcane_torrent_3 arcane_torrent_4 arcane_torrent_5 arcane_torrent_6 arcane_torrent_7 arcane_torrent_8)
 SpellList(consecration consecration_0 consecration_1)
+SpellList(fireblood fireblood_0 fireblood_1)
+SpellList(judgment judgment_0 judgment_1)
 SpellList(crusader_strike crusader_strike_0 crusader_strike_1)
 SpellList(empyrean_power_buff empyrean_power_buff_0 empyrean_power_buff_1)
-SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(judgment judgment_0 judgment_1)
 SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams_1 memory_of_lucid_dreams_2)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
+Define(blessed_hammer_talent 3) #23469
+# Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
+Define(blinding_light_talent 9) #21811
+# Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 20) #22215
 # Call upon the Light and begin a crusade, increasing your damage done and haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and haste by an additional <damage>.rnrnMaximum u stacks.
+Define(crusaders_judgment_talent 5) #22604
+# Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
 Define(execution_sentence_talent 3) #23467
 # A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
 Define(final_reckoning_talent 21) #22634
 # Call down a blast of heavenly energy, dealing s2 Holy damage to all targets in the target area and causing them to take s3 increased damage from your Holy Power abilities for 8 seconds.rnrn|cFFFFFFFFPassive:|r While off cooldown, your attacks have a high chance to call down a bolt that deals 343724s1 Holy damage and causes the target to take 343724s2 increased damage from your next Holy Power ability.
 Define(holy_avenger_talent 14) #17599
 # Your Holy Power generation is tripled for 20 seconds.
+Define(moment_of_glory_talent 6) #23468
+# Reset the cooldown of Avenger's Shield. Your next n Avenger's Shields have no cooldown and deal s2 additional damage.
+Define(sanctified_wrath_talent_protection 19) #23457
+# Avenging Wrath lasts s1 longer and causes Judgment to generate s2 additional Holy Power.
 Define(seraphim_talent 15) #17601
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(condensed_lifeforce_essence_id 14)
     `;
 // END
     code += `
-Define(blinding_light 115750)
-    SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
-    SpellAddBuff(blinding_light blinding_light=1)
+
+    
+    
 Define(blinding_light_talent 9)
 Define(divine_shield 642)
 	SpellInfo(divine_shield cd=300 duration=8)
@@ -334,7 +381,7 @@ Define(lay_on_hands 633)
     SpellInfo(lay_on_hands add_cd=-180 talent=unbreakable_spirit_talent)
     SpellRequire(lay_on_hands unusable 1=target_debuff,forbearance_debuff)
     SpellAddTargetDebuff(lay_on_hands forbearance_debuff=1)
-Define(shield_of_the_righteous 53600)
+
     SpellInfo(shield_of_the_righteous holypower=3)
     SpellAddBuff(shield_of_the_righteous shield_of_the_righteous_buff=1)
     SpellRequire(shield_of_the_righteous holypower_percent 0=buff,divine_purpose)
@@ -342,8 +389,8 @@ Define(shield_of_the_righteous 53600)
 Define(shield_of_the_righteous_buff 132403)
     SpellInfo(shield_of_the_righteous_buff duration=4.5)
 Define(unbreakable_spirit_talent 10)
-Define(word_of_glory 85673)
-    SpellInfo(word_of_glory holypower=3)
+
+    
     SpellRequire(word_of_glory holypower_percent 0=buff,divine_purpose)
     SpellAddBuff(word_of_glory divine_purpose=0)
     `;

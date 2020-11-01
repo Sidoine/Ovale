@@ -50,6 +50,11 @@ Define(blood_of_the_enemy_2 297971)
 Define(blood_of_the_enemy_3 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_3)
+Define(bloodlust 2825)
+# Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(bloodlust bloodlust=1)
 Define(bloodtalons 319439)
 # When you use s2 different combo point-generating abilities within s1 sec, the damage of your next 145152n Rips or Ferocious Bites is increased by 145152s1.
   SpellInfo(bloodtalons channel=0 gcd=0 offgcd=1 talent=bloodtalons_talent)
@@ -115,6 +120,10 @@ Define(convoke_the_spirits 323764)
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.333)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits=1)
+Define(dawning_sun_buff 276153)
+# Starfire increases the damage of your Wrath by s1 for 8 seconds.
+  SpellInfo(dawning_sun_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(eclipse_lunar 48518)
 # Casting s1 lStarfire:Starfires; empowers Wrath for 15 seconds. Casting s1 lWrath:Wraths; empowers Starfire for 15 seconds. These Eclipses occur in alternation.rnrn@spellicon48517 @spellname48517rnWrath cast time reduced 48517s1 and damage increased 48517s2.rnrn@spellicon48518 @spellname48518rnStarfire cast time reduced 48518s1 and critical strike chance increased 48518s2.
   SpellInfo(eclipse_lunar duration=15 channel=15 gcd=0 offgcd=1)
@@ -325,12 +334,12 @@ Define(oath_of_the_elder_druid 338643)
   SpellAddBuff(oath_of_the_elder_druid oath_of_the_elder_druid=1)
 Define(oneths_clear_vision 339797)
 # Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
-  SpellInfo(oneths_clear_vision duration=30 gcd=0 offgcd=1)
+  SpellInfo(oneths_clear_vision duration=30 channel=30 gcd=0 offgcd=1)
   # Your next Starsurge costs no Astral Power.
   SpellAddBuff(oneths_clear_vision oneths_clear_vision=1)
 Define(oneths_perception 339800)
 # Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
-  SpellInfo(oneths_perception duration=30 gcd=0 offgcd=1)
+  SpellInfo(oneths_perception duration=30 channel=30 gcd=0 offgcd=1)
   # Your next Starfall costs no Astral Power.
   SpellAddBuff(oneths_perception oneths_perception=1)
 Define(primal_wrath 285381)
@@ -521,6 +530,10 @@ Define(starfall 191034)
 Define(starfire 194153)
 # Call down a burst of energy, causing (76.5 of Spell Power) Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(starfire lunarpower=-8)
+Define(starlord 202345)
+# Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
+  SpellInfo(starlord channel=0 gcd=0 offgcd=1 talent=starlord_talent)
+  SpellAddBuff(starlord starlord=1)
 Define(starsurge 78674)
 # Launch a surge of stellar energies at the target, dealing (206.99999999999997 of Spell Power) Astral damage, and empowering the damage bonus of any active Eclipse for its duration.
 # Rank 2: Starsurge further empowers the damage bonus of any active Eclipse.
@@ -541,6 +554,16 @@ Define(sunfire 93402)
   SpellInfo(sunfire lunarpower=0)
   # Suffering w2 Nature damage every t2 sec.
   SpellAddBuff(sunfire sunfire=1)
+Define(superior_battle_potion_of_agility 298146)
+# Increases your Agility by s1 for 25 seconds.
+  SpellInfo(superior_battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(superior_battle_potion_of_agility superior_battle_potion_of_agility=1)
+Define(superior_battle_potion_of_intellect 298152)
+# Increases your Intellect by s1 for 25 seconds.
+  SpellInfo(superior_battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(superior_battle_potion_of_intellect superior_battle_potion_of_intellect=1)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
 # Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
@@ -569,6 +592,11 @@ Define(tigers_fury 5217)
   SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
   # Attacks deal s1 additional damage for their full duration.
   SpellAddBuff(tigers_fury tigers_fury=1)
+Define(timeworn_dreambinder_buff 340049)
+# Starsurge and Starfall reduce the cost of Starsurge and Starfall by 340049s1 and increase their damage by 340049s2 for 5 seconds, stacking up to 340049u times.
+  SpellInfo(timeworn_dreambinder_buff duration=5 max_stacks=2 gcd=0 offgcd=1)
+  # Cost of Starsurge and Starfall reduced by w1, and their damage increased by w2.
+  SpellAddBuff(timeworn_dreambinder_buff timeworn_dreambinder_buff=1)
 Define(tooth_and_claw_buff 135286)
 # Autoattacks have a s1 chance to empower your next Maul, stacking up to 135286u times.rnrnEmpowered Maul deals 135286s1 increased damage and reduces the target's damage to you by 135601s2 for 6 seconds.
   SpellInfo(tooth_and_claw_buff duration=15 channel=15 max_stacks=2 gcd=0 offgcd=1)
@@ -621,6 +649,7 @@ Define(worldvein_resonance_3 298611)
 Define(wrath 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath lunarpower=0)
+SpellList(empower_bond empower_bond_0 empower_bond_1 empower_bond_2)
 SpellList(full_moon full_moon_0 full_moon_1)
 SpellList(half_moon half_moon_0 half_moon_1)
 SpellList(ravenous_frenzy ravenous_frenzy_0 ravenous_frenzy_1)
@@ -641,7 +670,6 @@ SpellList(shred shred_0 shred_1 shred_2)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(wild_charge wild_charge_0 wild_charge_1 wild_charge_2 wild_charge_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
-SpellList(empower_bond empower_bond_0 empower_bond_1 empower_bond_2)
 SpellList(heart_of_the_wild heart_of_the_wild_0 heart_of_the_wild_1 heart_of_the_wild_2 heart_of_the_wild_3 heart_of_the_wild_4)
 Define(balance_affinity_talent 7) #22163
 # You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628rn@spellicon197630 @spellname197630rn@spellicon132469@spellname132469
@@ -693,7 +721,13 @@ Define(twin_moons_talent 17) #21712
 # Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
 Define(warrior_of_elune_talent 2) #22386
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
+Define(dawning_sun_trait 276152)
+Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
+Define(balance_of_all_things_runeforge 7107)
+Define(lycaras_fleeting_glimpse_runeforge_restoration 7110)
+Define(primordial_arcanic_pulsar_runeforge 7088)
+Define(timeworn_dreambinder_runeforge 7108)
     `;
 // END
     code += `

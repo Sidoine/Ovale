@@ -454,10 +454,18 @@
   dependencies:
     "@wowts/lua" "^1.3.2"
 
-"@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.22.1":
+"@wowts/wow-mock@^1.19.0":
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.22.1.tgz#c320dabb65b21f70a13d6778096d92a00671daf3"
   integrity sha512-uxvZH7HZiCrVarT01ilgtdJHA/spJ7bq8mLC1vAnIu2VJ6r/dMHb7DgtvIiHv+XgSWSUL3NRmvtz76zcuNphpQ==
+  dependencies:
+    "@wowts/lua" "^1.3.2"
+    "@wowts/table" "^1.0.1"
+
+"@wowts/wow-mock@^1.23.0":
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.23.0.tgz#210fec2dc8bb231b90ebefe5ab36eeca6a0d2183"
+  integrity sha512-PMQIrRS0ve5jObojS2qUCXlJZ4oVpcuWqEqMKq5OkuJiBBtSWyuTonKnzKZj8gnSXnkPj4KaDoAb0W3MMHP9pg==
   dependencies:
     "@wowts/lua" "^1.3.2"
     "@wowts/table" "^1.0.1"

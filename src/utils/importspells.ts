@@ -17,6 +17,7 @@ interface AllData {
     azerite_essence_entry_t?: unknown[][];
     dbc_item_data_t?: unknown[][];
     spelltext_data_t?: unknown[][];
+    runeforge_legendary_entry_t?: unknown[][];
 }
 
 const enum SpellAttribute {
@@ -1069,6 +1070,16 @@ export interface AzeriteEssenceEntry {
     identifier: string;
 }
 
+export interface Runeforge {
+    bonus_id: number;
+    specialization_id: number;
+    spell_id: number;
+    mask_inv_type: number;
+    name: string;
+
+    identifier: string;
+}
+
 export function isFriendlyTarget(targetId: number) {
     switch (targetId) {
         case 1:
@@ -1209,10 +1220,14 @@ function readFile(directory: string, fileName: string, output: AllData) {
             line.match(/static (\w+)/);
         if (match) {
             const name = match[1];
-            console.log(`add ${name} data`);
-            const [columns, end] = getColumns(spellDataFile, endLine);
-            output[name as keyof AllData] = columns;
-            index = end;
+            if (name !== "const" && name !== "util" && name !== "hotfix") {
+                console.log(`add ${name} data`);
+                const [columns, end] = getColumns(spellDataFile, endLine);
+                output[name as keyof AllData] = columns;
+                index = end;
+            } else {
+                index += 6;
+            }
         } else {
             index += 6;
         }
@@ -1302,6 +1317,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "azerite", output);
     readFile(directory, "specialization_spells", output);
     readFile(directory, "spelltext_data", output);
+    readFile(directory, "item_runeforge", output);
     // readFile(directory, "sc_spell_lists", output);
 
     console.log("Import spells...");
@@ -1696,6 +1712,29 @@ export function getSpellData(directory: string) {
         essenceById.set(essence.id, essence);
     }
 
+    if (!output.runeforge_legendary_entry_t)
+        throw Error("No runeforge_legendary_entry_t");
+    const runeforgeById = new Map<number, Runeforge>();
+    for (const row of output.runeforge_legendary_entry_t) {
+        let i = 0;
+        const runeforge: Runeforge = {
+            bonus_id: getNumber(row[i++]),
+            specialization_id: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            mask_inv_type: getNumber(row[i++]),
+            name: getString(row[i++]),
+            identifier: "",
+        };
+        runeforge.identifier = getIdentifier(runeforge.name + "_runeforge");
+        if (identifiers[runeforge.identifier]) {
+            runeforge.identifier += `_${specIdToSpecName.get(
+                runeforge.specialization_id
+            )}`;
+        }
+        identifiers[runeforge.identifier] = runeforge.bonus_id;
+        runeforgeById.set(runeforge.bonus_id, runeforge);
+    }
+
     if (!output.dbc_item_data_t) throw Error("No dbc_item_data_t");
 
     console.log("Import item data...");
@@ -1757,5 +1796,6 @@ export function getSpellData(directory: string) {
         azeriteTraitById,
         spellLists,
         essenceById,
+        runeforgeById,
     };
 }

@@ -40,19 +40,18 @@ export class Covenant {
         },
     };
 
-    constructor(
-        ovale: OvaleClass,
-        condition: OvaleConditionClass,
-        debug: OvaleDebugClass
-    ) {
+    constructor(ovale: OvaleClass, debug: OvaleDebugClass) {
         this.module = ovale.createModule(
             "Covenant",
             this.onInitialize,
             this.onDisable,
             aceEvent
         );
-        condition.RegisterCondition("iscovenant", false, this.isCovenant);
         debug.defaultOptions.args["covenant"] = this.debugOptions;
+    }
+
+    public registerConditions(condition: OvaleConditionClass) {
+        condition.RegisterCondition("iscovenant", false, this.isCovenant);
     }
 
     private onInitialize = () => {
@@ -60,7 +59,9 @@ export class Covenant {
         this.covenantId = C_Covenants.GetActiveCovenantID();
     };
 
-    private onDisable = () => {};
+    private onDisable = () => {
+        this.module.UnregisterEvent("COVENANT_CHOSEN");
+    };
 
     private onCovenantChosen: AceEventHandler<CovenantChosenEvent> = (
         _,

@@ -39,6 +39,7 @@
    <Script file="Controls.lua"/>
    <Script file="states\AzeriteArmor.lua"/>
    <Script file="Condition.lua"/>
+   <Script file="states\runeforge.lua"/>
    <Script file="states\covenant.lua"/>
    <Script file="GUID.lua"/>
    <Script file="Queue.lua"/>

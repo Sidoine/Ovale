@@ -268,7 +268,7 @@ __exports.MISC_OPERAND = {
                 type = 3
             }
         },
-        symbol = 0
+        symbol = ""
     },
     ["cp_max_spend"] = {
         name = "maxcombopoints"
@@ -321,6 +321,14 @@ __exports.MISC_OPERAND = {
     ["rune"] = {
         name = "rune",
         modifiers = powerModifiers
+    },
+    ["runeforge"] = {
+        modifiers = {
+            equipped = {
+                type = 1
+            }
+        },
+        symbol = "runeforge"
     },
     ["runic_power"] = {
         name = "runicpower",

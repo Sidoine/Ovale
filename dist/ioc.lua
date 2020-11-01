@@ -113,6 +113,8 @@ local __statescombat = LibStub:GetLibrary("ovale/states/combat")
 local OvaleCombatClass = __statescombat.OvaleCombatClass
 local __statescovenant = LibStub:GetLibrary("ovale/states/covenant")
 local Covenant = __statescovenant.Covenant
+local __statesruneforge = LibStub:GetLibrary("ovale/states/runeforge")
+local Runeforge = __statesruneforge.Runeforge
 __exports.IoC = __class(nil, {
     constructor = function(self)
         self.ovale = OvaleClass()
@@ -139,7 +141,7 @@ __exports.IoC = __class(nil, {
         self.lossOfControl = OvaleLossOfControlClass(self.ovale, self.debug, self.requirement)
         self.azeriteEssence = OvaleAzeriteEssenceClass(self.ovale, self.debug)
         self.azeriteArmor = OvaleAzeriteArmor(self.equipment, self.ovale, self.debug)
-        local combat = OvaleCombatClass(self.ovale, self.debug, self.spellBook, self.requirement, self.condition, self.state)
+        local combat = OvaleCombatClass(self.ovale, self.debug, self.spellBook, self.requirement)
         self.scripts = OvaleScriptsClass(self.ovale, self.options, self.paperDoll, self.debug)
         self.ast = OvaleASTClass(self.condition, self.debug, self.profiler, self.scripts, self.spellBook)
         self.score = OvaleScoreClass(self.ovale, self.future, self.debug, self.spellBook, combat)
@@ -169,7 +171,8 @@ __exports.IoC = __class(nil, {
         self.generator = Generator(self.ast, self.data)
         self.simulationCraft = OvaleSimulationCraftClass(self.options, self.data, self.emiter, self.ast, self.parser, self.unparser, self.debug, self.compile, self.splitter, self.generator, self.ovale)
         self.recount = OvaleRecountClass(self.ovale, self.score)
-        self.covenant = Covenant(self.ovale, self.condition, self.debug)
+        local covenant = Covenant(self.ovale, self.debug)
+        local runeforge = Runeforge(self.debug)
         self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.warlock, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.lossOfControl, self.spellDamage, self.stagger, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
         self.state:RegisterState(self.cooldown)
         self.state:RegisterState(self.paperDoll)
@@ -186,5 +189,9 @@ __exports.IoC = __class(nil, {
         self.state:RegisterState(self.variables)
         self.state:RegisterState(self.warlock)
         self.state:RegisterState(self.runes)
+        self.state:RegisterState(combat)
+        runeforge:registerConditions(self.condition)
+        covenant:registerConditions(self.condition)
+        combat:registerConditions(self.condition)
     end,
 })

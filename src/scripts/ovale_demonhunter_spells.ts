@@ -30,6 +30,12 @@ Define(blood_of_the_enemy_3 299039)
 Define(bulk_extraction 320341)
 # Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
   SpellInfo(bulk_extraction cd=90 talent=bulk_extraction_talent)
+Define(burning_wound 346279)
+# Demon's Bite leaves an open wound on your enemy dealing 346278s1 Chaos damage over 15 seconds and increasing damage taken from your Immolation Aura by 346278s2.
+  SpellInfo(burning_wound channel=0 gcd=0 offgcd=1)
+  # Demon's Bite leaves an open wound on your enemy dealing 346278o1 Chaos damage over 346278d and increasing damage taken from your Immolation Aura by 346278s2.
+  SpellAddBuff(burning_wound burning_wound=1)
+
 Define(chaos_nova_0 179057)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
   SpellInfo(chaos_nova_0 fury=30 cd=60 duration=2)
@@ -127,11 +133,13 @@ Define(fel_barrage 258925)
   SpellInfo(fel_barrage cd=60 duration=3 channel=3 tick=0.25 talent=fel_barrage_talent)
   # Unleashing Fel.
   SpellAddBuff(fel_barrage fel_barrage=1)
-Define(fel_bombardment 337849)
+Define(fel_bombardment_0 337849)
 # Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage that your next Throw Glaive deals to your primary target by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
-  SpellInfo(fel_bombardment max_stacks=5 gcd=0 offgcd=1)
+  SpellInfo(fel_bombardment_0 duration=30 max_stacks=5 gcd=0 offgcd=1)
   # Throw Glaive damage to your primary target increased by w1 and s2 additional Lglaive:glaives; Lis:are; thrown at La:; nearby Lenemy:enemies;.
-  SpellAddBuff(fel_bombardment fel_bombardment=1)
+  SpellAddBuff(fel_bombardment_0 fel_bombardment_0=1)
+Define(fel_bombardment_1 345604)
+  SpellInfo(fel_bombardment_1 gcd=0 offgcd=1)
 Define(fel_eruption 211881)
 # Impales the target for s1 Chaos damage and stuns them for 4 seconds.
   SpellInfo(fel_eruption fury=10 pain=10 cd=30 duration=4 talent=fel_eruption_talent)
@@ -443,13 +451,10 @@ Define(throw_glaive 204157)
 # Rank 3: Reduces the cooldown of Throw Glaive by abs(s0/1000) sec.
   SpellInfo(throw_glaive cd=9)
 
-Define(unbound_chaos_0 275147)
-# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
-  SpellInfo(unbound_chaos_0 duration=1 gcd=0 offgcd=1)
-Define(unbound_chaos_1 275148)
-# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
-  SpellInfo(unbound_chaos_1 gcd=0 offgcd=1)
-
+Define(unbound_chaos 347461)
+# Activating Immolation Aura increases the damage of your next Fel Rush by 347462s1. Lasts 20 seconds.
+  SpellInfo(unbound_chaos channel=0 gcd=0 offgcd=1 talent=unbound_chaos_talent)
+  SpellAddBuff(unbound_chaos unbound_chaos=1)
 Define(vengeful_retreat 344866)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage?s320635[ and have their movement speed reduced by 198813s1 for 3 seconds][].?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
 # Rank 2: Vengeful Retreat reduces the movement speed of all nearby enemies by 198813s1 for 3 seconds.
@@ -471,6 +476,7 @@ SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_
 SpellList(chaos_nova chaos_nova_0 chaos_nova_1)
 SpellList(concentrated_flame concentrated_flame_0 concentrated_flame_1 concentrated_flame_2 concentrated_flame_3 concentrated_flame_4 concentrated_flame_5 concentrated_flame_6)
 SpellList(elysian_decree elysian_decree_0 elysian_decree_1 elysian_decree_2 elysian_decree_3)
+SpellList(fel_bombardment fel_bombardment_0 fel_bombardment_1)
 SpellList(fel_rush fel_rush_0 fel_rush_1)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(fodder_to_the_flame fodder_to_the_flame_0 fodder_to_the_flame_1 fodder_to_the_flame_2 fodder_to_the_flame_3)
@@ -485,7 +491,6 @@ SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reap
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
-SpellList(unbound_chaos unbound_chaos_0 unbound_chaos_1)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(infernal_strike infernal_strike_0 infernal_strike_1 infernal_strike_2)
 Define(blind_fury_talent 1) #21854
@@ -519,12 +524,13 @@ Define(spirit_bomb_talent 9) #22540
 Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
 Define(unbound_chaos_talent 8) #22494
-# Activating Immolation Aura will cause your inner demon to slam into nearby enemies at the end of your next Fel Rush, dealing 275148s1 Chaos damage.
-Define(unbridled_fury_item 169299)
+# Activating Immolation Aura increases the damage of your next Fel Rush by 347462s1. Lasts 20 seconds.
 Define(chaotic_transformation_trait 288754)
 Define(eyes_of_rage_trait 278500)
 Define(revolving_blades_trait 279581)
 Define(breath_of_the_dying_essence_id 35)
+Define(burning_wound_runeforge 7219)
+Define(razelikhs_defilement_runeforge 7046)
     `;
 // END
     code += `

@@ -19,7 +19,6 @@ import {
     OperandParseNode,
     OperatorParseNode,
     MiscOperandModifierType,
-    MiscOperandSymbolType,
 } from "./definitions";
 import {
     LuaArray,
@@ -227,12 +226,7 @@ export class Emiter {
     public InitializeDisambiguation() {
         this.AddDisambiguation("none", "none");
 
-        this.AddDisambiguation(
-            "berserk_bear",
-            "berserk",
-            "DRUID",
-            "guardian"
-        );
+        this.AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian");
         this.AddDisambiguation(
             "dummon_demonic_tyrant",
             "summon_demonic_tyrant",
@@ -298,7 +292,7 @@ export class Emiter {
         let info = MISC_OPERAND[miscOperand];
         if (info) {
             let modifier = tokenIterator();
-            let name = info.name;
+            let name = info.name || miscOperand;
             let parameter: AstNode | undefined;
             while (modifier) {
                 if (!info.modifiers && info.symbol === undefined) {
@@ -331,10 +325,8 @@ export class Emiter {
                         );
                     }
                 } else if (info.symbol !== undefined) {
-                    if (info.symbol === MiscOperandSymbolType.Buff) {
-                        modifier = `${modifier}_buff`;
-                    } else if (info.symbol === MiscOperandSymbolType.Debuff) {
-                        modifier = `${modifier}_debuff`;
+                    if (info.symbol !== "") {
+                        modifier = `${modifier}_${info.symbol}`;
                     }
                     [modifier] = this.Disambiguate(
                         annotation,

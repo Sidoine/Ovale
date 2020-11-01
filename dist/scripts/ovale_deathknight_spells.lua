@@ -97,18 +97,6 @@ Define(blood_fury_3 33702)
   SpellInfo(blood_fury_3 cd=120 duration=15 gcd=0 offgcd=1)
   # Intellect increased by w1.
   SpellAddBuff(blood_fury_3 blood_fury_3=1)
-Define(blood_of_the_enemy_0 297969)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_0)
-Define(blood_of_the_enemy_1 297970)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_1)
-Define(blood_of_the_enemy_2 297971)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_2)
-Define(blood_of_the_enemy_3 299039)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy_3)
 Define(blooddrinker 206931)
 # Drains o1 health from the target over 3 seconds.rnrnYou can move, parry, dodge, and use defensive abilities while channeling this ability.
   SpellInfo(blooddrinker runes=1 runicpower=-10 cd=30 duration=3 channel=3 tick=1 talent=blooddrinker_talent)
@@ -135,14 +123,6 @@ Define(chains_of_ice 45524)
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
   # Movement slowed s1 by frozen chains.
   SpellAddTargetDebuff(chains_of_ice chains_of_ice=1)
-Define(chill_streak_0 204160)
-# Deals up to 204167s2 of the target's total health in Frost damage and reduces their movement speed by 204206m2 for 4 seconds.rnrnChill Streak bounces up to m1 times between closest targets within 204165A1 yards.
-  SpellInfo(chill_streak_0 cd=45)
-Define(chill_streak_1 204165)
-  SpellInfo(chill_streak_1 channel=0 gcd=0 offgcd=1)
-Define(clawing_shadows 207311)
-# Deals s2 Shadow damage and causes 1 Festering Wound to burst.
-  SpellInfo(clawing_shadows runes=1 runicpower=-10 talent=clawing_shadows_talent)
 Define(cold_heart_buff 281209)
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
@@ -206,11 +186,11 @@ Define(death_coil 47541)
 # Rank 2: Damage dealt reduces the cooldown of Dark Transformation by 47541s2/1000 sec.
   SpellInfo(death_coil runicpower=40)
 Define(death_strike 49998)
-# Focuses dark power into a strike?s137006[ with both weapons, that deals a total of s1+66188s1][ that deals s1] Physical damage and heals you for s2 of all damage taken in the last s4 sec, minimum s3 of maximum health.
+# Focuses dark power into a strike?s137006[ with both weapons, that deals a total of s1+66188s1][ that deals s1] Physical damage and heals you for s2 of all damage taken in the last s4 sec, minimum s3.1 of maximum health.
 # Rank 2: Death Strike's cost is reduced by s3/-10, and its healing is increased by s1.
   SpellInfo(death_strike runicpower=45)
 Define(defile 152280)
-# Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][].rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
+# Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
   SpellInfo(defile runes=1 runicpower=-10 cd=20 duration=10 tick=1 talent=defile_talent)
   SpellAddBuff(defile defile=1)
 Define(empower_rune_weapon 47568)
@@ -222,6 +202,11 @@ Define(empower_rune_weapon 47568)
 Define(epidemic 207317)
 # Causes each of your Virulent Plagues to flare up, dealing 212739s1 Shadow damage to the infected enemy, and an additional 215969s2 Shadow damage to all other enemies near them.
   SpellInfo(epidemic runicpower=30 channel=0)
+Define(eradicating_blow 337936)
+# Obliterate increases the damage of your next Frost Strike by |cFFFFFFFFs1.1|r, stacks up to 337936u times.
+  SpellInfo(eradicating_blow duration=10 max_stacks=2 gcd=0 offgcd=1)
+  # Frost Strike damage increased by w1.
+  SpellAddBuff(eradicating_blow eradicating_blow=1)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
 # Rank 2: Increases damage done by s1.
@@ -230,11 +215,6 @@ Define(festering_wound 197147)
 # Festering Strike applies a pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.rnrnStacks up to 194310u times on any target.
   SpellInfo(festering_wound channel=0 gcd=0 offgcd=1)
 
-Define(festermight 274373)
-# Bursting a Festering Wound grants you s1 Strength for 20 seconds, stacking. Stacking this effect does not extend its duration.
-  SpellInfo(festermight duration=20 channel=20 max_stacks=30 gcd=0 offgcd=1)
-  # Strength increased by w1.
-  SpellAddBuff(festermight festermight=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -243,24 +223,6 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 295258)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
-Define(focused_azerite_beam_1 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_1 cd=90)
-Define(focused_azerite_beam_2 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
-  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
-Define(focused_azerite_beam_3 299338)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
-  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(frost_fever 195621)
 # Grants the Death Knight s2 runic power.
   SpellInfo(frost_fever channel=0 gcd=0 offgcd=1)
@@ -282,29 +244,6 @@ Define(frozen_pulse_buff 195750)
 Define(glacial_advance 194913)
 # Summon glacial spikes from the ground that advance forward, each dealing 195975s1*<CAP>/AP Frost damage and applying Razorice to enemies near their eruption point.
   SpellInfo(glacial_advance runicpower=30 cd=6 talent=glacial_advance_talent)
-Define(guardian_of_azeroth_0 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
-  SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
-Define(guardian_of_azeroth_1 295855)
-# Each time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
-  SpellInfo(guardian_of_azeroth_1 duration=60 max_stacks=5 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
-Define(guardian_of_azeroth_2 299355)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
-  SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
-  SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
-Define(guardian_of_azeroth_3 299358)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 295840s1/10.1 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
-  SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
-  SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
-Define(guardian_of_azeroth_4 300091)
-# Call upon Azeroth to summon a Guardian of Azeroth to aid you in combat for 30 seconds.
-  SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
-Define(guardian_of_azeroth_5 303347)
-  SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
-
 Define(heart_strike 206930)
 # Instantly strike the target and 1 other nearby enemy, causing s2 Physical damage, and reducing enemies' movement speed by s5 for 8 seconds?s316575[rnrn|cFFFFFFFFGenerates s3 bonus Runic Power][]?s221536[, plus 210738s1/10 Runic Power per additional enemy struck][].|r
 # Rank 3: Increases damage done by s1.
@@ -322,10 +261,11 @@ Define(horn_of_winter 57330)
 Define(howling_blast 49184)
 # Blast the target with a frigid wind, dealing s1*<CAP>/AP ?s204088[Frost damage and applying Frost Fever to the target.][Frost damage to that foe, and reduced damage to all other enemies within 237680A1 yards, infecting all targets with Frost Fever.]rnrn|Tinterfaceiconsspell_deathknight_frostfever.blp:24|t |cFFFFFFFFFrost Fever|rrnA disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
   SpellInfo(howling_blast runes=1 runicpower=-10)
-Define(icy_citadel_buff 272719)
-# When Pillar of Frost expires, your Strength is increased by s1 for 6 seconds. This effect lasts s2/1000 sec longer for each Obliterate and Frostscythe critical strike during Pillar of Frost.
-  SpellInfo(icy_citadel_buff channel=-0.001 gcd=0 offgcd=1)
-
+Define(hypothermic_presence 321995)
+# Embrace the ice in your veins, reducing the Runic Power cost of your abilities by s1 for 8 seconds. Does not trigger the global cooldown.
+  SpellInfo(hypothermic_presence cd=45 duration=8 gcd=0 offgcd=1 talent=hypothermic_presence_talent)
+  # The Runic Power cost of your abilities is reduced by s1.
+  SpellAddBuff(hypothermic_presence hypothermic_presence=1)
 Define(icy_talons_buff 194879)
 # Your Runic Power spending abilities increase your melee attack speed by 194879s1 for 6 seconds, stacking up to 194879u times.
   SpellInfo(icy_talons_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
@@ -372,28 +312,6 @@ Define(pillar_of_frost 51271)
   SpellInfo(pillar_of_frost cd=60 duration=12 gcd=0 offgcd=1)
   # Strength increased by w1.
   SpellAddBuff(pillar_of_frost pillar_of_frost=1)
-Define(purifying_blast_0 295337)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_0 cd=60 duration=6)
-Define(purifying_blast_1 295338)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_1 channel=0 gcd=0 offgcd=1)
-Define(purifying_blast_2 295354)
-# When an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.
-  SpellInfo(purifying_blast_2 duration=8 gcd=0 offgcd=1)
-  # Damage dealt increased by s1.
-  SpellAddBuff(purifying_blast_2 purifying_blast_2=1)
-Define(purifying_blast_3 295366)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_3 duration=3 gcd=0 offgcd=1)
-  # Stunned.
-  SpellAddTargetDebuff(purifying_blast_3 purifying_blast_3=1)
-Define(purifying_blast_4 299345)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_4 cd=60 duration=6 channel=6 gcd=1)
-Define(purifying_blast_5 299347)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast_5 cd=60 duration=6 gcd=1)
 Define(raise_dead 46585)
 # Raises a ?s58640[geist][ghoul] to fight by your side.  You can have a maximum of one ?s58640[geist][ghoul] at a time.  Lasts 60 seconds.
 # Rank 2: Raises ?s207313[an abomination]?s58640[a geist][a ghoul] to fight by your side. You can have a maximum of one ?s207313[abomination]?s58640[geist][ghoul] at a time.
@@ -423,37 +341,6 @@ Define(razorice 51714)
   SpellInfo(razorice duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)
   # Frost damage taken from the Death Knight's abilities increased by s1.
   SpellAddTargetDebuff(razorice razorice=1)
-Define(reaping_flames_0 310690)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
-  SpellInfo(reaping_flames_0 cd=45 channel=0)
-Define(reaping_flames_1 311194)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.
-  SpellInfo(reaping_flames_1 cd=45 channel=0)
-Define(reaping_flames_2 311195)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health or more than 310705s1 health, the cooldown is reduced by m3 sec.rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use. 
-  SpellInfo(reaping_flames_2 cd=45 channel=0)
-Define(reaping_flames_3 311202)
-# Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
-  SpellInfo(reaping_flames_3 duration=30 gcd=0 offgcd=1)
-  # Damage of next Reaping Flames increased by w1.
-  SpellAddBuff(reaping_flames_3 reaping_flames_3=1)
-Define(reaping_flames_4 311947)
-  SpellInfo(reaping_flames_4 duration=2 gcd=0 offgcd=1)
-  SpellAddTargetDebuff(reaping_flames_4 reaping_flames_4=1)
-Define(reckless_force_buff_0 298409)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
-  SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
-Define(reckless_force_buff_1 304038)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
-Define(reckless_force_counter 302917)
-# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
-  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
-  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
 # Rank 2: Increases damage done by s1.
@@ -477,16 +364,6 @@ Define(ripple_in_space_2 299309)
 Define(ripple_in_space_3 299310)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space_3)
-Define(scourge_strike 55090)
-# An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
-# Rank 2: Increases damage done by s1.
-  SpellInfo(scourge_strike runes=1 runicpower=-10)
-
-Define(seething_rage 297126)
-# Increases your critical hit damage by 297126m for 5 seconds.
-  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
-  # Critical strike damage increased by w1.
-  SpellAddBuff(seething_rage seething_rage=1)
 Define(soul_reaper 343294)
 # Strike an enemy for s1 Shadow damage and afflict the enemy with Soul Reaper. rnrnAfter 5 seconds, if the target is below s3 health this effect will explode dealing an additional 343295s1 Shadow damage to the target. If the enemy that yields experience or honor dies while afflicted by Soul Reaper, gain Runic Corruption.
   SpellInfo(soul_reaper runes=1 runicpower=-10 cd=6 duration=5 tick=5 talent=soul_reaper_talent)
@@ -501,18 +378,6 @@ Define(summon_gargoyle 49206)
 # Summon a Gargoyle into the area to bombard the target for 30 seconds.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
   SpellInfo(summon_gargoyle cd=180 duration=35 talent=summon_gargoyle_talent)
 
-Define(the_unbound_force_0 299321)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_0)
-Define(the_unbound_force_1 299322)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_1)
-Define(the_unbound_force_2 299323)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_2)
-Define(the_unbound_force_3 299324)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force_3)
 Define(tombstone 219809)
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for 8 seconds.
   SpellInfo(tombstone cd=60 duration=8 runicpower=0 talent=tombstone_talent)
@@ -533,6 +398,11 @@ Define(unholy_strength 53365)
   SpellInfo(unholy_strength duration=15 max_stacks=1 gcd=0 offgcd=1)
   # Strength increased by s1.
   SpellAddBuff(unholy_strength unholy_strength=1)
+Define(unleashed_frenzy_buff 338501)
+# Frost Strike increases your strength by |cFFFFFFFFs1.1|r for 6 seconds, stacks up to 338501u times.
+  SpellInfo(unleashed_frenzy_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
+  # Strength increased by w1.1.
+  SpellAddBuff(unleashed_frenzy_buff unleashed_frenzy_buff=1)
 Define(vampiric_blood 55233)
 # Embrace your undeath, increasing your maximum health by s4 and increasing all healing and absorbs received by s1 for 10 seconds.
 # Rank 2: Increases all healing and absorbs by s1 and duration by s3/1000 sec.
@@ -571,15 +441,6 @@ SpellList(memory_of_lucid_dreams memory_of_lucid_dreams_0 memory_of_lucid_dreams
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
-SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
-SpellList(chill_streak chill_streak_0 chill_streak_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
-SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
-SpellList(ineffable_truth )
-SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
-SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
-SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
-SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 Define(army_of_the_damned_talent 19) #22030
 # ?s207317[Death Coil and Epidemic reduce][Death Coil reduces] the cooldown of Apocalypse by <cd1> sec and Army of the Dead by <cd2> sec. rnrnAdditionally Apocalypse and Army of the Dead summon a Magus of the Dead for 15 seconds who hurls Frostbolts and Shadow Bolts at your foes.rn
 Define(asphyxiate_talent_unholy 9) #22520
@@ -592,16 +453,12 @@ Define(bonestorm_talent 21) #21209
 # A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
 Define(breath_of_sindragosa_talent 21) #22537
 # Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
-Define(bursting_sores_talent 4) #22027
-# Bursting a Festering Wound deals s1 more damage, and deals 207267s1 Shadow damage to 207267s3-1 nearby targets.
-Define(clawing_shadows_talent 3) #22026
-# Deals s2 Shadow damage and causes 1 Festering Wound to burst.
 Define(cold_heart_talent 3) #22018
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
 Define(consumption_talent 6) #19220
 # Strikes up to s3 enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
 Define(defile_talent 18) #22536
-# Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][].rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
+# Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
 Define(frostscythe_talent 12) #22525
 # A sweeping attack that strikes up to s5 enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
 Define(frozen_pulse_talent 11) #22523
@@ -614,6 +471,8 @@ Define(heartbreaker_talent 1) #19165
 # Heart Strike generates 210738s1/10 additional Runic Power per target hit.
 Define(horn_of_winter_talent 6) #22021
 # Blow the Horn of Winter, gaining s1 LRune:Runes; and generating s2/10 Runic Power.
+Define(hypothermic_presence_talent 17) #22533
+# Embrace the ice in your veins, reducing the Runic Power cost of your abilities by s1 for 8 seconds. Does not trigger the global cooldown.
 Define(icecap_talent 19) #22023
 # Your Frost Strike?s207230[, Frostscythe,][] and Obliterate critical strikes reduce the remaining cooldown of Pillar of Frost by <cd> sec.
 Define(obliteration_talent 20) #22109
@@ -632,24 +491,10 @@ Define(unholy_assault_talent 21) #22538
 # Strike your target dealing s2 Shadow damage, infecting the target with s3 Festering Wounds and sending you into an Unholy Frenzy increasing haste by s1 for 12 seconds.
 Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
-Define(dribbling_inkpod_item 169319)
-Define(unbridled_fury_item 169299)
-Define(ashvanes_razor_coral_item 169311)
-Define(corrupted_gladiators_badge_item 172669)
-Define(corrupted_gladiators_medallion_item 184055)
-Define(first_mates_spyglass_item 158163)
-Define(jes_howler_item 159627)
-Define(lurkers_insidious_gift_item 167866)
-Define(notorious_gladiators_badge_item 167380)
-Define(notorious_gladiators_medallion_item 167377)
-Define(vial_of_animated_blood_item 159625)
-Define(ramping_amplitude_gigavolt_engine_item 165580)
-Define(vision_of_demise_item 169307)
-Define(frozen_tempest_trait 278487)
-Define(icy_citadel_trait 272718)
-Define(magus_of_the_dead_trait 288417)
-Define(condensed_lifeforce_essence_id 14)
-Define(vision_of_perfection_essence_id 22)
+Define(unholy_pact_talent 17) #22534
+# Dark Transformation creates an unholy pact between you and your pet, igniting flaming chains that deal 319236s1*s2 Shadow damage over s2 sec to enemies between you and your pet. rnrnWhile active, your strength is increased by 319255s1.
+Define(biting_cold_runeforge 6945)
+Define(deadliest_coil_runeforge 6952)
     ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")
 end

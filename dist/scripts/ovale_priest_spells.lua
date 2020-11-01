@@ -34,9 +34,12 @@ Define(arcane_torrent_7 202719)
 Define(arcane_torrent_8 232633)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore ?s137033[s3/100 Insanity][s2 of your mana].
   SpellInfo(arcane_torrent_8 cd=120 insanity=-1500)
-Define(ascended_blast 325283)
+Define(ascended_blast_0 325283)
 # Blasts the enemy with pure Anima, causing (179 of Spell Power) Arcane damage and healing a nearby ally for s2 of the damage done.rnrnGrants s3 lstack:stacks; of Boon of the Ascended.
-  SpellInfo(ascended_blast cd=3 gcd=1)
+  SpellInfo(ascended_blast_0 cd=3 gcd=1)
+Define(ascended_blast_1 325315)
+# Blasts the enemy with pure Anima, causing (179 of Spell Power) Arcane damage and healing a nearby ally for s2 of the damage done.rnrnGrants s3 lstack:stacks; of Boon of the Ascended.
+  SpellInfo(ascended_blast_1 channel=0 gcd=0 offgcd=1)
 Define(ascended_nova 325020)
 # Release a powerful burst of anima, dealing up to (74 of Spell Power) Arcane damage, based on the number of enemies, and (24 of Spell Power) healing to up to 325041s2 allies within A1 yds.rnrnGrants s3 lstack:stacks; of Boon of the Ascended for each target damaged.
   SpellInfo(ascended_nova gcd=1)
@@ -112,10 +115,11 @@ Define(concentrated_flame_6 299353)
 Define(damnation 341374)
 # Instantly afflicts the target with Shadow Word: Pain, Vampiric Touch and Devouring Plague.
   SpellInfo(damnation cd=45 talent=damnation_talent)
-Define(dark_thoughts 341205)
-# For each of your Shadow damage over time effects on the target, your Mind Flay and Mind Sear have a m1 chance to trigger a Dark Thought.rnrn|CFFFFFFFFDark Thought|RrnIncreases the number of charges of Mind Blast by 1, Mind Blast can be cast instantly, and can be cast while channelling Mind Flay or Mind Sear.
-  SpellInfo(dark_thoughts channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(dark_thoughts dark_thoughts=1)
+Define(dark_thought 341207)
+# For each damage over time effects on the target, your Mind Flay and Mind Sear have a m1 chance to trigger a Dark Thought. rnrnDark ThoughtrnIncreases the number of charges of Mind Blast by 1, Mind Blast has no cooldown and can be cast instantly, and can be cast while channelling Mind Flay or Mind Sear.
+  SpellInfo(dark_thought duration=10 max_stacks=1 gcd=0 offgcd=1)
+  # Maximum number of charges of Mind Blast increased by w1.rnrnMind Blast no longer has a  cooldown, can be cast instantly, and while channelling Mind Flay or Mind Sear.
+  SpellAddBuff(dark_thought dark_thought=1)
 Define(devouring_plague 335467)
 # Afflicts the target with a disease that instantly causes (65 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
   SpellInfo(devouring_plague insanity=5000 duration=6 tick=3)
@@ -318,7 +322,7 @@ Define(shadow_covenant 314867)
   SpellInfo(shadow_covenant cd=30 talent=shadow_covenant_talent)
 
 Define(shadow_crash 342834)
-# Hurl a bolt of slow-moving, far-reaching Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
+# Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=45 insanity=-800 talent=shadow_crash_talent)
   # Damage taken from the Priests' Shadow Crash increased by w2.
   SpellAddTargetDebuff(shadow_crash shadow_crash_debuff_1=1)
@@ -326,7 +330,7 @@ Define(shadow_crash_debuff_0 205386)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash_debuff_0 channel=0 gcd=0 offgcd=1)
 Define(shadow_crash_debuff_1 342835)
-# Hurl a bolt of slow-moving, far-reaching Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
+# Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash_debuff_1 duration=15 channel=15 max_stacks=2 gcd=0 offgcd=1)
   # Damage taken from the Priests' Shadow Crash increased by w2.
   SpellAddTargetDebuff(shadow_crash_debuff_1 shadow_crash_debuff_1=1)
@@ -404,8 +408,8 @@ Define(void_eruption 228260)
 # Rank 2: Void Eruption cast time reduced by m1.
   SpellInfo(void_eruption cd=90)
 Define(void_torrent 263165)
-# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. While channelling, all of your Shadow damage over time effects are refreshed on the target.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
-  SpellInfo(void_torrent cd=45 duration=4 channel=4 tick=1 talent=void_torrent_talent)
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+  SpellInfo(void_torrent cd=30 duration=3 channel=3 tick=1 talent=void_torrent_talent)
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddBuff(void_torrent void_torrent=1)
   # Dealing s1 Shadow damage to the target every t1 sec.
@@ -440,6 +444,7 @@ Define(wrathful_faerie_1 342132)
   # Direct damage on this target restores 327703s1/100.1 Mana or 327703s2/100 Insanity to @auracaster.rnrnFollows your Shadow Word: Pain.
   SpellAddTargetDebuff(wrathful_faerie_1 wrathful_faerie_1=1)
 SpellList(arcane_torrent arcane_torrent_0 arcane_torrent_1 arcane_torrent_2 arcane_torrent_3 arcane_torrent_4 arcane_torrent_5 arcane_torrent_6 arcane_torrent_7 arcane_torrent_8)
+SpellList(ascended_blast ascended_blast_0 ascended_blast_1)
 SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2 blood_fury_3)
 SpellList(divine_star divine_star_0 divine_star_1 divine_star_2)
 SpellList(fireblood fireblood_0 fireblood_1)
@@ -482,14 +487,15 @@ Define(searing_nightmare_talent 9) #23127
 Define(shadow_covenant_talent 15) #19766
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
 Define(shadow_crash_talent 15) #21755
-# Hurl a bolt of slow-moving, far-reaching Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
+# Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(surrender_to_madness_talent 21) #21979
 # Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
 Define(twist_of_fate_talent_shadow 7) #23125
 # After damaging a target below s1 health, you gain 123254s2 increased damage and healing for 8 seconds.
 Define(void_torrent_talent 18) #21720
-# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. While channelling, all of your Shadow damage over time effects are refreshed on the target.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
-Define(unbridled_fury_item 169299)
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(painbreaker_psalm_runeforge 6981)
+Define(shadowflame_prism_runeforge 6982)
     ]]
     OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
 end

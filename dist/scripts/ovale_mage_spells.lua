@@ -186,6 +186,11 @@ Define(evocation 12051)
   SpellInfo(evocation cd=180 duration=6 channel=6 tick=1)
   # Mana regeneration increased by s1.
   SpellAddBuff(evocation evocation=1)
+Define(exhaustion 57723)
+# Cannot benefit from Heroism or other similar effects.
+  SpellInfo(exhaustion duration=600 channel=600 gcd=0 offgcd=1)
+  # Cannot benefit from Heroism or other similar effects.
+  SpellAddTargetDebuff(exhaustion exhaustion=1)
 Define(expanded_potential_buff 327495)
 # Your Fireball, Frostbolt and Arcane Blast have a chance to give you Expanded Potential, which causes your next Hot Streak, Brain Freeze or Clearcasting to not be consumed.
   SpellInfo(expanded_potential_buff duration=300 gcd=0 offgcd=1)
@@ -287,7 +292,7 @@ Define(gladiators_badge_0 277185)
 Define(gladiators_badge_1 345228)
 # Increases primary stat by s1 for 15 seconds.rn
   SpellInfo(gladiators_badge_1 cd=120 duration=15 channel=15 gcd=0 offgcd=1)
-  # Primary stat increased by s1.
+  # Primary stat increased by w1.
   SpellAddBuff(gladiators_badge_1 gladiators_badge_1=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
@@ -616,23 +621,24 @@ Define(rune_of_power_talent 9) #22447
 # Places a Rune of Power on the ground for 15 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
 Define(searing_touch_talent 3) #22462
 # Scorch deals s2 increased damage and is a guaranteed Critical Strike when the target is below s1 health.
+Define(splitting_ice_talent 17) #23176
+# Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 18) #22474
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
-Define(focused_resolve_item 168506)
-Define(ancient_knot_of_wisdom_item 166793)
-Define(azsharas_font_of_power_item 169314)
-Define(azurethos_singed_plumage_item 161377)
-Define(balefire_branch_item 159630)
-Define(gladiators_medallion_item 184268)
-Define(hyperthread_wristwraps_item 168989)
-Define(ignition_mages_fuse_item 159615)
+Define(gladiators_medallion_item 184269)
 Define(manifesto_of_madness_item 174103)
-Define(neural_synapse_enhancer_item 168973)
-Define(shockbiters_fang_item 169318)
-Define(superior_battle_potion_of_intellect_item 168498)
-Define(tzanes_barkspines_item 161411)
+Define(arcane_pummeling_trait 270669)
 Define(blaster_master_trait 274596)
 Define(vision_of_perfection_essence_id 22)
+Define(arcane_infinity_runeforge 6926)
+Define(disciplinary_command_runeforge_frost 6832)
+Define(grisly_icicle_runeforge_frost 6937)
+Define(siphon_storm_runeforge 6928)
+Define(temporal_warp_runeforge 6834)
+Define(sun_kings_blessing_runeforge 6934)
+Define(cold_front_runeforge 6828)
+Define(freezing_winds_runeforge 6829)
+Define(glacial_fragments_runeforge 6830)
     ]]
     OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end

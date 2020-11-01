@@ -82,6 +82,9 @@ Define(blood_of_the_enemy_2 297971)
 Define(blood_of_the_enemy_3 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_3)
+Define(bloodbath 335096)
+# Assault the target in a bloodthirsty craze, dealing s1 Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+  SpellInfo(bloodbath cd=3 rage=-8)
 Define(bloodthirst 23881)
 # Assault the target in a bloodthirsty craze, dealing s1 Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 # Rank 2: Damage increased by s1.
@@ -134,6 +137,10 @@ Define(conductive_ink_debuff 302597)
 Define(crushing_assault_buff 278824)
 # Your melee abilities have a chance to increase the damage of your next Slam by s1 and reduce its Rage cost by s2/10.
   SpellInfo(crushing_assault_buff channel=-0.001 gcd=0 offgcd=1)
+
+Define(crushing_blow 335097)
+# Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(crushing_blow cd=8 rage=-12)
 
 Define(deadly_calm 262228)
 # Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.

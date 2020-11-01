@@ -54,6 +54,7 @@ import { Splitter } from "./simulationcraft/splitter";
 import { OvaleRequirement } from "./Requirement";
 import { OvaleCombatClass } from "./states/combat";
 import { Covenant } from "./states/covenant";
+import { Runeforge } from "./states/runeforge";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -111,7 +112,6 @@ export class IoC {
     public variables: Variables;
     public version: OvaleVersionClass;
     public warlock: OvaleWarlockClass;
-    public covenant: Covenant;
 
     constructor() {
         // TODO créer configuration avec la partie GUI et rajouter une méthode register à appeler ici comme pour les states
@@ -232,9 +232,7 @@ export class IoC {
             this.ovale,
             this.debug,
             this.spellBook,
-            this.requirement,
-            this.condition,
-            this.state
+            this.requirement
         );
         this.scripts = new OvaleScriptsClass(
             this.ovale,
@@ -428,7 +426,8 @@ export class IoC {
             this.ovale
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
-        this.covenant = new Covenant(this.ovale, this.condition, this.debug);
+        const covenant = new Covenant(this.ovale, this.debug);
+        const runeforge = new Runeforge(this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
             this.data,
@@ -465,6 +464,7 @@ export class IoC {
             this.spells
         );
 
+        // States
         this.state.RegisterState(this.cooldown);
         this.state.RegisterState(this.paperDoll);
         this.state.RegisterState(this.baseState);
@@ -480,5 +480,11 @@ export class IoC {
         this.state.RegisterState(this.variables);
         this.state.RegisterState(this.warlock);
         this.state.RegisterState(this.runes);
+        this.state.RegisterState(combat);
+
+        // Conditions
+        runeforge.registerConditions(this.condition);
+        covenant.registerConditions(this.condition);
+        combat.registerConditions(this.condition);
     }
 }

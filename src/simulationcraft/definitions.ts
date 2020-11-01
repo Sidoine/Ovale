@@ -535,12 +535,6 @@ export const enum MiscOperandModifierType {
     Remove,
 }
 
-export const enum MiscOperandSymbolType {
-    Unmodified,
-    Buff,
-    Debuff,
-}
-
 interface MiscOperandModifier {
     name?: string;
     type: MiscOperandModifierType;
@@ -558,9 +552,9 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
 };
 
 export interface MiscOperand {
-    name: string;
+    name?: string;
     modifiers?: LuaObj<MiscOperandModifier>;
-    symbol?: MiscOperandSymbolType;
+    symbol?: string;
 }
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
@@ -571,7 +565,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["covenant"]: {
         name: "covenant",
         modifiers: { enabled: { type: MiscOperandModifierType.Remove } },
-        symbol: MiscOperandSymbolType.Unmodified,
+        symbol: "",
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
@@ -587,6 +581,12 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["pain"]: { name: "pain", modifiers: powerModifiers },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
+    ["runeforge"]: {
+        modifiers: {
+            equipped: { type: MiscOperandModifierType.Prefix },
+        },
+        symbol: "runeforge",
+    },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },

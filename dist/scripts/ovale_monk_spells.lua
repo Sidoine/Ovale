@@ -225,7 +225,7 @@ Define(focused_azerite_beam_3 299338)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fortifying_brew 243435)
-# Turns your skin to stone, increasing your current and maximum health by s1, and reducing damage taken by s2 for 15 seconds.
+# Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
 # Rank 2: Cooldown reduced by s1/-60000 min.
   SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
   # Maximum health increased by w1.rnDamage taken reduced by w2.?w4>1[rnAbsorbs w4 damage.][]
@@ -482,6 +482,7 @@ SpellList(expel_harm expel_harm_0 expel_harm_1 expel_harm_2 expel_harm_3)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 SpellList(spinning_crane_kick spinning_crane_kick_0 spinning_crane_kick_1 spinning_crane_kick_2)
+SpellList(touch_of_death touch_of_death_0 touch_of_death_1 touch_of_death_2)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3)
 SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
@@ -490,7 +491,6 @@ SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 
 SpellList(reaping_flames reaping_flames_0 reaping_flames_1 reaping_flames_2 reaping_flames_3 reaping_flames_4)
 SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 ripple_in_space_3)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
-SpellList(touch_of_death touch_of_death_0 touch_of_death_1 touch_of_death_2)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 Define(black_ox_brew_talent 9) #19992
 # Chug some Black Ox Brew, which instantly refills your Energy, Purifying Brew charges, and resets the cooldown of Celestial Brew.
@@ -520,7 +520,6 @@ Define(special_delivery_talent 16) #19819
 # Drinking from your Brews has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
-Define(unbridled_fury_item 169299)
 Define(the_crucible_of_flame_essence_id 12)
 Define(blood_of_the_enemy_essence_id 23)
 Define(conflict_and_strife_essence_id 32)
