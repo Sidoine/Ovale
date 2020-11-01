@@ -152,7 +152,7 @@ AddFunction beast_masteryprecombatshortcdactions
   #focused_azerite_beam,if=!raid_event.invulnerable.exists
   if not message("raid_event.invulnerable.exists is not implemented") spell(focused_azerite_beam)
   #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
-  if hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast) } spell(bestial_wrath)
+  if hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } spell(bestial_wrath)
  }
 }
 
@@ -180,12 +180,12 @@ AddFunction beast_masteryprecombatcdactions
    unless not message("raid_event.invulnerable.exists is not implemented") and spell(focused_azerite_beam)
    {
     #aspect_of_the_wild,precast_time=1.3,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
-    if not hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast) } spell(aspect_of_the_wild)
+    if not hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } spell(aspect_of_the_wild)
 
-    unless hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast) } and spell(bestial_wrath)
+    unless hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
     {
      #potion,dynamic_prepot=1
-     if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+     if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
     }
    }
   }
@@ -194,7 +194,7 @@ AddFunction beast_masteryprecombatcdactions
 
 AddFunction beast_masteryprecombatcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not message("raid_event.invulnerable.exists is not implemented") and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast) } and spell(bestial_wrath)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not message("raid_event.invulnerable.exists is not implemented") and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
 }
 
 ### actions.cleave
@@ -319,7 +319,7 @@ AddFunction beast_masterycdscdactions
   #lights_judgment,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains>gcd.max|!pet.main.buff.frenzy.up
   if pet.buffpresent(main_frenzy_buff) and pet.buffremaining(main_frenzy_buff) > gcd() or not pet.buffpresent(main_frenzy_buff) spell(lights_judgment)
   #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-  if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(potion_of_unbridled_fury) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
   unless { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance)
   {
@@ -391,7 +391,7 @@ AddFunction beast_mastery_defaultcdactions
  #use_item,name=azsharas_font_of_power,if=cooldown.aspect_of_the_wild.remains_guess<15&target.time_to_die>10
  if spellcooldown(aspect_of_the_wild) < 15 and target.timetodie() > 10 beast_masteryuseitemactions()
  #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(!equipped.azsharas_font_of_power|trinket.azsharas_font_of_power.cooldown.remains>86|essence.blood_of_the_enemy.major)&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>9)&(!essence.condensed_lifeforce.major|buff.guardian_of_azeroth.up)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
- if target.debuffpresent(razor_coral) and { not hasequippeditem(azsharas_font_of_power_item) or buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 86 or azeriteessenceismajor(blood_of_the_enemy_essence_id) } and { previousgcdspell(aspect_of_the_wild) or not hasequippeditem(cyclotronic_blast) and buffremaining(aspect_of_the_wild) > 9 } and { not azeriteessenceismajor(condensed_lifeforce_essence_id) or buffpresent(guardian_of_azeroth_buff) } and { target.healthpercent() < 35 or not azeriteessenceismajor(condensed_lifeforce_essence_id) or not hastalent(killer_instinct_talent) } or { target.debuffexpires(razor_coral) or target.timetodie() < 26 } and target.timetodie() > 24 * { spellcooldown(cyclotronic_blast) + 4 < target.timetodie() } beast_masteryuseitemactions()
+ if target.debuffpresent(razor_coral) and { not hasequippeditem(azsharas_font_of_power_item) or buffremaining(trinket_azsharas_font_of_power_cooldown_buff) > 86 or azeriteessenceismajor(blood_of_the_enemy_essence_id) } and { previousgcdspell(aspect_of_the_wild) or not hasequippeditem(cyclotronic_blast_item) and buffremaining(aspect_of_the_wild) > 9 } and { not azeriteessenceismajor(condensed_lifeforce_essence_id) or buffpresent(guardian_of_azeroth_buff) } and { target.healthpercent() < 35 or not azeriteessenceismajor(condensed_lifeforce_essence_id) or not hastalent(killer_instinct_talent) } or { target.debuffexpires(razor_coral) or target.timetodie() < 26 } and target.timetodie() > 24 * { spellcooldown(cyclotronic_blast) + 4 < target.timetodie() } beast_masteryuseitemactions()
  #use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
  if buffexpires(bestial_wrath) or target.timetodie() < 5 beast_masteryuseitemactions()
  #call_action_list,name=cds
@@ -476,6 +476,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # condensed_lifeforce_essence_id
 # counter_shot
 # cyclotronic_blast
+# cyclotronic_blast_item
 # dance_of_death_buff
 # dance_of_death_trait
 # dire_beast
@@ -493,6 +494,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # memory_of_lucid_dreams
 # multishot
 # one_with_the_pack_talent
+# potion_of_unbridled_fury
 # primal_instincts_trait
 # purifying_blast
 # quaking_palm
@@ -507,7 +509,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # stampede
 # the_unbound_force
 # trinket_azsharas_font_of_power_cooldown_buff
-# unbridled_fury
+# unbridled_fury_buff
+# unbridled_fury_item
 # variable_intensity_gigavolt_oscillating_reactor_item
 # vision_of_perfection_essence_id
 # war_stomp
@@ -729,7 +732,7 @@ AddFunction marksmanshipprecombatcdactions
     #trueshot,precast_time=1.5,if=active_enemies>2
     if enemies() > 2 spell(trueshot)
     #potion,dynamic_prepot=1
-    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
    }
   }
  }
@@ -797,7 +800,7 @@ AddFunction marksmanshipcdscdactions
    unless spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams)
    {
     #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.remains>14&target.health.pct<20|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-    if { buffpresent(trueshot) and buffpresent(bloodlust) or buffremaining(trueshot) > 14 and target.healthpercent() < 20 or { buffpresent(unbridled_fury) or buffpresent(unbridled_fury) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+    if { buffpresent(trueshot) and buffpresent(bloodlust) or buffremaining(trueshot) > 14 and target.healthpercent() < 20 or { buffpresent(potion_of_unbridled_fury) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
     #trueshot,if=buff.trueshot.down&cooldown.rapid_fire.remains|target.time_to_die<15
     if buffexpires(trueshot) and spellcooldown(rapid_fire) > 0 or target.timetodie() < 15 spell(trueshot)
    }
@@ -971,6 +974,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # lights_judgment
 # memory_of_lucid_dreams
 # multishot
+# potion_of_unbridled_fury
 # precise_shots
 # purifying_blast
 # quaking_palm
@@ -990,7 +994,8 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trick_shots
 # trinket_azsharas_font_of_power_cooldown_buff
 # trueshot
-# unbridled_fury
+# unbridled_fury_buff
+# unbridled_fury_item
 # unerring_vision_buff
 # unerring_vision_trait
 # vision_of_perfection_essence_id
@@ -1232,7 +1237,7 @@ AddFunction survivalprecombatcdactions
  unless spell(worldvein_resonance)
  {
   #potion,dynamic_prepot=1
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
  }
 }
 
@@ -1387,7 +1392,7 @@ AddFunction survivalcdscdactions
  unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
  {
   #potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
-  if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+  if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(potion_of_unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
   unless target.distance() >= 6 and spell(aspect_of_the_eagle)
   {
@@ -1807,6 +1812,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # mongoose_bite
 # mongoose_fury
 # muzzle
+# potion_of_unbridled_fury
 # purifying_blast
 # quaking_palm
 # raptor_strike
@@ -1821,7 +1827,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # terms_of_engagement_talent
 # the_unbound_force
 # tip_of_the_spear
-# unbridled_fury
+# unbridled_fury_item
 # vipers_venom_buff
 # vipers_venom_talent
 # war_stomp

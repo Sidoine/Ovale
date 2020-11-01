@@ -296,6 +296,10 @@ __exports.MISC_OPERAND = {
     ["expected_combat_length"] = {
         name = "expectedcombatlength"
     },
+    ["exsanguinated"] = {
+        name = "targetdebuffremaining",
+        symbol = "exsanguinated"
+    },
     ["holy_power"] = {
         name = "holypower",
         modifiers = powerModifiers

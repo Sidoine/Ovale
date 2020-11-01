@@ -28,11 +28,6 @@ AddFunction protectioninterruptactions
  }
 }
 
-AddFunction protectionuseheartessence
-{
- spell(concentrated_flame_essence)
-}
-
 AddFunction protectionuseitemactions
 {
  item(trinket0slot text=13 usable=1)
@@ -176,6 +171,8 @@ AddFunction protectioncooldownsmainactions
  if buffpresent(avenging_wrath) or spellcooldown(avenging_wrath) > 60 spell(holy_avenger)
  #moment_of_glory,if=prev_gcd.1.avengers_shield&cooldown.avengers_shield.remains
  if previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 spell(moment_of_glory)
+ #heart_essence
+ spell(296208)
 }
 
 AddFunction protectioncooldownsmainpostconditions
@@ -188,7 +185,7 @@ AddFunction protectioncooldownsshortcdactions
 
 AddFunction protectioncooldownsshortcdpostconditions
 {
- spell(seraphim) or { buffpresent(avenging_wrath) or spellcooldown(avenging_wrath) > 60 } and spell(holy_avenger) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory)
+ spell(seraphim) or { buffpresent(avenging_wrath) or spellcooldown(avenging_wrath) > 60 } and spell(holy_avenger) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory) or spell(296208)
 }
 
 AddFunction protectioncooldownscdactions
@@ -206,19 +203,13 @@ AddFunction protectioncooldownscdactions
    #potion,if=buff.avenging_wrath.up
    #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
    if buffpresent(seraphim) or not hastalent(seraphim_talent) protectionuseitemactions()
-
-   unless previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory)
-   {
-    #heart_essence
-    protectionuseheartessence()
-   }
   }
  }
 }
 
 AddFunction protectioncooldownscdpostconditions
 {
- spell(seraphim) or { buffpresent(avenging_wrath) or spellcooldown(avenging_wrath) > 60 } and spell(holy_avenger) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory)
+ spell(seraphim) or { buffpresent(avenging_wrath) or spellcooldown(avenging_wrath) > 60 } and spell(holy_avenger) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory) or spell(296208)
 }
 
 ### actions.default
@@ -324,7 +315,6 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # avenging_wrath
 # blessed_hammer
 # blinding_light
-# concentrated_flame_essence
 # consecration
 # crusaders_judgment_talent
 # divine_toll

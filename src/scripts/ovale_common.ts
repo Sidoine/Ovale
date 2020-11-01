@@ -5,6 +5,10 @@ export function registerCommon(OvaleScripts: OvaleScriptsClass) {
     let desc = "[9.0] Ovale: Common spell definitions";
     let code = `
 
+# Essences
+Define(concentrated_flame_burn_debuff 295368)
+SpellInfo(concentrated_flame_burn_debuff duration=6)
+
 # Covenants
 Define(kyrian 1)
 Define(venthyr 2)

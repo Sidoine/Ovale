@@ -90,12 +90,6 @@ AddFunction havocgetinmeleerange
 
 AddFunction havocprecombatmainactions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
 }
 
 AddFunction havocprecombatmainpostconditions
@@ -108,21 +102,22 @@ AddFunction havocprecombatshortcdactions
 
 AddFunction havocprecombatshortcdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
 }
 
 AddFunction havocprecombatcdactions
 {
- unless checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
- {
-  #use_item,name=azsharas_font_of_power
-  havocuseitemactions()
- }
+ #flask
+ #augmentation
+ #food
+ #snapshot_stats
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+ #use_item,name=azsharas_font_of_power
+ havocuseitemactions()
 }
 
 AddFunction havocprecombatcdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
 }
 
 ### actions.normal
@@ -375,8 +370,6 @@ AddFunction havocdemoniccdpostconditions
 
 AddFunction havoccooldownmainactions
 {
- #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
- if { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
  #call_action_list,name=essences
  havocessencesmainactions()
 }
@@ -394,17 +387,13 @@ AddFunction havoccooldownshortcdactions
  spell(the_hunt)
  #elysian_decree
  spell(elysian_decree)
-
- unless { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
- {
-  #call_action_list,name=essences
-  havocessencesshortcdactions()
- }
+ #call_action_list,name=essences
+ havocessencesshortcdactions()
 }
 
 AddFunction havoccooldownshortcdpostconditions
 {
- { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1) or havocessencesshortcdpostconditions()
+ havocessencesshortcdpostconditions()
 }
 
 AddFunction havoccooldowncdactions
@@ -419,8 +408,10 @@ AddFunction havoccooldowncdactions
   #fodder_to_the_flame
   spell(fodder_to_the_flame)
 
-  unless spell(elysian_decree) or { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
+  unless spell(elysian_decree)
   {
+   #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
+   if { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
    #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
    if not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) == 0 havocuseitemactions()
    #use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
@@ -439,7 +430,7 @@ AddFunction havoccooldowncdactions
 
 AddFunction havoccooldowncdpostconditions
 {
- not target.debuffpresent(sinful_brand) and spell(sinful_brand) or spell(the_hunt) or spell(elysian_decree) or { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1) or havocessencescdpostconditions()
+ not target.debuffpresent(sinful_brand) and spell(sinful_brand) or spell(the_hunt) or spell(elysian_decree) or havocessencescdpostconditions()
 }
 
 ### actions.default
@@ -684,11 +675,6 @@ AddFunction vengeanceinterruptactions
  }
 }
 
-AddFunction vengeanceuseheartessence
-{
- spell(concentrated_flame_essence)
-}
-
 AddFunction vengeanceuseitemactions
 {
  item(trinket0slot text=13 usable=1)
@@ -704,12 +690,6 @@ AddFunction vengeancegetinmeleerange
 
 AddFunction vengeanceprecombatmainactions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
 }
 
 AddFunction vengeanceprecombatmainpostconditions
@@ -722,21 +702,22 @@ AddFunction vengeanceprecombatshortcdactions
 
 AddFunction vengeanceprecombatshortcdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
 }
 
 AddFunction vengeanceprecombatcdactions
 {
- unless checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
- {
-  #use_item,name=azsharas_font_of_power
-  vengeanceuseitemactions()
- }
+ #flask
+ #augmentation
+ #food
+ #snapshot_stats
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+ #use_item,name=azsharas_font_of_power
+ vengeanceuseitemactions()
 }
 
 AddFunction vengeanceprecombatcdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1)
 }
 
 ### actions.normal
@@ -839,14 +820,14 @@ AddFunction vengeancedefensivescdpostconditions
 
 AddFunction vengeancecooldownsmainactions
 {
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
  #concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
  if not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() spell(concentrated_flame)
  #worldvein_resonance,if=buff.lifeblood.stack<3
  if buffstacks(lifeblood_buff) < 3 spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
+ #heart_essence
+ spell(296208)
 }
 
 AddFunction vengeancecooldownsmainpostconditions
@@ -859,15 +840,16 @@ AddFunction vengeancecooldownsshortcdactions
 
 AddFunction vengeancecooldownsshortcdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1) or { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 AddFunction vengeancecooldownscdactions
 {
- unless checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1) or { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+
+ unless { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
  {
-  #heart_essence
-  vengeanceuseheartessence()
   #use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
   if buffexpires(memory_of_lucid_dreams) vengeanceuseitemactions()
   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
@@ -879,7 +861,7 @@ AddFunction vengeancecooldownscdactions
 
 AddFunction vengeancecooldownscdpostconditions
 {
- checkboxon(opt_use_consumables) and target.classification(worldboss) and item(potion_of_unbridled_fury_item usable=1) or { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 ### actions.brand
@@ -1076,7 +1058,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # bulk_extraction
 # concentrated_flame
 # concentrated_flame_burn_debuff
-# concentrated_flame_essence
 # conductive_ink_debuff
 # consume_magic
 # demon_spikes

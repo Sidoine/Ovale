@@ -323,7 +323,7 @@ AddFunction shadowprecombatcdactions
  #augmentation
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
  unless not buffpresent(shadowform) and spell(shadowform)
  {
@@ -625,7 +625,7 @@ AddFunction shadow_defaultshortcdpostconditions
 AddFunction shadow_defaultcdactions
 {
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
- if { buffpresent(bloodlust) or target.timetodie() <= 80 or target.healthpercent() < 35 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury usable=1)
+ if { buffpresent(bloodlust) or target.timetodie() <= 80 or target.healthpercent() < 35 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
  #variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
  #variable,name=all_dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking&dot.devouring_plague.ticking
  #variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
@@ -725,7 +725,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # the_unbound_force
 # twins_of_the_sun_priestess_runeforge_shadow
 # twist_of_fate_talent_shadow
-# unbridled_fury
+# unbridled_fury_item
 # unfurling_darkness_buff
 # vampiric_touch
 # void_bolt

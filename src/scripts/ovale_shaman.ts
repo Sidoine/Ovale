@@ -637,6 +637,8 @@ AddFunction enhancement_defaultmainactions
 {
  #windstrike
  spell(windstrike)
+ #heart_essence
+ spell(296208)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
  #ascendance
@@ -661,7 +663,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(windstrike) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+ unless spell(windstrike) or spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -682,7 +684,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(windstrike) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or buffexpires(ascendance_enhancement_buff) and spell(ascendance_enhancement) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ spell(windstrike) or spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or buffexpires(ascendance_enhancement_buff) and spell(ascendance_enhancement) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -693,10 +695,8 @@ AddFunction enhancement_defaultcdactions
  #wind_shear
  enhancementinterruptactions()
 
- unless spell(windstrike)
+ unless spell(windstrike) or spell(296208)
  {
-  #heart_essence
-  enhancementuseheartessence()
   #use_items
   enhancementuseitemactions()
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
@@ -732,7 +732,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(windstrike) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or buffexpires(ascendance_enhancement_buff) and spell(ascendance_enhancement) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ spell(windstrike) or spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or buffexpires(ascendance_enhancement_buff) and spell(ascendance_enhancement) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.

@@ -1442,8 +1442,7 @@ export class Emiter {
                 }
                 isSpellAction = false;
             } else if (action == "heart_essence") {
-                bodyCode = `${camelSpecialization}UseHeartEssence()`;
-                annotation.use_heart_essence = true;
+                bodyCode = `Spell(296208)`;
                 isSpellAction = false;
             }
             if (isSpellAction) {

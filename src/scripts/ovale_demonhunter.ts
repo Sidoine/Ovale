@@ -831,6 +831,8 @@ AddFunction vengeancecooldownsmainactions
  if buffstacks(lifeblood_buff) < 3 spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
+ #heart_essence
+ spell(296208)
 }
 
 AddFunction vengeancecooldownsmainpostconditions
@@ -843,7 +845,7 @@ AddFunction vengeancecooldownsshortcdactions
 
 AddFunction vengeancecooldownsshortcdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 AddFunction vengeancecooldownscdactions
@@ -851,10 +853,8 @@ AddFunction vengeancecooldownscdactions
  #potion
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
 
- unless { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ unless { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
  {
-  #heart_essence
-  vengeanceuseheartessence()
   #use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
   if buffexpires(memory_of_lucid_dreams) vengeanceuseitemactions()
   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
@@ -866,7 +866,7 @@ AddFunction vengeancecooldownscdactions
 
 AddFunction vengeancecooldownscdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 ### actions.brand

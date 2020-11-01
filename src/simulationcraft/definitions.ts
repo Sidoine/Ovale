@@ -893,7 +893,6 @@ export class Annotation implements InterruptAnnotation {
     time_to_hpg_tank?: string;
     bloodlust?: string;
     use_item?: boolean;
-    use_heart_essence?: boolean;
     summon_pet?: string;
     storm_earth_and_fire?: string;
     touch_of_death?: string;

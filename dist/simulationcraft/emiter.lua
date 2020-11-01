@@ -672,8 +672,7 @@ __exports.Emiter = __class(nil, {
                     end
                     isSpellAction = false
                 elseif action == "heart_essence" then
-                    bodyCode = camelSpecialization .. "UseHeartEssence()"
-                    annotation.use_heart_essence = true
+                    bodyCode = [[Spell(296208)]]
                     isSpellAction = false
                 end
                 if isSpellAction then

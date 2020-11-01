@@ -58,10 +58,6 @@ Define(arcane_power 12042)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(balefire_branch 268999)
-# Kindle your soul, gaining 268998U1*268998s1 Intellect, which decays over D or when taking damage.
-  SpellInfo(balefire_branch cd=90 duration=20 channel=20 gcd=0 offgcd=1 tick=1)
-  SpellAddBuff(balefire_branch balefire_branch=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -254,11 +250,10 @@ Define(focused_azerite_beam_3 299338)
   SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
   SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
-Define(focused_resolve 298317)
-# Narrow your gaze to a single foe. Your damaging abilities will mark the target, increasing your chance to critically strike them up to s2. Damaging a new target will reset your focus. Lasts 25 seconds. Does not work on targets above s3.
-  SpellInfo(focused_resolve duration=25 channel=25 gcd=0 offgcd=1 tick=1)
-  # Increases your chance to critically hit your marked target by w1.
-  SpellAddBuff(focused_resolve focused_resolve=1)
+Define(focused_resolve 298614)
+  SpellInfo(focused_resolve duration=25 channel=25 max_stacks=20 gcd=0 offgcd=1)
+  # Increased chance to critically strike this creature by w1.
+  SpellAddTargetDebuff(focused_resolve focused_resolve=1)
 Define(freezing_rain_buff 270232)
 # Frozen Orb makes Blizzard instant cast and increases its damage done by 270232s2 for 12 seconds.
   SpellInfo(freezing_rain_buff duration=12 gcd=0 offgcd=1)
@@ -336,12 +331,6 @@ Define(hot_streak 195283)
   SpellInfo(hot_streak channel=0 max_stacks=1 gcd=0 offgcd=1)
   # Your next Pyroblast or Flamestrike spell is instant cast, and causes double the normal Ignite damage.
   SpellAddBuff(hot_streak hot_streak=1)
-Define(hyperthread_wristwraps_0 300142)
-# Reduce the remaining cooldown of your s1 most recently cast spells by s2 sec.
-  SpellInfo(hyperthread_wristwraps_0 cd=120 gcd=20)
-Define(hyperthread_wristwraps_1 301564)
-  SpellInfo(hyperthread_wristwraps_1 gcd=0 offgcd=1)
-  SpellAddBuff(hyperthread_wristwraps_1 hyperthread_wristwraps_1=1)
 Define(ice_floes 108839)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
   SpellInfo(ice_floes cd=20 duration=15 max_stacks=3 gcd=0 offgcd=1 talent=ice_floes_talent)
@@ -367,10 +356,6 @@ Define(ignite 12654)
   SpellInfo(ignite duration=9 channel=9 gcd=0 offgcd=1 tick=1)
   # Deals w1 Fire damage every t1 sec.?w3>0[rnMovement speed reduced by w3.][]
   SpellAddTargetDebuff(ignite ignite=1)
-Define(ignition_mages_fuse 271117)
-# Ignite the fuse, gaining 271115s1 Haste every t1 sec. Haste is removed after 20 seconds.
-  SpellInfo(ignition_mages_fuse cd=120 duration=20 channel=20 gcd=0 offgcd=1 tick=4)
-  SpellAddBuff(ignition_mages_fuse ignition_mages_fuse=1)
 Define(infernal_cascade 336832)
 # While Combustion is active, your Fire Blast grants you |cFFFFFFFFs1.1 |r increased Fire damage for 5 seconds, stacking up to 336832u times.
   SpellInfo(infernal_cascade duration=5 max_stacks=2 gcd=0 offgcd=1)
@@ -531,11 +516,6 @@ Define(shifting_power 314791)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
-Define(superior_battle_potion_of_intellect 298152)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(superior_battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(superior_battle_potion_of_intellect superior_battle_potion_of_intellect=1)
 Define(supernova 157980)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
   SpellInfo(supernova cd=25 talent=supernova_talent)
@@ -593,7 +573,6 @@ SpellList(ripple_in_space ripple_in_space_0 ripple_in_space_1 ripple_in_space_2 
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3)
 SpellList(worldvein_resonance worldvein_resonance_0 worldvein_resonance_1 worldvein_resonance_2 worldvein_resonance_3)
 SpellList(gladiators_badge gladiators_badge_0 gladiators_badge_1)
-SpellList(hyperthread_wristwraps hyperthread_wristwraps_0 hyperthread_wristwraps_1)
 SpellList(brain_freeze brain_freeze_0 brain_freeze_1)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 Define(alexstraszas_fury_talent 11) #22465
@@ -650,8 +629,18 @@ Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 18) #22474
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
+Define(ancient_knot_of_wisdom_item 166793)
+Define(azsharas_font_of_power_item 169314)
+Define(azurethos_singed_plumage_item 161377)
+Define(balefire_branch_item 159630)
 Define(gladiators_medallion_item 184269)
+Define(hyperthread_wristwraps_item 168989)
+Define(ignition_mages_fuse_item 159615)
 Define(manifesto_of_madness_item 174103)
+Define(neural_synapse_enhancer_item 168973)
+Define(shockbiters_fang_item 169318)
+Define(superior_battle_potion_of_intellect_item 168498)
+Define(tzanes_barkspines_item 161411)
 Define(arcane_pummeling_trait 270669)
 Define(blaster_master_trait 274596)
 Define(vision_of_perfection_essence_id 22)

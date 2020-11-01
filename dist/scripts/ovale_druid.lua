@@ -107,11 +107,6 @@ AddFunction balanceinterruptactions
  }
 }
 
-AddFunction balanceuseheartessence
-{
- spell(concentrated_flame_essence)
-}
-
 AddFunction balanceuseitemactions
 {
  item(trinket0slot text=13 usable=1)
@@ -673,6 +668,8 @@ AddFunction balance_defaultmainactions
  #variable,name=is_cleave,value=spell_targets.starfire>1
  #berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.up
  if { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) spell(berserking)
+ #heart_essence,if=level=50
+ if level() == 50 spell(296208)
  #run_action_list,name=aoe,if=variable.is_aoe
  if is_aoe() balanceaoemainactions()
 
@@ -711,7 +708,7 @@ AddFunction balance_defaultmainpostconditions
 
 AddFunction balance_defaultshortcdactions
 {
- unless { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
+ unless { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208)
  {
   #run_action_list,name=aoe,if=variable.is_aoe
   if is_aoe() balanceaoeshortcdactions()
@@ -747,7 +744,7 @@ AddFunction balance_defaultshortcdactions
 
 AddFunction balance_defaultshortcdpostconditions
 {
- { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or is_aoe() and balanceaoeshortcdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindershortcdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatshortcdpostconditions() or level() > 50 and balancestshortcdpostconditions() or balanceprepatch_stshortcdpostconditions()
+ { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208) or is_aoe() and balanceaoeshortcdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindershortcdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatshortcdpostconditions() or level() > 50 and balancestshortcdpostconditions() or balanceprepatch_stshortcdpostconditions()
 }
 
 AddFunction balance_defaultcdactions
@@ -757,36 +754,38 @@ AddFunction balance_defaultcdactions
  unless { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
  {
   #potion,if=buff.ca_inc.up
-  if buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_intellect usable=1)
+  if buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_intellect_item usable=1)
   #use_items
   balanceuseitemactions()
-  #heart_essence,if=level=50
-  if level() == 50 balanceuseheartessence()
-  #run_action_list,name=aoe,if=variable.is_aoe
-  if is_aoe() balanceaoecdactions()
 
-  unless is_aoe() and balanceaoecdpostconditions()
+  unless level() == 50 and spell(296208)
   {
-   #run_action_list,name=dreambinder,if=runeforge.timeworn_dreambinder.equipped
-   if equippedruneforge(timeworn_dreambinder_runeforge) balancedreambindercdactions()
+   #run_action_list,name=aoe,if=variable.is_aoe
+   if is_aoe() balanceaoecdactions()
 
-   unless equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions()
+   unless is_aoe() and balanceaoecdpostconditions()
    {
-    #run_action_list,name=boat,if=runeforge.balance_of_all_things.equipped
-    if equippedruneforge(balance_of_all_things_runeforge) balanceboatcdactions()
+    #run_action_list,name=dreambinder,if=runeforge.timeworn_dreambinder.equipped
+    if equippedruneforge(timeworn_dreambinder_runeforge) balancedreambindercdactions()
 
-    unless equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions()
+    unless equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions()
     {
-     #run_action_list,name=st,if=level>50
-     if level() > 50 balancestcdactions()
+     #run_action_list,name=boat,if=runeforge.balance_of_all_things.equipped
+     if equippedruneforge(balance_of_all_things_runeforge) balanceboatcdactions()
 
-     unless level() > 50 and balancestcdpostconditions()
+     unless equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions()
      {
-      #variable,name=prev_wrath,value=prev.wrath
-      #variable,name=prev_starfire,value=prev.starfire
-      #variable,name=prev_starsurge,value=prev.starsurge
-      #run_action_list,name=prepatch_st
-      balanceprepatch_stcdactions()
+      #run_action_list,name=st,if=level>50
+      if level() > 50 balancestcdactions()
+
+      unless level() > 50 and balancestcdpostconditions()
+      {
+       #variable,name=prev_wrath,value=prev.wrath
+       #variable,name=prev_starfire,value=prev.starfire
+       #variable,name=prev_starsurge,value=prev.starsurge
+       #run_action_list,name=prepatch_st
+       balanceprepatch_stcdactions()
+      }
      }
     }
    }
@@ -796,7 +795,7 @@ AddFunction balance_defaultcdactions
 
 AddFunction balance_defaultcdpostconditions
 {
- { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or is_aoe() and balanceaoecdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions() or level() > 50 and balancestcdpostconditions() or balanceprepatch_stcdpostconditions()
+ { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208) or is_aoe() and balanceaoecdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions() or level() > 50 and balancestcdpostconditions() or balanceprepatch_stcdpostconditions()
 }
 
 ### Balance icons.
@@ -852,7 +851,6 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # ca_inc
 # ca_inc_buff
 # celestial_alignment
-# concentrated_flame_essence
 # convoke_the_spirits
 # dawning_sun_buff
 # dawning_sun_trait
@@ -894,7 +892,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # stellar_flare
 # streaking_stars_trait
 # sunfire
-# superior_battle_potion_of_intellect
+# superior_battle_potion_of_intellect_item
 # timeworn_dreambinder_buff
 # timeworn_dreambinder_runeforge
 # twin_moons_talent
@@ -1259,7 +1257,7 @@ AddFunction feralcooldowncdactions
   unless { buffpresent(tigers_fury) or buffpresent(bs_inc_buff) } and spell(berserking)
   {
    #potion,if=buff.bs_inc.up
-   if buffpresent(bs_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility usable=1)
+   if buffpresent(bs_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility_item usable=1)
    #call_action_list,name=essence
    feralessencecdactions()
 
@@ -1584,7 +1582,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # shred
 # skull_bash
 # sudden_ambush_buff
-# superior_battle_potion_of_agility
+# superior_battle_potion_of_agility_item
 # swipe
 # swipe_cat
 # the_unbound_force
@@ -1937,7 +1935,7 @@ AddFunction guardianbearcdactions
  unless not buffpresent(bear_form) and spell(bear_form)
  {
   #potion,if=((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear))
-  if { buffpresent(berserk) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility usable=1)
+  if { buffpresent(berserk) or buffpresent(incarnation_guardian_of_ursoc) } and not message("druid.catweave_bear is not implemented") and not message("druid.owlweave_bear is not implemented") and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility_item usable=1)
   #ravenous_frenzy
   spell(ravenous_frenzy)
   #convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
@@ -2032,7 +2030,7 @@ AddFunction guardian_defaultcdactions
  #use_items
  guardianuseitemactions()
  #potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear))
- if hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility usable=1)
+ if hastalent(heart_of_the_wild_talent) and buffpresent(heart_of_the_wild) and { message("druid.catweave_bear is not implemented") or message("druid.owlweave_bear is not implemented") } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_agility_item usable=1)
  #run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20))|(runeforge.oath_of_the_elder_druid.equipped&buff.heart_of_the_wild.remains<10)&(buff.cat_form.up&energy>20)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2))
  if message("druid.catweave_bear is not implemented") and { spellcooldown(thrash_bear) > 0 and spellcooldown(mangle) > 0 and target.debuffremaining(moonfire) >= gcd() + 0.5 and rage() < 40 and buffexpires(incarnation_guardian_of_ursoc) and buffexpires(berserk) and buffexpires(galactic_guardian) or buffpresent(cat_form) and energy() > 25 or equippedruneforge(oath_of_the_elder_druid_runeforge_guardian) and not buffpresent(oath_of_the_elder_druid) and buffpresent(cat_form) and energy() > 20 or equippedruneforge(oath_of_the_elder_druid_runeforge_guardian) and buffremaining(heart_of_the_wild) < 10 and buffpresent(cat_form) and energy() > 20 or covenant(kyrian) and spellcooldown(empower_bond) <= 1 and enemies() < 2 } guardiancatweavecdactions()
 
@@ -2152,7 +2150,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # starsurge
 # starsurge_empowerment_buff
 # sunfire
-# superior_battle_potion_of_agility
+# superior_battle_potion_of_agility_item
 # swipe
 # swipe_bear
 # thrash_bear

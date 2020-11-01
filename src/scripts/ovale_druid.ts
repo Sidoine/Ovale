@@ -671,6 +671,8 @@ AddFunction balance_defaultmainactions
  #variable,name=is_cleave,value=spell_targets.starfire>1
  #berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.up
  if { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) spell(berserking)
+ #heart_essence,if=level=50
+ if level() == 50 spell(296208)
  #run_action_list,name=aoe,if=variable.is_aoe
  if is_aoe() balanceaoemainactions()
 
@@ -709,7 +711,7 @@ AddFunction balance_defaultmainpostconditions
 
 AddFunction balance_defaultshortcdactions
 {
- unless { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking)
+ unless { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208)
  {
   #run_action_list,name=aoe,if=variable.is_aoe
   if is_aoe() balanceaoeshortcdactions()
@@ -745,7 +747,7 @@ AddFunction balance_defaultshortcdactions
 
 AddFunction balance_defaultshortcdpostconditions
 {
- { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or is_aoe() and balanceaoeshortcdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindershortcdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatshortcdpostconditions() or level() > 50 and balancestshortcdpostconditions() or balanceprepatch_stshortcdpostconditions()
+ { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208) or is_aoe() and balanceaoeshortcdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindershortcdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatshortcdpostconditions() or level() > 50 and balancestshortcdpostconditions() or balanceprepatch_stshortcdpostconditions()
 }
 
 AddFunction balance_defaultcdactions
@@ -758,33 +760,35 @@ AddFunction balance_defaultcdactions
   if buffpresent(ca_inc_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(superior_battle_potion_of_intellect_item usable=1)
   #use_items
   balanceuseitemactions()
-  #heart_essence,if=level=50
-  if level() == 50 balanceuseheartessence()
-  #run_action_list,name=aoe,if=variable.is_aoe
-  if is_aoe() balanceaoecdactions()
 
-  unless is_aoe() and balanceaoecdpostconditions()
+  unless level() == 50 and spell(296208)
   {
-   #run_action_list,name=dreambinder,if=runeforge.timeworn_dreambinder.equipped
-   if equippedruneforge(timeworn_dreambinder_runeforge) balancedreambindercdactions()
+   #run_action_list,name=aoe,if=variable.is_aoe
+   if is_aoe() balanceaoecdactions()
 
-   unless equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions()
+   unless is_aoe() and balanceaoecdpostconditions()
    {
-    #run_action_list,name=boat,if=runeforge.balance_of_all_things.equipped
-    if equippedruneforge(balance_of_all_things_runeforge) balanceboatcdactions()
+    #run_action_list,name=dreambinder,if=runeforge.timeworn_dreambinder.equipped
+    if equippedruneforge(timeworn_dreambinder_runeforge) balancedreambindercdactions()
 
-    unless equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions()
+    unless equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions()
     {
-     #run_action_list,name=st,if=level>50
-     if level() > 50 balancestcdactions()
+     #run_action_list,name=boat,if=runeforge.balance_of_all_things.equipped
+     if equippedruneforge(balance_of_all_things_runeforge) balanceboatcdactions()
 
-     unless level() > 50 and balancestcdpostconditions()
+     unless equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions()
      {
-      #variable,name=prev_wrath,value=prev.wrath
-      #variable,name=prev_starfire,value=prev.starfire
-      #variable,name=prev_starsurge,value=prev.starsurge
-      #run_action_list,name=prepatch_st
-      balanceprepatch_stcdactions()
+      #run_action_list,name=st,if=level>50
+      if level() > 50 balancestcdactions()
+
+      unless level() > 50 and balancestcdpostconditions()
+      {
+       #variable,name=prev_wrath,value=prev.wrath
+       #variable,name=prev_starfire,value=prev.starfire
+       #variable,name=prev_starsurge,value=prev.starsurge
+       #run_action_list,name=prepatch_st
+       balanceprepatch_stcdactions()
+      }
      }
     }
    }
@@ -794,7 +798,7 @@ AddFunction balance_defaultcdactions
 
 AddFunction balance_defaultcdpostconditions
 {
- { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or is_aoe() and balanceaoecdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions() or level() > 50 and balancestcdpostconditions() or balanceprepatch_stcdpostconditions()
+ { not covenant(night_fae) or not { not spellcooldown(convoke_the_spirits) > 0 } } and buffpresent(ca_inc_buff) and spell(berserking) or level() == 50 and spell(296208) or is_aoe() and balanceaoecdpostconditions() or equippedruneforge(timeworn_dreambinder_runeforge) and balancedreambindercdpostconditions() or equippedruneforge(balance_of_all_things_runeforge) and balanceboatcdpostconditions() or level() > 50 and balancestcdpostconditions() or balanceprepatch_stcdpostconditions()
 }
 
 ### Balance icons.
