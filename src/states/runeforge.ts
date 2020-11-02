@@ -39,7 +39,7 @@ export class Runeforge {
     };
 
     constructor(debug: OvaleDebugClass) {
-        debug.defaultOptions.args["covenant"] = this.debugOptions;
+        debug.defaultOptions.args["runeforge"] = this.debugOptions;
     }
 
     registerConditions(condition: OvaleConditionClass) {

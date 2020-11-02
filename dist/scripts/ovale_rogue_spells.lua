@@ -664,6 +664,9 @@ Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
 Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
+Define(ashvanes_razor_coral_item 169311)
+Define(azsharas_font_of_power_item 169314)
+Define(potion_of_unbridled_fury_item 169299)
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
 Define(scent_of_blood_trait 277679)
@@ -680,6 +683,9 @@ Define(dashing_scoundrel_runeforge 7115)
 Define(mark_of_the_master_assassin_runeforge_subtlety 7111)
 Define(akaaris_soul_fragment_runeforge 7124)
 Define(deathly_shadows_runeforge 7126)
+Define(ambidexterity_conduit 242)
+Define(deeper_daggers_conduit 245)
+Define(perforated_veins_conduit 248)
     ]]
     OvaleScripts:RegisterScript("ROGUE", nil, name, desc, code, "include")
 end

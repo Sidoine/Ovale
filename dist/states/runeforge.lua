@@ -38,7 +38,7 @@ __exports.Runeforge = __class(nil, {
             local runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(powerId)
             return ReturnBoolean(runeforgePower.state == undefined)
         end
-        debug.defaultOptions.args["covenant"] = self.debugOptions
+        debug.defaultOptions.args["runeforge"] = self.debugOptions
     end,
     registerConditions = function(self, condition)
         condition:RegisterCondition("equippedruneforge", false, self.equipedRuneForge)

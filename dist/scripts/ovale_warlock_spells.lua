@@ -412,11 +412,6 @@ Define(the_unbound_force_2 299323)
 Define(the_unbound_force_3 299324)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force_3)
-Define(unbridled_fury 300714)
-# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
-  SpellInfo(unbridled_fury duration=60 gcd=0 offgcd=1)
-  # Chance to deal an extra 300717s1 Fire damage to your current target.
-  SpellAddBuff(unbridled_fury unbridled_fury=1)
 Define(unstable_affliction 316099)
 # Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
 # Rank 3: Unstable Affliction's duration is increased by 5 seconds.
@@ -520,6 +515,7 @@ Define(summon_vilefiend_talent 12) #23160
 # Summon a Vilefiend to fight for you for the next 15 seconds.
 Define(vile_taint_talent 12) #22046
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+Define(unbridled_fury_item 139327)
 Define(cascading_calamity_trait 275372)
 Define(explosive_potential_trait 275395)
     ]]

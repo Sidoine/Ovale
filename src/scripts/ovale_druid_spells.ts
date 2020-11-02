@@ -554,16 +554,6 @@ Define(sunfire 93402)
   SpellInfo(sunfire lunarpower=0)
   # Suffering w2 Nature damage every t2 sec.
   SpellAddBuff(sunfire sunfire=1)
-Define(superior_battle_potion_of_agility 298146)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(superior_battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(superior_battle_potion_of_agility superior_battle_potion_of_agility=1)
-Define(superior_battle_potion_of_intellect 298152)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(superior_battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(superior_battle_potion_of_intellect superior_battle_potion_of_intellect=1)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
 # Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
@@ -721,6 +711,8 @@ Define(twin_moons_talent 17) #21712
 # Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
 Define(warrior_of_elune_talent 2) #22386
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
+Define(superior_battle_potion_of_intellect_item 168498)
+Define(superior_battle_potion_of_agility_item 168489)
 Define(dawning_sun_trait 276152)
 Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
@@ -728,6 +720,7 @@ Define(balance_of_all_things_runeforge 7107)
 Define(lycaras_fleeting_glimpse_runeforge_restoration 7110)
 Define(primordial_arcanic_pulsar_runeforge 7088)
 Define(timeworn_dreambinder_runeforge 7108)
+Define(precise_alignment_conduit 262)
     `;
 // END
     code += `

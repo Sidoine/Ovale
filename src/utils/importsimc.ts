@@ -110,6 +110,21 @@ const spellListsByClass = new Map<string, string[]>();
 const azeriteTraitByClass = new Map<string, number[]>();
 const essenceByClass = new Map<string, number[]>();
 const runeforgeByClass = new Map<string, number[]>();
+const conduitByClass = new Map<string, number[]>();
+
+function getOrSet<T>(map: Map<string, T[]>, className: string) {
+    let result = map.get(className);
+    if (result) return result;
+    result = [];
+    map.set(className, result);
+    return result;
+}
+
+function addId<T>(ids: T[], id?: T) {
+    if (id && !ids.includes(id)) {
+        ids.push(id);
+    }
+}
 
 for (const filename of files) {
     if (!filename.startsWith("generate")) {
@@ -208,41 +223,15 @@ for (const filename of files) {
             }
             writeFileSync(outputName, output.join("\n"), { flag: "a" });
 
-            let classSpells = spellsByClass.get(className);
-            if (!classSpells) {
-                classSpells = [];
-                spellsByClass.set(className, classSpells);
-            }
-            let classTalents = talentsByClass.get(className);
-            if (!classTalents) {
-                classTalents = [];
-                talentsByClass.set(className, classTalents);
-            }
-            let classItems = itemsByClass.get(className);
-            if (!classItems) {
-                classItems = [];
-                itemsByClass.set(className, classItems);
-            }
-            let azeriteTraits = azeriteTraitByClass.get(className);
-            if (!azeriteTraits) {
-                azeriteTraits = [];
-                azeriteTraitByClass.set(className, azeriteTraits);
-            }
-            let essences = essenceByClass.get(className);
-            if (!essences) {
-                essences = [];
-                essenceByClass.set(className, essences);
-            }
-            let spellLists = spellListsByClass.get(className);
-            if (!spellLists) {
-                spellLists = [];
-                spellListsByClass.set(className, spellLists);
-            }
-            let runeforges = runeforgeByClass.get(className);
-            if (!runeforges) {
-                runeforges = [];
-                runeforgeByClass.set(className, runeforges);
-            }
+            let classSpells = getOrSet(spellsByClass, className);
+            let classTalents = getOrSet(talentsByClass, className);
+            let classItems = getOrSet(itemsByClass, className);
+            let azeriteTraits = getOrSet(azeriteTraitByClass, className);
+            let essences = getOrSet(essenceByClass, className);
+            let spellLists = getOrSet(spellListsByClass, className);
+            let runeforges = getOrSet(runeforgeByClass, className);
+            let conduits = getOrSet(conduitByClass, className);
+
             const identifiers = ipairs(profile.annotation.symbolList)
                 .map((x) => x[1])
                 .sort();
@@ -258,25 +247,17 @@ for (const filename of files) {
                 }
                 const id = spellData.identifiers[symbol];
                 if (symbol.match(/_talent/)) {
-                    if (id && classTalents.indexOf(id) < 0) {
-                        classTalents.push(id);
-                    }
+                    addId(classTalents, id);
                 } else if (symbol.match(/_item$/)) {
-                    if (id && classItems.indexOf(id) < 0) {
-                        classItems.push(id);
-                    }
+                    addId(classItems, id);
                 } else if (symbol.match(/_trait$/)) {
-                    if (id && azeriteTraits.indexOf(id) < 0) {
-                        azeriteTraits.push(id);
-                    }
+                    addId(azeriteTraits, id);
                 } else if (symbol.match(/_essence_id$/)) {
-                    if (id && essences.indexOf(id) < 0) {
-                        essences.push(id);
-                    }
+                    addId(essences, id);
                 } else if (symbol.match(/_runeforge$/)) {
-                    if (id && runeforges.indexOf(id) < 0) {
-                        runeforges.push(id);
-                    }
+                    addId(runeforges, id);
+                } else if (symbol.match(/_conduit$/)) {
+                    addId(conduits, id);
                 } else {
                     if (id && classSpells.indexOf(id) < 0) {
                         classSpells.push(id);
@@ -464,41 +445,26 @@ ${limitLine2}
         }
     }
 
-    const itemIds = itemsByClass.get(className);
-    if (itemIds) {
-        for (const itemId of itemIds) {
-            const item = spellData.itemsById.get(itemId);
-            if (!item) continue;
-            output += `Define(${item.identifier} ${itemId})\n`;
+    function writeIds<T, U extends { identifier: string }>(
+        idInSimc: Map<string, T[]>,
+        repository: Map<T, U>,
+        idProperty: keyof U
+    ) {
+        const ids = idInSimc.get(className);
+        if (ids) {
+            for (const id of ids) {
+                const item = repository.get(id);
+                if (!item) continue;
+                output += `Define(${item.identifier} ${item[idProperty]})\n`;
+            }
         }
     }
 
-    const traitsIds = azeriteTraitByClass.get(className);
-    if (traitsIds) {
-        for (const traitId of traitsIds) {
-            const trait = spellData.azeriteTraitById.get(traitId);
-            if (!trait) continue;
-            output += `Define(${trait.identifier} ${trait.spellId})\n`;
-        }
-    }
-
-    const essenceIds = essenceByClass.get(className);
-    if (essenceIds) {
-        for (const essenceId of essenceIds) {
-            const essence = spellData.essenceById.get(essenceId);
-            if (essence)
-                output += `Define(${essence.identifier} ${essence.id})\n`;
-        }
-    }
-
-    const runeforgeIds = runeforgeByClass.get(className);
-    if (runeforgeIds) {
-        for (const runeforgeId of runeforgeIds) {
-            const runeforge = spellData.runeforgeById.get(runeforgeId);
-            if (runeforge)
-                output += `Define(${runeforge.identifier} ${runeforge.bonus_id})\n`;
-        }
-    }
+    writeIds(itemsByClass, spellData.itemsById, "id");
+    writeIds(azeriteTraitByClass, spellData.azeriteTraitById, "spellId");
+    writeIds(essenceByClass, spellData.essenceById, "id");
+    writeIds(runeforgeByClass, spellData.runeforgeById, "bonus_id");
+    writeIds(conduitByClass, spellData.conduitById, "id");
 
     output += `    \`;
 // END`;

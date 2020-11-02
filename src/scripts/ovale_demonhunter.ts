@@ -115,7 +115,7 @@ AddFunction havocprecombatcdactions
  #food
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
  #use_item,name=azsharas_font_of_power
  havocuseitemactions()
 }
@@ -141,7 +141,7 @@ AddFunction havocnormalmainactions
  #glaive_tempest,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>10)
  if not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } spell(glaive_tempest)
  #throw_glaive,if=conduit.serrated_glaive.enabled&cooldown.eye_beam.remains<6&!buff.metamorphosis.up&!debuff.exposed_wound.up
- if message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) spell(throw_glaive)
+ if conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) spell(throw_glaive)
  #blade_dance,if=variable.blade_dance
  if blade_dance() spell(blade_dance)
  #felblade,if=fury.deficit>=40
@@ -172,7 +172,7 @@ AddFunction havocnormalmainpostconditions
 
 AddFunction havocnormalshortcdactions
 {
- unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive)
+ unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive)
  {
   #eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
   if enemies() > 1 and { not false(raid_event_adds_exists) or false(raid_event_adds_exists) } and not waiting_for_momentum() spell(eye_beam)
@@ -193,7 +193,7 @@ AddFunction havocnormalshortcdactions
 
 AddFunction havocnormalshortcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and spell(felblade) or { target.distance() > 15 or buffpresent(out_of_range_buff) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and spell(felblade) or { target.distance() > 15 or buffpresent(out_of_range_buff) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocnormalcdactions
@@ -202,7 +202,7 @@ AddFunction havocnormalcdactions
 
 AddFunction havocnormalcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or enemies() > 1 and { not false(raid_event_adds_exists) or false(raid_event_adds_exists) } and not waiting_for_momentum() and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or not hastalent(blind_fury_talent) and not waiting_for_essence_break() and 600 > spellcooldown(eye_beam) and spell(eye_beam) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and spell(felblade) or { target.distance() > 15 or buffpresent(out_of_range_buff) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > message("desired_targets is not implemented") or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or enemies() > 1 and { not false(raid_event_adds_exists) or false(raid_event_adds_exists) } and not waiting_for_momentum() and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or not hastalent(blind_fury_talent) and not waiting_for_essence_break() and 600 > spellcooldown(eye_beam) and spell(eye_beam) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and spell(felblade) or { target.distance() > 15 or buffpresent(out_of_range_buff) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.essences
@@ -316,7 +316,7 @@ AddFunction havocdemonicmainactions
  #glaive_tempest,if=active_enemies>desired_targets|raid_event.adds.in>10
  if enemies() > message("desired_targets is not implemented") or 600 > 10 spell(glaive_tempest)
  #throw_glaive,if=conduit.serrated_glaive.enabled&cooldown.eye_beam.remains<6&!buff.metamorphosis.up&!debuff.exposed_wound.up
- if message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) spell(throw_glaive)
+ if conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) spell(throw_glaive)
  #blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
  if blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and { spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 or 600 > spellcooldown(blade_dance) and 600 < 25 } spell(blade_dance)
  #immolation_aura
@@ -349,7 +349,7 @@ AddFunction havocdemonicmainpostconditions
 
 AddFunction havocdemonicshortcdactions
 {
- unless hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive)
+ unless hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive)
  {
   #eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
   if false(raid_event_adds_exists) or 600 > 25 spell(eye_beam)
@@ -358,7 +358,7 @@ AddFunction havocdemonicshortcdactions
 
 AddFunction havocdemonicshortcdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and { spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) == 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or buffpresent(out_of_range_buff) and spell(throw_glaive) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and { spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) == 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or buffpresent(out_of_range_buff) and spell(throw_glaive) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocdemoniccdactions
@@ -367,7 +367,7 @@ AddFunction havocdemoniccdactions
 
 AddFunction havocdemoniccdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or message("conduit.serrated_glaive.enabled is not implemented") and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or { false(raid_event_adds_exists) or 600 > 25 } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and { spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) == 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or buffpresent(out_of_range_buff) and spell(throw_glaive) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > message("desired_targets is not implemented") or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound) and spell(throw_glaive) or { false(raid_event_adds_exists) or 600 > 25 } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis_havoc) == 0 } and { spellcooldown(eye_beam) > 5 - azeritetraitrank(revolving_blades_trait) * 3 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) == 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or equippedruneforge(burning_wound_runeforge) and target.debuffremaining(burning_wound) < 4 and spell(demons_bite) or spell(demons_bite) or buffpresent(out_of_range_buff) and spell(throw_glaive) or { target.distance() > 15 or buffpresent(out_of_range_buff) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.cooldown
@@ -415,7 +415,7 @@ AddFunction havoccooldowncdactions
   unless spell(elysian_decree)
   {
    #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-   if { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+   if { buffremaining(metamorphosis_buff) > 25 or target.timetodie() < 60 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
    #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
    if not hastalent(fel_barrage_talent) or spellcooldown(fel_barrage) == 0 havocuseitemactions()
    #use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
@@ -628,6 +628,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # momentum_talent
 # out_of_range_buff
 # pick_up_fragment
+# potion_of_unbridled_fury_item
 # prepared_buff
 # purifying_blast
 # razor_coral
@@ -636,6 +637,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # reckless_force_counter
 # revolving_blades_trait
 # ripple_in_space
+# serrated_glaive_conduit
 # sinful_brand
 # the_hunt
 # the_unbound_force
@@ -643,7 +645,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # trail_of_ruin_talent
 # unbound_chaos
 # unbound_chaos_talent
-# unbridled_fury_item
 # vengeful_retreat
 # venthyr
 # worldvein_resonance
@@ -677,11 +678,6 @@ AddFunction vengeanceinterruptactions
   if not target.classification(worldboss) and not sigilcharging(silence misery chains) and target.remainingcasttime() >= 2 - talent(quickened_sigils_talent) + gcdremaining() spell(sigil_of_chains)
   if target.inrange(imprison) and not target.classification(worldboss) and target.creaturetype(demon humanoid beast) spell(imprison)
  }
-}
-
-AddFunction vengeanceuseheartessence
-{
- spell(concentrated_flame_essence)
 }
 
 AddFunction vengeanceuseitemactions
@@ -720,7 +716,7 @@ AddFunction vengeanceprecombatcdactions
  #food
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
  #use_item,name=azsharas_font_of_power
  vengeanceuseitemactions()
 }
@@ -835,6 +831,8 @@ AddFunction vengeancecooldownsmainactions
  if buffstacks(lifeblood_buff) < 3 spell(worldvein_resonance)
  #memory_of_lucid_dreams
  spell(memory_of_lucid_dreams)
+ #heart_essence
+ spell(296208)
 }
 
 AddFunction vengeancecooldownsmainpostconditions
@@ -847,18 +845,16 @@ AddFunction vengeancecooldownsshortcdactions
 
 AddFunction vengeancecooldownsshortcdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 AddFunction vengeancecooldownscdactions
 {
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
 
- unless { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ unless { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
  {
-  #heart_essence
-  vengeanceuseheartessence()
   #use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
   if buffexpires(memory_of_lucid_dreams) vengeanceuseitemactions()
   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
@@ -870,7 +866,7 @@ AddFunction vengeancecooldownscdactions
 
 AddFunction vengeancecooldownscdpostconditions
 {
- { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
+ { not target.debuffpresent(concentrated_flame_burn_debuff) and not inflighttotarget(concentrated_flame) or spellfullrecharge(concentrated_flame) < gcd() } and spell(concentrated_flame) or buffstacks(lifeblood_buff) < 3 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(296208)
 }
 
 ### actions.brand
@@ -1067,7 +1063,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # bulk_extraction
 # concentrated_flame
 # concentrated_flame_burn_debuff
-# concentrated_flame_essence
 # conductive_ink_debuff
 # consume_magic
 # demon_spikes
@@ -1083,6 +1078,7 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # memory_of_lucid_dreams
 # metamorphosis
 # metamorphosis_buff
+# potion_of_unbridled_fury_item
 # razelikhs_defilement_runeforge
 # razor_coral
 # shear
@@ -1094,7 +1090,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # spirit_bomb
 # spirit_bomb_talent
 # throw_glaive
-# unbridled_fury_item
 # worldvein_resonance
 `
 	OvaleScripts.RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")

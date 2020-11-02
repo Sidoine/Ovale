@@ -520,6 +520,7 @@ Define(special_delivery_talent 16) #19819
 # Drinking from your Brews has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+Define(unbridled_fury_item 139327)
 Define(the_crucible_of_flame_essence_id 12)
 Define(blood_of_the_enemy_essence_id 23)
 Define(conflict_and_strife_essence_id 32)

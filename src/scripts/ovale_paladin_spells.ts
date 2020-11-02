@@ -360,6 +360,7 @@ Define(sanctified_wrath_talent_protection 19) #23457
 Define(seraphim_talent 15) #17601
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(condensed_lifeforce_essence_id 14)
+Define(vengeful_shock_conduit 195)
     `;
 // END
     code += `

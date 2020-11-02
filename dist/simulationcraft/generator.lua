@@ -99,7 +99,7 @@ __exports.Sweep = function(node)
                 childNode = child[1]
             end
         end
-        isSwept = isSwept or (#child == 0)
+        isSwept = isSwept or #child == 0
         isChanged = isChanged or  not  not isSwept
     elseif node.type == "icon" then
         isChanged, isSwept = __exports.Sweep(node.child[1])
@@ -114,7 +114,7 @@ __exports.Sweep = function(node)
                     node.child[index] = swept
                 elseif swept then
                     if node.operator == "or" then
-                        isSwept = (childNode == lhsNode) and rhsNode or lhsNode
+                        isSwept = (childNode == lhsNode and rhsNode) or lhsNode
                     else
                         isSwept = isSwept or swept
                     end
@@ -165,7 +165,7 @@ __exports.Generator = __class(nil, {
         local lines = {}
         for _, spell in pairs(spells) do
             annotation:AddSymbol(spell.name)
-            if (spell.addSymbol ~= nil) then
+            if spell.addSymbol ~= nil then
                 for _, v in pairs(spell.addSymbol) do
                     annotation:AddSymbol(v)
                 end
@@ -823,22 +823,6 @@ __exports.Generator = __class(nil, {
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "cd"
                 count = count + 1
-            end
-        end
-        if annotation.use_heart_essence then
-            local fmt = [[
-                AddFunction %sUseHeartEssence
-                {
-                    Spell(concentrated_flame_essence)
-                }
-            ]]
-            local code = format(fmt, camelSpecialization)
-            local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
-                insert(child, 1, node)
-                annotation.functionTag[node.name] = "cd"
-                count = count + 1
-                annotation:AddSymbol("concentrated_flame_essence")
             end
         end
         return count

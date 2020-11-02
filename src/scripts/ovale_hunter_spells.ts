@@ -319,6 +319,11 @@ Define(mongoose_fury 259388)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(potion_of_unbridled_fury 300714)
+# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
+  SpellInfo(potion_of_unbridled_fury duration=60 gcd=0 offgcd=1)
+  # Chance to deal an extra 300717s1 Fire damage to your current target.
+  SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury=1)
 Define(precise_shots 260240)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
   SpellInfo(precise_shots channel=0 gcd=0 offgcd=1)
@@ -480,11 +485,6 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15 gcd=0 offgcd=1)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
-Define(unbridled_fury 300714)
-# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
-  SpellInfo(unbridled_fury duration=60 gcd=0 offgcd=1)
-  # Chance to deal an extra 300717s1 Fire damage to your current target.
-  SpellAddBuff(unbridled_fury unbridled_fury=1)
 Define(unerring_vision_buff_0 274445)
 # While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
   SpellInfo(unerring_vision_buff_0 channel=-0.001 gcd=0 offgcd=1)
@@ -615,6 +615,10 @@ Define(volley_talent 21) #22288
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
 Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
+Define(azsharas_font_of_power_item 169314)
+Define(cyclotronic_blast_item 167672)
+Define(unbridled_fury_item 139327)
+Define(variable_intensity_gigavolt_oscillating_reactor_item 165572)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
 Define(rapid_reload_trait 278530)

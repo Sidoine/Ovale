@@ -293,7 +293,7 @@ export class Emiter {
         if (info) {
             let modifier = tokenIterator();
             let name = info.name || miscOperand;
-            let parameter: AstNode | undefined;
+            let parameters: LuaArray<AstNode> = {};
             while (modifier) {
                 if (!info.modifiers && info.symbol === undefined) {
                     this.tracer.Warning(
@@ -319,9 +319,18 @@ export class Emiter {
                         modifierParameters.type ===
                         MiscOperandModifierType.Parameter
                     ) {
-                        parameter = this.ovaleAst.newValue(
-                            nodeList,
-                            modifierName
+                        insert(
+                            parameters,
+                            this.ovaleAst.newValue(nodeList, modifierName)
+                        );
+                    }
+                    if (modifierParameters.extraParameter) {
+                        insert(
+                            parameters,
+                            this.ovaleAst.newValue(
+                                nodeList,
+                                modifierParameters.extraParameter
+                            )
                         );
                     }
                 } else if (info.symbol !== undefined) {
@@ -335,7 +344,10 @@ export class Emiter {
                         annotation.specialization
                     );
                     this.AddSymbol(annotation, modifier);
-                    parameter = this.ovaleAst.newValue(nodeList, modifier);
+                    insert(
+                        parameters,
+                        this.ovaleAst.newValue(nodeList, modifier)
+                    );
                 } else {
                     this.tracer.Warning(
                         `Modifier parameters not found for ${modifier} in ${name}`
@@ -345,9 +357,11 @@ export class Emiter {
 
                 modifier = tokenIterator();
             }
-            if (parameter) {
+            if (lualength(parameters) > 0) {
                 const result = this.ovaleAst.newFunction(nodeList, name, true);
-                result.rawPositionalParams[1] = parameter;
+                for (const [k, v] of ipairs(parameters)) {
+                    result.rawPositionalParams[k] = v;
+                }
                 return result;
             }
             return this.ovaleAst.newFunction(nodeList, name);
@@ -1428,8 +1442,7 @@ export class Emiter {
                 }
                 isSpellAction = false;
             } else if (action == "heart_essence") {
-                bodyCode = `${camelSpecialization}UseHeartEssence()`;
-                annotation.use_heart_essence = true;
+                bodyCode = `Spell(296208)`;
                 isSpellAction = false;
             }
             if (isSpellAction) {

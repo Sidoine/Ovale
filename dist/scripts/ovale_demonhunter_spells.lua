@@ -523,12 +523,14 @@ Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
 Define(unbound_chaos_talent 8) #22494
 # Activating Immolation Aura increases the damage of your next Fel Rush by 347462s1. Lasts 20 seconds.
+Define(potion_of_unbridled_fury_item 169299)
 Define(chaotic_transformation_trait 288754)
 Define(eyes_of_rage_trait 278500)
 Define(revolving_blades_trait 279581)
 Define(breath_of_the_dying_essence_id 35)
 Define(burning_wound_runeforge 7219)
 Define(razelikhs_defilement_runeforge 7046)
+Define(serrated_glaive_conduit 152)
     ]]
     code = code .. [[
 Define(arcane_torrent 202719)

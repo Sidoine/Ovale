@@ -494,8 +494,10 @@ Define(twist_of_fate_talent_shadow 7) #23125
 # After damaging a target below s1 health, you gain 123254s2 increased damage and healing for 8 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(unbridled_fury_item 139327)
 Define(painbreaker_psalm_runeforge 6981)
 Define(shadowflame_prism_runeforge 6982)
+Define(dissonant_echoes_conduit 115)
     ]]
     OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
 end

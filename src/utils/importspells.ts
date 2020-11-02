@@ -18,6 +18,10 @@ interface AllData {
     dbc_item_data_t?: unknown[][];
     spelltext_data_t?: unknown[][];
     runeforge_legendary_entry_t?: unknown[][];
+    conduit_entry_t?: unknown[][];
+    conduit_rank_entry_t?: unknown[][];
+    soulbind_ability_entry_t?: unknown[][];
+    covenant_ability_entry_t?: unknown[][];
 }
 
 const enum SpellAttribute {
@@ -1080,6 +1084,38 @@ export interface Runeforge {
     identifier: string;
 }
 
+export interface Conduit {
+    id: number;
+    spell_id: number;
+    name: string;
+    identifier: string;
+}
+
+export interface ConduitRank {
+    conduit_id: number;
+    rank: number;
+    spell_id: number;
+    value: number;
+}
+
+export interface SoulbindAbility {
+    spell_id: number;
+    covenant_id: number;
+    name: string;
+
+    identifier: string;
+}
+
+export interface CovenantAbilityEntry {
+    class_id: number;
+    covenant_id: number;
+    ability_type: number;
+    spell_id: number;
+    name: string;
+
+    identifier: string;
+}
+
 export function isFriendlyTarget(targetId: number) {
     switch (targetId) {
         case 1:
@@ -1222,7 +1258,9 @@ function readFile(directory: string, fileName: string, output: AllData) {
             const name = match[1];
             if (name !== "const" && name !== "util" && name !== "hotfix") {
                 console.log(`add ${name} data`);
-                const [columns, end] = getColumns(spellDataFile, endLine);
+                let [columns, end] = getColumns(spellDataFile, endLine);
+                const existing = output[name as keyof AllData];
+                if (existing) columns = existing.concat(columns);
                 output[name as keyof AllData] = columns;
                 index = end;
             } else {
@@ -1254,14 +1292,16 @@ function readFile(directory: string, fileName: string, output: AllData) {
 function getIdentifier(name: string) {
     if (!name) return name;
     if (typeof name !== "string") return name;
-    return name
-        .toLowerCase()
-        .replace(/^potion of (the )?/, "")
-        .replace(/ /g, "_")
-        .replace("!", "_aura")
-        .replace(/[:'()]/g, "")
-        .replace(/[-,]/g, "_")
-        .replace(/_+/g, "_");
+    return (
+        name
+            .toLowerCase()
+            //.replace(/^potion of (the )?/, "")
+            .replace(/ /g, "_")
+            .replace("!", "_aura")
+            .replace(/[:'()]/g, "")
+            .replace(/[-,]/g, "_")
+            .replace(/_+/g, "_")
+    );
 }
 
 const classNames: (ClassId | "PET")[] = [
@@ -1318,6 +1358,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "specialization_spells", output);
     readFile(directory, "spelltext_data", output);
     readFile(directory, "item_runeforge", output);
+    readFile(directory, "covenant_data", output);
     // readFile(directory, "sc_spell_lists", output);
 
     console.log("Import spells...");
@@ -1735,6 +1776,21 @@ export function getSpellData(directory: string) {
         runeforgeById.set(runeforge.bonus_id, runeforge);
     }
 
+    if (!output.conduit_entry_t) throw Error("No conduit_entry_t");
+    const conduitById = new Map<number, Conduit>();
+    for (const row of output.conduit_entry_t) {
+        let i = 0;
+        const conduit: Conduit = {
+            id: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            name: getString(row[i++]),
+            identifier: "",
+        };
+        conduit.identifier = getIdentifier(conduit.name + "_conduit");
+        identifiers[conduit.identifier] = conduit.id;
+        conduitById.set(conduit.id, conduit);
+    }
+
     if (!output.dbc_item_data_t) throw Error("No dbc_item_data_t");
 
     console.log("Import item data...");
@@ -1797,5 +1853,6 @@ export function getSpellData(directory: string) {
         spellLists,
         essenceById,
         runeforgeById,
+        conduitById,
     };
 }

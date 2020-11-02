@@ -55,6 +55,7 @@ import { OvaleRequirement } from "./Requirement";
 import { OvaleCombatClass } from "./states/combat";
 import { Covenant } from "./states/covenant";
 import { Runeforge } from "./states/runeforge";
+import { Conduit } from "./states/conduit";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -430,6 +431,7 @@ export class IoC {
         this.recount = new OvaleRecountClass(this.ovale, this.score);
         const covenant = new Covenant(this.ovale, this.debug);
         const runeforge = new Runeforge(this.debug);
+        const conduit = new Conduit(this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
             this.data,
@@ -488,5 +490,6 @@ export class IoC {
         runeforge.registerConditions(this.condition);
         covenant.registerConditions(this.condition);
         combat.registerConditions(this.condition);
+        conduit.registerConditions(this.condition);
     }
 }
