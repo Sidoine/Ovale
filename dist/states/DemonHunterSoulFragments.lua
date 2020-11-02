@@ -19,10 +19,11 @@ local SOUL_FRAGMENT_FINISHERS = {
     [263648] = true
 }
 __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
-    constructor = function(self, ovaleAura, ovale, requirement)
+    constructor = function(self, ovaleAura, ovale, requirement, ovalePaperDoll)
         self.ovaleAura = ovaleAura
         self.ovale = ovale
         self.requirement = requirement
+        self.ovalePaperDoll = ovalePaperDoll
         self.estimatedCount = 0
         self.OnInitialize = function()
             if self.ovale.playerClass == "DEMONHUNTER" then
@@ -39,6 +40,9 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
             self.requirement:UnregisterRequirement("soulfragments_max")
         end
         self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
+            if  not self.ovalePaperDoll.IsSpecialization("vengeance") then
+                return 
+            end
             local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
             local me = self.ovale.playerGUID
             if sourceGUID == me then

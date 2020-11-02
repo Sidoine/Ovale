@@ -1,3 +1,4 @@
+
 import { OvaleAuraClass } from "./Aura";
 import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -26,7 +27,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
     estimated?: boolean;
     private module: AceModule & AceEvent;
 
-    constructor(private ovaleAura: OvaleAuraClass, private ovale: OvaleClass, private requirement: OvaleRequirement) {
+    constructor(private ovaleAura: OvaleAuraClass, private ovale: OvaleClass, private requirement: OvaleRequirement, private ovalePaperDoll: OvalePaperDollClass) {
         this.module = ovale.createModule("OvaleDemonHunterSoulFragments", this.OnInitialize, this.OnDisable, aceEvent)
     }
 
@@ -46,6 +47,9 @@ export class OvaleDemonHunterSoulFragmentsClass {
         this.requirement.UnregisterRequirement("soulfragments_max");
     }
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+        if (!this.ovalePaperDoll.IsSpecialization("vengeance")) {
+            return;
+        }
         let [, subtype, , sourceGUID, , , , , , , , spellID] = CombatLogGetCurrentEventInfo();
         let me = this.ovale.playerGUID;
         if (sourceGUID == me) {

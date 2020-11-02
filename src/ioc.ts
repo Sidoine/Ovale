@@ -323,7 +323,8 @@ export class IoC {
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
             this.ovale,
-            this.requirement
+            this.requirement,
+            this.paperDoll
         );
         this.runes = new OvaleRunesClass(
             this.ovale,
