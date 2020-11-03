@@ -65,6 +65,17 @@ if (existsSync("../wow-mock")) {
         spellInfos += ` 	[${spellId}]: { name: "${data.name}", castTime: ${data.cast_time}, minRange: ${data.min_range}, maxRange: ${data.max_range}},\n`;
     }
     spellInfos += "};";
+    spellInfos += `export const enum SpellId {
+        ${Array.from(spellData.spellDataById.values())
+            .filter(
+                (x) =>
+                    !x.identifier.match(/_unused/) &&
+                    !x.identifier.match(/_(\d)$/)
+            )
+            .map((x) => ` 	${x.identifier} = ${x.id},`)
+            .join("\n")}
+}
+`;
     writeFileSync("../wow-mock/src/spells.ts", spellInfos, {
         encoding: "utf8",
     });
@@ -340,6 +351,12 @@ function getDefinition(
         output += getConditions(customSpellData.conditions, talentIds);
 
     output += `)\n`;
+
+    for (const require of customSpellData.require) {
+        output += `  SpellRequire(${customSpellData.identifier} ${
+            require.property
+        } ${require.value}=${require.not ? "not_" : ""}${require.condition})\n`;
+    }
 
     if (
         customSpellData.replace &&

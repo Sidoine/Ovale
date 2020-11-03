@@ -16,7 +16,7 @@ Include(ovale_monk_spells)
 AddCheckBox(opt_interrupt l(interrupt) default specialization=brewmaster)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=brewmaster)
-AddCheckBox(opt_touch_of_death_on_elite_only l(touch_of_death_on_elite_only) default specialization=brewmaster)
+AddCheckBox(opt_touch_of_death_on_elite_only l(opt_touch_of_death_on_elite_only) default specialization=brewmaster)
 AddCheckBox(opt_chi_burst spellname(chi_burst) default specialization=brewmaster)
 
 AddFunction brewmasterinterruptactions
@@ -86,7 +86,7 @@ AddFunction brewmaster_defaultmainactions
 {
  #gift_of_the_ox,if=health<health.max*0.65
  #dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down
- if incomingdamage(1.5) > 0 and buffexpires(fortifying_brew) spell(dampen_harm)
+ if incomingdamage(1.5) > 0 and buffexpires(fortifying_brew_buff) spell(dampen_harm)
  #berserking
  spell(berserking)
  #purifying_brew,if=stagger.pct>18
@@ -119,12 +119,10 @@ AddFunction brewmaster_defaultmainactions
  if not azeriteessenceismajor(the_crucible_of_flame_essence_id) spell(296208)
  #expel_harm,if=buff.gift_of_the_ox.stack>=3
  if buffstacks(gift_of_the_ox) >= 3 spell(expel_harm)
- #touch_of_death,if=target.health.pct<=15
- if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
  #rushing_jade_wind,if=buff.rushing_jade_wind.down
  if buffexpires(rushing_jade_wind) spell(rushing_jade_wind)
  #breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
- if buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_dot_debuff) } spell(breath_of_fire)
+ if buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } spell(breath_of_fire)
  #chi_burst
  if checkboxon(opt_chi_burst) spell(chi_burst)
  #chi_wave
@@ -148,7 +146,7 @@ AddFunction brewmaster_defaultshortcdactions
  #auto_attack
  brewmastergetinmeleerange()
 
- unless incomingdamage(1.5) > 0 and buffexpires(fortifying_brew) and spell(dampen_harm) or spell(berserking)
+ unless incomingdamage(1.5) > 0 and buffexpires(fortifying_brew_buff) and spell(dampen_harm) or spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -163,19 +161,19 @@ AddFunction brewmaster_defaultshortcdactions
 
 AddFunction brewmaster_defaultshortcdpostconditions
 {
- incomingdamage(1.5) > 0 and buffexpires(fortifying_brew) and spell(dampen_harm) or spell(berserking) or staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_dot_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ incomingdamage(1.5) > 0 and buffexpires(fortifying_brew_buff) and spell(dampen_harm) or spell(berserking) or staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 AddFunction brewmaster_defaultcdactions
 {
  brewmasterinterruptactions()
 
- unless incomingdamage(1.5) > 0 and buffexpires(fortifying_brew) and spell(dampen_harm)
+ unless incomingdamage(1.5) > 0 and buffexpires(fortifying_brew_buff) and spell(dampen_harm)
  {
   #fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
   if incomingdamage(1.5) > 0 and { buffexpires(dampen_harm) or buffexpires(diffuse_magic) } spell(fortifying_brew)
   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
-  if target.debuffexpires(razor_coral) or target.debuffpresent(conductive_ink_debuff) and target.healthpercent() < 31 or target.timetodie() < 20 brewmasteruseitemactions()
+  if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink_debuff) and target.healthpercent() < 31 or target.timetodie() < 20 brewmasteruseitemactions()
   #use_items
   brewmasteruseitemactions()
   #potion
@@ -197,10 +195,16 @@ AddFunction brewmaster_defaultcdactions
     #invoke_niuzao_the_black_ox,if=target.time_to_die>25
     if target.timetodie() > 25 spell(invoke_niuzao_the_black_ox)
 
-    unless staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick(4) and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_dot_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm)
+    unless staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick(4) and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm)
     {
-     #arcane_torrent,if=energy<31
-     if energy() < 31 spell(arcane_torrent)
+     #touch_of_death,if=target.health.pct<=15
+     if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
+
+     unless buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm)
+     {
+      #arcane_torrent,if=energy<31
+      if energy() < 31 spell(arcane_torrent)
+     }
     }
    }
   }
@@ -209,7 +213,7 @@ AddFunction brewmaster_defaultcdactions
 
 AddFunction brewmaster_defaultcdpostconditions
 {
- incomingdamage(1.5) > 0 and buffexpires(fortifying_brew) and spell(dampen_harm) or spell(berserking) or spell(bag_of_tricks) or staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick(4) and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_dot_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ incomingdamage(1.5) > 0 and buffexpires(fortifying_brew_buff) and spell(dampen_harm) or spell(berserking) or spell(bag_of_tricks) or staggerremaining() / maxhealth() * 100 > 18 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 9 and message("stagger.amounttototalpct is not implemented") > 53 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 4.5 and message("stagger.amounttototalpct is not implemented") > 71 and spell(purifying_brew) or staggerremaining() / maxhealth() * 100 > 3 and message("stagger.amounttototalpct is not implemented") > 80 and spell(purifying_brew) or spellcharges(purifying_brew count=0) < 0.5 and spell(black_ox_brew) or energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 and spell(black_ox_brew) or enemies() >= 2 and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick(4) and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or { 1 or hastalent(special_delivery_talent) } and buffpresent(blackout_combo_buff) and spell(tiger_palm) or buffstacks(gift_of_the_ox) > 4 and spell(expel_harm) or spell(blackout_kick) or spell(keg_smash) or not target.debuffremaining(concentrated_flame) > 0 and spell(concentrated_flame) or not azeriteessenceismajor(the_crucible_of_flame_essence_id) and spell(296208) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or buffstacks(gift_of_the_ox) >= 2 and spell(expel_harm) or enemies() >= 3 and spellcooldown(keg_smash) > executetime(spinning_crane_kick) and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 ### Brewmaster icons.
@@ -264,7 +268,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # blood_fury
 # bloodlust
 # breath_of_fire
-# breath_of_fire_dot_debuff
+# breath_of_fire_debuff
 # celestial_brew
 # chi_burst
 # chi_wave
@@ -276,6 +280,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # expel_harm
 # fireblood
 # fortifying_brew
+# fortifying_brew_buff
 # gift_of_the_ox
 # hidden_masters_forbidden_touch_buff
 # invoke_niuzao_the_black_ox
@@ -285,7 +290,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # paralysis
 # purifying_brew
 # quaking_palm
-# razor_coral
+# razor_coral_debuff
 # rushing_jade_wind
 # rushing_jade_wind_talent
 # spear_hand_strike
@@ -330,7 +335,7 @@ AddFunction xuen_on_use_trinket
 AddCheckBox(opt_interrupt l(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=windwalker)
-AddCheckBox(opt_touch_of_death_on_elite_only l(touch_of_death_on_elite_only) default specialization=windwalker)
+AddCheckBox(opt_touch_of_death_on_elite_only l(opt_touch_of_death_on_elite_only) default specialization=windwalker)
 AddCheckBox(opt_flying_serpent_kick spellname(flying_serpent_kick) default specialization=windwalker)
 AddCheckBox(opt_touch_of_karma spellname(touch_of_karma) specialization=windwalker)
 AddCheckBox(opt_chi_burst spellname(chi_burst) default specialization=windwalker)
@@ -560,8 +565,6 @@ AddFunction windwalkercd_serenitymainactions
  spell(ripple_in_space)
  #berserking,if=fight_remains>185|variable.serenity_burst
  if fightremains() > 185 or serenity_burst() spell(berserking)
- #touch_of_death,if=target.health.pct<=15
- if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
  #serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
  if spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 spell(serenity)
 }
@@ -585,17 +588,13 @@ AddFunction windwalkercd_serenityshortcdactions
   {
    #bag_of_tricks,if=variable.serenity_burst
    if serenity_burst() spell(bag_of_tricks)
+   #touch_of_karma,interval=90,pct_health=0.5
+   if checkboxon(opt_touch_of_karma) spell(touch_of_karma)
 
-   unless target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death)
+   unless { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
    {
-    #touch_of_karma,interval=90,pct_health=0.5
-    if checkboxon(opt_touch_of_karma) spell(touch_of_karma)
-
-    unless { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
-    {
-     #bag_of_tricks
-     spell(bag_of_tricks)
-    }
+    #bag_of_tricks
+    spell(bag_of_tricks)
    }
   }
  }
@@ -603,7 +602,7 @@ AddFunction windwalkercd_serenityshortcdactions
 
 AddFunction windwalkercd_serenityshortcdpostconditions
 {
- serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
+ serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
 }
 
 AddFunction windwalkercd_serenitycdactions
@@ -634,6 +633,8 @@ AddFunction windwalkercd_serenitycdactions
    {
     #use_item,name=ashvanes_razor_coral
     windwalkeruseitemactions()
+    #touch_of_death,if=target.health.pct<=15
+    if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
    }
   }
  }
@@ -641,15 +642,13 @@ AddFunction windwalkercd_serenitycdactions
 
 AddFunction windwalkercd_serenitycdpostconditions
 {
- serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 or target.timetodie() < 2 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
+ serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 or target.timetodie() < 2 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
 }
 
 ### actions.cd_sef
 
 AddFunction windwalkercd_sefmainactions
 {
- #touch_of_death,if=target.health.pct<=15&buff.storm_earth_and_fire.down
- if target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
  #blood_of_the_enemy,if=cooldown.fists_of_fury.remains<2|fight_remains<12
  if spellcooldown(fists_of_fury) < 2 or fightremains() < 12 spell(blood_of_the_enemy)
  #worldvein_resonance
@@ -674,7 +673,7 @@ AddFunction windwalkercd_sefmainpostconditions
 
 AddFunction windwalkercd_sefshortcdactions
 {
- unless target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force)
+ unless { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force)
  {
   #purifying_blast
   spell(purifying_blast)
@@ -699,7 +698,7 @@ AddFunction windwalkercd_sefshortcdactions
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking)
+ { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -708,8 +707,10 @@ AddFunction windwalkercd_sefcdactions
  if not hold_xuen() or fightremains() < 25 spell(invoke_xuen_the_white_tiger)
  #arcane_torrent,if=chi.max-chi>=1
  if maxchi() - chi() >= 1 spell(arcane_torrent)
+ #touch_of_death,if=target.health.pct<=15&buff.storm_earth_and_fire.down
+ if target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
 
- unless target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy)
+ unless { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy)
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
@@ -740,7 +741,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe
@@ -1068,7 +1069,7 @@ AddFunction xuen_on_use_trinket
 AddCheckBox(opt_interrupt l(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=windwalker)
-AddCheckBox(opt_touch_of_death_on_elite_only l(touch_of_death_on_elite_only) default specialization=windwalker)
+AddCheckBox(opt_touch_of_death_on_elite_only l(opt_touch_of_death_on_elite_only) default specialization=windwalker)
 AddCheckBox(opt_flying_serpent_kick spellname(flying_serpent_kick) default specialization=windwalker)
 AddCheckBox(opt_touch_of_karma spellname(touch_of_karma) specialization=windwalker)
 AddCheckBox(opt_chi_burst spellname(chi_burst) default specialization=windwalker)
@@ -1298,8 +1299,6 @@ AddFunction windwalkercd_serenitymainactions
  spell(ripple_in_space)
  #berserking,if=fight_remains>185|variable.serenity_burst
  if fightremains() > 185 or serenity_burst() spell(berserking)
- #touch_of_death,if=target.health.pct<=15
- if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
  #serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
  if spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 spell(serenity)
 }
@@ -1323,17 +1322,13 @@ AddFunction windwalkercd_serenityshortcdactions
   {
    #bag_of_tricks,if=variable.serenity_burst
    if serenity_burst() spell(bag_of_tricks)
+   #touch_of_karma,interval=90,pct_health=0.5
+   if checkboxon(opt_touch_of_karma) spell(touch_of_karma)
 
-   unless target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death)
+   unless { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
    {
-    #touch_of_karma,interval=90,pct_health=0.5
-    if checkboxon(opt_touch_of_karma) spell(touch_of_karma)
-
-    unless { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
-    {
-     #bag_of_tricks
-     spell(bag_of_tricks)
-    }
+    #bag_of_tricks
+    spell(bag_of_tricks)
    }
   }
  }
@@ -1341,7 +1336,7 @@ AddFunction windwalkercd_serenityshortcdactions
 
 AddFunction windwalkercd_serenityshortcdpostconditions
 {
- serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
+ serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity)
 }
 
 AddFunction windwalkercd_serenitycdactions
@@ -1372,6 +1367,8 @@ AddFunction windwalkercd_serenitycdactions
    {
     #use_item,name=ashvanes_razor_coral
     windwalkeruseitemactions()
+    #touch_of_death,if=target.health.pct<=15
+    if target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
    }
   }
  }
@@ -1379,15 +1376,13 @@ AddFunction windwalkercd_serenitycdactions
 
 AddFunction windwalkercd_serenitycdpostconditions
 {
- serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 or target.timetodie() < 2 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or target.healthpercent() <= 15 and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
+ serenity_burst() and spell(worldvein_resonance) or serenity_burst() and spell(blood_of_the_enemy) or { spellcooldown(serenity) > 0 or spellcharges(concentrated_flame) == 2 } and not target.debuffremaining(concentrated_flame_burn_debuff) and { spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 or target.timetodie() < 2 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { fightremains() > 185 or serenity_burst() } and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
 }
 
 ### actions.cd_sef
 
 AddFunction windwalkercd_sefmainactions
 {
- #touch_of_death,if=target.health.pct<=15&buff.storm_earth_and_fire.down
- if target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
  #blood_of_the_enemy,if=cooldown.fists_of_fury.remains<2|fight_remains<12
  if spellcooldown(fists_of_fury) < 2 or fightremains() < 12 spell(blood_of_the_enemy)
  #worldvein_resonance
@@ -1412,7 +1407,7 @@ AddFunction windwalkercd_sefmainpostconditions
 
 AddFunction windwalkercd_sefshortcdactions
 {
- unless target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force)
+ unless { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force)
  {
   #purifying_blast
   spell(purifying_blast)
@@ -1437,7 +1432,7 @@ AddFunction windwalkercd_sefshortcdactions
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking)
+ { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -1446,8 +1441,10 @@ AddFunction windwalkercd_sefcdactions
  if not hold_xuen() or fightremains() < 25 spell(invoke_xuen_the_white_tiger)
  #arcane_torrent,if=chi.max-chi>=1
  if maxchi() - chi() >= 1 spell(arcane_torrent)
+ #touch_of_death,if=target.health.pct<=15&buff.storm_earth_and_fire.down
+ if target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } spell(touch_of_death)
 
- unless target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy)
+ unless { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy)
  {
   #guardian_of_azeroth
   spell(guardian_of_azeroth)
@@ -1478,7 +1475,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- target.healthpercent() <= 15 and buffexpires(storm_earth_and_fire) and { not checkboxon(opt_touch_of_death_on_elite_only) or not unitinraid() and target.classification(elite) or target.classification(worldboss) or not buffexpires(hidden_masters_forbidden_touch_buff) } and spell(touch_of_death) or { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ { spellcooldown(fists_of_fury) < 2 or fightremains() < 12 } and spell(blood_of_the_enemy) or spell(worldvein_resonance) or { not target.debuffremaining(concentrated_flame_burn_debuff) and { not hastalent(whirling_dragon_punch_talent) or spellcooldown(whirling_dragon_punch) > 0 } and spellcooldown(rising_sun_kick) > 0 and spellcooldown(fists_of_fury) > 0 and buffexpires(storm_earth_and_fire) or fightremains() < 8 } and spell(concentrated_flame) or spell(the_unbound_force) or spell(purifying_blast) or { target.timetohealthpercent(20) > 30 or target.healthpercent() <= 20 } and spell(reaping_flames) or spell(focused_azerite_beam) or energy() < 40 and spell(memory_of_lucid_dreams) or spell(ripple_in_space) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or buffpresent(seething_rage) or { spellcooldown(blood_of_the_enemy) + 1 > spellcooldown(storm_earth_and_fire) or not azeriteessenceismajor(blood_of_the_enemy_essence_id) } and spellcooldown(fists_of_fury) < 10 and chi() >= 2 and spellcooldown(whirling_dragon_punch) < 12 } and checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire_buff) and spell(storm_earth_and_fire) or checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { fightremains() > 185 or buffpresent(storm_earth_and_fire) or fightremains() < 20 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe

@@ -59,6 +59,7 @@ function createFakeSpell(
         specializationName: [],
         identifier: "",
         identifierScore: 0,
+        classFlags: [],
     };
 }
 

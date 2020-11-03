@@ -199,16 +199,22 @@ __exports.OvaleDataClass = __class(nil, {
             stealthed_buff = {
                 [1784] = true,
                 [5215] = true,
-                [11327] = true,
-                [24450] = true,
+                [1856] = true,
                 [58984] = true,
-                [90328] = true,
                 [102543] = true,
-                [148523] = true,
-                [115191] = true,
                 [115192] = true,
                 [115193] = true,
-                [185422] = true
+                [185313] = true
+            },
+            rogue_stealthed_buff = {
+                [1784] = true,
+                [1856] = true,
+                [185313] = true,
+                [115192] = true
+            },
+            mantle_stealthed_buff = {
+                [1784] = true,
+                [1856] = true
             },
             burst_haste_buff = {
                 [2825] = true,
@@ -224,6 +230,14 @@ __exports.OvaleDataClass = __class(nil, {
             },
             raid_movement_buff = {
                 [106898] = true
+            },
+            roll_the_bones_buff = {
+                [193356] = true,
+                [199600] = true,
+                [193358] = true,
+                [193357] = true,
+                [199603] = true,
+                [193359] = true
             }
         }
         self.DEFAULT_SPELL_LIST = {}

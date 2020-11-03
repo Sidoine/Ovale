@@ -169,6 +169,13 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/csv-parse@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@types/csv-parse/-/csv-parse-1.2.2.tgz#713486235759d615dc8e6a6a979170ada76701d5"
+  integrity sha512-k33tLtRKTQxf7hQfMlkWoS2TQYsnpk1ibZN+rzbuCkeBs8m23nHTeDTF1wb/e7/MSLdtgCzqu3oM1I101kd6yw==
+  dependencies:
+    csv-parse "*"
+
 "@types/events@*":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
@@ -439,10 +446,10 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.10.1":
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.10.1.tgz#45efdc8463e23eabf840cb9dd47b46c4dbaf8877"
-  integrity sha512-rCw4iclXJSmwybQsTo/M6HFoj9E8cKGIYopazRcG0bxtRFhuEisVPXfWOp6d25mMTSJ4wWTYJOw4Y60WGDaPcg==
+"@wowts/tstolua@^1.10.2":
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.10.2.tgz#cc1b9ba579774aa973109a4ebf6e9ef1d9a59d43"
+  integrity sha512-3aG/oYi4jHiG0xbUWCTsngmZqGRgqez4TeUJ3t4ESQsNitb0Ne1cg2+OwFtY87xNBTqT3YZpaPcz1OISWed7sw==
   dependencies:
     commander "^4.0.0"
     typescript "^4.0.3"
@@ -462,10 +469,10 @@
     "@wowts/lua" "^1.3.2"
     "@wowts/table" "^1.0.1"
 
-"@wowts/wow-mock@^1.23.0":
-  version "1.23.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.23.0.tgz#210fec2dc8bb231b90ebefe5ab36eeca6a0d2183"
-  integrity sha512-PMQIrRS0ve5jObojS2qUCXlJZ4oVpcuWqEqMKq5OkuJiBBtSWyuTonKnzKZj8gnSXnkPj4KaDoAb0W3MMHP9pg==
+"@wowts/wow-mock@^1.24.2":
+  version "1.24.2"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.24.2.tgz#b96e3c769e8c471277e589f1430b0e1d269acd65"
+  integrity sha512-keS+R+cTEBmDoLAdlA4wFaiJI77a0XzdfEx9HDNfWTw5skgWES/uC3Kbywi3E3cG8MMM2Oe/XvlUTlIwQ9VaAw==
   dependencies:
     "@wowts/lua" "^1.3.2"
     "@wowts/table" "^1.0.1"
@@ -1141,6 +1148,11 @@ crypto-random-string@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
+
+csv-parse@*, csv-parse@^4.12.0:
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.12.0.tgz#fd42d6291bbaadd51d3009f6cadbb3e53b4ce026"
+  integrity sha512-wPQl3H79vWLPI8cgKFcQXl0NBgYYEqVnT1i6/So7OjMpsI540oD7p93r3w6fDSyPvwkTepG05F69/7AViX2lXg==
 
 currently-unhandled@^0.4.1:
   version "0.4.1"

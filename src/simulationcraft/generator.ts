@@ -781,7 +781,7 @@ export class Generator {
             let code = `
                 AddFunction RetributionTimeToHPG
                 {
-                    SpellCooldown(crusader_strike exorcism hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+                    SpellCooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
                 }
             `;
             let [node] = this.ovaleAst.ParseCode(
@@ -793,7 +793,6 @@ export class Generator {
             if (node) {
                 insert(child, 1, node);
                 annotation.AddSymbol("crusader_strike");
-                annotation.AddSymbol("exorcism");
                 annotation.AddSymbol("hammer_of_wrath");
                 annotation.AddSymbol("judgment");
                 count = count + 1;
@@ -1065,47 +1064,21 @@ export class Generator {
                 insert(child, 1, node);
             }
         }
-        if (annotation.opt_meta_only_during_boss == "DEMONHUNTER") {
-            let fmt = `
-                AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
-            `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
-                "checkbox",
-                code,
-                nodeList,
-                annotation.astAnnotation
-            );
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        if (annotation.opt_arcane_mage_burn_phase == "MAGE") {
-            let fmt = `
-                AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
-            `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
-                "checkbox",
-                code,
-                nodeList,
-                annotation.astAnnotation
-            );
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        if (annotation.opt_touch_of_death_on_elite_only == "MONK") {
-            let fmt = `
-                AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default %s)
-            `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
-                "checkbox",
-                code,
-                nodeList,
-                annotation.astAnnotation
-            );
-            insert(child, 1, node);
-            count = count + 1;
+        if (annotation.options) {
+            for (const [v] of pairs(annotation.options)) {
+                let fmt = `
+                    AddCheckBox(${v} L(${v}) default %s)
+                `;
+                let code = format(fmt, ifSpecialization);
+                let [node] = this.ovaleAst.ParseCode(
+                    "checkbox",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
+                insert(child, 1, node);
+                count = count + 1;
+            }
         }
         if (annotation.use_legendary_ring) {
             let legendaryRing = annotation.use_legendary_ring;

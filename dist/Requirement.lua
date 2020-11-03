@@ -4,6 +4,8 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local OneTimeMessage = __tools.OneTimeMessage
+local gsub = string.gsub
+local match = string.match
 __exports.getNextToken = function(tokens, index)
     if isLuaArray(tokens) then
         local result = tokens[index]
@@ -32,11 +34,21 @@ __exports.OvaleRequirement = __class(nil, {
             local verified = true
             local requirement = name
             while verified and name do
+                local negate
+                if match(name, "^not_") then
+                    name = gsub(name, "^not_", "")
+                    negate = true
+                else
+                    negate = false
+                end
                 local handler = requirements[name]
                 if handler then
                     verified, requirement, index = handler(spellId, atTime, name, tokens, index, targetGUID)
                     name = tokens[index]
                     index = index + 1
+                    if negate then
+                        verified =  not verified
+                    end
                 else
                     OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
                     verified = false

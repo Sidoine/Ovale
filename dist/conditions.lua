@@ -65,9 +65,6 @@ end
 local AMPLIFICATION = 146051
 local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
 local IMBUED_BUFF_ID = 214336
-local INNER_DEMONS_TALENT = 17
-local HAND_OF_GULDAN_SPELL_ID = 105174
-local WILD_IMP_INNER_DEMONS = 143622
 local NECROTIC_PLAGUE_TALENT = 19
 local NECROTIC_PLAGUE_DEBUFF = 155159
 local BLOOD_PLAGUE_DEBUFF = 55078
@@ -248,7 +245,7 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return self.ovaleCondition:ParseCondition(positionalParams, namedParams, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.ovaleCondition = ovaleCondition
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
@@ -263,7 +260,6 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleFrameModule = OvaleFrameModule
         self.OvaleGUID = OvaleGUID
         self.OvaleDamageTaken = OvaleDamageTaken
-        self.OvaleWarlock = OvaleWarlock
         self.OvalePower = OvalePower
         self.OvaleEnemies = OvaleEnemies
         self.variables = variables
@@ -741,41 +737,6 @@ __exports.OvaleConditions = __class(nil, {
                 end
             end
             return Compare(value, comparator, limit)
-        end
-        self.Demons = function(positionalParams, namedParams, atTime)
-            local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleWarlock:GetDemonsCount(creatureId, atTime)
-            return Compare(value, comparator, limit)
-        end
-        self.NotDeDemons = function(positionalParams, namedParams, atTime)
-            local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleWarlock:GetNotDemonicEmpoweredDemonsCount(creatureId, atTime)
-            return Compare(value, comparator, limit)
-        end
-        self.DemonDuration = function(positionalParams, namedParams, atTime)
-            local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleWarlock:GetRemainingDemonDuration(creatureId, atTime)
-            return Compare(value, comparator, limit)
-        end
-        self.ImpsSpawnedDuring = function(positionalParams, namedParams, atTime)
-            local ms, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local delay = ms / 1000
-            local impsSpawned = 0
-            if self.OvaleFuture.next.currentCast.spellId == HAND_OF_GULDAN_SPELL_ID then
-                local soulshards = self.OvalePower.current.power["soulshards"] or 0
-                if soulshards >= 3 then
-                    soulshards = 3
-                end
-                impsSpawned = impsSpawned + soulshards
-            end
-            local talented = self.OvaleSpellBook:GetTalentPoints(INNER_DEMONS_TALENT) > 0
-            if talented then
-                local value = self.OvaleWarlock:GetRemainingDemonDuration(WILD_IMP_INNER_DEMONS, atTime + delay)
-                if value <= 0 then
-                    impsSpawned = impsSpawned + 1
-                end
-            end
-            return Compare(impsSpawned, comparator, limit)
         end
         self.DiseasesRemaining = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
@@ -2000,11 +1961,6 @@ __exports.OvaleConditions = __class(nil, {
             local value = self.OvaleDemonHunterSoulFragments:SoulFragments(atTime)
             return Compare(value, comparator, limit)
         end
-        self.TimeToShard = function(positionalParams, namedParams, atTime)
-            local comparator, limit = positionalParams[1], positionalParams[2]
-            local value = self.OvaleWarlock:TimeToShard(atTime)
-            return Compare(value, comparator, limit)
-        end
         self.HasDebuffType = function(positionalParams, namedParams, atTime)
             local target = self:ParseCondition(positionalParams, namedParams)
             for _, debuffType in ipairs(positionalParams) do
@@ -2128,10 +2084,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("damage", false, self.Damage)
         ovaleCondition:RegisterCondition("damagetaken", false, self.DamageTaken)
         ovaleCondition:RegisterCondition("incomingdamage", false, self.DamageTaken)
-        ovaleCondition:RegisterCondition("demons", false, self.Demons)
-        ovaleCondition:RegisterCondition("notdedemons", false, self.NotDeDemons)
-        ovaleCondition:RegisterCondition("demonduration", false, self.DemonDuration)
-        ovaleCondition:RegisterCondition("impsspawnedduring", false, self.ImpsSpawnedDuring)
         ovaleCondition:RegisterCondition("diseasesremaining", false, self.DiseasesRemaining)
         ovaleCondition:RegisterCondition("diseasesticking", false, self.DiseasesTicking)
         ovaleCondition:RegisterCondition("diseasesanyticking", false, self.DiseasesAnyTicking)
@@ -2331,7 +2283,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("unitinparty", false, self.UnitInPartyCond)
         ovaleCondition:RegisterCondition("unitinraid", false, self.UnitInRaidCond)
         ovaleCondition:RegisterCondition("soulfragments", false, self.SoulFragments)
-        ovaleCondition:RegisterCondition("timetoshard", false, self.TimeToShard)
         ovaleCondition:RegisterCondition("hasdebufftype", false, self.HasDebuffType)
     end,
 })
