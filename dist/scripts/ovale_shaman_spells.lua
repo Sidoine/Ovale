@@ -12,6 +12,11 @@ Define(ascendance 114050)
   SpellInfo(ascendance cd=180 duration=15 talent=ascendance_talent)
   # Transformed into a powerful Fire ascendant. Chain Lightning is transformed into Lava Beam.
   SpellAddBuff(ascendance ascendance=1)
+Define(ascendance_buff 28204)
+# Spell power increases by (100 of Spell Power) with each spell cast.
+  SpellInfo(ascendance_buff max_stacks=5 gcd=0 offgcd=1)
+  # Spell power increased by s1.
+  SpellAddBuff(ascendance_buff ascendance_buff=1)
 Define(ascendance_enhancement 114051)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
   SpellInfo(ascendance_enhancement cd=180 duration=15 talent=ascendance_talent_enhancement)

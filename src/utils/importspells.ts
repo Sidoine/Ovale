@@ -1669,10 +1669,13 @@ export function getSpellData(directory: string) {
                 // console.log(`Can't find spell ${spellEffect.trigger_spell_id}`);
                 continue;
             }
-            if (triggerSpell.identifier === spell.identifier) {
-                if (spell.tooltip) {
-                    triggerSpell.identifier += "_trigger";
-                } else if (isFriendlyTarget(spellEffect.targeting_1)) {
+            if (
+                triggerSpell.name === spell.name &&
+                triggerSpell.id !== spell.id
+            ) {
+                if (!triggerSpell.tooltip) triggerSpell.identifierScore--;
+
+                if (isFriendlyTarget(spellEffect.targeting_1)) {
                     triggerSpell.identifier += "_buff";
                 } else {
                     triggerSpell.identifier += "_debuff";

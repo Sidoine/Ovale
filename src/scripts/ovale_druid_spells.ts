@@ -76,18 +76,20 @@ Define(concentrated_flame 295368)
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
-Define(conductive_ink_debuff 302597)
+Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_debuff gcd=0 offgcd=1)
+  SpellInfo(conductive_ink gcd=0 offgcd=1)
 
 Define(convoke_the_spirits 323764)
 # Call upon the Night Fae for an eruption of energy, channeling a rapid flurry of s2 Druid spells and abilities over 4 seconds.rnrnYou will cast ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake and Thrash on appropriate nearby targets, favoring your current shapeshift form.
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.333)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits=1)
-Define(dawning_sun_buff 276153)
+Define(dawning_sun_buff 276154)
 # Starfire increases the damage of your Wrath by s1 for 8 seconds.
-  SpellInfo(dawning_sun_buff gcd=0 offgcd=1)
+  SpellInfo(dawning_sun_buff duration=8 gcd=0 offgcd=1)
+  # Increases the damage of Wrath by w1.
+  SpellAddBuff(dawning_sun_buff dawning_sun_buff=1)
 
 Define(eclipse_lunar 48518)
 # Casting s1 lStarfire:Starfires; empowers Wrath for 15 seconds. Casting s1 lWrath:Wraths; empowers Starfire for 15 seconds. These Eclipses occur in alternation.rnrn@spellicon48517 @spellname48517rnWrath cast time reduced 48517s1 and damage increased 48517s2.rnrn@spellicon48518 @spellname48518rnStarfire cast time reduced 48518s1 and critical strike chance increased 48518s2.
@@ -286,10 +288,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 4 seconds*2 secrn   2 points: o1*3 over 4 seconds*3 secrn   3 points: o1*4 over 4 seconds*4 secrn   4 points: o1*5 over 4 seconds*5 secrn   5 points: o1*6 over 4 seconds*6 sec
@@ -387,11 +388,11 @@ Define(timeworn_dreambinder_buff 340049)
   SpellInfo(timeworn_dreambinder_buff duration=5 max_stacks=2 gcd=0 offgcd=1)
   # Cost of Starsurge and Starfall reduced by w1, and their damage increased by w2.
   SpellAddBuff(timeworn_dreambinder_buff timeworn_dreambinder_buff=1)
-Define(tooth_and_claw_buff 135286)
+Define(tooth_and_claw_buff 135601)
 # Autoattacks have a s1 chance to empower your next Maul, stacking up to 135286u times.rnrnEmpowered Maul deals 135286s1 increased damage and reduces the target's damage to you by 135601s2 for 6 seconds.
-  SpellInfo(tooth_and_claw_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
-  # Your next Maul deals s1 more damage and reduces the target's damage to you by 135601s1~ for 135601d.
-  SpellAddBuff(tooth_and_claw_buff tooth_and_claw_buff=1)
+  SpellInfo(tooth_and_claw_buff duration=6 gcd=0 offgcd=1)
+  # Dealing w1 reduced damage to @auracaster.
+  SpellAddTargetDebuff(tooth_and_claw_buff tooth_and_claw_buff=1)
 Define(typhoon 132469)
 # Blasts targets within 61391a1 yards in front of you with a violent Typhoon, knocking them back and dazing them for 6 seconds. Usable in all shapeshift forms.
   SpellInfo(typhoon cd=30)

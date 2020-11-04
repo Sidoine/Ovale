@@ -322,7 +322,7 @@ AddFunction beast_masterycdscdactions
   #lights_judgment,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains>gcd.max|!pet.main.buff.frenzy.up
   if pet.buffpresent(main_frenzy_buff) and pet.buffremaining(main_frenzy_buff) > gcd() or not pet.buffpresent(main_frenzy_buff) spell(lights_judgment)
   #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-  if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(potion_of_unbridled_fury) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if { buffpresent(bestial_wrath) and buffpresent(aspect_of_the_wild) and target.healthpercent() < 35 or { buffpresent(potion_of_unbridled_fury_buff) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
   unless { previousgcdspell(aspect_of_the_wild) or spellcooldown(aspect_of_the_wild) < gcd() or target.timetodie() < 20 or not azeriteessenceisminor(vision_of_perfection_essence_id) } and spell(worldvein_resonance)
   {
@@ -499,7 +499,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # memory_of_lucid_dreams_buff
 # multishot
 # one_with_the_pack_talent
-# potion_of_unbridled_fury
+# potion_of_unbridled_fury_buff
 # primal_instincts_trait
 # purifying_blast
 # quaking_palm
@@ -805,7 +805,7 @@ AddFunction marksmanshipcdscdactions
    unless spellcooldown(trueshot) < 7 and spell(ripple_in_space) or not buffpresent(trueshot) and spell(memory_of_lucid_dreams)
    {
     #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.remains>14&target.health.pct<20|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-    if { buffpresent(trueshot) and buffpresent(bloodlust) or buffremaining(trueshot) > 14 and target.healthpercent() < 20 or { buffpresent(potion_of_unbridled_fury) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+    if { buffpresent(trueshot) and buffpresent(bloodlust) or buffremaining(trueshot) > 14 and target.healthpercent() < 20 or { buffpresent(potion_of_unbridled_fury_buff) or buffpresent(unbridled_fury_buff) } and target.timetodie() < 61 or target.timetodie() < 26 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
     #trueshot,if=buff.trueshot.down&cooldown.rapid_fire.remains|target.time_to_die<15
     if buffexpires(trueshot) and spellcooldown(rapid_fire) > 0 or target.timetodie() < 15 spell(trueshot)
    }
@@ -981,7 +981,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # lights_judgment
 # memory_of_lucid_dreams
 # multishot
-# potion_of_unbridled_fury
+# potion_of_unbridled_fury_buff
 # precise_shots_buff
 # purifying_blast
 # quaking_palm
@@ -1399,7 +1399,7 @@ AddFunction survivalcdscdactions
  unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
  {
   #potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
-  if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(potion_of_unbridled_fury) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if { buffpresent(guardian_of_azeroth_buff) and { buffpresent(berserking_buff) or buffpresent(blood_fury) or not race(troll) } or buffpresent(potion_of_unbridled_fury_buff) and target.timetodie() < 61 or target.timetodie() < 26 or not azeriteessenceismajor(condensed_lifeforce_essence_id) and buffpresent(coordinated_assault) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
   unless target.distance() >= 6 and spell(aspect_of_the_eagle)
   {
@@ -1821,7 +1821,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # mongoose_bite
 # mongoose_fury
 # muzzle
-# potion_of_unbridled_fury
+# potion_of_unbridled_fury_buff
 # purifying_blast
 # quaking_palm
 # raptor_strike

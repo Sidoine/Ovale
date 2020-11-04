@@ -35,9 +35,11 @@ Define(blood_of_the_enemy 297969)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
-Define(cascading_calamity_buff 275376)
+Define(cascading_calamity_buff 275378)
 # Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
-  SpellInfo(cascading_calamity_buff gcd=0 offgcd=1)
+  SpellInfo(cascading_calamity_buff duration=15 gcd=0 offgcd=1)
+  # Grants w1 Haste.
+  SpellAddBuff(cascading_calamity_buff cascading_calamity_buff=1)
 
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
@@ -196,10 +198,9 @@ Define(rain_of_fire 5740)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.

@@ -447,13 +447,6 @@ __exports.Emiter = __class(nil, {
                     conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
                     annotation[action] = className
                 elseif className == "MONK" and action == "touch_of_death" then
-                    conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
-                    annotation[action] = className
-                    if  not annotation.options then
-                        annotation.options = {}
-                    end
-                    annotation.options["opt_touch_of_death_on_elite_only"] = true
-                    self:AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
                 elseif className == "MONK" and action == "whirling_dragon_punch" then
                     conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
                 elseif className == "PALADIN" and action == "blessing_of_kings" then
@@ -2352,6 +2345,9 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
         self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
         self:AddDisambiguation("ashvanes_razor_coral", "razor_coral")
+        self:AddDisambiguation("bok_proc_buff", "blackout_kick_aura", "MONK", "windwalker")
+        self:AddDisambiguation("dance_of_chiji_azerite_buff", "dance_of_chiji_buff", "MONK", "windwalker")
+        self:AddDisambiguation("energizing_elixer_talent", "energizing_elixir_talent", "MONK", "windwalker")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

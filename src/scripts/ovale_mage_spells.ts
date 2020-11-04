@@ -20,10 +20,9 @@ Define(arcane_barrage 44425)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing (45.7 of Spell Power) Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
   SpellInfo(arcane_blast arcanecharges=-1)
-Define(arcane_charge_buff 36032)
-# @spelldesc114664
+Define(arcane_charge_buff 195302)
   SpellInfo(arcane_charge_buff max_stacks=4 gcd=0 offgcd=1)
-  # Increases the damage of Arcane Blast, Arcane Missiles, Arcane Explosion, and Arcane Barrage by 36032w1.rnrnIncreases the mana cost of Arcane Blast by 36032w2?w5<0[, and reduces the cast time of Arcane Blast by w5.][.]rnrnIncreases the number of targets hit by Arcane Barrage for 50 damage by 36032w3.
+  # Increases the mana cost of Arcane Blast by 36032w2?w5<0[, and reduces the cast time of Arcane Blast by w5.][.]rnrnIncreases the number of targets hit by Arcane Barrage for 50 damage by 36032w3.
   SpellAddBuff(arcane_charge_buff arcane_charge_buff=1)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing (54.6 of Spell Power) Arcane damage to all enemies within A2 yards.?a137021[rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r][]
@@ -57,9 +56,11 @@ Define(bag_of_tricks 312411)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(blaster_master_buff 274597)
-# Scorch increases the damage the target takes from your Fire Blast by s1 for 30 seconds.
-  SpellInfo(blaster_master_buff gcd=0 offgcd=1)
+Define(blaster_master_buff 274598)
+# Fire Blast increases your Mastery by s1 for 3 sec. This effect stacks.
+  SpellInfo(blaster_master_buff duration=3 max_stacks=3 gcd=0 offgcd=1)
+  # Mastery increased by w1.
+  SpellAddBuff(blaster_master_buff blaster_master_buff=1)
 
 Define(blizzard 190356)
 # Ice shards pelt the target area, dealing 190357m1*8 Frost damage over 8 seconds and reducing movement speed by 12486s1 for 3 seconds.?a236662[rnrnEach time Blizzard deals damage, the cooldown of Frozen Orb is reduced by 236662s1/100.1 sec.][]
@@ -327,10 +328,9 @@ Define(ray_of_frost 205021)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.

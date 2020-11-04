@@ -84,9 +84,9 @@ Define(concentrated_flame 295368)
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
-Define(conductive_ink_debuff 302597)
+Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_debuff gcd=0 offgcd=1)
+  SpellInfo(conductive_ink gcd=0 offgcd=1)
 
 Define(crimson_tempest 121411)
 # Finishing move that slashes at up to s3 enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
@@ -103,9 +103,11 @@ Define(deadly_poison 2823)
   SpellInfo(deadly_poison duration=3600 gcd=0 offgcd=1)
   # Each strike has a chance of causing the target to suffer Nature damage every 2818t1 sec for 2818d. Subsequent poison applications deal instant Nature damage.
   SpellAddBuff(deadly_poison deadly_poison=1)
-Define(deadshot_buff 272936)
-# Mutilate has a s1 chance to apply additional Deadly Poison, and does s2*2 additional damage.rnrn|C000FFF00Assassination|R
+Define(deadshot_buff 272940)
+# Between the Eyes increases the damage of your next Pistol Shot by s1.
   SpellInfo(deadshot_buff gcd=0 offgcd=1)
+  # Increases Pistol Shot damage by w1.
+  SpellAddBuff(deadshot_buff deadshot_buff=1)
 
 Define(deathly_shadows_buff 341202)
 # Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 12 seconds.
@@ -195,10 +197,11 @@ Define(internal_bleeding_debuff 154953)
   SpellInfo(internal_bleeding_debuff duration=6 gcd=0 offgcd=1 tick=1)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(internal_bleeding_debuff internal_bleeding_debuff=1)
-Define(keep_your_wits_about_you_buff 288985)
+Define(keep_your_wits_about_you_buff 288988)
 # When an attack Blade Flurries, increase the chance for Sinister Strike to strike again by s1. Additional strikes of Sinister Strike deal s2 more damage.
-  SpellInfo(keep_your_wits_about_you_buff gcd=0 offgcd=1)
-
+  SpellInfo(keep_your_wits_about_you_buff duration=15 max_stacks=33 gcd=0 offgcd=1)
+  # Your Sinister Strike has an additional w1 chance to strike again.
+  SpellAddBuff(keep_your_wits_about_you_buff keep_your_wits_about_you_buff=1)
 Define(kick 1766)
 # A quick kick that interrupts spellcasting and prevents any spell in that school from being cast for 5 seconds.
   SpellInfo(kick cd=15 duration=5 gcd=0 offgcd=1 interrupt=1)
@@ -283,10 +286,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(reckless_force_counter 302917)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.

@@ -79,10 +79,11 @@ Define(bloodlust 2825)
 Define(bloodshed 321530)
 # Command your pet to tear into your target, causing your target to bleed for <damage> over 18 seconds and increase all damage taken from your pet by 321538s2 for 18 seconds.
   SpellInfo(bloodshed cd=60 talent=bloodshed_talent)
-Define(blur_of_talons_buff 277966)
+Define(blur_of_talons_buff 277969)
 # During Coordinated Assault, ?s259387[Mongoose Bite][Raptor Strike] increases your Agility by s1 and your Speed by s2 for 6 seconds. Stacks up to 277969u times.
-  SpellInfo(blur_of_talons_buff gcd=0 offgcd=1)
-
+  SpellInfo(blur_of_talons_buff duration=6 max_stacks=5 gcd=0 offgcd=1)
+  # Agility increased by w1. Speed increased by w2.
+  SpellAddBuff(blur_of_talons_buff blur_of_talons_buff=1)
 Define(butchery 212436)
 # Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
   SpellInfo(butchery focus=30 cd=9 talent=butchery_talent)
@@ -122,10 +123,11 @@ Define(cyclotronic_blast 293491)
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
   # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
-Define(dance_of_death_buff 274442)
+Define(dance_of_death_buff 274443)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
-  SpellInfo(dance_of_death_buff gcd=0 offgcd=1)
-
+  SpellInfo(dance_of_death_buff duration=8 gcd=0 offgcd=1)
+  # Increases Agility by w1.
+  SpellAddBuff(dance_of_death_buff dance_of_death_buff=1)
 Define(dire_beast 120679)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
   SpellInfo(dire_beast cd=20 duration=8 talent=dire_beast_talent)
@@ -208,11 +210,9 @@ Define(multishot 2643)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
-Define(potion_of_unbridled_fury 300714)
-# Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
-  SpellInfo(potion_of_unbridled_fury duration=60 gcd=0 offgcd=1)
-  # Chance to deal an extra 300717s1 Fire damage to your current target.
-  SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury=1)
+Define(potion_of_unbridled_fury_buff 300717)
+# Deal s1 Fire damage to your current target.
+  SpellInfo(potion_of_unbridled_fury_buff gcd=0 offgcd=1)
 Define(precise_shots_buff 260242)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
   SpellInfo(precise_shots_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
@@ -244,10 +244,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(reckless_force_counter 302917)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
@@ -303,9 +302,11 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15 gcd=0 offgcd=1)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
-Define(unerring_vision_buff 274445)
+Define(unerring_vision_buff 274447)
 # While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
-  SpellInfo(unerring_vision_buff gcd=0 offgcd=1)
+  SpellInfo(unerring_vision_buff duration=5 max_stacks=10 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(unerring_vision_buff unerring_vision_buff=1)
 
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
@@ -332,9 +333,11 @@ Define(wildfire_bomb_debuff 265163)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
-Define(worldvein_resonance_buff 295206)
-  SpellInfo(worldvein_resonance_buff gcd=0 offgcd=1)
-
+Define(worldvein_resonance_buff 313310)
+# Concentrate energy into the Heart of Azeroth, immediately causing s1 Lifeblood Shards to erupt from the nearby ground for 12 seconds, and incease the primary stat gained from Lifeblood Shards by 313310s1 for 18 seconds.rnrn@spellicon295078@spellname295114rnGrants you and any other ally using Worldvein Resonance 295078s5 primary stat while within 295078s2 yds of the Lifeblood Shard. You can benefit from a maximum of 295137u Lifeblood Shards at a time.
+  SpellInfo(worldvein_resonance_buff duration=18 gcd=0 offgcd=1)
+  # Primary stat gained from Lifeblood Shards increased by w1.
+  SpellAddBuff(worldvein_resonance_buff worldvein_resonance_buff=1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
 Define(alpha_predator_talent 3) #22296

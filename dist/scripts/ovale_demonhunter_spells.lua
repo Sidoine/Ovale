@@ -18,12 +18,11 @@ Define(blood_of_the_enemy 297969)
 Define(bulk_extraction 320341)
 # Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
   SpellInfo(bulk_extraction cd=90 talent=bulk_extraction_talent)
-Define(burning_wound 346279)
+Define(burning_wound_debuff 346278)
 # Demon's Bite leaves an open wound on your enemy dealing 346278s1 Chaos damage over 15 seconds and increasing damage taken from your Immolation Aura by 346278s2.
-  SpellInfo(burning_wound gcd=0 offgcd=1)
-  # Demon's Bite leaves an open wound on your enemy dealing 346278o1 Chaos damage over 346278d and increasing damage taken from your Immolation Aura by 346278s2.
-  SpellAddBuff(burning_wound burning_wound=1)
-
+  SpellInfo(burning_wound_debuff duration=15 gcd=0 offgcd=1 tick=3)
+  # Taking w1 Chaos damage every t1 seconds.
+  SpellAddTargetDebuff(burning_wound_debuff burning_wound_debuff=1)
 Define(chaos_nova 179057)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
   SpellInfo(chaos_nova fury=30 cd=60 duration=2)
@@ -38,9 +37,9 @@ Define(concentrated_flame 295368)
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
-Define(conductive_ink_debuff 302597)
+Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_debuff gcd=0 offgcd=1)
+  SpellInfo(conductive_ink gcd=0 offgcd=1)
 
 Define(consume_magic 278326)
 # Consume m1 beneficial Magic effect removing it from the target?s320313[ and granting you s2 Fury][].
@@ -106,6 +105,9 @@ Define(fiery_brand 204021)
   SpellInfo(fiery_brand cd=60)
   # Dealing s1 less damage to the branding Demon Hunter.
   SpellAddBuff(fiery_brand fiery_brand=1)
+Define(fiery_brand_debuff 209247)
+  SpellInfo(fiery_brand_debuff duration=30 gcd=0 offgcd=1)
+  SpellAddTargetDebuff(fiery_brand_debuff fiery_brand_debuff=1)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
@@ -128,8 +130,12 @@ Define(guardian_of_azeroth 295840)
 Define(immolation_aura 258920)
 # Engulf yourself in flames, ?a320364 [instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and ][]radiating 258922s1*6 seconds Fire damage over 6 seconds.?s320374[rnrn|cFFFFFFFFGenerates <havocTalentFury> Fury over 6 seconds.|r][]?(s212612 & !s320374)[rnrn|cFFFFFFFFGenerates <havocFury> Fury.|r][]?s212613[rnrn|cFFFFFFFFGenerates <vengeFury> Fury over 6 seconds.|r][]
   SpellInfo(immolation_aura cd=30 duration=6 fury=-8 tick=1)
+  SpellAddBuff(immolation_aura immolation_aura_buff=1)
   # Burning nearby enemies for 258922s1 Fire damage every t1 sec.?a207548[rnrnMovement speed increased by w4.][]?a320331[rnrnArmor increased by w5. Attackers suffer Fire damage.][]
   SpellAddBuff(immolation_aura immolation_aura=1)
+Define(immolation_aura_buff 258922)
+# Engulf yourself in flames, ?a320364 [instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and ][]radiating 258922s1*6 seconds Fire damage over 6 seconds.?s320374[rnrn|cFFFFFFFFGenerates <havocTalentFury> Fury over 6 seconds.|r][]?(s212612 & !s320374)[rnrn|cFFFFFFFFGenerates <havocFury> Fury.|r][]?s212613[rnrn|cFFFFFFFFGenerates <vengeFury> Fury over 6 seconds.|r][]
+  SpellInfo(immolation_aura_buff gcd=0 offgcd=1 fury=-2)
 Define(imprison 217832)
 # Imprisons a demon, beast, or humanoid, incapacitating them for 60 seconds. Damage will cancel the effect. Limit 1.
   SpellInfo(imprison cd=45 duration=60)
@@ -138,9 +144,11 @@ Define(imprison 217832)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
   SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
-Define(lifeblood_buff 274419)
+Define(lifeblood_buff 274420)
 # When you use a Healthstone, gain s1 Leech for 20 seconds.
-  SpellInfo(lifeblood_buff gcd=0 offgcd=1)
+  SpellInfo(lifeblood_buff duration=20 gcd=0 offgcd=1)
+  # Leech increased by w1.
+  SpellAddBuff(lifeblood_buff lifeblood_buff=1)
 
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
@@ -185,10 +193,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(reckless_force_counter 302917)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.

@@ -158,12 +158,12 @@ Define(shadow_crash 342834)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=45 insanity=-800 talent=shadow_crash_talent)
   # Damage taken from the Priests' Shadow Crash increased by w2.
-  SpellAddTargetDebuff(shadow_crash shadow_crash_debuff_debuff=1)
-Define(shadow_crash_debuff_debuff 342835)
+  SpellAddTargetDebuff(shadow_crash shadow_crash_debuff=1)
+Define(shadow_crash_debuff 342835)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
-  SpellInfo(shadow_crash_debuff_debuff duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(shadow_crash_debuff duration=15 max_stacks=2 gcd=0 offgcd=1)
   # Damage taken from the Priests' Shadow Crash increased by w2.
-  SpellAddTargetDebuff(shadow_crash_debuff_debuff shadow_crash_debuff_debuff=1)
+  SpellAddTargetDebuff(shadow_crash_debuff shadow_crash_debuff=1)
 Define(shadow_word_death 32379)
 # A word of dark binding that inflicts (85 of Spell Power) Shadow damage to the target. If the target is not killed by Shadow Word: Death, the caster takes damage equal to the damage inflicted upon the target.rnrnDamage increased by s3 to targets below s2 health.?c3[][]?s81749[rnrnDoes not trigger Atonement.][]
   SpellInfo(shadow_word_death cd=30)

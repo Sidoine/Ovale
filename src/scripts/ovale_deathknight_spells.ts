@@ -71,8 +71,12 @@ Define(bonestorm 194844)
 Define(breath_of_sindragosa 152279)
 # Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
   SpellInfo(breath_of_sindragosa cd=120 gcd=0 offgcd=1 tick=1 talent=breath_of_sindragosa_talent)
+  SpellAddBuff(breath_of_sindragosa breath_of_sindragosa_buff=1)
   # Continuously dealing Frost damage every t1 sec to enemies in a cone in front of you.
   SpellAddBuff(breath_of_sindragosa breath_of_sindragosa=1)
+Define(breath_of_sindragosa_buff 155166)
+# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
+  SpellInfo(breath_of_sindragosa_buff gcd=0 offgcd=1)
 Define(chains_of_ice 45524)
 # Shackles the target with frozen chains, reducing movement speed by s1 for 8 seconds.
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
@@ -248,8 +252,12 @@ Define(razorice 51714)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
+  SpellAddBuff(remorseless_winter remorseless_winter_buff=1)
   # Dealing 196771s1 Frost damage to enemies within 196771A1 yards each second.
   SpellAddBuff(remorseless_winter remorseless_winter=1)
+Define(remorseless_winter_buff 196771)
+# Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
+  SpellInfo(remorseless_winter_buff gcd=0 offgcd=1)
 Define(rime_buff 59052)
 # Your next Howling Blast will consume no Runes, generate no Runic Power, and deal s2 additional damage.
   SpellInfo(rime_buff duration=15 max_stacks=1 gcd=0 offgcd=1)

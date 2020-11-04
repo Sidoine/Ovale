@@ -1267,7 +1267,7 @@ AddFunction feralcooldowncdactions
    unless feralessencecdpostconditions()
    {
     #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
-    if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink_debuff) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral_debuff) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
+    if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink) and target.timetohealthpercent(30) < 1.5 or not target.debuffpresent(conductive_ink) and { target.debuffstacks(razor_coral_debuff) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or target.timetodie() < 40 } and buffremaining(tigers_fury) > 10 feraluseitemactions()
     #use_items,if=buff.tigers_fury.up|target.time_to_die<20
     if buffpresent(tigers_fury) or target.timetodie() < 20 feraluseitemactions()
    }
@@ -1554,7 +1554,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # cat_form
 # clearcasting_buff
 # concentrated_flame
-# conductive_ink_debuff
+# conductive_ink
 # feral_frenzy
 # ferocious_bite
 # focused_azerite_beam

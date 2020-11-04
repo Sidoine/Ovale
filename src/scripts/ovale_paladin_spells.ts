@@ -57,9 +57,11 @@ Define(divine_storm 53385)
 Define(divine_toll 304971)
 # Instantly cast Holy Shock, Avenger's Shield, or Judgment on up to s1 targets within A2 yds (based on your current specialization).
   SpellInfo(divine_toll cd=60)
-Define(empyrean_power_buff 286392)
+Define(empyrean_power_buff 286393)
 # Your attacks have a chance to make your next Divine Storm free and deal s1 additional damage.
-  SpellInfo(empyrean_power_buff gcd=0 offgcd=1)
+  SpellInfo(empyrean_power_buff duration=15 gcd=0 offgcd=1)
+  # Your next Divine Storm is free and deals w1 additional damage.
+  SpellAddBuff(empyrean_power_buff empyrean_power_buff=1)
 
 Define(execution_sentence 343527)
 # A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
@@ -134,10 +136,9 @@ Define(razor_coral_debuff 303568)
 Define(rebuke 96231)
 # Interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.

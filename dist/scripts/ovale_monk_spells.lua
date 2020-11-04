@@ -27,6 +27,11 @@ Define(blackout_combo_buff 228563)
 Define(blackout_kick 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and granting Shuffle for s2 sec][].
   SpellInfo(blackout_kick cd=4)
+Define(blackout_kick_aura 116768)
+# You have a m1 chance when you Tiger Palm to cause your next Blackout Kick to cost no Chi within 15 seconds.
+  SpellInfo(blackout_kick_aura duration=15 gcd=0 offgcd=1)
+  # Your next Blackout Kick costs no Chi.
+  SpellAddBuff(blackout_kick_aura blackout_kick_aura=1)
 Define(blood_fury 20572)
 # Increases your attack power by s1 for 15 seconds.
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
@@ -69,18 +74,20 @@ Define(concentrated_flame 295368)
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
-Define(conductive_ink_debuff 302597)
+Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_debuff gcd=0 offgcd=1)
+  SpellInfo(conductive_ink gcd=0 offgcd=1)
 
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1 talent=dampen_harm_talent)
   # Damage taken reduced by m2 to m3 for d, with larger attacks being reduced by more.
   SpellAddBuff(dampen_harm dampen_harm=1)
-Define(dance_of_chiji_buff 286586)
+Define(dance_of_chiji_buff 286587)
 # Spending Chi has a chance to make your next Spinning Crane Kick free and deal s1 additional damage.
-  SpellInfo(dance_of_chiji_buff gcd=0 offgcd=1)
+  SpellInfo(dance_of_chiji_buff duration=15 gcd=0 offgcd=1)
+  # Your next Spinning Crane Kick is free and deals w1 additional damage.
+  SpellAddBuff(dance_of_chiji_buff dance_of_chiji_buff=1)
 
 Define(diffuse_magic 122783)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
@@ -198,8 +205,12 @@ Define(rising_sun_kick 107428)
 Define(rushing_jade_wind 116847)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent_windwalker)
+  SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1)
   # Dealing physical damage to nearby enemies every 116847t1 sec.
   SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
+Define(rushing_jade_wind_buff 148187)
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+  SpellInfo(rushing_jade_wind_buff gcd=0 offgcd=1)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
   SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)

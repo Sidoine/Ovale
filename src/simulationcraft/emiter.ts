@@ -235,6 +235,24 @@ export class Emiter {
         );
         this.AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE");
         this.AddDisambiguation("ashvanes_razor_coral", "razor_coral");
+        this.AddDisambiguation(
+            "bok_proc_buff",
+            "blackout_kick_aura",
+            "MONK",
+            "windwalker"
+        );
+        this.AddDisambiguation(
+            "dance_of_chiji_azerite_buff",
+            "dance_of_chiji_buff",
+            "MONK",
+            "windwalker"
+        );
+        this.AddDisambiguation(
+            "energizing_elixer_talent",
+            "energizing_elixir_talent",
+            "MONK",
+            "windwalker"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -1105,15 +1123,15 @@ export class Emiter {
                     "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)";
                 annotation[action] = className;
             } else if (className == "MONK" && action == "touch_of_death") {
-                conditionCode =
-                    "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)";
-                annotation[action] = className;
-                if (!annotation.options) annotation.options = {};
-                annotation.options["opt_touch_of_death_on_elite_only"] = true;
-                this.AddSymbol(
-                    annotation,
-                    "hidden_masters_forbidden_touch_buff"
-                );
+                // conditionCode =
+                //     "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)";
+                // annotation[action] = className;
+                // if (!annotation.options) annotation.options = {};
+                // annotation.options["opt_touch_of_death_on_elite_only"] = true;
+                // this.AddSymbol(
+                //     annotation,
+                //     "hidden_masters_forbidden_touch_buff"
+                // );
             } else if (
                 className == "MONK" &&
                 action == "whirling_dragon_punch"

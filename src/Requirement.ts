@@ -48,6 +48,8 @@ export type RequirementName =
     | "combat"
     | "buff"
     | "debuff"
+    | "soulfragments_min"
+    | "soulfragments_max"
     | PowerType;
 
 export class OvaleRequirement {

@@ -59,14 +59,15 @@ Define(concentrated_flame 295368)
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
-Define(conductive_ink_debuff 302597)
+Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_debuff gcd=0 offgcd=1)
+  SpellInfo(conductive_ink gcd=0 offgcd=1)
 
-Define(crushing_assault_buff 278824)
+Define(crushing_assault_buff 278826)
 # Your melee abilities have a chance to increase the damage of your next Slam by s1 and reduce its Rage cost by s2/10.
-  SpellInfo(crushing_assault_buff gcd=0 offgcd=1)
-
+  SpellInfo(crushing_assault_buff duration=10 gcd=0 offgcd=1)
+  # Slam deals w1 additional damage, and costs w2/10 less Rage.
+  SpellAddBuff(crushing_assault_buff crushing_assault_buff=1)
 Define(crushing_blow 335097)
 # Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(crushing_blow cd=8 rage=-12)
@@ -180,10 +181,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-  # Gaining unstable Azerite energy.
+  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(recklessness 1719)
 # Go berserk, increasing all Rage generation by s4?a202751[, greatly empowering Bloodthirst and Raging Blow,][] and granting your abilities s1 increased critical strike chance for 10 seconds.?a202751[rnrn|cFFFFFFFFGenerates s3/10 Rage.|r][]

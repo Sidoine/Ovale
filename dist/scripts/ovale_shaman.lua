@@ -179,7 +179,7 @@ AddFunction elemental_defaultmainactions
  #storm_elemental
  spell(storm_elemental)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent) or buffpresent(ascendance) spell(berserking)
+ if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) spell(berserking)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if enemies() > 2 and { enemies() > 2 or enemies() > 2 } elementalaoemainactions()
 
@@ -197,10 +197,10 @@ AddFunction elemental_defaultmainpostconditions
 
 AddFunction elemental_defaultshortcdactions
 {
- unless not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance) } and spell(berserking)
+ unless not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
-  if not hastalent(ascendance_talent) or not buffpresent(ascendance) spell(bag_of_tricks)
+  if not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) spell(bag_of_tricks)
   #primordial_wave,if=covenant.necrolord
   if covenant(necrolord) spell(primordial_wave)
   #vesper_totem,if=covenant.kyrian
@@ -220,7 +220,7 @@ AddFunction elemental_defaultshortcdactions
 
 AddFunction elemental_defaultshortcdpostconditions
 {
- not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance) } and spell(berserking) or enemies() > 2 and { enemies() > 2 or enemies() > 2 } and elementalaoeshortcdpostconditions() or enemies() <= 2 and elementalsingle_targetshortcdpostconditions()
+ not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies() > 2 or enemies() > 2 } and elementalaoeshortcdpostconditions() or enemies() <= 2 and elementalsingle_targetshortcdpostconditions()
 }
 
 AddFunction elemental_defaultcdactions
@@ -238,16 +238,16 @@ AddFunction elemental_defaultcdactions
   unless spell(storm_elemental)
   {
    #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(blood_fury)
+   if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury)
 
-   unless { not hastalent(ascendance_talent) or buffpresent(ascendance) } and spell(berserking)
+   unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
    {
     #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(fireblood)
+    if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(fireblood)
     #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(ancestral_call)
+    if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(ancestral_call)
 
-    unless { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or covenant(necrolord) and spell(primordial_wave) or covenant(kyrian) and spell(vesper_totem) or covenant(venthyr) and spell(chain_harvest)
+    unless { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or covenant(necrolord) and spell(primordial_wave) or covenant(kyrian) and spell(vesper_totem) or covenant(venthyr) and spell(chain_harvest)
     {
      #fae_transfusion,if=covenant.night_fae
      if covenant(night_fae) spell(fae_transfusion)
@@ -267,7 +267,7 @@ AddFunction elemental_defaultcdactions
 
 AddFunction elemental_defaultcdpostconditions
 {
- not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or covenant(necrolord) and spell(primordial_wave) or covenant(kyrian) and spell(vesper_totem) or covenant(venthyr) and spell(chain_harvest) or enemies() > 2 and { enemies() > 2 or enemies() > 2 } and elementalaoecdpostconditions() or enemies() <= 2 and elementalsingle_targetcdpostconditions()
+ not buffpresent(flame_shock) and spell(flame_shock) or spell(storm_elemental) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or covenant(necrolord) and spell(primordial_wave) or covenant(kyrian) and spell(vesper_totem) or covenant(venthyr) and spell(chain_harvest) or enemies() > 2 and { enemies() > 2 or enemies() > 2 } and elementalaoecdpostconditions() or enemies() <= 2 and elementalsingle_targetcdpostconditions()
 }
 
 ### Elemental icons.
@@ -313,6 +313,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 ### Required symbols
 # ancestral_call
 # ascendance
+# ascendance_buff
 # ascendance_talent
 # bag_of_tricks
 # berserking

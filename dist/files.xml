@@ -50,8 +50,8 @@
    <Script file="BaseState.lua"/>
    <Script file="acegui-helpers.lua"/>
    <Script file="tools.lua"/>
-   <Script file="states\DemonHunterSoulFragments.lua"/>
    <Script file="states\runeforge.lua"/>
+   <Script file="states\DemonHunterSoulFragments.lua"/>
    <Script file="states\LossOfControl.lua"/>
    <Script file="states\Health.lua"/>
    <Script file="PoolGC.lua"/>

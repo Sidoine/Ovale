@@ -337,7 +337,7 @@ AddFunction arms_defaultcdactions
    unless target.debuffexpires(colossus_smash_debuff) and buffexpires(memory_of_lucid_dreams_buff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks)
    {
     #use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<20.1&buff.memory_of_lucid_dreams.up&cooldown.memory_of_lucid_dreams.remains<117)|(target.health.pct<30.1&debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major)|(!debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)|target.time_to_die<30
-    if not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 20.1 and buffpresent(memory_of_lucid_dreams_buff) and spellcooldown(memory_of_lucid_dreams) < 117 or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or not target.debuffpresent(conductive_ink_debuff) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) or target.timetodie() < 30 armsuseitemactions()
+    if not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 20.1 and buffpresent(memory_of_lucid_dreams_buff) and spellcooldown(memory_of_lucid_dreams) < 117 or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or not target.debuffpresent(conductive_ink) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) or target.timetodie() < 30 armsuseitemactions()
 
     unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } and spell(sweeping_strikes) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(purifying_blast) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(focused_azerite_beam) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(reaping_flames) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
     {
@@ -423,7 +423,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
-# conductive_ink_debuff
+# conductive_ink
 # crushing_assault_buff
 # deadly_calm
 # deadly_calm_talent
@@ -757,7 +757,7 @@ AddFunction fury_defaultcdactions
    unless not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind)
    {
     #use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-    if target.timetodie() < 20 or not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) or not target.debuffpresent(conductive_ink_debuff) and buffpresent(memory_of_lucid_dreams_buff) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
+    if target.timetodie() < 20 or not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) or not target.debuffpresent(conductive_ink) and buffpresent(memory_of_lucid_dreams_buff) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
     #blood_fury,if=buff.recklessness.up
     if buffpresent(recklessness) spell(blood_fury)
 
@@ -841,7 +841,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
-# conductive_ink_debuff
+# conductive_ink
 # crushing_blow
 # dragon_roar
 # execute

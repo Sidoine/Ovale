@@ -1079,7 +1079,7 @@ AddFunction outlawcdscdactions
       #use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
       if not buffpresent(adrenaline_rush) and not buffpresent(blade_flurry) and spellcooldown(adrenaline_rush) < 15 outlawuseitemactions()
       #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
-      if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink_debuff) and target.healthpercent() < 32 and target.healthpercent() >= 30 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral_debuff) >= 20 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or target.timetodie() < 60 } and buffremaining(adrenaline_rush) > 18 outlawuseitemactions()
+      if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink) and target.healthpercent() < 32 and target.healthpercent() >= 30 or not target.debuffpresent(conductive_ink) and { target.debuffstacks(razor_coral_debuff) >= 20 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or target.timetodie() < 60 } and buffremaining(adrenaline_rush) > 18 outlawuseitemactions()
       #use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
       if buffpresent(bloodlust) or fightremains() <= 20 or combopointsdeficit() <= 2 outlawuseitemactions()
      }
@@ -1325,7 +1325,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # concealed_blunderbuss
 # concentrated_flame
 # concentrated_flame_burn_debuff
-# conductive_ink_debuff
+# conductive_ink
 # cyclotronic_blast
 # deadshot_buff
 # dispatch
@@ -1873,7 +1873,7 @@ AddFunction subtletycdscdactions
        #use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
        if not buffpresent(shadow_dance_buff) and spellcooldown(symbols_of_death) < 10 subtletyuseitemactions()
        #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|fight_remains<40)&buff.symbols_of_death.remains>8
-       if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink_debuff) and target.healthpercent() < 32 and target.healthpercent() >= 30 or not target.debuffpresent(conductive_ink_debuff) and { target.debuffstacks(razor_coral_debuff) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or fightremains() < 40 } and buffremaining(symbols_of_death) > 8 subtletyuseitemactions()
+       if target.debuffexpires(razor_coral_debuff) or target.debuffpresent(conductive_ink) and target.healthpercent() < 32 and target.healthpercent() >= 30 or not target.debuffpresent(conductive_ink) and { target.debuffstacks(razor_coral_debuff) >= 25 - 10 * target.debuffpresent(blood_of_the_enemy_debuff) or fightremains() < 40 } and buffremaining(symbols_of_death) > 8 subtletyuseitemactions()
        #use_item,name=mydas_talisman
        subtletyuseitemactions()
        #use_items,if=buff.symbols_of_death.up|fight_remains<20
@@ -2204,7 +2204,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # cheap_shot
 # concentrated_flame
 # concentrated_flame_burn_debuff
-# conductive_ink_debuff
+# conductive_ink
 # dark_shadow_talent
 # deathly_shadows_buff
 # deathly_shadows_runeforge
