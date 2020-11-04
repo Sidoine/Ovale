@@ -563,6 +563,7 @@ export interface MiscOperand {
     modifiers?: LuaObj<MiscOperandModifier>;
     symbol?: string;
     extraParameter?: number | string;
+    extraSymbol?: string;
 }
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
@@ -577,6 +578,13 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             enabled: { type: MiscOperandModifierType.Remove },
             rank: { type: MiscOperandModifierType.Suffix },
         },
+    },
+    ["consecration"]: {
+        name: "buff",
+        modifiers: {
+            up: { type: MiscOperandModifierType.Suffix, name: "present" },
+        },
+        extraSymbol: "consecration",
     },
     ["covenant"]: {
         name: "covenant",

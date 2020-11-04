@@ -280,6 +280,16 @@ __exports.MISC_OPERAND = {
             }
         }
     },
+    ["consecration"] = {
+        name = "buff",
+        modifiers = {
+            up = {
+                type = 0,
+                name = "present"
+            }
+        },
+        extraSymbol = "consecration"
+    },
     ["covenant"] = {
         name = "covenant",
         modifiers = {

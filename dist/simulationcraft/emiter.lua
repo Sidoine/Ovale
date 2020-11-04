@@ -2382,6 +2382,10 @@ __exports.Emiter = __class(nil, {
             if info.extraParameter then
                 insert(parameters, self.ovaleAst:newValue(nodeList, info.extraParameter))
             end
+            if info.extraSymbol then
+                insert(parameters, self.ovaleAst:newValue(nodeList, info.extraSymbol))
+                annotation:AddSymbol(info.extraSymbol)
+            end
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")

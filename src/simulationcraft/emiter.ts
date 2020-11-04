@@ -296,6 +296,13 @@ export class Emiter {
                     this.ovaleAst.newValue(nodeList, info.extraParameter)
                 );
             }
+            if (info.extraSymbol) {
+                insert(
+                    parameters,
+                    this.ovaleAst.newValue(nodeList, info.extraSymbol)
+                );
+                annotation.AddSymbol(info.extraSymbol);
+            }
             while (modifier) {
                 if (!info.modifiers && info.symbol === undefined) {
                     this.tracer.Warning(

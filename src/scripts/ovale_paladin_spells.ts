@@ -240,9 +240,10 @@ Define(shield_of_the_righteous_buff 132403)
     SpellInfo(shield_of_the_righteous_buff duration=4.5)
 Define(unbreakable_spirit_talent 10)
 
-    
     SpellRequire(word_of_glory holypower_percent 0=buff,divine_purpose)
     SpellAddBuff(word_of_glory divine_purpose=0)
+    
+Define(shining_light_free_buff 327510)
     `;
     OvaleScripts.RegisterScript(
         "PALADIN",
