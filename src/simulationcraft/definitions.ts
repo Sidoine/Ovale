@@ -538,7 +538,8 @@ export const enum MiscOperandModifierType {
 interface MiscOperandModifier {
     name?: string;
     type: MiscOperandModifierType;
-    extraParameter?: number;
+    extraParameter?: number | string;
+    createOptions?: boolean;
 }
 
 const powerModifiers: LuaObj<MiscOperandModifier> = {
@@ -561,10 +562,13 @@ export interface MiscOperand {
     name?: string;
     modifiers?: LuaObj<MiscOperandModifier>;
     symbol?: string;
+    extraParameter?: number | string;
+    extraSymbol?: string;
 }
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
+    ["animacharged_cp"]: { name: "maxcombopoints" },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
@@ -574,6 +578,13 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             enabled: { type: MiscOperandModifierType.Remove },
             rank: { type: MiscOperandModifierType.Suffix },
         },
+    },
+    ["consecration"]: {
+        name: "buff",
+        modifiers: {
+            up: { type: MiscOperandModifierType.Suffix, name: "present" },
+        },
+        extraSymbol: "consecration",
     },
     ["covenant"]: {
         name: "covenant",
@@ -589,18 +600,28 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         name: "targetdebuffremaining",
         symbol: "exsanguinated",
     },
-    ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
     ["fight_remains"]: { name: "fightremains" },
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
     ["health"]: {
         modifiers: { max: { type: MiscOperandModifierType.Prefix } },
     },
+    ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
+    ["incoming_imps"]: { name: "impsspawnedduring" },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
     ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
     ["mana"]: { name: "mana", modifiers: powerModifiers },
     ["pain"]: { name: "pain", modifiers: powerModifiers },
+    ["priest"]: {
+        name: "checkboxon",
+        modifiers: {
+            self_power_infusion: {
+                type: MiscOperandModifierType.Parameter,
+                createOptions: true,
+            },
+        },
+    },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
     ["runeforge"]: {
@@ -613,10 +634,20 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
     ["stealthed"]: {
-        name: "stealthed",
+        name: "buffpresent",
         modifiers: {
-            all: { name: "", type: MiscOperandModifierType.Remove },
-            rogue: { name: "", type: MiscOperandModifierType.Remove },
+            all: {
+                name: "stealthed_buff",
+                type: MiscOperandModifierType.Parameter,
+            },
+            rogue: {
+                type: MiscOperandModifierType.Parameter,
+                name: "rogue_stealthed_buff",
+            },
+            mantle: {
+                name: "mantle_stealthed_buff",
+                type: MiscOperandModifierType.Parameter,
+            },
         },
     },
     ["time"]: { name: "timeincombat" },
@@ -884,9 +915,7 @@ export class Annotation implements InterruptAnnotation {
     interrupt?: string;
     wild_charge?: string;
     use_legendary_ring?: string;
-    opt_touch_of_death_on_elite_only?: string;
-    opt_arcane_mage_burn_phase?: string;
-    opt_meta_only_during_boss?: string;
+    options?: LuaObj<boolean>;
     opt_priority_rotation?: string;
     time_to_hpg_heal?: string;
     time_to_hpg_melee?: string;

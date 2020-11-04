@@ -1,7 +1,9 @@
-import { LuaObj, LuaArray } from "@wowts/lua";
+import { LuaObj, LuaArray, truthy } from "@wowts/lua";
 import { isLuaArray, OneTimeMessage } from "./tools";
 import { BaseState } from "./BaseState";
 import { OvaleGUIDClass } from "./GUID";
+import { PowerType } from "./states/Power";
+import { gsub, match } from "@wowts/string";
 
 export type Tokens = LuaArray<string | number>;
 export type RequirementMethod = (
@@ -24,6 +26,30 @@ export function getNextToken(
     return [tokens, index];
 }
 
+export type RequirementName =
+    | "stance"
+    | "target_health_pct"
+    | "lossofcontrol"
+    | "pet_health_pct"
+    | "health_pct"
+    | "oncooldown"
+    | "target_debuff_any"
+    | "target_debuff"
+    | "target_buff_any"
+    | "target_buff"
+    | "stealthed"
+    | "stealth"
+    | "pet_debuff"
+    | "pet_buff"
+    | "debuff_any"
+    | "buff_any"
+    | "spellcount_max"
+    | "spellcount_min"
+    | "combat"
+    | "buff"
+    | "debuff"
+    | PowerType;
+
 export class OvaleRequirement {
     nowRequirements: LuaObj<RequirementMethod> = {};
 
@@ -32,7 +58,7 @@ export class OvaleRequirement {
         private ovaleGuid: OvaleGUIDClass
     ) {}
 
-    RegisterRequirement(name: string, nowMethod: RequirementMethod) {
+    RegisterRequirement(name: RequirementName, nowMethod: RequirementMethod) {
         this.nowRequirements[name] = nowMethod;
     }
 
@@ -60,6 +86,13 @@ export class OvaleRequirement {
             let verified = true;
             let requirement = name;
             while (verified && name) {
+                let negate;
+                if (truthy(match(name, "^not_"))) {
+                    name = gsub(name, "^not_", "");
+                    negate = true;
+                } else {
+                    negate = false;
+                }
                 let handler = requirements[name];
                 if (handler) {
                     [verified, requirement, index] = handler(
@@ -72,6 +105,7 @@ export class OvaleRequirement {
                     );
                     name = <string>tokens[index];
                     index = index + 1;
+                    if (negate) verified = !verified;
                 } else {
                     OneTimeMessage(
                         "Warning: requirement '%s' has no registered handler; FAILING requirement.",

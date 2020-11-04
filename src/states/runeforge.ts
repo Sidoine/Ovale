@@ -1,4 +1,4 @@
-import { ipairs, LuaArray, unpack } from "@wowts/lua";
+import { ipairs, LuaArray, tonumber, unpack } from "@wowts/lua";
 import { concat, insert } from "@wowts/table";
 import { C_LegendaryCrafting, RuneforgePowerState } from "@wowts/wow-mock";
 import { OptionUiGroup } from "../acegui-helpers";
@@ -8,6 +8,7 @@ import {
     ReturnBoolean,
 } from "../Condition";
 import { OvaleDebugClass } from "../Debug";
+import { isNumber, OneTimeMessage } from "../tools";
 
 export class Runeforge {
     private debugOptions: OptionUiGroup = {
@@ -46,14 +47,18 @@ export class Runeforge {
         condition.RegisterCondition(
             "equippedruneforge",
             false,
-            this.equipedRuneForge
+            this.equippedRuneforge
         );
     }
 
-    private equipedRuneForge: ConditionFunction = (positionalParameters) => {
+    private equippedRuneforge: ConditionFunction = (positionalParameters) => {
         const [powerId] = unpack(positionalParameters);
+        if (!isNumber(powerId)) {
+            OneTimeMessage(`${powerId} is not defined in EquippedRuneforge`);
+            return [];
+        }
         const runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(
-            powerId as number
+            tonumber(powerId)
         );
         return ReturnBoolean(
             runeforgePower.state === RuneforgePowerState.Available

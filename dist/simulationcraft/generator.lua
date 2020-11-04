@@ -674,14 +674,13 @@ __exports.Generator = __class(nil, {
             local code = [[
                 AddFunction RetributionTimeToHPG
                 {
-                    SpellCooldown(crusader_strike exorcism hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+                    SpellCooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
                 }
             ]]
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
             if node then
                 insert(child, 1, node)
                 annotation:AddSymbol("crusader_strike")
-                annotation:AddSymbol("exorcism")
                 annotation:AddSymbol("hammer_of_wrath")
                 annotation:AddSymbol("judgment")
                 count = count + 1
@@ -873,32 +872,14 @@ __exports.Generator = __class(nil, {
                 insert(child, 1, node)
             end
         end
-        if annotation.opt_meta_only_during_boss == "DEMONHUNTER" then
-            local fmt = [[
-                AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
-            ]]
-            local code = format(fmt, ifSpecialization)
-            local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            count = count + 1
-        end
-        if annotation.opt_arcane_mage_burn_phase == "MAGE" then
-            local fmt = [[
-                AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
-            ]]
-            local code = format(fmt, ifSpecialization)
-            local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            count = count + 1
-        end
-        if annotation.opt_touch_of_death_on_elite_only == "MONK" then
-            local fmt = [[
-                AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default %s)
-            ]]
-            local code = format(fmt, ifSpecialization)
-            local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            count = count + 1
+        if annotation.options then
+            for v in pairs(annotation.options) do
+                local fmt = "\n                    AddCheckBox(" .. v .. " L(" .. v .. ") default %s)\n                "
+                local code = format(fmt, ifSpecialization)
+                local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+                insert(child, 1, node)
+                count = count + 1
+            end
         end
         if annotation.use_legendary_ring then
             local legendaryRing = annotation.use_legendary_ring

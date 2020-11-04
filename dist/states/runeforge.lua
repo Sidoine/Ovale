@@ -2,12 +2,16 @@ local __exports = LibStub:NewLibrary("ovale/states/runeforge", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local ipairs = ipairs
+local tonumber = tonumber
 local unpack = unpack
 local concat = table.concat
 local insert = table.insert
 local C_LegendaryCrafting = C_LegendaryCrafting
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local ReturnBoolean = __Condition.ReturnBoolean
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
+local OneTimeMessage = __tools.OneTimeMessage
 __exports.Runeforge = __class(nil, {
     constructor = function(self, debug)
         self.debugOptions = {
@@ -33,14 +37,18 @@ __exports.Runeforge = __class(nil, {
                 }
             }
         }
-        self.equipedRuneForge = function(positionalParameters)
+        self.equippedRuneforge = function(positionalParameters)
             local powerId = unpack(positionalParameters)
-            local runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(powerId)
-            return ReturnBoolean(runeforgePower.state == undefined)
+            if  not isNumber(powerId) then
+                OneTimeMessage(powerId .. " is not defined in EquippedRuneforge")
+                return 
+            end
+            local runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(tonumber(powerId))
+            return ReturnBoolean(runeforgePower.state == 0)
         end
         debug.defaultOptions.args["runeforge"] = self.debugOptions
     end,
     registerConditions = function(self, condition)
-        condition:RegisterCondition("equippedruneforge", false, self.equipedRuneForge)
+        condition:RegisterCondition("equippedruneforge", false, self.equippedRuneforge)
     end,
 })

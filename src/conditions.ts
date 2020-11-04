@@ -64,7 +64,6 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "./Frame";
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleDamageTakenClass } from "./states/DamageTaken";
-import { OvaleWarlockClass } from "./states/Warlock";
 import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleCooldownClass } from "./states/Cooldown";
 import { OvaleCompileClass } from "./Compile";
@@ -92,8 +91,7 @@ function BossArmorDamageReduction(target: string) {
     return 0.3;
 }
 // Return a Capitalized word
-function Capitalize(word: string): string 
-{
+function Capitalize(word: string): string {
     if (!word) return word;
     return upper(sub(word, 1, 1)) + lower(sub(word, 2));
 }
@@ -101,9 +99,6 @@ function Capitalize(word: string): string
 const AMPLIFICATION = 146051;
 const INCREASED_CRIT_EFFECT_3_PERCENT = 44797;
 const IMBUED_BUFF_ID = 214336;
-const INNER_DEMONS_TALENT = 17;
-const HAND_OF_GULDAN_SPELL_ID = 105174;
-const WILD_IMP_INNER_DEMONS = 143622;
 const NECROTIC_PLAGUE_TALENT = 19;
 const NECROTIC_PLAGUE_DEBUFF = 155159;
 const BLOOD_PLAGUE_DEBUFF = 55078;
@@ -114,8 +109,6 @@ const MODERATE_STAGGER = 124274;
 const HEAVY_STAGGER = 124273;
 
 export class OvaleConditions {
-    
-    
     /**
      * Return the value of a parameter from the named spell's information.  If the value is the name of a
      * in the script, then return the compute the value of that instead.
@@ -1476,7 +1469,7 @@ export class OvaleConditions {
             <string>positionalParams[1],
             <"yes" | "no">positionalParams[2],
         ];
-        name = Capitalize(name)
+        name = Capitalize(name);
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let family = UnitCreatureFamily(target);
         let lookupTable =
@@ -1510,7 +1503,7 @@ export class OvaleConditions {
             LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
         if (lookupTable) {
             for (const [, name] of ipairs<string>(positionalParams)) {
-                let capitalizedName: string = Capitalize(name)
+                let capitalizedName: string = Capitalize(name);
                 if (creatureType == lookupTable[capitalizedName]) {
                     return [0, INFINITY];
                 }
@@ -1664,88 +1657,6 @@ export class OvaleConditions {
         return Compare(value, comparator, limit);
     };
 
-    private Demons = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [creatureId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.OvaleWarlock.GetDemonsCount(creatureId, atTime);
-        return Compare(value, comparator, limit);
-    };
-    private NotDeDemons = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [creatureId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.OvaleWarlock.GetNotDemonicEmpoweredDemonsCount(
-            creatureId,
-            atTime
-        );
-        return Compare(value, comparator, limit);
-    };
-    private DemonDuration = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [creatureId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.OvaleWarlock.GetRemainingDemonDuration(
-            creatureId,
-            atTime
-        );
-        return Compare(value, comparator, limit);
-    };
-    private ImpsSpawnedDuring = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [ms, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let delay = ms / 1000;
-        let impsSpawned = 0;
-        // check for hand of guldan
-        if (
-            this.OvaleFuture.next.currentCast.spellId == HAND_OF_GULDAN_SPELL_ID
-        ) {
-            let soulshards = this.OvalePower.current.power["soulshards"] || 0;
-            if (soulshards >= 3) {
-                soulshards = 3;
-            }
-            impsSpawned = impsSpawned + soulshards;
-        }
-
-        // inner demons talent
-        let talented =
-            this.OvaleSpellBook.GetTalentPoints(INNER_DEMONS_TALENT) > 0;
-        if (talented) {
-            let value = this.OvaleWarlock.GetRemainingDemonDuration(
-                WILD_IMP_INNER_DEMONS,
-                atTime + delay
-            );
-            if (value <= 0) {
-                impsSpawned = impsSpawned + 1;
-            }
-        }
-        return Compare(impsSpawned, comparator, limit);
-    };
     GetDiseases(
         target: string,
         atTime: number
@@ -6815,16 +6726,6 @@ l    */
         return Compare(value, comparator, limit);
     };
 
-    private TimeToShard = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = this.OvaleWarlock.TimeToShard(atTime);
-        return Compare(value, comparator, limit);
-    };
-
     /** Test if a specific dispel type is present.
 	 @name HasDebuffType
 	 @paramsig boolean
@@ -6944,7 +6845,6 @@ l    */
         private OvaleFrameModule: OvaleFrameModuleClass,
         private OvaleGUID: OvaleGUIDClass,
         private OvaleDamageTaken: OvaleDamageTakenClass,
-        private OvaleWarlock: OvaleWarlockClass,
         private OvalePower: OvalePowerClass,
         private OvaleEnemies: OvaleEnemiesClass,
         private variables: Variables,
@@ -7237,22 +7137,6 @@ l    */
             "incomingdamage",
             false,
             this.DamageTaken
-        );
-        ovaleCondition.RegisterCondition("demons", false, this.Demons);
-        ovaleCondition.RegisterCondition(
-            "notdedemons",
-            false,
-            this.NotDeDemons
-        );
-        ovaleCondition.RegisterCondition(
-            "demonduration",
-            false,
-            this.DemonDuration
-        );
-        ovaleCondition.RegisterCondition(
-            "impsspawnedduring",
-            false,
-            this.ImpsSpawnedDuring
         );
         ovaleCondition.RegisterCondition(
             "diseasesremaining",
@@ -7908,11 +7792,6 @@ l    */
             "soulfragments",
             false,
             this.SoulFragments
-        );
-        ovaleCondition.RegisterCondition(
-            "timetoshard",
-            false,
-            this.TimeToShard
         );
         ovaleCondition.RegisterCondition(
             "hasdebufftype",

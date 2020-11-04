@@ -11,6 +11,7 @@ import { SpellInfo } from "../Data";
 import { PowerType as OvalePowerType } from "../states/Power";
 import { ConditionNamedParameters } from "../AST";
 import { debug } from "console";
+import { RequirementName } from "../Requirement";
 
 export interface CustomAura {
     id: number;
@@ -27,6 +28,13 @@ export interface CustomSpellDataIf {
     spellInfo?: SpellInfo;
 }
 
+export interface CustomSpellRequire {
+    condition: RequirementName;
+    not?: boolean;
+    property: keyof SpellInfo;
+    value: string | number;
+}
+
 export interface CustomSpellData {
     id: number;
     identifier: string;
@@ -37,8 +45,8 @@ export interface CustomSpellData {
     customSpellInfo?: SpellInfo;
     conditions?: ConditionNamedParameters;
     nextRank?: number;
-    ifs?: CustomSpellDataIf[];
     replace?: number;
+    require: CustomSpellRequire[];
 }
 
 function getPowerName(power: PowerType): OvalePowerType | "runes" | "health" {
@@ -106,6 +114,12 @@ function getPowerValue(powerType: PowerType, cost: number) {
     return cost / divisor;
 }
 
+function hasAttribute(spell: SpellData, attribute: SpellAttributes) {
+    const i = Math.floor(attribute / 32);
+    const bit = attribute % 32;
+    return (spell.attributes[i] & (1 << bit)) > 0;
+}
+
 export function convertFromSpellData(
     spell: SpellData,
     spellDataById: Map<number, SpellData>
@@ -133,14 +147,26 @@ export function convertFromSpellData(
         spellInfo.duration = spell.duration / 1000;
     }
     if (
-        spell.attributes.some(
-            (x) =>
-                (x & (SpellAttributes.Channeled | SpellAttributes.Channeled2)) >
-                0
-        )
+        hasAttribute(spell, SpellAttributes.SX_CHANNELED) ||
+        hasAttribute(spell, SpellAttributes.SX_CHANNELED_2)
     ) {
         spellInfo.channel = spell.duration / 1000;
     }
+
+    let require: CustomSpellRequire[] = [];
+
+    if (
+        hasAttribute(spell, SpellAttributes.SX_REQ_STEALTH) ||
+        spell.shapeshifts?.some((x) => x.flags_1 === 536870912)
+    ) {
+        require.push({
+            condition: "stealthed",
+            property: "unusable",
+            not: true,
+            value: 1,
+        });
+    }
+
     if (spell.max_stack) {
         spellInfo.max_stacks = spell.max_stack;
     }
@@ -174,7 +200,7 @@ export function convertFromSpellData(
 
     let buffAdded = false;
     let debuffAdded = false;
-    if (spell.name === "Executioner's precision") {
+    if (spell.name === "Ambush") {
         debug;
     }
     const playerAuras: CustomAura[] = [];
@@ -231,6 +257,7 @@ export function convertFromSpellData(
         tooltip: spell.tooltip ? spell.tooltip : undefined,
         nextRank: spell.nextRank ? spell.nextRank.id : undefined,
         replace: spell.replace_spell_id,
+        require,
     };
     if (hasConditions) {
         customSpellData.conditions = conditions;

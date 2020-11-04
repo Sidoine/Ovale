@@ -228,17 +228,13 @@ export class Emiter {
 
         this.AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian");
         this.AddDisambiguation(
-            "dummon_demonic_tyrant",
-            "summon_demonic_tyrant",
-            "WARLOCK",
-            "demonology"
-        );
-        this.AddDisambiguation(
             "dark_soul",
             "dark_soul_misery",
             "WARLOCK",
             "affliction"
         );
+        this.AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE");
+        this.AddDisambiguation("ashvanes_razor_coral", "razor_coral");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -294,6 +290,19 @@ export class Emiter {
             let modifier = tokenIterator();
             let name = info.name || miscOperand;
             let parameters: LuaArray<AstNode> = {};
+            if (info.extraParameter) {
+                insert(
+                    parameters,
+                    this.ovaleAst.newValue(nodeList, info.extraParameter)
+                );
+            }
+            if (info.extraSymbol) {
+                insert(
+                    parameters,
+                    this.ovaleAst.newValue(nodeList, info.extraSymbol)
+                );
+                annotation.AddSymbol(info.extraSymbol);
+            }
             while (modifier) {
                 if (!info.modifiers && info.symbol === undefined) {
                     this.tracer.Warning(
@@ -323,6 +332,10 @@ export class Emiter {
                             parameters,
                             this.ovaleAst.newValue(nodeList, modifierName)
                         );
+                    }
+                    if (modifierParameters.createOptions) {
+                        if (!annotation.options) annotation.options = {};
+                        annotation.options[modifierName] = true;
                     }
                     if (modifierParameters.extraParameter) {
                         insert(
@@ -1095,7 +1108,8 @@ export class Emiter {
                 conditionCode =
                     "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)";
                 annotation[action] = className;
-                annotation.opt_touch_of_death_on_elite_only = "MONK";
+                if (!annotation.options) annotation.options = {};
+                annotation.options["opt_touch_of_death_on_elite_only"] = true;
                 this.AddSymbol(
                     annotation,
                     "hidden_masters_forbidden_touch_buff"
@@ -1153,7 +1167,12 @@ export class Emiter {
                 className == "SHAMAN" &&
                 sub(action, 1, 11) == "ascendance_"
             ) {
-                let buffName = `${action}_buff`;
+                let [buffName] = this.Disambiguate(
+                    annotation,
+                    `${action}_buff`,
+                    className,
+                    specialization
+                );
                 this.AddSymbol(annotation, buffName);
                 conditionCode = format("BuffExpires(%s)", buffName);
             } else if (className == "SHAMAN" && action == "bloodlust") {
@@ -1251,7 +1270,8 @@ export class Emiter {
             ) {
                 conditionCode =
                     "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()";
-                annotation.opt_meta_only_during_boss = "DEMONHUNTER";
+                if (!annotation.options) annotation.options = {};
+                annotation.options["opt_meta_only_during_boss"] = true;
             } else if (
                 className == "DEMONHUNTER" &&
                 action == "consume_magic"
@@ -1295,7 +1315,10 @@ export class Emiter {
                         ) {
                             conditionCode =
                                 "CheckBoxOn(opt_arcane_mage_burn_phase)";
-                            annotation.opt_arcane_mage_burn_phase = className;
+                            if (!annotation.options) annotation.options = {};
+                            annotation.options[
+                                "opt_arcane_mage_burn_phase"
+                            ] = true;
                         }
                     }
                     isSpellAction = false;
@@ -2654,6 +2677,13 @@ export class Emiter {
                         buffName,
                         any
                     );
+                } else if (property == "refreshable") {
+                    code = format(
+                        "%s%sRefreshable(%s)",
+                        target,
+                        prefix,
+                        buffName
+                    );
                 } else if (property == "improved") {
                     code = format("%sImproved(%s%s)", prefix, buffName);
                 } else if (property == "value") {
@@ -2953,7 +2983,12 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let dotName = `${name}_debuff`;
+            let dotName;
+            if (truthy(match(name, "_dot$"))) {
+                dotName = gsub(name, "_dot$", "_debuff");
+            } else {
+                dotName = `${name}_debuff`;
+            }
             [dotName] = this.Disambiguate(
                 annotation,
                 dotName,
@@ -3288,6 +3323,8 @@ export class Emiter {
         } else if (name == "invulnerable") {
             if (property == "up") {
                 code = "False(raid_events_invulnerable_up)";
+            } else if (property === "exists") {
+                code = "False(raid_event_invulnerable_exists)";
             }
         }
         if (code) {
@@ -3321,6 +3358,8 @@ export class Emiter {
                     raceId = "Troll";
                 } else if (race == "orc") {
                     raceId = "Orc";
+                } else if (race == "night_elf") {
+                    raceId = "NightElf";
                 } else {
                     this.tracer.Print("Warning: Race '%s' not defined", race);
                 }
@@ -3677,9 +3716,9 @@ export class Emiter {
             code = "0";
         } else if (className == "ROGUE" && operand == "poisoned_bleeds") {
             code =
-                "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)";
-            this.AddSymbol(annotation, "rupture_debuff");
-            this.AddSymbol(annotation, "garrote_debuff");
+                "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)";
+            this.AddSymbol(annotation, "rupture");
+            this.AddSymbol(annotation, "garrote");
             this.AddSymbol(annotation, "internal_bleeding_talent");
             this.AddSymbol(annotation, "internal_bleeding_debuff");
         } else if (className == "ROGUE" && operand == "exsanguinated") {
@@ -3690,8 +3729,8 @@ export class Emiter {
         else if (className == "ROGUE" && operand == "ss_buffed") {
             code = "False(ss_buffed)";
         } else if (className == "ROGUE" && operand == "non_ss_buffed_targets") {
-            code = "Enemies() - DebuffCountOnAny(garrote_debuff)";
-            this.AddSymbol(annotation, "garrote_debuff");
+            code = "Enemies() - DebuffCountOnAny(garrote)";
+            this.AddSymbol(annotation, "garrote");
         } else if (
             className == "ROGUE" &&
             operand == "ss_buffed_targets_above_pandemic"
@@ -4059,14 +4098,16 @@ export class Emiter {
                     code =
                         "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
                 }
+            } else if (procType === "has_cooldown") {
+                code =
+                    "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
             } else if (sub(procType, 1, 4) == "has_") {
                 code = format("True(trinket_%s_%s)", procType, statName);
             } else {
-                let property = tokenIterator();
-                let buffName = format("trinket_%s_%s_buff", procType, statName);
-                [buffName] = this.Disambiguate(
+                let property = statName;
+                let [buffName] = this.Disambiguate(
                     annotation,
-                    buffName,
+                    procType,
                     annotation.classId,
                     annotation.specialization
                 );
