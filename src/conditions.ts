@@ -6,10 +6,11 @@ import {
     TestBoolean,
     ConditionFunction,
     isComparator,
-    ConditionResult,
     ReturnValue,
     OvaleConditionClass,
     ReturnConstant,
+    ConditionResult,
+    ParseCondition,
 } from "./Condition";
 import { SpellInfo, OvaleDataClass } from "./Data";
 import { PowerType, OvalePowerClass } from "./states/Power";
@@ -50,7 +51,6 @@ import {
     UnitPower,
     UnitPowerMax,
     UnitRace,
-    UnitStagger,
 } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
@@ -59,7 +59,7 @@ import { lower, upper, sub } from "@wowts/string";
 import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
 import { OvaleAzeriteEssenceClass } from "./states/AzeriteEssence";
 import { BaseState } from "./BaseState";
-import { OvaleFutureClass } from "./Future";
+import { OvaleFutureClass } from "./states/Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "./Frame";
 import { OvaleGUIDClass } from "./GUID";
@@ -68,13 +68,12 @@ import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleCooldownClass } from "./states/Cooldown";
 import { OvaleCompileClass } from "./Compile";
 import { Variables } from "./states/Variables";
-import { LastSpell } from "./LastSpell";
+import { LastSpell } from "./states/LastSpell";
 import { OvaleEquipmentClass } from "./Equipment";
 import { OvaleHealthClass } from "./states/Health";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleLossOfControlClass } from "./states/LossOfControl";
 import { OvaleSpellDamageClass } from "./states/SpellDamage";
-import { OvaleStaggerClass } from "./states/Stagger";
 import { OvaleTotemClass } from "./states/Totem";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./states/DemonHunterSigils";
@@ -104,9 +103,6 @@ const NECROTIC_PLAGUE_DEBUFF = 155159;
 const BLOOD_PLAGUE_DEBUFF = 55078;
 const FROST_FEVER_DEBUFF = 55095;
 const STEADY_FOCUS = 177668;
-const LIGHT_STAGGER = 124275;
-const MODERATE_STAGGER = 124274;
-const HEAVY_STAGGER = 124273;
 
 export class OvaleConditions {
     /**
@@ -5568,86 +5564,6 @@ l    */
         return TestBoolean(boolean, yesno);
     };
 
-    /** Get the remaining amount of damage Stagger will cause to the target.
-	 @name StaggerRemaining
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	     Defaults to target=player.
-	     Valid values: player, target, focus, pet.
-	 @return The amount of damage.
-	 @return A boolean value for the result of the comparison.
-	 @usage
-	 if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
-     */
-    private StaggerRemaining = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let [target] = this.ParseCondition(positionalParams, namedParams);
-        let aura = this.OvaleAura.GetAura(
-            target,
-            HEAVY_STAGGER,
-            atTime,
-            "HARMFUL"
-        );
-        if (!aura || !this.OvaleAura.IsActiveAura(aura, atTime)) {
-            aura = this.OvaleAura.GetAura(
-                target,
-                MODERATE_STAGGER,
-                atTime,
-                "HARMFUL"
-            );
-        }
-        if (!aura || !this.OvaleAura.IsActiveAura(aura, atTime)) {
-            aura = this.OvaleAura.GetAura(
-                target,
-                LIGHT_STAGGER,
-                atTime,
-                "HARMFUL"
-            );
-        }
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
-            let stagger = UnitStagger(target);
-            let rate = (-1 * stagger) / (ending - start);
-            return TestValue(gain, ending, 0, ending, rate, comparator, limit);
-        }
-        return Compare(0, comparator, limit);
-    };
-    /** Get the last Stagger tick damage.
-	 @name StaggerTick
-     @paramsig number or boolean
-     @param count Optional. Counts n amount of previous stagger ticks.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	     Defaults to target=player.
-	     Valid values: player, target, focus, pet.
-	 @return Stagger tick damage.
-	 @return A boolean value for the result of the comparison.
-	 @usage
-     if StaggerTick() > 1000 Spell(purifying_brew) #return current tick of stagger
-     or 
-     if StaggerTick(2) > 1000 Spell(purifying_brew) #return two ticks of current stagger
-     */
-    private StaggerTick = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [count, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[2],
-        ];
-        let damage = this.OvaleStagger.LastTickDamage(count);
-        return Compare(damage, comparator, limit);
-    };
-
     /** Test if the player is in a given stance.
 	 @name Stance
 	 @paramsig boolean
@@ -6823,15 +6739,11 @@ l    */
         namedParams: NamedParameters,
         defaultTarget?: string
     ) {
-        return this.ovaleCondition.ParseCondition(
-            positionalParams,
-            namedParams,
-            defaultTarget
-        );
+        return ParseCondition(namedParams, this.baseState, defaultTarget);
     }
 
     constructor(
-        private ovaleCondition: OvaleConditionClass,
+        ovaleCondition: OvaleConditionClass,
         private OvaleData: OvaleDataClass,
         private OvaleCompile: OvaleCompileClass,
         private OvalePaperDoll: OvalePaperDollClass,
@@ -6854,7 +6766,6 @@ l    */
         private ovaleOptions: OvaleOptionsClass,
         private OvaleLossOfControl: OvaleLossOfControlClass,
         private OvaleSpellDamage: OvaleSpellDamageClass,
-        private OvaleStagger: OvaleStaggerClass,
         private OvaleTotem: OvaleTotemClass,
         private OvaleSigil: OvaleSigilClass,
         private OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass,
@@ -7618,21 +7529,6 @@ l    */
             this.SpellMaxCharges
         );
         ovaleCondition.RegisterCondition("spellusable", true, this.SpellUsable);
-        ovaleCondition.RegisterCondition(
-            "staggerremaining",
-            false,
-            this.StaggerRemaining
-        );
-        ovaleCondition.RegisterCondition(
-            "staggerremains",
-            false,
-            this.StaggerRemaining
-        );
-        ovaleCondition.RegisterCondition(
-            "staggertick",
-            false,
-            this.StaggerTick
-        );
         ovaleCondition.RegisterCondition("stance", false, this.Stance);
         ovaleCondition.RegisterCondition("isstealthed", false, this.Stealthed);
         ovaleCondition.RegisterCondition("stealthed", false, this.Stealthed);

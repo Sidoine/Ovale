@@ -15,13 +15,6 @@ __exports.isComparator = function(token)
     return COMPARATOR[token] ~= nil
 end
 __exports.OvaleConditionClass = __class(nil, {
-    constructor = function(self, baseState)
-        self.baseState = baseState
-        self.conditions = {}
-        self.spellBookConditions = {
-            spell = true
-        }
-    end,
     RegisterCondition = function(self, name, isSpellBookCondition, func)
         self.conditions[name] = func
         if isSpellBookCondition then
@@ -43,31 +36,37 @@ __exports.OvaleConditionClass = __class(nil, {
     HasAny = function(self)
         return next(self.conditions) ~= nil
     end,
-    ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
-        local target = namedParams.target or defaultTarget or "player"
-        namedParams.target = namedParams.target or target
-        if target == "cycle" or target == "target" then
-            target = self.baseState.next.defaultTarget
-        end
-        local filter
-        if namedParams.filter then
-            if namedParams.filter == "debuff" then
-                filter = "HARMFUL"
-            elseif namedParams.filter == "buff" then
-                filter = "HELPFUL"
-            end
-        end
-        local mine = true
-        if namedParams.any and namedParams.any == 1 then
-            mine = false
-        else
-            if  not namedParams.any and namedParams.mine and namedParams.mine ~= 1 then
-                mine = false
-            end
-        end
-        return target, filter, mine
-    end,
+    constructor = function(self)
+        self.conditions = {}
+        self.spellBookConditions = {
+            spell = true
+        }
+    end
 })
+__exports.ParseCondition = function(namedParams, baseState, defaultTarget)
+    local target = namedParams.target or defaultTarget or "player"
+    namedParams.target = namedParams.target or target
+    if target == "cycle" or target == "target" then
+        target = baseState.next.defaultTarget
+    end
+    local filter
+    if namedParams.filter then
+        if namedParams.filter == "debuff" then
+            filter = "HARMFUL"
+        elseif namedParams.filter == "buff" then
+            filter = "HELPFUL"
+        end
+    end
+    local mine = true
+    if namedParams.any and namedParams.any == 1 then
+        mine = false
+    else
+        if  not namedParams.any and namedParams.mine and namedParams.mine ~= 1 then
+            mine = false
+        end
+    end
+    return target, filter, mine
+end
 __exports.TestBoolean = function(a, yesno)
     if  not yesno or yesno == "yes" then
         if a then
@@ -82,6 +81,12 @@ __exports.TestBoolean = function(a, yesno)
 end
 __exports.ReturnValue = function(value, origin, rate)
     return 0, INFINITY, value, origin, rate
+end
+__exports.ReturnValueBetween = function(start, end, value, origin, rate)
+    if start >= end then
+        return 
+    end
+    return start, end, value, origin, rate
 end
 __exports.ReturnConstant = function(value)
     return 0, INFINITY, value, 0, 0

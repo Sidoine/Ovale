@@ -585,6 +585,9 @@ __exports.Emiter = __class(nil, {
                             isSpellAction = false
                         end
                     end
+                elseif action == "cancel_action" then
+                    bodyCode = "texture(INV_Pet_ExitBattle text=cancel)"
+                    isSpellAction = false
                 elseif action == "pool_resource" then
                     bodyNode = self.ovaleAst:NewNode(nodeList)
                     bodyNode.type = "simc_pool_resource"
@@ -606,7 +609,7 @@ __exports.Emiter = __class(nil, {
                         self:AddSymbol(annotation, name)
                         isSpellAction = false
                     end
-                elseif action == "sequence" then
+                elseif action == "sequence" or action == "strict_sequence" then
                     isSpellAction = false
                 elseif action == "stance" then
                     if modifiers.choose then
@@ -1080,6 +1083,8 @@ __exports.Emiter = __class(nil, {
                 code = format("SpellMaxCharges(%s)", name)
             elseif property == "charges_fractional" then
                 code = format("Charges(%s count=0)", name)
+            elseif property == "channeling" then
+                code = format("channeling(%s)", name)
             elseif property == "cooldown" then
                 code = format("SpellCooldown(%s)", name)
             elseif property == "cooldown_react" then
@@ -1093,6 +1098,8 @@ __exports.Emiter = __class(nil, {
             elseif property == "duration" or property == "new_duration" then
                 code = format("BaseDuration(%s)", buffName)
                 symbol = buffName
+            elseif property == "last_used" then
+                code = format("TimeSincePreviousSpell(%s)", name)
             elseif property == "enabled" then
                 if parseNode.asType == "boolean" then
                     code = format("Talent(%s)", talentName)
@@ -1294,6 +1301,8 @@ __exports.Emiter = __class(nil, {
                         code = format("%s%sExpires(%s%s)", target, prefix, buffName, any)
                     elseif property == "duration" then
                         code = format("BaseDuration(%s)", buffName)
+                    elseif property == "last_expire" then
+                        code = format("%sBuffLastExpire(%s)", target, buffName)
                     elseif property == "max_stack" then
                         code = format("SpellData(%s max_stacks)", buffName)
                     elseif property == "react" or property == "stack" then
@@ -1913,18 +1922,6 @@ __exports.Emiter = __class(nil, {
                 local buffName = "zen_sphere_buff"
                 code = format("BuffPresent(%s)", buffName)
                 self:AddSymbol(annotation, buffName)
-            elseif className == "MONK" and sub(operand, 1, 8) == "stagger." then
-                local property = sub(operand, 9)
-                if property == "heavy" or property == "light" or property == "moderate" then
-                    local buffName = format("%s_stagger_debuff", property)
-                    code = format("DebuffPresent(%s)", buffName)
-                    self:AddSymbol(annotation, buffName)
-                elseif property == "pct" then
-                    code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target)
-                elseif match(property, "last_tick_damage_(%d+)") then
-                    local ticks = match(property, "last_tick_damage_(%d+)")
-                    code = format("StaggerTick(%d)", ticks)
-                end
             elseif className == "MONK" and operand == "spinning_crane_kick.count" then
                 code = "SpellCount(spinning_crane_kick)"
                 self:AddSymbol(annotation, "spinning_crane_kick")
@@ -2259,7 +2256,7 @@ __exports.Emiter = __class(nil, {
                     if #group.child == 0 then
                         node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
                     else
-                        node = self.ovaleAst:ParseCode("expression", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
+                        node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
                     end
                 else
                     node = self.ovaleAst:NewNode(nodeList)
@@ -2348,6 +2345,13 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("bok_proc_buff", "blackout_kick_aura", "MONK", "windwalker")
         self:AddDisambiguation("dance_of_chiji_azerite_buff", "dance_of_chiji_buff", "MONK", "windwalker")
         self:AddDisambiguation("energizing_elixer_talent", "energizing_elixir_talent", "MONK", "windwalker")
+        self:AddDisambiguation("blink_any", "blink", "MAGE")
+        self:AddDisambiguation("buff_disciplinary_command", "disciplinary_command", "MAGE")
+        self:AddDisambiguation("disciplinary_command_arcane_buff", "disciplinary_command__arcane_aura_dnt", "MAGE")
+        self:AddDisambiguation("disciplinary_command_fire_buff", "disciplinary_command__fire_aura_dnt", "MAGE")
+        self:AddDisambiguation("disciplinary_command_frost_buff", "disciplinary_command__frost_aura_dnt", "MAGE")
+        self:AddDisambiguation("hyperthread_wristwraps_300142", "hyperthread_wristwraps", "MAGE", "fire")
+        self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2396,6 +2400,8 @@ __exports.Emiter = __class(nil, {
                         name = name .. modifierName
                     elseif modifierParameters.type == 2 then
                         insert(parameters, self.ovaleAst:newValue(nodeList, modifierName))
+                    elseif modifierParameters.type == 4 then
+                        name = modifierName
                     end
                     if modifierParameters.createOptions then
                         if  not annotation.options then

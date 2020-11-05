@@ -8,7 +8,7 @@ import {
     PaperDollSnapshot,
     SpellCastModule,
     LastSpell,
-} from "../LastSpell";
+} from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { tonumber, LuaObj, LuaArray, ipairs } from "@wowts/lua";
 import {

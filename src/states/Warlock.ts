@@ -10,7 +10,7 @@ import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { Compare, OvaleConditionClass } from "../Condition";
-import { OvaleFutureClass } from "../Future";
+import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 
 interface customAura {

@@ -122,6 +122,7 @@ const azeriteTraitByClass = new Map<string, number[]>();
 const essenceByClass = new Map<string, number[]>();
 const runeforgeByClass = new Map<string, number[]>();
 const conduitByClass = new Map<string, number[]>();
+const soulbindAbilityByClass = new Map<string, number[]>();
 
 function getOrSet<T>(map: Map<string, T[]>, className: string) {
     let result = map.get(className);
@@ -242,6 +243,7 @@ for (const filename of files) {
             let spellLists = getOrSet(spellListsByClass, className);
             let runeforges = getOrSet(runeforgeByClass, className);
             let conduits = getOrSet(conduitByClass, className);
+            let soulbindAbilities = getOrSet(soulbindAbilityByClass, className);
 
             const identifiers = ipairs(profile.annotation.symbolList)
                 .map((x) => x[1])
@@ -269,6 +271,8 @@ for (const filename of files) {
                     addId(runeforges, id);
                 } else if (symbol.match(/_conduit$/)) {
                     addId(conduits, id);
+                } else if (symbol.match(/_soulbind$/)) {
+                    addId(soulbindAbilities, id);
                 } else {
                     if (id && classSpells.indexOf(id) < 0) {
                         classSpells.push(id);
@@ -482,6 +486,7 @@ ${limitLine2}
     writeIds(essenceByClass, spellData.essenceById, "id");
     writeIds(runeforgeByClass, spellData.runeforgeById, "bonus_id");
     writeIds(conduitByClass, spellData.conduitById, "id");
+    writeIds(soulbindAbilityByClass, spellData.soulbindAbilityById, "spell_id");
 
     output += `    \`;
 // END`;

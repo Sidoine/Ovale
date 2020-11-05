@@ -1,7 +1,7 @@
 import { OvaleDataClass } from "../Data";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { OvaleClass } from "../Ovale";
-import { LastSpell, SpellCast, SpellCastModule } from "../LastSpell";
+import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import { RequirementMethod, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { next, pairs, LuaObj, tonumber, kpairs } from "@wowts/lua";

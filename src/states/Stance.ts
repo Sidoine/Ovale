@@ -10,7 +10,7 @@ import {
     GetShapeshiftFormInfo,
     GetSpellInfo,
 } from "@wowts/wow-mock";
-import { SpellCast } from "../LastSpell";
+import { SpellCast } from "./LastSpell";
 import { isString, OneTimeMessage } from "../tools";
 import { States, StateModule } from "../State";
 import { OvaleDebugClass, Tracer } from "../Debug";

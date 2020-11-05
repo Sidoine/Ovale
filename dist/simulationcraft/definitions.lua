@@ -219,6 +219,7 @@ __exports.SPECIAL_ACTION = {
     ["start_moving"] = true,
     ["stealth"] = true,
     ["stop_moving"] = true,
+    ["strict_sequence"] = true,
     ["swap_action_list"] = true,
     ["use_items"] = true,
     ["use_item"] = true,
@@ -316,6 +317,15 @@ __exports.MISC_OPERAND = {
     ["fight_remains"] = {
         name = "fightremains"
     },
+    ["firestarter"] = {
+        modifiers = {
+            remains = {
+                type = 4,
+                name = "TargetTimeToHealthPercent",
+                extraParameter = 90
+            }
+        }
+    },
     ["focus"] = {
         name = "focus",
         modifiers = powerModifiers
@@ -337,6 +347,10 @@ __exports.MISC_OPERAND = {
     },
     ["incoming_imps"] = {
         name = "impsspawnedduring"
+    },
+    ["hot_streak_spells_in_flight"] = {
+        name = "inflighttotarget",
+        extraSymbol = "hot_streak"
     },
     ["insanity"] = {
         name = "insanity",
@@ -370,6 +384,10 @@ __exports.MISC_OPERAND = {
         name = "rage",
         modifiers = powerModifiers
     },
+    ["remaining_winters_chill"] = {
+        name = "buffstacks",
+        extraSymbol = "winters_chill"
+    },
     ["rune"] = {
         name = "rune",
         modifiers = powerModifiers
@@ -393,6 +411,30 @@ __exports.MISC_OPERAND = {
     ["soul_shard"] = {
         name = "soulshards",
         modifiers = powerModifiers
+    },
+    ["soulbind"] = {
+        modifiers = {
+            enabled = {
+                type = 1
+            }
+        },
+        symbol = "soulbind"
+    },
+    ["stagger"] = {
+        modifiers = {
+            last_tick_damage_4 = {
+                name = "tick",
+                type = 0
+            },
+            pct = {
+                name = "percent",
+                type = 0
+            },
+            amounttototalpct = {
+                name = "missingpercent",
+                type = 0
+            }
+        }
     },
     ["stealthed"] = {
         name = "buffpresent",

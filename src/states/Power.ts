@@ -1,6 +1,6 @@
 import { L } from "../Localization";
 import { Tokens, OvaleRequirement } from "../Requirement";
-import { SpellCast } from "../LastSpell";
+import { SpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
 import {
@@ -27,7 +27,7 @@ import {
 } from "@wowts/wow-mock";
 import { isNumber, isLuaArray, OneTimeMessage } from "../tools";
 import { OvaleDebugClass, Tracer } from "../Debug";
-import { OvaleFutureClass } from "../Future";
+import { OvaleFutureClass } from "./Future";
 import { BaseState } from "../BaseState";
 import { OvaleDataClass, SpellInfo } from "../Data";
 import { OvaleClass } from "../Ovale";

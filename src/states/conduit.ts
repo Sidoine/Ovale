@@ -33,6 +33,11 @@ export class Conduit {
     registerConditions(condition: OvaleConditionClass) {
         condition.RegisterCondition("conduit", false, this.conduit);
         condition.RegisterCondition("conduitrank", false, this.conduitRank);
+        condition.RegisterCondition(
+            "enabledsoulbind",
+            false,
+            this.enabledSoulbind
+        );
     }
 
     private conduit: ConditionFunction = (positionalParameters) => {
@@ -51,5 +56,10 @@ export class Conduit {
         const data = C_Soulbinds.GetConduitCollectionData(conduitId as number);
         if (!data) return [];
         return ReturnConstant(data.conduitRank);
+    };
+
+    private enabledSoulbind: ConditionFunction = (positionalParameters) => {
+        const [soulbindId] = unpack(positionalParameters);
+        return ReturnBoolean(C_Soulbinds.GetActiveSoulbindID() === soulbindId);
     };
 }

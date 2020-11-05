@@ -253,6 +253,34 @@ export class Emiter {
             "MONK",
             "windwalker"
         );
+        this.AddDisambiguation("blink_any", "blink", "MAGE");
+        this.AddDisambiguation(
+            "buff_disciplinary_command",
+            "disciplinary_command",
+            "MAGE"
+        );
+        this.AddDisambiguation(
+            "disciplinary_command_arcane_buff",
+            "disciplinary_command__arcane_aura_dnt",
+            "MAGE"
+        );
+        this.AddDisambiguation(
+            "disciplinary_command_fire_buff",
+            "disciplinary_command__fire_aura_dnt",
+            "MAGE"
+        );
+        this.AddDisambiguation(
+            "disciplinary_command_frost_buff",
+            "disciplinary_command__frost_aura_dnt",
+            "MAGE"
+        );
+        this.AddDisambiguation(
+            "hyperthread_wristwraps_300142",
+            "hyperthread_wristwraps",
+            "MAGE",
+            "fire"
+        );
+        this.AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -350,6 +378,11 @@ export class Emiter {
                             parameters,
                             this.ovaleAst.newValue(nodeList, modifierName)
                         );
+                    } else if (
+                        modifierParameters.type ===
+                        MiscOperandModifierType.Replace
+                    ) {
+                        name = modifierName;
                     }
                     if (modifierParameters.createOptions) {
                         if (!annotation.options) annotation.options = {};
@@ -1359,6 +1392,9 @@ export class Emiter {
                         isSpellAction = false;
                     }
                 }
+            } else if (action === "cancel_action") {
+                bodyCode = "texture(INV_Pet_ExitBattle text=cancel)";
+                isSpellAction = false;
             } else if (action == "pool_resource") {
                 bodyNode = this.ovaleAst.NewNode(nodeList);
                 bodyNode.type = "simc_pool_resource";
@@ -1391,7 +1427,8 @@ export class Emiter {
                     this.AddSymbol(annotation, name);
                     isSpellAction = false;
                 }
-            } else if (action === "sequence") {
+            } else if (action === "sequence" || action == "strict_sequence") {
+                // TODO doesn't seem to be supported
                 isSpellAction = false;
             } else if (action == "stance") {
                 if (modifiers.choose) {
@@ -2290,6 +2327,8 @@ export class Emiter {
             code = format("SpellMaxCharges(%s)", name);
         } else if (property == "charges_fractional") {
             code = format("Charges(%s count=0)", name);
+        } else if (property === "channeling") {
+            code = format("channeling(%s)", name);
         } else if (property == "cooldown") {
             code = format("SpellCooldown(%s)", name);
         } else if (property == "cooldown_react") {
@@ -2303,6 +2342,8 @@ export class Emiter {
         } else if (property == "duration" || property == "new_duration") {
             code = format("BaseDuration(%s)", buffName);
             symbol = buffName;
+        } else if (property === "last_used") {
+            code = format("TimeSincePreviousSpell(%s)", name);
         } else if (property == "enabled") {
             if (parseNode.asType == "boolean") {
                 code = format("Talent(%s)", talentName);
@@ -2649,6 +2690,8 @@ export class Emiter {
                     );
                 } else if (property == "duration") {
                     code = format("BaseDuration(%s)", buffName);
+                } else if (property === "last_expire") {
+                    code = format("%sBuffLastExpire(%s)", target, buffName);
                 } else if (property == "max_stack") {
                     code = format("SpellData(%s max_stacks)", buffName);
                 } else if (property == "react" || property == "stack") {
@@ -3673,26 +3716,26 @@ export class Emiter {
             let buffName = "zen_sphere_buff";
             code = format("BuffPresent(%s)", buffName);
             this.AddSymbol(annotation, buffName);
-        } else if (className == "MONK" && sub(operand, 1, 8) == "stagger.") {
-            let property = sub(operand, 9);
-            if (
-                property == "heavy" ||
-                property == "light" ||
-                property == "moderate"
-            ) {
-                let buffName = format("%s_stagger_debuff", property);
-                code = format("DebuffPresent(%s)", buffName);
-                this.AddSymbol(annotation, buffName);
-            } else if (property == "pct") {
-                code = format(
-                    "%sStaggerRemaining() / %sMaxHealth() * 100",
-                    target,
-                    target
-                );
-            } else if (truthy(match(property, "last_tick_damage_(%d+)"))) {
-                let ticks = match(property, "last_tick_damage_(%d+)");
-                code = format("StaggerTick(%d)", ticks);
-            }
+            // } else if (className == "MONK" && sub(operand, 1, 8) == "stagger.") {
+            //     let property = sub(operand, 9);
+            //     if (
+            //         property == "heavy" ||
+            //         property == "light" ||
+            //         property == "moderate"
+            //     ) {
+            //         let buffName = format("%s_stagger_debuff", property);
+            //         code = format("DebuffPresent(%s)", buffName);
+            //         this.AddSymbol(annotation, buffName);
+            //     } else if (property == "pct") {
+            //         code = format(
+            //             "%sStaggerRemaining() / %sMaxHealth() * 100",
+            //             target,
+            //             target
+            //         );
+            //     } else if (truthy(match(property, "last_tick_damage_(%d+)"))) {
+            //         let ticks = match(property, "last_tick_damage_(%d+)");
+            //         code = format("StaggerTick(%d)", ticks);
+            //     }
         } else if (
             className == "MONK" &&
             operand == "spinning_crane_kick.count"
@@ -4192,7 +4235,7 @@ export class Emiter {
                     );
                 } else {
                     [node] = this.ovaleAst.ParseCode(
-                        "expression",
+                        "group",
                         this.ovaleAst.Unparse(group),
                         nodeList,
                         annotation.astAnnotation

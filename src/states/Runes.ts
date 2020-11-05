@@ -5,7 +5,7 @@ import { ipairs, LuaArray, wipe } from "@wowts/lua";
 import { GetRuneCooldown, GetTime } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { sort } from "@wowts/table";
-import { SpellCast, PaperDollSnapshot } from "../LastSpell";
+import { SpellCast, PaperDollSnapshot } from "./LastSpell";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, OvaleDebugClass } from "../Debug";
 import { Profiler, OvaleProfilerClass } from "../Profiler";

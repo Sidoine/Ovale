@@ -1,7 +1,7 @@
-import { OvaleAuraClass } from "./states/Aura";
-import { OvaleDataClass } from "./Data";
-import { OvaleGUIDClass } from "./GUID";
-import { OvalePaperDollClass, HasteType } from "./states/PaperDoll";
+import { OvaleAuraClass } from "./Aura";
+import { OvaleDataClass } from "../Data";
+import { OvaleGUIDClass } from "../GUID";
+import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LastSpell, SpellCast, self_pool, createSpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -13,6 +13,7 @@ import {
     LuaArray,
     wipe,
     kpairs,
+    unpack,
 } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { insert, remove } from "@wowts/table";
@@ -26,17 +27,22 @@ import {
     UnitName,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
-import { OvaleStateClass, States } from "./State";
-import { OvaleCooldownClass } from "./states/Cooldown";
-import { BaseState } from "./BaseState";
-import { isLuaArray } from "./tools";
-import { OvaleRequirement } from "./Requirement";
-import { OvaleClass } from "./Ovale";
+import { OvaleStateClass, States } from "../State";
+import { OvaleCooldownClass } from "./Cooldown";
+import { BaseState } from "../BaseState";
+import { isLuaArray } from "../tools";
+import { OvaleRequirement } from "../Requirement";
+import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Tracer, OvaleDebugClass } from "./Debug";
-import { Profiler, OvaleProfilerClass } from "./Profiler";
-import { OvaleStanceClass } from "./states/Stance";
-import { OvaleSpellBookClass } from "./SpellBook";
+import { Tracer, OvaleDebugClass } from "../Debug";
+import { Profiler, OvaleProfilerClass } from "../Profiler";
+import { OvaleStanceClass } from "./Stance";
+import { OvaleSpellBookClass } from "../SpellBook";
+import {
+    ConditionFunction,
+    OvaleConditionClass,
+    ReturnValueBetween,
+} from "../Condition";
 
 let strsub = sub;
 let tremove = remove;
@@ -174,6 +180,28 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             aceEvent
         );
     }
+
+    public registerConditions(condition: OvaleConditionClass) {
+        condition.RegisterCondition("channeling", true, this.isChanneling);
+    }
+
+    private isChanneling: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ) => {
+        const [spellId] = unpack(positionalParameters);
+        const state = this.GetState(atTime);
+        if (state.currentCast.spellId !== spellId || !state.currentCast.channel)
+            return [];
+        return ReturnValueBetween(
+            state.currentCast.start,
+            state.currentCast.stop,
+            1,
+            state.currentCast.start,
+            0
+        );
+    };
 
     UpdateStateCounters(
         state: OvaleFutureData,

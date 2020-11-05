@@ -1,5 +1,5 @@
 import { OvaleQueue } from "./Queue";
-import { SpellCast } from "./LastSpell";
+import { SpellCast } from "./states/LastSpell";
 
 export interface StateModule {
     CleanState(): void;

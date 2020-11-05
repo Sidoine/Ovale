@@ -12,7 +12,7 @@ import {
 } from "@wowts/wow-mock";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleFutureClass } from "./Future";
+import { OvaleFutureClass } from "./states/Future";
 import { Tracer, OvaleDebugClass } from "./Debug";
 import { OvaleCombatClass } from "./states/combat";
 

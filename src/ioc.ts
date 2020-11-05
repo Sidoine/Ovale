@@ -23,10 +23,10 @@ import { OvaleSigilClass } from "./states/DemonHunterSigils";
 import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleEquipmentClass } from "./Equipment";
 import { OvaleFrameModuleClass } from "./Frame";
-import { OvaleFutureClass } from "./Future";
+import { OvaleFutureClass } from "./states/Future";
 import { OvaleGUIDClass } from "./GUID";
 import { OvaleHealthClass } from "./states/Health";
-import { LastSpell } from "./LastSpell";
+import { LastSpell } from "./states/LastSpell";
 import { OvaleLossOfControlClass } from "./states/LossOfControl";
 import { OvalePowerClass } from "./states/Power";
 import { OvaleProfilerClass } from "./Profiler";
@@ -134,7 +134,7 @@ export class IoC {
             this.lastSpell
         );
         this.baseState = new BaseState();
-        this.condition = new OvaleConditionClass(this.baseState);
+        this.condition = new OvaleConditionClass();
         this.guid = new OvaleGUIDClass(this.ovale, this.debug, this.condition);
         this.requirement = new OvaleRequirement(this.baseState, this.guid);
         this.data = new OvaleDataClass(
@@ -284,7 +284,13 @@ export class IoC {
             this.spellBook,
             combat
         );
-        this.stagger = new OvaleStaggerClass(this.ovale, combat);
+        this.stagger = new OvaleStaggerClass(
+            this.ovale,
+            combat,
+            this.baseState,
+            this.aura,
+            this.health
+        );
         this.spellFlash = new OvaleSpellFlashClass(
             this.options,
             this.ovale,
@@ -458,7 +464,6 @@ export class IoC {
             this.options,
             this.lossOfControl,
             this.spellDamage,
-            this.stagger,
             this.totem,
             this.demonHunterSigils,
             this.demonHunterSoulFragments,
@@ -493,5 +498,7 @@ export class IoC {
         combat.registerConditions(this.condition);
         conduit.registerConditions(this.condition);
         this.warlock.registerConditions(this.condition);
+        this.aura.registerConditions(this.condition);
+        this.future.registerConditions(this.condition);
     }
 }

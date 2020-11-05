@@ -10,6 +10,7 @@ local TestBoolean = __Condition.TestBoolean
 local isComparator = __Condition.isComparator
 local ReturnValue = __Condition.ReturnValue
 local ReturnConstant = __Condition.ReturnConstant
+local ParseCondition = __Condition.ParseCondition
 local ipairs = ipairs
 local pairs = pairs
 local type = type
@@ -42,7 +43,6 @@ local UnitName = UnitName
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitRace = UnitRace
-local UnitStagger = UnitStagger
 local huge = math.huge
 local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
@@ -70,9 +70,6 @@ local NECROTIC_PLAGUE_DEBUFF = 155159
 local BLOOD_PLAGUE_DEBUFF = 55078
 local FROST_FEVER_DEBUFF = 55095
 local STEADY_FOCUS = 177668
-local LIGHT_STAGGER = 124275
-local MODERATE_STAGGER = 124274
-local HEAVY_STAGGER = 124273
 __exports.OvaleConditions = __class(nil, {
     ComputeParameter = function(self, spellId, paramName, atTime)
         local si = self.OvaleData:GetSpellInfo(spellId)
@@ -243,10 +240,9 @@ __exports.OvaleConditions = __class(nil, {
         end
     end,
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
-        return self.ovaleCondition:ParseCondition(positionalParams, namedParams, defaultTarget)
+        return ParseCondition(namedParams, self.baseState, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
-        self.ovaleCondition = ovaleCondition
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
         self.OvalePaperDoll = OvalePaperDoll
@@ -269,7 +265,6 @@ __exports.OvaleConditions = __class(nil, {
         self.ovaleOptions = ovaleOptions
         self.OvaleLossOfControl = OvaleLossOfControl
         self.OvaleSpellDamage = OvaleSpellDamage
-        self.OvaleStagger = OvaleStagger
         self.OvaleTotem = OvaleTotem
         self.OvaleSigil = OvaleSigil
         self.OvaleDemonHunterSoulFragments = OvaleDemonHunterSoulFragments
@@ -1636,29 +1631,6 @@ __exports.OvaleConditions = __class(nil, {
             local boolean = isUsable or noMana
             return TestBoolean(boolean, yesno)
         end
-        self.StaggerRemaining = function(positionalParams, namedParams, atTime)
-            local comparator, limit = positionalParams[1], positionalParams[2]
-            local target = self:ParseCondition(positionalParams, namedParams)
-            local aura = self.OvaleAura:GetAura(target, HEAVY_STAGGER, atTime, "HARMFUL")
-            if  not aura or  not self.OvaleAura:IsActiveAura(aura, atTime) then
-                aura = self.OvaleAura:GetAura(target, MODERATE_STAGGER, atTime, "HARMFUL")
-            end
-            if  not aura or  not self.OvaleAura:IsActiveAura(aura, atTime) then
-                aura = self.OvaleAura:GetAura(target, LIGHT_STAGGER, atTime, "HARMFUL")
-            end
-            if aura and self.OvaleAura:IsActiveAura(aura, atTime) then
-                local gain, start, ending = aura.gain, aura.start, aura.ending
-                local stagger = UnitStagger(target)
-                local rate = (-1 * stagger) / (ending - start)
-                return TestValue(gain, ending, 0, ending, rate, comparator, limit)
-            end
-            return Compare(0, comparator, limit)
-        end
-        self.StaggerTick = function(positionalParams, namedParams, atTime)
-            local count, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[2]
-            local damage = self.OvaleStagger:LastTickDamage(count)
-            return Compare(damage, comparator, limit)
-        end
         self.Stance = function(positionalParams, namedParams, atTime)
             local stance, yesno = positionalParams[1], positionalParams[2]
             local boolean = self.OvaleStance:IsStance(stance, atTime)
@@ -2236,9 +2208,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("spellknown", true, self.SpellKnown)
         ovaleCondition:RegisterCondition("spellmaxcharges", true, self.SpellMaxCharges)
         ovaleCondition:RegisterCondition("spellusable", true, self.SpellUsable)
-        ovaleCondition:RegisterCondition("staggerremaining", false, self.StaggerRemaining)
-        ovaleCondition:RegisterCondition("staggerremains", false, self.StaggerRemaining)
-        ovaleCondition:RegisterCondition("staggertick", false, self.StaggerTick)
         ovaleCondition:RegisterCondition("stance", false, self.Stance)
         ovaleCondition:RegisterCondition("isstealthed", false, self.Stealthed)
         ovaleCondition:RegisterCondition("stealthed", false, self.Stealthed)

@@ -43,8 +43,6 @@ export class OvaleConditionClass {
         spell: true,
     };
 
-    constructor(private baseState: BaseState) {}
-
     /**
      * Register a new condition
      * @param name The condition name (must be lowercase)
@@ -81,36 +79,36 @@ export class OvaleConditionClass {
     HasAny() {
         return next(this.conditions) !== undefined;
     }
+}
 
-    ParseCondition(
-        positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
-        defaultTarget?: string
-    ): [string, AuraType | undefined, boolean] {
-        let target = namedParams.target || defaultTarget || "player";
-        namedParams.target = namedParams.target || target;
+export function ParseCondition(
+    namedParams: NamedParameters,
+    baseState: BaseState,
+    defaultTarget?: string
+): [string, AuraType | undefined, boolean] {
+    let target = namedParams.target || defaultTarget || "player";
+    namedParams.target = namedParams.target || target;
 
-        if (target === "cycle" || target === "target") {
-            target = this.baseState.next.defaultTarget;
-        }
-        let filter: AuraType | undefined;
-        if (namedParams.filter) {
-            if (namedParams.filter == "debuff") {
-                filter = "HARMFUL";
-            } else if (namedParams.filter == "buff") {
-                filter = "HELPFUL";
-            }
-        }
-        let mine = true;
-        if (namedParams.any && namedParams.any == 1) {
-            mine = false;
-        } else {
-            if (!namedParams.any && namedParams.mine && namedParams.mine != 1) {
-                mine = false;
-            }
-        }
-        return [target, filter, mine];
+    if (target === "cycle" || target === "target") {
+        target = baseState.next.defaultTarget;
     }
+    let filter: AuraType | undefined;
+    if (namedParams.filter) {
+        if (namedParams.filter == "debuff") {
+            filter = "HARMFUL";
+        } else if (namedParams.filter == "buff") {
+            filter = "HELPFUL";
+        }
+    }
+    let mine = true;
+    if (namedParams.any && namedParams.any == 1) {
+        mine = false;
+    } else {
+        if (!namedParams.any && namedParams.mine && namedParams.mine != 1) {
+            mine = false;
+        }
+    }
+    return [target, filter, mine];
 }
 
 export function TestBoolean(a: boolean, yesno: "yes" | "no"): ConditionResult {
@@ -132,6 +130,17 @@ export function ReturnValue(
     rate: number
 ): ConditionResult {
     return [0, INFINITY, value, origin, rate];
+}
+
+export function ReturnValueBetween(
+    start: number,
+    end: number,
+    value: number,
+    origin: number,
+    rate: number
+): ConditionResult {
+    if (start >= end) return [];
+    return [start, end, value, origin, rate];
 }
 
 export function ReturnConstant(

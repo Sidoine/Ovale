@@ -49,7 +49,7 @@ import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./GUID";
 import { OvalePowerClass } from "./states/Power";
-import { OvaleFutureClass } from "./Future";
+import { OvaleFutureClass } from "./states/Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
 import { OvaleDebugClass, Tracer } from "./Debug";

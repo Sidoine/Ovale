@@ -1,13 +1,13 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
-import { SpellCast } from "../LastSpell";
+import { SpellCast } from "./LastSpell";
 import { OvaleStateClass, StateModule, States } from "../State";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Profiler, OvaleProfilerClass } from "../Profiler";
 import { OvaleDataClass } from "../Data";
-import { OvaleFutureClass } from "../Future";
+import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { OvaleDebugClass, Tracer } from "../Debug";

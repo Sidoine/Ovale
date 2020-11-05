@@ -1,7 +1,7 @@
-import { OvalePool } from "./Pool";
+import { OvalePool } from "../Pool";
 import { lualength, LuaObj, LuaArray, pairs } from "@wowts/lua";
 import { remove, insert } from "@wowts/table";
-import { Powers } from "./states/Power";
+import { Powers } from "./Power";
 
 export interface SpellCast extends PaperDollSnapshot {
     stop: number;

@@ -36,10 +36,15 @@ __exports.Conduit = __class(nil, {
             end
             return ReturnConstant(data.conduitRank)
         end
+        self.enabledSoulbind = function(positionalParameters)
+            local soulbindId = unpack(positionalParameters)
+            return ReturnBoolean(C_Soulbinds.GetActiveSoulbindID() == soulbindId)
+        end
         debug.defaultOptions.args["covenant"] = self.debugOptions
     end,
     registerConditions = function(self, condition)
         condition:RegisterCondition("conduit", false, self.conduit)
         condition:RegisterCondition("conduitrank", false, self.conduitRank)
+        condition:RegisterCondition("enabledsoulbind", false, self.enabledSoulbind)
     end,
 })

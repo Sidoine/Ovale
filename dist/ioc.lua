@@ -51,14 +51,14 @@ local __Equipment = LibStub:GetLibrary("ovale/Equipment")
 local OvaleEquipmentClass = __Equipment.OvaleEquipmentClass
 local __Frame = LibStub:GetLibrary("ovale/Frame")
 local OvaleFrameModuleClass = __Frame.OvaleFrameModuleClass
-local __Future = LibStub:GetLibrary("ovale/Future")
-local OvaleFutureClass = __Future.OvaleFutureClass
+local __statesFuture = LibStub:GetLibrary("ovale/states/Future")
+local OvaleFutureClass = __statesFuture.OvaleFutureClass
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUIDClass = __GUID.OvaleGUIDClass
 local __statesHealth = LibStub:GetLibrary("ovale/states/Health")
 local OvaleHealthClass = __statesHealth.OvaleHealthClass
-local __LastSpell = LibStub:GetLibrary("ovale/LastSpell")
-local LastSpell = __LastSpell.LastSpell
+local __statesLastSpell = LibStub:GetLibrary("ovale/states/LastSpell")
+local LastSpell = __statesLastSpell.LastSpell
 local __statesLossOfControl = LibStub:GetLibrary("ovale/states/LossOfControl")
 local OvaleLossOfControlClass = __statesLossOfControl.OvaleLossOfControlClass
 local __statesPower = LibStub:GetLibrary("ovale/states/Power")
@@ -127,7 +127,7 @@ __exports.IoC = __class(nil, {
         self.lastSpell = LastSpell()
         self.paperDoll = OvalePaperDollClass(self.equipment, self.ovale, self.debug, self.profiler, self.lastSpell)
         self.baseState = BaseState()
-        self.condition = OvaleConditionClass(self.baseState)
+        self.condition = OvaleConditionClass()
         self.guid = OvaleGUIDClass(self.ovale, self.debug, self.condition)
         self.requirement = OvaleRequirement(self.baseState, self.guid)
         self.data = OvaleDataClass(self.baseState, self.guid, self.requirement)
@@ -149,7 +149,7 @@ __exports.IoC = __class(nil, {
         self.score = OvaleScoreClass(self.ovale, self.future, self.debug, self.spellBook, combat)
         self.compile = OvaleCompileClass(self.azeriteArmor, self.equipment, self.ast, self.condition, self.cooldown, self.paperDoll, self.data, self.profiler, self.debug, self.options, self.ovale, self.score, self.spellBook, self.stance)
         self.power = OvalePowerClass(self.debug, self.ovale, self.profiler, self.data, self.future, self.baseState, self.aura, self.paperDoll, self.requirement, self.spellBook, combat)
-        self.stagger = OvaleStaggerClass(self.ovale, combat)
+        self.stagger = OvaleStaggerClass(self.ovale, combat, self.baseState, self.aura, self.health)
         self.spellFlash = OvaleSpellFlashClass(self.options, self.ovale, combat, self.data, self.spellBook, self.stance)
         self.totem = OvaleTotemClass(self.ovale, self.state, self.profiler, self.data, self.future, self.aura, self.spellBook, self.debug)
         self.variables = Variables(combat, self.baseState, self.debug)
@@ -176,7 +176,7 @@ __exports.IoC = __class(nil, {
         local covenant = Covenant(self.ovale, self.debug)
         local runeforge = Runeforge(self.debug)
         local conduit = Conduit(self.debug)
-        self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.lossOfControl, self.spellDamage, self.stagger, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
+        self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.lossOfControl, self.spellDamage, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
         self.state:RegisterState(self.cooldown)
         self.state:RegisterState(self.paperDoll)
         self.state:RegisterState(self.baseState)
@@ -198,5 +198,7 @@ __exports.IoC = __class(nil, {
         combat:registerConditions(self.condition)
         conduit:registerConditions(self.condition)
         self.warlock:registerConditions(self.condition)
+        self.aura:registerConditions(self.condition)
+        self.future:registerConditions(self.condition)
     end,
 })

@@ -28,7 +28,6 @@
    <Script file="scripts\index.lua"/>
    <Script file="states\BossMod.lua"/>
    <Script file="states\DemonHunterSigils.lua"/>
-   <Script file="states\Stagger.lua"/>
    <Script file="states\SpellDamage.lua"/>
    <Script file="states\AzeriteEssence.lua"/>
    <Script file="Recount.lua"/>
@@ -51,6 +50,7 @@
    <Script file="acegui-helpers.lua"/>
    <Script file="tools.lua"/>
    <Script file="states\runeforge.lua"/>
+   <Script file="states\Stagger.lua"/>
    <Script file="states\DemonHunterSoulFragments.lua"/>
    <Script file="states\LossOfControl.lua"/>
    <Script file="states\Health.lua"/>
@@ -68,8 +68,8 @@
    <Script file="simulationcraft\generator.lua"/>
    <Script file="simulationcraft\unparser.lua"/>
    <Script file="states\DamageTaken.lua"/>
-   <Script file="LastSpell.lua"/>
-   <Script file="Future.lua"/>
+   <Script file="states\LastSpell.lua"/>
+   <Script file="states\Future.lua"/>
    <Script file="Localization.lua"/>
    <Script file="simulationcraft\SimulationCraft.lua"/>
    <Script file="Icon.lua"/>

@@ -7,7 +7,7 @@ import { OvaleGUIDClass } from "../GUID";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { OvaleStateClass, States } from "../State";
 import { OvaleClass } from "../Ovale";
-import { LastSpell, SpellCast, PaperDollSnapshot } from "../LastSpell";
+import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
 import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -19,6 +19,7 @@ import {
     next,
     LuaArray,
     kpairs,
+    unpack,
 } from "@wowts/lua";
 import { lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
@@ -31,7 +32,13 @@ import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "../BaseState";
 import { isLuaArray, isString, OneTimeMessage } from "../tools";
-import { ConditionResult } from "../Condition";
+import {
+    ConditionFunction,
+    ConditionResult,
+    OvaleConditionClass,
+    ParseCondition,
+    ReturnValue,
+} from "../Condition";
 import { OvaleOptionsClass } from "../Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../acegui-helpers";
@@ -123,6 +130,8 @@ export interface Aura extends SpellCast {
 }
 
 type AuraDB = LuaObj<LuaObj<LuaObj<Aura>>>;
+
+/** Either a spell id or a spell list name */
 type AuraId = number | string;
 
 export function PutAura(
@@ -342,6 +351,14 @@ export class OvaleAuraClass extends States<AuraInterface> {
         this.profiler = ovaleProfiler.create("OvaleAura");
         this.ovaleState.RegisterState(this);
         this.addDebugOptions();
+    }
+
+    registerConditions(condition: OvaleConditionClass) {
+        condition.RegisterCondition(
+            "bufflastexpire",
+            true,
+            this.buffLastExpire
+        );
     }
 
     IsWithinAuraLag(time1: number, time2: number, factor?: number) {
@@ -752,6 +769,28 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
     }
+
+    private buffLastExpire: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ) => {
+        let [spellId] = unpack(positionalParameters);
+        let [target, filter, mine] = ParseCondition(
+            namedParameters,
+            this.baseState
+        );
+        const aura = this.GetAura(
+            target,
+            spellId as number,
+            atTime,
+            filter,
+            mine
+        );
+        if (!aura) return [];
+        return ReturnValue(0, aura.ending, 1);
+    };
+
     IsActiveAura(aura: Aura, atTime: number): aura is Aura {
         let boolean = false;
         atTime = atTime || this.baseState.next.currentTime;

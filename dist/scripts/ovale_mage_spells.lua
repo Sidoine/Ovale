@@ -60,6 +60,11 @@ Define(blaster_master_buff 274598)
   # Mastery increased by w1.
   SpellAddBuff(blaster_master_buff blaster_master_buff=1)
 
+Define(blink 1953)
+# Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
+  SpellInfo(blink cd=0.5 charge_cd=15 duration=0.3)
+  # Blinking.
+  SpellAddBuff(blink blink=1)
 Define(blizzard 190356)
 # Ice shards pelt the target area, dealing 190357m1*8 Frost damage over 8 seconds and reducing movement speed by 12486s1 for 3 seconds.?a236662[rnrnEach time Blizzard deals damage, the cooldown of Frozen Orb is reduced by 236662s1/100.1 sec.][]
   SpellInfo(blizzard cd=8 duration=8)
@@ -110,6 +115,18 @@ Define(disciplinary_command 327371)
   SpellInfo(disciplinary_command cd=30 duration=20 gcd=0 offgcd=1)
   # Critical Strike damage increased by w1.
   SpellAddBuff(disciplinary_command disciplinary_command=1)
+Define(disciplinary_command__arcane_aura_dnt 327369)
+# Casting a Frost, Fire and Arcane spell within 10 seconds of each other increases your Critical Strike damage of all your spells by 327371s1. This effect can only occur once every 327371s2 sec.
+  SpellInfo(disciplinary_command__arcane_aura_dnt duration=10 gcd=0 offgcd=1)
+  SpellAddBuff(disciplinary_command__arcane_aura_dnt disciplinary_command__arcane_aura_dnt=1)
+Define(disciplinary_command__fire_aura_dnt 327368)
+# Casting a Frost, Fire and Arcane spell within 10 seconds of each other increases your Critical Strike damage of all your spells by 327371s1. This effect can only occur once every 327371s2 sec.
+  SpellInfo(disciplinary_command__fire_aura_dnt duration=10 gcd=0 offgcd=1)
+  SpellAddBuff(disciplinary_command__fire_aura_dnt disciplinary_command__fire_aura_dnt=1)
+Define(disciplinary_command__frost_aura_dnt 327366)
+# Casting a Frost, Fire and Arcane spell within 10 seconds of each other increases your Critical Strike damage of all your spells by 327371s1. This effect can only occur once every 327371s2 sec.
+  SpellInfo(disciplinary_command__frost_aura_dnt duration=10 gcd=0 offgcd=1)
+  SpellAddBuff(disciplinary_command__frost_aura_dnt disciplinary_command__frost_aura_dnt=1)
 Define(dragons_breath 31661)
 # Enemies in a cone in front of you take (58.25 of Spell Power) Fire damage and are disoriented for 4 seconds. Damage will cancel the effect.
   SpellInfo(dragons_breath cd=20 duration=4)
@@ -223,6 +240,9 @@ Define(hot_streak 195283)
   SpellInfo(hot_streak max_stacks=1 gcd=0 offgcd=1)
   # Your next Pyroblast or Flamestrike spell is instant cast, and causes double the normal Ignite damage.
   SpellAddBuff(hot_streak hot_streak=1)
+Define(hyperthread_wristwraps 300142)
+# Reduce the remaining cooldown of your s1 most recently cast spells by s2 sec.
+  SpellInfo(hyperthread_wristwraps cd=120 gcd=20)
 Define(ice_floes 108839)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
   SpellInfo(ice_floes cd=20 duration=15 max_stacks=3 gcd=0 offgcd=1 talent=ice_floes_talent)
@@ -330,6 +350,11 @@ Define(reckless_force_buff 304038)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff gcd=0 offgcd=1)
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(replenish_mana 5405)
+# Restores s1 mana.
+  SpellInfo(replenish_mana cd=120 gcd=0 offgcd=1)
+  # Restoring w2 mana every t1 sec.
+  SpellAddBuff(replenish_mana replenish_mana=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
@@ -459,6 +484,14 @@ Define(glacial_fragments_runeforge 6830)
 Define(arcane_prodigy_conduit 34)
 Define(flame_accretion_conduit 53)
 Define(infernal_cascade_conduit 30)
+Define(field_of_blossoms_soulbind 319191)
+Define(combat_meditation_soulbind 328266)
+Define(grove_invigoration_soulbind 322721)
+Define(wasteland_propriety_soulbind 319983)
     ]]
+    code = code .. [[
+Define(sun_kings_blessing_ready_buff 333315)  
+Define(clearcasting_channel_buff 277726)
+]]
     OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end

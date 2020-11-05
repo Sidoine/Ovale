@@ -37,7 +37,7 @@ import {
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { AceGUIRegisterAsContainer } from "./acegui-helpers";
-import { OvaleFutureClass } from "./Future";
+import { OvaleFutureClass } from "./states/Future";
 import { BaseState } from "./BaseState";
 import { AstNode } from "./AST";
 import { OvaleClass } from "./Ovale";

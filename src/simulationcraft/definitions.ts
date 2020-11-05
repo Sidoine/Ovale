@@ -521,6 +521,7 @@ export let SPECIAL_ACTION: LuaObj<boolean> = {
     ["start_moving"]: true,
     ["stealth"]: true,
     ["stop_moving"]: true,
+    ["strict_sequence"]: true,
     ["swap_action_list"]: true,
     ["use_items"]: true,
     ["use_item"]: true,
@@ -533,6 +534,7 @@ export const enum MiscOperandModifierType {
     Prefix,
     Parameter,
     Remove,
+    Replace,
 }
 
 interface MiscOperandModifier {
@@ -601,6 +603,15 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         symbol: "exsanguinated",
     },
     ["fight_remains"]: { name: "fightremains" },
+    ["firestarter"]: {
+        modifiers: {
+            remains: {
+                type: MiscOperandModifierType.Replace,
+                name: "TargetTimeToHealthPercent",
+                extraParameter: 90,
+            },
+        },
+    },
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
     ["health"]: {
@@ -608,6 +619,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     },
     ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
     ["incoming_imps"]: { name: "impsspawnedduring" },
+    ["hot_streak_spells_in_flight"]: {
+        name: "inflighttotarget",
+        extraSymbol: "hot_streak",
+    },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
     ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
@@ -623,6 +638,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         },
     },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
+    ["remaining_winters_chill"]: {
+        name: "buffstacks",
+        extraSymbol: "winters_chill",
+    },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
     ["runeforge"]: {
         modifiers: {
@@ -633,6 +652,26 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
+    ["soulbind"]: {
+        modifiers: { enabled: { type: MiscOperandModifierType.Prefix } },
+        symbol: "soulbind",
+    },
+    ["stagger"]: {
+        modifiers: {
+            last_tick_damage_4: {
+                name: "tick",
+                type: MiscOperandModifierType.Suffix,
+            },
+            pct: {
+                name: "percent",
+                type: MiscOperandModifierType.Suffix,
+            },
+            amounttototalpct: {
+                name: "missingpercent",
+                type: MiscOperandModifierType.Suffix,
+            },
+        },
+    },
     ["stealthed"]: {
         name: "buffpresent",
         modifiers: {

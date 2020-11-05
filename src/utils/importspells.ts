@@ -1938,6 +1938,24 @@ export function getSpellData(directory: string) {
         conduitById.set(conduit.id, conduit);
     }
 
+    if (!output.soulbind_ability_entry_t)
+        throw Error("No soulbind_ability_entry_t");
+    const soulbindAbilityById = new Map<number, SoulbindAbility>();
+    for (const row of output.soulbind_ability_entry_t) {
+        let i = 0;
+        const soulbindAbility: SoulbindAbility = {
+            spell_id: getNumber(row[i++]),
+            covenant_id: getNumber(row[i++]),
+            name: getString(row[i++]),
+            identifier: "",
+        };
+        soulbindAbility.identifier = getIdentifier(
+            soulbindAbility.name + "_soulbind"
+        );
+        identifiers[soulbindAbility.identifier] = soulbindAbility.spell_id;
+        soulbindAbilityById.set(soulbindAbility.spell_id, soulbindAbility);
+    }
+
     if (!output.dbc_item_data_t) throw Error("No dbc_item_data_t");
 
     console.log("Import item data...");
@@ -2001,5 +2019,6 @@ export function getSpellData(directory: string) {
         essenceById,
         runeforgeById,
         conduitById,
+        soulbindAbilityById,
     };
 }

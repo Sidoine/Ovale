@@ -13,6 +13,7 @@ local tonumber = tonumber
 local wipe = wipe
 local next = next
 local kpairs = pairs
+local unpack = unpack
 local lower = string.lower
 local sub = string.sub
 local concat = table.concat
@@ -27,6 +28,9 @@ local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local isString = __tools.isString
 local OneTimeMessage = __tools.OneTimeMessage
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local ParseCondition = __Condition.ParseCondition
+local ReturnValue = __Condition.ReturnValue
 local strlower = lower
 local strsub = sub
 local tconcat = concat
@@ -341,6 +345,15 @@ __exports.OvaleAuraClass = __class(States, {
                 self:ScanAuras(unitId, guid)
             end
         end
+        self.buffLastExpire = function(positionalParameters, namedParameters, atTime)
+            local spellId = unpack(positionalParameters)
+            local target, filter, mine = ParseCondition(namedParameters, self.baseState)
+            local aura = self:GetAura(target, spellId, atTime, filter, mine)
+            if  not aura then
+                return 
+            end
+            return ReturnValue(0, aura.ending, 1)
+        end
         self.RequireBuffHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
             local stacks = 1
@@ -425,6 +438,9 @@ __exports.OvaleAuraClass = __class(States, {
         self.profiler = ovaleProfiler:create("OvaleAura")
         self.ovaleState:RegisterState(self)
         self:addDebugOptions()
+    end,
+    registerConditions = function(self, condition)
+        condition:RegisterCondition("bufflastexpire", true, self.buffLastExpire)
     end,
     IsWithinAuraLag = function(self, time1, time2, factor)
         factor = factor or 1
