@@ -16,6 +16,7 @@ import { BaseState } from "./BaseState";
 import { isLuaArray, isString, OneTimeMessage } from "./tools";
 import { HasteType } from "./states/PaperDoll";
 import { Powers } from "./states/Power";
+import { SpellId } from "@wowts/wow-mock";
 
 const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
@@ -294,18 +295,24 @@ export class OvaleDataClass {
             [115804]: true,
         },
         stealthed_buff: {
-            [1784]: true,
-            [5215]: true,
-            [11327]: true,
-            [24450]: true,
-            [58984]: true,
-            [90328]: true,
-            [102543]: true,
-            [148523]: true,
-            [115191]: true,
-            [115192]: true,
+            [SpellId.stealth]: true,
+            [SpellId.prowl]: true,
+            [SpellId.vanish]: true,
+            [SpellId.shadowmeld]: true,
+            [SpellId.incarnation_king_of_the_jungle]: true,
+            [SpellId.subterfuge]: true,
             [115193]: true,
-            [185422]: true,
+            [SpellId.shadow_dance]: true,
+        },
+        rogue_stealthed_buff: {
+            [SpellId.stealth]: true,
+            [SpellId.vanish]: true,
+            [SpellId.shadow_dance]: true,
+            [SpellId.subterfuge]: true,
+        },
+        mantle_stealthed_buff: {
+            [SpellId.stealth]: true,
+            [SpellId.vanish]: true,
         },
         burst_haste_buff: {
             [2825]: true,
@@ -321,6 +328,14 @@ export class OvaleDataClass {
         },
         raid_movement_buff: {
             [106898]: true,
+        },
+        roll_the_bones_buff: {
+            [SpellId.broadside]: true,
+            [SpellId.buried_treasure]: true,
+            [SpellId.grand_melee]: true,
+            [SpellId.ruthless_precision]: true,
+            [SpellId.skull_and_crossbones]: true,
+            [SpellId.true_bearing]: true,
         },
     };
     constructor(
@@ -564,7 +579,7 @@ export class OvaleDataClass {
             for (const [v, rArray] of pairs(requirements)) {
                 if (isLuaArray(rArray)) {
                     for (const [, requirement] of ipairs<any>(rArray)) {
-                        let verified = this.requirement.CheckRequirements(
+                        let [verified] = this.requirement.CheckRequirements(
                             itemId,
                             atTime,
                             requirement,
@@ -609,7 +624,7 @@ export class OvaleDataClass {
             for (const [v, rArray] of kpairs(requirements)) {
                 if (isLuaArray(rArray)) {
                     for (const [, requirement] of ipairs<any>(rArray)) {
-                        let verified = this.requirement.CheckRequirements(
+                        let [verified] = this.requirement.CheckRequirements(
                             spellId,
                             atTime,
                             requirement,
@@ -662,7 +677,7 @@ export class OvaleDataClass {
                 for (const [v, rArray] of pairs(ratioRequirements)) {
                     if (isLuaArray(rArray)) {
                         for (const [, requirement] of ipairs<any>(rArray)) {
-                            let verified = this.requirement.CheckRequirements(
+                            let [verified] = this.requirement.CheckRequirements(
                                 spellId,
                                 atTime,
                                 requirement,
@@ -694,7 +709,9 @@ export class OvaleDataClass {
                     for (const [v, rArray] of pairs(addRequirements)) {
                         if (isLuaArray(rArray)) {
                             for (const [, requirement] of ipairs<any>(rArray)) {
-                                let verified = this.requirement.CheckRequirements(
+                                let [
+                                    verified,
+                                ] = this.requirement.CheckRequirements(
                                     spellId,
                                     atTime,
                                     requirement,

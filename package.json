@@ -8,6 +8,7 @@
         "prepare": "tstolua -p tsconfig.lua.json",
         "prepare-tools": "tsc",
         "simc": "node dist/src/utils/importsimc.js ../../simc",
+        "dbc": "node dist/src/utils/dbc.js",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",
         "watch-test": "ava --watch",
@@ -46,14 +47,16 @@
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
-        "@wowts/wow-mock": "^1.23.0"
+        "@wowts/wow-mock": "^1.24.2"
     },
     "devDependencies": {
-        "@wowts/tstolua": "^1.10.1",
+        "@types/csv-parse": "^1.2.2",
+        "@wowts/tstolua": "^1.10.2",
         "ava": "^3.12.1",
+        "csv-parse": "^4.12.0",
         "eslint": "^7.9.0",
-        "typemoq": "^2.1.0",
-        "nyc": "^12"
+        "nyc": "^12",
+        "typemoq": "^2.1.0"
     },
     "repository": {
         "type": "git",

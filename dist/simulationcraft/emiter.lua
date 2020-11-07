@@ -447,10 +447,6 @@ __exports.Emiter = __class(nil, {
                     conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
                     annotation[action] = className
                 elseif className == "MONK" and action == "touch_of_death" then
-                    conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
-                    annotation[action] = className
-                    annotation.opt_touch_of_death_on_elite_only = "MONK"
-                    self:AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
                 elseif className == "MONK" and action == "whirling_dragon_punch" then
                     conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
                 elseif className == "PALADIN" and action == "blessing_of_kings" then
@@ -483,7 +479,7 @@ __exports.Emiter = __class(nil, {
                     annotation.vanish = className
                     conditionCode = format("CheckBoxOn(opt_vanish)", action)
                 elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
-                    local buffName = action .. "_buff"
+                    local buffName = self:Disambiguate(annotation, action .. "_buff", className, specialization)
                     self:AddSymbol(annotation, buffName)
                     conditionCode = format("BuffExpires(%s)", buffName)
                 elseif className == "SHAMAN" and action == "bloodlust" then
@@ -546,7 +542,10 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "DEMONHUNTER" and action == "metamorphosis_havoc" then
                     conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
-                    annotation.opt_meta_only_during_boss = "DEMONHUNTER"
+                    if  not annotation.options then
+                        annotation.options = {}
+                    end
+                    annotation.options["opt_meta_only_during_boss"] = true
                 elseif className == "DEMONHUNTER" and action == "consume_magic" then
                     conditionCode = "target.HasDebuffType(magic)"
                 elseif checkOptionalSkill(action, className, specialization) then
@@ -566,7 +565,10 @@ __exports.Emiter = __class(nil, {
                             bodyCode = functionName .. "()"
                             if className == "MAGE" and specialization == "arcane" and (name == "burn" or name == "init_burn") then
                                 conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)"
-                                annotation.opt_arcane_mage_burn_phase = className
+                                if  not annotation.options then
+                                    annotation.options = {}
+                                end
+                                annotation.options["opt_arcane_mage_burn_phase"] = true
                             end
                         end
                         isSpellAction = false
@@ -1308,6 +1310,8 @@ __exports.Emiter = __class(nil, {
                         end
                     elseif property == "up" then
                         code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+                    elseif property == "refreshable" then
+                        code = format("%s%sRefreshable(%s)", target, prefix, buffName)
                     elseif property == "improved" then
                         code = format("%sImproved(%s%s)", prefix, buffName)
                     elseif property == "value" then
@@ -1499,7 +1503,12 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 local property = tokenIterator()
                 name = self:Disambiguate(annotation, name, annotation.classId, annotation.specialization)
-                local dotName = name .. "_debuff"
+                local dotName
+                if match(name, "_dot$") then
+                    dotName = gsub(name, "_dot$", "_debuff")
+                else
+                    dotName = name .. "_debuff"
+                end
                 dotName = self:Disambiguate(annotation, dotName, annotation.classId, annotation.specialization)
                 local prefix = (find(dotName, "_buff$") and "Buff") or "Debuff"
                 target = (target and target .. ".") or ""
@@ -1687,6 +1696,8 @@ __exports.Emiter = __class(nil, {
             elseif name == "invulnerable" then
                 if property == "up" then
                     code = "False(raid_events_invulnerable_up)"
+                elseif property == "exists" then
+                    code = "False(raid_event_invulnerable_exists)"
                 end
             end
             if code then
@@ -1709,6 +1720,8 @@ __exports.Emiter = __class(nil, {
                         raceId = "Troll"
                     elseif race == "orc" then
                         raceId = "Orc"
+                    elseif race == "night_elf" then
+                        raceId = "NightElf"
                     else
                         self.tracer:Print("Warning: Race '%s' not defined", race)
                     end
@@ -1942,9 +1955,9 @@ __exports.Emiter = __class(nil, {
             elseif className == "ROGUE" and operand == "poisoned_enemies" then
                 code = "0"
             elseif className == "ROGUE" and operand == "poisoned_bleeds" then
-                code = "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)"
-                self:AddSymbol(annotation, "rupture_debuff")
-                self:AddSymbol(annotation, "garrote_debuff")
+                code = "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)"
+                self:AddSymbol(annotation, "rupture")
+                self:AddSymbol(annotation, "garrote")
                 self:AddSymbol(annotation, "internal_bleeding_talent")
                 self:AddSymbol(annotation, "internal_bleeding_debuff")
             elseif className == "ROGUE" and operand == "exsanguinated" then
@@ -1953,8 +1966,8 @@ __exports.Emiter = __class(nil, {
             elseif className == "ROGUE" and operand == "ss_buffed" then
                 code = "False(ss_buffed)"
             elseif className == "ROGUE" and operand == "non_ss_buffed_targets" then
-                code = "Enemies() - DebuffCountOnAny(garrote_debuff)"
-                self:AddSymbol(annotation, "garrote_debuff")
+                code = "Enemies() - DebuffCountOnAny(garrote)"
+                self:AddSymbol(annotation, "garrote")
             elseif className == "ROGUE" and operand == "ss_buffed_targets_above_pandemic" then
                 code = "0"
             elseif className == "ROGUE" and operand == "master_assassin_remains" then
@@ -2199,12 +2212,13 @@ __exports.Emiter = __class(nil, {
                     if statName == "remains" then
                         code = "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }"
                     end
+                elseif procType == "has_cooldown" then
+                    code = "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }"
                 elseif sub(procType, 1, 4) == "has_" then
                     code = format("True(trinket_%s_%s)", procType, statName)
                 else
-                    local property = tokenIterator()
-                    local buffName = format("trinket_%s_%s_buff", procType, statName)
-                    buffName = self:Disambiguate(annotation, buffName, annotation.classId, annotation.specialization)
+                    local property = statName
+                    local buffName = self:Disambiguate(annotation, procType, annotation.classId, annotation.specialization)
                     if property == "cooldown" then
                         code = format("BuffCooldownDuration(%s)", buffName)
                     elseif property == "cooldown_remains" then
@@ -2328,8 +2342,12 @@ __exports.Emiter = __class(nil, {
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
         self:AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian")
-        self:AddDisambiguation("dummon_demonic_tyrant", "summon_demonic_tyrant", "WARLOCK", "demonology")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
+        self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
+        self:AddDisambiguation("ashvanes_razor_coral", "razor_coral")
+        self:AddDisambiguation("bok_proc_buff", "blackout_kick_aura", "MONK", "windwalker")
+        self:AddDisambiguation("dance_of_chiji_azerite_buff", "dance_of_chiji_buff", "MONK", "windwalker")
+        self:AddDisambiguation("energizing_elixer_talent", "energizing_elixir_talent", "MONK", "windwalker")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2357,6 +2375,13 @@ __exports.Emiter = __class(nil, {
             local modifier = tokenIterator()
             local name = info.name or miscOperand
             local parameters = {}
+            if info.extraParameter then
+                insert(parameters, self.ovaleAst:newValue(nodeList, info.extraParameter))
+            end
+            if info.extraSymbol then
+                insert(parameters, self.ovaleAst:newValue(nodeList, info.extraSymbol))
+                annotation:AddSymbol(info.extraSymbol)
+            end
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
@@ -2371,6 +2396,12 @@ __exports.Emiter = __class(nil, {
                         name = name .. modifierName
                     elseif modifierParameters.type == 2 then
                         insert(parameters, self.ovaleAst:newValue(nodeList, modifierName))
+                    end
+                    if modifierParameters.createOptions then
+                        if  not annotation.options then
+                            annotation.options = {}
+                        end
+                        annotation.options[modifierName] = true
                     end
                     if modifierParameters.extraParameter then
                         insert(parameters, self.ovaleAst:newValue(nodeList, modifierParameters.extraParameter))

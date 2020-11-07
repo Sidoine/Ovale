@@ -54,31 +54,29 @@ AddFunction armssingle_targetmainactions
  #deadly_calm
  spell(deadly_calm)
  #skullsplitter,if=rage<60&buff.deadly_calm.down&buff.memory_of_lucid_dreams.down|rage<20
- if rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams) or rage() < 20 spell(skullsplitter)
+ if rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 spell(skullsplitter)
  #ravager,if=(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
  if spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 spell(ravager)
  #mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!talent.cleave.enabled)
- if target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } spell(mortal_strike)
+ if target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } spell(mortal_strike)
  #cleave,if=spell_targets.whirlwind>2&dot.deep_wounds.remains<=duration*0.3
- if enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 spell(cleave)
+ if enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 spell(cleave)
  #warbreaker,if=!essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>50)|essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>80)|talent.massacre.enabled&(target.time_to_pct_35>10|target.time_to_die>50)
  if not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } spell(warbreaker)
  #execute,if=buff.sudden_death.react
  if buffpresent(sudden_death) spell(execute)
- #bladestorm,if=cooldown.mortal_strike.remains&debuff.colossus_smash.down&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down&rage<40
- if spellcooldown(mortal_strike) > 0 and target.debuffexpires(colossus_smash) and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and { target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) or buffpresent(test_of_might_buff) } and buffexpires(memory_of_lucid_dreams) and rage() < 40 spell(bladestorm)
  #mortal_strike,if=spell_targets.whirlwind=1|!talent.cleave.enabled
  if enemies() == 1 or not hastalent(cleave_talent) spell(mortal_strike)
  #cleave,if=spell_targets.whirlwind>2
  if enemies() > 2 spell(cleave)
  #whirlwind,if=(((buff.memory_of_lucid_dreams.up)|(debuff.colossus_smash.up)|(buff.deadly_calm.up))&talent.fervor_of_battle.enabled)|((buff.memory_of_lucid_dreams.up|rage>89)&debuff.colossus_smash.up&buff.test_of_might.down&!talent.fervor_of_battle.enabled)
- if { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams) or rage() > 89 } and target.debuffpresent(colossus_smash) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) spell(whirlwind)
+ if { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams_buff) or rage() > 89 } and target.debuffpresent(colossus_smash_debuff) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) spell(whirlwind)
  #slam,if=!talent.fervor_of_battle.enabled&(buff.memory_of_lucid_dreams.up|debuff.colossus_smash.up)
- if not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) } spell(slam)
+ if not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) } spell(slam)
  #overpower
  spell(overpower)
  #whirlwind,if=talent.fervor_of_battle.enabled&(buff.test_of_might.up|debuff.colossus_smash.down&buff.test_of_might.down&rage>60)
- if hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash) and buffexpires(test_of_might_buff) and rage() > 60 } spell(whirlwind)
+ if hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash_debuff) and buffexpires(test_of_might_buff) and rage() > 60 } spell(whirlwind)
  #slam,if=!talent.fervor_of_battle.enabled
  if not hastalent(fervor_of_battle_talent) spell(slam)
 }
@@ -89,16 +87,22 @@ AddFunction armssingle_targetmainpostconditions
 
 AddFunction armssingle_targetshortcdactions
 {
- unless buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 and spell(cleave)
+ unless buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 and spell(cleave)
  {
   #colossus_smash,if=!essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>50)|essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>80)|talent.massacre.enabled&(target.time_to_pct_35>10|target.time_to_die>50)
   if not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } spell(colossus_smash)
+
+  unless { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(warbreaker) or buffpresent(sudden_death) and spell(execute)
+  {
+   #bladestorm,if=cooldown.mortal_strike.remains&debuff.colossus_smash.down&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down&rage<40
+   if spellcooldown(mortal_strike) > 0 and target.debuffexpires(colossus_smash_debuff) and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and { target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) or buffpresent(test_of_might_buff) } and buffexpires(memory_of_lucid_dreams_buff) and rage() < 40 spell(bladestorm)
+  }
  }
 }
 
 AddFunction armssingle_targetshortcdpostconditions
 {
- buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 and spell(cleave) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(warbreaker) or buffpresent(sudden_death) and spell(execute) or spellcooldown(mortal_strike) > 0 and target.debuffexpires(colossus_smash) and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and { target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) or buffpresent(test_of_might_buff) } and buffexpires(memory_of_lucid_dreams) and rage() < 40 and spell(bladestorm) or { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and spell(cleave) or { { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams) or rage() > 89 } and target.debuffpresent(colossus_smash) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) } and spell(slam) or spell(overpower) or hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash) and buffexpires(test_of_might_buff) and rage() > 60 } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
+ buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 and spell(cleave) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(warbreaker) or buffpresent(sudden_death) and spell(execute) or { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and spell(cleave) or { { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams_buff) or rage() > 89 } and target.debuffpresent(colossus_smash_debuff) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) } and spell(slam) or spell(overpower) or hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash_debuff) and buffexpires(test_of_might_buff) and rage() > 60 } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
 }
 
 AddFunction armssingle_targetcdactions
@@ -107,7 +111,7 @@ AddFunction armssingle_targetcdactions
 
 AddFunction armssingle_targetcdpostconditions
 {
- buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 and spell(cleave) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(colossus_smash) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(warbreaker) or buffpresent(sudden_death) and spell(execute) or spellcooldown(mortal_strike) > 0 and target.debuffexpires(colossus_smash) and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and { target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) or buffpresent(test_of_might_buff) } and buffexpires(memory_of_lucid_dreams) and rage() < 40 and spell(bladestorm) or { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and spell(cleave) or { { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams) or rage() > 89 } and target.debuffpresent(colossus_smash) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams) or target.debuffpresent(colossus_smash) } and spell(slam) or spell(overpower) or hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash) and buffexpires(test_of_might_buff) and rage() > 60 } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
+ buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 60 and buffexpires(deadly_calm) and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 and spell(cleave) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(colossus_smash) or { not azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 50 } or azeriteessenceisenabled(condensed_lifeforce_essence_id) and not hastalent(massacre_talent_arms) and { target.timetohealthpercent(20) > 10 or target.timetodie() > 80 } or hastalent(massacre_talent_arms) and { target.timetohealthpercent(35) > 10 or target.timetodie() > 50 } } and spell(warbreaker) or buffpresent(sudden_death) and spell(execute) or spellcooldown(mortal_strike) > 0 and target.debuffexpires(colossus_smash_debuff) and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and { target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) or buffpresent(test_of_might_buff) } and buffexpires(memory_of_lucid_dreams_buff) and rage() < 40 and spell(bladestorm) or { enemies() == 1 or not hastalent(cleave_talent) } and spell(mortal_strike) or enemies() > 2 and spell(cleave) or { { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) or buffpresent(deadly_calm) } and hastalent(fervor_of_battle_talent) or { buffpresent(memory_of_lucid_dreams_buff) or rage() > 89 } and target.debuffpresent(colossus_smash_debuff) and buffexpires(test_of_might_buff) and not hastalent(fervor_of_battle_talent) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { buffpresent(memory_of_lucid_dreams_buff) or target.debuffpresent(colossus_smash_debuff) } and spell(slam) or spell(overpower) or hastalent(fervor_of_battle_talent) and { buffpresent(test_of_might_buff) or target.debuffexpires(colossus_smash_debuff) and buffexpires(test_of_might_buff) and rage() > 60 } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
 }
 
 ### actions.precombat
@@ -163,21 +167,19 @@ AddFunction armsexecutemainactions
  #deadly_calm
  spell(deadly_calm)
  #skullsplitter,if=rage<52&buff.memory_of_lucid_dreams.down|rage<20
- if rage() < 52 and buffexpires(memory_of_lucid_dreams) or rage() < 20 spell(skullsplitter)
+ if rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 spell(skullsplitter)
  #ravager,,if=cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2)
  if spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 spell(ravager)
  #warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
- if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 10 spell(warbreaker)
+ if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 spell(warbreaker)
  #mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!spell_targets.whirlwind>1&!talent.cleave.enabled)
- if target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } spell(mortal_strike)
+ if target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } spell(mortal_strike)
  #cleave,if=(spell_targets.whirlwind>2&dot.deep_wounds.remains<=duration*0.3)|(spell_targets.whirlwind>3)
- if enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 or enemies() > 3 spell(cleave)
- #bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
- if not buffpresent(memory_of_lucid_dreams) and buffpresent(test_of_might_buff) and rage() < 30 and not buffpresent(deadly_calm) spell(bladestorm)
+ if enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 spell(cleave)
  #execute,if=buff.memory_of_lucid_dreams.up|buff.deadly_calm.up|debuff.colossus_smash.up|buff.test_of_might.up
- if buffpresent(memory_of_lucid_dreams) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash) or buffpresent(test_of_might_buff) spell(execute)
+ if buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might_buff) spell(execute)
  #slam,if=buff.crushing_assault.up&buff.memory_of_lucid_dreams.down
- if buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams) spell(slam)
+ if buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) spell(slam)
  #overpower
  spell(overpower)
  #execute
@@ -190,16 +192,22 @@ AddFunction armsexecutemainpostconditions
 
 AddFunction armsexecuteshortcdactions
 {
- unless buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager)
+ unless buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager)
  {
   #colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-  if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 10 spell(colossus_smash)
+  if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 spell(colossus_smash)
+
+  unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave)
+  {
+   #bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
+   if not buffpresent(memory_of_lucid_dreams_buff) and buffpresent(test_of_might_buff) and rage() < 30 and not buffpresent(deadly_calm) spell(bladestorm)
+  }
  }
 }
 
 AddFunction armsexecuteshortcdpostconditions
 {
- buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or not buffpresent(memory_of_lucid_dreams) and buffpresent(test_of_might_buff) and rage() < 30 and not buffpresent(deadly_calm) and spell(bladestorm) or { buffpresent(memory_of_lucid_dreams) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash) or buffpresent(test_of_might_buff) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams) and spell(slam) or spell(overpower) or spell(execute)
+ buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might_buff) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
 }
 
 AddFunction armsexecutecdactions
@@ -208,7 +216,7 @@ AddFunction armsexecutecdactions
 
 AddFunction armsexecutecdpostconditions
 {
- buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(colossus_smash) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds) <= baseduration(mortal_strike) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or not buffpresent(memory_of_lucid_dreams) and buffpresent(test_of_might_buff) and rage() < 30 and not buffpresent(deadly_calm) and spell(bladestorm) or { buffpresent(memory_of_lucid_dreams) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash) or buffpresent(test_of_might_buff) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams) and spell(slam) or spell(overpower) or spell(execute)
+ buffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(colossus_smash) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or not buffpresent(memory_of_lucid_dreams_buff) and buffpresent(test_of_might_buff) and rage() < 30 and not buffpresent(deadly_calm) and spell(bladestorm) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might_buff) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
 }
 
 ### actions.default
@@ -218,17 +226,17 @@ AddFunction arms_defaultmainactions
  #charge
  if checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) spell(charge)
  #berserking,if=buff.memory_of_lucid_dreams.up|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
- if buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) spell(berserking)
+ if buffpresent(memory_of_lucid_dreams_buff) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) spell(berserking)
  #avatar,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>45)
- if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 45 spell(avatar)
+ if not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 spell(avatar)
  #blood_of_the_enemy,if=buff.test_of_might.up|(debuff.colossus_smash.up&!azerite.test_of_might.enabled)
- if buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) spell(blood_of_the_enemy)
+ if buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) spell(blood_of_the_enemy)
  #ripple_in_space,if=!debuff.colossus_smash.up&!buff.test_of_might.up
- if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) spell(ripple_in_space)
+ if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) spell(ripple_in_space)
  #worldvein_resonance,if=!debuff.colossus_smash.up&!buff.test_of_might.up
- if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) spell(worldvein_resonance)
+ if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) spell(worldvein_resonance)
  #concentrated_flame,if=!debuff.colossus_smash.up&!buff.test_of_might.up&dot.concentrated_flame_burn.remains=0
- if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 spell(concentrated_flame)
+ if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 spell(concentrated_flame)
  #the_unbound_force,if=buff.reckless_force.up
  if buffpresent(reckless_force_buff) spell(the_unbound_force)
  #memory_of_lucid_dreams,if=!talent.warbreaker.enabled&cooldown.colossus_smash.remains<gcd&(target.time_to_die>150|target.health.pct<20)
@@ -257,29 +265,29 @@ AddFunction arms_defaultshortcdactions
   #auto_attack
   armsgetinmeleerange()
 
-  unless { buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) } and spell(berserking)
+  unless { buffpresent(memory_of_lucid_dreams_buff) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) } and spell(berserking)
   {
    #bag_of_tricks,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
-   if target.debuffexpires(colossus_smash) and buffexpires(memory_of_lucid_dreams) and spellcooldown(mortal_strike) > 0 spell(bag_of_tricks)
+   if target.debuffexpires(colossus_smash_debuff) and buffexpires(memory_of_lucid_dreams_buff) and spellcooldown(mortal_strike) > 0 spell(bag_of_tricks)
 
-   unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar)
+   unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar)
    {
     #sweeping_strikes,if=spell_targets.whirlwind>1&(cooldown.bladestorm.remains>10|cooldown.colossus_smash.remains>8|azerite.test_of_might.enabled)
     if enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } spell(sweeping_strikes)
 
-    unless { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy)
+    unless { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy)
     {
      #purifying_blast,if=!debuff.colossus_smash.up&!buff.test_of_might.up
-     if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) spell(purifying_blast)
+     if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) spell(purifying_blast)
 
-     unless not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance)
+     unless not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance)
      {
       #focused_azerite_beam,if=!debuff.colossus_smash.up&!buff.test_of_might.up
-      if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) spell(focused_azerite_beam)
+      if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) spell(focused_azerite_beam)
       #reaping_flames,if=!debuff.colossus_smash.up&!buff.test_of_might.up
-      if not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) spell(reaping_flames)
+      if not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) spell(reaping_flames)
 
-      unless not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams)
+      unless not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams)
       {
        #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
        if hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 armsexecuteshortcdactions()
@@ -299,7 +307,7 @@ AddFunction arms_defaultshortcdactions
 
 AddFunction arms_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or { buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) } and spell(berserking) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 } and armsexecuteshortcdpostconditions() or armssingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or { buffpresent(memory_of_lucid_dreams_buff) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) } and spell(berserking) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 } and armsexecuteshortcdpostconditions() or armssingle_targetshortcdpostconditions()
 }
 
 AddFunction arms_defaultcdactions
@@ -309,25 +317,25 @@ AddFunction arms_defaultcdactions
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
   #blood_fury,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-  if buffremaining(memory_of_lucid_dreams) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) spell(blood_fury)
+  if buffremaining(memory_of_lucid_dreams_buff) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) spell(blood_fury)
 
-  unless { buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) } and spell(berserking)
+  unless { buffpresent(memory_of_lucid_dreams_buff) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) } and spell(berserking)
   {
    #arcane_torrent,if=cooldown.mortal_strike.remains>1.5&buff.memory_of_lucid_dreams.down&rage<50
-   if spellcooldown(mortal_strike) > 1.5 and buffexpires(memory_of_lucid_dreams) and rage() < 50 spell(arcane_torrent)
+   if spellcooldown(mortal_strike) > 1.5 and buffexpires(memory_of_lucid_dreams_buff) and rage() < 50 spell(arcane_torrent)
    #lights_judgment,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
-   if target.debuffexpires(colossus_smash) and buffexpires(memory_of_lucid_dreams) and spellcooldown(mortal_strike) > 0 spell(lights_judgment)
+   if target.debuffexpires(colossus_smash_debuff) and buffexpires(memory_of_lucid_dreams_buff) and spellcooldown(mortal_strike) > 0 spell(lights_judgment)
    #fireblood,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-   if buffremaining(memory_of_lucid_dreams) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) spell(fireblood)
+   if buffremaining(memory_of_lucid_dreams_buff) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) spell(fireblood)
    #ancestral_call,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-   if buffremaining(memory_of_lucid_dreams) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) spell(ancestral_call)
+   if buffremaining(memory_of_lucid_dreams_buff) < 5 or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) spell(ancestral_call)
 
-   unless target.debuffexpires(colossus_smash) and buffexpires(memory_of_lucid_dreams) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks)
+   unless target.debuffexpires(colossus_smash_debuff) and buffexpires(memory_of_lucid_dreams_buff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks)
    {
     #use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<20.1&buff.memory_of_lucid_dreams.up&cooldown.memory_of_lucid_dreams.remains<117)|(target.health.pct<30.1&debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major)|(!debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)|target.time_to_die<30
-    if not target.debuffpresent(razor_coral) or target.healthpercent() < 20.1 and buffpresent(memory_of_lucid_dreams) and spellcooldown(memory_of_lucid_dreams) < 117 or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or not target.debuffpresent(conductive_ink_debuff) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) or target.timetodie() < 30 armsuseitemactions()
+    if not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 20.1 and buffpresent(memory_of_lucid_dreams_buff) and spellcooldown(memory_of_lucid_dreams) < 117 or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or not target.debuffpresent(conductive_ink) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) or target.timetodie() < 30 armsuseitemactions()
 
-    unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } and spell(sweeping_strikes) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(purifying_blast) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(focused_azerite_beam) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(reaping_flames) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+    unless { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } and spell(sweeping_strikes) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(purifying_blast) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(focused_azerite_beam) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(reaping_flames) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
     {
      #guardian_of_azeroth,if=cooldown.colossus_smash.remains<10
      if spellcooldown(colossus_smash) < 10 spell(guardian_of_azeroth)
@@ -351,7 +359,7 @@ AddFunction arms_defaultcdactions
 
 AddFunction arms_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or { buffpresent(memory_of_lucid_dreams) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash) } and spell(berserking) or target.debuffexpires(colossus_smash) and buffexpires(memory_of_lucid_dreams) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } and spell(sweeping_strikes) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(purifying_blast) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(focused_azerite_beam) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and spell(reaping_flames) or not target.debuffpresent(colossus_smash) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 } and armsexecutecdpostconditions() or armssingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or { buffpresent(memory_of_lucid_dreams_buff) or not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and target.debuffpresent(colossus_smash_debuff) } and spell(berserking) or target.debuffexpires(colossus_smash_debuff) and buffexpires(memory_of_lucid_dreams_buff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 45 } and spell(avatar) or enemies() > 1 and { spellcooldown(bladestorm) > 10 or spellcooldown(colossus_smash) > 8 or hasazeritetrait(test_of_might_trait) } and spell(sweeping_strikes) or { buffpresent(test_of_might_buff) or target.debuffpresent(colossus_smash_debuff) and not hasazeritetrait(test_of_might_trait) } and spell(blood_of_the_enemy) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(purifying_blast) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(ripple_in_space) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(worldvein_resonance) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(focused_azerite_beam) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and spell(reaping_flames) or not target.debuffpresent(colossus_smash_debuff) and not buffpresent(test_of_might_buff) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < gcd() and { target.timetodie() > 150 or target.healthpercent() < 20 } and spell(memory_of_lucid_dreams) or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 } and armsexecutecdpostconditions() or armssingle_targetcdpostconditions()
 }
 
 ### Arms icons.
@@ -407,14 +415,15 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # cleave
 # cleave_talent
 # colossus_smash
+# colossus_smash_debuff
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
-# conductive_ink_debuff
+# conductive_ink
 # crushing_assault_buff
 # deadly_calm
 # deadly_calm_talent
-# deep_wounds
+# deep_wounds_debuff
 # execute
 # fervor_of_battle_talent
 # fireblood
@@ -425,14 +434,16 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # lights_judgment
 # massacre_talent_arms
 # memory_of_lucid_dreams
+# memory_of_lucid_dreams_buff
 # memory_of_lucid_dreams_essence_id
 # mortal_strike
+# mortal_strike_debuff
 # overpower
 # pummel
 # purifying_blast
 # quaking_palm
 # ravager
-# razor_coral
+# razor_coral_debuff
 # reaping_flames
 # reckless_force_buff
 # rend
@@ -505,11 +516,9 @@ AddFunction furysingle_targetmainactions
  #siegebreaker
  spell(siegebreaker)
  #rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(buff.enrage.remains<gcd|rage>90)
- if buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or enrageremaining() < gcd() or rage() > 90 spell(rampage)
+ if buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams_buff) or enrageremaining() < gcd() or rage() > 90 spell(rampage)
  #execute
  spell(execute)
- #bladestorm,if=prev_gcd.1.rampage
- if previousgcdspell(rampage) spell(bladestorm)
  #bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
  if not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 spell(bloodthirst)
  #bloodbath,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
@@ -540,11 +549,16 @@ AddFunction furysingle_targetmainpostconditions
 
 AddFunction furysingle_targetshortcdactions
 {
+ unless spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams_buff) or enrageremaining() < gcd() or rage() > 90 } and spell(rampage) or spell(execute)
+ {
+  #bladestorm,if=prev_gcd.1.rampage
+  if previousgcdspell(rampage) spell(bladestorm)
+ }
 }
 
 AddFunction furysingle_targetshortcdpostconditions
 {
- spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or enrageremaining() < gcd() or rage() > 90 } and spell(rampage) or spell(execute) or previousgcdspell(rampage) and spell(bladestorm) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodbath) or spell(onslaught) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
+ spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams_buff) or enrageremaining() < gcd() or rage() > 90 } and spell(rampage) or spell(execute) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodbath) or spell(onslaught) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
 }
 
 AddFunction furysingle_targetcdactions
@@ -553,7 +567,7 @@ AddFunction furysingle_targetcdactions
 
 AddFunction furysingle_targetcdpostconditions
 {
- spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams) or enrageremaining() < gcd() or rage() > 90 } and spell(rampage) or spell(execute) or previousgcdspell(rampage) and spell(bladestorm) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodbath) or spell(onslaught) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
+ spell(siegebreaker) or { buffpresent(recklessness) or buffpresent(memory_of_lucid_dreams_buff) or enrageremaining() < gcd() or rage() > 90 } and spell(rampage) or spell(execute) or previousgcdspell(rampage) and spell(bladestorm) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodthirst) or { not isenraged() or azeritetraitrank(cold_steel_hot_blood_trait) > 1 } and spell(bloodbath) or spell(onslaught) or isenraged() and spell(dragon_roar) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
 }
 
 ### actions.precombat
@@ -706,7 +720,7 @@ AddFunction fury_defaultshortcdactions
      unless enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking)
      {
       #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
-      if buffexpires(recklessness) and target.debuffexpires(siegebreaker) and isenraged() spell(bag_of_tricks)
+      if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
       #run_action_list,name=single_target
       furysingle_targetshortcdactions()
      }
@@ -738,20 +752,20 @@ AddFunction fury_defaultcdactions
    unless not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind)
    {
     #use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-    if target.timetodie() < 20 or not target.debuffpresent(razor_coral) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink_debuff) or not target.debuffpresent(conductive_ink_debuff) and buffpresent(memory_of_lucid_dreams) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
+    if target.timetodie() < 20 or not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) or not target.debuffpresent(conductive_ink) and buffpresent(memory_of_lucid_dreams_buff) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
     #blood_fury,if=buff.recklessness.up
     if buffpresent(recklessness) spell(blood_fury)
 
     unless buffpresent(recklessness) and spell(berserking)
     {
      #lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
-     if buffexpires(recklessness) and target.debuffexpires(siegebreaker) spell(lights_judgment)
+     if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) spell(lights_judgment)
      #fireblood,if=buff.recklessness.up
      if buffpresent(recklessness) spell(fireblood)
      #ancestral_call,if=buff.recklessness.up
      if buffpresent(recklessness) spell(ancestral_call)
 
-     unless buffexpires(recklessness) and target.debuffexpires(siegebreaker) and isenraged() and spell(bag_of_tricks)
+     unless buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks)
      {
       #run_action_list,name=single_target
       furysingle_targetcdactions()
@@ -764,7 +778,7 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
@@ -822,7 +836,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # concentrated_flame
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
-# conductive_ink_debuff
+# conductive_ink
 # crushing_blow
 # dragon_roar
 # execute
@@ -835,6 +849,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # lights_judgment
 # meat_cleaver
 # memory_of_lucid_dreams
+# memory_of_lucid_dreams_buff
 # memory_of_lucid_dreams_essence_id
 # noxious_venom
 # onslaught
@@ -843,7 +858,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # quaking_palm
 # raging_blow
 # rampage
-# razor_coral
+# razor_coral_debuff
 # reaping_flames
 # reckless_abandon_talent
 # reckless_force_buff
@@ -851,6 +866,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # ripple_in_space
 # shockwave
 # siegebreaker
+# siegebreaker_debuff
 # storm_bolt
 # the_unbound_force
 # war_stomp

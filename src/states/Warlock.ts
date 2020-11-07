@@ -9,6 +9,9 @@ import { StateModule } from "../State";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "../SpellBook";
+import { Compare, OvaleConditionClass } from "../Condition";
+import { OvaleFutureClass } from "../Future";
+import { OvalePowerClass } from "./Power";
 
 interface customAura {
     customId: number;
@@ -26,41 +29,51 @@ let CUSTOM_AURAS: LuaArray<customAura> = {
     },
 };
 
+const enum DemonId {
+    WildImp = 55659,
+    Dreadstalkers = 98035,
+    Darkglare = 103673,
+    Doomguard = 11859,
+    Infernal = 89,
+    InnerDemonsWildImp = 143622,
+    DemonicTyrant = 135002,
+    GrimoireFelguard = 17252,
+    Vilefiend = 135816,
+}
+
+const enum Spells {
+    Implosion = 196277,
+    HandOfGuldan = 105174,
+}
+
+const INNER_DEMONS_TALENT = 17;
+
 let demonData: LuaArray<{ duration: number }> = {
-    [55659]: {
-        // Wild Imp
-        duration: 12,
-    },
-    [98035]: {
-        // Dreadstalkers
-        duration: 12,
-    },
-    [103673]: {
-        // Darkglare
-        duration: 12,
-    },
-    [11859]: {
-        // Doomguard
-        duration: 25,
-    },
-    [89]: {
-        // Infernal
-        duration: 25,
-    },
-    [143622]: {
-        // Inner Demons
-        duration: 12,
-    },
-    [135002]: {
-        // Demonic Tyrant
+    [DemonId.WildImp]: {
         duration: 15,
     },
-    [17252]: {
-        // Grimoire Felguard
+    [DemonId.Dreadstalkers]: {
+        duration: 12,
+    },
+    [DemonId.Darkglare]: {
+        duration: 12,
+    },
+    [DemonId.Doomguard]: {
+        duration: 25,
+    },
+    [DemonId.Infernal]: {
+        duration: 25,
+    },
+    [DemonId.InnerDemonsWildImp]: {
+        duration: 12,
+    },
+    [DemonId.DemonicTyrant]: {
         duration: 15,
     },
-    [135816]: {
-        // Vilefiend
+    [DemonId.GrimoireFelguard]: {
+        duration: 15,
+    },
+    [DemonId.Vilefiend]: {
         duration: 15,
     },
 };
@@ -69,19 +82,20 @@ interface Demon {
     finish: number;
     id: number;
     timestamp: number;
-    de?: boolean;
 }
 
-let self_demons: LuaObj<Demon> = {};
-let self_serial = 1;
 export class OvaleWarlockClass implements StateModule {
     private module: AceModule & AceEvent;
+    private demonsCount: LuaObj<Demon> = {};
+    private serial = 1;
 
     constructor(
         private ovale: OvaleClass,
         private ovaleAura: OvaleAuraClass,
         private ovalePaperDoll: OvalePaperDollClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private future: OvaleFutureClass,
+        private power: OvalePowerClass
     ) {
         this.module = ovale.createModule(
             "OvaleWarlock",
@@ -91,13 +105,24 @@ export class OvaleWarlockClass implements StateModule {
         );
     }
 
+    public registerConditions(condition: OvaleConditionClass) {
+        condition.RegisterCondition("timetoshard", false, this.timeToShard);
+        condition.RegisterCondition("demons", false, this.getDemonsCount);
+        condition.RegisterCondition("demonduration", false, this.demonDuration);
+        condition.RegisterCondition(
+            "impsspawnedduring",
+            false,
+            this.impsSpawnedDuring
+        );
+    }
+
     private OnInitialize = () => {
         if (this.ovale.playerClass == "WARLOCK") {
             this.module.RegisterEvent(
                 "COMBAT_LOG_EVENT_UNFILTERED",
                 this.COMBAT_LOG_EVENT_UNFILTERED
             );
-            self_demons = {};
+            this.demonsCount = {};
         }
     };
 
@@ -125,17 +150,18 @@ export class OvaleWarlockClass implements StateModule {
         if (sourceGUID != this.ovale.playerGUID) {
             return;
         }
-        self_serial = self_serial + 1;
+        this.serial = this.serial + 1;
         if (cleuEvent == "SPELL_SUMMON") {
             let [, , , , , , , creatureId] = find(
                 destGUID,
                 "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)"
             );
             creatureId = tonumber(creatureId);
+
             let now = GetTime();
             for (const [id, v] of pairs(demonData)) {
-                if (id == creatureId) {
-                    self_demons[destGUID] = {
+                if (id === creatureId) {
+                    this.demonsCount[destGUID] = {
                         id: creatureId,
                         timestamp: now,
                         finish: now + v.duration,
@@ -143,17 +169,21 @@ export class OvaleWarlockClass implements StateModule {
                     break;
                 }
             }
-            for (const [k, d] of pairs(self_demons)) {
+            for (const [k, d] of pairs(this.demonsCount)) {
                 if (d.finish < now) {
-                    delete self_demons[k];
+                    delete this.demonsCount[k];
                 }
             }
             this.ovale.needRefresh();
         } else if (cleuEvent == "SPELL_CAST_SUCCESS") {
-            if (spellId == 196277) {
-                for (const [k, d] of pairs(self_demons)) {
-                    if (d.id == 55659 || d.id == 143622) {
-                        delete self_demons[k];
+            // Implosion removes all the wild imps
+            if (spellId == Spells.Implosion) {
+                for (const [k, d] of pairs(this.demonsCount)) {
+                    if (
+                        d.id == DemonId.WildImp ||
+                        d.id == DemonId.InnerDemonsWildImp
+                    ) {
+                        delete this.demonsCount[k];
                     }
                 }
                 this.ovale.needRefresh();
@@ -161,7 +191,7 @@ export class OvaleWarlockClass implements StateModule {
 
             const aura = CUSTOM_AURAS[spellId];
             if (aura) {
-                this.AddCustomAura(
+                this.addCustomAura(
                     aura.customId,
                     aura.stacks,
                     aura.duration,
@@ -174,27 +204,79 @@ export class OvaleWarlockClass implements StateModule {
     CleanState(): void {}
     InitializeState(): void {}
     ResetState(): void {}
-    GetNotDemonicEmpoweredDemonsCount(creatureId: number, atTime: number) {
-        let count = 0;
-        for (const [, d] of pairs(self_demons)) {
-            if (d.finish >= atTime && d.id == creatureId && !d.de) {
-                count = count + 1;
+
+    private impsSpawnedDuring = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [ms, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        let delay = ms / 1000;
+        let impsSpawned = 0;
+        // check for hand of guldan
+        if (this.future.next.currentCast.spellId == Spells.HandOfGuldan) {
+            let soulshards = this.power.current.power["soulshards"] || 0;
+            if (soulshards >= 3) {
+                soulshards = 3;
+            }
+            impsSpawned = impsSpawned + soulshards;
+        }
+
+        // inner demons talent
+        let talented =
+            this.ovaleSpellBook.GetTalentPoints(INNER_DEMONS_TALENT) > 0;
+        if (talented) {
+            let value = this.getRemainingDemonDuration(
+                DemonId.InnerDemonsWildImp,
+                atTime + delay
+            );
+            if (value <= 0) {
+                impsSpawned = impsSpawned + 1;
             }
         }
-        return count;
-    }
-    GetDemonsCount(creatureId: number, atTime: number) {
+        return Compare(impsSpawned, comparator, limit);
+    };
+
+    private getDemonsCount = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [creatureId, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
         let count = 0;
-        for (const [, d] of pairs(self_demons)) {
+        for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
                 count = count + 1;
             }
         }
-        return count;
-    }
-    GetRemainingDemonDuration(creatureId: number, atTime: number) {
+        return Compare(count, comparator, limit);
+    };
+
+    private demonDuration = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [creatureId, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        let value = this.getRemainingDemonDuration(creatureId, atTime);
+        return Compare(value, comparator, limit);
+    };
+
+    private getRemainingDemonDuration(creatureId: number, atTime: number) {
         let max = 0;
-        for (const [, d] of pairs(self_demons)) {
+        for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
                 let remaining = d.finish - atTime;
                 if (remaining > max) {
@@ -205,7 +287,7 @@ export class OvaleWarlockClass implements StateModule {
         return max;
     }
 
-    AddCustomAura(
+    private addCustomAura(
         customId: number,
         stacks: number,
         duration: number,
@@ -237,7 +319,7 @@ export class OvaleWarlockClass implements StateModule {
      * Based on SimulationCraft function time_to_shard
      * Seeks to return the average expected time for the player to generate a single soul shard.
      */
-    TimeToShard(now: number) {
+    private getTimeToShard(now: number) {
         let value = 3600;
         let creepingDeathTalent = 20;
         let tickTime =
@@ -264,4 +346,14 @@ export class OvaleWarlockClass implements StateModule {
         }
         return value;
     }
+
+    private timeToShard = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let value = this.getTimeToShard(atTime);
+        return Compare(value, comparator, limit);
+    };
 }

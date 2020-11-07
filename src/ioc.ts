@@ -308,7 +308,9 @@ export class IoC {
             this.ovale,
             this.aura,
             this.paperDoll,
-            this.spellBook
+            this.spellBook,
+            this.future,
+            this.power
         );
         this.version = new OvaleVersionClass(
             this.ovale,
@@ -447,7 +449,6 @@ export class IoC {
             this.frame,
             this.guid,
             this.damageTaken,
-            this.warlock,
             this.power,
             this.enemies,
             this.variables,
@@ -491,5 +492,6 @@ export class IoC {
         covenant.registerConditions(this.condition);
         combat.registerConditions(this.condition);
         conduit.registerConditions(this.condition);
+        this.warlock.registerConditions(this.condition);
     }
 }

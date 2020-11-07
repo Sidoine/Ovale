@@ -254,6 +254,9 @@ __exports.MISC_OPERAND = {
     ["active_enemies"] = {
         name = "enemies"
     },
+    ["animacharged_cp"] = {
+        name = "maxcombopoints"
+    },
     ["astral_power"] = {
         name = "astralpower",
         modifiers = powerModifiers
@@ -276,6 +279,16 @@ __exports.MISC_OPERAND = {
                 type = 0
             }
         }
+    },
+    ["consecration"] = {
+        name = "buff",
+        modifiers = {
+            up = {
+                type = 0,
+                name = "present"
+            }
+        },
+        extraSymbol = "consecration"
     },
     ["covenant"] = {
         name = "covenant",
@@ -300,10 +313,6 @@ __exports.MISC_OPERAND = {
         name = "targetdebuffremaining",
         symbol = "exsanguinated"
     },
-    ["holy_power"] = {
-        name = "holypower",
-        modifiers = powerModifiers
-    },
     ["fight_remains"] = {
         name = "fightremains"
     },
@@ -321,6 +330,13 @@ __exports.MISC_OPERAND = {
                 type = 1
             }
         }
+    },
+    ["holy_power"] = {
+        name = "holypower",
+        modifiers = powerModifiers
+    },
+    ["incoming_imps"] = {
+        name = "impsspawnedduring"
     },
     ["insanity"] = {
         name = "insanity",
@@ -340,6 +356,15 @@ __exports.MISC_OPERAND = {
     ["pain"] = {
         name = "pain",
         modifiers = powerModifiers
+    },
+    ["priest"] = {
+        name = "checkboxon",
+        modifiers = {
+            self_power_infusion = {
+                type = 2,
+                createOptions = true
+            }
+        }
     },
     ["rage"] = {
         name = "rage",
@@ -370,15 +395,19 @@ __exports.MISC_OPERAND = {
         modifiers = powerModifiers
     },
     ["stealthed"] = {
-        name = "stealthed",
+        name = "buffpresent",
         modifiers = {
             all = {
-                name = "",
-                type = 3
+                name = "stealthed_buff",
+                type = 2
             },
             rogue = {
-                name = "",
-                type = 3
+                type = 2,
+                name = "rogue_stealthed_buff"
+            },
+            mantle = {
+                name = "mantle_stealthed_buff",
+                type = 2
             }
         }
     },

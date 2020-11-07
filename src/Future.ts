@@ -1304,7 +1304,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                     if (isLuaArray(spellData)) {
                         multiplier = <number>spellData[1];
                         index = 2;
-                        verified = this.requirement.CheckRequirements(
+                        [verified] = this.requirement.CheckRequirements(
                             spellId,
                             atTime,
                             spellData,

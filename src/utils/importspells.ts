@@ -6,6 +6,8 @@ import {
     OVALE_SPECIALIZATION_NAME,
 } from "../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
+import * as parse from "csv-parse/lib/sync";
+import { SpellShapeshift } from "./types";
 
 interface AllData {
     spell_data_t?: unknown[][];
@@ -22,6 +24,7 @@ interface AllData {
     conduit_rank_entry_t?: unknown[][];
     soulbind_ability_entry_t?: unknown[][];
     covenant_ability_entry_t?: unknown[][];
+    active_class_spell_t?: unknown[][];
 }
 
 const enum SpellAttribute {
@@ -802,8 +805,38 @@ export const enum PowerType {
 }
 
 export const enum SpellAttributes {
-    Channeled = 1 << 34,
-    Channeled2 = 1 << 38,
+    SX_RANGED_ABILITY = 1,
+    SX_TRADESKILL_ABILITY = 5,
+    SX_PASSIVE = 6,
+    SX_HIDDEN = 7,
+    SX_REQ_STEALTH = 17,
+    SX_STOP_ATTACK = 20,
+    SX_NO_D_P_B = 21,
+    SX_NO_COMBAT = 22,
+    SX_NO_CANCEL = 31,
+    SX_CHANNELED = 34,
+    SX_NO_STEALTH_BREAK = 37,
+    SX_CHANNELED_2 = 38,
+    SX_MELEE_COMBAT_START = 41,
+    SX_DONT_DISPLAY_IN_AURA_BAR = 60,
+    SX_CANNOT_CRIT = 93,
+    SX_FOOD_AURA = 95,
+    SX_NOT_PROC = 105,
+    SX_REQ_MAIN_HAND = 106,
+    SX_DISABLE_PLAYER_PROCS = 112,
+    SX_DISABLE_TARGET_PROCS = 113,
+    SX_ALWAYS_HIT = 114,
+    SX_REQ_OFF_HAND = 120,
+    SX_TREAT_AS_PERIODIC = 121,
+    SX_DISABLE_WEAPON_PROCS = 151,
+    SX_TICK_ON_APPLICATION = 169,
+    SX_DOT_HASTED = 173,
+    SX_REQ_LINE_OF_SIGHT = 186,
+    SX_DISABLE_PLAYER_MULT = 221,
+    SX_TICK_MAY_CRIT = 265,
+    SX_DURATION_HASTED = 273,
+    SX_FIXED_TRAVEL_TIME = 292,
+    SX_SCALE_ILEVEL = 354,
 }
 
 export interface SpellData {
@@ -912,6 +945,7 @@ export interface SpellData {
     /** 46 SpellCategories.db2 classification for the spell */
     //dmg_class: number;
 
+    shapeshifts?: SpellShapeshift[];
     spellEffects?: SpellEffectData[];
     spellPowers?: SpellPowerData[];
     identifier: string;
@@ -922,6 +956,7 @@ export interface SpellData {
     specializationName: SpecializationName[];
     nextRank?: SpellData;
     spellAttributes: SpellAttribute[];
+    classFlags: number[];
     replace_spell_id?: number;
 }
 
@@ -1116,6 +1151,14 @@ export interface CovenantAbilityEntry {
     identifier: string;
 }
 
+export interface ActiveClassSpell {
+    class_id: number;
+    spec_id: number;
+    spell_id: number;
+    override_spell_id: number;
+    name: string;
+}
+
 export function isFriendlyTarget(targetId: number) {
     switch (targetId) {
         case 1:
@@ -1292,15 +1335,16 @@ function readFile(directory: string, fileName: string, output: AllData) {
 function getIdentifier(name: string) {
     if (!name) return name;
     if (typeof name !== "string") return name;
+    if (!name.match(/^[a-z]/i)) name = "_" + name;
     return (
         name
             .toLowerCase()
             //.replace(/^potion of (the )?/, "")
             .replace(/ /g, "_")
             .replace("!", "_aura")
-            .replace(/[:'()]/g, "")
-            .replace(/[-,]/g, "_")
+            .replace(/[,]/g, "_")
             .replace(/_+/g, "_")
+            .replace(/[^a-z0-9_]/g, "")
     );
 }
 
@@ -1349,7 +1393,35 @@ function getArrayOfNumbers(o: unknown): number[] {
     throw Error(`typeof ${o} is not a number[]`);
 }
 
+function toMap<TKey, TValue>(array: TValue[], key: (v: TValue) => TKey) {
+    const map = new Map<TKey, TValue[]>();
+    for (const v of array) {
+        const k = key(v);
+        let current = map.get(k);
+        if (!current) {
+            current = [];
+            map.set(k, current);
+        }
+        current.push(v);
+    }
+    return map;
+}
+
 export function getSpellData(directory: string) {
+    const toto = readFileSync(`${directory}/dbc_extract3/SpellShapeshift.csv`, {
+        encoding: "ucs2",
+    });
+    const spellShapeshift = parse(toto, {
+        columns: true,
+        delimiter: ",",
+        relaxColumnCount: true,
+        cast: (value, context) =>
+            !context.header && typeof value === "string"
+                ? parseInt(value)
+                : value,
+    }) as SpellShapeshift[];
+    const spellShapeshiftById = toMap(spellShapeshift, (x) => x.id_spell);
+
     let output: AllData = {};
     readFile(directory, "sc_spell_data", output);
     readFile(directory, "sc_talent_data", output);
@@ -1359,7 +1431,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "spelltext_data", output);
     readFile(directory, "item_runeforge", output);
     readFile(directory, "covenant_data", output);
-    // readFile(directory, "sc_spell_lists", output);
+    readFile(directory, "active_spells", output);
 
     console.log("Import spells...");
     const identifierById = new Map<number, string>();
@@ -1431,14 +1503,24 @@ export function getSpellData(directory: string) {
             rank_str: "",
             identifierScore: 0,
             spellAttributes: [],
+            classFlags: [],
             specializationName: [],
             identifier: "",
         };
+        spell.shapeshifts = spellShapeshiftById.get(spell.id);
 
         for (let i = 0; i < spell.attributes.length; i++) {
             for (let flag = 0; flag < 32; flag++) {
                 if (spell.attributes[i] & (1 << flag)) {
                     spell.spellAttributes.push(i * 32 + flag);
+                }
+            }
+        }
+
+        for (let i = 0; i < spell.class_flags.length; i++) {
+            for (let flag = 0; flag < 32; flag++) {
+                if (spell.class_flags[i] & (1 << flag)) {
+                    spell.classFlags.push(i * 32 + flag);
                 }
             }
         }
@@ -1450,6 +1532,14 @@ export function getSpellData(directory: string) {
         } else if (spell.name) {
             spell.identifier = getIdentifier(spell.name);
         }
+
+        if (spell.rank_str) {
+            const m = spell.rank_str.match(/Rank (\d+)/);
+            if (m && parseInt(m[1]) > 1) {
+                spell.identifier += `_rank${m[1]}`;
+            }
+        }
+
         spellData.push(spell);
         spellDataById.set(spell.id, spell);
         if (!spell.identifier) continue;
@@ -1462,6 +1552,27 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Passive") spell.identifierScore--;
         if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)
             spell.identifierScore--;
+    }
+
+    console.log("Import active spells...");
+    if (!output.active_class_spell_t) {
+        throw Error("active_class_spell_t does not exist");
+    }
+
+    for (const row of output.active_class_spell_t) {
+        let i = 0;
+        const activeSpell: ActiveClassSpell = {
+            class_id: getNumber(row[i++]),
+            spec_id: getNumber(row[i++]),
+            spell_id: getNumber(row[i++]),
+            override_spell_id: getNumber(row[i++]),
+            name: getString(row[i++]),
+        };
+        const spell = spellDataById.get(activeSpell.spell_id);
+        if (spell) {
+            spell.identifierScore += 10;
+            spell.className = classNames[activeSpell.class_id];
+        }
     }
 
     console.log("Import specializations...");
@@ -1547,7 +1658,6 @@ export function getSpellData(directory: string) {
             );
         if (!spell.spellEffects) spell.spellEffects = [];
         spell.spellEffects.push(spellEffect);
-        if (spell.id === 238147) debugger;
 
         if (spellEffect.trigger_spell_id) {
             // for some weird reason, Azerite Essence are considered buffs instead of spells
@@ -1559,10 +1669,13 @@ export function getSpellData(directory: string) {
                 // console.log(`Can't find spell ${spellEffect.trigger_spell_id}`);
                 continue;
             }
-            if (triggerSpell.identifier === spell.identifier) {
-                if (spell.tooltip) {
-                    triggerSpell.identifier += "_trigger";
-                } else if (isFriendlyTarget(spellEffect.targeting_1)) {
+            if (
+                triggerSpell.name === spell.name &&
+                triggerSpell.id !== spell.id
+            ) {
+                if (!triggerSpell.tooltip) triggerSpell.identifierScore--;
+
+                if (isFriendlyTarget(spellEffect.targeting_1)) {
                     triggerSpell.identifier += "_buff";
                 } else {
                     triggerSpell.identifier += "_debuff";
@@ -1647,8 +1760,30 @@ export function getSpellData(directory: string) {
         }
     }
 
+    function getRandomIdentifier(spell: SpellData, other: SpellData) {
+        let identifier = spell.identifier;
+        if (spell.tooltip && !other.tooltip) {
+            if (spell.spellEffects) {
+                if (
+                    spell.spellEffects.some((x) =>
+                        isFriendlyTarget(x.targeting_1)
+                    )
+                ) {
+                    identifier += "_buff";
+                } else {
+                    identifier += "_debuff";
+                }
+                if (!identifiers[identifier]) return identifier;
+            }
+        }
+        let i = 0;
+        while (identifiers[`${identifier}_unused_${i}`]) {
+            i++;
+        }
+        return `${identifier}_unused_${i}`;
+    }
+
     for (const spell of spellData) {
-        if (isRankSpell(spell)) continue;
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other) {
@@ -1665,10 +1800,13 @@ export function getSpellData(directory: string) {
                     ) {
                         spell.identifier += "_" + spell.className.toLowerCase();
                     } else {
-                        continue;
+                        spell.identifier = getRandomIdentifier(spell, other);
                     }
                 } else if (other.identifierScore > spell.identifierScore) {
-                    continue;
+                    spell.identifier = getRandomIdentifier(spell, other);
+                } else {
+                    other.identifier = getRandomIdentifier(other, spell);
+                    identifiers[other.identifier] = other.id;
                 }
             }
         }
@@ -1701,11 +1839,17 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (isRankSpell(spell) && identifiers[spell.identifier]) {
-            const currentSpell = spellDataById.get(
-                identifiers[spell.identifier]
-            );
-            if (currentSpell) currentSpell.nextRank = spell;
+        if (isRankSpell(spell)) {
+            const mat = spell.rank_str.match(/Rank (\d+)/);
+            if (mat) {
+                const nextRank = parseInt(mat[1]) + 1;
+                const nextRankId =
+                    identifiers[`${spell.identifier}_rank${nextRank}`];
+                if (nextRankId) {
+                    const nextSpell = spellDataById.get(nextRankId);
+                    spell.nextRank = nextSpell;
+                }
+            }
         }
     }
 
@@ -1767,7 +1911,10 @@ export function getSpellData(directory: string) {
             identifier: "",
         };
         runeforge.identifier = getIdentifier(runeforge.name + "_runeforge");
-        if (identifiers[runeforge.identifier]) {
+        if (
+            identifiers[runeforge.identifier] &&
+            identifiers[runeforge.identifier] !== runeforge.bonus_id
+        ) {
             runeforge.identifier += `_${specIdToSpecName.get(
                 runeforge.specialization_id
             )}`;

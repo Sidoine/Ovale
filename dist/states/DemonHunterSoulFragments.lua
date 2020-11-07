@@ -40,7 +40,7 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
             self.requirement:UnregisterRequirement("soulfragments_max")
         end
         self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
-            if  not self.ovalePaperDoll.IsSpecialization("vengeance") then
+            if  not self.ovalePaperDoll:IsSpecialization("vengeance") then
                 return 
             end
             local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()

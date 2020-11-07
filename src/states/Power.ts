@@ -174,7 +174,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.initializePower();
         for (const [powerType] of pairs(this.POWER_INFO)) {
             this.requirement.RegisterRequirement(
-                powerType,
+                powerType as PowerType,
                 this.RequirePowerHandler
             );
         }
@@ -725,8 +725,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 if (addRequirements) {
                     for (const [v, rArray] of pairs(addRequirements)) {
                         if (isLuaArray(rArray)) {
-                            for (const [, requirement] of ipairs<any>(rArray)) {
-                                let verified = this.requirement.CheckRequirements(
+                            for (const [, requirement] of ipairs(rArray)) {
+                                let [
+                                    verified,
+                                ] = this.requirement.CheckRequirements(
                                     spellId,
                                     atTime,
                                     requirement,
@@ -785,7 +787,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                                 for (const [, requirement] of ipairs<any>(
                                     rArray
                                 )) {
-                                    let verified = this.requirement.CheckRequirements(
+                                    let [
+                                        verified,
+                                    ] = this.requirement.CheckRequirements(
                                         spellId,
                                         atTime,
                                         requirement,
