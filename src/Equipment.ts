@@ -27,26 +27,25 @@ import { Profiler, OvaleProfilerClass } from "./Profiler";
 import { OptionUiAll } from "./acegui-helpers";
 
 let OVALE_SLOTID_BY_SLOTNAME = {
-    AmmoSlot: 0,
-    HeadSlot: 1,
-    NeckSlot: 2,
-    ShoulderSlot: 3,
-    ShirtSlot: 4,
-    ChestSlot: 5,
-    WaistSlot: 6,
-    LegsSlot: 7,
-    FeetSlot: 8,
-    WristSlot: 9,
-    HandsSlot: 10,
-    Finger0Slot: 11,
-    Finger1Slot: 12,
-    Trinket0Slot: 13,
-    Trinket1Slot: 14,
-    BackSlot: 15,
-    MainHandSlot: 16,
-    SecondaryHandSlot: 17,
-    // RangedSlot: 18, no longer used
-    TabardSlot: 19,
+    ammoslot: 0,
+    headslot: 1,
+    neckslot: 2,
+    shoulderslot: 3,
+    shirtslot: 4,
+    chestslot: 5,
+    waistslot: 6,
+    legsslot: 7,
+    feetslot: 8,
+    wristslot: 9,
+    handsslot: 10,
+    finger0slot: 11,
+    finger1slot: 12,
+    trinket0slot: 13,
+    trinket1slot: 14,
+    backslot: 15,
+    mainhandslot: 16,
+    secondaryhandslot: 17,
+    tabardslot: 19,
 };
 export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
 let OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
@@ -208,8 +207,8 @@ export class OvaleEquipmentClass {
     */
     GetEquippedTrinkets() {
         return [
-            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]],
-            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]],
+            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket0slot"]],
+            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket1slot"]],
         ];
     }
     HasEquippedItem(itemId: number) {
@@ -269,13 +268,13 @@ export class OvaleEquipmentClass {
             slotId = OVALE_SLOTID_BY_SLOTNAME[slotId];
         }
         if (slotId) {
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"]) {
+            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
                 return (
                     this.mainHandItemType &&
                     OVALE_ONE_HANDED_WEAPON[this.mainHandItemType]
                 );
             } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"]
+                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
             ) {
                 return (
                     this.offHandItemType &&
@@ -303,12 +302,12 @@ export class OvaleEquipmentClass {
             this.equippedItemById[newItemId] = slotId;
             this.equippedItemBySlot[slotId] = newItemId;
             //this.equippedItemLevels[newItemId] = GetDetailedItemLevelInfo(newItemId);
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"]) {
+            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
                 let [itemEquipLoc, dps] = this.UpdateWeapons(slotId, newItemId);
                 this.mainHandItemType = itemEquipLoc;
                 this.mainHandDPS = dps;
             } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"]
+                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
             ) {
                 let [itemEquipLoc, dps] = this.UpdateWeapons(slotId, newItemId);
                 this.offHandItemType = itemEquipLoc;
@@ -317,11 +316,11 @@ export class OvaleEquipmentClass {
         } else {
             delete this.equippedItemBySlot[slotId];
 
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"]) {
+            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
                 this.mainHandItemType = undefined;
                 this.mainHandDPS = 0;
             } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"]
+                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
             ) {
                 this.offHandItemType = undefined;
                 this.offHandDPS = 0;
