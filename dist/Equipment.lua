@@ -19,25 +19,25 @@ local insert = table.insert
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
 local OVALE_SLOTID_BY_SLOTNAME = {
-    AmmoSlot = 0,
-    HeadSlot = 1,
-    NeckSlot = 2,
-    ShoulderSlot = 3,
-    ShirtSlot = 4,
-    ChestSlot = 5,
-    WaistSlot = 6,
-    LegsSlot = 7,
-    FeetSlot = 8,
-    WristSlot = 9,
-    HandsSlot = 10,
-    Finger0Slot = 11,
-    Finger1Slot = 12,
-    Trinket0Slot = 13,
-    Trinket1Slot = 14,
-    BackSlot = 15,
-    MainHandSlot = 16,
-    SecondaryHandSlot = 17,
-    TabardSlot = 19
+    ammoslot = 0,
+    headslot = 1,
+    neckslot = 2,
+    shoulderslot = 3,
+    shirtslot = 4,
+    chestslot = 5,
+    waistslot = 6,
+    legsslot = 7,
+    feetslot = 8,
+    wristslot = 9,
+    handsslot = 10,
+    finger0slot = 11,
+    finger1slot = 12,
+    trinket0slot = 13,
+    trinket1slot = 14,
+    backslot = 15,
+    mainhandslot = 16,
+    secondaryhandslot = 17,
+    tabardslot = 19
 }
 local OVALE_SLOTNAME_BY_SLOTID = {}
 local OVALE_ONE_HANDED_WEAPON = {
@@ -134,7 +134,7 @@ __exports.OvaleEquipmentClass = __class(nil, {
         return nil
     end,
     GetEquippedTrinkets = function(self)
-        return self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]
+        return self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket0slot"]], self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket1slot"]]
     end,
     HasEquippedItem = function(self, itemId)
         return (self.equippedItemById[itemId] and true) or false
@@ -186,9 +186,9 @@ __exports.OvaleEquipmentClass = __class(nil, {
             slotId = OVALE_SLOTID_BY_SLOTNAME[slotId]
         end
         if slotId then
-            if slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"] then
+            if slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"] then
                 return (self.mainHandItemType and OVALE_ONE_HANDED_WEAPON[self.mainHandItemType])
-            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"] then
+            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"] then
                 return (self.offHandItemType and OVALE_ONE_HANDED_WEAPON[self.offHandItemType])
             end
         else
@@ -205,21 +205,21 @@ __exports.OvaleEquipmentClass = __class(nil, {
         if newItemId then
             self.equippedItemById[newItemId] = slotId
             self.equippedItemBySlot[slotId] = newItemId
-            if slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"] then
+            if slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"] then
                 local itemEquipLoc, dps = self:UpdateWeapons(slotId, newItemId)
                 self.mainHandItemType = itemEquipLoc
                 self.mainHandDPS = dps
-            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"] then
+            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"] then
                 local itemEquipLoc, dps = self:UpdateWeapons(slotId, newItemId)
                 self.offHandItemType = itemEquipLoc
                 self.offHandDPS = dps
             end
         else
             self.equippedItemBySlot[slotId] = nil
-            if slotId == OVALE_SLOTID_BY_SLOTNAME["MainHandSlot"] then
+            if slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"] then
                 self.mainHandItemType = nil
                 self.mainHandDPS = 0
-            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["SecondaryHandSlot"] then
+            elseif slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"] then
                 self.offHandItemType = nil
                 self.offHandDPS = 0
             end
