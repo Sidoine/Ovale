@@ -277,9 +277,6 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
-Define(razor_coral 303564)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
-  SpellInfo(razor_coral cd=20 gcd=0 offgcd=1)
 Define(razor_coral_debuff 303568)
 # ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
   SpellInfo(razor_coral_debuff duration=120 max_stacks=100 gcd=0 offgcd=1)

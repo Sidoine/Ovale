@@ -262,6 +262,12 @@ __exports.MISC_OPERAND = {
         name = "astralpower",
         modifiers = powerModifiers
     },
+    ["ca_active"] = {
+        code = "talent(careful_aim_talent) and targethealthpercent() > 70",
+        symbolsInCode = {
+            [1] = "careful_aim_talent"
+        }
+    },
     ["chi"] = {
         name = "chi",
         modifiers = powerModifiers
@@ -366,6 +372,10 @@ __exports.MISC_OPERAND = {
     ["mana"] = {
         name = "mana",
         modifiers = powerModifiers
+    },
+    ["next_wi_bomb"] = {
+        name = "buffpresent",
+        symbol = "bomb"
     },
     ["pain"] = {
         name = "pain",

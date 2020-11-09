@@ -43,6 +43,11 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2 talent=barrage_talent_marksmanship)
 
+Define(beast_cleave_buff 118455)
+# After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
+  SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
+  # Melee attacks also strike all other nearby enemy targets.
+  SpellAddBuff(beast_cleave_buff beast_cleave_buff=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -151,6 +156,11 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(frenzy_buff 138895)
+# Haste increased by s1 for 10 seconds.
+  SpellInfo(frenzy_buff duration=10 max_stacks=5 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(frenzy_buff frenzy_buff=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -208,6 +218,11 @@ Define(multishot 2643)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(pheromone_bomb 270332)
+# Hurl a bomb at the target, exploding for 270329s1 Fire damage in a cone and coating enemies in pheromones, causing them to suffer 270332o1 Fire damage over 6 seconds.rnrnKill Command has a s2 chance to reset against targets coated with Pheromone Bomb.
+  SpellInfo(pheromone_bomb duration=6 gcd=0 offgcd=1 tick=1)
+  # Suffering w1 Fire damage every t1 sec.
+  SpellAddTargetDebuff(pheromone_bomb pheromone_bomb=1)
 Define(potion_of_unbridled_fury_buff 300717)
 # Deal s1 Fire damage to your current target.
   SpellInfo(potion_of_unbridled_fury_buff gcd=0 offgcd=1)
@@ -263,6 +278,11 @@ Define(serpent_sting 259491)
   SpellInfo(serpent_sting focus=20 duration=12 tick=3)
   # Suffering w2 Nature damage every t2 sec.?a265428[ The Hunter's pet deals w3 increased damage to you.][]
   SpellAddTargetDebuff(serpent_sting serpent_sting=1)
+Define(shrapnel_bomb 270339)
+# Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
+  SpellInfo(shrapnel_bomb duration=6 gcd=0 offgcd=1 tick=1)
+  # Suffering w1 Fire damage every t1 sec.rn?s259387[Mongoose Bite][Raptor Strike] and Butchery apply a stack of Internal Bleeding.
+  SpellAddTargetDebuff(shrapnel_bomb shrapnel_bomb=1)
 Define(shrapnel_bomb_debuff 270336)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb_debuff duration=0.5 gcd=0 offgcd=1)
@@ -311,6 +331,10 @@ Define(vipers_venom_buff 268552)
   SpellInfo(vipers_venom_buff duration=8 gcd=0 offgcd=1)
   # Your next Serpent Sting costs no Focus, and will deal s1 increased initial damage.
   SpellAddBuff(vipers_venom_buff vipers_venom_buff=1)
+Define(volatile_bomb 271045)
+# Hurl a bomb at the target, exploding for 271048s1 Fire damage in a cone and coating enemies in volatile wildfire, scorching them for 271049o1 Fire damage over 6 seconds.rnrnVolatile Bomb causes an extra explosion for 260231s1 Fire damage against targets affected by Serpent Sting, and refreshes your Serpent Stings when it explodes.
+  SpellInfo(volatile_bomb cd=18)
+
 Define(volley 260243)
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
   SpellInfo(volley cd=45 duration=6 tick=0.5 talent=volley_talent)

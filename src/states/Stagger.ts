@@ -187,7 +187,7 @@ export class OvaleStaggerClass implements StateModule {
         atTime
     ) => {
         let [target] = ParseCondition(namedParams, this.baseState);
-        let [start, end, value, origin, rate] = this.getAnyStaggerAura(
+        let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
             target,
             atTime
         );
@@ -198,7 +198,7 @@ export class OvaleStaggerClass implements StateModule {
         if (rate !== undefined) {
             rate = (rate * 100) / healthMax;
         }
-        return [start, end, value, origin, rate];
+        return [start, ending, value, origin, rate];
     };
 
     private missingStaggerPercent: ConditionFunction = (
@@ -207,7 +207,7 @@ export class OvaleStaggerClass implements StateModule {
         atTime
     ) => {
         let [target] = ParseCondition(namedParams, this.baseState);
-        let [start, end, value, origin, rate] = this.getAnyStaggerAura(
+        let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
             target,
             atTime
         );
@@ -218,7 +218,7 @@ export class OvaleStaggerClass implements StateModule {
         if (rate !== undefined) {
             rate = -(rate * 100) / healthMax;
         }
-        return [start, end, value, origin, rate];
+        return [start, ending, value, origin, rate];
     };
 
     /** Get the last Stagger tick damage.

@@ -454,22 +454,7 @@
     commander "^4.0.0"
     typescript "^4.0.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0":
-  version "1.21.1"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.21.1.tgz#d1343430a0debcfc15ea2dbb0baddb8be4340ac7"
-  integrity sha512-71aAJ49p1zozeCGmnZXDnuqX7QQpAbqm+8YHRkSbqxWKO2Ui9734iYMzl1tvBrpiSqGOCi94p5FHETABT1krrg==
-  dependencies:
-    "@wowts/lua" "^1.3.2"
-
-"@wowts/wow-mock@^1.19.0":
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.22.1.tgz#c320dabb65b21f70a13d6778096d92a00671daf3"
-  integrity sha512-uxvZH7HZiCrVarT01ilgtdJHA/spJ7bq8mLC1vAnIu2VJ6r/dMHb7DgtvIiHv+XgSWSUL3NRmvtz76zcuNphpQ==
-  dependencies:
-    "@wowts/lua" "^1.3.2"
-    "@wowts/table" "^1.0.1"
-
-"@wowts/wow-mock@^1.24.2":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.24.2", "@wowts/wow-mock@^1.6.0":
   version "1.24.2"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.24.2.tgz#b96e3c769e8c471277e589f1430b0e1d269acd65"
   integrity sha512-keS+R+cTEBmDoLAdlA4wFaiJI77a0XzdfEx9HDNfWTw5skgWES/uC3Kbywi3E3cG8MMM2Oe/XvlUTlIwQ9VaAw==

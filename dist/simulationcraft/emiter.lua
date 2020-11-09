@@ -1610,7 +1610,7 @@ __exports.Emiter = __class(nil, {
                         if  not node then
                             local petAbilityName = match(petOperand, "^[%w_]+%.([^.]+)")
                             petAbilityName = self:Disambiguate(annotation, petAbilityName, annotation.classId, annotation.specialization)
-                            if sub(petAbilityName, 1, 4) ~= "pet_" then
+                            if sub(petAbilityName, 1, 4) ~= "pet_" and name ~= "main" then
                                 petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
                             end
                             if property == "buff" then
@@ -1701,6 +1701,8 @@ __exports.Emiter = __class(nil, {
                     code = "600"
                 elseif property == "duration" then
                     code = "10"
+                elseif property == "remains" then
+                    code = "0"
                 end
             elseif name == "invulnerable" then
                 if property == "up" then
@@ -2215,7 +2217,7 @@ __exports.Emiter = __class(nil, {
                     code = format("True(trinket_%s_%s)", procType, statName)
                 else
                     local property = statName
-                    local buffName = self:Disambiguate(annotation, procType, annotation.classId, annotation.specialization)
+                    local buffName = self:Disambiguate(annotation, procType .. "_item", annotation.classId, annotation.specialization)
                     if property == "cooldown" then
                         code = format("BuffCooldownDuration(%s)", buffName)
                     elseif property == "cooldown_remains" then
@@ -2352,6 +2354,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("disciplinary_command_frost_buff", "disciplinary_command__frost_aura_dnt", "MAGE")
         self:AddDisambiguation("hyperthread_wristwraps_300142", "hyperthread_wristwraps", "MAGE", "fire")
         self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
+        self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury_buff")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2378,6 +2381,18 @@ __exports.Emiter = __class(nil, {
         if info then
             local modifier = tokenIterator()
             local name = info.name or miscOperand
+            if info.code then
+                if info.symbolsInCode then
+                    for _, symbol in ipairs(info.symbolsInCode) do
+                        annotation:AddSymbol(symbol)
+                    end
+                    local result = self.ovaleAst:ParseCode("expression", info.code, nodeList, annotation.astAnnotation)
+                    if result then
+                        return result
+                    end
+                    return nil
+                end
+            end
             local parameters = {}
             if info.extraParameter then
                 insert(parameters, self.ovaleAst:newValue(nodeList, info.extraParameter))

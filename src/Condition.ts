@@ -134,13 +134,13 @@ export function ReturnValue(
 
 export function ReturnValueBetween(
     start: number,
-    end: number,
+    ending: number,
     value: number,
     origin: number,
     rate: number
 ): ConditionResult {
-    if (start >= end) return [];
-    return [start, end, value, origin, rate];
+    if (start >= ending) return [];
+    return [start, ending, value, origin, rate];
 }
 
 export function ReturnConstant(

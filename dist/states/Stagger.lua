@@ -55,7 +55,7 @@ __exports.OvaleStaggerClass = __class(nil, {
         end
         self.staggerPercent = function(positionalparameters, namedParams, atTime)
             local target = ParseCondition(namedParams, self.baseState)
-            local start, end, value, origin, rate = self:getAnyStaggerAura(target, atTime)
+            local start, ending, value, origin, rate = self:getAnyStaggerAura(target, atTime)
             local healthMax = self.health:UnitHealthMax(target)
             if value ~= nil and isNumber(value) then
                 value = (value * 100) / healthMax
@@ -63,11 +63,11 @@ __exports.OvaleStaggerClass = __class(nil, {
             if rate ~= nil then
                 rate = (rate * 100) / healthMax
             end
-            return start, end, value, origin, rate
+            return start, ending, value, origin, rate
         end
         self.missingStaggerPercent = function(positionalparameters, namedParams, atTime)
             local target = ParseCondition(namedParams, self.baseState)
-            local start, end, value, origin, rate = self:getAnyStaggerAura(target, atTime)
+            local start, ending, value, origin, rate = self:getAnyStaggerAura(target, atTime)
             local healthMax = self.health:UnitHealthMax(target)
             if value ~= nil and isNumber(value) then
                 value = ((healthMax - value) * 100) / healthMax
@@ -75,7 +75,7 @@ __exports.OvaleStaggerClass = __class(nil, {
             if rate ~= nil then
                 rate = -(rate * 100) / healthMax
             end
-            return start, end, value, origin, rate
+            return start, ending, value, origin, rate
         end
         self.StaggerTick = function(positionalParams, namedParams, atTime)
             local count, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[2]

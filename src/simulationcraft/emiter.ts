@@ -281,6 +281,10 @@ export class Emiter {
             "fire"
         );
         this.AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE");
+        this.AddDisambiguation(
+            "unbridled_fury_buff",
+            "potion_of_unbridled_fury_buff"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -335,6 +339,21 @@ export class Emiter {
         if (info) {
             let modifier = tokenIterator();
             let name = info.name || miscOperand;
+            if (info.code) {
+                if (info.symbolsInCode) {
+                    for (const [_, symbol] of ipairs(info.symbolsInCode)) {
+                        annotation.AddSymbol(symbol);
+                    }
+                    const [result] = this.ovaleAst.ParseCode(
+                        "expression",
+                        info.code,
+                        nodeList,
+                        annotation.astAnnotation
+                    );
+                    if (result) return result;
+                    return undefined;
+                }
+            }
             let parameters: LuaArray<AstNode> = {};
             if (info.extraParameter) {
                 insert(
@@ -3229,7 +3248,10 @@ export class Emiter {
                             annotation.classId,
                             annotation.specialization
                         );
-                        if (sub(petAbilityName, 1, 4) != "pet_") {
+                        if (
+                            sub(petAbilityName, 1, 4) != "pet_" &&
+                            name !== "main"
+                        ) {
                             petOperand = gsub(
                                 petOperand,
                                 "^([%w_]+)%.",
@@ -3380,6 +3402,8 @@ export class Emiter {
                 code = "600";
             } else if (property == "duration") {
                 code = "10"; //TODO
+            } else if (property == "remains") {
+                code = "0"; // TODO
             }
         } else if (name == "invulnerable") {
             if (property == "up") {
@@ -4168,7 +4192,7 @@ export class Emiter {
                 let property = statName;
                 let [buffName] = this.Disambiguate(
                     annotation,
-                    procType,
+                    procType + "_item",
                     annotation.classId,
                     annotation.specialization
                 );

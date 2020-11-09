@@ -566,12 +566,20 @@ export interface MiscOperand {
     symbol?: string;
     extraParameter?: number | string;
     extraSymbol?: string;
+    code?: string;
+    symbolsInCode?: LuaArray<string>;
 }
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
     ["animacharged_cp"]: { name: "maxcombopoints" },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
+    ["ca_active"]: {
+        code: "talent(careful_aim_talent) and targethealthpercent() > 70",
+        symbolsInCode: {
+            1: "careful_aim_talent",
+        },
+    },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
     ["conduit"]: {
@@ -627,6 +635,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
     ["mana"]: { name: "mana", modifiers: powerModifiers },
+    ["next_wi_bomb"]: {
+        name: "buffpresent",
+        symbol: "bomb",
+    },
     ["pain"]: { name: "pain", modifiers: powerModifiers },
     ["priest"]: {
         name: "checkboxon",

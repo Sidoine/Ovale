@@ -82,11 +82,11 @@ end
 __exports.ReturnValue = function(value, origin, rate)
     return 0, INFINITY, value, origin, rate
 end
-__exports.ReturnValueBetween = function(start, end, value, origin, rate)
-    if start >= end then
+__exports.ReturnValueBetween = function(start, ending, value, origin, rate)
+    if start >= ending then
         return 
     end
-    return start, end, value, origin, rate
+    return start, ending, value, origin, rate
 end
 __exports.ReturnConstant = function(value)
     return 0, INFINITY, value, 0, 0
