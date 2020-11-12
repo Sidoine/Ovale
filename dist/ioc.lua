@@ -200,5 +200,6 @@ __exports.IoC = __class(nil, {
         self.warlock:registerConditions(self.condition)
         self.aura:registerConditions(self.condition)
         self.future:registerConditions(self.condition)
+        self.stagger:registerConditions(self.condition)
     end,
 })

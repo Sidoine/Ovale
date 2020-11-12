@@ -500,5 +500,6 @@ export class IoC {
         this.warlock.registerConditions(this.condition);
         this.aura.registerConditions(this.condition);
         this.future.registerConditions(this.condition);
+        this.stagger.registerConditions(this.condition);
     }
 }
