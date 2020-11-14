@@ -305,6 +305,8 @@ Define(arcane_torrent 202719)
     SpellInfo(arcane_torrent cd=120 fury=-15)
 Define(frailty_debuff 247456)
     SpellInfo(frailty_debuff duration=20)
+#infernal_strike
+    SpellRequire(infernal_strike unusable 1=lossofcontrol,root)
 #spirit_bomb
     SpellRequire(spirit_bomb unusable 1=soulfragments_max,0)
 	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
