@@ -462,7 +462,6 @@ export class IoC {
             this.equipment,
             this.health,
             this.options,
-            this.lossOfControl,
             this.spellDamage,
             this.totem,
             this.demonHunterSigils,
@@ -501,5 +500,6 @@ export class IoC {
         this.aura.registerConditions(this.condition);
         this.future.registerConditions(this.condition);
         this.stagger.registerConditions(this.condition);
+        this.lossOfControl.registerConditions(this.condition);
     }
 }

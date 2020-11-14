@@ -72,7 +72,6 @@ import { LastSpell } from "./states/LastSpell";
 import { OvaleEquipmentClass } from "./Equipment";
 import { OvaleHealthClass } from "./states/Health";
 import { OvaleOptionsClass } from "./Options";
-import { OvaleLossOfControlClass } from "./states/LossOfControl";
 import { OvaleSpellDamageClass } from "./states/SpellDamage";
 import { OvaleTotemClass } from "./states/Totem";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
@@ -2716,28 +2715,6 @@ export class OvaleConditions {
         return [];
     };
 
-    /**  Test if the player is feared.
-	 @name IsFeared
-	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if feared. If no, then return true if it not feared.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 if IsFeared() Spell(every_man_for_himself)
-     */
-    private IsFeared = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let yesno = positionalParams[1];
-        let boolean =
-            !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("FEAR", atTime);
-        return TestBoolean(boolean, yesno);
-    };
-
     /** Test if the target is friendly to the player.
 	 @name IsFriend
 	 @paramsig boolean
@@ -2759,28 +2736,6 @@ export class OvaleConditions {
         let yesno = positionalParams[1];
         let [target] = this.ParseCondition(positionalParams, namedParams);
         let boolean = UnitIsFriend("player", target);
-        return TestBoolean(boolean, yesno);
-    };
-
-    /** Test if the player is incapacitated.
-	 @name IsIncapacitated
-	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if incapacitated. If no, then return true if it not incapacitated.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 if IsIncapacitated() Spell(every_man_for_himself)
-     */
-    private IsIncapacitated = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let yesno = positionalParams[1];
-        let boolean =
-            !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime);
         return TestBoolean(boolean, yesno);
     };
 
@@ -2835,47 +2790,7 @@ export class OvaleConditions {
         let boolean = UnitIsPVP(target);
         return TestBoolean(boolean, yesno);
     };
-    /** Test if the player is rooted.
-	 @name IsRooted
-	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if rooted. If no, then return true if it not rooted.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 if IsRooted() Item(Trinket0Slot usable=1)
-     */
-    private IsRooted = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let yesno = positionalParams[1];
-        let boolean = this.OvaleLossOfControl.HasLossOfControl("ROOT", atTime);
-        return TestBoolean(boolean, yesno);
-    };
 
-    /** Test if the player is stunned.
-	 @name IsStunned
-	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if stunned. If no, then return true if it not stunned.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 if IsStunned() Item(Trinket0Slot usable=1)
-     */
-    private IsStunned = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let yesno = positionalParams[1];
-        let boolean =
-            !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime);
-        return TestBoolean(boolean, yesno);
-    };
     /**  Get the current number of charges of the given item in the player's inventory.
 	 @name ItemCharges
 	 @paramsig number or boolean
@@ -6764,7 +6679,6 @@ l    */
         private OvaleEquipment: OvaleEquipmentClass,
         private OvaleHealth: OvaleHealthClass,
         private ovaleOptions: OvaleOptionsClass,
-        private OvaleLossOfControl: OvaleLossOfControlClass,
         private OvaleSpellDamage: OvaleSpellDamageClass,
         private OvaleTotem: OvaleTotemClass,
         private OvaleSigil: OvaleSigilClass,
@@ -7177,21 +7091,13 @@ l    */
         ovaleCondition.RegisterCondition("isaggroed", false, this.IsAggroed);
         ovaleCondition.RegisterCondition("isdead", false, this.IsDead);
         ovaleCondition.RegisterCondition("isenraged", false, this.IsEnraged);
-        ovaleCondition.RegisterCondition("isfeared", false, this.IsFeared);
         ovaleCondition.RegisterCondition("isfriend", false, this.IsFriend);
-        ovaleCondition.RegisterCondition(
-            "isincapacitated",
-            false,
-            this.IsIncapacitated
-        );
         ovaleCondition.RegisterCondition(
             "isinterruptible",
             false,
             this.IsInterruptible
         );
         ovaleCondition.RegisterCondition("ispvp", false, this.IsPVP);
-        ovaleCondition.RegisterCondition("isrooted", false, this.IsRooted);
-        ovaleCondition.RegisterCondition("isstunned", false, this.IsStunned);
         ovaleCondition.RegisterCondition(
             "itemcharges",
             false,

@@ -4,13 +4,17 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local C_LossOfControl = C_LossOfControl
 local GetTime = GetTime
+local HasFullControl = HasFullControl
 local pairs = pairs
+local ipairs = ipairs
 local insert = table.insert
 local sub = string.sub
 local upper = string.upper
 local format = string.format
 local __tools = LibStub:GetLibrary("ovale/tools")
 local OneTimeMessage = __tools.OneTimeMessage
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local TestBoolean = __Condition.TestBoolean
 __exports.OvaleLossOfControlClass = __class(nil, {
     constructor = function(self, ovale, ovaleDebug, requirement)
         self.requirement = requirement
@@ -56,7 +60,7 @@ __exports.OvaleLossOfControlClass = __class(nil, {
             end
             return verified, requirement, index
         end
-        self.HasLossOfControl = function(locType, atTime)
+        self.GetLossOfControlTiming = function(locType, atTime)
             local lowestStartTime = nil
             local highestEndTime = nil
             for _, data in pairs(self.lossOfControlHistory) do
@@ -69,10 +73,50 @@ __exports.OvaleLossOfControlClass = __class(nil, {
                     end
                 end
             end
+            return lowestStartTime, highestEndTime
+        end
+        self.HasLossOfControl = function(locType, atTime)
+            local lowestStartTime, highestEndTime = self.GetLossOfControlTiming(locType, atTime)
             return lowestStartTime ~= nil and highestEndTime ~= nil
+        end
+        self.IsFeared = function(positionalParams, namedParams, atTime)
+            local yesno = positionalParams[1]
+            local boolean =  not HasFullControl() and self.HasLossOfControl("FEAR", atTime)
+            return TestBoolean(boolean, yesno)
+        end
+        self.IsIncapacitated = function(positionalParams, namedParams, atTime)
+            local yesno = positionalParams[1]
+            local boolean =  not HasFullControl() and self.HasLossOfControl("CONFUSE", atTime)
+            return TestBoolean(boolean, yesno)
+        end
+        self.IsRooted = function(positionalParams, namedParams, atTime)
+            local yesno = positionalParams[1]
+            local boolean = self.HasLossOfControl("ROOT", atTime)
+            return TestBoolean(boolean, yesno)
+        end
+        self.IsStunned = function(positionalParams, namedParams, atTime)
+            local yesno = positionalParams[1]
+            local boolean =  not HasFullControl() and self.HasLossOfControl("STUN_MECHANIC", atTime)
+            return TestBoolean(boolean, yesno)
+        end
+        self.HasLossOfControlCondition = function(positionalParams, namedParams, atTime)
+            for _, lossOfControlType in ipairs(positionalParams) do
+                local start, ending = self.GetLossOfControlTiming(upper(lossOfControlType), atTime)
+                if start ~= nil and ending ~= nil then
+                    return start, ending
+                end
+            end
+            return 
         end
         self.module = ovale:createModule("OvaleLossOfControl", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())
+    end,
+    registerConditions = function(self, ovaleCondition)
+        ovaleCondition:RegisterCondition("isfeared", false, self.IsFeared)
+        ovaleCondition:RegisterCondition("isincapacitated", false, self.IsIncapacitated)
+        ovaleCondition:RegisterCondition("isrooted", false, self.IsRooted)
+        ovaleCondition:RegisterCondition("isstunned", false, self.IsStunned)
+        ovaleCondition:RegisterCondition("haslossofcontrol", false, self.HasLossOfControlCondition)
     end,
     CleanState = function(self)
     end,

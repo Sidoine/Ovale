@@ -51,8 +51,8 @@
    <Script file="tools.lua"/>
    <Script file="states\runeforge.lua"/>
    <Script file="states\Stagger.lua"/>
-   <Script file="states\DemonHunterSoulFragments.lua"/>
    <Script file="states\LossOfControl.lua"/>
+   <Script file="states\DemonHunterSoulFragments.lua"/>
    <Script file="states\Health.lua"/>
    <Script file="PoolGC.lua"/>
    <Script file="Data.lua"/>

@@ -176,7 +176,7 @@ __exports.IoC = __class(nil, {
         local covenant = Covenant(self.ovale, self.debug)
         local runeforge = Runeforge(self.debug)
         local conduit = Conduit(self.debug)
-        self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.lossOfControl, self.spellDamage, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
+        self.conditions = OvaleConditions(self.condition, self.data, self.compile, self.paperDoll, self.azeriteArmor, self.azeriteEssence, self.aura, self.baseState, self.cooldown, self.future, self.spellBook, self.frame, self.guid, self.damageTaken, self.power, self.enemies, self.variables, self.lastSpell, self.equipment, self.health, self.options, self.spellDamage, self.totem, self.demonHunterSigils, self.demonHunterSoulFragments, self.bestAction, self.runes, self.stance, self.bossMod, self.spells)
         self.state:RegisterState(self.cooldown)
         self.state:RegisterState(self.paperDoll)
         self.state:RegisterState(self.baseState)
@@ -201,5 +201,6 @@ __exports.IoC = __class(nil, {
         self.aura:registerConditions(self.condition)
         self.future:registerConditions(self.condition)
         self.stagger:registerConditions(self.condition)
+        self.lossOfControl:registerConditions(self.condition)
     end,
 })

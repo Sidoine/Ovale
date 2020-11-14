@@ -242,7 +242,7 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return ParseCondition(namedParams, self.baseState, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleSpellDamage, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
         self.OvalePaperDoll = OvalePaperDoll
@@ -263,7 +263,6 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleEquipment = OvaleEquipment
         self.OvaleHealth = OvaleHealth
         self.ovaleOptions = ovaleOptions
-        self.OvaleLossOfControl = OvaleLossOfControl
         self.OvaleSpellDamage = OvaleSpellDamage
         self.OvaleTotem = OvaleTotem
         self.OvaleSigil = OvaleSigil
@@ -1064,20 +1063,10 @@ __exports.OvaleConditions = __class(nil, {
             end
             return 
         end
-        self.IsFeared = function(positionalParams, namedParams, atTime)
-            local yesno = positionalParams[1]
-            local boolean =  not HasFullControl() and self.OvaleLossOfControl.HasLossOfControl("FEAR", atTime)
-            return TestBoolean(boolean, yesno)
-        end
         self.IsFriend = function(positionalParams, namedParams, atTime)
             local yesno = positionalParams[1]
             local target = self:ParseCondition(positionalParams, namedParams)
             local boolean = UnitIsFriend("player", target)
-            return TestBoolean(boolean, yesno)
-        end
-        self.IsIncapacitated = function(positionalParams, namedParams, atTime)
-            local yesno = positionalParams[1]
-            local boolean =  not HasFullControl() and self.OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime)
             return TestBoolean(boolean, yesno)
         end
         self.IsInterruptible = function(positionalParams, namedParams, atTime)
@@ -1094,16 +1083,6 @@ __exports.OvaleConditions = __class(nil, {
             local yesno = positionalParams[1]
             local target = self:ParseCondition(positionalParams, namedParams)
             local boolean = UnitIsPVP(target)
-            return TestBoolean(boolean, yesno)
-        end
-        self.IsRooted = function(positionalParams, namedParams, atTime)
-            local yesno = positionalParams[1]
-            local boolean = self.OvaleLossOfControl.HasLossOfControl("ROOT", atTime)
-            return TestBoolean(boolean, yesno)
-        end
-        self.IsStunned = function(positionalParams, namedParams, atTime)
-            local yesno = positionalParams[1]
-            local boolean =  not HasFullControl() and self.OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime)
             return TestBoolean(boolean, yesno)
         end
         self.ItemCharges = function(positionalParams, namedParams, atTime)
@@ -2096,13 +2075,9 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("isaggroed", false, self.IsAggroed)
         ovaleCondition:RegisterCondition("isdead", false, self.IsDead)
         ovaleCondition:RegisterCondition("isenraged", false, self.IsEnraged)
-        ovaleCondition:RegisterCondition("isfeared", false, self.IsFeared)
         ovaleCondition:RegisterCondition("isfriend", false, self.IsFriend)
-        ovaleCondition:RegisterCondition("isincapacitated", false, self.IsIncapacitated)
         ovaleCondition:RegisterCondition("isinterruptible", false, self.IsInterruptible)
         ovaleCondition:RegisterCondition("ispvp", false, self.IsPVP)
-        ovaleCondition:RegisterCondition("isrooted", false, self.IsRooted)
-        ovaleCondition:RegisterCondition("isstunned", false, self.IsStunned)
         ovaleCondition:RegisterCondition("itemcharges", false, self.ItemCharges)
         ovaleCondition:RegisterCondition("itemcooldown", false, self.ItemCooldown)
         ovaleCondition:RegisterCondition("itemcount", false, self.ItemCount)
