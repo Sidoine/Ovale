@@ -1,9 +1,9 @@
-import test from "ava";
+import { test, expect } from "@jest/globals";
 import { It, Mock } from "typemoq";
 import { registerScripts } from "./index";
 import { OvaleScriptsClass } from "../Scripts";
 
-test("Test scripts", (t) => {
+test("Test scripts", () => {
     // Arrange
     const messages = new Map<string, number>();
     const scriptsMock = Mock.ofType<OvaleScriptsClass>();
@@ -44,5 +44,5 @@ test("Test scripts", (t) => {
     registerScripts(scriptsMock.object);
 
     // Assert
-    t.is(Array.from(messages.keys()), []);
+    expect(Array.from(messages.keys())).toEqual([]);
 });

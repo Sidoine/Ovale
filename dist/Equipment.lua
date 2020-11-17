@@ -6,6 +6,7 @@ local pairs = pairs
 local wipe = wipe
 local ipairs = ipairs
 local kpairs = pairs
+local type = type
 local sub = string.sub
 local GetInventoryItemID = GetInventoryItemID
 local GetInventoryItemLink = GetInventoryItemLink
@@ -14,10 +15,15 @@ local GetItemInfoInstant = GetItemInfoInstant
 local GetInventorySlotInfo = GetInventorySlotInfo
 local INVSLOT_FIRST_EQUIPPED = INVSLOT_FIRST_EQUIPPED
 local INVSLOT_LAST_EQUIPPED = INVSLOT_LAST_EQUIPPED
+local GetItemCooldown = GetItemCooldown
 local concat = table.concat
 local insert = table.insert
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local Compare = __Condition.Compare
+local TestBoolean = __Condition.TestBoolean
+local TestValue = __Condition.TestValue
 local OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot = 0,
     headslot = 1,
@@ -50,8 +56,9 @@ local OVALE_RANGED_WEAPON = {
     INVTYPE_RANGED = true
 }
 __exports.OvaleEquipmentClass = __class(nil, {
-    constructor = function(self, ovale, ovaleDebug, ovaleProfiler)
+    constructor = function(self, ovale, ovaleDebug, ovaleProfiler, OvaleData)
         self.ovale = ovale
+        self.OvaleData = OvaleData
         self.ready = false
         self.equippedItemById = {}
         self.equippedItemBySlot = {}
@@ -110,6 +117,59 @@ __exports.OvaleEquipmentClass = __class(nil, {
             self.ready = true
             self.profiler:StopProfiling("OvaleEquipment_UpdateEquippedItems")
         end
+        self.hasEquippedItem = function(positionalParams, namedParams, atTime)
+            local itemId, yesno = positionalParams[1], positionalParams[2]
+            local boolean = false
+            local slotId
+            if type(itemId) == "number" then
+                slotId = self:HasEquippedItem(itemId)
+                if slotId then
+                    boolean = true
+                end
+            elseif self.OvaleData.itemList[itemId] then
+                for _, v in pairs(self.OvaleData.itemList[itemId]) do
+                    slotId = self:HasEquippedItem(v)
+                    if slotId then
+                        boolean = true
+                        break
+                    end
+                end
+            end
+            return TestBoolean(boolean, yesno)
+        end
+        self.hasShield = function(positionalParams, namedParams, atTime)
+            local yesno = positionalParams[1]
+            local boolean = self:HasShield()
+            return TestBoolean(boolean, yesno)
+        end
+        self.hasTrinket = function(positionalParams, namedParams, atTime)
+            local trinketId, yesno = positionalParams[1], positionalParams[2]
+            local boolean = nil
+            if type(trinketId) == "number" then
+                boolean = self:HasTrinket(trinketId)
+            elseif self.OvaleData.itemList[trinketId] then
+                for _, v in pairs(self.OvaleData.itemList[trinketId]) do
+                    boolean = self:HasTrinket(v)
+                    if boolean then
+                        break
+                    end
+                end
+            end
+            return TestBoolean(boolean ~= nil, yesno)
+        end
+        self.ItemCooldown = function(positionalParams, namedParams, atTime)
+            local itemId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            if itemId and type(itemId) ~= "number" then
+                itemId = self:GetEquippedItemBySlotName(itemId)
+            end
+            if itemId then
+                local start, duration = GetItemCooldown(itemId)
+                if start > 0 and duration > 0 then
+                    return TestValue(start, start + duration, duration, start, -1, comparator, limit)
+                end
+            end
+            return Compare(0, comparator, limit)
+        end
         self.module = ovale:createModule("OvaleEquipment", self.OnInitialize, self.OnDisable, aceEvent)
         self.profiler = ovaleProfiler:create(self.module:GetName())
         for k, v in pairs(self.debugOptions) do
@@ -120,6 +180,12 @@ __exports.OvaleEquipmentClass = __class(nil, {
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName
         end
+    end,
+    registerConditions = function(self, ovaleCondition)
+        ovaleCondition:RegisterCondition("hasequippeditem", false, self.hasEquippedItem)
+        ovaleCondition:RegisterCondition("hasshield", false, self.hasShield)
+        ovaleCondition:RegisterCondition("hastrinket", false, self.hasTrinket)
+        ovaleCondition:RegisterCondition("itemcooldown", false, self.ItemCooldown)
     end,
     GetArmorSetCount = function(self, name)
         return 0

@@ -1,8 +1,6 @@
 import { OvaleGUIDClass } from "../GUID";
-import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { sub } from "@wowts/string";
-import { tonumber, wipe, LuaObj } from "@wowts/lua";
+import { wipe, LuaObj } from "@wowts/lua";
 import {
     UnitHealth,
     UnitHealthMax,
@@ -11,7 +9,6 @@ import {
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { BaseState } from "../BaseState";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleOptionsClass } from "../Options";
@@ -50,12 +47,10 @@ export class OvaleHealthClass {
 
     constructor(
         private ovaleGuid: OvaleGUIDClass,
-        private baseState: BaseState,
         ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         ovaleDebug: OvaleDebugClass,
-        ovaleProfiler: OvaleProfilerClass,
-        private requirement: OvaleRequirement
+        ovaleProfiler: OvaleProfilerClass
     ) {
         this.module = ovale.createModule(
             "OvaleHealth",
@@ -94,23 +89,8 @@ export class OvaleHealthClass {
             "Ovale_UnitChanged",
             this.Ovale_UnitChanged
         );
-        this.requirement.RegisterRequirement(
-            "health_pct",
-            this.RequireHealthPercentHandler
-        );
-        this.requirement.RegisterRequirement(
-            "pet_health_pct",
-            this.RequireHealthPercentHandler
-        );
-        this.requirement.RegisterRequirement(
-            "target_health_pct",
-            this.RequireHealthPercentHandler
-        );
     };
     private OnDisable = () => {
-        this.requirement.UnregisterRequirement("health_pct");
-        this.requirement.UnregisterRequirement("pet_health_pct");
-        this.requirement.UnregisterRequirement("target_health_pct");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_TARGET_CHANGED");
         this.module.UnregisterEvent("UNIT_HEALTH");
@@ -358,78 +338,7 @@ export class OvaleHealthClass {
         this.profiler.StopProfiling("OvaleHealth_UnitTimeToDie");
         return timeToDie;
     }
-    RequireHealthPercentHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let threshold = <string>tokens[index];
-        index = index + 1;
-        if (threshold) {
-            let isBang = false;
-            if (sub(threshold, 1, 1) == "!") {
-                isBang = true;
-                threshold = sub(threshold, 2);
-            }
-            const thresholdValue = tonumber(threshold) || 0;
-            let guid, unitId: string;
-            if (sub(requirement, 1, 7) == "target_") {
-                if (targetGUID) {
-                    guid = targetGUID;
-                    const [result] = this.ovaleGuid.GUIDUnit(guid);
-                    unitId = result || "target";
-                } else {
-                    unitId = this.baseState.next.defaultTarget || "target";
-                }
-            } else if (sub(requirement, 1, 4) == "pet_") {
-                unitId = "pet";
-            } else {
-                unitId = "player";
-            }
-            guid = guid || this.ovaleGuid.UnitGUID(unitId);
-            let health = this.UnitHealth(unitId, guid) || 0;
-            let maxHealth = this.UnitHealthMax(unitId, guid);
-            let healthPercent;
-            if (maxHealth === 0) healthPercent = 100;
-            else healthPercent = (health / maxHealth) * 100 || 100;
-            if (
-                (!isBang && healthPercent <= thresholdValue) ||
-                (isBang && healthPercent > thresholdValue)
-            ) {
-                verified = true;
-            }
-            let result = (verified && "passed") || "FAILED";
-            if (isBang) {
-                this.tracer.Log(
-                    "    Require %s health > %f%% (%f) at time=%f: %s",
-                    unitId,
-                    threshold,
-                    healthPercent,
-                    atTime,
-                    result
-                );
-            } else {
-                this.tracer.Log(
-                    "    Require %s health <= %f%% (%f) at time=%f: %s",
-                    unitId,
-                    threshold,
-                    healthPercent,
-                    atTime,
-                    result
-                );
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a threshold argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
+
     CleanState(): void {}
     InitializeState(): void {}
     ResetState(): void {}

@@ -17,9 +17,9 @@ export function registerDeathKnight(OvaleScripts: OvaleScriptsClass) {
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=blood)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=blood)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=blood)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(blood)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(blood)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(blood)))
 
 AddFunction bloodinterruptactions
 {
@@ -39,7 +39,7 @@ AddFunction blooduseitemactions
 
 AddFunction bloodgetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=l(not_in_melee_range))
+ if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 ### actions.standard
@@ -286,7 +286,7 @@ AddFunction blood_defaultcdactions
    unless spell(vampiric_blood)
    {
     #potion,if=buff.dancing_rune_weapon.up
-    if buffpresent(dancing_rune_weapon_buff) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+    if buffpresent(dancing_rune_weapon_buff) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_unbridled_fury_item usable=1)
     #dancing_rune_weapon,if=!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready
     if not hastalent(blooddrinker_talent) or not spellcooldown(blooddrinker) == 0 spell(dancing_rune_weapon)
 
@@ -313,39 +313,39 @@ AddFunction blood_defaultcdpostconditions
 
 ### Blood icons.
 
-AddCheckBox(opt_deathknight_blood_aoe l(aoe) default specialization=blood)
+AddCheckBox(opt_deathknight_blood_aoe l(aoe) default enabled=(specialization(blood)))
 
-AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=shortcd specialization=blood
+AddIcon enabled=(not checkboxon(opt_deathknight_blood_aoe) and specialization(blood)) enemies=1 help=shortcd
 {
  if not incombat() bloodprecombatshortcdactions()
  blood_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_blood_aoe help=shortcd specialization=blood
+AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and specialization(blood)) help=shortcd
 {
  if not incombat() bloodprecombatshortcdactions()
  blood_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=blood
+AddIcon enabled=(specialization(blood)) enemies=1 help=main
 {
  if not incombat() bloodprecombatmainactions()
  blood_defaultmainactions()
 }
 
-AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
+AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and specialization(blood)) help=aoe
 {
  if not incombat() bloodprecombatmainactions()
  blood_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=cd specialization=blood
+AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and not specialization(blood)) enemies=1 help=cd
 {
  if not incombat() bloodprecombatcdactions()
  blood_defaultcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
+AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and specialization(blood)) help=cd
 {
  if not incombat() bloodprecombatcdactions()
  blood_defaultcdactions()
@@ -407,9 +407,9 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=frost)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=frost)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=frost)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(frost)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(frost)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(frost)))
 
 AddFunction frostinterruptactions
 {
@@ -429,7 +429,7 @@ AddFunction frostuseitemactions
 
 AddFunction frostgetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=l(not_in_melee_range))
+ if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 ### actions.standard
@@ -615,7 +615,7 @@ AddFunction frostcooldownscdactions
  #use_items,if=cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20
  if spellcooldown(pillar_of_frost) == 0 or spellcooldown(pillar_of_frost) > 20 frostuseitemactions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
- if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+ if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_unbridled_fury_item usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(blood_fury)
 
@@ -1015,39 +1015,39 @@ AddFunction frost_defaultcdpostconditions
 
 ### Frost icons.
 
-AddCheckBox(opt_deathknight_frost_aoe l(aoe) default specialization=frost)
+AddCheckBox(opt_deathknight_frost_aoe l(aoe) default enabled=(specialization(frost)))
 
-AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
+AddIcon enabled=(not checkboxon(opt_deathknight_frost_aoe) and specialization(frost)) enemies=1 help=shortcd
 {
  if not incombat() frostprecombatshortcdactions()
  frost_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
+AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)) help=shortcd
 {
  if not incombat() frostprecombatshortcdactions()
  frost_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=frost
+AddIcon enabled=(specialization(frost)) enemies=1 help=main
 {
  if not incombat() frostprecombatmainactions()
  frost_defaultmainactions()
 }
 
-AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
+AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)) help=aoe
 {
  if not incombat() frostprecombatmainactions()
  frost_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
+AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and not specialization(frost)) enemies=1 help=cd
 {
  if not incombat() frostprecombatcdactions()
  frost_defaultcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
+AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)) help=cd
 {
  if not incombat() frostprecombatcdactions()
  frost_defaultcdactions()
@@ -1127,9 +1127,9 @@ AddFunction pooling_for_gargoyle
  spellcooldown(summon_gargoyle) < 5 and hastalent(summon_gargoyle_talent)
 }
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=unholy)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=unholy)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=unholy)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(unholy)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(unholy)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(unholy)))
 
 AddFunction unholyinterruptactions
 {
@@ -1149,7 +1149,7 @@ AddFunction unholyuseitemactions
 
 AddFunction unholygetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=l(not_in_melee_range))
+ if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 ### actions.precombat
@@ -1327,7 +1327,7 @@ AddFunction unholycooldownscdactions
  #use_items
  unholyuseitemactions()
  #potion,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned.enabled&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)
- if { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_unbridled_fury_item usable=1)
+ if { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_unbridled_fury_item usable=1)
  #army_of_the_dead,if=cooldown.unholy_blight.remains<5&talent.unholy_blight.enabled|!talent.unholy_blight.enabled
  if spellcooldown(unholy_blight) < 5 and hastalent(unholy_blight_talent) or not hastalent(unholy_blight_talent) spell(army_of_the_dead)
 
@@ -1572,39 +1572,39 @@ AddFunction unholy_defaultcdpostconditions
 
 ### Unholy icons.
 
-AddCheckBox(opt_deathknight_unholy_aoe l(aoe) default specialization=unholy)
+AddCheckBox(opt_deathknight_unholy_aoe l(aoe) default enabled=(specialization(unholy)))
 
-AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
+AddIcon enabled=(not checkboxon(opt_deathknight_unholy_aoe) and specialization(unholy)) enemies=1 help=shortcd
 {
  if not incombat() unholyprecombatshortcdactions()
  unholy_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
+AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unholy)) help=shortcd
 {
  if not incombat() unholyprecombatshortcdactions()
  unholy_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=unholy
+AddIcon enabled=(specialization(unholy)) enemies=1 help=main
 {
  if not incombat() unholyprecombatmainactions()
  unholy_defaultmainactions()
 }
 
-AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
+AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unholy)) help=aoe
 {
  if not incombat() unholyprecombatmainactions()
  unholy_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy
+AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and not specialization(unholy)) enemies=1 help=cd
 {
  if not incombat() unholyprecombatcdactions()
  unholy_defaultcdactions()
 }
 
-AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
+AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unholy)) help=cd
 {
  if not incombat() unholyprecombatcdactions()
  unholy_defaultcdactions()

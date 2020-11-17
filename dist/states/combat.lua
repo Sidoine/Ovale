@@ -5,15 +5,12 @@ local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local GetTime = GetTime
-local tonumber = tonumber
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local TestBoolean = __Condition.TestBoolean
 local TestValue = __Condition.TestValue
 local Compare = __Condition.Compare
 local ReturnConstant = __Condition.ReturnConstant
 local huge = math.huge
-local __tools = LibStub:GetLibrary("ovale/tools")
-local OneTimeMessage = __tools.OneTimeMessage
 __exports.CombatState = __class(nil, {
     constructor = function(self)
         self.inCombat = false
@@ -21,19 +18,26 @@ __exports.CombatState = __class(nil, {
     end
 })
 __exports.OvaleCombatClass = __class(States, {
-    constructor = function(self, ovale, debug, ovaleSpellBook, requirement)
+    constructor = function(self, ovale, debug, ovaleSpellBook)
         self.ovale = ovale
         self.ovaleSpellBook = ovaleSpellBook
-        self.requirement = requirement
+        self.ApplySpellOnHit = function(spellId, targetGUID, startCast, endCast, channel)
+            if  not self.next.inCombat and self.ovaleSpellBook:IsHarmfulSpell(spellId) then
+                self.next.inCombat = true
+                if channel then
+                    self.next.combatStartTime = startCast
+                else
+                    self.next.combatStartTime = endCast
+                end
+            end
+        end
         self.onInitialize = function()
             self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.handlePlayerRegenDisabled)
             self.module:RegisterEvent("PLAYER_REGEN_ENABLED", self.handlePlayerRegenEnabled)
-            self.requirement:RegisterRequirement("combat", self.CombatRequirement)
         end
         self.onRelease = function()
             self.module:UnregisterEvent("PLAYER_REGEN_DISABLED")
             self.module:UnregisterEvent("PLAYER_REGEN_ENABLED")
-            self.requirement:UnregisterRequirement("combat")
         end
         self.handlePlayerRegenDisabled = function(event)
             self.tracer:Debug(event, "Entering combat.")
@@ -49,26 +53,6 @@ __exports.OvaleCombatClass = __class(States, {
             self.current.inCombat = false
             self.ovale:needRefresh()
             self.module:SendMessage("Ovale_CombatEnded", now)
-        end
-        self.CombatRequirement = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local verified = false
-            local combatFlag = tokens[index]
-            index = index + 1
-            if combatFlag then
-                combatFlag = tonumber(combatFlag)
-                if (combatFlag == 1 and self:isInCombat(atTime)) or (combatFlag ~= 1 and  not self:isInCombat(atTime)) then
-                    verified = true
-                end
-                local result = (verified and "passed") or "FAILED"
-                if combatFlag == 1 then
-                    self.tracer:Log("    Require combat at time=%f: %s", atTime, result)
-                else
-                    self.tracer:Log("    Require NOT combat at time=%f: %s", atTime, result)
-                end
-            else
-                OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
-            end
-            return verified, requirement, index
         end
         self.InCombat = function(positionalParams, namedParams, atTime)
             local yesno = positionalParams[1]
@@ -109,15 +93,5 @@ __exports.OvaleCombatClass = __class(States, {
         self.next.combatStartTime = self.current.combatStartTime or 0
     end,
     CleanState = function(self)
-    end,
-    ApplySpellOnHit = function(self, spellId, targetGUID, startCast, endCast, channel)
-        if  not self.next.inCombat and self.ovaleSpellBook:IsHarmfulSpell(spellId) then
-            self.next.inCombat = true
-            if channel then
-                self.next.combatStartTime = startCast
-            else
-                self.next.combatStartTime = endCast
-            end
-        end
     end,
 })

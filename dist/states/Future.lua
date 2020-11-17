@@ -7,7 +7,6 @@ local createSpellCast = __LastSpell.createSpellCast
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
-local type = type
 local wipe = wipe
 local kpairs = pairs
 local unpack = unpack
@@ -25,7 +24,7 @@ local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
 local __tools = LibStub:GetLibrary("ovale/tools")
-local isLuaArray = __tools.isLuaArray
+local isNumber = __tools.isNumber
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local ReturnValueBetween = __Condition.ReturnValueBetween
 local strsub = sub
@@ -65,12 +64,6 @@ end
 local SPELLCAST_AURA_ORDER = {
     [1] = "target",
     [2] = "pet"
-}
-local SPELLAURALIST_AURA_VALUE = {
-    count = true,
-    extend = true,
-    refresh = true,
-    refresh_keep_snapshot = true
 }
 local WHITE_ATTACK = {
     [75] = true,
@@ -129,7 +122,7 @@ __exports.OvaleFutureData = __class(nil, {
     end
 })
 __exports.OvaleFutureClass = __class(States, {
-    constructor = function(self, ovaleData, ovaleAura, ovalePaperDoll, baseState, ovaleCooldown, ovaleState, ovaleGuid, lastSpell, ovale, ovaleDebug, ovaleProfiler, ovaleStance, requirement, ovaleSpellBook)
+    constructor = function(self, ovaleData, ovaleAura, ovalePaperDoll, baseState, ovaleCooldown, ovaleState, ovaleGuid, lastSpell, ovale, ovaleDebug, ovaleProfiler, ovaleStance, ovaleSpellBook, runner)
         self.ovaleData = ovaleData
         self.ovaleAura = ovaleAura
         self.ovalePaperDoll = ovalePaperDoll
@@ -140,8 +133,8 @@ __exports.OvaleFutureClass = __class(States, {
         self.lastSpell = lastSpell
         self.ovale = ovale
         self.ovaleStance = ovaleStance
-        self.requirement = requirement
         self.ovaleSpellBook = ovaleSpellBook
+        self.runner = runner
         self.isChanneling = function(positionalParameters, namedParameters, atTime)
             local spellId = unpack(positionalParameters)
             local state = self:GetState(atTime)
@@ -546,6 +539,20 @@ __exports.OvaleFutureClass = __class(States, {
                 self.profiler:StopProfiling("OvaleFuture_UnitSpellcastEnded")
             end
         end
+        self.ApplySpellStartCast = function(spellId, targetGUID, startCast, endCast, channel, spellcast)
+            self.profiler:StartProfiling("OvaleFuture_ApplySpellStartCast")
+            if channel then
+                self:UpdateCounters(spellId, startCast, targetGUID)
+            end
+            self.profiler:StopProfiling("OvaleFuture_ApplySpellStartCast")
+        end
+        self.ApplySpellAfterCast = function(spellId, targetGUID, startCast, endCast, channel, spellcast)
+            self.profiler:StartProfiling("OvaleFuture_ApplySpellAfterCast")
+            if  not channel then
+                self:UpdateCounters(spellId, endCast, targetGUID)
+            end
+            self.profiler:StopProfiling("OvaleFuture_ApplySpellAfterCast")
+        end
         States.constructor(self, __exports.OvaleFutureData)
         local name = "OvaleFuture"
         self.tracer = ovaleDebug:create(name)
@@ -643,8 +650,8 @@ __exports.OvaleFutureClass = __class(States, {
             for _, unitId in ipairs(SPELLCAST_AURA_ORDER) do
                 for _, auraList in kpairs(si.aura[unitId]) do
                     for id, spellData in kpairs(auraList) do
-                        local verified, value = self.ovaleData:CheckSpellAuraData(id, spellData, atTime, targetGUID)
-                        if verified and (SPELLAURALIST_AURA_VALUE[value] or (type(value) == "number" and value > 0)) then
+                        local value = self.ovaleData:CheckSpellAuraData(id, spellData, atTime, targetGUID)
+                        if (value.enabled == nil or value.enabled) and isNumber(value.add) and value.add > 0 then
                             auraId = id
                             auraGUID = self.ovaleGuid:UnitGUID(unitId)
                             break
@@ -682,16 +689,11 @@ __exports.OvaleFutureClass = __class(States, {
         if si and si.aura and si.aura.damage then
             for filter, auraList in kpairs(si.aura.damage) do
                 for auraId, spellData in pairs(auraList) do
-                    local index, multiplier
+                    local multiplier
                     local verified
-                    if isLuaArray(spellData) then
-                        multiplier = spellData[1]
-                        index = 2
-                        verified = self.requirement:CheckRequirements(spellId, atTime, spellData, index, targetGUID)
-                    else
-                        multiplier = spellData
-                        verified = true
-                    end
+                    local _, namedParameters = self.runner:computeParameters(spellData, atTime)
+                    multiplier = namedParameters.set
+                    verified = namedParameters.enabled == nil or namedParameters.enabled
                     if verified then
                         local aura = self.ovaleAura:GetAuraByGUID(self.ovale.playerGUID, auraId, filter, false, atTime)
                         if aura and self.ovaleAura:IsActiveAura(aura, atTime) then
@@ -899,20 +901,6 @@ __exports.OvaleFutureClass = __class(States, {
         for k in pairs(self.next.counter) do
             self.next.counter[k] = nil
         end
-    end,
-    ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)
-        self.profiler:StartProfiling("OvaleFuture_ApplySpellStartCast")
-        if channel then
-            self:UpdateCounters(spellId, startCast, targetGUID)
-        end
-        self.profiler:StopProfiling("OvaleFuture_ApplySpellStartCast")
-    end,
-    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)
-        self.profiler:StartProfiling("OvaleFuture_ApplySpellAfterCast")
-        if  not channel then
-            self:UpdateCounters(spellId, endCast, targetGUID)
-        end
-        self.profiler:StopProfiling("OvaleFuture_ApplySpellAfterCast")
     end,
     staticSpellcast = createSpellCast(),
     ApplySpell = function(self, spellId, targetGUID, startCast, endCast, channel, spellcast)

@@ -13,7 +13,7 @@ __exports.registerShaman = function(OvaleScripts)
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=elemental)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(elemental)))
 
 AddFunction elementalinterruptactions
 {
@@ -287,39 +287,39 @@ AddFunction elemental_defaultcdpostconditions
 
 ### Elemental icons.
 
-AddCheckBox(opt_shaman_elemental_aoe l(aoe) default specialization=elemental)
+AddCheckBox(opt_shaman_elemental_aoe l(aoe) default enabled=(specialization(elemental)))
 
-AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
+AddIcon enabled=(not checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) enemies=1 help=shortcd
 {
  if not incombat() elementalprecombatshortcdactions()
  elemental_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
+AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) help=shortcd
 {
  if not incombat() elementalprecombatshortcdactions()
  elemental_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=elemental
+AddIcon enabled=(specialization(elemental)) enemies=1 help=main
 {
  if not incombat() elementalprecombatmainactions()
  elemental_defaultmainactions()
 }
 
-AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
+AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) help=aoe
 {
  if not incombat() elementalprecombatmainactions()
  elemental_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
+AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and not specialization(elemental)) enemies=1 help=cd
 {
  if not incombat() elementalprecombatcdactions()
  elemental_defaultcdactions()
 }
 
-AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
+AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) help=cd
 {
  if not incombat() elementalprecombatcdactions()
  elemental_defaultcdactions()
@@ -386,9 +386,9 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=enhancement)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=enhancement)
-AddCheckBox(opt_bloodlust spellname(bloodlust) specialization=enhancement)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(enhancement)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(enhancement)))
+AddCheckBox(opt_bloodlust spellname(bloodlust) enabled=(specialization(enhancement)))
 
 AddFunction enhancementinterruptactions
 {
@@ -423,7 +423,7 @@ AddFunction enhancementgetinmeleerange
  if checkboxon(opt_melee_range) and not target.inrange(stormstrike)
  {
   if target.inrange(feral_lunge) spell(feral_lunge)
-  texture(misc_arrowlup help=l(not_in_melee_range))
+  texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
 
@@ -768,39 +768,39 @@ AddFunction enhancement_defaultcdpostconditions
 
 ### Enhancement icons.
 
-AddCheckBox(opt_shaman_enhancement_aoe l(aoe) default specialization=enhancement)
+AddCheckBox(opt_shaman_enhancement_aoe l(aoe) default enabled=(specialization(enhancement)))
 
-AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
+AddIcon enabled=(not checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) enemies=1 help=shortcd
 {
  if not incombat() enhancementprecombatshortcdactions()
  enhancement_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
+AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) help=shortcd
 {
  if not incombat() enhancementprecombatshortcdactions()
  enhancement_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=enhancement
+AddIcon enabled=(specialization(enhancement)) enemies=1 help=main
 {
  if not incombat() enhancementprecombatmainactions()
  enhancement_defaultmainactions()
 }
 
-AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
+AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) help=aoe
 {
  if not incombat() enhancementprecombatmainactions()
  enhancement_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
+AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and not specialization(enhancement)) enemies=1 help=cd
 {
  if not incombat() enhancementprecombatcdactions()
  enhancement_defaultcdactions()
 }
 
-AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
+AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) help=cd
 {
  if not incombat() enhancementprecombatcdactions()
  enhancement_defaultcdactions()
@@ -868,7 +868,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=restoration)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(restoration)))
 
 AddFunction restorationinterruptactions
 {
@@ -1011,39 +1011,39 @@ AddFunction restoration_defaultcdpostconditions
 
 ### Restoration icons.
 
-AddCheckBox(opt_shaman_restoration_aoe l(aoe) default specialization=restoration)
+AddCheckBox(opt_shaman_restoration_aoe l(aoe) default enabled=(specialization(restoration)))
 
-AddIcon checkbox=!opt_shaman_restoration_aoe enemies=1 help=shortcd specialization=restoration
+AddIcon enabled=(not checkboxon(opt_shaman_restoration_aoe) and specialization(restoration)) enemies=1 help=shortcd
 {
  if not incombat() restorationprecombatshortcdactions()
  restoration_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_shaman_restoration_aoe help=shortcd specialization=restoration
+AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and specialization(restoration)) help=shortcd
 {
  if not incombat() restorationprecombatshortcdactions()
  restoration_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=restoration
+AddIcon enabled=(specialization(restoration)) enemies=1 help=main
 {
  if not incombat() restorationprecombatmainactions()
  restoration_defaultmainactions()
 }
 
-AddIcon checkbox=opt_shaman_restoration_aoe help=aoe specialization=restoration
+AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and specialization(restoration)) help=aoe
 {
  if not incombat() restorationprecombatmainactions()
  restoration_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_shaman_restoration_aoe enemies=1 help=cd specialization=restoration
+AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and not specialization(restoration)) enemies=1 help=cd
 {
  if not incombat() restorationprecombatcdactions()
  restoration_defaultcdactions()
 }
 
-AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
+AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and specialization(restoration)) help=cd
 {
  if not incombat() restorationprecombatcdactions()
  restoration_defaultcdactions()

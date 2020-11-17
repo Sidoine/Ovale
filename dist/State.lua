@@ -46,7 +46,7 @@ __exports.OvaleStateClass = __class(nil, {
         local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellStartCast then
-                iterator.value:ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
+                iterator.value.ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
             end
         end
     end,
@@ -54,7 +54,7 @@ __exports.OvaleStateClass = __class(nil, {
         local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellAfterCast then
-                iterator.value:ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
+                iterator.value.ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast)
             end
         end
     end,
@@ -62,7 +62,7 @@ __exports.OvaleStateClass = __class(nil, {
         local iterator = self.self_stateAddons:Iterator()
         while iterator:Next() do
             if iterator.value.ApplySpellOnHit then
-                iterator.value:ApplySpellOnHit(spellId, targetGUID, startCast, endCast, channel, spellcast)
+                iterator.value.ApplySpellOnHit(spellId, targetGUID, startCast, endCast, channel, spellcast)
             end
         end
     end,

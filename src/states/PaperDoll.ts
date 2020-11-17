@@ -10,7 +10,7 @@ import {
     LastSpell,
 } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { tonumber, LuaObj, LuaArray, ipairs } from "@wowts/lua";
+import { tonumber, LuaObj, LuaArray, ipairs, unpack } from "@wowts/lua";
 import {
     GetCombatRating,
     GetCombatRatingBonus,
@@ -40,6 +40,12 @@ import {
 } from "@wowts/wow-mock";
 import { isNumber } from "../tools";
 import { AceModule } from "@wowts/tsaddon";
+import {
+    ConditionFunction,
+    OvaleConditionClass,
+    ReturnBoolean,
+    ReturnConstant,
+} from "../Condition";
 
 let OVALE_SPELLDAMAGE_SCHOOL: LuaObj<number> = {
     DEATHKNIGHT: 4,
@@ -252,6 +258,29 @@ export class OvalePaperDollClass
         this.debug = ovaleDebug.create("OvalePaperDoll");
         this.profiler = ovaleProfiler.create("OvalePaperDoll");
     }
+
+    registerConditions(condition: OvaleConditionClass) {
+        condition.RegisterCondition("level", false, this.getLevel);
+        condition.RegisterCondition(
+            "specialization",
+            false,
+            this.isSpecialization
+        );
+    }
+
+    private getLevel: ConditionFunction = () => {
+        return ReturnConstant(this.level);
+    };
+
+    private isSpecialization: ConditionFunction = (positional) => {
+        const [id] = unpack(positional);
+        if (this.specialization)
+            return ReturnBoolean(
+                OVALE_SPECIALIZATION_NAME[this.class][this.specialization] ===
+                    id
+            );
+        return [];
+    };
 
     private GetAppropriateDamageMultiplier(unit: string) {
         let damageMultiplier = 1;

@@ -7,7 +7,6 @@ import { OvaleConditionClass } from "./Condition";
 import { OvaleLexer, LexerFilter } from "./Lexer";
 import { OvaleScriptsClass } from "./Scripts";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { STANCE_NAME } from "./states/Stance";
 import {
     LuaArray,
     LuaObj,
@@ -24,10 +23,13 @@ import {
 import { format, gsub, lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
-import { isLuaArray, isNumber, isString, checkToken } from "./tools";
-import { SpellInfo } from "./Data";
+import { checkToken, isNumber, KeyCheck, TypeCheck } from "./tools";
+import { SpellInfoProperty, SpellInfoValues } from "./Data";
 import { HasteType } from "./states/PaperDoll";
 import { Result } from "./simulationcraft/definitions";
+import { newTimeSpan, OvaleTimeSpan } from "./TimeSpan";
+import { ActionType } from "./BestAction";
+import { PowerType } from "./states/Power";
 
 const KEYWORD: LuaObj<boolean> = {
     ["and"]: true,
@@ -53,26 +55,18 @@ const DECLARATION_KEYWORD: LuaObj<boolean> = {
     ["spelllist"]: true,
     ["spellrequire"]: true,
 };
-export const PARAMETER_KEYWORD = {
-    ["checkbox"]: true,
-    ["help"]: true,
-    ["if_buff"]: true,
-    ["if_equipped"]: true,
-    ["if_spell"]: true,
-    ["if_stance"]: true,
-    ["if_target_debuff"]: true,
-    ["itemcount"]: true,
-    ["itemset"]: true,
-    ["level"]: true,
-    ["listitem"]: true,
-    ["pertrait"]: true,
-    ["specialization"]: true,
-    ["talent"]: true,
-    ["trait"]: true,
-    ["text"]: true,
-    ["wait"]: true,
-};
-const SPELL_AURA_KEYWORD: LuaObj<boolean> = {
+
+export type SpellAuraKeyWord =
+    | "spelladdbuff"
+    | "spelladddebuff"
+    | "spelladdpetbuff"
+    | "spelladdpetdebuff"
+    | "spelladdtargetbuff"
+    | "spelladdtargetdebuff"
+    | "spelldamagebuff"
+    | "spelldamagedebuff";
+
+const SPELL_AURA_KEYWORD: KeyCheck<SpellAuraKeyWord> = {
     ["spelladdbuff"]: true,
     ["spelladddebuff"]: true,
     ["spelladdpetbuff"]: true,
@@ -82,19 +76,88 @@ const SPELL_AURA_KEYWORD: LuaObj<boolean> = {
     ["spelldamagebuff"]: true,
     ["spelldamagedebuff"]: true,
 };
-const STANCE_KEYWORD = {
-    ["if_stance"]: true,
-    ["stance"]: true,
-    ["to_stance"]: true,
+
+export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
+    add_cd: true,
+    add_duration: true,
+    add_duration_combopoints: true,
+    alternate: true,
+    arcanecharges: true,
+    base: true,
+    bonusap: true,
+    bonusapcp: true,
+    bonuscp: true,
+    bonusmainhand: true,
+    bonusoffhand: true,
+    bonussp: true,
+    // buff: true,
+    buff_cd: true,
+    buff_cdr: true,
+    buff_totem: true,
+    canStopChannelling: true,
+    casttime: true,
+    cd: true,
+    cd_haste: true,
+    channel: true,
+    charge_cd: true,
+    chi: true,
+    combopoints: true,
+    damage: true,
+    duration: true,
+    energy: true,
+    focus: true,
+    forcecd: true,
+    fury: true,
+    gcd: true,
+    gcd_haste: true,
+    haste: true,
+    health: true,
+    holypower: true,
+    inccounter: true,
+    insanity: true,
+    interrupt: true,
+    lunarpower: true,
+    maelstrom: true,
+    mana: true,
+    max_stacks: true,
+    max_totems: true,
+    max_travel_time: true,
+    offgcd: true,
+    pain: true,
+    physical: true,
+    rage: true,
+    replaced_by: true,
+    resetcounter: true,
+    runes: true,
+    runicpower: true,
+    shared_cd: true,
+    soulshards: true,
+    stacking: true,
+    // stat: true,
+    tag: true,
+    texture: true,
+    tick: true,
+    to_stance: true,
+    totem: true,
+    travel_time: true,
+    unusable: true,
+    addlist: true,
+    dummy_replace: true,
+    learn: true,
+    pertrait: true,
+    proc: true,
 };
+
+// const STANCE_KEYWORD = {
+//     ["if_stance"]: true,
+//     ["stance"]: true,
+//     ["to_stance"]: true,
+// };
 {
     for (const [keyword, value] of pairs(SPELL_AURA_KEYWORD)) {
         DECLARATION_KEYWORD[keyword] = value;
     }
     for (const [keyword, value] of pairs(DECLARATION_KEYWORD)) {
-        KEYWORD[keyword] = value;
-    }
-    for (const [keyword, value] of pairs(PARAMETER_KEYWORD)) {
         KEYWORD[keyword] = value;
     }
 }
@@ -248,19 +311,19 @@ export interface AstAnnotation {
     listList?: LuaArray<ListParameters>;
     positionalParametersList?: LuaArray<PositionalParameters>;
     rawPositionalParametersList?: LuaArray<RawPositionalParameters>;
-    flattenParametersList?: LuaArray<FlattenParameters>;
+    flattenParametersList?: LuaArray<NamedParameters>;
     rawNamedParametersList?: LuaArray<RawNamedParameters>;
     objects?: LuaArray<any>;
     nodeList: LuaArray<AstNode>;
     parametersReference?: LuaArray<AstNode>;
-    postOrderReference?: LuaArray<AstNode>;
-    customFunction?: LuaObj<AstNode>;
+    postOrderReference?: LuaArray<AstGroupNode>;
+    customFunction?: LuaObj<AstAddFunctionNode>;
     stringReference?: LuaArray<AstNode>;
     functionCall?: LuaObj<boolean>;
-    functionReference?: LuaArray<FunctionNode>;
+    functionReference?: LuaArray<AstFunctionNode>;
     nameReference?: LuaArray<AstNode>;
-    definition: LuaObj<any>;
-    numberFlyweight?: LuaObj<ValueNode>;
+    definition: LuaObj<number | string>;
+    numberFlyweight?: LuaObj<AstValueNode>;
     verify?: boolean;
     functionHash?: LuaObj<AstNode>;
     expressionHash?: LuaObj<AstNode>;
@@ -269,176 +332,516 @@ export interface AstAnnotation {
 }
 
 interface NodeTypes {
-    function: FunctionNode;
-    string: StringNode;
-    variable: VariableNode;
-    value: ValueNode;
-    spell_aura_list: AstNode;
-    item_info: AstNode;
-    itemrequire: AstNode;
-    spell_info: AstNode;
-    spell_require: AstNode;
-    score_spells: AstNode;
-    add_function: AstNode;
-    icon: AstNode;
-    script: AstNode;
-    checkbox: AstNode;
-    list_item: AstNode;
-    list: AstNode;
-    logical: AstNode;
-    group: AstNode;
-    unless: AstNode;
-    comment: AstNode;
-    if: AstNode;
-    simc_pool_resource: AstNode;
-    simc_wait: AstNode;
-    custom_function: FunctionNode;
-    wait: AstNode;
-    action: FunctionNode;
-    operand: AstNode;
-    arithmetic: AstNode;
-    action_list: AstNode;
-    compare: AstNode;
-    boolean: AstNode;
-    comma_separated_values: CsvNode;
-    bang_value: AstNode;
-    define: AstNode;
-    state: FunctionNode;
-    expression: AstNode;
+    action: AstFunctionNode;
+    action_list: AstActionListNode;
+    add_function: AstAddFunctionNode;
+    arithmetic: AstExpressionNode;
+    bang_value: AstBangValueNode;
+    boolean: AstBooleanNode;
+    checkbox: AstCheckBoxNode;
+    comment: AstCommentNode;
+    compare: AstExpressionNode;
+    custom_function: AstFunctionNode;
+    define: AstDefineNode;
+    expression: AstExpressionNode;
+    function: AstFunctionNode;
+    group: AstGroupNode;
+    icon: AstIconNode;
+    if: AstIfNode;
+    item_info: AstItemInfoNode;
+    itemrequire: AstItemRequireNode;
+    list: AstListNode;
+    list_item: AstListItemNode;
+    logical: AstExpressionNode;
+    lua: AstLuaNode;
+    score_spells: AstScoreSpellsNode;
+    script: AstScriptNode;
+    simc_pool_resource: AstSimcPoolResourceNode;
+    simc_wait: AstSimcWaitnode;
+    spell_aura_list: AstSpellAuraListNode;
+    spell_info: AstSpellInfoNode;
+    spell_require: AstSpellRequireNode;
+    state: AstFunctionNode;
+    string: AstStringNode;
+    unless: AstUnlessNode;
+    value: AstValueNode;
+    variable: AstVariableNode;
 }
 
 export type NodeType = keyof NodeTypes;
+type NodeWithParametersType = {
+    [k in NodeType]: NodeTypes[k] extends AstNodeWithParameters<any, any>
+        ? k
+        : never;
+}[NodeType];
+type NodeWithChildrenType = {
+    [k in NodeType]: NodeTypes[k] extends AstBaseNodeWithChildren<any>
+        ? k
+        : never;
+}[NodeType];
+type NodeWithBodyType = {
+    [k in NodeType]: NodeTypes[k] extends { body: any } ? k : never;
+}[NodeType];
+interface BaseNodeValue {
+    /**
+     * The serial is used to know if the value has already
+     * been computed this frame
+     */
+    serial: number;
 
-export function isNodeType<T extends keyof NodeTypes>(
-    node: AstNode,
-    type: T
-): node is NodeTypes[T] {
-    return node.type === type;
+    timeSpan: OvaleTimeSpan;
 }
 
-export interface AstNode {
-    child: LuaArray<AstNode>;
-    type: NodeType;
-    func: string;
-    name: string;
-    rune: string;
-    includeDeath: boolean;
-    itemId: number;
-    spellId: number;
-    key: string;
-    previousType: NodeType;
-    rawPositionalParams: RawPositionalParameters;
-    origin: number;
-    rate: number;
-    positionalParams: PositionalParameters;
-    rawNamedParams: RawNamedParameters;
-    namedParams: NamedParameters;
-    paramsAsString: string;
-    postOrder: LuaArray<AstNode>;
-    asString: string;
+export interface NodeNoResult extends BaseNodeValue {
+    type: "none";
+}
+
+export interface NodeStateResult extends BaseNodeValue {
+    type: "state";
+    value?: number;
+    name?: string;
+}
+
+export interface NodeValueResult extends BaseNodeValue {
+    type: "value";
+    value?: number | string;
+    origin?: number;
+    rate?: number;
+}
+
+export interface NodeActionResult extends BaseNodeValue {
+    type: "action";
+    actionTexture?: string;
+    actionInRange?: boolean;
+    actionCooldownDuration?: number;
+    actionCooldownStart?: number;
+    actionUsable?: boolean;
+    actionShortcut?: string;
+    actionIsCurrent?: boolean;
+    actionEnable?: boolean;
+    actionType?: ActionType;
+    actionId?: string | number;
+    actionTarget?: string;
+    actionResourceExtend?: number;
+    actionCharges?: number;
+    castTime?: number;
+    offgcd?: boolean;
+    options?: {
+        wait?: FlattenParameterValue;
+        text?: FlattenParameterValue;
+        sound?: FlattenParameterValue;
+        soundtime?: FlattenParameterValue;
+        nored?: FlattenParameterValue;
+        help?: FlattenParameterValue;
+        pool_resource?: FlattenParameterValue;
+        nocd?: FlattenParameterValue;
+        flash?: FlattenParameterValue;
+    };
+}
+
+interface AstNodeTypes {
+    state: NodeStateResult;
+    value: NodeValueResult;
+    action: NodeActionResult;
+    none: NodeNoResult;
+}
+
+export function setResultType<T extends AstNodeSnapshot["type"]>(
+    result: AstNodeSnapshot,
+    type: T
+): asserts result is AstNodeTypes[T] {
+    result.type = type;
+}
+
+/** Used to store the result of an AstNode */
+export type AstNodeSnapshot =
+    | NodeStateResult
+    | NodeValueResult
+    | NodeActionResult
+    | NodeNoResult;
+
+export interface AstBaseNode<T extends NodeType> {
+    type: T;
     nodeId: number;
-    secure: boolean;
-    operator: OperatorType;
-    expressionType: "unary" | "binary";
-    simc_pool_resource: boolean;
-    simc_wait: boolean;
+    asString?: string;
+
+    annotation: AstAnnotation;
+    postOrder?: LuaArray<AstNode>;
+
+    result: AstNodeSnapshot;
+
+    /** Used to decorate a node with a { or (. Only used to unparse the node */
+    left?: string;
+
+    /** Used to decorate a node with a } or ). Only used to unparse the node */
+    right?: string;
+}
+
+export interface AstBaseNodeWithChildren<T extends NodeType>
+    extends AstBaseNode<T> {
+    child: LuaArray<AstNode>;
+}
+
+export function isAstNodeWithChildren(
+    node: AstNode
+): node is AstBaseNodeWithChildren<any> {
+    return (node as any).child !== undefined;
+}
+
+export interface AstNodeWithParameters<
+    T extends NodeType,
+    P extends string = DefaultNamedParameters
+> extends AstBaseNodeWithChildren<T> {
+    rawPositionalParams: RawPositionalParameters;
+    rawNamedParams: RawNamedParameters<P>;
+
+    /**
+     * Store the current values of the rawPositionalParams and rawNamedParams (only number or strings).
+     * Used by conditions because they don't take full values (AstNodeSnapshot) as parameters.
+     */
+    cachedParams: {
+        serial?: number;
+        named: NamedParameters<P>;
+        positional: PositionalParameters;
+    };
+}
+
+export type AstNode =
+    | AstActionListNode
+    | AstAddFunctionNode
+    | AstBangValueNode
+    | AstBooleanNode
+    | AstCheckBoxNode
+    | AstCommentNode
+    | AstDefineNode
+    | AstExpressionNode
+    | AstFunctionNode
+    | AstGroupNode
+    | AstIconNode
+    | AstIfNode
+    | AstItemInfoNode
+    | AstItemRequireNode
+    | AstListItemNode
+    | AstListNode
+    | AstLuaNode
+    | AstScoreSpellsNode
+    | AstScriptNode
+    | AstSimcPoolResourceNode
+    | AstSimcWaitnode
+    | AstSpellAuraListNode
+    | AstSpellInfoNode
+    | AstSpellRequireNode
+    | AstStringNode
+    | AstUnlessNode
+    | AstValueNode
+    | AstVariableNode;
+
+export interface AstLuaNode extends AstBaseNode<"lua"> {
+    lua: string;
+}
+
+export interface AstSimcPoolResourceNode
+    extends AstBaseNode<"simc_pool_resource"> {
     for_next: boolean;
     extra_amount: number;
-    comment: string;
-    property: keyof SpellInfo;
-    keyword: string;
+    powerType: PowerType;
+}
+
+export interface AstBooleanNode extends AstBaseNode<"boolean"> {}
+
+export interface AstSimcWaitnode extends AstBaseNodeWithChildren<"simc_wait"> {}
+
+export interface AstActionListNode extends AstBaseNode<"action_list"> {}
+
+export interface AstCheckBoxNode
+    extends AstNodeWithParameters<"checkbox", "enabled"> {
+    name: string;
     description: AstNode;
-    item?: string;
+}
+
+const checkCheckBoxParameters: NamedParametersCheck<AstCheckBoxNode> = {
+    enabled: true,
+};
+
+export interface AstUnlessNode extends AstBaseNodeWithChildren<"unless"> {
+    // TODO Should be moved to annotations instead (used by simc emiter)
+    simc_pool_resource?: boolean;
+    simc_wait?: boolean;
+}
+
+export interface AstSpellAuraListNode
+    extends AstNodeWithParameters<
+        "spell_aura_list",
+        | "enabled"
+        | "add"
+        | "set"
+        | "extend"
+        | "refresh"
+        | "toggle"
+        | "refresh_keep_snapshot"
+    > {
+    keyword: SpellAuraKeyWord;
+    name: string;
+    spellId: number;
+    buffName: string;
+    buffSpellId: number;
+}
+
+type NamedParametersCheck<
+    T extends AstNodeWithParameters<any, any>
+> = TypeCheck<T["rawNamedParams"]>;
+
+const spellAuraListParametersCheck: TypeCheck<
+    AstSpellAuraListNode["rawNamedParams"]
+> = {
+    enabled: true,
+    add: true,
+    set: true,
+    extend: true,
+    refresh: true,
+    refresh_keep_snapshot: true,
+    toggle: true,
+};
+
+export interface AstSpellInfoNode
+    extends AstNodeWithParameters<"spell_info", SpellInfoProperty> {
+    name: string;
+    spellId: number;
+}
+export interface AstSpellRequireNode
+    extends AstNodeWithParameters<
+        "spell_require",
+        "set" | "add" | "percent" | "enabled"
+    > {
+    name: string;
+    spellId: number;
+    property: SpellInfoProperty;
+}
+
+const checkSpellRequireParameters: NamedParametersCheck<AstSpellRequireNode> = {
+    add: true,
+    percent: true,
+    set: true,
+    enabled: true,
+};
+
+export interface AstAddFunctionNode
+    extends AstNodeWithParameters<"add_function", "help"> {
+    name: string;
+    body: AstGroupNode;
+}
+
+const checkAddFunctionParameters: NamedParametersCheck<AstAddFunctionNode> = {
+    help: true,
+};
+
+export interface AstScriptNode extends AstBaseNodeWithChildren<"script"> {}
+
+export interface AstScoreSpellsNode
+    extends AstNodeWithParameters<"score_spells", "enabled"> {}
+
+export interface AstListNode extends AstNodeWithParameters<"list", "enabled"> {
+    keyword: string;
+    name: string;
+}
+
+const checkListParameters: NamedParametersCheck<AstListNode> = {
+    enabled: true,
+};
+
+export interface AstItemRequireNode
+    extends AstNodeWithParameters<
+        "itemrequire",
+        "set" | "add" | "percent" | "enabled"
+    > {
+    name: string;
+    itemId: number;
+    property: SpellInfoProperty;
+}
+
+export interface AstItemInfoNode
+    extends AstNodeWithParameters<"item_info", SpellInfoProperty> {
+    name: string;
+    itemId: number;
+}
+
+export interface AstGroupNode extends AstBaseNodeWithChildren<"group"> {}
+
+export interface AstIfNode extends AstBaseNodeWithChildren<"if"> {
+    // TODO Should be moved to annotations instead (used by simc emiter)
+    simc_pool_resource?: boolean;
+    simc_wait?: boolean;
+}
+
+export interface AstIconNode
+    extends AstNodeWithParameters<
+        "icon",
+        | "secure"
+        | "target"
+        | "enemies"
+        | "size"
+        | "type"
+        | "help"
+        | "text"
+        | "flash"
+        | "enabled"
+    > {
+    body: AstGroupNode;
+}
+
+const iconParametersCheck: NamedParametersCheck<AstIconNode> = {
+    secure: true,
+    enemies: true,
+    target: true,
+    size: true,
+    type: true,
+    help: true,
+    text: true,
+    flash: true,
+    enabled: true,
+};
+
+export interface AstListItemNode
+    extends AstNodeWithParameters<"list_item", "enabled"> {
+    name: string;
+    item: string;
+    description: AstNode;
+}
+
+const checkListItemParameters: NamedParametersCheck<AstListItemNode> = {
+    enabled: true,
+};
+
+export interface AstBangValueNode
+    extends AstBaseNodeWithChildren<"bang_value"> {}
+
+export interface AstCommentNode extends AstBaseNode<"comment"> {
+    comment: string;
+}
+
+export interface AstExpressionNode
+    extends AstBaseNodeWithChildren<
+        "logical" | "arithmetic" | "compare" | "expression"
+    > {
+    expressionType: "unary" | "binary";
+    operator: OperatorType;
     precedence: number;
-    value?: string | number;
-
-    // ?
-    annotation: AstAnnotation;
-
-    // Not sure (used in EmitActionList)
-    action: string;
-    asType: "boolean" | "value";
-    left: string;
-    right: string;
-
-    // ---
-    powerType: string;
 }
 
-export interface FunctionNode extends AstNode {
-    func: string;
-    type: "state" | "action" | "function" | "custom_function";
-}
-
-export interface StringNode extends AstNode {
-    type: "string";
-    value: string;
-}
-
-function isCheckBoxParameter(
-    key: string | number,
-    value: Value
-): value is LuaArray<AstNode> {
-    return key === "checkbox";
-}
-
-function isListItemParameter(
-    key: string | number,
-    value: Value
-): value is LuaObj<AstNode> {
-    return key === "listitem";
-}
-
-function isCheckBoxFlattenParameters(
-    key: string | number,
-    value:
-        | FlattenParameterValue
-        | FlattenListParameters
-        | FlattenCheckBoxParameters
-): value is FlattenCheckBoxParameters {
-    return key === "checkbox";
-}
-
-function isListItemFlattenParameters(
-    key: string | number,
-    value:
-        | FlattenParameterValue
-        | FlattenListParameters
-        | FlattenCheckBoxParameters
-): value is FlattenListParameters {
-    return key === "listitem";
-}
-
-interface CsvNode extends AstNode {
-    csv: LuaArray<AstNode>;
-    type: "comma_separated_values";
-}
-
-function isCsvNode(node: AstNode): node is CsvNode {
+function isExpressionNode(node: AstNode): node is AstExpressionNode {
     return (
-        node.type === "comma_separated_values" ||
-        node.previousType === "comma_separated_values"
+        node.type === "logical" ||
+        node.type === "arithmetic" ||
+        node.type === "compare" ||
+        node.type === "expression"
     );
 }
 
-interface VariableNode extends AstNode {
-    type: "variable";
+export interface AstFunctionNode
+    extends AstNodeWithParameters<
+        "state" | "action" | "function" | "custom_function",
+        | "target"
+        | "filter"
+        | "text"
+        | "pool_resource"
+        | "usable"
+        | "offgcd"
+        | "texture"
+        | "extra_amount"
+        | "help"
+        | "count"
+        | "any"
+    > {
+    name: string;
+}
+
+const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
+    filter: true,
+    target: true,
+    text: true,
+    pool_resource: true,
+    usable: true,
+    offgcd: true,
+    texture: true,
+    extra_amount: true,
+    help: true,
+    count: true,
+    any: true
+};
+
+export interface AstStringNode extends AstBaseNode<"string"> {
     value: string;
+
+    /** Used to unparse, if it was a constant that has been replaced by its value */
+    name?: string;
+    func?: string;
 }
 
-function isVariableNode(node: AstNode): node is VariableNode {
-    return node.type === "variable" || node.previousType === "variable";
+export interface AstVariableNode extends AstBaseNode<"variable"> {
+    name: string;
 }
 
-export interface ValueNode extends AstNode {
-    type: "value";
+export interface AstValueNode extends AstBaseNode<"value"> {
+    value: number;
+    origin: number;
+    rate: number;
+
+    /** Used to unparse, if it was a constant that has been replaced by its value */
+    name?: string;
+}
+
+interface AstDefineNode extends AstBaseNode<"define"> {
+    name: string;
     value: string | number;
 }
+// export interface AstNode {
+//     child: LuaArray<AstNode>;
+//     type: NodeType;
+//     func: string;
+//     name: string;
+//     rune: string;
+//     includeDeath: boolean;
+//     itemId: number;
+//     spellId: number;
+//     key: string;
+//     previousType: NodeType;
+//     rawPositionalParams: RawPositionalParameters;
+//     origin: number;
+//     rate: number;
+//     // positionalParams: PositionalParameters;
+//     rawNamedParams: RawNamedParameters;
+//     // namedParams: NamedParameters;
+//     paramsAsString: string;
+//     postOrder: LuaArray<AstNode>;
+//     asString: string;
+//     nodeId: number;
+//     secure: boolean;
+//     operator: OperatorType;
+//     expressionType: "unary" | "binary";
+//     simc_pool_resource: boolean;
+//     simc_wait: boolean;
+//     for_next: boolean;
+//     extra_amount: number;
+//     comment: string;
+//     property: keyof SpellInfo;
+//     keyword: string;
+//     description: AstNode;
+//     item?: string;
+//     precedence: number;
+//     value?: string | number;
 
-interface DefineNode extends AstNode {
-    type: "define";
-    value: string | number;
-}
+//     // ?
+//     annotation: AstAnnotation;
+
+//     // Not sure (used in EmitActionList)
+//     action: string;
+//     asType: "boolean" | "value";
+//     left: string;
+//     right: string;
+
+//     // ---
+//     powerType: string;
+// }
 
 const TokenizeComment: Tokenizer = function (token) {
     return ["comment", token];
@@ -551,8 +954,10 @@ class SelfPool extends OvalePool<AstNode> {
     }
 
     Clean(node: AstNode): void {
-        if (node.child) {
-            this.ovaleAst.childrenPool.Release(node.child);
+        if (isAstNodeWithChildren(node)) {
+            this.ovaleAst.childrenPool.Release(
+                (node as AstBaseNodeWithChildren<any>).child
+            );
         }
         if (node.postOrder) {
             this.ovaleAst.postOrderPool.Release(node.postOrder);
@@ -561,27 +966,10 @@ class SelfPool extends OvalePool<AstNode> {
     }
 }
 
-type SimpleValue = string | number | AstNode;
 type CheckboxParameters = LuaArray<AstNode>;
 type ListParameters = LuaObj<AstNode>;
-type ControlParameters = CheckboxParameters | ListParameters;
-type Value = SimpleValue | ControlParameters;
-type FlattenListParameters = LuaObj<FlattenParameterValue>;
-type FlattenCheckBoxParameters = LuaArray<FlattenParameterValue>;
 
-export interface ConditionNamedParameters {
-    if_spell?: number;
-    if_equipped?: number;
-    if_stance?: number;
-    level?: number;
-    maxLevel?: number;
-    specialization?: number;
-    talent?: number;
-    trait?: number;
-    pertrait?: number;
-}
-
-export interface ValuedNamedParameters extends ConditionNamedParameters {
+export interface ValuedNamedParameters {
     pertrait?: number;
     nocd?: number;
     cd?: number;
@@ -621,34 +1009,32 @@ export interface ValuedNamedParameters extends ConditionNamedParameters {
     rage?: number;
 }
 
-export interface NamedParameters extends ValuedNamedParameters {
-    // TODO should not be there, see RawNamedParameters
-    target?: string;
-    filter?: string;
-    checkbox?: LuaArray<string | number>;
-    listitem?: LuaObj<string | number>;
-}
+export type NamedParameters<K extends string = DefaultNamedParameters> = {
+    [key in K]?: FlattenParameterValue;
+};
 
+type FlattenParameterValue = string | number | boolean | undefined;
 export type PositionalParameters = LuaArray<FlattenParameterValue>;
 
-type BaseRawNamedParameters = { [key in keyof ValuedNamedParameters]: AstNode };
+type DefaultNamedParameters =
+    | keyof ValuedNamedParameters
+    | "filter"
+    | "target"
+    | "listitem"
+    | "checkbox"
+    | "if"
+    | "add"
+    | "set"
+    | "percent";
 
-interface RawNamedParameters extends BaseRawNamedParameters {
-    // TODO This is not a good idea and this should be changed
-    filter: AstNode | string;
-    target: AstNode | string;
-    listitem: LuaObj<AstNode>;
-    checkbox: LuaArray<AstNode>;
-}
+export type RawNamedParameters<K extends string = DefaultNamedParameters> = {
+    [key in K]?: AstNode;
+};
 
-type RawPositionalParameters = LuaArray<AstNode>;
-
-type FlattenParameters = LuaArray<string | number>;
-type FlattenParameterValue = FlattenParameters | string | number;
+export type RawPositionalParameters = LuaArray<AstNode>;
 
 type ParserFunction<T = AstNode> = (
     tokenStream: OvaleLexer,
-    nodeList: LuaArray<AstNode>,
     annotation: AstAnnotation,
     minPrecedence?: number
 ) => T | undefined;
@@ -665,16 +1051,16 @@ export class OvaleASTClass {
     private checkboxPool = new OvalePool<CheckboxParameters>(
         "OvaleAST_checkboxPool"
     );
-    private flattenParameterValuesPool = new OvalePool<
-        LuaArray<FlattenParameterValue>
-    >("OvaleAST_FlattenParameterValues");
+    private positionalParametersPool = new OvalePool<PositionalParameters>(
+        "OvaleAST_FlattenParameterValues"
+    );
     private rawNamedParametersPool = new OvalePool<RawNamedParameters>(
         "OvaleAST_rawNamedParametersPool"
     );
     private rawPositionalParametersPool = new OvalePool<
         RawPositionalParameters
     >("OVALEAST_rawPositionParametersPool");
-    private flattenParametersPool = new OvalePool<FlattenParameters>(
+    private namedParametersPool = new OvalePool<NamedParameters>(
         "OvaleAST_FlattenParametersPool"
     );
     private objectPool = new OvalePool<any>("OvalePool");
@@ -741,16 +1127,11 @@ export class OvaleASTClass {
         return output;
     }
 
-    private GetNumberNode(
-        value: number,
-        nodeList: LuaArray<AstNode>,
-        annotation: AstAnnotation
-    ) {
+    private GetNumberNode(value: number, annotation: AstAnnotation) {
         annotation.numberFlyweight = annotation.numberFlyweight || {};
         let node = annotation.numberFlyweight[value];
         if (!node) {
-            node = <ValueNode>this.NewNode(nodeList);
-            node.type = "value";
+            node = this.NewNode("value", annotation);
             node.value = value;
             node.origin = 0;
             node.rate = 0;
@@ -764,7 +1145,7 @@ export class OvaleASTClass {
         array: LuaArray<AstNode>,
         visited: LuaObj<boolean>
     ) {
-        if (node.child) {
+        if (isAstNodeWithChildren(node)) {
             for (const [, childNode] of ipairs(node.child)) {
                 if (!visited[childNode.nodeId]) {
                     this.PostOrderTraversal(childNode, array, visited);
@@ -776,76 +1157,27 @@ export class OvaleASTClass {
         visited[node.nodeId] = true;
     }
 
-    /** Flatten a parameter value node into a string (must not be csv) */
-    private FlattenParameterValueNotCsv(
-        parameterValue: SimpleValue,
-        annotation: AstAnnotation
-    ): string | number {
-        if (isAstNode(parameterValue)) {
-            let node = parameterValue;
-            let isBang = false;
-            let value: string | number;
-            if (node.type == "bang_value") {
-                isBang = true;
-                node = node.child[1];
-            }
-            if (isNodeType(node, "value")) {
-                value = node.value;
-            } else if (node.type == "variable") {
-                value = node.name;
-            } else if (isNodeType(node, "string")) {
-                value = node.value;
-            } else {
-                // TODO not nice at all!
-                return <any>parameterValue;
-            }
-            if (isBang) {
-                value = `!${tostring(value)}`;
-            }
-            return value;
-        }
-        return parameterValue;
-    }
-
-    /** "Flatten" a parameter value node into a string, or a table of strings if it is a comma-separated value. */
-    private FlattenParameterValue(
-        parameterValue: SimpleValue,
-        annotation: AstAnnotation
-    ): FlattenParameterValue {
-        if (isAstNode(parameterValue) && isCsvNode(parameterValue)) {
-            const parameters = this.flattenParametersPool.Get();
-            for (const [k, v] of ipairs(parameterValue.csv)) {
-                parameters[k] = this.FlattenParameterValueNotCsv(v, annotation);
-            }
-            annotation.flattenParametersList =
-                annotation.flattenParametersList || {};
-            annotation.flattenParametersList[
-                lualength(annotation.flattenParametersList) + 1
-            ] = parameters;
-            return parameters;
-        } else {
-            return this.FlattenParameterValueNotCsv(parameterValue, annotation);
-        }
-    }
-
     private GetPrecedence(node: AstNode) {
-        let precedence = node.precedence;
-        if (!precedence) {
-            const operator = node.operator;
-            if (operator) {
-                if (node.expressionType == "unary") {
-                    const operatorInfos = UNARY_OPERATOR[operator];
-                    if (operatorInfos) precedence = operatorInfos[2];
-                } else if (node.expressionType == "binary") {
-                    const operatorInfos = BINARY_OPERATOR[operator];
-                    if (operatorInfos) precedence = operatorInfos[2];
+        if (isExpressionNode(node)) {
+            let precedence = node.precedence;
+            if (!precedence) {
+                const operator = node.operator;
+                if (operator) {
+                    if (node.expressionType == "unary") {
+                        const operatorInfos = UNARY_OPERATOR[operator];
+                        if (operatorInfos) precedence = operatorInfos[2];
+                    } else if (node.expressionType == "binary") {
+                        const operatorInfos = BINARY_OPERATOR[operator];
+                        if (operatorInfos) precedence = operatorInfos[2];
+                    }
                 }
             }
+            return precedence;
         }
-        return precedence;
+        return 0;
     }
 
-    private HasParameters(node: AstNode) {
+    private HasParameters(node: AstNodeWithParameters<any, any>) {
         return (
             (node.rawPositionalParams && next(node.rawPositionalParams)) ||
             (node.rawNamedParams && next(node.rawNamedParams))
@@ -856,17 +1188,10 @@ export class OvaleASTClass {
         if (node.asString) {
             return node.asString;
         } else {
-            let visitor;
+            let visitor = this.UNPARSE_VISITOR[node.type] as UnparserFunction<
+                NodeTypes[typeof node.type]
+            >;
 
-            if (node.previousType) {
-                visitor = this.UNPARSE_VISITOR[
-                    node.previousType
-                ] as UnparserFunction<NodeTypes[typeof node.previousType]>;
-            } else {
-                visitor = this.UNPARSE_VISITOR[node.type] as UnparserFunction<
-                    NodeTypes[typeof node.type]
-                >;
-            }
             if (!visitor) {
                 this.debug.Error(
                     "Unable to unparse node of type '%s'.",
@@ -874,15 +1199,13 @@ export class OvaleASTClass {
                 );
                 return `Unkown_${node.type}`;
             } else {
-                node.asString = visitor(
-                    node as NodeTypes[typeof node.previousType]
-                );
+                node.asString = visitor(node);
                 return node.asString;
             }
         }
     }
 
-    private UnparseAddCheckBox: UnparserFunction = (node) => {
+    private UnparseAddCheckBox: UnparserFunction<AstCheckBoxNode> = (node) => {
         let s;
         if (
             (node.rawPositionalParams && next(node.rawPositionalParams)) ||
@@ -906,7 +1229,9 @@ export class OvaleASTClass {
         }
         return s;
     };
-    private UnparseAddFunction: UnparserFunction = (node) => {
+    private UnparseAddFunction: UnparserFunction<AstAddFunctionNode> = (
+        node
+    ) => {
         let s;
         if (this.HasParameters(node)) {
             s = format(
@@ -916,18 +1241,18 @@ export class OvaleASTClass {
                     node.rawPositionalParams,
                     node.rawNamedParams
                 ),
-                this.UnparseGroup(node.child[1])
+                this.UnparseGroup(node.body)
             );
         } else {
             s = format(
                 "AddFunction %s%s",
                 node.name,
-                this.UnparseGroup(node.child[1])
+                this.UnparseGroup(node.body)
             );
         }
         return s;
     };
-    private UnparseAddIcon: UnparserFunction = (node) => {
+    private UnparseAddIcon: UnparserFunction<AstIconNode> = (node) => {
         let s;
         if (this.HasParameters(node)) {
             s = format(
@@ -936,14 +1261,14 @@ export class OvaleASTClass {
                     node.rawPositionalParams,
                     node.rawNamedParams
                 ),
-                this.UnparseGroup(node.child[1])
+                this.UnparseGroup(node.body)
             );
         } else {
-            s = format("AddIcon%s", this.UnparseGroup(node.child[1]));
+            s = format("AddIcon%s", this.UnparseGroup(node.body));
         }
         return s;
     };
-    private UnparseAddListItem: UnparserFunction = (node) => {
+    private UnparseAddListItem: UnparserFunction<AstListItemNode> = (node) => {
         let s;
         if (this.HasParameters(node)) {
             s = format(
@@ -966,29 +1291,20 @@ export class OvaleASTClass {
         }
         return s;
     };
-    private UnparseBangValue: UnparserFunction = (node) => {
+    private UnparseBangValue: UnparserFunction<AstBangValueNode> = (node) => {
         return `!${this.Unparse(node.child[1])}`;
     };
-    private UnparseComment: UnparserFunction = (node) => {
+    private UnparseComment: UnparserFunction<AstCommentNode> = (node) => {
         if (!node.comment || node.comment == "") {
             return "";
         } else {
             return `#${node.comment}`;
         }
     };
-    private UnparseCommaSeparatedValues = (node: CsvNode) => {
-        let output = this.outputPool.Get();
-        for (const [k, v] of ipairs(node.csv)) {
-            output[k] = this.Unparse(v);
-        }
-        let outputString = concat(output, ",");
-        this.outputPool.Release(output);
-        return outputString;
-    };
-    private UnparseDefine: UnparserFunction = (node) => {
+    private UnparseDefine: UnparserFunction<AstDefineNode> = (node) => {
         return format("Define(%s %s)", node.name, node.value);
     };
-    private UnparseExpression: UnparserFunction = (node) => {
+    private UnparseExpression: UnparserFunction<AstExpressionNode> = (node) => {
         let expression;
         let precedence = this.GetPrecedence(node);
         if (node.expressionType == "unary") {
@@ -1023,6 +1339,7 @@ export class OvaleASTClass {
                 if (
                     operatorInfo &&
                     operatorInfo[3] == "associative" &&
+                    rhsNode.type === "expression" &&
                     node.operator == rhsNode.operator
                 ) {
                     rhsExpression = this.Unparse(rhsNode);
@@ -1041,25 +1358,27 @@ export class OvaleASTClass {
         }
         return expression;
     };
-    private UnparseFunction: UnparserFunction<FunctionNode> = (node) => {
+    private UnparseFunction: UnparserFunction<AstFunctionNode> = (node) => {
         let s;
         if (this.HasParameters(node)) {
             let name;
             let filter = node.rawNamedParams.filter;
-            if (filter == "debuff") {
+            if (filter && this.Unparse(filter) == "debuff") {
                 name = gsub(node.name, "^Buff", "Debuff");
             } else {
                 name = node.name;
             }
             let target = node.rawNamedParams.target;
-            if (target) {
+            if (target && target.type === "string") {
                 s = format(
                     "%s.%s(%s)",
-                    target,
+                    target.value,
                     name,
                     this.UnparseParameters(
                         node.rawPositionalParams,
-                        node.rawNamedParams
+                        node.rawNamedParams,
+                        true,
+                        true
                     )
                 );
             } else {
@@ -1068,7 +1387,8 @@ export class OvaleASTClass {
                     name,
                     this.UnparseParameters(
                         node.rawPositionalParams,
-                        node.rawNamedParams
+                        node.rawNamedParams,
+                        true
                     )
                 );
             }
@@ -1077,7 +1397,7 @@ export class OvaleASTClass {
         }
         return s;
     };
-    private UnparseGroup: UnparserFunction = (node) => {
+    private UnparseGroup: UnparserFunction<AstGroupNode> = (node) => {
         let output = this.outputPool.Get();
         output[lualength(output) + 1] = "";
         output[lualength(output) + 1] = `${INDENT(this.indent)}{`;
@@ -1096,7 +1416,7 @@ export class OvaleASTClass {
         this.outputPool.Release(output);
         return outputString;
     };
-    private UnparseIf: UnparserFunction = (node) => {
+    private UnparseIf: UnparserFunction<AstIfNode> = (node) => {
         if (node.child[2].type == "group") {
             return format(
                 "if %s%s",
@@ -1111,7 +1431,7 @@ export class OvaleASTClass {
             );
         }
     };
-    private UnparseItemInfo: UnparserFunction = (node) => {
+    private UnparseItemInfo: UnparserFunction<AstItemInfoNode> = (node) => {
         let identifier = (node.name && node.name) || node.itemId;
         return format(
             "ItemInfo(%s %s)",
@@ -1122,7 +1442,9 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseItemRequire: UnparserFunction = (node) => {
+    private UnparseItemRequire: UnparserFunction<AstItemRequireNode> = (
+        node
+    ) => {
         let identifier = (node.name && node.name) || node.itemId;
         return format(
             "ItemRequire(%s %s %s)",
@@ -1134,7 +1456,7 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseList: UnparserFunction = (node) => {
+    private UnparseList: UnparserFunction<AstListNode> = (node) => {
         return format(
             "%s(%s %s)",
             node.keyword,
@@ -1145,51 +1467,55 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseValue = (node: ValueNode) => {
+    private UnparseValue = (node: AstValueNode) => {
+        if (node.name) return node.name;
         return tostring(node.value);
     };
+
+    private unparseParameter(node: AstNode) {
+        if (
+            node.type === "string" ||
+            node.type === "value" ||
+            node.type === "variable" ||
+            node.type === "boolean"
+        ) {
+            return this.Unparse(node);
+        } else {
+            return `(${this.Unparse(node)})`;
+        }
+    }
+
     private UnparseParameters(
         positionalParams: RawPositionalParameters,
-        namedParams: RawNamedParameters
+        namedParams: RawNamedParameters<any>,
+        noFilter?: boolean,
+        noTarget?: boolean
     ) {
         let output = this.outputPool.Get();
         for (const [k, v] of kpairs(namedParams)) {
-            if (isListItemParameter(k, v)) {
-                for (const [list, item] of pairs(v)) {
-                    output[lualength(output) + 1] = format(
-                        "listitem=%s:%s",
-                        list,
-                        this.Unparse(item)
-                    );
-                }
-            } else if (isCheckBoxParameter(k, v)) {
-                for (const [, name] of ipairs(v)) {
-                    output[lualength(output) + 1] = format(
-                        "checkbox=%s",
-                        this.Unparse(name)
-                    );
-                }
-            } else if (isAstNode(v)) {
+            if (
+                (!noFilter || k !== "filter") &&
+                (!noTarget || k !== "target")
+            ) {
                 output[lualength(output) + 1] = format(
                     "%s=%s",
                     k,
-                    this.Unparse(v)
+                    this.unparseParameter(v)
                 );
-            } else if (k == "filter" || k == "target") {
-            } else {
-                output[lualength(output) + 1] = format("%s=%s", k, v);
             }
         }
+
         sort(output);
         for (let k = lualength(positionalParams); k >= 1; k += -1) {
-            // TODO suspicious cast
-            insert(output, 1, this.Unparse(positionalParams[k]));
+            insert(output, 1, this.unparseParameter(positionalParams[k]));
         }
         let outputString = concat(output, " ");
         this.outputPool.Release(output);
         return outputString;
     }
-    private UnparseScoreSpells: UnparserFunction = (node) => {
+    private UnparseScoreSpells: UnparserFunction<AstScoreSpellsNode> = (
+        node
+    ) => {
         return format(
             "ScoreSpells(%s)",
             this.UnparseParameters(
@@ -1198,7 +1524,7 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseScript: UnparserFunction = (node: AstNode) => {
+    private UnparseScript: UnparserFunction<AstScriptNode> = (node) => {
         let output = this.outputPool.Get();
         let previousDeclarationType;
         for (const [, declarationNode] of ipairs(node.child)) {
@@ -1241,19 +1567,23 @@ export class OvaleASTClass {
         this.outputPool.Release(output);
         return outputString;
     };
-    private UnparseSpellAuraList: UnparserFunction = (node) => {
-        let identifier = (node.name && node.name) || node.spellId;
+    private UnparseSpellAuraList: UnparserFunction<AstSpellAuraListNode> = (
+        node
+    ) => {
+        let identifier = node.name || node.spellId;
+        let buffName = node.buffName || node.buffSpellId;
         return format(
-            "%s(%s %s)",
+            "%s(%s %s %s)",
             node.keyword,
             identifier,
+            buffName,
             this.UnparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseSpellInfo: UnparserFunction = (node) => {
+    private UnparseSpellInfo: UnparserFunction<AstSpellInfoNode> = (node) => {
         let identifier = (node.name && node.name) || node.spellId;
         return format(
             "SpellInfo(%s %s)",
@@ -1264,7 +1594,9 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseSpellRequire: UnparserFunction = (node) => {
+    private UnparseSpellRequire: UnparserFunction<AstSpellRequireNode> = (
+        node
+    ) => {
         let identifier = (node.name && node.name) || node.spellId;
         return format(
             "SpellRequire(%s %s %s)",
@@ -1276,10 +1608,14 @@ export class OvaleASTClass {
             )
         );
     };
-    private UnparseString = (node: StringNode) => {
+    private UnparseString = (node: AstStringNode) => {
+        if (node.name) {
+            if (node.func) return `${node.func}(${node.name})`;
+            return node.name;
+        }
         return `"${node.value}"`;
     };
-    private UnparseUnless: UnparserFunction = (node) => {
+    private UnparseUnless: UnparserFunction<AstUnlessNode> = (node) => {
         if (node.child[2].type == "group") {
             return format(
                 "unless %s%s",
@@ -1294,7 +1630,7 @@ export class OvaleASTClass {
             );
         }
     };
-    private UnparseVariable: UnparserFunction = (node) => {
+    private UnparseVariable: UnparserFunction<AstVariableNode> = (node) => {
         return node.name;
     };
 
@@ -1307,7 +1643,6 @@ export class OvaleASTClass {
         ["bang_value"]: this.UnparseBangValue,
         ["checkbox"]: this.UnparseAddCheckBox,
         ["compare"]: this.UnparseExpression,
-        ["comma_separated_values"]: this.UnparseCommaSeparatedValues,
         ["comment"]: this.UnparseComment,
         ["custom_function"]: this.UnparseFunction,
         ["define"]: this.UnparseDefine,
@@ -1356,16 +1691,20 @@ export class OvaleASTClass {
         annotation: AstAnnotation
     ): Result<AstNode> {
         const visitor = this.PARSE_VISITOR[nodeType];
+        this.debug.Debug(`Visit ${nodeType}`);
         if (!visitor) {
             this.debug.Error("Unable to parse node of type '%s'.", nodeType);
             return undefined;
         } else {
-            return visitor(tokenStream, nodeList, annotation);
+            const result = visitor(tokenStream, annotation);
+            if (!result) {
+                this.debug.Error(`Failed in %s visitor`, nodeType);
+            }
+            return result;
         }
     }
-    private ParseAddCheckBox: ParserFunction = (
+    private ParseAddCheckBox: ParserFunction<AstCheckBoxNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -1400,17 +1739,15 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        const descriptionNode = this.ParseString(
-            tokenStream,
-            nodeList,
-            annotation
-        );
+        const descriptionNode = this.ParseString(tokenStream, annotation);
         if (!descriptionNode) return undefined;
 
         const [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "ParseAddCheckBox",
+            annotation,
+            1,
+            checkCheckBoxParameters
         );
         if (!positionalParams || !namedParams) return undefined;
 
@@ -1423,21 +1760,20 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        const node = this.NewNode(nodeList);
-        node.type = "checkbox";
+        const node = this.newNodeWithParameters(
+            "checkbox",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.name = name;
         node.description = descriptionNode;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
+
         return node;
     };
-    private ParseAddFunction: ParserFunction = (
+    private ParseAddFunction: ParserFunction<AstAddFunctionNode> = (
         tokenStream,
-        nodeList,
+
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -1463,19 +1799,23 @@ export class OvaleASTClass {
         }
         const [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "ParseAddFunction",
+            annotation,
+            0,
+            checkAddFunctionParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        let bodyNode = this.ParseGroup(tokenStream, nodeList, annotation);
+        let bodyNode = this.ParseGroup(tokenStream, annotation);
         if (!bodyNode) return undefined;
         let node;
-        node = this.NewNode(nodeList, true);
-        node.type = "add_function";
+        node = this.newNodeWithBodyAndParameters(
+            "add_function",
+            annotation,
+            bodyNode,
+            positionalParams,
+            namedParams
+        );
         node.name = name;
-        node.child[1] = bodyNode;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
         annotation.parametersReference = annotation.parametersReference || {};
         annotation.parametersReference[
             lualength(annotation.parametersReference) + 1
@@ -1488,9 +1828,8 @@ export class OvaleASTClass {
         annotation.customFunction[name] = node;
         return node;
     };
-    private ParseAddIcon: ParserFunction = (
+    private ParseAddIcon: ParserFunction<AstIconNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -1504,31 +1843,30 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "addicon",
+            annotation,
+            0,
+            iconParametersCheck
         );
         if (!positionalParams || !namedParams) return undefined;
-        let bodyNode = this.ParseGroup(tokenStream, nodeList, annotation);
+        let bodyNode = this.ParseGroup(tokenStream, annotation);
         if (!bodyNode) return undefined;
         let node: AstNode;
-        node = this.NewNode(nodeList, true);
-        node.type = "icon";
-        node.child[1] = bodyNode;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
+        node = this.newNodeWithBodyAndParameters(
+            "icon",
+            annotation,
+            bodyNode,
+            positionalParams,
+            namedParams
+        );
         annotation.postOrderReference = annotation.postOrderReference || {};
         annotation.postOrderReference[
             lualength(annotation.postOrderReference) + 1
         ] = bodyNode;
         return node;
     };
-    private ParseAddListItem: ParserFunction = (
+    private ParseAddListItem: ParserFunction<AstListItemNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -1574,17 +1912,15 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        let descriptionNode = this.ParseString(
-            tokenStream,
-            nodeList,
-            annotation
-        );
+        let descriptionNode = this.ParseString(tokenStream, annotation);
         if (!descriptionNode) return undefined;
 
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "ParseAddListItem",
+            annotation,
+            0,
+            checkListItemParameters
         );
         if (!positionalParams || !namedParams) return undefined;
         [tokenType, token] = tokenStream.Consume();
@@ -1597,70 +1933,58 @@ export class OvaleASTClass {
             return undefined;
         }
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "list_item";
+        node = this.newNodeWithParameters(
+            "list_item",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.name = name;
         node.item = item;
         node.description = descriptionNode;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
         return node;
     };
-    private ParseComment: ParserFunction = (
+    private ParseComment: ParserFunction<AstCommentNode> = (
         tokenStream,
-        nodeList,
         annotation
-    ): AstNode | undefined => {
+    ) => {
         return undefined;
     };
     private ParseDeclaration: ParserFunction = (
         tokenStream,
-        nodeList,
         annotation
     ): AstNode | undefined => {
         let node: AstNode | undefined;
         let [tokenType, token] = tokenStream.Peek();
         if (tokenType == "keyword" && token && DECLARATION_KEYWORD[token]) {
             if (token == "addcheckbox") {
-                node = this.ParseAddCheckBox(tokenStream, nodeList, annotation);
+                node = this.ParseAddCheckBox(tokenStream, annotation);
             } else if (token == "addfunction") {
-                node = this.ParseAddFunction(tokenStream, nodeList, annotation);
+                node = this.ParseAddFunction(tokenStream, annotation);
             } else if (token == "addicon") {
-                node = this.ParseAddIcon(tokenStream, nodeList, annotation);
+                node = this.ParseAddIcon(tokenStream, annotation);
             } else if (token == "addlistitem") {
-                node = this.ParseAddListItem(tokenStream, nodeList, annotation);
+                node = this.ParseAddListItem(tokenStream, annotation);
             } else if (token == "define") {
-                node = this.ParseDefine(tokenStream, nodeList, annotation);
+                node = this.ParseDefine(tokenStream, annotation);
             } else if (token == "include") {
-                node = this.ParseInclude(tokenStream, nodeList, annotation);
+                node = this.ParseInclude(tokenStream, annotation);
             } else if (token == "iteminfo") {
-                node = this.ParseItemInfo(tokenStream, nodeList, annotation);
+                node = this.ParseItemInfo(tokenStream, annotation);
             } else if (token == "itemrequire") {
-                node = this.ParseItemRequire(tokenStream, nodeList, annotation);
+                node = this.ParseItemRequire(tokenStream, annotation);
             } else if (token == "itemlist") {
-                node = this.ParseList(tokenStream, nodeList, annotation);
+                node = this.ParseList(tokenStream, annotation);
             } else if (token == "scorespells") {
-                node = this.ParseScoreSpells(tokenStream, nodeList, annotation);
-            } else if (SPELL_AURA_KEYWORD[token]) {
-                node = this.ParseSpellAuraList(
-                    tokenStream,
-                    nodeList,
-                    annotation
-                );
+                node = this.ParseScoreSpells(tokenStream, annotation);
+            } else if (checkToken(SPELL_AURA_KEYWORD, token)) {
+                node = this.ParseSpellAuraList(tokenStream, annotation);
             } else if (token == "spellinfo") {
-                node = this.ParseSpellInfo(tokenStream, nodeList, annotation);
+                node = this.ParseSpellInfo(tokenStream, annotation);
             } else if (token == "spelllist") {
-                node = this.ParseList(tokenStream, nodeList, annotation);
+                node = this.ParseList(tokenStream, annotation);
             } else if (token == "spellrequire") {
-                node = this.ParseSpellRequire(
-                    tokenStream,
-                    nodeList,
-                    annotation
-                );
+                node = this.ParseSpellRequire(tokenStream, annotation);
             } else {
                 this.SyntaxError(
                     tokenStream,
@@ -1680,9 +2004,8 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseDefine: ParserFunction = (
+    private ParseDefine: ParserFunction<AstDefineNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -1751,18 +2074,16 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        let node: DefineNode;
-        node = <DefineNode>this.NewNode(nodeList);
-        node.type = "define";
+        let node: AstDefineNode;
+        node = this.NewNode("define", annotation);
         node.name = name;
         node.value = value;
         annotation.definition = annotation.definition || {};
         annotation.definition[name] = value;
         return node;
     };
-    private ParseExpression: ParserFunction = (
+    private ParseExpression: ParserFunction<AstNode> = (
         tokenStream,
-        nodeList,
         annotation,
         minPrecedence?
     ) => {
@@ -1778,17 +2099,15 @@ export class OvaleASTClass {
                 let operator: OperatorType = <OperatorType>token;
                 const rhsNode = this.ParseExpression(
                     tokenStream,
-                    nodeList,
                     annotation,
                     precedence
                 );
                 if (rhsNode) {
-                    if (operator == "-" && isNodeType(rhsNode, "value")) {
+                    if (operator == "-" && rhsNode.type === "value") {
                         let value = -1 * tonumber(rhsNode.value);
-                        node = this.GetNumberNode(value, nodeList, annotation);
+                        node = this.GetNumberNode(value, annotation);
                     } else {
-                        node = this.NewNode(nodeList, true);
-                        node.type = opType;
+                        node = this.newNodeWithChildren(opType, annotation);
                         node.expressionType = "unary";
                         node.operator = operator;
                         node.precedence = precedence;
@@ -1800,7 +2119,6 @@ export class OvaleASTClass {
             } else {
                 const simpleExpression = this.ParseSimpleExpression(
                     tokenStream,
-                    nodeList,
                     annotation
                 );
                 if (!simpleExpression) return undefined;
@@ -1825,13 +2143,11 @@ export class OvaleASTClass {
                         let lhsNode = node;
                         let rhsNode = this.ParseExpression(
                             tokenStream,
-                            nodeList,
                             annotation,
                             precedence
                         );
                         if (rhsNode) {
-                            node = this.NewNode(nodeList, true);
-                            node.type = opType;
+                            node = this.newNodeWithChildren(opType, annotation);
                             node.expressionType = "binary";
                             node.operator = operator;
                             node.precedence = precedence;
@@ -1861,9 +2177,8 @@ export class OvaleASTClass {
         return node;
     };
 
-    private ParseFunction: ParserFunction<FunctionNode> = (
+    private ParseFunction: ParserFunction<AstFunctionNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let name;
@@ -1907,8 +2222,10 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "function",
+            annotation,
+            undefined,
+            checkFunctionParameters
         );
         if (!positionalParams || !namedParams) return undefined;
         if (ACTION_PARAMETER_COUNT[name]) {
@@ -1934,65 +2251,63 @@ export class OvaleASTClass {
         }
         if (!namedParams.target) {
             if (sub(name, 1, 6) == "target") {
-                namedParams.target = "target";
+                namedParams.target = this.newString(annotation, "target");
                 name = sub(name, 7);
             }
         }
         if (!namedParams.filter) {
             if (sub(name, 1, 6) == "debuff") {
-                namedParams.filter = "debuff";
+                namedParams.filter = this.newString(annotation, "debuff");
             } else if (sub(name, 1, 4) == "buff") {
-                namedParams.filter = "buff";
+                namedParams.filter = this.newString(annotation, "buff");
             } else if (sub(name, 1, 11) == "otherdebuff") {
-                namedParams.filter = "debuff";
+                namedParams.filter = this.newString(annotation, "debuff");
             } else if (sub(name, 1, 9) == "otherbuff") {
-                namedParams.filter = "buff";
+                namedParams.filter = this.newString(annotation, "buff");
             }
         }
         if (target) {
-            namedParams.target = target;
+            namedParams.target = this.newString(annotation, target);
         }
         let node;
-        node = <FunctionNode>this.NewNode(nodeList);
-        node.name = name;
+        let nodeType: "state" | "action" | "function" | "custom_function";
         if (STATE_ACTION[name]) {
-            node.type = "state";
-            node.func = name;
+            nodeType = "state";
         } else if (ACTION_PARAMETER_COUNT[name]) {
-            node.type = "action";
-            node.func = name;
+            nodeType = "action";
         } else if (STRING_LOOKUP_FUNCTION[name]) {
-            node.type = "function";
-            node.func = name;
+            nodeType = "function";
+        } else if (this.ovaleCondition.IsCondition(name)) {
+            nodeType = "function";
+        } else {
+            nodeType = "custom_function";
+        }
+
+        node = this.newNodeWithParameters(
+            nodeType,
+            annotation,
+            positionalParams,
+            namedParams
+        );
+        node.name = name;
+        if (STRING_LOOKUP_FUNCTION[name]) {
             annotation.stringReference = annotation.stringReference || {};
             annotation.stringReference[
                 lualength(annotation.stringReference) + 1
             ] = node;
-        } else if (this.ovaleCondition.IsCondition(name)) {
-            node.type = "function";
-            node.func = name;
-        } else {
-            node.type = "custom_function";
-            node.func = name;
         }
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
         node.asString = this.UnparseFunction(node);
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
         annotation.functionCall = annotation.functionCall || {};
-        annotation.functionCall[node.func] = true;
+        annotation.functionCall[node.name] = true;
         annotation.functionReference = annotation.functionReference || {};
         annotation.functionReference[
             lualength(annotation.functionReference) + 1
         ] = node;
         return node;
     };
-    private ParseGroup: ParserFunction = (
+
+    private ParseGroup: ParserFunction<AstGroupNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -2004,19 +2319,17 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        let child = this.childrenPool.Get();
+        let node = this.newNodeWithChildren("group", annotation);
+        let child = node.child;
         [tokenType] = tokenStream.Peek();
         while (tokenType && tokenType != "}") {
             let statementNode;
-            statementNode = this.ParseStatement(
-                tokenStream,
-                nodeList,
-                annotation
-            );
+            statementNode = this.ParseStatement(tokenStream, annotation);
             if (statementNode) {
                 child[lualength(child) + 1] = statementNode;
                 [tokenType] = tokenStream.Peek();
             } else {
+                this.nodesPool.Release(node);
                 return undefined;
             }
         }
@@ -2027,16 +2340,12 @@ export class OvaleASTClass {
                 "Syntax error: unexpected token '%s' when parsing GROUP; '}' expected.",
                 token
             );
-            this.childrenPool.Release(child);
+            this.nodesPool.Release(node);
             return undefined;
         }
-        let node;
-        node = this.NewNode(nodeList);
-        node.type = "group";
-        node.child = child;
         return node;
     };
-    private ParseIf: ParserFunction = (tokenStream, nodeList, annotation) => {
+    private ParseIf: ParserFunction<AstIfNode> = (tokenStream, annotation) => {
         let [tokenType, token] = tokenStream.Consume();
         if (!(tokenType == "keyword" && token == "if")) {
             this.SyntaxError(
@@ -2047,18 +2356,17 @@ export class OvaleASTClass {
             return undefined;
         }
         let conditionNode, bodyNode;
-        conditionNode = this.ParseExpression(tokenStream, nodeList, annotation);
+        conditionNode = this.ParseExpression(tokenStream, annotation);
         if (!conditionNode) return undefined;
-        bodyNode = this.ParseStatement(tokenStream, nodeList, annotation);
+        bodyNode = this.ParseStatement(tokenStream, annotation);
         if (!bodyNode) return undefined;
         let node;
-        node = this.NewNode(nodeList, true);
-        node.type = "if";
+        node = this.newNodeWithChildren("if", annotation);
         node.child[1] = conditionNode;
         node.child[2] = bodyNode;
         return node;
     };
-    private ParseInclude: ParserFunction = (
+    private ParseInclude: ParserFunction<AstScriptNode> = (
         tokenStream,
         nodeList,
         annotation
@@ -2116,9 +2424,8 @@ export class OvaleASTClass {
         includeTokenStream.Release();
         return node;
     };
-    private ParseItemInfo: ParserFunction = (
+    private ParseItemInfo: ParserFunction<AstItemInfoNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let name;
@@ -2156,8 +2463,10 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "iteminfo",
+            annotation,
+            undefined,
+            checkSpellInfo
         );
         if (!positionalParams || !namedParams) return undefined;
         [tokenType, token] = tokenStream.Consume();
@@ -2170,17 +2479,15 @@ export class OvaleASTClass {
             return undefined;
         }
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "item_info";
+        node = this.newNodeWithParameters(
+            "item_info",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.itemId = tonumber(itemId);
-        if (name) node.name = name;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
         if (name) {
+            node.name = name;
             annotation.nameReference = annotation.nameReference || {};
             annotation.nameReference[
                 lualength(annotation.nameReference) + 1
@@ -2189,9 +2496,8 @@ export class OvaleASTClass {
         return node;
     };
 
-    private ParseItemRequire: ParserFunction = (
+    private ParseItemRequire: ParserFunction<AstItemRequireNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -2227,22 +2533,19 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        let property;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "name") {
-            property = token;
-        } else {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; property name expected.",
-                token
-            );
-            return undefined;
-        }
+        let property = this.parseName(
+            tokenStream,
+            "ITEMREQUIRE",
+            checkSpellInfo
+        );
+        if (!property) return undefined;
+
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "itemrequire",
+            annotation,
+            0,
+            checkSpellRequireParameters
         );
         if (!positionalParams || !namedParams) return undefined;
         [tokenType, token] = tokenStream.Consume();
@@ -2255,17 +2558,15 @@ export class OvaleASTClass {
             return undefined;
         }
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "itemrequire";
+        node = this.newNodeWithParameters(
+            "itemrequire",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.itemId = tonumber(itemId);
         if (name) node.name = name;
-        node.property = property as keyof SpellInfo;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
+        node.property = property;
         if (name) {
             annotation.nameReference = annotation.nameReference || {};
             annotation.nameReference[
@@ -2274,7 +2575,10 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseList: ParserFunction = (tokenStream, nodeList, annotation) => {
+    private ParseList: ParserFunction<AstListNode> = (
+        tokenStream,
+        annotation
+    ) => {
         let keyword;
         let [tokenType, token] = tokenStream.Consume();
         if (
@@ -2313,8 +2617,10 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "list",
+            annotation,
+            undefined,
+            checkListParameters
         );
         if (!positionalParams || !namedParams) return undefined;
         [tokenType, token] = tokenStream.Consume();
@@ -2327,23 +2633,20 @@ export class OvaleASTClass {
             return undefined;
         }
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "list";
+        node = this.newNodeWithParameters(
+            "list",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.keyword = keyword;
         node.name = name;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
         return node;
     };
     private ParseNumber = (
         tokenStream: OvaleLexer,
-        nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
-    ): Result<ValueNode> => {
+    ): Result<AstValueNode> => {
         let value;
         let [tokenType, token] = tokenStream.Consume();
         if (tokenType == "number") {
@@ -2356,221 +2659,86 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        let node = this.GetNumberNode(value, nodeList, annotation);
+        let node = this.GetNumberNode(value, annotation);
         return node;
     };
-    private ParseParameterValue: ParserFunction = (
-        tokenStream,
-        nodeList,
-        annotation
-    ) => {
-        let node;
-        let tokenType;
-        let parameters: LuaArray<AstNode> | undefined;
-        do {
-            node = this.ParseSimpleParameterValue(
-                tokenStream,
-                nodeList,
-                annotation
-            );
-            if (node) {
-                [tokenType] = tokenStream.Peek();
-                if (tokenType == ",") {
-                    tokenStream.Consume();
-                    parameters =
-                        parameters || <LuaArray<AstNode>>this.objectPool.Get();
-                }
-                if (parameters) {
-                    parameters[lualength(parameters) + 1] = node;
-                }
-            } else {
-                return undefined;
-            }
-        } while (node && tokenType === ",");
-        if (parameters) {
-            node = <CsvNode>this.NewNode(nodeList);
-            node.type = "comma_separated_values";
-            node.csv = parameters;
-            annotation.objects = annotation.objects || {};
-            annotation.objects[lualength(annotation.objects) + 1] = parameters;
-        }
-        return node;
-    };
-    private ParseParameters(
+    private ParseParameters<T extends string = DefaultNamedParameters>(
         tokenStream: OvaleLexer,
-        nodeList: LuaArray<AstNode>,
+        methodName: string,
         annotation: AstAnnotation,
-        isList?: boolean
-    ): [RawPositionalParameters?, RawNamedParameters?] {
+        maxNumberOfParameters: number | undefined,
+        namedParameters: KeyCheck<T>
+    ): [RawPositionalParameters?, RawNamedParameters<T>?] {
         let positionalParams = this.rawPositionalParametersPool.Get();
-        let namedParams = this.rawNamedParametersPool.Get();
+        let namedParams = <RawNamedParameters<T>>(
+            this.rawNamedParametersPool.Get()
+        );
         while (true) {
-            let [tokenType, token] = tokenStream.Peek();
+            let [tokenType] = tokenStream.Peek();
             if (tokenType) {
-                let name: string;
-                let node;
-                if (tokenType == "name") {
-                    node = this.ParseVariable(
+                const [nextTokenType] = tokenStream.Peek(2);
+                if (nextTokenType === "=") {
+                    const parameterName = this.parseName(
                         tokenStream,
-                        nodeList,
+                        methodName,
+                        namedParameters
+                    );
+                    if (!parameterName) {
+                        return [];
+                    }
+
+                    // Consume the '=' token.
+                    tokenStream.Consume();
+
+                    const node = this.ParseSimpleParameterValue(
+                        tokenStream,
                         annotation
                     );
-                    if (node) {
-                        name = node.name;
-                    } else {
-                        return [];
-                    }
-                } else if (tokenType == "number") {
-                    node = this.ParseNumber(tokenStream, nodeList, annotation);
-                    if (node) {
-                        name = tostring(node.value);
-                    } else {
-                        return [];
-                    }
-                } else if (tokenType == "-") {
-                    tokenStream.Consume();
-                    node = this.ParseNumber(tokenStream, nodeList, annotation);
-                    if (node) {
-                        let value = -1 * <number>node.value;
-                        node = this.GetNumberNode(value, nodeList, annotation);
-                        name = tostring(value);
-                    } else {
-                        return [];
-                    }
-                } else if (tokenType == "string") {
-                    node = this.ParseString(tokenStream, nodeList, annotation);
-                    if (node && isNodeType(node, "string")) {
-                        name = node.value;
-                    } else {
-                        return [];
-                    }
-                } else if (checkToken(PARAMETER_KEYWORD, token)) {
-                    if (isList) {
-                        this.SyntaxError(
-                            tokenStream,
-                            "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.",
-                            token
-                        );
-                        return [];
-                    } else {
-                        tokenStream.Consume();
-                        name = token;
-                    }
+                    if (!node) return [];
+                    namedParams[parameterName] = node;
                 } else {
-                    break;
-                }
-
-                // Check if this is a bare value or the start of a "name=value" pair.
-                if (name) {
-                    [tokenType, token] = tokenStream.Peek();
-                    if (tokenType == "=") {
-                        // Consume the '=' token.
+                    let node;
+                    if (tokenType == "name" || tokenType === "keyword") {
+                        node = this.ParseVariable(tokenStream, annotation);
+                        if (!node) {
+                            return [];
+                        }
+                    } else if (tokenType == "number") {
+                        node = this.ParseNumber(tokenStream, annotation);
+                        if (!node) {
+                            return [];
+                        }
+                    } else if (tokenType == "-") {
                         tokenStream.Consume();
-                        const parameterName = name as keyof RawNamedParameters;
-                        //if (isListItemParameter(name, np)) {
-                        if (parameterName === "listitem") {
-                            const np = namedParams[parameterName];
-                            //  Consume the list name.
-                            let control = np || this.listPool.Get();
-                            [tokenType, token] = tokenStream.Consume();
-                            let list: string;
-                            if (tokenType == "name" && token) {
-                                list = token;
-                            } else {
-                                this.SyntaxError(
-                                    tokenStream,
-                                    "Syntax error: unexpected token '%s' when parsing PARAMETERS; name expected.",
-                                    token
-                                );
-                                return [];
-                            }
-                            [tokenType, token] = tokenStream.Consume();
-                            if (tokenType != ":") {
-                                this.SyntaxError(
-                                    tokenStream,
-                                    "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.",
-                                    token
-                                );
-                                return [];
-                            }
-                            // Consume the list item.
-                            node = this.ParseSimpleParameterValue(
-                                tokenStream,
-                                nodeList,
-                                annotation
-                            );
-                            if (!node) return [];
-                            // Check afterwards that the parameter value is only "name" or "!name".
-                            if (
-                                !(
-                                    node.type == "variable" ||
-                                    (node.type == "bang_value" &&
-                                        node.child[1].type == "variable")
-                                )
-                            ) {
-                                this.SyntaxError(
-                                    tokenStream,
-                                    "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.",
-                                    this.Unparse(node)
-                                );
-                                return [];
-                            }
-                            control[list] = node;
-                            if (!namedParams[parameterName]) {
-                                namedParams[parameterName] = control;
-                                annotation.listList = annotation.listList || {};
-                                annotation.listList[
-                                    lualength(annotation.listList) + 1
-                                ] = control;
-                            }
-                        } else if (name === "checkbox") {
-                            // Get the checkbox name.
-                            const np = namedParams[name];
-                            let control = np || this.checkboxPool.Get();
-                            node = this.ParseSimpleParameterValue(
-                                tokenStream,
-                                nodeList,
-                                annotation
-                            );
-                            if (!node) return [];
-                            // Check afterwards that the parameter value is only "name" or "!name".
-                            if (
-                                !(
-                                    node.type == "variable" ||
-                                    (node.type == "bang_value" &&
-                                        node.child[1].type == "variable")
-                                )
-                            ) {
-                                this.SyntaxError(
-                                    tokenStream,
-                                    "Syntax error: 'checkbox' parameter with unexpected value '%s'.",
-                                    this.Unparse(node)
-                                );
-                                return [];
-                            }
-                            control[lualength(control) + 1] = node;
-                            if (!namedParams[name]) {
-                                namedParams[name] = control;
-                                annotation.checkBoxList =
-                                    annotation.checkBoxList || {};
-                                annotation.checkBoxList[
-                                    lualength(annotation.checkBoxList) + 1
-                                ] = control;
-                            }
+                        node = this.ParseNumber(tokenStream, annotation);
+                        if (node) {
+                            let value = -1 * <number>node.value;
+                            node = this.GetNumberNode(value, annotation);
                         } else {
-                            node = this.ParseParameterValue(
-                                tokenStream,
-                                nodeList,
-                                annotation
-                            );
-                            if (!node) return [];
-                            (<any>namedParams[parameterName]) = node;
+                            return [];
+                        }
+                    } else if (tokenType == "string") {
+                        node = this.ParseString(tokenStream, annotation);
+                        if (!node) {
+                            return [];
                         }
                     } else {
-                        if (!node) return [];
-                        positionalParams[
-                            lualength(positionalParams) + 1
-                        ] = node;
+                        break;
+                    }
+
+                    // Check if this is a bare value or the start of a "name=value" pair.
+                    positionalParams[lualength(positionalParams) + 1] = node;
+                    if (
+                        maxNumberOfParameters &&
+                        lualength(positionalParams) > maxNumberOfParameters
+                    ) {
+                        this.SyntaxError(
+                            tokenStream,
+                            "Error: the maximum number of parameters in %s is %s",
+                            methodName,
+                            maxNumberOfParameters
+                        );
+                        return [];
                     }
                 }
             } else {
@@ -2591,7 +2759,6 @@ export class OvaleASTClass {
     }
     private ParseParentheses(
         tokenStream: OvaleLexer,
-        nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
     ): AstNode | undefined {
         let leftToken, rightToken;
@@ -2610,7 +2777,7 @@ export class OvaleASTClass {
                 return undefined;
             }
         }
-        let node = this.ParseExpression(tokenStream, nodeList, annotation);
+        let node = this.ParseExpression(tokenStream, annotation);
         if (!node) return undefined;
         let [tokenType, token] = tokenStream.Consume();
         if (tokenType != rightToken) {
@@ -2626,9 +2793,8 @@ export class OvaleASTClass {
         node.right = rightToken;
         return node;
     }
-    private ParseScoreSpells: ParserFunction = (
+    private ParseScoreSpells: ParserFunction<AstScoreSpellsNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -2653,8 +2819,10 @@ export class OvaleASTClass {
 
         const [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "scorespells",
+            annotation,
+            undefined,
+            checkListParameters
         );
         if (!positionalParams || !namedParams) return undefined;
 
@@ -2667,33 +2835,32 @@ export class OvaleASTClass {
             );
             return undefined;
         }
-        const node = this.NewNode(nodeList);
-        node.type = "score_spells";
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
+        const node = this.newNodeWithParameters(
+            "score_spells",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         return node;
     };
-    private ParseScriptStream: ParserFunction = (
+    private ParseScriptStream: ParserFunction<AstScriptNode> = (
         tokenStream: OvaleLexer,
-        nodeList,
         annotation
     ) => {
         this.profiler.StartProfiling("OvaleAST_ParseScript");
-        let child = this.childrenPool.Get();
+        let ast: AstNode;
+        ast = this.newNodeWithChildren("script", annotation);
+        const child = ast.child;
         while (true) {
-            let [tokenType] = tokenStream.Peek();
+            let [tokenType, token] = tokenStream.Peek();
             if (tokenType) {
                 let declarationNode = this.ParseDeclaration(
                     tokenStream,
-                    nodeList,
                     annotation
                 );
                 if (!declarationNode) {
-                    this.childrenPool.Release(child);
+                    this.debug.Error(`Failed on ${token}`);
+                    this.nodesPool.Release(ast);
                     return undefined;
                 }
                 if (declarationNode.type == "script") {
@@ -2708,33 +2875,28 @@ export class OvaleASTClass {
                 break;
             }
         }
-        let ast: AstNode;
-        ast = this.NewNode();
-        ast.type = "script";
-        ast.child = child;
         this.profiler.StopProfiling("OvaleAST_ParseScript");
         return ast;
     };
     private ParseSimpleExpression(
         tokenStream: OvaleLexer,
-        nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
-    ): AstNode | undefined {
+    ) {
         let node;
         let [tokenType, token] = tokenStream.Peek();
         if (tokenType == "number") {
-            node = this.ParseNumber(tokenStream, nodeList, annotation);
+            node = this.ParseNumber(tokenStream, annotation);
         } else if (tokenType == "string") {
-            node = this.ParseString(tokenStream, nodeList, annotation);
+            node = this.ParseString(tokenStream, annotation);
         } else if (tokenType == "name" || tokenType === "keyword") {
             [tokenType, token] = tokenStream.Peek(2);
             if (tokenType == "." || tokenType == "(") {
-                node = this.ParseFunction(tokenStream, nodeList, annotation);
+                node = this.ParseFunction(tokenStream, annotation);
             } else {
-                node = this.ParseVariable(tokenStream, nodeList, annotation);
+                node = this.ParseVariable(tokenStream, annotation);
             }
         } else if (tokenType == "(" || tokenType == "{") {
-            node = this.ParseParentheses(tokenStream, nodeList, annotation);
+            node = this.ParseParentheses(tokenStream, annotation);
         } else {
             tokenStream.Consume();
             this.SyntaxError(
@@ -2746,9 +2908,8 @@ export class OvaleASTClass {
         }
         return node;
     }
-    private ParseSimpleParameterValue: ParserFunction = (
+    private ParseSimpleParameterValue: ParserFunction<AstNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let isBang = false;
@@ -2760,97 +2921,243 @@ export class OvaleASTClass {
         let expressionNode;
         [tokenType] = tokenStream.Peek();
         if (tokenType == "(" || tokenType == "-") {
-            expressionNode = this.ParseExpression(
-                tokenStream,
-                nodeList,
-                annotation
-            );
+            expressionNode = this.ParseExpression(tokenStream, annotation);
         } else {
             expressionNode = this.ParseSimpleExpression(
                 tokenStream,
-                nodeList,
                 annotation
             );
         }
         if (!expressionNode) return undefined;
         let node;
         if (isBang) {
-            node = this.NewNode(nodeList, true);
-            node.type = "bang_value";
+            node = this.newNodeWithChildren("bang_value", annotation);
             node.child[1] = expressionNode;
         } else {
             node = expressionNode;
         }
         return node;
     };
-    private ParseSpellAuraList: ParserFunction = (
-        tokenStream,
-        nodeList,
-        annotation
-    ) => {
-        let keyword;
+
+    private parseNumberOrNameParameter(
+        tokenStream: OvaleLexer,
+        methodName: string
+    ): [number?, string?] {
         let [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "keyword" && token && SPELL_AURA_KEYWORD[token]) {
-            keyword = token;
-        } else {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; keyword expected.",
-                token
-            );
-            return undefined;
-        }
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType != "(") {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; '(' expected.",
-                token
-            );
-            return undefined;
-        }
         let spellId, name;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "number") {
+        if (tokenType === "-") {
+            [tokenType, token] = tokenStream.Consume();
+            if (tokenType === "number") spellId = -tonumber(token);
+            else {
+                this.SyntaxError(
+                    tokenStream,
+                    "Syntax error: unexpected token '%s' wheren parsing '%s'; number expected",
+                    token,
+                    methodName
+                );
+                return [];
+            }
+        } else if (tokenType == "number") {
             spellId = tonumber(token);
         } else if (tokenType == "name") {
             name = token;
         } else {
             this.SyntaxError(
                 tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; number or name expected.",
-                token
+                "Syntax error: unexpected token '%s' when parsing '%s'; number or name expected.",
+                token,
+                methodName
             );
-            return undefined;
+            return [];
         }
-        let [positionalParams, namedParams] = this.ParseParameters(
-            tokenStream,
-            nodeList,
-            annotation
-        );
-        if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType != ")") {
+        return [spellId, name];
+    }
+
+    // private parseName(tokenStream: OvaleLexer, methodName: string) {
+    //     let [tokenType, token] = tokenStream.Consume();
+    //     if (tokenType === "name") {
+    //         return token;
+    //     }
+    //     this.SyntaxError(
+    //         tokenStream,
+    //         "Syntax error: unexpected token '%s' when parsing '%s'; name expected",
+    //         token,
+    //         methodName
+    //     );
+    //     return undefined;
+    // }
+
+    // private parseNumber(
+    //     tokenStream: OvaleLexer,
+    //     methodName: string
+    // ): number | undefined {
+    //     let [tokenType, token] = tokenStream.Consume();
+    //     let spellId;
+    //     if (tokenType === "-") {
+    //         [tokenType, token] = tokenStream.Consume();
+    //         if (tokenType === "number") spellId = -tonumber(token);
+    //         else {
+    //             this.SyntaxError(
+    //                 tokenStream,
+    //                 "Syntax error: unexpected token '%s' wheren parsing '%s'; number expected",
+    //                 token,
+    //                 methodName
+    //             );
+    //             return undefined;
+    //         }
+    //     } else if (tokenType == "number") {
+    //         spellId = tonumber(token);
+    //     } else {
+    //         this.SyntaxError(
+    //             tokenStream,
+    //             "Syntax error: unexpected token '%s' when parsing '%s'; number expected.",
+    //             token,
+    //             methodName
+    //         );
+    //         return undefined;
+    //     }
+    //     return spellId;
+    // }
+
+    private parseToken(
+        tokenStream: OvaleLexer,
+        methodName: string,
+        expectedToken: string
+    ) {
+        let [tokenType, token] = tokenStream.Consume();
+        if (tokenType != expectedToken) {
             this.SyntaxError(
                 tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLAURALIST; ')' expected.",
-                token
+                "Syntax error: unexpected token '%s' when parsing %s; '%s' expected.",
+                token,
+                methodName,
+                expectedToken
+            );
+            return false;
+        }
+        return true;
+    }
+
+    private parseKeywords<T extends string>(
+        tokenStream: OvaleLexer,
+        methodName: string,
+        keyCheck: KeyCheck<T>
+    ): T | undefined {
+        let keyword;
+        let [tokenType, token] = tokenStream.Consume();
+        if (tokenType == "keyword" && token && checkToken(keyCheck, token)) {
+            keyword = token;
+        } else {
+            this.SyntaxError(
+                tokenStream,
+                "Syntax error: unexpected token '%s' when parsing %s; keyword expected.",
+                token,
+                methodName
             );
             return undefined;
         }
+        return keyword;
+    }
+
+    private parseKeyword<T extends string>(
+        tokenStream: OvaleLexer,
+        methodName: string,
+        keyCheck: T
+    ): T | undefined {
+        let keyword;
+        let [tokenType, token] = tokenStream.Consume();
+        if (tokenType == "keyword" && token && token === keyCheck) {
+            keyword = keyCheck;
+        } else {
+            this.SyntaxError(
+                tokenStream,
+                "Syntax error: unexpected token '%s' when parsing %s; keyword %s expected.",
+                token,
+                methodName,
+                keyCheck
+            );
+            return undefined;
+        }
+        return keyword;
+    }
+
+    private parseName<T extends string>(
+        tokenStream: OvaleLexer,
+        methodName: string,
+        keyCheck: KeyCheck<T>
+    ): T | undefined {
+        let keyword;
+        let [tokenType, token] = tokenStream.Consume();
+        if (tokenType == "name" && token && checkToken(keyCheck, token)) {
+            keyword = token;
+        } else {
+            this.SyntaxError(
+                tokenStream,
+                "Syntax error: unexpected token '%s' when parsing %s; name expected.",
+                token,
+                methodName
+            );
+            return undefined;
+        }
+        return keyword;
+    }
+
+    private ParseSpellAuraList: ParserFunction<AstSpellAuraListNode> = (
+        tokenStream,
+        annotation
+    ) => {
+        let keyword = this.parseKeywords(
+            tokenStream,
+            "SPELLAURALIST",
+            SPELL_AURA_KEYWORD
+        );
+
+        if (!keyword) {
+            this.debug.Error("Failed on keyword");
+            return undefined;
+        }
+
+        if (!this.parseToken(tokenStream, "SPELLAURALIST", "(")) {
+            this.debug.Error("Failed on (");
+            return undefined;
+        }
+        let [spellId, name] = this.parseNumberOrNameParameter(
+            tokenStream,
+            "SPELLAURALIST"
+        );
+        let [buffSpellId, buffName] = this.parseNumberOrNameParameter(
+            tokenStream,
+            "SPELLAURALIST"
+        );
+
+        let [positionalParams, namedParams] = this.ParseParameters(
+            tokenStream,
+            "spellauralist",
+            annotation,
+            0,
+            spellAuraListParametersCheck
+        );
+        if (!positionalParams || !namedParams) {
+            return undefined;
+        }
+        if (!this.parseToken(tokenStream, "SPELLAURALIST", ")")) {
+            this.debug.Error("Failed on )");
+            return undefined;
+        }
+
         let node: AstNode;
-        node = this.NewNode(nodeList);
-        node.type = "spell_aura_list";
+        node = this.newNodeWithParameters(
+            "spell_aura_list",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         node.keyword = keyword;
         if (spellId) node.spellId = spellId;
-        if (name) node.name = name;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
-        if (name) {
+        else if (name) node.name = name;
+        if (buffSpellId) node.buffSpellId = buffSpellId;
+        else if (buffName) node.buffName = buffName;
+        if (name || buffName) {
             annotation.nameReference = annotation.nameReference || {};
             annotation.nameReference[
                 lualength(annotation.nameReference) + 1
@@ -2858,9 +3165,8 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseSpellInfo: ParserFunction = (
+    private ParseSpellInfo: ParserFunction<AstSpellInfoNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let name;
@@ -2899,8 +3205,10 @@ export class OvaleASTClass {
         }
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "spellinfo",
+            annotation,
+            0,
+            checkSpellInfo
         );
         if (!positionalParams || !namedParams) return undefined;
         [tokenType, token] = tokenStream.Consume();
@@ -2913,17 +3221,15 @@ export class OvaleASTClass {
             return undefined;
         }
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "spell_info";
+        node = this.newNodeWithParameters(
+            "spell_info",
+            annotation,
+            positionalParams,
+            namedParams
+        );
         if (spellId) node.spellId = spellId;
-        if (name) node.name = name;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
         if (name) {
+            node.name = name;
             annotation.nameReference = annotation.nameReference || {};
             annotation.nameReference[
                 lualength(annotation.nameReference) + 1
@@ -2931,85 +3237,52 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseSpellRequire: ParserFunction = (
+    private ParseSpellRequire: ParserFunction<AstSpellRequireNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
-        if (!(tokenType == "keyword" && token == "spellrequire")) {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; keyword expected.",
-                token
-            );
+        if (
+            this.parseKeyword(tokenStream, "SPELLREQUIRE", "spellrequire") ===
+            undefined
+        )
             return undefined;
-        }
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType != "(") {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; '(' expected.",
-                token
-            );
+        if (!this.parseToken(tokenStream, "SPELLREQUIRE", "("))
             return undefined;
-        }
-        let spellId, name;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "number") {
-            spellId = tonumber(token);
-        } else if (tokenType == "name") {
-            name = token;
-        } else {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; number or name expected.",
-                token
-            );
-            return undefined;
-        }
-        let property;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "name") {
-            property = token;
-        } else {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; property name expected.",
-                token
-            );
-            return undefined;
-        }
+        const [spellId, name] = this.parseNumberOrNameParameter(
+            tokenStream,
+            "SPELLREQUIRE"
+        );
+        if (!spellId && !name) return undefined;
+
+        let property = this.parseName(
+            tokenStream,
+            "SPELLREQUIRE",
+            checkSpellInfo
+        );
+        if (!property) return undefined;
+
         let [positionalParams, namedParams] = this.ParseParameters(
             tokenStream,
-            nodeList,
-            annotation
+            "spellrequire",
+            annotation,
+            0,
+            checkSpellRequireParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
-        if (tokenType != ")") {
-            this.SyntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; ')' expected.",
-                token
-            );
+        if (!this.parseToken(tokenStream, "SPELLREQUIRE", ")"))
             return undefined;
-        }
-        let node;
-        node = this.NewNode(nodeList);
-        node.type = "spell_require";
-        if (spellId) node.spellId = spellId;
-        if (name) node.name = name;
 
-        // TODO check all the casts to property names
-        node.property = property as keyof SpellInfo;
-        node.rawPositionalParams = positionalParams;
-        node.rawNamedParams = namedParams;
-        annotation.parametersReference = annotation.parametersReference || {};
-        annotation.parametersReference[
-            lualength(annotation.parametersReference) + 1
-        ] = node;
+        const node = this.newNodeWithParameters(
+            "spell_require",
+            annotation,
+            positionalParams,
+            namedParams
+        );
+        if (spellId) node.spellId = spellId;
+
+        node.property = property;
         if (name) {
+            node.name = name;
             annotation.nameReference = annotation.nameReference || {};
             annotation.nameReference[
                 lualength(annotation.nameReference) + 1
@@ -3017,9 +3290,9 @@ export class OvaleASTClass {
         }
         return node;
     };
+
     private ParseStatement(
         tokenStream: OvaleLexer,
-        nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
     ): AstNode | undefined {
         let node;
@@ -3042,17 +3315,9 @@ export class OvaleASTClass {
                 }
                 if (tokenType) {
                     if (BINARY_OPERATOR[token as OperatorType]) {
-                        node = this.ParseExpression(
-                            tokenStream,
-                            nodeList,
-                            annotation
-                        );
+                        node = this.ParseExpression(tokenStream, annotation);
                     } else {
-                        node = this.ParseGroup(
-                            tokenStream,
-                            nodeList,
-                            annotation
-                        );
+                        node = this.ParseGroup(tokenStream, annotation);
                     }
                 } else {
                     this.SyntaxError(
@@ -3061,18 +3326,17 @@ export class OvaleASTClass {
                     );
                 }
             } else if (token == "if") {
-                node = this.ParseIf(tokenStream, nodeList, annotation);
+                node = this.ParseIf(tokenStream, annotation);
             } else if (token == "unless") {
-                node = this.ParseUnless(tokenStream, nodeList, annotation);
+                node = this.ParseUnless(tokenStream, annotation);
             } else {
-                node = this.ParseExpression(tokenStream, nodeList, annotation);
+                node = this.ParseExpression(tokenStream, annotation);
             }
         }
         return node;
     }
-    private ParseString: ParserFunction<StringNode | FunctionNode> = (
+    private ParseString: ParserFunction<AstStringNode | AstFunctionNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let value;
@@ -3082,7 +3346,7 @@ export class OvaleASTClass {
             tokenStream.Consume();
         } else if (tokenType == "name" && token) {
             if (STRING_LOOKUP_FUNCTION[lower(token)]) {
-                return this.ParseFunction(tokenStream, nodeList, annotation);
+                return this.ParseFunction(tokenStream, annotation);
             } else {
                 value = token;
                 tokenStream.Consume();
@@ -3097,9 +3361,8 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        let node: StringNode;
-        node = <StringNode>this.NewNode(nodeList);
-        node.type = "string";
+        let node: AstStringNode;
+        node = this.NewNode("string", annotation);
         node.value = value;
         annotation.stringReference = annotation.stringReference || {};
         annotation.stringReference[
@@ -3107,9 +3370,8 @@ export class OvaleASTClass {
         ] = node;
         return node;
     };
-    private ParseUnless: ParserFunction = (
+    private ParseUnless: ParserFunction<AstUnlessNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let [tokenType, token] = tokenStream.Consume();
@@ -3122,25 +3384,23 @@ export class OvaleASTClass {
             return undefined;
         }
         let conditionNode, bodyNode;
-        conditionNode = this.ParseExpression(tokenStream, nodeList, annotation);
+        conditionNode = this.ParseExpression(tokenStream, annotation);
         if (!conditionNode) return undefined;
-        bodyNode = this.ParseStatement(tokenStream, nodeList, annotation);
+        bodyNode = this.ParseStatement(tokenStream, annotation);
         if (!bodyNode) return undefined;
         let node;
-        node = this.NewNode(nodeList, true);
-        node.type = "unless";
+        node = this.newNodeWithChildren("unless", annotation);
         node.child[1] = conditionNode;
         node.child[2] = bodyNode;
         return node;
     };
-    private ParseVariable: ParserFunction = (
+    private ParseVariable: ParserFunction<AstVariableNode> = (
         tokenStream,
-        nodeList,
         annotation
     ) => {
         let name;
         let [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "name" && token) {
+        if ((tokenType == "name" || tokenType === "keyword") && token) {
             name = token;
         } else {
             this.SyntaxError(
@@ -3152,8 +3412,7 @@ export class OvaleASTClass {
         }
 
         let node;
-        node = this.NewNode(nodeList);
-        node.type = "variable";
+        node = this.NewNode("variable", annotation);
         node.name = name;
         annotation.nameReference = annotation.nameReference || {};
         annotation.nameReference[
@@ -3192,46 +3451,121 @@ export class OvaleASTClass {
         ["variable"]: this.ParseVariable,
     };
 
-    public newFunction(
-        nodeList: LuaArray<AstNode>,
-        name: string,
-        hasParameters?: boolean
-    ) {
-        const node = this.NewNode(nodeList);
-        node.type = "function";
+    public newFunction(name: string, annotation: AstAnnotation) {
+        const node = this.newNodeWithParameters("function", annotation);
         node.name = name;
-        if (hasParameters) {
-            node.rawNamedParams = this.rawNamedParametersPool.Get();
-            node.rawPositionalParams = this.rawPositionalParametersPool.Get();
-        }
         return node;
     }
 
-    public newString(nodeList: LuaArray<AstNode>, value: string) {
-        const node = this.NewNode(nodeList);
-        node.type = "string";
+    public newString(annotation: AstAnnotation, value: string) {
+        const node = this.NewNode("string", annotation);
         node.value = value;
         return node;
     }
 
-    public newValue(nodeList: LuaArray<AstNode>, value: string | number) {
-        const node = this.NewNode(nodeList);
-        node.type = "value";
+    public newVariable(annotation: AstAnnotation, name: string) {
+        const node = this.NewNode("variable", annotation);
+        node.name = name;
+        return node;
+    }
+
+    public newValue(annotation: AstAnnotation, value: number) {
+        const node = this.NewNode("value", annotation);
         node.value = value;
         return node;
     }
 
-    public NewNode(nodeList?: LuaArray<AstNode>, hasChild?: boolean) {
-        let node = this.nodesPool.Get();
-        if (nodeList) {
-            let nodeId = lualength(nodeList) + 1;
-            node.nodeId = nodeId;
-            nodeList[nodeId] = node;
-        }
-        if (hasChild) {
-            node.child = this.childrenPool.Get();
-        }
+    private internalNewNodeWithParameters<T extends NodeWithParametersType>(
+        type: T,
+        annotation: AstAnnotation,
+        rawPositionalParameters?: RawPositionalParameters,
+        rawNamedParams?: NodeTypes[T]["rawNamedParams"]
+    ) {
+        const node = this.internalNewNodeWithChildren(type, annotation);
+        node.rawNamedParams =
+            rawNamedParams || this.rawNamedParametersPool.Get();
+        node.rawPositionalParams =
+            rawPositionalParameters || this.rawPositionalParametersPool.Get();
+        node.cachedParams = {
+            named: this.namedParametersPool.Get(),
+            positional: this.positionalParametersPool.Get(),
+        };
+        annotation.parametersReference = annotation.parametersReference || {};
+        annotation.parametersReference[
+            lualength(annotation.parametersReference) + 1
+        ] = node;
         return node;
+    }
+
+    private internalNewNodeWithChildren<T extends NodeWithChildrenType>(
+        type: T,
+        annotation: AstAnnotation
+    ) {
+        const node = this.internalNewNode(type, annotation);
+        node.child = this.childrenPool.Get();
+        return node;
+    }
+
+    private internalNewNode<T extends NodeType>(
+        type: T,
+        annotation: AstAnnotation
+    ): NodeTypes[T] {
+        let node = this.nodesPool.Get() as NodeTypes[T];
+        node.type = type;
+        node.annotation = annotation;
+        const nodeList = annotation.nodeList;
+        let nodeId = lualength(nodeList) + 1;
+        node.nodeId = nodeId;
+        nodeList[nodeId] = node;
+        node.result = { type: "none", timeSpan: newTimeSpan(), serial: 0 };
+        return node;
+    }
+
+    public newNodeWithBodyAndParameters<T extends NodeWithBodyType>(
+        type: T,
+        annotation: AstAnnotation,
+        body: NodeTypes[T]["body"],
+        rawPositionalParameters?: RawPositionalParameters,
+        rawNamedParams?: NodeTypes[T]["rawNamedParams"]
+    ): NodeTypes[T] {
+        const node = this.internalNewNodeWithParameters(
+            type,
+            annotation,
+            rawPositionalParameters,
+            rawNamedParams
+        );
+        node.body = body;
+        node.child[1] = body;
+        return node;
+    }
+
+    public newNodeWithParameters<
+        T extends Exclude<NodeWithParametersType, NodeWithBodyType>
+    >(
+        type: T,
+        annotation: AstAnnotation,
+        rawPositionalParameters?: RawPositionalParameters,
+        rawNamedParams?: NodeTypes[T]["rawNamedParams"]
+    ) {
+        return this.internalNewNodeWithParameters(
+            type,
+            annotation,
+            rawPositionalParameters,
+            rawNamedParams
+        );
+    }
+
+    public newNodeWithChildren<
+        T extends Exclude<NodeWithChildrenType, NodeWithParametersType>
+    >(type: T, annotation: AstAnnotation) {
+        return this.internalNewNodeWithChildren(type, annotation);
+    }
+
+    public NewNode<T extends Exclude<NodeType, NodeWithChildrenType>>(
+        type: T,
+        annotation: AstAnnotation
+    ): NodeTypes[T] {
+        return this.internalNewNode(type, annotation);
     }
 
     public NodeToString(node: AstNode) {
@@ -3281,9 +3615,8 @@ export class OvaleASTClass {
         wipe(annotation);
     }
     public Release(ast: AstNode) {
-        if (ast.annotation) {
-            this.ReleaseAnnotation(ast.annotation);
-        }
+        ast.result.timeSpan.Release();
+        wipe(ast.result);
         wipe(ast);
         this.nodesPool.Release(ast);
     }
@@ -3293,8 +3626,6 @@ export class OvaleASTClass {
         nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
     ): [AstNode, LuaArray<AstNode>, AstAnnotation] | [] {
-        nodeList = nodeList || {};
-        annotation = annotation || {};
         let tokenStream = new OvaleLexer("Ovale", code, MATCHES, {
             comments: TokenizeComment,
             space: TokenizeWhitespace,
@@ -3325,20 +3656,28 @@ export class OvaleASTClass {
             annotation
         );
         if (ast) {
-            ast.annotation = annotation;
-            this.PropagateConstants(ast);
-            this.PropagateStrings(ast);
-            this.FlattenParameters(ast);
-            this.VerifyParameterStances(ast);
-            this.VerifyFunctionCalls(ast);
-            if (options.optimize) {
-                this.Optimize(ast);
+            if (ast.type == "script") {
+                ast.annotation = annotation;
+                this.PropagateConstants(ast);
+                this.PropagateStrings(ast);
+                //    this.FlattenParameters(ast);
+                //this.VerifyParameterStances(ast);
+                this.VerifyFunctionCalls(ast);
+                if (options.optimize) {
+                    this.Optimize(ast);
+                }
+                this.InsertPostOrderTraversal(ast);
+                return ast;
             }
-            this.InsertPostOrderTraversal(ast);
+
+            this.debug.Debug(`Unexpected type ${ast.type} in parseScript`);
+            this.Release(ast);
         } else {
-            this.ReleaseAnnotation(annotation);
+            this.debug.Error("Parse failed");
         }
-        return ast;
+
+        this.ReleaseAnnotation(annotation);
+        return undefined;
     }
 
     public parseNamedScript(
@@ -3354,6 +3693,18 @@ export class OvaleASTClass {
         }
     }
 
+    private getId(name: string, dictionary: LuaObj<string | number>) {
+        let itemId = dictionary[name];
+        if (itemId) {
+            if (isNumber(itemId)) {
+                return itemId;
+            } else {
+                this.debug.Error(`${name} is as string and not an item id`);
+            }
+        }
+        return 0;
+    }
+
     public PropagateConstants(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_PropagateConstants");
         if (ast.annotation) {
@@ -3362,35 +3713,41 @@ export class OvaleASTClass {
                 for (const [, node] of ipairs<AstNode>(
                     ast.annotation.nameReference
                 )) {
-                    const valueNode = <ValueNode>node;
                     if (
                         (node.type == "item_info" ||
                             node.type == "itemrequire") &&
                         node.name
                     ) {
-                        let itemId = dictionary[node.name];
-                        if (itemId) {
-                            node.itemId = itemId;
-                        }
+                        node.itemId = this.getId(node.name, dictionary);
                     } else if (
-                        (node.type == "spell_aura_list" ||
-                            node.type == "spell_info" ||
-                            node.type == "spell_require") &&
-                        node.name
+                        node.type == "spell_aura_list" ||
+                        node.type == "spell_info" ||
+                        node.type == "spell_require"
                     ) {
-                        let spellId = dictionary[node.name];
-                        if (spellId) {
-                            node.spellId = spellId;
-                        }
-                    } else if (isVariableNode(node)) {
+                        if (node.name)
+                            node.spellId = this.getId(node.name, dictionary);
+                        if (node.type === "spell_aura_list" && node.buffName)
+                            node.buffSpellId = this.getId(
+                                node.buffName,
+                                dictionary
+                            );
+                    } else if (node.type === "variable") {
                         let name = node.name;
                         let value = dictionary[name];
                         if (value) {
-                            valueNode.previousType = "variable";
-                            valueNode.type = "value";
-                            valueNode.value = value;
-                            valueNode.origin = 0;
-                            valueNode.rate = 0;
+                            if (isNumber(value)) {
+                                const valueNode = (node as unknown) as AstValueNode;
+                                valueNode.type = "value";
+                                valueNode.name = name;
+                                valueNode.value = value;
+                                valueNode.origin = 0;
+                                valueNode.rate = 0;
+                            } else {
+                                const valueNode = (node as unknown) as AstStringNode;
+                                valueNode.type = "string";
+                                valueNode.value = value;
+                                valueNode.name = name;
+                            }
                         }
                     }
                 }
@@ -3398,37 +3755,38 @@ export class OvaleASTClass {
         }
         this.profiler.StopProfiling("OvaleAST_PropagateConstants");
     }
+
     public PropagateStrings(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_PropagateStrings");
         if (ast.annotation && ast.annotation.stringReference) {
             for (const [, node] of ipairs(ast.annotation.stringReference)) {
-                const targetNode = <StringNode>node;
-                if (isNodeType(node, "string")) {
+                const nodeAsString = <AstStringNode>node;
+                if (node.type === "string") {
                     let key = node.value;
                     let value = L[key];
                     if (key != value) {
-                        targetNode.value = value;
-                        targetNode.key = key;
+                        nodeAsString.value = value;
+                        nodeAsString.name = key;
                     }
-                } else if (isVariableNode(node)) {
-                    let value = node.name;
-                    targetNode.previousType = node.type;
-                    targetNode.type = "string";
-                    targetNode.value = value;
-                } else if (isNodeType(node, "value")) {
+                } else if (node.type === "variable") {
+                    nodeAsString.type = "string";
+                    const name = node.name;
+                    nodeAsString.name = node.name;
+                    nodeAsString.value = name;
+                } else if (node.type === "value") {
                     let value = node.value;
-                    targetNode.previousType = "value";
-                    targetNode.type = "string";
-                    targetNode.value = tostring(value);
+                    nodeAsString.type = "string";
+                    nodeAsString.name = tostring(node.value);
+                    nodeAsString.value = tostring(value);
                 } else if (node.type == "function") {
                     let key = node.rawPositionalParams[1];
                     let stringKey: string | undefined;
                     if (isAstNode(key)) {
-                        if (isNodeType(key, "value")) {
+                        if (key.type === "value") {
                             stringKey = tostring(key.value);
-                        } else if (isVariableNode(key)) {
+                        } else if (key.type === "variable") {
                             stringKey = key.name;
-                        } else if (isNodeType(key, "string")) {
+                        } else if (key.type === "string") {
                             stringKey = key.value;
                         } else {
                             stringKey = undefined;
@@ -3451,10 +3809,10 @@ export class OvaleASTClass {
                                 ) || "spell:" + stringKey;
                         }
                         if (value) {
-                            targetNode.previousType = "function";
-                            targetNode.type = "string";
-                            targetNode.value = value;
-                            targetNode.key = stringKey;
+                            nodeAsString.type = "string";
+                            nodeAsString.value = value;
+                            nodeAsString.func = node.name;
+                            nodeAsString.name = stringKey;
                         }
                     }
                 }
@@ -3462,141 +3820,141 @@ export class OvaleASTClass {
         }
         this.profiler.StopProfiling("OvaleAST_PropagateStrings");
     }
-    public FlattenParameters(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_FlattenParameters");
-        let annotation = ast.annotation;
-        if (annotation && annotation.parametersReference) {
-            let dictionary = annotation.definition;
-            for (const [, node] of ipairs<AstNode>(
-                annotation.parametersReference
-            )) {
-                if (node.rawPositionalParams) {
-                    let parameters = this.flattenParameterValuesPool.Get();
-                    for (const [key, value] of ipairs(
-                        node.rawPositionalParams
-                    )) {
-                        parameters[key] = this.FlattenParameterValue(
-                            value,
-                            annotation
-                        );
-                    }
-                    node.positionalParams = parameters;
-                    annotation.positionalParametersList =
-                        annotation.positionalParametersList || {};
-                    annotation.positionalParametersList[
-                        lualength(annotation.positionalParametersList) + 1
-                    ] = parameters;
-                }
-                if (node.rawNamedParams) {
-                    const parameters: NamedParameters = this.objectPool.Get();
-                    for (const [key] of kpairs(node.rawNamedParams)) {
-                        if (key === "listitem") {
-                            const control: LuaObj<string | number> =
-                                parameters[key] || this.objectPool.Get();
-                            const listItems = node.rawNamedParams[key];
-                            for (const [list, item] of pairs(listItems)) {
-                                control[
-                                    list
-                                ] = this.FlattenParameterValueNotCsv(
-                                    item,
-                                    annotation
-                                );
-                            }
-                            if (!parameters[key]) {
-                                parameters[key] = control;
-                                annotation.objects = annotation.objects || {};
-                                annotation.objects[
-                                    lualength(annotation.objects) + 1
-                                ] = control;
-                            }
-                        } else if (key === "checkbox") {
-                            let control: LuaObj<number | string> =
-                                parameters[key] || this.objectPool.Get();
-                            const checkBoxItems = node.rawNamedParams[key];
-                            for (const [i, name] of ipairs(checkBoxItems)) {
-                                control[i] = this.FlattenParameterValueNotCsv(
-                                    name,
-                                    annotation
-                                );
-                            }
-                            if (!parameters[key]) {
-                                parameters[key] = control;
-                                annotation.objects = annotation.objects || {};
-                                annotation.objects[
-                                    lualength(annotation.objects) + 1
-                                ] = control;
-                            }
-                        } else {
-                            const value = node.rawNamedParams[key]!; //TODO
-                            const flattenValue = this.FlattenParameterValue(
-                                value,
-                                annotation
-                            );
-                            if (
-                                type(key) != "number" &&
-                                dictionary &&
-                                dictionary[key]
-                            ) {
-                                parameters[
-                                    dictionary[key] as keyof typeof parameters
-                                ] = flattenValue as any;
-                            } else {
-                                // TODO delete named parameters that are not single values
-                                (<any>parameters[key]) = flattenValue;
-                            }
-                        }
-                    }
-                    node.namedParams = parameters;
-                    annotation.parametersList = annotation.parametersList || {};
-                    annotation.parametersList[
-                        lualength(annotation.parametersList) + 1
-                    ] = parameters;
-                }
-                let output = this.outputPool.Get();
-                for (const [k, v] of kpairs(node.namedParams)) {
-                    if (isCheckBoxFlattenParameters(k, v)) {
-                        for (const [, name] of ipairs(v)) {
-                            output[lualength(output) + 1] = format(
-                                "checkbox=%s",
-                                name
-                            );
-                        }
-                    } else if (isListItemFlattenParameters(k, v)) {
-                        for (const [list, item] of ipairs(v)) {
-                            output[lualength(output) + 1] = format(
-                                "listitem=%s:%s",
-                                list,
-                                item
-                            );
-                        }
-                    } else if (isLuaArray<SimpleValue>(v)) {
-                        output[lualength(output) + 1] = format(
-                            "%s=%s",
-                            k,
-                            concat(v, ",")
-                        );
-                    } else {
-                        output[lualength(output) + 1] = format("%s=%s", k, v);
-                    }
-                }
-                sort(output);
-                for (
-                    let k = lualength(node.positionalParams);
-                    k >= 1;
-                    k += -1
-                ) {
-                    insert(output, 1, node.positionalParams[k] as string); // TODO
-                }
-                if (lualength(output) > 0) {
-                    node.paramsAsString = concat(output, " ");
-                } else {
-                    node.paramsAsString = "";
-                }
-                this.outputPool.Release(output);
-            }
-        }
-        this.profiler.StopProfiling("OvaleAST_FlattenParameters");
-    }
+    // public FlattenParameters(ast: AstNode) {
+    //     this.profiler.StartProfiling("OvaleAST_FlattenParameters");
+    //     let annotation = ast.annotation;
+    //     if (annotation && annotation.parametersReference) {
+    //         let dictionary = annotation.definition;
+    //         for (const [, node] of ipairs<AstNode>(
+    //             annotation.parametersReference
+    //         )) {
+    //             if (node.rawPositionalParams) {
+    //                 let parameters = this.flattenParameterValuesPool.Get();
+    //                 for (const [key, value] of ipairs(
+    //                     node.rawPositionalParams
+    //                 )) {
+    //                     parameters[key] = this.FlattenParameterValue(
+    //                         value,
+    //                         annotation
+    //                     );
+    //                 }
+    //                 node.positionalParams = parameters;
+    //                 annotation.positionalParametersList =
+    //                     annotation.positionalParametersList || {};
+    //                 annotation.positionalParametersList[
+    //                     lualength(annotation.positionalParametersList) + 1
+    //                 ] = parameters;
+    //             }
+    //             if (node.rawNamedParams) {
+    //                 const parameters: NamedParameters = this.objectPool.Get();
+    //                 for (const [key] of kpairs(node.rawNamedParams)) {
+    //                     if (key === "listitem") {
+    //                         const control: LuaObj<string | number> =
+    //                             parameters[key] || this.objectPool.Get();
+    //                         const listItems = node.rawNamedParams[key];
+    //                         for (const [list, item] of pairs(listItems)) {
+    //                             control[
+    //                                 list
+    //                             ] = this.FlattenParameterValueNotCsv(
+    //                                 item,
+    //                                 annotation
+    //                             );
+    //                         }
+    //                         if (!parameters[key]) {
+    //                             parameters[key] = control;
+    //                             annotation.objects = annotation.objects || {};
+    //                             annotation.objects[
+    //                                 lualength(annotation.objects) + 1
+    //                             ] = control;
+    //                         }
+    //                     } else if (key === "checkbox") {
+    //                         let control: LuaObj<number | string> =
+    //                             parameters[key] || this.objectPool.Get();
+    //                         const checkBoxItems = node.rawNamedParams[key];
+    //                         for (const [i, name] of ipairs(checkBoxItems)) {
+    //                             control[i] = this.FlattenParameterValueNotCsv(
+    //                                 name,
+    //                                 annotation
+    //                             );
+    //                         }
+    //                         if (!parameters[key]) {
+    //                             parameters[key] = control;
+    //                             annotation.objects = annotation.objects || {};
+    //                             annotation.objects[
+    //                                 lualength(annotation.objects) + 1
+    //                             ] = control;
+    //                         }
+    //                     } else {
+    //                         const value = node.rawNamedParams[key]!; //TODO
+    //                         const flattenValue = this.FlattenParameterValue(
+    //                             value,
+    //                             annotation
+    //                         );
+    //                         if (
+    //                             type(key) != "number" &&
+    //                             dictionary &&
+    //                             dictionary[key]
+    //                         ) {
+    //                             parameters[
+    //                                 dictionary[key] as keyof typeof parameters
+    //                             ] = flattenValue as any;
+    //                         } else {
+    //                             // TODO delete named parameters that are not single values
+    //                             (<any>parameters[key]) = flattenValue;
+    //                         }
+    //                     }
+    //                 }
+    //                 node.namedParams = parameters;
+    //                 annotation.parametersList = annotation.parametersList || {};
+    //                 annotation.parametersList[
+    //                     lualength(annotation.parametersList) + 1
+    //                 ] = parameters;
+    //             }
+    //             let output = this.outputPool.Get();
+    //             for (const [k, v] of kpairs(node.namedParams)) {
+    //                 if (isCheckBoxFlattenParameters(k, v)) {
+    //                     for (const [, name] of ipairs(v)) {
+    //                         output[lualength(output) + 1] = format(
+    //                             "checkbox=%s",
+    //                             name
+    //                         );
+    //                     }
+    //                 } else if (isListItemFlattenParameters(k, v)) {
+    //                     for (const [list, item] of ipairs(v)) {
+    //                         output[lualength(output) + 1] = format(
+    //                             "listitem=%s:%s",
+    //                             list,
+    //                             item
+    //                         );
+    //                     }
+    //                 } else if (isLuaArray<SimpleValue>(v)) {
+    //                     output[lualength(output) + 1] = format(
+    //                         "%s=%s",
+    //                         k,
+    //                         concat(v, ",")
+    //                     );
+    //                 } else {
+    //                     output[lualength(output) + 1] = format("%s=%s", k, v);
+    //                 }
+    //             }
+    //             sort(output);
+    //             for (
+    //                 let k = lualength(node.positionalParams);
+    //                 k >= 1;
+    //                 k += -1
+    //             ) {
+    //                 insert(output, 1, node.positionalParams[k] as string); // TODO
+    //             }
+    //             if (lualength(output) > 0) {
+    //                 node.paramsAsString = concat(output, " ");
+    //             } else {
+    //                 node.paramsAsString = "";
+    //             }
+    //             this.outputPool.Release(output);
+    //         }
+    //     }
+    //     this.profiler.StopProfiling("OvaleAST_FlattenParameters");
+    // }
     private VerifyFunctionCalls(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_VerifyFunctionCalls");
         if (ast.annotation && ast.annotation.verify) {
@@ -3617,54 +3975,11 @@ export class OvaleASTClass {
         this.profiler.StopProfiling("OvaleAST_VerifyFunctionCalls");
     }
 
-    private VerifyParameterStances(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_VerifyParameterStances");
-        let annotation = ast.annotation;
-        if (annotation && annotation.verify && annotation.parametersReference) {
-            for (const [, node] of ipairs(annotation.parametersReference)) {
-                if (node.rawNamedParams) {
-                    for (const [stanceKeyword] of kpairs(STANCE_KEYWORD)) {
-                        let valueNode = <AstNode>(
-                            node.rawNamedParams[stanceKeyword]
-                        );
-                        if (valueNode) {
-                            if (isCsvNode(valueNode)) {
-                                valueNode = valueNode.csv[1];
-                            }
-                            if (valueNode.type == "bang_value") {
-                                valueNode = valueNode.child[1];
-                            }
-                            let value = this.FlattenParameterValue(
-                                valueNode,
-                                annotation
-                            );
-                            if (!isNumber(value)) {
-                                if (!isString(value)) {
-                                    this.debug.Error(
-                                        "stance must be a string or a number"
-                                    );
-                                } else if (!checkToken(STANCE_NAME, value)) {
-                                    this.debug.Error(
-                                        "unknown stance '%s'.",
-                                        value
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        this.profiler.StopProfiling("OvaleAST_VerifyParameterStances");
-    }
-
     private InsertPostOrderTraversal(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_InsertPostOrderTraversal");
         let annotation = ast.annotation;
         if (annotation && annotation.postOrderReference) {
-            for (const [, node] of ipairs<AstNode>(
-                annotation.postOrderReference
-            )) {
+            for (const [, node] of ipairs(annotation.postOrderReference)) {
                 let array = this.postOrderPool.Get();
                 let visited = this.postOrderVisitedPool.Get();
                 this.PostOrderTraversal(node, array, visited);
@@ -3690,7 +4005,7 @@ export class OvaleASTClass {
 
             // Replace childs with the first node that has the same hash
             for (const [, node] of ipairs(ast.annotation.nodeList)) {
-                if (node.child) {
+                if (isAstNodeWithChildren(node)) {
                     for (const [i, childNode] of ipairs(node.child)) {
                         const hash = childNode.asString;
                         if (hash) {

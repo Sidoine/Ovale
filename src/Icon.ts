@@ -1,6 +1,6 @@
 import { L } from "./Localization";
-import { format, find, sub } from "@wowts/string";
-import { next, tostring, _G, kpairs } from "@wowts/lua";
+import { format } from "@wowts/string";
+import { next, tostring, _G } from "@wowts/lua";
 import {
     GetTime,
     PlaySoundFile,
@@ -14,10 +14,11 @@ import {
     UIPosition,
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { NamedParameters, PositionalParameters, AstNode } from "./AST";
+import { NodeActionResult, AstIconNode } from "./AST";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { ActionType } from "./BestAction";
+import { isNumber, isString } from "./tools";
 let INFINITY = huge;
 let COOLDOWN_THRESHOLD = 0.1;
 
@@ -33,8 +34,8 @@ export class OvaleIcon {
     actionId: any;
     actionType: ActionType | undefined;
     actionButton: boolean = false;
-    namedParams: any;
-    positionalParams: any;
+    namedParams: AstIconNode["rawNamedParams"] | undefined;
+    positionalParams: AstIconNode["rawPositionalParams"] | undefined;
     texture: string | undefined;
     cooldownStart: any;
     cooldownEnd: any;
@@ -151,42 +152,27 @@ export class OvaleIcon {
         }
         this.frame.Show();
     }
-    Update(
-        element?: AstNode,
-        startTime?: number,
-        actionTexture?: string,
-        actionInRange?: boolean,
-        actionCooldownStart?: number,
-        actionCooldownDuration?: number,
-        actionUsable?: boolean,
-        actionShortcut?: string,
-        actionIsCurrent?: boolean,
-        actionEnable?: boolean,
-        actionType?: ActionType,
-        actionId?: string | number,
-        actionTarget?: string,
-        actionResourceExtend?: number
-    ) {
-        this.actionType = actionType;
-        this.actionId = actionId;
+    Update(element: NodeActionResult, startTime?: number) {
+        this.actionType = element.actionType;
+        this.actionId = element.actionId;
         this.value = undefined;
         let now = GetTime();
         const profile = this.ovaleOptions.db.profile;
-        if (startTime && actionTexture) {
+        if (startTime && element.actionTexture) {
             let cd = this.cd;
             let resetCooldown = false;
             if (startTime > now) {
                 let duration = cd.GetCooldownDuration();
                 if (
                     duration == 0 &&
-                    this.texture == actionTexture &&
+                    this.texture == element.actionTexture &&
                     this.cooldownStart &&
                     this.cooldownEnd
                 ) {
                     resetCooldown = true;
                 }
                 if (
-                    this.texture != actionTexture ||
+                    this.texture != element.actionTexture ||
                     !this.cooldownStart ||
                     !this.cooldownEnd
                 ) {
@@ -203,7 +189,7 @@ export class OvaleIcon {
                     ) {
                         this.cooldownStart = now;
                     } else {
-                        let oldCooldownProgressPercent =
+                        const oldCooldownProgressPercent =
                             (now - this.cooldownStart) /
                             (this.cooldownEnd - this.cooldownStart);
                         this.cooldownStart =
@@ -213,7 +199,7 @@ export class OvaleIcon {
                     this.cooldownEnd = startTime;
                     resetCooldown = true;
                 }
-                this.texture = actionTexture;
+                this.texture = element.actionTexture;
             } else {
                 this.cooldownStart = undefined;
                 this.cooldownEnd = undefined;
@@ -236,31 +222,34 @@ export class OvaleIcon {
                 this.cd.Hide();
             }
             this.icone.Show();
-            this.icone.SetTexture(actionTexture);
-            if (actionUsable) {
+            this.icone.SetTexture(element.actionTexture);
+            if (element.actionUsable) {
                 this.icone.SetAlpha(1);
             } else {
                 this.icone.SetAlpha(0.5);
             }
 
-            if (element) {
+            const options = element.options;
+            if (options) {
                 if (
-                    element.namedParams.nored != 1 &&
-                    actionResourceExtend &&
-                    actionResourceExtend > 0
+                    options.nored != 1 &&
+                    element.actionResourceExtend &&
+                    element.actionResourceExtend > 0
                 ) {
                     this.icone.SetVertexColor(0.75, 0.2, 0.2);
                 } else {
                     this.icone.SetVertexColor(1, 1, 1);
                 }
-                this.actionHelp = element.namedParams.help;
+                if (isString(options.help)) this.actionHelp = options.help;
                 if (!(this.cooldownStart && this.cooldownEnd)) {
                     this.lastSound = undefined;
                 }
-                if (element.namedParams.sound && !this.lastSound) {
-                    let delay = element.namedParams.soundtime || 0.5;
+                if (options.sound && !this.lastSound) {
+                    let delay;
+                    if (isNumber(options.soundtime)) delay = options.soundtime;
+                    else delay = 0.5;
                     if (now >= startTime - delay) {
-                        this.lastSound = element.namedParams.sound;
+                        this.lastSound = options.sound;
                         PlaySoundFile(this.lastSound);
                     }
                 }
@@ -284,7 +273,10 @@ export class OvaleIcon {
             }
             if (
                 (profile.apparence.numeric ||
-                    this.namedParams.text == "always") &&
+                    (this.namedParams &&
+                        this.namedParams.text &&
+                        this.namedParams.text.type === "string" &&
+                        this.namedParams.text.value === "always")) &&
                 startTime > now
             ) {
                 this.remains.SetFormattedText("%.1f", startTime - now);
@@ -294,24 +286,27 @@ export class OvaleIcon {
             }
             if (profile.apparence.raccourcis) {
                 this.shortcut.Show();
-                this.shortcut.SetText(actionShortcut);
+                this.shortcut.SetText(element.actionShortcut);
             } else {
                 this.shortcut.Hide();
             }
-            if (actionInRange === undefined) {
+            if (element.actionInRange === undefined) {
                 this.rangeIndicator.Hide();
-            } else if (actionInRange) {
+            } else if (element.actionInRange) {
                 this.rangeIndicator.SetVertexColor(0.6, 0.6, 0.6);
                 this.rangeIndicator.Show();
             } else {
                 this.rangeIndicator.SetVertexColor(1.0, 0.1, 0.1);
                 this.rangeIndicator.Show();
             }
-            if (element && element.namedParams.text) {
-                this.focusText.SetText(tostring(element.namedParams.text));
+            if (options && options.text) {
+                this.focusText.SetText(tostring(options.text));
                 this.focusText.Show();
-            } else if (actionTarget && actionTarget != "target") {
-                this.focusText.SetText(actionTarget);
+            } else if (
+                element.actionTarget &&
+                element.actionTarget != "target"
+            ) {
+                this.focusText.SetText(element.actionTarget);
                 this.focusText.Show();
             } else {
                 this.focusText.Hide();
@@ -339,33 +334,33 @@ export class OvaleIcon {
         this.help = help;
     }
     SetParams(
-        positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        positionalParams: AstIconNode["rawPositionalParams"],
+        namedParams: AstIconNode["rawNamedParams"],
         secure?: boolean
     ) {
         this.positionalParams = positionalParams;
         this.namedParams = namedParams;
         this.actionButton = false;
-        if (secure) {
-            for (const [k, v] of kpairs(namedParams)) {
-                let [index] = find(k, "spell");
-                if (index) {
-                    let prefix = sub(k, 1, index - 1);
-                    let suffix = sub(k, index + 5);
-                    this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
-                    this.frame.SetAttribute(
-                        "unit",
-                        this.namedParams.target || "target"
-                    );
-                    this.frame.SetAttribute(
-                        k,
-                        this.ovaleSpellBook.GetSpellName(<number>v) ||
-                            "Unknown spell"
-                    );
-                    this.actionButton = true;
-                }
-            }
-        }
+        // if (secure) {
+        //     for (const [k, v] of kpairs(namedParams)) {
+        //         let [index] = find(k, "spell");
+        //         if (index) {
+        //             let prefix = sub(k, 1, index - 1);
+        //             let suffix = sub(k, index + 5);
+        //             this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
+        //             this.frame.SetAttribute(
+        //                 "unit",
+        //                 this.namedParams.target || "target"
+        //             );
+        //             this.frame.SetAttribute(
+        //                 k,
+        //                 this.ovaleSpellBook.GetSpellName(<number>v) ||
+        //                     "Unknown spell"
+        //             );
+        //             this.actionButton = true;
+        //         }
+        //     }
+        // }
     }
     SetRemainsFont(color: { r: number; g: number; b: number }) {
         this.remains.SetTextColor(color.r, color.g, color.b, 1.0);

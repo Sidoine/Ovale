@@ -168,28 +168,28 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
             delete this.next.rune[slot];
         }
     }
-    ApplySpellStartCast(
+    ApplySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleRunes_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyRuneCost(spellId, startCast, spellcast);
         }
         this.profiler.StopProfiling("OvaleRunes_ApplySpellStartCast");
-    }
-    ApplySpellAfterCast(
+    };
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleRunes_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyRuneCost(spellId, endCast, spellcast);
@@ -200,7 +200,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
             }
         }
         this.profiler.StopProfiling("OvaleRunes_ApplySpellAfterCast");
-    }
+    };
 
     ApplyRuneCost(spellId: number, atTime: number, spellcast: SpellCast) {
         let si = this.ovaleData.spellInfo[spellId];

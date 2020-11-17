@@ -2,13 +2,17 @@ import { L } from "../Localization";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvalePool } from "../Pool";
 import { OvaleProfilerClass, Profiler } from "../Profiler";
-import { OvaleDataClass, AuraByType, AuraType, SpellInfo } from "../Data";
+import {
+    OvaleDataClass,
+    SpellAddAurasByType,
+    AuraType,
+    SpellInfo,
+} from "../Data";
 import { OvaleGUIDClass } from "../GUID";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { OvaleStateClass, States } from "../State";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
-import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     pairs,
@@ -21,7 +25,7 @@ import {
     kpairs,
     unpack,
 } from "@wowts/lua";
-import { lower, sub } from "@wowts/string";
+import { lower } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import {
     GetTime,
@@ -31,7 +35,7 @@ import {
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "../BaseState";
-import { isLuaArray, isString, OneTimeMessage } from "../tools";
+import { isNumber, isString } from "../tools";
 import {
     ConditionFunction,
     ConditionResult,
@@ -44,7 +48,6 @@ import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../acegui-helpers";
 
 let strlower = lower;
-let strsub = sub;
 let tconcat = concat;
 
 let self_playerGUID: string = "fake_guid";
@@ -337,8 +340,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
         private ovaleDebug: OvaleDebugClass,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass,
-        private requirement: OvaleRequirement
+        private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(AuraInterface);
         this.module = ovale.createModule(
@@ -492,63 +494,9 @@ export class OvaleAuraClass extends States<AuraInterface> {
             "Ovale_UnitChanged",
             this.Ovale_UnitChanged
         );
-        this.requirement.RegisterRequirement("buff", this.RequireBuffHandler);
-        this.requirement.RegisterRequirement(
-            "buff_any",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement("debuff", this.RequireBuffHandler);
-        this.requirement.RegisterRequirement(
-            "debuff_any",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "pet_buff",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "pet_debuff",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "stealth",
-            this.RequireStealthHandler
-        );
-        this.requirement.RegisterRequirement(
-            "stealthed",
-            this.RequireStealthHandler
-        );
-        this.requirement.RegisterRequirement(
-            "target_buff",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "target_buff_any",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "target_debuff",
-            this.RequireBuffHandler
-        );
-        this.requirement.RegisterRequirement(
-            "target_debuff_any",
-            this.RequireBuffHandler
-        );
     };
 
     private OnDisable = () => {
-        this.requirement.UnregisterRequirement("buff");
-        this.requirement.UnregisterRequirement("buff_any");
-        this.requirement.UnregisterRequirement("debuff");
-        this.requirement.UnregisterRequirement("debuff_any");
-        this.requirement.UnregisterRequirement("pet_buff");
-        this.requirement.UnregisterRequirement("pet_debuff");
-        this.requirement.UnregisterRequirement("stealth");
-        this.requirement.UnregisterRequirement("stealthed");
-        this.requirement.UnregisterRequirement("target_buff");
-        this.requirement.UnregisterRequirement("target_buff_any");
-        this.requirement.UnregisterRequirement("target_debuff");
-        this.requirement.UnregisterRequirement("target_debuff_any");
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
@@ -943,22 +891,15 @@ export class OvaleAuraClass extends States<AuraInterface> {
                             (this.ovaleGuid.IsPlayerPet(guid) && si.aura.pet) ||
                             si.aura.target;
                         if (auraTable && auraTable[filter]) {
-                            let spellData = auraTable[filter]![auraId];
-                            if (spellData == "refresh_keep_snapshot") {
-                                keepSnapshot = true;
-                            } else if (
-                                isLuaArray(spellData) &&
-                                spellData[1] == "refresh_keep_snapshot"
+                            let spellData = auraTable[filter][auraId];
+                            if (
+                                spellData.cachedParams.named
+                                    .refresh_keep_snapshot &&
+                                (spellData.cachedParams.named.enabled ===
+                                    undefined ||
+                                    spellData.cachedParams.named.enabled)
                             ) {
-                                [
-                                    keepSnapshot,
-                                ] = this.requirement.CheckRequirements(
-                                    spellId,
-                                    atTime,
-                                    spellData,
-                                    2,
-                                    guid
-                                );
+                                keepSnapshot = true;
                             }
                         }
                     }
@@ -1243,153 +1184,6 @@ export class OvaleAuraClass extends States<AuraInterface> {
         }
         this.profiler.StopProfiling("OvaleAura_ScanAuras");
     }
-
-    RequireBuffHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let stacks = 1;
-        let buffName = <string>tokens[index];
-        index = index + 1;
-        let count = tonumber(tokens[index]);
-        if (count) {
-            stacks = count;
-            index = index + 1;
-        }
-        if (buffName) {
-            let isBang = false;
-            if (strsub(buffName, 1, 1) == "!") {
-                isBang = true;
-                buffName = strsub(buffName, 2);
-            }
-            const buffId = tonumber(buffName) || buffName;
-            let guid, unitId: string, filter: AuraType, mine;
-            if (strsub(requirement, 1, 7) == "target_") {
-                if (targetGUID) {
-                    guid = targetGUID;
-                    const [unitIdForGuid] = this.ovaleGuid.GUIDUnit(guid);
-                    unitId = unitIdForGuid || "target";
-                } else {
-                    unitId = this.baseState.next.defaultTarget || "target";
-                }
-                filter =
-                    (strsub(requirement, 8, 11) == "buff" && "HELPFUL") ||
-                    "HARMFUL";
-                mine = !(strsub(requirement, -4) == "_any");
-            } else if (strsub(requirement, 1, 4) == "pet_") {
-                unitId = "pet";
-                filter =
-                    (strsub(requirement, 5, 11) == "buff" && "HELPFUL") ||
-                    "HARMFUL";
-                mine = false;
-            } else {
-                unitId = "player";
-                filter =
-                    (strsub(requirement, 1, 4) == "buff" && "HELPFUL") ||
-                    "HARMFUL";
-                mine = !(strsub(requirement, -4) == "_any");
-            }
-            guid = guid || this.ovaleGuid.UnitGUID(unitId);
-            if (guid) {
-                let aura = this.GetAuraByGUID(
-                    guid,
-                    buffId,
-                    filter,
-                    mine,
-                    atTime
-                );
-                let isActiveAura =
-                    aura &&
-                    this.IsActiveAura(aura, atTime) &&
-                    aura.stacks >= stacks;
-                if ((!isBang && isActiveAura) || (isBang && !isActiveAura)) {
-                    verified = true;
-                }
-                let result = (verified && "passed") || "FAILED";
-                if (isBang) {
-                    this.debug.Log(
-                        "    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s",
-                        buffName,
-                        stacks,
-                        unitId,
-                        atTime,
-                        result
-                    );
-                } else {
-                    this.debug.Log(
-                        "    Require aura %s with at least %d stack(s) on %s at time=%f: %s",
-                        buffName,
-                        stacks,
-                        unitId,
-                        atTime,
-                        result
-                    );
-                }
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a buff argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
-
-    RequireStealthHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let stealthed = tokens[index];
-        index = index + 1;
-
-        if (stealthed) {
-            stealthed = tonumber(stealthed);
-            let aura = this.GetAura(
-                "player",
-                "stealthed_buff",
-                atTime,
-                "HELPFUL",
-                true
-            );
-            let isActiveAura = aura && this.IsActiveAura(aura, atTime);
-            if (
-                (stealthed == 1 && isActiveAura) ||
-                (stealthed != 1 && !isActiveAura)
-            ) {
-                verified = true;
-            }
-            let result = (verified && "passed") || "FAILED";
-            if (stealthed == 1) {
-                this.debug.Log(
-                    "    Require stealth at time=%f: %s",
-                    atTime,
-                    result
-                );
-            } else {
-                this.debug.Log(
-                    "    Require NOT stealth at time=%f: %s",
-                    atTime,
-                    result
-                );
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing an argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
 
     GetStateAura(
         guid: string,
@@ -1926,14 +1720,14 @@ export class OvaleAuraClass extends States<AuraInterface> {
             RemoveAurasOnGUID(this.next.aura, guid);
         }
     }
-    ApplySpellStartCast(
+    ApplySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleAura_ApplySpellStartCast");
         if (isChanneled) {
             let si = this.ovaleData.spellInfo[spellId];
@@ -1971,15 +1765,15 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
         this.profiler.StopProfiling("OvaleAura_ApplySpellStartCast");
-    }
-    ApplySpellAfterCast(
+    };
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleAura_ApplySpellAfterCast");
         if (!isChanneled) {
             let si = this.ovaleData.spellInfo[spellId];
@@ -2008,15 +1802,15 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
         this.profiler.StopProfiling("OvaleAura_ApplySpellAfterCast");
-    }
-    ApplySpellOnHit(
+    };
+    ApplySpellOnHit = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleAura_ApplySpellAfterHit");
         if (!isChanneled) {
             let si = this.ovaleData.spellInfo[spellId];
@@ -2039,13 +1833,13 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
         this.profiler.StopProfiling("OvaleAura_ApplySpellAfterHit");
-    }
+    };
 
     private ApplySpellAuras(
         spellId: number,
         guid: string,
         atTime: number,
-        auraList: AuraByType,
+        auraList: SpellAddAurasByType,
         spellcast: SpellCast
     ) {
         this.profiler.StartProfiling("OvaleAura_state_ApplySpellAuras");
@@ -2059,29 +1853,29 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 let toggle = undefined;
                 let refresh = false;
                 let keepSnapshot = false;
-                let [verified, value, data] = this.ovaleData.CheckSpellAuraData(
+                let data = this.ovaleData.CheckSpellAuraData(
                     auraId,
                     spellData,
                     atTime,
                     guid
                 );
-                if (value == "refresh") {
+                if (data.refresh) {
                     refresh = true;
-                } else if (value == "refresh_keep_snapshot") {
+                } else if (data.refresh_keep_snapshot) {
                     refresh = true;
                     keepSnapshot = true;
-                } else if (value == "toggle") {
+                } else if (data.toggle) {
                     toggle = true;
-                } else if (value == "count") {
-                    count = <number>data;
-                } else if (value == "extend") {
-                    extend = <number>data;
-                } else if (tonumber(value)) {
-                    stacks = tonumber(value);
+                } else if (isNumber(data.set)) {
+                    count = data.set;
+                } else if (isNumber(data.extend)) {
+                    extend = data.extend;
+                } else if (isNumber(data.add)) {
+                    stacks = data.add;
                 } else {
-                    this.debug.Log("Unknown stack %s", stacks);
+                    this.debug.Log("Aura has nothing defined");
                 }
-                if (verified) {
+                if (data.enabled === undefined || data.enabled) {
                     let si = this.ovaleData.spellInfo[auraId];
                     let auraFound = this.GetAuraByGUID(
                         guid,

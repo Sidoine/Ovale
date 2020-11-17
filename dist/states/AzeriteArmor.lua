@@ -13,6 +13,9 @@ local C_Item = C_Item
 local ItemLocation = ItemLocation
 local C_AzeriteEmpoweredItem = C_AzeriteEmpoweredItem
 local GetSpellInfo = GetSpellInfo
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local Compare = __Condition.Compare
+local TestBoolean = __Condition.TestBoolean
 local azeriteSlots = {
     [1] = true,
     [3] = true,
@@ -62,10 +65,24 @@ __exports.OvaleAzeriteArmor = __class(nil, {
         self.PLAYER_ENTERING_WORLD = function()
             self:UpdateTraits()
         end
+        self.AzeriteTraitRank = function(positionalParams, namedParams, atTime)
+            local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local value = self:TraitRank(spellId)
+            return Compare(value, comparator, limit)
+        end
+        self.HasAzeriteTrait = function(positionalParams, namedParams, atTime)
+            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local value = self:HasTrait(spellId)
+            return TestBoolean(value, yesno)
+        end
         self.module = ovale:createModule("OvaleAzeriteArmor", self.OnInitialize, self.OnDisable, aceEvent)
         for k, v in pairs(self.debugOptions) do
             ovaleDebug.defaultOptions.args[k] = v
         end
+    end,
+    registerConditions = function(self, ovaleCondition)
+        ovaleCondition:RegisterCondition("hasazeritetrait", false, self.HasAzeriteTrait)
+        ovaleCondition:RegisterCondition("azeritetraitrank", false, self.AzeriteTraitRank)
     end,
     UpdateTraits = function(self)
         self.self_traits = {}

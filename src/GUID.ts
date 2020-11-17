@@ -19,6 +19,7 @@ import {
     OvaleConditionClass,
     ReturnConstant,
 } from "./Condition";
+import { isString } from "./tools";
 
 let PET_UNIT: LuaObj<string> = {};
 {
@@ -174,15 +175,17 @@ export class OvaleGUIDClass {
     }
 
     private getGuid: ConditionFunction = (_, namedParameters) => {
-        return ReturnConstant(
-            this.UnitGUID(namedParameters.target || "target")
-        );
+        const target =
+            (isString(namedParameters.target) && namedParameters.target) ||
+            "target";
+        return ReturnConstant(this.UnitGUID(target));
     };
 
     private getTargetGuid: ConditionFunction = (_, namedParameters) => {
-        return ReturnConstant(
-            this.UnitGUID((namedParameters.target || "target") + "target")
-        );
+        const target =
+            (isString(namedParameters.target) && namedParameters.target) ||
+            "target";
+        return ReturnConstant(this.UnitGUID(target + "target"));
     };
 
     private OnInitialize = () => {

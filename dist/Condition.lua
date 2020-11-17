@@ -3,6 +3,8 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local next = next
 local huge = math.huge
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isString = __tools.isString
 local INFINITY = huge
 local COMPARATOR = {
     atleast = true,
@@ -21,6 +23,9 @@ __exports.OvaleConditionClass = __class(nil, {
             self.spellBookConditions[name] = true
         end
     end,
+    registerAction = function(self, name, func)
+        self.actions[name] = func
+    end,
     UnregisterCondition = function(self, name)
         self.conditions[name] = nil
     end,
@@ -38,13 +43,14 @@ __exports.OvaleConditionClass = __class(nil, {
     end,
     constructor = function(self)
         self.conditions = {}
+        self.actions = {}
         self.spellBookConditions = {
             spell = true
         }
     end
 })
 __exports.ParseCondition = function(namedParams, baseState, defaultTarget)
-    local target = namedParams.target or defaultTarget or "player"
+    local target = (isString(namedParams.target) and namedParams.target) or defaultTarget or "player"
     namedParams.target = namedParams.target or target
     if target == "cycle" or target == "target" then
         target = baseState.next.defaultTarget

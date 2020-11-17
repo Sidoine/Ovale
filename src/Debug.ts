@@ -17,7 +17,7 @@ const OVALE_TRACELOG_MAXLINES = 4096;
 export class Tracer {
     constructor(
         private options: OvaleOptionsClass,
-        private debug: OvaleDebugClass,
+        public debug: OvaleDebugClass,
         private name: string
     ) {
         const toggles = debug.defaultOptions.args.toggles as OptionUiGroup;

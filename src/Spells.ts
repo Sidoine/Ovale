@@ -1,6 +1,4 @@
-import { Tokens, OvaleRequirement } from "./Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { tonumber } from "@wowts/lua";
 import {
     GetSpellCount,
     IsSpellInRange,
@@ -14,9 +12,8 @@ import { OvaleClass } from "./Ovale";
 import { Tracer, OvaleDebugClass } from "./Debug";
 import { OvaleProfilerClass, Profiler } from "./Profiler";
 import { OvaleDataClass } from "./Data";
-import { PRIMARY_POWER, PowerType } from "./states/Power";
 import { StateModule } from "./State";
-import { OneTimeMessage } from "./tools";
+import { OvalePowerClass } from "./states/Power";
 
 let WARRIOR_INCERCEPT_SPELLID = 198304;
 let WARRIOR_HEROICTHROW_SPELLID = 57755;
@@ -32,7 +29,7 @@ export class OvaleSpellsClass implements StateModule {
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
-        private requirement: OvaleRequirement
+        private power: OvalePowerClass
     ) {
         this.module = ovale.createModule(
             "OvaleSpells",
@@ -44,20 +41,8 @@ export class OvaleSpellsClass implements StateModule {
         this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
-    private OnInitialize = (): void => {
-        this.requirement.RegisterRequirement(
-            "spellcount_min",
-            this.RequireSpellCountHandler
-        );
-        this.requirement.RegisterRequirement(
-            "spellcount_max",
-            this.RequireSpellCountHandler
-        );
-    };
-    private OnDisable = (): void => {
-        this.requirement.UnregisterRequirement("spellcount_max");
-        this.requirement.UnregisterRequirement("spellcount_min");
-    };
+    private OnInitialize = (): void => {};
+    private OnDisable = (): void => {};
     GetCastTime(spellId: number): number | undefined {
         if (spellId) {
             let [name, , , castTime] = this.OvaleSpellBook.GetSpellInfo(
@@ -124,35 +109,6 @@ export class OvaleSpellsClass implements StateModule {
         return undefined;
     }
 
-    private RequireSpellCountHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let countString;
-        if (index) {
-            countString = <string>tokens[index];
-            index = index + 1;
-        }
-        if (countString) {
-            let count = tonumber(countString) || 1;
-            let actualCount = this.GetSpellCount(spellId);
-            verified =
-                (requirement == "spellcount_min" && count <= actualCount) ||
-                (requirement == "spellcount_max" && count >= actualCount);
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a count argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
-
     CleanState(): void {}
     InitializeState(): void {}
     ResetState(): void {}
@@ -188,8 +144,13 @@ export class OvaleSpellsClass implements StateModule {
         let isUsable = this.OvaleSpellBook.IsKnownSpell(spellId);
         let noMana = false;
         let si = this.ovaleData.spellInfo[spellId];
-        let requirement: string | undefined;
+        // let requirement: string | undefined;
         if (si) {
+            this.tracer.Log(
+                "Found spell info about %s (isUsable = %s)",
+                spellId,
+                isUsable
+            );
             if (isUsable) {
                 let unusable = this.ovaleData.GetSpellInfoProperty(
                     spellId,
@@ -197,7 +158,7 @@ export class OvaleSpellsClass implements StateModule {
                     "unusable",
                     targetGUID
                 );
-                if (unusable && unusable > 0) {
+                if (unusable !== undefined && unusable > 0) {
                     this.tracer.Log(
                         "Spell ID '%s' is flagged as unusable.",
                         spellId
@@ -206,29 +167,26 @@ export class OvaleSpellsClass implements StateModule {
                 }
             }
             if (isUsable) {
-                [isUsable, requirement] = this.ovaleData.CheckSpellInfo(
-                    spellId,
-                    atTime,
-                    targetGUID
-                );
-                if (!isUsable) {
-                    noMana = PRIMARY_POWER[requirement as PowerType] || false;
-                    if (noMana) {
-                        this.tracer.Log(
-                            "Spell ID '%s' does not have enough %s.",
-                            spellId,
-                            requirement
-                        );
-                    } else {
-                        this.tracer.Log(
-                            "Spell ID '%s' failed '%s' requirements.",
-                            spellId,
-                            requirement
-                        );
-                    }
+                noMana = !this.power.hasPowerFor(si, atTime);
+                if (noMana) {
+                    isUsable = false;
+                    this.tracer.Log(
+                        "Spell ID '%s' does not have enough power.",
+                        spellId
+                    );
+                } else {
+                    this.tracer.Log(
+                        "Spell ID '%s' passed power requirements.",
+                        spellId
+                    );
                 }
             }
         } else {
+            this.tracer.Log(
+                "Look for spell info about %s in spell book",
+                spellId
+            );
+
             let [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(
                 spellId
             );

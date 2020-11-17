@@ -2,46 +2,21 @@ local __exports = LibStub:NewLibrary("ovale/Spells", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local tonumber = tonumber
 local GetSpellCount = GetSpellCount
 local IsSpellInRange = IsSpellInRange
 local IsUsableItem = IsUsableItem
 local IsUsableSpell = IsUsableSpell
 local UnitIsFriend = UnitIsFriend
-local __statesPower = LibStub:GetLibrary("ovale/states/Power")
-local PRIMARY_POWER = __statesPower.PRIMARY_POWER
-local __tools = LibStub:GetLibrary("ovale/tools")
-local OneTimeMessage = __tools.OneTimeMessage
 local WARRIOR_INCERCEPT_SPELLID = 198304
 local WARRIOR_HEROICTHROW_SPELLID = 57755
 __exports.OvaleSpellsClass = __class(nil, {
-    constructor = function(self, OvaleSpellBook, ovale, ovaleDebug, ovaleProfiler, ovaleData, requirement)
+    constructor = function(self, OvaleSpellBook, ovale, ovaleDebug, ovaleProfiler, ovaleData, power)
         self.OvaleSpellBook = OvaleSpellBook
         self.ovaleData = ovaleData
-        self.requirement = requirement
+        self.power = power
         self.OnInitialize = function()
-            self.requirement:RegisterRequirement("spellcount_min", self.RequireSpellCountHandler)
-            self.requirement:RegisterRequirement("spellcount_max", self.RequireSpellCountHandler)
         end
         self.OnDisable = function()
-            self.requirement:UnregisterRequirement("spellcount_max")
-            self.requirement:UnregisterRequirement("spellcount_min")
-        end
-        self.RequireSpellCountHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local verified = false
-            local countString
-            if index then
-                countString = tokens[index]
-                index = index + 1
-            end
-            if countString then
-                local count = tonumber(countString) or 1
-                local actualCount = self:GetSpellCount(spellId)
-                verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
-            else
-                OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
-            end
-            return verified, requirement, index
         end
         self.module = ovale:createModule("OvaleSpells", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())
@@ -127,27 +102,26 @@ __exports.OvaleSpellsClass = __class(nil, {
         local isUsable = self.OvaleSpellBook:IsKnownSpell(spellId)
         local noMana = false
         local si = self.ovaleData.spellInfo[spellId]
-        local requirement
         if si then
+            self.tracer:Log("Found spell info about %s (isUsable = %s)", spellId, isUsable)
             if isUsable then
                 local unusable = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
-                if unusable and unusable > 0 then
+                if unusable ~= nil and unusable > 0 then
                     self.tracer:Log("Spell ID '%s' is flagged as unusable.", spellId)
                     isUsable = false
                 end
             end
             if isUsable then
-                isUsable, requirement = self.ovaleData:CheckSpellInfo(spellId, atTime, targetGUID)
-                if  not isUsable then
-                    noMana = PRIMARY_POWER[requirement] or false
-                    if noMana then
-                        self.tracer:Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
-                    else
-                        self.tracer:Log("Spell ID '%s' failed '%s' requirements.", spellId, requirement)
-                    end
+                noMana =  not self.power:hasPowerFor(si, atTime)
+                if noMana then
+                    isUsable = false
+                    self.tracer:Log("Spell ID '%s' does not have enough power.", spellId)
+                else
+                    self.tracer:Log("Spell ID '%s' passed power requirements.", spellId)
                 end
             end
         else
+            self.tracer:Log("Look for spell info about %s in spell book", spellId)
             local index, bookType = self.OvaleSpellBook:GetSpellBookIndex(spellId)
             if index and bookType then
                 return IsUsableSpell(index, bookType)

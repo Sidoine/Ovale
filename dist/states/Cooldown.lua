@@ -4,16 +4,12 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local next = next
 local pairs = pairs
-local tonumber = tonumber
 local kpairs = pairs
 local GetSpellCooldown = GetSpellCooldown
 local GetTime = GetTime
 local GetSpellCharges = GetSpellCharges
-local sub = string.sub
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
-local __tools = LibStub:GetLibrary("ovale/tools")
-local OneTimeMessage = __tools.OneTimeMessage
 local GLOBAL_COOLDOWN = 61304
 local COOLDOWN_THRESHOLD = 0.1
 local BASE_GCD = {
@@ -72,13 +68,12 @@ __exports.CooldownData = __class(nil, {
     end
 })
 __exports.OvaleCooldownClass = __class(States, {
-    constructor = function(self, ovalePaperDoll, ovaleData, lastSpell, ovale, ovaleDebug, ovaleProfiler, ovaleSpellBook, requirement)
+    constructor = function(self, ovalePaperDoll, ovaleData, lastSpell, ovale, ovaleDebug, ovaleProfiler, ovaleSpellBook)
         self.ovalePaperDoll = ovalePaperDoll
         self.ovaleData = ovaleData
         self.lastSpell = lastSpell
         self.ovale = ovale
         self.ovaleSpellBook = ovaleSpellBook
-        self.requirement = requirement
         self.serial = 0
         self.sharedCooldown = {}
         self.gcd = {
@@ -99,11 +94,9 @@ __exports.OvaleCooldownClass = __class(States, {
             self.module:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", self.Update)
             self.module:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", self.Update)
             self.lastSpell:RegisterSpellcastInfo(self)
-            self.requirement:RegisterRequirement("oncooldown", self.RequireCooldownHandler)
         end
         self.OnDisable = function()
             self.lastSpell:UnregisterSpellcastInfo(self)
-            self.requirement:UnregisterRequirement("oncooldown")
             self.module:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
             self.module:UnregisterEvent("BAG_UPDATE_COOLDOWN")
             self.module:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
@@ -146,24 +139,19 @@ __exports.OvaleCooldownClass = __class(States, {
                 end
             end
         end
-        self.RequireCooldownHandler = function(spellId, atTime, requirement, tokens, index)
-            local verified = false
-            local cdSpellId = tokens[index]
-            index = index + 1
-            if cdSpellId then
-                local isBang = false
-                if sub(cdSpellId, 1, 1) == "!" then
-                    isBang = true
-                    cdSpellId = sub(cdSpellId, 2)
-                end
-                local cd = self:GetCD(tonumber(cdSpellId), atTime)
-                verified = ( not isBang and cd.duration > 0) or (isBang and cd.duration <= 0)
-                local result = (verified and "passed") or "FAILED"
-                self.tracer:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, (isBang and "OFF") or ( not isBang and "ON"), atTime, result, cd.duration)
-            else
-                OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
+        self.ApplySpellStartCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvaleCooldown_ApplySpellStartCast")
+            if isChanneled then
+                self:ApplyCooldown(spellId, targetGUID, startCast)
             end
-            return verified, requirement, index
+            self.profiler:StopProfiling("OvaleCooldown_ApplySpellStartCast")
+        end
+        self.ApplySpellAfterCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
+            if  not isChanneled then
+                self:ApplyCooldown(spellId, targetGUID, endCast)
+            end
+            self.profiler:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
         end
         States.constructor(self, __exports.CooldownData)
         self.module = ovale:createModule("OvaleCooldown", self.OnInitialize, self.OnDisable, aceEvent)
@@ -337,20 +325,6 @@ __exports.OvaleCooldownClass = __class(States, {
             end
         end
         return charges, maxCharges, chargeStart, chargeDuration
-    end,
-    ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvaleCooldown_ApplySpellStartCast")
-        if isChanneled then
-            self:ApplyCooldown(spellId, targetGUID, startCast)
-        end
-        self.profiler:StopProfiling("OvaleCooldown_ApplySpellStartCast")
-    end,
-    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
-        if  not isChanneled then
-            self:ApplyCooldown(spellId, targetGUID, endCast)
-        end
-        self.profiler:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
     end,
     InitializeState = function(self)
         self.next.cd = {}

@@ -12,7 +12,7 @@ import {
     ConditionResult,
     ParseCondition,
 } from "./Condition";
-import { SpellInfo, OvaleDataClass } from "./Data";
+import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "./Data";
 import { PowerType, OvalePowerClass } from "./states/Power";
 import {
     HasteType,
@@ -23,7 +23,6 @@ import { Aura, OvaleAuraClass } from "./states/Aura";
 import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import {
     GetBuildInfo,
-    GetItemCooldown,
     GetItemCount,
     GetNumTrackingTypes,
     GetTime,
@@ -53,10 +52,9 @@ import {
     UnitRace,
 } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
-import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
+import { PositionalParameters, NamedParameters } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
-import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
 import { OvaleAzeriteEssenceClass } from "./states/AzeriteEssence";
 import { BaseState } from "./BaseState";
 import { OvaleFutureClass } from "./states/Future";
@@ -66,10 +64,7 @@ import { OvaleGUIDClass } from "./GUID";
 import { OvaleDamageTakenClass } from "./states/DamageTaken";
 import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleCooldownClass } from "./states/Cooldown";
-import { OvaleCompileClass } from "./Compile";
-import { Variables } from "./states/Variables";
 import { LastSpell } from "./states/LastSpell";
-import { OvaleEquipmentClass } from "./Equipment";
 import { OvaleHealthClass } from "./states/Health";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleLossOfControlClass } from "./states/LossOfControl";
@@ -77,9 +72,7 @@ import { OvaleSpellDamageClass } from "./states/SpellDamage";
 import { OvaleTotemClass } from "./states/Totem";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./states/DemonHunterSigils";
-import { OvaleBestActionClass } from "./BestAction";
 import { OvaleRunesClass } from "./states/Runes";
-import { OvaleStanceClass } from "./states/Stance";
 import { OvaleBossModClass } from "./states/BossMod";
 import { OneTimeMessage } from "./tools";
 
@@ -112,31 +105,34 @@ export class OvaleConditions {
      * @param paramName The name of the parameter
      * @param atTime The time
      */
-    ComputeParameter<T extends keyof SpellInfo>(
+    ComputeParameter<T extends SpellInfoProperty>(
         spellId: number,
         paramName: T,
         atTime: number
     ): SpellInfo[T] | undefined {
-        let si = this.OvaleData.GetSpellInfo(spellId);
-        if (si && si[paramName]) {
-            let name = si[paramName];
-            let node = this.OvaleCompile.GetFunctionNode(<string>name);
-            if (node) {
-                let [, element] = this.OvaleBestAction.Compute(
-                    node.child[1],
-                    atTime
-                );
-                if (element && isNodeType(element, "value")) {
-                    let value =
-                        <number>element.value +
-                        (atTime - element.origin) * element.rate;
-                    return <any>value;
-                }
-            } else {
-                return si[paramName];
-            }
-        }
-        return undefined;
+        // let si = this.OvaleData.GetSpellInfo(spellId);
+        // if (si && si[paramName]) {
+        //     let name = si[paramName];
+        //     let node = this.OvaleCompile.GetFunctionNode(<string>name);
+        //     if (node) {
+        //         let result = this.runner.Compute(node.child[1], atTime);
+        //         if (result.type === "value") {
+        //             let value =
+        //                 <number>result.value +
+        //                 (atTime - element.origin) * element.rate;
+        //             return <any>value;
+        //         }
+        //     } else {
+        //         return si[paramName];
+        //     }
+        // }
+        // return undefined;
+        return this.OvaleData.GetSpellInfoProperty(
+            spellId,
+            atTime,
+            paramName,
+            undefined
+        );
     }
 
     /** Return the time in seconds, adjusted by the named haste effect. */
@@ -197,29 +193,6 @@ export class OvaleConditions {
         let value = 0;
         OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         return Compare(value, comparator, limit);
-    };
-
-    private AzeriteTraitRank = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.OvaleAzerite.TraitRank(spellId);
-        return Compare(value, comparator, limit);
-    };
-    private HasAzeriteTrait = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
-        let value = this.OvaleAzerite.HasTrait(spellId);
-        return TestBoolean(value, yesno);
     };
 
     private AzeriteEssenceIsMajor = (
@@ -768,7 +741,10 @@ export class OvaleConditions {
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         if (aura) {
             let [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            seconds = this.GetHastedTime(seconds, namedParams.haste);
+            seconds = this.GetHastedTime(
+                seconds,
+                namedParams.haste as HasteType
+            );
             if (ending - seconds <= gain) {
                 return [];
             } else {
@@ -2108,51 +2084,6 @@ export class OvaleConditions {
         return Compare(0, comparator, limit);
     };
 
-    /**  Get the value of the named state variable from the simulator.
-	 @name GetState
-	 @paramsig number or boolean
-	 @param name The name of the state variable.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The value of the state variable.
-	 @return A boolean value for the result of the comparison.
-     */
-    private GetState = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [name, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.variables.GetState(name);
-        return Compare(value, comparator, limit);
-    };
-
-    /** Get the duration in seconds that the simulator was most recently in the named state.
-	 @name GetStateDuration
-	 @paramsig number or boolean
-	 @param name The name of the state variable.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
-     */
-    private GetStateDuration = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [name, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        let value = this.variables.GetStateDuration(name);
-        return Compare(value, comparator, limit);
-    };
     private Glyph = (
         positionalParams: LuaArray<any>,
         namedParams: LuaObj<any>,
@@ -2160,39 +2091,6 @@ export class OvaleConditions {
     ) => {
         let [, yesno] = [positionalParams[1], positionalParams[2]];
         return TestBoolean(false, yesno);
-    };
-
-    /**  Test if the player has a particular item equipped.
-	 @name HasEquippedItem
-	 @paramsig boolean
-	 @param item Item to be checked whether it is equipped.
-	 @param yesno Optional. If yes, then return true if the item is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
-     */
-    private HasEquippedItem = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [itemId, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean = false;
-        let slotId;
-        if (type(itemId) == "number") {
-            slotId = this.OvaleEquipment.HasEquippedItem(itemId);
-            if (slotId) {
-                boolean = true;
-            }
-        } else if (this.OvaleData.itemList[itemId]) {
-            for (const [, v] of pairs(this.OvaleData.itemList[itemId])) {
-                slotId = this.OvaleEquipment.HasEquippedItem(v);
-                if (slotId) {
-                    boolean = true;
-                    break;
-                }
-            }
-        }
-        return TestBoolean(boolean, yesno);
     };
 
     /** Test if the player has full control, i.e., isn't feared, charmed, etc.
@@ -2213,58 +2111,6 @@ export class OvaleConditions {
         let yesno = positionalParams[1];
         let boolean = HasFullControl();
         return TestBoolean(boolean, yesno);
-    };
-    /** Test if the player has a shield equipped.
-	 @name HasShield
-	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if a shield is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 if HasShield() Spell(shield_wall)
-     */
-    private HasShield = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let yesno = positionalParams[1];
-        let boolean = this.OvaleEquipment.HasShield();
-        return TestBoolean(boolean, yesno);
-    };
-
-    /** Test if the player has a particular trinket equipped.
-	 @name HasTrinket
-	 @paramsig boolean
-	 @param id The item ID of the trinket or the name of an item list.
-	 @param yesno Optional. If yes, then return true if the trinket is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 ItemList(rune_of_reorigination 94532 95802 96546)
-	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
-	     Spell(rake)
-     */
-    private HasTrinket = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean: boolean | undefined = undefined;
-        if (type(trinketId) == "number") {
-            boolean = this.OvaleEquipment.HasTrinket(trinketId);
-        } else if (this.OvaleData.itemList[trinketId]) {
-            for (const [, v] of pairs(this.OvaleData.itemList[trinketId])) {
-                boolean = this.OvaleEquipment.HasTrinket(v);
-                if (boolean) {
-                    break;
-                }
-            }
-        }
-        return TestBoolean(boolean !== undefined, yesno);
     };
 
     /** Get the current amount of health points of the target.
@@ -2901,50 +2747,6 @@ export class OvaleConditions {
         ];
         let value = GetItemCount(itemId, false, true);
         return Compare(value, comparator, limit);
-    };
-
-    /** Get the cooldown time in seconds of an item, e.g., trinket.
-	 @name ItemCooldown
-	 @paramsig number or boolean
-	 @param id The item ID or the equipped slot name.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
-	 @usage
-	 if not ItemCooldown(ancient_petrified_seed) > 0
-	     Spell(berserk_cat)
-	 if not ItemCooldown(Trinket0Slot) > 0
-	     Spell(berserk_cat)
-     */
-    private ItemCooldown = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [itemId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        if (itemId && type(itemId) != "number") {
-            itemId = this.OvaleEquipment.GetEquippedItemBySlotName(itemId);
-        }
-        if (itemId) {
-            let [start, duration] = GetItemCooldown(itemId);
-            if (start > 0 && duration > 0) {
-                return TestValue(
-                    start,
-                    start + duration,
-                    duration,
-                    start,
-                    -1,
-                    comparator,
-                    limit
-                );
-            }
-        }
-        return Compare(0, comparator, limit);
     };
 
     /** Get the current number of the given item in the player's inventory.
@@ -5429,7 +5231,7 @@ l    */
     ) => {
         let [spellId, key, comparator, limit] = [
             <number>positionalParams[1],
-            <keyof SpellInfo>positionalParams[2],
+            <SpellInfoProperty>positionalParams[2],
             <string>positionalParams[3],
             <number>positionalParams[4],
         ];
@@ -5561,27 +5363,6 @@ l    */
             targetGuid
         );
         let boolean = isUsable || noMana;
-        return TestBoolean(boolean, yesno);
-    };
-
-    /** Test if the player is in a given stance.
-	 @name Stance
-	 @paramsig boolean
-	 @param stance The stance name or a number representing the stance index.
-	 @param yesno Optional. If yes, then return true if the player is in the given stance. If no, then return true otherwise.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
-	 @usage
-	 unless Stance(druid_bear_form) Spell(bear_form)
-     */
-    private Stance = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [stance, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean = this.OvaleStance.IsStance(stance, atTime);
         return TestBoolean(boolean, yesno);
     };
 
@@ -6745,9 +6526,7 @@ l    */
     constructor(
         ovaleCondition: OvaleConditionClass,
         private OvaleData: OvaleDataClass,
-        private OvaleCompile: OvaleCompileClass,
         private OvalePaperDoll: OvalePaperDollClass,
-        private OvaleAzerite: OvaleAzeriteArmor,
         private OvaleAzeriteEssence: OvaleAzeriteEssenceClass,
         private OvaleAura: OvaleAuraClass,
         private baseState: BaseState,
@@ -6759,9 +6538,7 @@ l    */
         private OvaleDamageTaken: OvaleDamageTakenClass,
         private OvalePower: OvalePowerClass,
         private OvaleEnemies: OvaleEnemiesClass,
-        private variables: Variables,
         private lastSpell: LastSpell,
-        private OvaleEquipment: OvaleEquipmentClass,
         private OvaleHealth: OvaleHealthClass,
         private ovaleOptions: OvaleOptionsClass,
         private OvaleLossOfControl: OvaleLossOfControlClass,
@@ -6769,9 +6546,7 @@ l    */
         private OvaleTotem: OvaleTotemClass,
         private OvaleSigil: OvaleSigilClass,
         private OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass,
-        private OvaleBestAction: OvaleBestActionClass,
         private OvaleRunes: OvaleRunesClass,
-        private OvaleStance: OvaleStanceClass,
         private OvaleBossMod: OvaleBossModClass,
         private OvaleSpells: OvaleSpellsClass
     ) {
@@ -6792,16 +6567,6 @@ l    */
             "armorsetparts",
             false,
             this.ArmorSetParts
-        );
-        ovaleCondition.RegisterCondition(
-            "hasazeritetrait",
-            false,
-            this.HasAzeriteTrait
-        );
-        ovaleCondition.RegisterCondition(
-            "azeritetraitrank",
-            false,
-            this.AzeriteTraitRank
         );
         ovaleCondition.RegisterCondition(
             "azeriteessenceismajor",
@@ -7104,25 +6869,12 @@ l    */
             false,
             this.GCDRemaining
         );
-        ovaleCondition.RegisterCondition("getstate", false, this.GetState);
-        ovaleCondition.RegisterCondition(
-            "getstateduration",
-            false,
-            this.GetStateDuration
-        );
         ovaleCondition.RegisterCondition("glyph", false, this.Glyph);
-        ovaleCondition.RegisterCondition(
-            "hasequippeditem",
-            false,
-            this.HasEquippedItem
-        );
         ovaleCondition.RegisterCondition(
             "hasfullcontrol",
             false,
             this.HasFullControlCondition
         );
-        ovaleCondition.RegisterCondition("hasshield", false, this.HasShield);
-        ovaleCondition.RegisterCondition("hastrinket", false, this.HasTrinket);
         ovaleCondition.RegisterCondition("health", false, this.Health);
         ovaleCondition.RegisterCondition("life", false, this.Health);
         ovaleCondition.RegisterCondition(
@@ -7196,11 +6948,6 @@ l    */
             "itemcharges",
             false,
             this.ItemCharges
-        );
-        ovaleCondition.RegisterCondition(
-            "itemcooldown",
-            false,
-            this.ItemCooldown
         );
         ovaleCondition.RegisterCondition("itemcount", false, this.ItemCount);
         ovaleCondition.RegisterCondition("lastdamage", false, this.LastDamage);
@@ -7529,7 +7276,6 @@ l    */
             this.SpellMaxCharges
         );
         ovaleCondition.RegisterCondition("spellusable", true, this.SpellUsable);
-        ovaleCondition.RegisterCondition("stance", false, this.Stance);
         ovaleCondition.RegisterCondition("isstealthed", false, this.Stealthed);
         ovaleCondition.RegisterCondition("stealthed", false, this.Stealthed);
         ovaleCondition.RegisterCondition("lastswing", false, this.LastSwing);

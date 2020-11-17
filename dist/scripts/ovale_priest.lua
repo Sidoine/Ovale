@@ -169,39 +169,39 @@ AddFunction discipline_defaultcdpostconditions
 
 ### Discipline icons.
 
-AddCheckBox(opt_priest_discipline_aoe l(aoe) default specialization=discipline)
+AddCheckBox(opt_priest_discipline_aoe l(aoe) default enabled=(specialization(discipline)))
 
-AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=shortcd specialization=discipline
+AddIcon enabled=(not checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) enemies=1 help=shortcd
 {
  if not incombat() disciplineprecombatshortcdactions()
  discipline_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_priest_discipline_aoe help=shortcd specialization=discipline
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=shortcd
 {
  if not incombat() disciplineprecombatshortcdactions()
  discipline_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=discipline
+AddIcon enabled=(specialization(discipline)) enemies=1 help=main
 {
  if not incombat() disciplineprecombatmainactions()
  discipline_defaultmainactions()
 }
 
-AddIcon checkbox=opt_priest_discipline_aoe help=aoe specialization=discipline
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=aoe
 {
  if not incombat() disciplineprecombatmainactions()
  discipline_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=cd specialization=discipline
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and not specialization(discipline)) enemies=1 help=cd
 {
  if not incombat() disciplineprecombatcdactions()
  discipline_defaultcdactions()
 }
 
-AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=cd
 {
  if not incombat() disciplineprecombatcdactions()
  discipline_defaultcdactions()
@@ -250,7 +250,7 @@ Include(ovale_priest_spells)
 
 AddFunction pi_or_vf_sync_condition
 {
- { checkboxon(self_power_infusion) or equippedruneforge(twins_of_the_sun_priestess_runeforge) } and level() >= 58 and not spellcooldown(power_infusion) > 0 or { level() < 58 or not checkboxon(self_power_infusion) and not equippedruneforge(twins_of_the_sun_priestess_runeforge) } and not spellcooldown(void_eruption) > 0
+ { checkboxon("self_power_infusion") or equippedruneforge(twins_of_the_sun_priestess_runeforge) } and level() >= 58 and not spellcooldown(power_infusion) > 0 or { level() < 58 or not checkboxon("self_power_infusion") and not equippedruneforge(twins_of_the_sun_priestess_runeforge) } and not spellcooldown(void_eruption) > 0
 }
 
 AddFunction searing_nightmare_cutoff
@@ -273,9 +273,9 @@ AddFunction mind_sear_cutoff
  1
 }
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=shadow)
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=shadow)
-AddCheckBox(self_power_infusion l(self_power_infusion) default specialization=shadow)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(shadow)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(shadow)))
+AddCheckBox(self_power_infusion l(self_power_infusion) default enabled=(specialization(shadow)))
 
 AddFunction shadowinterruptactions
 {
@@ -627,7 +627,7 @@ AddFunction shadow_defaultshortcdpostconditions
 AddFunction shadow_defaultcdactions
 {
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
- if { buffpresent(bloodlust) or target.timetodie() <= 80 or target.healthpercent() < 35 } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if { buffpresent(bloodlust) or target.timetodie() <= 80 or target.healthpercent() < 35 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(unbridled_fury_item usable=1)
  #variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
  #variable,name=all_dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking&dot.devouring_plague.ticking
  #variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
@@ -649,39 +649,39 @@ AddFunction shadow_defaultcdpostconditions
 
 ### Shadow icons.
 
-AddCheckBox(opt_priest_shadow_aoe l(aoe) default specialization=shadow)
+AddCheckBox(opt_priest_shadow_aoe l(aoe) default enabled=(specialization(shadow)))
 
-AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=shortcd specialization=shadow
+AddIcon enabled=(not checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) enemies=1 help=shortcd
 {
  if not incombat() shadowprecombatshortcdactions()
  shadow_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_priest_shadow_aoe help=shortcd specialization=shadow
+AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) help=shortcd
 {
  if not incombat() shadowprecombatshortcdactions()
  shadow_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=shadow
+AddIcon enabled=(specialization(shadow)) enemies=1 help=main
 {
  if not incombat() shadowprecombatmainactions()
  shadow_defaultmainactions()
 }
 
-AddIcon checkbox=opt_priest_shadow_aoe help=aoe specialization=shadow
+AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) help=aoe
 {
  if not incombat() shadowprecombatmainactions()
  shadow_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=cd specialization=shadow
+AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and not specialization(shadow)) enemies=1 help=cd
 {
  if not incombat() shadowprecombatcdactions()
  shadow_defaultcdactions()
 }
 
-AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
+AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) help=cd
 {
  if not incombat() shadowprecombatcdactions()
  shadow_defaultcdactions()

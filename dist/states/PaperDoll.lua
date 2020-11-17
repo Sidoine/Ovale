@@ -6,6 +6,7 @@ local States = __State.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local tonumber = tonumber
 local ipairs = ipairs
+local unpack = unpack
 local GetCombatRating = GetCombatRating
 local GetCombatRatingBonus = GetCombatRatingBonus
 local GetCritChance = GetCritChance
@@ -31,6 +32,9 @@ local CR_HASTE_MELEE = CR_HASTE_MELEE
 local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local __Condition = LibStub:GetLibrary("ovale/Condition")
+local ReturnBoolean = __Condition.ReturnBoolean
+local ReturnConstant = __Condition.ReturnConstant
 local OVALE_SPELLDAMAGE_SCHOOL = {
     DEATHKNIGHT = 4,
     DEMONHUNTER = 3,
@@ -171,6 +175,16 @@ __exports.OvalePaperDollClass = __class(States, {
         self.lastSpell = lastSpell
         self.level = UnitLevel("player")
         self.specialization = nil
+        self.getLevel = function()
+            return ReturnConstant(self.level)
+        end
+        self.isSpecialization = function(positional)
+            local id = unpack(positional)
+            if self.specialization then
+                return ReturnBoolean(__exports.OVALE_SPECIALIZATION_NAME[self.class][self.specialization] == id)
+            end
+            return 
+        end
         self.OnInitialize = function()
             self.class = self.ovale.playerClass
             self.module:RegisterEvent("UNIT_STATS", self.UNIT_STATS)
@@ -324,6 +338,10 @@ __exports.OvalePaperDollClass = __class(States, {
         self.module = ovale:createModule("OvalePaperDoll", self.OnInitialize, self.OnDisable, aceEvent)
         self.debug = ovaleDebug:create("OvalePaperDoll")
         self.profiler = ovaleProfiler:create("OvalePaperDoll")
+    end,
+    registerConditions = function(self, condition)
+        condition:RegisterCondition("level", false, self.getLevel)
+        condition:RegisterCondition("specialization", false, self.isSpecialization)
     end,
     GetAppropriateDamageMultiplier = function(self, unit)
         local damageMultiplier = 1

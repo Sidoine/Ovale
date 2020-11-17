@@ -52,6 +52,17 @@ __exports.OvaleTotemClass = __class(States, {
             self_serial = self_serial + 1
             self.ovale:needRefresh()
         end
+        self.ApplySpellAfterCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvaleTotem_ApplySpellAfterCast")
+            if TOTEM_CLASS[self.ovale.playerClass] then
+                self.debug:Log("OvaleTotem_ApplySpellAfterCast: spellId %s, endCast %s", spellId, endCast)
+                local si = self.ovaleData.spellInfo[spellId]
+                if si and si.totem then
+                    self:SummonTotem(spellId, endCast)
+                end
+            end
+            self.profiler:StopProfiling("OvaleTotem_ApplySpellAfterCast")
+        end
         States.constructor(self, TotemData)
         self.debug = ovaleDebug:create("OvaleTotem")
         self.module = ovale:createModule("OvaleTotem", self.OnInitialize, self.OnDisable, aceEvent)
@@ -78,17 +89,6 @@ __exports.OvaleTotemClass = __class(States, {
             end
             self.next.totems[slot] = nil
         end
-    end,
-    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvaleTotem_ApplySpellAfterCast")
-        if TOTEM_CLASS[self.ovale.playerClass] then
-            self.debug:Log("OvaleTotem_ApplySpellAfterCast: spellId %s, endCast %s", spellId, endCast)
-            local si = self.ovaleData.spellInfo[spellId]
-            if si and si.totem then
-                self:SummonTotem(spellId, endCast)
-            end
-        end
-        self.profiler:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
         if  not totem then

@@ -1,8 +1,9 @@
 import { next, LuaObj } from "@wowts/lua";
 import { huge } from "@wowts/math";
 import { BaseState } from "./BaseState";
-import { PositionalParameters, NamedParameters } from "./AST";
+import { PositionalParameters, NamedParameters, AstNodeSnapshot } from "./AST";
 import { AuraType } from "./Data";
+import { isString } from "./tools";
 let INFINITY = huge;
 
 export type ConditionResult = [
@@ -23,6 +24,13 @@ export type ConditionFunction = (
     atTime: number
 ) => ConditionResult;
 
+export type ConditionAction = (
+    positionalParams: PositionalParameters,
+    namedParams: NamedParameters,
+    atTime: number,
+    result: AstNodeSnapshot
+) => void;
+
 export type ComparatorId = "atleast" | "atmost" | "equal" | "less" | "more";
 
 const COMPARATOR: { [k in ComparatorId]: boolean } = {
@@ -39,6 +47,7 @@ export function isComparator(token: string): token is ComparatorId {
 
 export class OvaleConditionClass {
     private conditions: LuaObj<ConditionFunction> = {};
+    private actions: LuaObj<ConditionAction> = {};
     private spellBookConditions: LuaObj<boolean> = {
         spell: true,
     };
@@ -59,6 +68,11 @@ export class OvaleConditionClass {
             this.spellBookConditions[name] = true;
         }
     }
+
+    registerAction(name: string, func: ConditionAction) {
+        this.actions[name] = func;
+    }
+
     UnregisterCondition(name: string) {
         delete this.conditions[name];
     }
@@ -86,7 +100,10 @@ export function ParseCondition(
     baseState: BaseState,
     defaultTarget?: string
 ): [string, AuraType | undefined, boolean] {
-    let target = namedParams.target || defaultTarget || "player";
+    let target =
+        (isString(namedParams.target) && namedParams.target) ||
+        defaultTarget ||
+        "player";
     namedParams.target = namedParams.target || target;
 
     if (target === "cycle" || target === "target") {

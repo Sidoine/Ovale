@@ -1,34 +1,22 @@
 import { OvaleQueue } from "./Queue";
 import { SpellCast } from "./states/LastSpell";
 
+export type SpellCastEventHandler = (
+    spellId: number,
+    targetGUID: string,
+    startCast: number,
+    endCast: number,
+    channel: boolean,
+    spellcast: SpellCast
+) => void;
+
 export interface StateModule {
     CleanState(): void;
     InitializeState(): void;
     ResetState(): void;
-    ApplySpellStartCast?(
-        spellId: number,
-        targetGUID: string,
-        startCast: number,
-        endCast: number,
-        channel: boolean,
-        spellcast: SpellCast
-    ): void;
-    ApplySpellAfterCast?(
-        spellId: number,
-        targetGUID: string,
-        startCast: number,
-        endCast: number,
-        channel: boolean,
-        spellcast: SpellCast
-    ): void;
-    ApplySpellOnHit?(
-        spellId: number,
-        targetGUID: string,
-        startCast: number,
-        endCast: number,
-        channel: boolean,
-        spellcast: SpellCast
-    ): void;
+    ApplySpellStartCast?: SpellCastEventHandler;
+    ApplySpellAfterCast?: SpellCastEventHandler;
+    ApplySpellOnHit?: SpellCastEventHandler;
 }
 
 export class States<T> {

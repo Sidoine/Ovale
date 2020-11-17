@@ -8,8 +8,7 @@ import {
     UnitIsDead,
     UnitCanAttack,
 } from "@wowts/wow-mock";
-import { AstNode } from "./AST";
-import { Element } from "./BestAction";
+import { AstNodeSnapshot } from "./AST";
 import { SpellFlashOptions, OvaleOptionsClass } from "./Options";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
@@ -18,6 +17,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStanceClass } from "./states/Stance";
 import { OvaleCombatClass } from "./states/combat";
 import { OptionUiGroup } from "./acegui-helpers";
+import { isNumber, isString } from "./tools";
 
 interface SpellFlashCoreClass {
     FlashForm: (
@@ -396,8 +396,9 @@ export class OvaleSpellFlashClass {
         return enabled;
     }
     Flash(
-        node: AstNode,
-        element: Element | undefined,
+        iconFlash: string | undefined,
+        iconHelp: string | undefined,
+        element: AstNodeSnapshot,
         start: number,
         now?: number
     ) {
@@ -408,18 +409,16 @@ export class OvaleSpellFlashClass {
             start &&
             start - now <= db.threshold / 1000
         ) {
-            if (element && element.type == "action") {
+            if (element.type == "action") {
                 let spellId, spellInfo;
-                if (element.name == "spell") {
-                    spellId = <number>element.positionalParams[1];
-                    spellInfo = this.ovaleData.spellInfo[spellId];
+                if (element.actionType == "spell") {
+                    spellId = element.actionId;
+                    spellInfo = spellId && this.ovaleData.spellInfo[spellId];
                 }
                 let interrupt = spellInfo && spellInfo.interrupt;
                 let color = undefined;
-                let flash = element.namedParams && element.namedParams.flash;
-                let iconFlash = node.namedParams.flash;
-                let iconHelp = node.namedParams.help;
-                if (flash && COLORTABLE[flash]) {
+                let flash = element.options && element.options.flash;
+                if (isString(flash) && COLORTABLE[flash]) {
                     color = COLORTABLE[flash];
                 } else if (iconFlash && COLORTABLE[iconFlash]) {
                     color = COLORTABLE[iconFlash];
@@ -437,7 +436,7 @@ export class OvaleSpellFlashClass {
                 }
                 let brightness = db.brightness * 100;
                 if (SpellFlashCore) {
-                    if (element.name == "spell" && spellId) {
+                    if (element.actionType == "spell" && isNumber(spellId)) {
                         if (this.ovaleStance.IsStanceSpell(spellId)) {
                             SpellFlashCore.FlashForm(
                                 spellId,
@@ -460,14 +459,15 @@ export class OvaleSpellFlashClass {
                             size,
                             brightness
                         );
-                    } else if (element.name == "item") {
-                        let itemId = <number>element.positionalParams[1];
-                        SpellFlashCore.FlashItem(
-                            itemId,
-                            color,
-                            size,
-                            brightness
-                        );
+                    } else if (element.actionType == "item") {
+                        let itemId = element.actionId;
+                        if (isNumber(itemId))
+                            SpellFlashCore.FlashItem(
+                                itemId,
+                                color,
+                                size,
+                                brightness
+                            );
                     }
                 }
             }

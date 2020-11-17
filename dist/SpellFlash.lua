@@ -10,6 +10,9 @@ local UnitHasVehicleUI = UnitHasVehicleUI
 local UnitExists = UnitExists
 local UnitIsDead = UnitIsDead
 local UnitCanAttack = UnitCanAttack
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
+local isString = __tools.isString
 local SpellFlashCore = nil
 local colorMain = {
     r = nil,
@@ -285,22 +288,20 @@ __exports.OvaleSpellFlashClass = __class(nil, {
         end
         return enabled
     end,
-    Flash = function(self, node, element, start, now)
+    Flash = function(self, iconFlash, iconHelp, element, start, now)
         local db = self.ovaleOptions.db.profile.apparence.spellFlash
         now = now or GetTime()
         if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
-            if element and element.type == "action" then
+            if element.type == "action" then
                 local spellId, spellInfo
-                if element.name == "spell" then
-                    spellId = element.positionalParams[1]
-                    spellInfo = self.ovaleData.spellInfo[spellId]
+                if element.actionType == "spell" then
+                    spellId = element.actionId
+                    spellInfo = spellId and self.ovaleData.spellInfo[spellId]
                 end
                 local interrupt = spellInfo and spellInfo.interrupt
                 local color = nil
-                local flash = element.namedParams and element.namedParams.flash
-                local iconFlash = node.namedParams.flash
-                local iconHelp = node.namedParams.help
-                if flash and COLORTABLE[flash] then
+                local flash = element.options and element.options.flash
+                if isString(flash) and COLORTABLE[flash] then
                     color = COLORTABLE[flash]
                 elseif iconFlash and COLORTABLE[iconFlash] then
                     color = COLORTABLE[iconFlash]
@@ -318,7 +319,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                 end
                 local brightness = db.brightness * 100
                 if SpellFlashCore then
-                    if element.name == "spell" and spellId then
+                    if element.actionType == "spell" and isNumber(spellId) then
                         if self.ovaleStance:IsStanceSpell(spellId) then
                             SpellFlashCore.FlashForm(spellId, color, size, brightness)
                         end
@@ -326,9 +327,11 @@ __exports.OvaleSpellFlashClass = __class(nil, {
                             SpellFlashCore.FlashPet(spellId, color, size, brightness)
                         end
                         SpellFlashCore.FlashAction(spellId, color, size, brightness)
-                    elseif element.name == "item" then
-                        local itemId = element.positionalParams[1]
-                        SpellFlashCore.FlashItem(itemId, color, size, brightness)
+                    elseif element.actionType == "item" then
+                        local itemId = element.actionId
+                        if isNumber(itemId) then
+                            SpellFlashCore.FlashItem(itemId, color, size, brightness)
+                        end
                     end
                 end
             end

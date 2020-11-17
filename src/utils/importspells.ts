@@ -1823,7 +1823,7 @@ export function getSpellData(directory: string) {
         }
     }
 
-    const spellLists = new Map<string, SpellData[]>();
+    const spellLists = new Map<string, { id: number; identifier: string }[]>();
     for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
         if (spells.length === 1) continue;
         const max = spells.reduce(

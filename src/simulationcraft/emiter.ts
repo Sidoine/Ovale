@@ -34,9 +34,9 @@ import {
     AstNode,
     OvaleASTClass,
     OperatorType,
-    StringNode,
-    ValueNode,
-    isNodeType,
+    AstAddFunctionNode,
+    AstGroupNode,
+    isAstNodeWithChildren,
 } from "../AST";
 import { Tracer, OvaleDebugClass } from "../Debug";
 import {
@@ -59,7 +59,7 @@ import {
 } from "./text-tools";
 import { POOLED_RESOURCE } from "../states/Power";
 import { Unparser } from "./unparser";
-import { MakeString } from "../tools";
+import { isNumber, MakeString } from "../tools";
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../states/PaperDoll";
 
@@ -225,7 +225,11 @@ export class Emiter {
 
     public InitializeDisambiguation() {
         this.AddDisambiguation("none", "none");
-
+        this.AddDisambiguation(
+            "inevitable_demise_az_buff",
+            "inevitable_demise_debuff",
+            "WARLOCK"
+        );
         this.AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian");
         this.AddDisambiguation(
             "dark_soul",
@@ -356,15 +360,31 @@ export class Emiter {
             }
             let parameters: LuaArray<AstNode> = {};
             if (info.extraParameter) {
-                insert(
-                    parameters,
-                    this.ovaleAst.newValue(nodeList, info.extraParameter)
-                );
+                if (isNumber(info.extraParameter)) {
+                    insert(
+                        parameters,
+                        this.ovaleAst.newValue(
+                            annotation.astAnnotation,
+                            info.extraParameter
+                        )
+                    );
+                } else {
+                    insert(
+                        parameters,
+                        this.ovaleAst.newString(
+                            annotation.astAnnotation,
+                            info.extraParameter
+                        )
+                    );
+                }
             }
             if (info.extraSymbol) {
                 insert(
                     parameters,
-                    this.ovaleAst.newValue(nodeList, info.extraSymbol)
+                    this.ovaleAst.newVariable(
+                        annotation.astAnnotation,
+                        info.extraSymbol
+                    )
                 );
                 annotation.AddSymbol(info.extraSymbol);
             }
@@ -395,7 +415,10 @@ export class Emiter {
                     ) {
                         insert(
                             parameters,
-                            this.ovaleAst.newValue(nodeList, modifierName)
+                            this.ovaleAst.newString(
+                                annotation.astAnnotation,
+                                modifierName
+                            )
                         );
                     } else if (
                         modifierParameters.type ===
@@ -408,13 +431,23 @@ export class Emiter {
                         annotation.options[modifierName] = true;
                     }
                     if (modifierParameters.extraParameter) {
-                        insert(
-                            parameters,
-                            this.ovaleAst.newValue(
-                                nodeList,
-                                modifierParameters.extraParameter
-                            )
-                        );
+                        if (isNumber(modifierParameters.extraParameter)) {
+                            insert(
+                                parameters,
+                                this.ovaleAst.newValue(
+                                    annotation.astAnnotation,
+                                    modifierParameters.extraParameter
+                                )
+                            );
+                        } else {
+                            insert(
+                                parameters,
+                                this.ovaleAst.newString(
+                                    annotation.astAnnotation,
+                                    modifierParameters.extraParameter
+                                )
+                            );
+                        }
                     }
                 } else if (info.symbol !== undefined) {
                     if (info.symbol !== "") {
@@ -429,7 +462,10 @@ export class Emiter {
                     this.AddSymbol(annotation, modifier);
                     insert(
                         parameters,
-                        this.ovaleAst.newValue(nodeList, modifier)
+                        this.ovaleAst.newVariable(
+                            annotation.astAnnotation,
+                            modifier
+                        )
                     );
                 } else {
                     this.tracer.Warning(
@@ -440,14 +476,16 @@ export class Emiter {
 
                 modifier = tokenIterator();
             }
+            const result = this.ovaleAst.newFunction(
+                name,
+                annotation.astAnnotation
+            );
             if (lualength(parameters) > 0) {
-                const result = this.ovaleAst.newFunction(nodeList, name, true);
                 for (const [k, v] of ipairs(parameters)) {
                     result.rawPositionalParams[k] = v;
                 }
-                return result;
             }
-            return this.ovaleAst.newFunction(nodeList, name);
+            return result;
         }
 
         return undefined;
@@ -550,30 +588,30 @@ export class Emiter {
                         action
                     );
                     if (syncActionNode) {
-                        let syncActionType = syncActionNode.type;
-                        if (syncActionType == "action") {
+                        if (syncActionNode.type == "action") {
                             node = syncActionNode;
-                        } else if (syncActionType == "custom_function") {
+                        } else if (syncActionNode.type == "custom_function") {
                             node = syncActionNode;
                         } else if (
-                            syncActionType == "if" ||
-                            syncActionType == "unless"
+                            syncActionNode.type == "if" ||
+                            syncActionNode.type == "unless"
                         ) {
                             let lhsNode = syncActionNode.child[1];
-                            if (syncActionType == "unless") {
-                                let notNode = this.ovaleAst.NewNode(
-                                    nodeList,
-                                    true
+                            if (syncActionNode.type == "unless") {
+                                let notNode = this.ovaleAst.newNodeWithChildren(
+                                    "logical",
+                                    annotation.astAnnotation
                                 );
-                                notNode.type = "logical";
                                 notNode.expressionType = "unary";
                                 notNode.operator = "not";
                                 notNode.child[1] = lhsNode;
                                 lhsNode = notNode;
                             }
                             let rhsNode = syncActionNode.child[2];
-                            let andNode = this.ovaleAst.NewNode(nodeList, true);
-                            andNode.type = "logical";
+                            let andNode = this.ovaleAst.newNodeWithChildren(
+                                "logical",
+                                annotation.astAnnotation
+                            );
                             andNode.expressionType = "binary";
                             andNode.operator = "and";
                             andNode.child[1] = lhsNode;
@@ -638,8 +676,10 @@ export class Emiter {
                     conditionNode = rhsNode;
                 } else {
                     let lhsNode = conditionNode;
-                    conditionNode = this.ovaleAst.NewNode(nodeList, true);
-                    conditionNode.type = "logical";
+                    conditionNode = this.ovaleAst.newNodeWithChildren(
+                        "logical",
+                        annotation.astAnnotation
+                    );
                     conditionNode.expressionType = "binary";
                     conditionNode.operator = "and";
                     conditionNode.child[1] = lhsNode;
@@ -651,8 +691,10 @@ export class Emiter {
             if (conditionNode) {
                 let lhsNode = conditionNode;
                 let rhsNode = extraConditionNode;
-                conditionNode = this.ovaleAst.NewNode(nodeList, true);
-                conditionNode.type = "logical";
+                conditionNode = this.ovaleAst.newNodeWithChildren(
+                    "logical",
+                    annotation.astAnnotation
+                );
                 conditionNode.expressionType = "binary";
                 conditionNode.operator = "and";
                 conditionNode.child[1] = lhsNode;
@@ -662,7 +704,10 @@ export class Emiter {
             }
         }
         if (conditionNode) {
-            let node = this.ovaleAst.NewNode(nodeList, true);
+            let node = this.ovaleAst.newNodeWithChildren(
+                "if",
+                annotation.astAnnotation
+            );
             node.type = "if";
             node.child[1] = conditionNode;
             node.child[2] = bodyNode;
@@ -689,15 +734,19 @@ export class Emiter {
         let node = annotation.variable[name];
         let group;
         if (!node) {
-            node = this.ovaleAst.NewNode(nodeList, true);
+            group = this.ovaleAst.newNodeWithChildren(
+                "group",
+                annotation.astAnnotation
+            );
+            node = this.ovaleAst.newNodeWithBodyAndParameters(
+                "add_function",
+                annotation.astAnnotation,
+                group
+            );
             annotation.variable[name] = node;
-            node.type = "add_function";
             node.name = name;
-            group = this.ovaleAst.NewNode(nodeList, true);
-            group.type = "group";
-            node.child[1] = group;
         } else {
-            group = node.child[1];
+            group = node.body;
         }
         annotation.currentVariable = node;
         if (!modifiers.value) {
@@ -757,7 +806,7 @@ export class Emiter {
             annotation.astAnnotation
         );
         if (node) {
-            annotation.variable[name] = node;
+            annotation.variable[name] = node as AstAddFunctionNode;
         }
     };
 
@@ -795,7 +844,7 @@ export class Emiter {
             annotation.astAnnotation
         );
         if (node) {
-            annotation.variable[name] = node;
+            annotation.variable[name] = node as AstAddFunctionNode;
         }
     };
 
@@ -850,17 +899,21 @@ export class Emiter {
         action: string
     ) => {
         let node = annotation.variable[name];
-        let group: AstNode;
+        let group: AstGroupNode;
         if (!node) {
-            node = this.ovaleAst.NewNode(nodeList, true);
+            group = this.ovaleAst.newNodeWithChildren(
+                "group",
+                annotation.astAnnotation
+            );
+            node = this.ovaleAst.newNodeWithBodyAndParameters(
+                "add_function",
+                annotation.astAnnotation,
+                group
+            );
             annotation.variable[name] = node;
-            node.type = "add_function";
             node.name = name;
-            group = this.ovaleAst.NewNode(nodeList, true);
-            group.type = "group";
-            node.child[1] = group;
         } else {
-            group = node.child[1];
+            group = node.body;
         }
 
         annotation.currentVariable = node;
@@ -870,8 +923,10 @@ export class Emiter {
             return;
         }
 
-        const ifNode = this.ovaleAst.NewNode(nodeList, true);
-        ifNode.type = "if";
+        const ifNode = this.ovaleAst.newNodeWithChildren(
+            "if",
+            annotation.astAnnotation
+        );
         const condition = this.Emit(
             modifiers.condition,
             nodeList,
@@ -888,8 +943,10 @@ export class Emiter {
         ifNode.child[1] = condition;
         ifNode.child[2] = value;
         insert(group.child, ifNode);
-        const elseNode = this.ovaleAst.NewNode(nodeList, true);
-        elseNode.type = "unless";
+        const elseNode = this.ovaleAst.newNodeWithChildren(
+            "unless",
+            annotation.astAnnotation
+        );
         elseNode.child[1] = ifNode.child[1];
         const valueElse = this.Emit(
             modifiers.value_else,
@@ -1415,8 +1472,10 @@ export class Emiter {
                 bodyCode = "texture(INV_Pet_ExitBattle text=cancel)";
                 isSpellAction = false;
             } else if (action == "pool_resource") {
-                bodyNode = this.ovaleAst.NewNode(nodeList);
-                bodyNode.type = "simc_pool_resource";
+                bodyNode = this.ovaleAst.NewNode(
+                    "simc_pool_resource",
+                    annotation.astAnnotation
+                );
                 bodyNode.for_next = modifiers.for_next != undefined;
                 if (modifiers.extra_amount) {
                     bodyNode.extra_amount = tonumber(
@@ -1523,8 +1582,10 @@ export class Emiter {
                     );
                     if (seconds) {
                     } else {
-                        bodyNode = this.ovaleAst.NewNode(nodeList);
-                        bodyNode.type = "simc_wait";
+                        bodyNode = this.ovaleAst.newNodeWithChildren(
+                            "simc_wait",
+                            annotation.astAnnotation
+                        );
                         let expressionNode = this.Emit(
                             modifiers.sec,
                             nodeList,
@@ -1596,14 +1657,18 @@ export class Emiter {
         nodeList,
         annotation
     ) => {
-        let groupNode = this.ovaleAst.NewNode(nodeList, true);
-        groupNode.type = "group";
+        let groupNode = this.ovaleAst.newNodeWithChildren(
+            "group",
+            annotation.astAnnotation
+        );
         let child = groupNode.child;
         let poolResourceNode;
         let emit = true;
         for (const [, actionNode] of ipairs(parseNode.child)) {
-            let commentNode = this.ovaleAst.NewNode(nodeList);
-            commentNode.type = "comment";
+            let commentNode = this.ovaleAst.NewNode(
+                "comment",
+                annotation.astAnnotation
+            );
             commentNode.comment = actionNode.action;
             child[lualength(child) + 1] = commentNode;
             if (emit) {
@@ -1628,7 +1693,7 @@ export class Emiter {
                         child[lualength(child) + 1] = statementNode;
                         let bodyNode;
                         let poolingConditionNode: AstNode | undefined;
-                        if (statementNode.child) {
+                        if (isAstNodeWithChildren(statementNode)) {
                             poolingConditionNode = statementNode.child[1];
                             bodyNode = statementNode.child[2];
                         } else {
@@ -1695,75 +1760,87 @@ export class Emiter {
                             );
                             if (conditionNode) {
                                 if (
-                                    statementNode.child &&
+                                    isAstNodeWithChildren(statementNode) &&
                                     poolingConditionNode
                                 ) {
                                     let rhsNode = conditionNode;
-                                    conditionNode = this.ovaleAst.NewNode(
-                                        nodeList,
-                                        true
+                                    conditionNode = this.ovaleAst.newNodeWithChildren(
+                                        "logical",
+                                        annotation.astAnnotation
                                     );
-                                    conditionNode.type = "logical";
                                     conditionNode.expressionType = "binary";
                                     conditionNode.operator = "and";
                                     conditionNode.child[1] = poolingConditionNode;
                                     conditionNode.child[2] = rhsNode;
                                 }
-                                let restNode = this.ovaleAst.NewNode(
-                                    nodeList,
-                                    true
+                                let restNodeType: "if" | "unless";
+                                if (statementNode.type == "unless") {
+                                    restNodeType = "if";
+                                } else {
+                                    restNodeType = "unless";
+                                }
+
+                                let restNode = this.ovaleAst.newNodeWithChildren(
+                                    restNodeType,
+                                    annotation.astAnnotation
                                 );
                                 child[lualength(child) + 1] = restNode;
-                                if (statementNode.type == "unless") {
-                                    restNode.type = "if";
-                                } else {
-                                    restNode.type = "unless";
-                                }
                                 restNode.child[1] = conditionNode;
-                                restNode.child[2] = this.ovaleAst.NewNode(
-                                    nodeList,
-                                    true
+                                restNode.child[2] = this.ovaleAst.newNodeWithChildren(
+                                    "group",
+                                    annotation.astAnnotation
                                 );
-                                restNode.child[2].type = "group";
                                 child = restNode.child[2].child;
                             }
                         }
                         poolResourceNode = undefined;
                     } else if (statementNode.type == "simc_wait") {
-                    } else if (statementNode.simc_wait) {
-                        let restNode = this.ovaleAst.NewNode(nodeList, true);
+                    } else if (
+                        (statementNode.type === "if" ||
+                            statementNode.type == "unless") &&
+                        statementNode.simc_wait
+                    ) {
+                        let restNode = this.ovaleAst.newNodeWithChildren(
+                            "unless",
+                            annotation.astAnnotation
+                        );
                         child[lualength(child) + 1] = restNode;
                         restNode.type = "unless";
                         restNode.child[1] = statementNode.child[1];
-                        restNode.child[2] = this.ovaleAst.NewNode(
-                            nodeList,
-                            true
+                        restNode.child[2] = this.ovaleAst.newNodeWithChildren(
+                            "group",
+                            annotation.astAnnotation
                         );
-                        restNode.child[2].type = "group";
                         child = restNode.child[2].child;
                     } else {
                         child[lualength(child) + 1] = statementNode;
-                        if (statementNode.simc_pool_resource) {
+                        if (
+                            (statementNode.type === "if" ||
+                                statementNode.type == "unless") &&
+                            statementNode.simc_pool_resource
+                        ) {
                             if (statementNode.type == "if") {
-                                statementNode.type = "unless";
+                                statementNode.type = "unless" as "if";
                             } else if (statementNode.type == "unless") {
-                                statementNode.type = "if";
+                                statementNode.type = "if" as "unless";
                             }
-                            statementNode.child[2] = this.ovaleAst.NewNode(
-                                nodeList,
-                                true
+                            statementNode.child[2] = this.ovaleAst.newNodeWithChildren(
+                                "group",
+                                annotation.astAnnotation
                             );
-                            statementNode.child[2].type = "group";
                             child = statementNode.child[2].child;
                         }
                     }
                 }
             }
         }
-        let node = this.ovaleAst.NewNode(nodeList, true);
-        node.type = "add_function";
+
+        const node = this.ovaleAst.newNodeWithBodyAndParameters(
+            "add_function",
+            annotation.astAnnotation,
+            groupNode
+        );
         node.name = OvaleFunctionName(parseNode.name, annotation);
-        node.child[1] = groupNode;
         return node;
     };
 
@@ -1793,11 +1870,13 @@ export class Emiter {
                         action
                     );
                     if (rhsNode) {
-                        if (operator == "-" && isNodeType(rhsNode, "value")) {
-                            rhsNode.value = -1 * <number>rhsNode.value;
+                        if (operator == "-" && rhsNode.type === "value") {
+                            rhsNode.value = -1 * rhsNode.value;
                         } else {
-                            node = this.ovaleAst.NewNode(nodeList, true);
-                            node.type = opInfo[1];
+                            node = this.ovaleAst.newNodeWithChildren(
+                                opInfo[1],
+                                annotation.astAnnotation
+                            );
                             node.expressionType = "unary";
                             node.operator = operator;
                             node.precedence = opInfo[2];
@@ -1896,8 +1975,10 @@ export class Emiter {
                         action
                     );
                     if (lhsNode && rhsNode) {
-                        node = this.ovaleAst.NewNode(nodeList, true);
-                        node.type = opInfo[1];
+                        node = this.ovaleAst.newNodeWithChildren(
+                            opInfo[1],
+                            annotation.astAnnotation
+                        );
                         node.expressionType = "binary";
                         node.operator = operator;
                         node.child[1] = lhsNode;
@@ -1937,8 +2018,10 @@ export class Emiter {
                     parseNode.operator
                 );
             this.tracer.Print(msg);
-            const stringNode = <StringNode>this.ovaleAst.NewNode(nodeList);
-            stringNode.type = "string";
+            const stringNode = this.ovaleAst.NewNode(
+                "string",
+                annotation.astAnnotation
+            );
             stringNode.value = `FIXME_${parseNode.operator}`;
             return stringNode;
         }
@@ -1959,8 +2042,7 @@ export class Emiter {
                 "Warning: Function '%s' is not implemented.",
                 parseNode.name
             );
-            node = this.ovaleAst.NewNode(nodeList);
-            node.type = "variable";
+            node = this.ovaleAst.NewNode("variable", annotation.astAnnotation);
             node.name = `FIXME_${parseNode.name}`;
         }
         return node;
@@ -1972,8 +2054,7 @@ export class Emiter {
         annotation,
         action
     ) => {
-        let node = <ValueNode>this.ovaleAst.NewNode(nodeList);
-        node.type = "value";
+        let node = this.ovaleAst.NewNode("value", annotation.astAnnotation);
         node.value = parseNode.value;
         node.origin = 0;
         node.rate = 0;
@@ -2269,9 +2350,12 @@ export class Emiter {
                 "Warning: Variable '%s' is not implemented.",
                 parseNode.name
             );
-            node = this.ovaleAst.newFunction(nodeList, "message", true);
+            node = this.ovaleAst.newFunction(
+                "message",
+                annotation.astAnnotation
+            );
             node.rawPositionalParams[1] = this.ovaleAst.newString(
-                nodeList,
+                annotation.astAnnotation,
                 `${parseNode.name} is not implemented`
             );
         }
@@ -4249,7 +4333,7 @@ export class Emiter {
                 annotation.currentVariable &&
                 annotation.currentVariable.name == name
             ) {
-                let group = annotation.currentVariable.child[1];
+                let group = annotation.currentVariable.body;
                 if (lualength(group.child) == 0) {
                     [node] = this.ovaleAst.ParseCode(
                         "expression",
@@ -4266,8 +4350,10 @@ export class Emiter {
                     );
                 }
             } else {
-                node = this.ovaleAst.NewNode(nodeList);
-                node.type = "function";
+                node = this.ovaleAst.newNodeWithParameters(
+                    "function",
+                    annotation.astAnnotation
+                );
                 node.name = name;
             }
         }
