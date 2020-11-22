@@ -263,7 +263,13 @@ Define(unbreakable_spirit_talent 10)
 
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
     SpellAddBuff(word_of_glory divine_purpose set=0)
-    
+#word_of_glory
+    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
+    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(shining_light_free_buff)))
+    SpellAddBuff(word_of_glory divine_purpose set=0)
+    SpellAddBuff(word_of_glory shining_light_free_buff set=0)
+Define(shining_light_free_buff 327510)
+    SpellInfo(shining_light_free_buff duration=30)
     ]]
     OvaleScripts:RegisterScript("PALADIN", nil, name, desc, code, "include")
 end
