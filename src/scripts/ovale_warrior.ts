@@ -17,8 +17,8 @@ export function registerWarrior(OvaleScripts: OvaleScriptsClass) {
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=arms)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=arms)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(arms)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(arms)))
 
 AddFunction armsinterruptactions
 {
@@ -45,7 +45,7 @@ AddFunction armsgetinmeleerange
  {
   if target.inrange(charge) spell(charge)
   if spellcharges(charge) == 0 and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
-  texture(misc_arrowlup help=l(not_in_melee_range))
+  texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
 
@@ -376,39 +376,39 @@ AddFunction arms_defaultcdpostconditions
 
 ### Arms icons.
 
-AddCheckBox(opt_warrior_arms_aoe l(aoe) default specialization=arms)
+AddCheckBox(opt_warrior_arms_aoe l(aoe) default enabled=(specialization(arms)))
 
-AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=shortcd specialization=arms
+AddIcon enabled=(not checkboxon(opt_warrior_arms_aoe) and specialization(arms)) enemies=1 help=shortcd
 {
  if not incombat() armsprecombatshortcdactions()
  arms_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_warrior_arms_aoe help=shortcd specialization=arms
+AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help=shortcd
 {
  if not incombat() armsprecombatshortcdactions()
  arms_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=arms
+AddIcon enabled=(specialization(arms)) enemies=1 help=main
 {
  if not incombat() armsprecombatmainactions()
  arms_defaultmainactions()
 }
 
-AddIcon checkbox=opt_warrior_arms_aoe help=aoe specialization=arms
+AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help=aoe
 {
  if not incombat() armsprecombatmainactions()
  arms_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=cd specialization=arms
+AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and not specialization(arms)) enemies=1 help=cd
 {
  if not incombat() armsprecombatcdactions()
  arms_defaultcdactions()
 }
 
-AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
+AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help=cd
 {
  if not incombat() armsprecombatcdactions()
  arms_defaultcdactions()
@@ -490,8 +490,8 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=fury)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=fury)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(fury)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(fury)))
 
 AddFunction furyinterruptactions
 {
@@ -518,7 +518,7 @@ AddFunction furygetinmeleerange
  {
   if target.inrange(charge) spell(charge)
   if spellcharges(charge) == 0 and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
-  texture(misc_arrowlup help=l(not_in_melee_range))
+  texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
 
@@ -679,7 +679,7 @@ AddFunction fury_defaultmainactions
  unless target.distance() > 5 and furymovementmainpostconditions()
  {
   #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
-  if target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
+  if target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } spell(heroic_leap)
   #rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #blood_of_the_enemy,if=(buff.recklessness.up|cooldown.recklessness.remains<1)&(rage>80&(buff.meat_cleaver.up&buff.enrage.up|spell_targets.whirlwind=1)|dot.noxious_venom.remains)
@@ -718,7 +718,7 @@ AddFunction fury_defaultshortcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementshortcdactions()
 
-  unless target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy)
+  unless target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy)
   {
    #purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
    if not buffpresent(recklessness) and not buffpresent(siegebreaker) spell(purifying_blast)
@@ -750,7 +750,7 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
@@ -762,7 +762,7 @@ AddFunction fury_defaultcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementcdactions()
 
-  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
   {
    #guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
    if not buffpresent(recklessness) and { target.timetodie() > 195 or target.healthpercent() < 20 } spell(guardian_of_azeroth)
@@ -770,7 +770,7 @@ AddFunction fury_defaultcdactions
    unless not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind)
    {
     #use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-    if target.timetodie() < 20 or not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) or not target.debuffpresent(conductive_ink) and buffpresent(memory_of_lucid_dreams_buff) or previousgcdspell(guardian_of_azeroth count=2) or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
+    if target.timetodie() < 20 or not target.debuffpresent(razor_coral_debuff) or target.healthpercent() < 30.1 and target.debuffpresent(conductive_ink) or { not target.debuffpresent(conductive_ink) and buffpresent(memory_of_lucid_dreams_buff) or previousgcdspell(guardian_of_azeroth count=2) } or previousgcdspell(recklessness count=2) and not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) and not azeriteessenceismajor(condensed_lifeforce_essence_id) furyuseitemactions()
     #blood_fury,if=buff.recklessness.up
     if buffpresent(recklessness) spell(blood_fury)
 
@@ -796,44 +796,44 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { buffpresent(recklessness) or spellcooldown(recklessness) < 1 } and { rage() > 80 and { buffpresent(meat_cleaver) and isenraged() or enemies() == 1 } or target.debuffremaining(noxious_venom) } and spell(blood_of_the_enemy) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(purifying_blast) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(ripple_in_space) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(worldvein_resonance) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(focused_azerite_beam) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and spell(reaping_flames) or not buffpresent(recklessness) and not buffpresent(siegebreaker) and not target.debuffremaining(concentrated_flame_burn_debuff) > 0 and spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force) or not buffpresent(recklessness) and spell(memory_of_lucid_dreams) or not gcdremaining() > 0 and { not azeriteessenceismajor(condensed_lifeforce_essence_id) and not azeriteessenceismajor(blood_of_the_enemy_essence_id) or spellcooldown(guardian_of_azeroth) > 1 or buffpresent(guardian_of_azeroth_buff) or buffpresent(blood_of_the_enemy) } and spell(recklessness) or enemies() > 1 and not buffpresent(meat_cleaver) and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
 
-AddCheckBox(opt_warrior_fury_aoe l(aoe) default specialization=fury)
+AddCheckBox(opt_warrior_fury_aoe l(aoe) default enabled=(specialization(fury)))
 
-AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fury
+AddIcon enabled=(not checkboxon(opt_warrior_fury_aoe) and specialization(fury)) enemies=1 help=shortcd
 {
  if not incombat() furyprecombatshortcdactions()
  fury_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
+AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help=shortcd
 {
  if not incombat() furyprecombatshortcdactions()
  fury_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=fury
+AddIcon enabled=(specialization(fury)) enemies=1 help=main
 {
  if not incombat() furyprecombatmainactions()
  fury_defaultmainactions()
 }
 
-AddIcon checkbox=opt_warrior_fury_aoe help=aoe specialization=fury
+AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help=aoe
 {
  if not incombat() furyprecombatmainactions()
  fury_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
+AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and not specialization(fury)) enemies=1 help=cd
 {
  if not incombat() furyprecombatcdactions()
  fury_defaultcdactions()
 }
 
-AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
+AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help=cd
 {
  if not incombat() furyprecombatcdactions()
  fury_defaultcdactions()

@@ -25,12 +25,14 @@ export function isLuaArray<T>(a: any): a is LuaArray<T> {
     return type(a) === "table";
 }
 
-export type TypeCheck<T> = { [K in keyof T]: boolean };
-export function checkToken<T>(
-    type: TypeCheck<T>,
+export type KeyCheck<T extends string> = { [K in T]: boolean };
+
+export type TypeCheck<T> = { [K in keyof Required<T>]: boolean };
+export function checkToken<T extends string>(
+    type: KeyCheck<T>,
     token: any
-): token is keyof T {
-    return type[<keyof T>token];
+): token is T {
+    return type[<T>token];
 }
 
 export const oneTimeMessages: LuaObj<boolean | "printed"> = {};

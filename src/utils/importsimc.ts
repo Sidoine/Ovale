@@ -16,8 +16,7 @@ import {
     CustomAuras,
     CustomSpellData,
 } from "./customspell";
-import { SpellInfo } from "../Data";
-import { ConditionNamedParameters } from "../AST";
+import { SpellInfoProperty } from "../Data";
 import { IoC } from "../ioc";
 
 let outputDirectory = "src/scripts";
@@ -123,6 +122,7 @@ const essenceByClass = new Map<string, number[]>();
 const runeforgeByClass = new Map<string, number[]>();
 const conduitByClass = new Map<string, number[]>();
 const soulbindAbilityByClass = new Map<string, number[]>();
+const customByClass = new Map<string, number[]>();
 
 function getOrSet<T>(map: Map<string, T[]>, className: string) {
     let result = map.get(className);
@@ -136,6 +136,53 @@ function addId<T>(ids: T[], id?: T) {
     if (id && !ids.includes(id)) {
         ids.push(id);
     }
+}
+
+const customIdentifiers = new Map<string, number>();
+
+// Pets and demons
+customIdentifiers.set("wild_imp_inner_demons", 143622);
+customIdentifiers.set("vilefiend", 135816);
+customIdentifiers.set("demonic_tyrant", 135002);
+customIdentifiers.set("wild_imp", 55659);
+customIdentifiers.set("dreadstalker", 98035);
+customIdentifiers.set("darkglare", 103673);
+customIdentifiers.set("infernal", 89);
+customIdentifiers.set("felguard", 17252);
+
+// Spells missing in the database
+customIdentifiers.set("hex", 51514);
+
+// Invisible auras
+customIdentifiers.set("garrote_exsanguinated", -703);
+customIdentifiers.set("rupture_exsanguinated", -1943);
+
+// Custom spell lists
+spellData.spellLists.set("exsanguinated", [
+    { identifier: "garrote_exsanguinated", id: -703 },
+    { identifier: "rupture_exsanguinated", id: -1943 },
+]);
+
+// Fix identifiers
+function fixIdentifier(identifier: string, spellId: number) {
+    const spell = spellData.spellDataById.get(spellId);
+    if (spell) {
+        spell.identifier = identifier;
+        spellData.identifiers[identifier] = spellId;
+    }
+}
+fixIdentifier("shining_light_free_buff", 327510);
+fixIdentifier("sun_kings_blessing_ready_buff", 333315);
+fixIdentifier("clearcasting_channel_buff", 277726);
+
+const customIdentifierById = new Map<
+    number,
+    { id: number; identifier: string }
+>();
+
+for (const [key, value] of customIdentifiers.entries()) {
+    spellData.identifiers[key] = value;
+    customIdentifierById.set(value, { identifier: key, id: value });
 }
 
 for (const filename of files) {
@@ -186,6 +233,9 @@ for (const filename of files) {
             const ioc = new IoC();
             ioc.ovale.playerGUID = "player";
             ioc.ovale.playerClass = <ClassId>className;
+            for (const [key] of spellData.spellLists) {
+                ioc.data.buffSpellList[key] = {};
+            }
             eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
             eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
             registerScripts(ioc.scripts);
@@ -244,6 +294,7 @@ for (const filename of files) {
             let runeforges = getOrSet(runeforgeByClass, className);
             let conduits = getOrSet(conduitByClass, className);
             let soulbindAbilities = getOrSet(soulbindAbilityByClass, className);
+            const custom = getOrSet(customByClass, className);
 
             const identifiers = ipairs(profile.annotation.symbolList)
                 .map((x) => x[1])
@@ -259,7 +310,8 @@ for (const filename of files) {
                     continue;
                 }
                 const id = spellData.identifiers[symbol];
-                if (symbol.match(/_talent/)) {
+                if (customIdentifiers.has(symbol)) addId(custom, id);
+                else if (symbol.match(/_talent/)) {
                     addId(classTalents, id);
                 } else if (symbol.match(/_item$/)) {
                     addId(classItems, id);
@@ -303,31 +355,28 @@ function getBuffDefinition(
         ret = `  # ${getTooltip(spell)}\n`;
     }
     if (target === "player") {
-        return `${ret}  SpellAddBuff(${identifier} ${spell.identifier}=${customAura.stacks})`;
+        return `${ret}  SpellAddBuff(${identifier} ${spell.identifier} add=${customAura.stacks})`;
     }
-    return `${ret}  SpellAddTargetDebuff(${identifier} ${spell.identifier}=${customAura.stacks})`;
+    return `${ret}  SpellAddTargetDebuff(${identifier} ${spell.identifier} add=${customAura.stacks})`;
 }
 
-function getConditions(
-    conditions: ConditionNamedParameters,
-    talentIds: number[]
-) {
-    let output = "";
-    for (const key in conditions) {
-        if (key === "talent") {
-            const talentId = conditions[key];
-            if (talentId) {
-                const talent = spellData.talentsById.get(talentId);
-                if (talent) {
-                    output += ` ${key}=${talent.identifier}`;
-                    if (talentIds.indexOf(talentId) < 0)
-                        talentIds.push(talentId);
-                }
-            }
-        }
-    }
-    return output;
-}
+// function getConditions(conditions: Condition[], talentIds: number[]) {
+//     let output = "";
+//     for (const key of conditions) {
+//         if (key.type === "talent") {
+//             const talentId = key.id;
+//             if (talentId) {
+//                 const talent = spellData.talentsById.get(talentId);
+//                 if (talent) {
+//                     output += ` hastalent(${talent.identifier})`;
+//                     if (talentIds.indexOf(talentId) < 0)
+//                         talentIds.push(talentId);
+//                 }
+//             }
+//         }
+//     }
+//     return output;
+// }
 
 function getDefinition(
     identifier: string,
@@ -347,19 +396,26 @@ function getDefinition(
     for (const key in customSpellData.spellInfo) {
         if (key === "require") continue;
         output += ` ${key}=${
-            customSpellData.spellInfo[key as keyof SpellInfo]
+            customSpellData.spellInfo[key as SpellInfoProperty]
         }`;
     }
 
-    if (customSpellData.conditions)
-        output += getConditions(customSpellData.conditions, talentIds);
+    // if (customSpellData.conditions)
+    //     output += getConditions(customSpellData.conditions, talentIds);
 
     output += `)\n`;
 
     for (const require of customSpellData.require) {
+        let parameter;
+        if (require.talentId) {
+            parameter = spellData.talentsById.get(require.talentId)?.identifier;
+            talentIds.push(require.talentId);
+        }
         output += `  SpellRequire(${customSpellData.identifier} ${
             require.property
-        } ${require.value}=${require.not ? "not_" : ""}${require.condition})\n`;
+        } set=${require.value} enabled=(${require.not ? "not " : ""}${
+            require.condition
+        }(${parameter ?? ""})))\n`;
     }
 
     if (
@@ -369,8 +425,8 @@ function getDefinition(
         const replaced = spellData.spellDataById.get(customSpellData.replace);
         if (replaced) {
             output += `  SpellInfo(${replaced.identifier} replaced_by=${identifier}`;
-            if (customSpellData.conditions)
-                output += getConditions(customSpellData.conditions, talentIds);
+            // if (customSpellData.conditions)
+            //     output += getConditions(customSpellData.conditions, talentIds);
             output += ")\n";
         }
     }
@@ -481,6 +537,7 @@ ${limitLine2}
         }
     }
 
+    writeIds(customByClass, customIdentifierById, "id");
     writeIds(itemsByClass, spellData.itemsById, "id");
     writeIds(azeriteTraitByClass, spellData.azeriteTraitById, "spellId");
     writeIds(essenceByClass, spellData.essenceById, "id");

@@ -321,9 +321,11 @@ export class OvaleSimulationCraftClass {
     }
     EmitAST(profile: Profile) {
         let nodeList = {};
-        let ast = this.ovaleAst.NewNode(nodeList, true);
+        let ast = this.ovaleAst.newNodeWithChildren(
+            "script",
+            profile.annotation.astAnnotation
+        );
         const child = ast.child;
-        ast.type = "script";
         let annotation = profile.annotation;
         let ok = true;
         if (profile.actionList) {
@@ -357,13 +359,13 @@ export class OvaleSimulationCraftClass {
                 dictionaryAnnotation.nodeList,
                 dictionaryAnnotation
             );
-            if (dictionaryAST) {
+            if (dictionaryAST && dictionaryAST.type == "script") {
                 dictionaryAST.annotation = dictionaryAnnotation;
                 annotation.dictionaryAST = dictionaryAST;
                 annotation.dictionary = dictionaryAnnotation.definition;
                 this.ovaleAst.PropagateConstants(dictionaryAST);
                 this.ovaleAst.PropagateStrings(dictionaryAST);
-                this.ovaleAst.FlattenParameters(dictionaryAST);
+                // this.ovaleAst.FlattenParameters(dictionaryAST);
                 ResetControls();
                 this.ovaleCompile.EvaluateScript(dictionaryAST, true);
             }
@@ -375,7 +377,10 @@ export class OvaleSimulationCraftClass {
                     annotation,
                     undefined
                 );
-                if (addFunctionNode) {
+                if (
+                    addFunctionNode &&
+                    addFunctionNode.type === "add_function"
+                ) {
                     // Add interrupt if not already added
                     if (node.name === "_default" && !annotation.interrupt) {
                         const defaultInterrupt =
@@ -383,10 +388,10 @@ export class OvaleSimulationCraftClass {
                                 annotation.specialization
                             ];
                         if (defaultInterrupt && defaultInterrupt.interrupt) {
-                            const interruptCall = this.ovaleAst.NewNode(
-                                nodeList
+                            const interruptCall = this.ovaleAst.newNodeWithParameters(
+                                "custom_function",
+                                annotation.astAnnotation
                             );
-                            interruptCall.type = "custom_function";
                             interruptCall.name = lower(
                                 LowerSpecialization(annotation) +
                                     "InterruptActions"
@@ -395,7 +400,7 @@ export class OvaleSimulationCraftClass {
                             annotation[defaultInterrupt.interrupt] =
                                 annotation.classId;
                             insert(
-                                addFunctionNode.child[1].child,
+                                addFunctionNode.body.child,
                                 1,
                                 interruptCall
                             );
@@ -403,8 +408,10 @@ export class OvaleSimulationCraftClass {
                     }
 
                     let actionListName = gsub(node.name, "^_+", "");
-                    let commentNode = this.ovaleAst.NewNode(nodeList);
-                    commentNode.type = "comment";
+                    let commentNode = this.ovaleAst.NewNode(
+                        "comment",
+                        annotation.astAnnotation
+                    );
                     commentNode.comment = `## actions.${actionListName}`;
                     child[lualength(child) + 1] = commentNode;
                     for (const [, tag] of pairs(OVALE_TAGS)) {
@@ -453,12 +460,14 @@ export class OvaleSimulationCraftClass {
             let lowerclass = lower(className);
             let aoeToggle = `opt_${lowerclass}_${specialization}_aoe`;
             {
-                let commentNode = this.ovaleAst.NewNode(nodeList);
-                commentNode.type = "comment";
+                let commentNode = this.ovaleAst.NewNode(
+                    "comment",
+                    annotation.astAnnotation
+                );
                 commentNode.comment = `## ${CamelCase(specialization)} icons.`;
                 insert(child, commentNode);
                 let code = format(
-                    "AddCheckBox(%s L(AOE) default specialization=%s)",
+                    "AddCheckBox(%s L(AOE) default enabled=(specialization(%s)))",
                     aoeToggle,
                     specialization
                 );
@@ -472,7 +481,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon checkbox=!%s enemies=1 help=shortcd specialization=%s
+				AddIcon enabled=(not checkboxon(%s) and specialization(%s)) enemies=1 help=shortcd
 				{
 					%s
 				}
@@ -493,7 +502,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon checkbox=%s help=shortcd specialization=%s
+				AddIcon enabled=(checkboxon(%s) and specialization(%s)) help=shortcd
 				{
 					%s
 				}
@@ -514,7 +523,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon enemies=1 help=main specialization=%s
+				AddIcon enemies=1 help=main enabled=(specialization(%s))
 				{
 					%s
 				}
@@ -534,7 +543,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon checkbox=%s help=aoe specialization=%s
+				AddIcon help=aoe enabled=(checkboxon(%s) and specialization(%s))
 				{
 					%s
 				}
@@ -555,7 +564,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon checkbox=!%s enemies=1 help=cd specialization=%s
+				AddIcon enemies=1 help=cd enabled=(checkboxon(%s) and not specialization(%s))
 				{
 					%s
 				}
@@ -576,7 +585,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 let fmt = `
-				AddIcon checkbox=%s help=cd specialization=%s
+				AddIcon enabled=(checkboxon(%s) and specialization(%s)) help=cd
 				{
 					%s
 				}
@@ -663,7 +672,6 @@ export class OvaleSimulationCraftClass {
             for (const [, symbol] of ipairs(profile.annotation.symbolList)) {
                 if (
                     !tonumber(symbol) &&
-                    profile.annotation.dictionary &&
                     !profile.annotation.dictionary[symbol] &&
                     !this.ovaleData.buffSpellList[symbol]
                 ) {

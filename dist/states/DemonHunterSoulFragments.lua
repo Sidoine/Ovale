@@ -2,11 +2,8 @@ local __exports = LibStub:NewLibrary("ovale/states/DemonHunterSoulFragments", 80
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local tonumber = tonumber
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local __tools = LibStub:GetLibrary("ovale/tools")
-local OneTimeMessage = __tools.OneTimeMessage
 local SOUL_FRAGMENTS_BUFF_ID = 203981
 local METAMORPHOSIS_BUFF_ID = 187827
 local SOUL_FRAGMENT_SPELLS = {
@@ -19,25 +16,20 @@ local SOUL_FRAGMENT_FINISHERS = {
     [263648] = true
 }
 __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
-    constructor = function(self, ovaleAura, ovale, requirement, ovalePaperDoll)
+    constructor = function(self, ovaleAura, ovale, ovalePaperDoll)
         self.ovaleAura = ovaleAura
         self.ovale = ovale
-        self.requirement = requirement
         self.ovalePaperDoll = ovalePaperDoll
         self.estimatedCount = 0
         self.OnInitialize = function()
             if self.ovale.playerClass == "DEMONHUNTER" then
                 self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
             end
-            self.requirement:RegisterRequirement("soulfragments_min", self.RequireSoulFragmentsHandler)
-            self.requirement:RegisterRequirement("soulfragments_max", self.RequireSoulFragmentsHandler)
         end
         self.OnDisable = function()
             if self.ovale.playerClass == "DEMONHUNTER" then
                 self.module:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             end
-            self.requirement:UnregisterRequirement("soulfragments_min")
-            self.requirement:UnregisterRequirement("soulfragments_max")
         end
         self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
             if  not self.ovalePaperDoll:IsSpecialization("vengeance") then
@@ -58,22 +50,6 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
                     self:SetPredictedSoulFragment(GetTime(), 0)
                 end
             end
-        end
-        self.RequireSoulFragmentsHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local verified = false
-            local countString = ""
-            if index then
-                countString = tokens[index]
-                index = index + 1
-            end
-            if countString then
-                local count = tonumber(countString) or 1
-                local actualCount = self:SoulFragments(atTime)
-                verified = (requirement == "soulfragments_min" and count <= actualCount) or (requirement == "soulfragments_max" and count >= actualCount)
-            else
-                OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
-            end
-            return verified, requirement, index
         end
         self.module = ovale:createModule("OvaleDemonHunterSoulFragments", self.OnInitialize, self.OnDisable, aceEvent)
     end,

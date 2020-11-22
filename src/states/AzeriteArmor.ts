@@ -23,6 +23,7 @@ import { OvaleClass } from "../Ovale";
 import { OvaleDebugClass } from "../Debug";
 import { AceEventHandler } from "../tools";
 import { OptionUiAll } from "../acegui-helpers";
+import { Compare, OvaleConditionClass, TestBoolean } from "../Condition";
 
 let azeriteSlots: LuaArray<boolean> = {
     [1]: true,
@@ -73,6 +74,19 @@ export class OvaleAzeriteArmor {
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
         }
+    }
+
+    public registerConditions(ovaleCondition: OvaleConditionClass) {
+        ovaleCondition.RegisterCondition(
+            "hasazeritetrait",
+            false,
+            this.HasAzeriteTrait
+        );
+        ovaleCondition.RegisterCondition(
+            "azeritetraitrank",
+            false,
+            this.AzeriteTraitRank
+        );
     }
 
     private OnInitialize = () => {
@@ -177,4 +191,27 @@ export class OvaleAzeriteArmor {
         }
         return concat(this.output, "\n");
     }
+
+    private AzeriteTraitRank = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [spellId, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        let value = this.TraitRank(spellId);
+        return Compare(value, comparator, limit);
+    };
+    private HasAzeriteTrait = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let value = this.HasTrait(spellId);
+        return TestBoolean(value, yesno);
+    };
 }

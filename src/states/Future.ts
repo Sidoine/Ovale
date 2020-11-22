@@ -7,7 +7,6 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     ipairs,
     pairs,
-    type,
     lualength,
     LuaObj,
     LuaArray,
@@ -30,8 +29,7 @@ import {
 import { OvaleStateClass, States } from "../State";
 import { OvaleCooldownClass } from "./Cooldown";
 import { BaseState } from "../BaseState";
-import { isLuaArray } from "../tools";
-import { OvaleRequirement } from "../Requirement";
+import { isNumber } from "../tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, OvaleDebugClass } from "../Debug";
@@ -43,6 +41,7 @@ import {
     OvaleConditionClass,
     ReturnValueBetween,
 } from "../Condition";
+import { Runner } from "../runner";
 
 let strsub = sub;
 let tremove = remove;
@@ -84,12 +83,6 @@ let CLEU_SPELLCAST_EVENT: LuaObj<boolean> = {
 let SPELLCAST_AURA_ORDER: LuaArray<"target" | "pet"> = {
     1: "target",
     2: "pet",
-};
-let SPELLAURALIST_AURA_VALUE: LuaObj<boolean> = {
-    count: true,
-    extend: true,
-    refresh: true,
-    refresh_keep_snapshot: true,
 };
 let WHITE_ATTACK: LuaArray<boolean> = {
     [75]: true,
@@ -166,8 +159,8 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleStance: OvaleStanceClass,
-        private requirement: OvaleRequirement,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private runner: Runner
     ) {
         super(OvaleFutureData);
         const name = "OvaleFuture";
@@ -1267,19 +1260,16 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             for (const [, unitId] of ipairs(SPELLCAST_AURA_ORDER)) {
                 for (const [, auraList] of kpairs(si.aura[unitId])) {
                     for (const [id, spellData] of kpairs(auraList)) {
-                        let [
-                            verified,
-                            value,
-                        ] = this.ovaleData.CheckSpellAuraData(
+                        let value = this.ovaleData.CheckSpellAuraData(
                             id,
                             spellData,
                             atTime,
                             targetGUID
                         );
                         if (
-                            verified &&
-                            (SPELLAURALIST_AURA_VALUE[<string>value] ||
-                                (type(value) == "number" && value > 0))
+                            (value.enabled === undefined || value.enabled) &&
+                            isNumber(value.add) &&
+                            value.add > 0
                         ) {
                             auraId = id;
                             auraGUID = this.ovaleGuid.UnitGUID(unitId);
@@ -1327,22 +1317,28 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         if (si && si.aura && si.aura.damage) {
             for (const [filter, auraList] of kpairs(si.aura.damage)) {
                 for (const [auraId, spellData] of pairs(auraList)) {
-                    let index, multiplier: number;
+                    let multiplier: number;
                     let verified;
-                    if (isLuaArray(spellData)) {
-                        multiplier = <number>spellData[1];
-                        index = 2;
-                        [verified] = this.requirement.CheckRequirements(
-                            spellId,
-                            atTime,
-                            spellData,
-                            index,
-                            targetGUID
-                        );
-                    } else {
-                        multiplier = spellData;
-                        verified = true;
-                    }
+                    // if (isLuaArray(spellData)) {
+                    //     multiplier = <number>spellData[1];
+                    //     index = 2;
+                    //     [verified] = this.requirement.CheckRequirements(
+                    //         spellId,
+                    //         atTime,
+                    //         spellData,
+                    //         index,
+                    //         targetGUID
+                    //     );
+                    // } else {
+                    const [, namedParameters] = this.runner.computeParameters(
+                        spellData,
+                        atTime
+                    );
+                    multiplier = namedParameters.set as number;
+                    verified =
+                        namedParameters.enabled === undefined ||
+                        namedParameters.enabled;
+                    // }
                     if (verified) {
                         let aura = this.ovaleAura.GetAuraByGUID(
                             this.ovale.playerGUID,
@@ -1683,34 +1679,34 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             delete this.next.counter[k];
         }
     }
-    ApplySpellStartCast(
+    ApplySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         channel: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleFuture_ApplySpellStartCast");
         if (channel) {
             this.UpdateCounters(spellId, startCast, targetGUID);
         }
         this.profiler.StopProfiling("OvaleFuture_ApplySpellStartCast");
-    }
-    ApplySpellAfterCast(
+    };
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         channel: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleFuture_ApplySpellAfterCast");
         if (!channel) {
             this.UpdateCounters(spellId, endCast, targetGUID);
         }
         this.profiler.StopProfiling("OvaleFuture_ApplySpellAfterCast");
-    }
+    };
 
     static staticSpellcast: SpellCast = createSpellCast();
 

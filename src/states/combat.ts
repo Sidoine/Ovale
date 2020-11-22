@@ -5,8 +5,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { Tracer, OvaleDebugClass } from "../Debug";
 import { GetTime } from "@wowts/wow-mock";
 import { OvaleSpellBookClass } from "../SpellBook";
-import { tonumber, LuaObj, LuaArray } from "@wowts/lua";
-import { Tokens, OvaleRequirement } from "../Requirement";
+import { LuaObj, LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
     TestBoolean,
@@ -16,7 +15,6 @@ import {
     ReturnConstant,
 } from "../Condition";
 import { huge } from "@wowts/math";
-import { OneTimeMessage } from "../tools";
 
 export class CombatState {
     inCombat: boolean = false;
@@ -32,8 +30,7 @@ export class OvaleCombatClass
     constructor(
         private ovale: OvaleClass,
         debug: OvaleDebugClass,
-        private ovaleSpellBook: OvaleSpellBookClass,
-        private requirement: OvaleRequirement
+        private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(CombatState);
         this.module = ovale.createModule(
@@ -69,13 +66,13 @@ export class OvaleCombatClass
 
     public CleanState() {}
 
-    public ApplySpellOnHit(
+    public ApplySpellOnHit = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         channel: boolean
-    ) {
+    ) => {
         if (
             !this.next.inCombat &&
             this.ovaleSpellBook.IsHarmfulSpell(spellId)
@@ -87,7 +84,7 @@ export class OvaleCombatClass
                 this.next.combatStartTime = endCast;
             }
         }
-    }
+    };
 
     private onInitialize = () => {
         this.module.RegisterEvent(
@@ -98,13 +95,11 @@ export class OvaleCombatClass
             "PLAYER_REGEN_ENABLED",
             this.handlePlayerRegenEnabled
         );
-        this.requirement.RegisterRequirement("combat", this.CombatRequirement);
     };
 
     private onRelease = () => {
         this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
-        this.requirement.UnregisterRequirement("combat");
     };
 
     private handlePlayerRegenDisabled = (event: string) => {
@@ -122,49 +117,6 @@ export class OvaleCombatClass
         this.current.inCombat = false;
         this.ovale.needRefresh();
         this.module.SendMessage("Ovale_CombatEnded", now);
-    };
-
-    private CombatRequirement = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let combatFlag = tokens[index];
-        index = index + 1;
-
-        if (combatFlag) {
-            combatFlag = tonumber(combatFlag);
-            if (
-                (combatFlag == 1 && this.isInCombat(atTime)) ||
-                (combatFlag != 1 && !this.isInCombat(atTime))
-            ) {
-                verified = true;
-            }
-            let result = (verified && "passed") || "FAILED";
-            if (combatFlag == 1) {
-                this.tracer.Log(
-                    "    Require combat at time=%f: %s",
-                    atTime,
-                    result
-                );
-            } else {
-                this.tracer.Log(
-                    "    Require NOT combat at time=%f: %s",
-                    atTime,
-                    result
-                );
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing an argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
     };
 
     /** Test if the player is in combat.

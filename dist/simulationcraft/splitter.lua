@@ -3,8 +3,6 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local ipairs = ipairs
 local wipe = wipe
-local __AST = LibStub:GetLibrary("ovale/AST")
-local isNodeType = __AST.isNodeType
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
 local TagPriority = __definitions.TagPriority
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
@@ -29,14 +27,14 @@ __exports.Splitter = __class(nil, {
             local bodyNode, conditionNode
             local actionTag, invokesGCD
             local name = "UNKNOWN"
-            local actionType = node.func
+            local actionType = node.name
             if actionType == "item" or actionType == "spell" then
                 local firstParamNode = node.rawPositionalParams[1]
                 local id, name
                 if firstParamNode.type == "variable" then
                     name = firstParamNode.name
                     id = annotation.dictionary and annotation.dictionary[name]
-                elseif isNodeType(firstParamNode, "value") then
+                elseif firstParamNode.type == "value" then
                     name = firstParamNode.value
                     id = firstParamNode.value
                 end
@@ -55,7 +53,7 @@ __exports.Splitter = __class(nil, {
                 if firstParamNode.type == "variable" then
                     name = firstParamNode.name
                     id = annotation.dictionary and annotation.dictionary[name]
-                elseif isNodeType(firstParamNode, "value") then
+                elseif firstParamNode.type == "value" then
                     name = firstParamNode.value
                     id = name
                 end
@@ -91,29 +89,23 @@ __exports.Splitter = __class(nil, {
             end
             local bodyNode, conditionNode = self.SplitByTag(tag, node.child[1], nodeList, annotation)
             if  not bodyNode or bodyNode.type ~= "group" then
-                local newGroupNode = self.ovaleAst:NewNode(nodeList, true)
-                newGroupNode.type = "group"
+                local newGroupNode = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                 if bodyNode then
                     newGroupNode.child[1] = bodyNode
                 end
                 bodyNode = newGroupNode
             end
             if  not conditionNode or conditionNode.type ~= "group" then
-                local newGroupNode = self.ovaleAst:NewNode(nodeList, true)
-                newGroupNode.type = "group"
+                local newGroupNode = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                 if conditionNode then
                     newGroupNode.child[1] = conditionNode
                 end
                 conditionNode = newGroupNode
             end
-            local bodyFunctionNode = self.ovaleAst:NewNode(nodeList, true)
-            bodyFunctionNode.type = "add_function"
+            local bodyFunctionNode = self.ovaleAst:newNodeWithBodyAndParameters("add_function", annotation.astAnnotation, bodyNode)
             bodyFunctionNode.name = bodyName
-            bodyFunctionNode.child[1] = bodyNode
-            local conditionFunctionNode = self.ovaleAst:NewNode(nodeList, true)
-            conditionFunctionNode.type = "add_function"
+            local conditionFunctionNode = self.ovaleAst:newNodeWithBodyAndParameters("add_function", annotation.astAnnotation, conditionNode)
             conditionFunctionNode.name = conditionName
-            conditionFunctionNode.child[1] = conditionNode
             return bodyFunctionNode, conditionFunctionNode
         end
         self.SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
@@ -122,15 +114,11 @@ __exports.Splitter = __class(nil, {
             if annotation.taggedFunctionName[functionName] then
                 local bodyName, conditionName = OvaleTaggedFunctionName(functionName, tag)
                 if bodyName and conditionName then
-                    bodyNode = self.ovaleAst:NewNode(nodeList)
+                    bodyNode = self.ovaleAst:newNodeWithParameters("custom_function", annotation.astAnnotation)
                     bodyNode.name = bodyName
-                    bodyNode.type = "custom_function"
-                    bodyNode.func = bodyName
                     bodyNode.asString = bodyName .. "()"
-                    conditionNode = self.ovaleAst:NewNode(nodeList)
+                    conditionNode = self.ovaleAst:newNodeWithParameters("custom_function", annotation.astAnnotation)
                     conditionNode.name = conditionName
-                    conditionNode.type = "custom_function"
-                    conditionNode.func = conditionName
                     conditionNode.asString = conditionName .. "()"
                 end
             else
@@ -184,8 +172,7 @@ __exports.Splitter = __class(nil, {
                             wipe(conditionList)
                             insert(bodyList, 1, bodyNode)
                         else
-                            local unlessNode = self.ovaleAst:NewNode(nodeList, true)
-                            unlessNode.type = "unless"
+                            local unlessNode = self.ovaleAst:newNodeWithChildren("unless", annotation.astAnnotation)
                             local condition = self:ConcatenatedConditionNode(conditionList, nodeList, annotation)
                             local body = self:ConcatenatedBodyNode(bodyList, nodeList, annotation)
                             if condition and body then
@@ -195,8 +182,7 @@ __exports.Splitter = __class(nil, {
                             wipe(bodyList)
                             wipe(conditionList)
                             insert(bodyList, 1, unlessNode)
-                            local commentNode = self.ovaleAst:NewNode(nodeList)
-                            commentNode.type = "comment"
+                            local commentNode = self.ovaleAst:NewNode("comment", annotation.astAnnotation)
                             insert(bodyList, 1, commentNode)
                             insert(bodyList, 1, bodyNode)
                         end
@@ -243,12 +229,10 @@ __exports.Splitter = __class(nil, {
             local remainderNode = self:ConcatenatedConditionNode(remainderList, nodeList, annotation)
             if bodyNode then
                 if conditionNode then
-                    local unlessNode = self.ovaleAst:NewNode(nodeList, true)
-                    unlessNode.type = "unless"
+                    local unlessNode = self.ovaleAst:newNodeWithChildren("unless", annotation.astAnnotation)
                     unlessNode.child[1] = conditionNode
                     unlessNode.child[2] = bodyNode
-                    local groupNode = self.ovaleAst:NewNode(nodeList, true)
-                    groupNode.type = "group"
+                    local groupNode = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                     groupNode.child[1] = unlessNode
                     bodyNode = groupNode
                 end
@@ -262,13 +246,13 @@ __exports.Splitter = __class(nil, {
                 local lhsNode = node.child[1]
                 local rhsNode = conditionNode
                 if node.type == "unless" then
-                    lhsNode = self:NewLogicalNode("not", lhsNode, nil, nodeList)
+                    lhsNode = self:NewLogicalNode("not", lhsNode, nil, annotation.astAnnotation)
                 end
-                local andNode = self:NewLogicalNode("and", lhsNode, rhsNode, nodeList)
+                local andNode = self:NewLogicalNode("and", lhsNode, rhsNode, annotation.astAnnotation)
                 conditionNode = andNode
             end
             if bodyNode then
-                local ifNode = self.ovaleAst:NewNode(nodeList, true)
+                local ifNode = self.ovaleAst:newNodeWithChildren(node.type, annotation.astAnnotation)
                 ifNode.type = node.type
                 ifNode.child[1] = node.child[1]
                 ifNode.child[2] = bodyNode
@@ -290,9 +274,8 @@ __exports.Splitter = __class(nil, {
         }
         self.tracer = ovaleDebug:create("SimulationCraftSplitter")
     end,
-    NewLogicalNode = function(self, operator, lhsNode, rhsNode, nodeList)
-        local node = self.ovaleAst:NewNode(nodeList, true)
-        node.type = "logical"
+    NewLogicalNode = function(self, operator, lhsNode, rhsNode, annotation)
+        local node = self.ovaleAst:newNodeWithChildren("logical", annotation)
         node.operator = operator
         if operator == "not" then
             node.expressionType = "unary"
@@ -312,11 +295,11 @@ __exports.Splitter = __class(nil, {
             elseif #conditionList > 1 then
                 local lhsNode = conditionList[1]
                 local rhsNode = conditionList[2]
-                conditionNode = self:NewLogicalNode("or", lhsNode, rhsNode, nodeList)
+                conditionNode = self:NewLogicalNode("or", lhsNode, rhsNode, annotation.astAnnotation)
                 for k = 3, #conditionList, 1 do
                     lhsNode = conditionNode
                     rhsNode = conditionList[k]
-                    conditionNode = self:NewLogicalNode("or", lhsNode, rhsNode, nodeList)
+                    conditionNode = self:NewLogicalNode("or", lhsNode, rhsNode, annotation.astAnnotation)
                 end
             end
         end
@@ -325,8 +308,7 @@ __exports.Splitter = __class(nil, {
     ConcatenatedBodyNode = function(self, bodyList, nodeList, annotation)
         local bodyNode
         if #bodyList > 0 then
-            bodyNode = self.ovaleAst:NewNode(nodeList, true)
-            bodyNode.type = "group"
+            bodyNode = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
             for k, node in ipairs(bodyList) do
                 bodyNode.child[k] = node
             end

@@ -309,6 +309,19 @@ __exports.MISC_OPERAND = {
     ["cp_max_spend"] = {
         name = "maxcombopoints"
     },
+    ["druid"] = {
+        name = "checkboxon",
+        modifiers = {
+            catweave_bear = {
+                type = 2,
+                createOptions = true
+            },
+            owlweave_bear = {
+                type = 2,
+                createOptions = true
+            }
+        }
+    },
     ["energy"] = {
         name = "energy",
         modifiers = powerModifiers

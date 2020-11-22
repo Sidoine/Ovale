@@ -2,18 +2,15 @@ import { OvaleDataClass } from "../Data";
 import { OvaleSpellBookClass } from "../SpellBook";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
-import { RequirementMethod, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { next, pairs, LuaObj, tonumber, kpairs } from "@wowts/lua";
+import { next, pairs, LuaObj, kpairs } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
-import { sub } from "@wowts/string";
 import { States } from "../State";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleProfilerClass, Profiler } from "../Profiler";
-import { OneTimeMessage } from "../tools";
 
 let GLOBAL_COOLDOWN = 61304;
 let COOLDOWN_THRESHOLD = 0.1;
@@ -113,8 +110,7 @@ export class OvaleCooldownClass
         private ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass,
-        private requirement: OvaleRequirement
+        private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(CooldownData);
         this.module = ovale.createModule(
@@ -143,15 +139,10 @@ export class OvaleCooldownClass
         this.module.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", this.Update);
         this.module.RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", this.Update);
         this.lastSpell.RegisterSpellcastInfo(this);
-        this.requirement.RegisterRequirement(
-            "oncooldown",
-            this.RequireCooldownHandler
-        );
     };
 
     private OnDisable = () => {
         this.lastSpell.UnregisterSpellcastInfo(this);
-        this.requirement.UnregisterRequirement("oncooldown");
         this.module.UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("BAG_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("PET_BAR_UPDATE_COOLDOWN");
@@ -235,6 +226,8 @@ export class OvaleCooldownClass
             let [index, bookType] = this.ovaleSpellBook.GetSpellBookIndex(
                 spellId
             );
+
+            // TODO Cache this
             if (index && bookType) {
                 [start, duration, enable] = GetSpellCooldown(index, bookType);
             } else {
@@ -302,7 +295,7 @@ export class OvaleCooldownClass
 
     GetCD(spellId: number, atTime: number) {
         this.profiler.StartProfiling("OvaleCooldown_state_GetCD");
-        let cdName = spellId;
+        let cdName: string | number = spellId;
         let si = this.ovaleData.spellInfo[spellId];
         if (si && si.shared_cd) {
             cdName = si.shared_cd;
@@ -459,71 +452,34 @@ export class OvaleCooldownClass
         return [charges, maxCharges, chargeStart, chargeDuration];
     }
 
-    RequireCooldownHandler: RequirementMethod = (
-        spellId,
-        atTime,
-        requirement,
-        tokens,
-        index
-    ): [boolean, string, number] => {
-        let verified = false;
-        let cdSpellId = <string>tokens[index];
-        index = index + 1;
-        if (cdSpellId) {
-            let isBang = false;
-            if (sub(cdSpellId, 1, 1) == "!") {
-                isBang = true;
-                cdSpellId = sub(cdSpellId, 2);
-            }
-            let cd = this.GetCD(tonumber(cdSpellId), atTime);
-            verified =
-                (!isBang && cd.duration > 0) || (isBang && cd.duration <= 0);
-            let result = (verified && "passed") || "FAILED";
-            this.tracer.Log(
-                "    Require spell %s %s cooldown at time=%f: %s (duration = %f)",
-                cdSpellId,
-                (isBang && "OFF") || (!isBang && "ON"),
-                atTime,
-                result,
-                cd.duration
-            );
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a spell argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
-
-    ApplySpellStartCast(
+    ApplySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleCooldown_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, startCast);
         }
         this.profiler.StopProfiling("OvaleCooldown_ApplySpellStartCast");
-    }
-    ApplySpellAfterCast(
+    };
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleCooldown_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, endCast);
         }
         this.profiler.StopProfiling("OvaleCooldown_ApplySpellAfterCast");
-    }
+    };
 
     InitializeState() {
         this.next.cd = {};

@@ -1,17 +1,8 @@
 import { L } from "../Localization";
-import { Tokens, OvaleRequirement } from "../Requirement";
 import { SpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
-import {
-    ipairs,
-    pairs,
-    LuaObj,
-    tostring,
-    tonumber,
-    LuaArray,
-    kpairs,
-} from "@wowts/lua";
+import { pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
 import {
@@ -25,14 +16,18 @@ import {
     MAX_COMBO_POINTS,
     ClassId,
 } from "@wowts/wow-mock";
-import { isNumber, isLuaArray, OneTimeMessage } from "../tools";
+import { isNumber, OneTimeMessage } from "../tools";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleFutureClass } from "./Future";
 import { BaseState } from "../BaseState";
-import { OvaleDataClass, SpellInfo } from "../Data";
+import {
+    OvaleDataClass,
+    SpellInfo,
+    SpellInfoNumberProperty,
+    SpellInfoProperty,
+} from "../Data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleAuraClass } from "./Aura";
 import { States, StateModule } from "../State";
 import { OvaleProfilerClass, Profiler } from "../Profiler";
 import { OvalePaperDollClass } from "./PaperDoll";
@@ -119,9 +114,8 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         private ovaleData: OvaleDataClass,
         private ovaleFuture: OvaleFutureClass,
         private baseState: BaseState,
-        private ovaleAura: OvaleAuraClass,
+        // private ovaleAura: OvaleAuraClass,
         private ovalePaperDoll: OvalePaperDollClass,
-        private requirement: OvaleRequirement,
         private ovaleSpellBook: OvaleSpellBookClass,
         private combat: OvaleCombatClass
     ) {
@@ -172,12 +166,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.module.RegisterMessage("Ovale_StanceChanged", this.EventHandler);
         this.module.RegisterMessage("Ovale_TalentsChanged", this.EventHandler);
         this.initializePower();
-        for (const [powerType] of pairs(this.POWER_INFO)) {
-            this.requirement.RegisterRequirement(
-                powerType as PowerType,
-                this.RequirePowerHandler
-            );
-        }
     };
 
     initializePower() {
@@ -257,9 +245,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     }
     private OnDisable = () => {
-        for (const [powerType] of pairs(this.POWER_INFO)) {
-            this.requirement.UnregisterRequirement(powerType);
-        }
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_LEVEL_UP");
         this.module.UnregisterEvent("UNIT_DISPLAYPOWER");
@@ -465,25 +450,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return [undefined, undefined];
     }
 
-    RequirePowerHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        return this.getPowerRequirementAt(
-            this.GetState(atTime),
-            spellId,
-            atTime,
-            requirement,
-            tokens,
-            index,
-            targetGUID
-        );
-    };
-
     DebugPower() {
         let array = {};
         insert(array, `Current Power Type: ${this.current.powerType}`);
@@ -553,34 +519,34 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             this.next.power[powerType] = undefined;
         }
     }
-    ApplySpellStartCast(
+    ApplySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvalePower_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyPowerCost(spellId, targetGUID, startCast, spellcast);
         }
         this.profiler.StopProfiling("OvalePower_ApplySpellStartCast");
-    }
-    ApplySpellAfterCast(
+    };
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvalePower_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyPowerCost(spellId, targetGUID, endCast, spellcast);
         }
         this.profiler.StopProfiling("OvalePower_ApplySpellAfterCast");
-    }
+    };
 
     ApplyPowerCost(
         spellId: number,
@@ -688,6 +654,25 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         return power;
     }
+
+    hasPowerFor(spellInfo: SpellInfo, atTime: number) {
+        for (const [, powerType] of kpairs(this.POWER_TYPE)) {
+            const cost = this.ovaleData.getSpellInfoProperty(
+                spellInfo,
+                atTime,
+                powerType
+            );
+            this.tracer.Log("Spell has cost of %s for %s", cost, powerType);
+            if (
+                cost !== undefined &&
+                cost > this.getPowerAt(this.GetState(atTime), powerType, atTime)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns the power cost of a spell atTime for the given powerType
      * @param spellId
@@ -718,50 +703,52 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 true
             );
             if (ratio && ratio != 0) {
-                let addRequirements =
-                    si &&
-                    si.require &&
-                    si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
-                if (addRequirements) {
-                    for (const [v, rArray] of pairs(addRequirements)) {
-                        if (isLuaArray(rArray)) {
-                            for (const [, requirement] of ipairs(rArray)) {
-                                let [
-                                    verified,
-                                ] = this.requirement.CheckRequirements(
-                                    spellId,
-                                    atTime,
-                                    requirement,
-                                    1,
-                                    targetGUID
-                                );
-                                if (verified) {
-                                    let aura = this.ovaleAura.GetAura(
-                                        "player",
-                                        requirement[2],
-                                        atTime,
-                                        undefined,
-                                        true
-                                    );
-                                    if (
-                                        aura &&
-                                        this.ovaleAura.IsActiveAura(
-                                            aura,
-                                            atTime
-                                        )
-                                    ) {
-                                        cost =
-                                            cost +
-                                            (tonumber(v) || 0) * aura.stacks;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                // let addRequirements =
+                //     si &&
+                //     si.require &&
+                //     si.require[
+                //         `add_${powerType}_from_aura` as SpellInfoProperty
+                //     ];
+                // if (addRequirements) {
+                //     for (const [v, rArray] of pairs(addRequirements)) {
+                //         // if (isLuaArray(rArray)) {
+                //         //     for (const [, requirement] of ipairs(rArray)) {
+                //         //         let [
+                //         //             verified,
+                //         //         ] = this.requirement.CheckRequirements(
+                //         //             spellId,
+                //         //             atTime,
+                //         //             requirement,
+                //         //             1,
+                //         //             targetGUID
+                //         //         );
+                //         //         if (verified) {
+                //         //             let aura = this.ovaleAura.GetAura(
+                //         //                 "player",
+                //         //                 requirement[2],
+                //         //                 atTime,
+                //         //                 undefined,
+                //         //                 true
+                //         //             );
+                //         //             if (
+                //         //                 aura &&
+                //         //                 this.ovaleAura.IsActiveAura(
+                //         //                     aura,
+                //         //                     atTime
+                //         //                 )
+                //         //             ) {
+                //         //                 cost =
+                //         //                     cost +
+                //         //                     (tonumber(v) || 0) * aura.stacks;
+                //         //             }
+                //         //         }
+                //         //     }
+                //         // }
+                //     }
+                // }
 
                 let maxCostParam = `max_${powerType}`;
-                let maxCost = <number>si[maxCostParam as keyof SpellInfo];
+                let maxCost = si[maxCostParam as SpellInfoNumberProperty];
                 if (maxCost) {
                     let power = this.getPowerAt(state, powerType, atTime);
                     if (power > maxCost || maximumCost) {
@@ -774,41 +761,17 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 spellCost =
                     (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
 
-                let refund = si[`refund_${powerType}` as keyof SpellInfo] || 0;
+                const parameter = `refund_${powerType}` as SpellInfoProperty;
+                const refund = this.ovaleData.getSpellInfoProperty(
+                    si,
+                    atTime,
+                    parameter
+                );
+
                 if (refund == "cost") {
                     spellRefund = spellCost;
-                } else {
-                    let refundRequirements =
-                        si &&
-                        si.require[`refund_${powerType}` as keyof SpellInfo];
-                    if (refundRequirements) {
-                        for (const [v, rArray] of pairs(refundRequirements)) {
-                            if (isLuaArray(rArray)) {
-                                for (const [, requirement] of ipairs<any>(
-                                    rArray
-                                )) {
-                                    let [
-                                        verified,
-                                    ] = this.requirement.CheckRequirements(
-                                        spellId,
-                                        atTime,
-                                        requirement,
-                                        1,
-                                        targetGUID
-                                    );
-                                    if (verified) {
-                                        if (v == "cost") {
-                                            spellRefund = spellCost;
-                                        } else if (isNumber(v)) {
-                                        }
-                                        refund =
-                                            <number>refund + (tonumber(v) || 0);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                } else if (isNumber(refund)) {
+                    spellRefund = refund;
                 }
             }
         } else {
@@ -821,74 +784,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return [spellCost, spellRefund];
     }
 
-    /**
-     * @name RequirePowerHandler
-     * @param spellId
-     * @param atTime
-     * @param requirement
-     * @param index
-     * @param targetGUID
-     * @return [verified, requirement, index] <[boolean, string, number]>
-     */
-    private getPowerRequirementAt(
-        state: PowerState,
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] {
-        let verified = false;
-        let baseCost = tokens[index];
-        index = index + 1;
-        if (baseCost) {
-            if (baseCost > 0) {
-                // Don't check power requirements for abilities that generate power
-                let powerType = <PowerType>requirement;
-                let [cost] = this.getPowerCostAt(
-                    state,
-                    spellId,
-                    powerType,
-                    atTime,
-                    targetGUID
-                );
-                if (cost > 0) {
-                    let power = this.getPowerAt(state, powerType, atTime);
-                    if (power >= cost) {
-                        verified = true;
-                    }
-                    this.tracer.Log("   Has power %f %s", power, powerType);
-                } else {
-                    verified = true;
-                }
-                if (cost > 0) {
-                    let result = (verified && "passed") || "FAILED";
-                    this.tracer.Log(
-                        "    Require %f %s at time=%f: %s",
-                        cost,
-                        powerType,
-                        atTime,
-                        result
-                    );
-                }
-            } else {
-                verified = true;
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' power is missing a cost argument.",
-                requirement
-            );
-            OneTimeMessage(tostring(index));
-            if (isLuaArray(tokens)) {
-                for (const [k, v] of pairs(tokens)) {
-                    OneTimeMessage(`${k} = ${tostring(v)}`);
-                }
-            }
-        }
-        return [verified, requirement, index];
-    }
     /**
      * How many seconds until there is enough power to use the ability.
      * @param spellId

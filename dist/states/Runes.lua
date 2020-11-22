@@ -69,6 +69,25 @@ __exports.OvaleRunesClass = __class(States, {
                 self:UpdateRune(slot)
             end
         end
+        self.ApplySpellStartCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvaleRunes_ApplySpellStartCast")
+            if isChanneled then
+                self:ApplyRuneCost(spellId, startCast, spellcast)
+            end
+            self.profiler:StopProfiling("OvaleRunes_ApplySpellStartCast")
+        end
+        self.ApplySpellAfterCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvaleRunes_ApplySpellAfterCast")
+            if  not isChanneled then
+                self:ApplyRuneCost(spellId, endCast, spellcast)
+                if spellId == EMPOWER_RUNE_WEAPON then
+                    for slot in ipairs(self.next.rune) do
+                        self:ReactivateRune(slot, endCast)
+                    end
+                end
+            end
+            self.profiler:StopProfiling("OvaleRunes_ApplySpellAfterCast")
+        end
         States.constructor(self, RuneData)
         self.module = ovale:createModule("OvaleRunes", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())
@@ -126,25 +145,6 @@ __exports.OvaleRunesClass = __class(States, {
             wipe(rune)
             self.next.rune[slot] = nil
         end
-    end,
-    ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvaleRunes_ApplySpellStartCast")
-        if isChanneled then
-            self:ApplyRuneCost(spellId, startCast, spellcast)
-        end
-        self.profiler:StopProfiling("OvaleRunes_ApplySpellStartCast")
-    end,
-    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvaleRunes_ApplySpellAfterCast")
-        if  not isChanneled then
-            self:ApplyRuneCost(spellId, endCast, spellcast)
-            if spellId == EMPOWER_RUNE_WEAPON then
-                for slot in ipairs(self.next.rune) do
-                    self:ReactivateRune(slot, endCast)
-                end
-            end
-        end
-        self.profiler:StopProfiling("OvaleRunes_ApplySpellAfterCast")
     end,
     ApplyRuneCost = function(self, spellId, atTime, spellcast)
         local si = self.ovaleData.spellInfo[spellId]

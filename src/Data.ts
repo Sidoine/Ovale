@@ -1,22 +1,23 @@
-import { OvaleGUIDClass } from "./GUID";
-import { OvaleRequirement } from "./Requirement";
 import {
     type,
     ipairs,
     pairs,
-    tonumber,
     wipe,
     truthy,
     LuaArray,
     LuaObj,
-    kpairs,
 } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { BaseState } from "./BaseState";
-import { isLuaArray, isString, OneTimeMessage } from "./tools";
+import { isNumber } from "./tools";
 import { HasteType } from "./states/PaperDoll";
 import { Powers } from "./states/Power";
 import { SpellId } from "@wowts/wow-mock";
+import {
+    AstItemRequireNode,
+    AstSpellAuraListNode,
+    AstSpellRequireNode,
+} from "./AST";
+import { Runner } from "./runner";
 
 const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
@@ -87,46 +88,42 @@ const STAT_USE_NAMES: LuaArray<string> = {
     5: "trinket_stack_proc",
 };
 
-type SpellData = number | string | LuaArray<number | string>;
-type Requirements = LuaObj<LuaArray<string>>;
+type SpellAuraInfo = AstSpellAuraListNode;
 
-type AuraList = { [key: number]: SpellData; [key: string]: SpellData };
+type SpellAddAurasById = {
+    [key: number]: SpellAuraInfo;
+    [key: string]: SpellAuraInfo;
+};
 
-export interface AuraByType {
-    HARMFUL: AuraList;
-    HELPFUL: AuraList;
+export interface SpellAddAurasByType {
+    HARMFUL: SpellAddAurasById;
+    HELPFUL: SpellAddAurasById;
 }
 
-export type AuraType = keyof AuraByType;
+export type AuraType = keyof SpellAddAurasByType;
 
-interface Auras {
-    damage: AuraByType;
-    pet: AuraByType;
-    target: AuraByType;
-    player: AuraByType;
+export interface SpellAddAuras {
+    damage: SpellAddAurasByType;
+    pet: SpellAddAurasByType;
+    target: SpellAddAurasByType;
+    player: SpellAddAurasByType;
 }
 
 //type Auras = LuaObj<LuaObj<LuaArray<SpellData>>>;
 
-/** Any <number> in SpellInfo or SpellRequire can include:
- *      `add_${property}`
- *      `${property}_percent`
- */
-export interface SpellInfo extends Powers {
-    //[key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
-    require: { [key in keyof SpellInfo]?: Requirements };
-    // Aura
-    aura?: Auras;
+export type SpellInfoProperty = keyof SpellInfoValues;
+
+export interface SpellInfoValues extends Powers {
     duration?: number;
     add_duration_combopoints?: number;
     tick?: number;
     stacking?: number;
     max_stacks?: number;
-    stat?: string | LuaArray<string>;
-    buff?: number | LuaArray<number>;
+    // stat?: string | LuaArray<string>;
+    // buff?: number | LuaArray<number>;
     // Cooldown
     gcd?: number;
-    shared_cd?: number;
+    shared_cd?: string;
     cd?: number;
     charge_cd?: number;
     forcecd?: number;
@@ -164,9 +161,6 @@ export interface SpellInfo extends Powers {
     // (custom) Counter
     inccounter?: number;
     resetcounter?: number;
-    /** Power
-     * ${powerType}: number; // Cost of a spell.  ${powerType} = energy, focus, rage, etc.
-     */
     runes?: number;
     interrupt?: number;
     add_duration?: number;
@@ -179,9 +173,32 @@ export interface SpellInfo extends Powers {
     offgcd?: number;
     casttime?: number;
     health?: number;
+
+    addlist?: string;
+    dummy_replace?: string;
+    learn?: number;
+    pertrait?: number;
+    proc?: number;
 }
 
-const tempTokens: LuaArray<string> = {};
+export type SpellInfoNumberProperty = {
+    [k in keyof Required<SpellInfoValues>]: Required<
+        SpellInfoValues
+    >[k] extends number
+        ? k
+        : never;
+}[keyof SpellInfoValues];
+
+export interface SpellInfo extends SpellInfoValues {
+    //[key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
+    require: {
+        [k in SpellInfoProperty]?: LuaArray<
+            AstSpellRequireNode | AstItemRequireNode
+        >;
+    };
+    // Aura
+    aura?: SpellAddAuras;
+}
 
 export class OvaleDataClass {
     STAT_NAMES = STAT_NAMES;
@@ -338,11 +355,7 @@ export class OvaleDataClass {
             [SpellId.true_bearing]: true,
         },
     };
-    constructor(
-        private baseState: BaseState,
-        private ovaleGuid: OvaleGUIDClass,
-        private requirement: OvaleRequirement
-    ) {
+    constructor(private runner: Runner) {
         for (const [, useName] of pairs(STAT_USE_NAMES)) {
             let name;
             for (const [, statName] of pairs(STAT_NAMES)) {
@@ -428,10 +441,10 @@ export class OvaleDataClass {
         }
         return ii;
     }
-    GetItemTagInfo(spellId: number): [string, boolean] {
+    GetItemTagInfo(spellId: number | string): [string, boolean] {
         return ["cd", false];
     }
-    GetSpellTagInfo(spellId: number): [string, boolean] {
+    GetSpellTagInfo(spellId: number | string): [string, boolean] {
         let tag: string | undefined = "main";
         let invokesGCD = true;
         let si = this.spellInfo[spellId];
@@ -458,143 +471,71 @@ export class OvaleDataClass {
 
     CheckSpellAuraData(
         auraId: number | string,
-        spellData: SpellData,
+        spellData: SpellAuraInfo,
         atTime: number,
         guid: string | undefined
-    ): [boolean, string | number, number | undefined] {
-        guid = guid || this.ovaleGuid.UnitGUID("player");
-        let index, value: string | number, data;
-        let spellDataArray: LuaArray<string | number> | undefined = undefined;
-        if (isLuaArray(spellData)) {
-            spellDataArray = spellData;
-            value = spellData[1];
-            index = 2;
-        } else {
-            value = spellData;
-        }
-        if (value == "count") {
-            let N;
-            if (index) {
-                N = spellDataArray![index];
-                index = index + 1;
-            }
-            if (N) {
-                data = tonumber(N);
-            } else {
-                OneTimeMessage(
-                    "Warning: '%d' has '%s' missing final stack count.",
-                    auraId,
-                    value
-                );
-            }
-        } else if (value == "extend") {
-            let seconds;
-            if (index) {
-                seconds = spellDataArray![index];
-                index = index + 1;
-            }
-            if (seconds) {
-                data = tonumber(seconds);
-            } else {
-                OneTimeMessage(
-                    "Warning: '%d' has '%s' missing duration.",
-                    auraId,
-                    value
-                );
-            }
-        } else {
-            let asNumber = tonumber(value);
-            value = asNumber || value;
-        }
-        let verified = true;
-        if (index) {
-            [verified] = this.requirement.CheckRequirements(
-                <number>auraId,
-                atTime,
-                spellDataArray!,
-                index,
-                guid
-            );
-        }
-        return [verified, value, data];
+    ) {
+        const [, named] = this.runner.computeParameters(spellData, atTime);
+        return named;
     }
 
-    CheckSpellInfo(
-        spellId: number,
-        atTime: number,
-        targetGUID: string | undefined
-    ): [boolean, string?] {
-        targetGUID =
-            targetGUID ||
-            this.ovaleGuid.UnitGUID(
-                this.baseState.next.defaultTarget || "target"
-            );
-        let verified = true;
-        let requirement: string | undefined;
-        for (const [name, handler] of pairs(this.requirement.nowRequirements)) {
-            let value = this.GetSpellInfoProperty(
-                spellId,
-                atTime,
-                <any>name,
-                targetGUID
-            );
-            if (value) {
-                if (!isString(value) && isLuaArray<string>(value)) {
-                    [verified, requirement] = handler(
-                        spellId,
-                        atTime,
-                        name,
-                        value,
-                        1,
-                        targetGUID
-                    );
-                } else {
-                    tempTokens[1] = <string>value;
-                    [verified, requirement] = handler(
-                        spellId,
-                        atTime,
-                        name,
-                        tempTokens,
-                        1,
-                        targetGUID
-                    );
-                }
-                if (!verified) {
-                    break;
-                }
-            }
-        }
-        return [verified, requirement];
-    }
+    // CheckSpellInfo(
+    //     spellId: number,
+    //     atTime: number,
+    //     targetGUID: string | undefined
+    // ): [boolean, string?] {
+    //     targetGUID =
+    //         targetGUID ||
+    //         this.ovaleGuid.UnitGUID(
+    //             this.baseState.next.defaultTarget || "target"
+    //         );
+    //     let verified = true;
+    //     let requirement: string | undefined;
+    //     for (const [name, handler] of pairs(this.requirement.nowRequirements)) {
+    //         let value = this.GetSpellInfoProperty(
+    //             spellId,
+    //             atTime,
+    //             <any>name,
+    //             targetGUID
+    //         );
+    //         if (value) {
+    //             if (!isString(value) && isLuaArray<string>(value)) {
+    //                 [verified, requirement] = handler(
+    //                     spellId,
+    //                     atTime,
+    //                     name,
+    //                     value,
+    //                     1,
+    //                     targetGUID
+    //                 );
+    //             } else {
+    //                 tempTokens[1] = <string>value;
+    //                 [verified, requirement] = handler(
+    //                     spellId,
+    //                     atTime,
+    //                     name,
+    //                     tempTokens,
+    //                     1,
+    //                     targetGUID
+    //                 );
+    //             }
+    //             if (!verified) {
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return [verified, requirement];
+    // }
     GetItemInfoProperty(
         itemId: number,
         atTime: number,
-        property: keyof SpellInfo
+        property: SpellInfoProperty
     ) {
-        const targetGUID = this.ovaleGuid.UnitGUID("player");
         let ii = this.ItemInfo(itemId);
-        let value = ii && ii[property];
-        let requirements = ii && ii.require[property];
-        if (requirements) {
-            for (const [v, rArray] of pairs(requirements)) {
-                if (isLuaArray(rArray)) {
-                    for (const [, requirement] of ipairs<any>(rArray)) {
-                        let [verified] = this.requirement.CheckRequirements(
-                            itemId,
-                            atTime,
-                            requirement,
-                            1,
-                            targetGUID
-                        );
-                        if (verified) {
-                            value = tonumber(v) || v;
-                            break;
-                        }
-                    }
-                }
-            }
+        if (ii) {
+            return this.getSpellInfoProperty(ii, atTime, property);
         }
-        return value;
+        return undefined;
     }
     //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combopoints"|"inccounter"|"resetcounter", targetGUID):number;
     /**
@@ -606,34 +547,55 @@ export class OvaleDataClass {
      * @param noCalculation Checks only SpellInfo and SpellRequire for the property itself.  No `add_${property}` or `${property}_percent`
      * @returns value or [value, ratio]
      */
-    GetSpellInfoProperty<T extends keyof SpellInfo>(
+    GetSpellInfoProperty<T extends SpellInfoProperty>(
         spellId: number,
-        atTime: number,
+        atTime: number | undefined,
         property: T,
         targetGUID: string | undefined
     ): SpellInfo[T] {
-        targetGUID =
-            targetGUID ||
-            this.ovaleGuid.UnitGUID(
-                this.baseState.next.defaultTarget || "target"
-            );
         let si = this.spellInfo[spellId];
-        let value = si && si[property];
-        let requirements = si && si.require[property];
-        if (requirements) {
-            for (const [v, rArray] of kpairs(requirements)) {
-                if (isLuaArray(rArray)) {
-                    for (const [, requirement] of ipairs<any>(rArray)) {
-                        let [verified] = this.requirement.CheckRequirements(
-                            spellId,
-                            atTime,
-                            requirement,
-                            1,
-                            targetGUID
-                        );
-                        if (verified) {
-                            (<any>value) = tonumber(v) || v;
-                            break;
+        if (si) {
+            return this.getSpellInfoProperty(si, atTime, property);
+        }
+
+        return undefined;
+    }
+
+    public getSpellInfoProperty<T extends SpellInfoProperty>(
+        si: SpellInfo,
+        atTime: number | undefined,
+        property: T
+    ): SpellInfo[T] {
+        let value = si[property];
+        if (atTime) {
+            const requirements:
+                | LuaArray<AstSpellRequireNode | AstItemRequireNode>
+                | undefined = si.require[property];
+            if (requirements) {
+                for (const [_, requirement] of ipairs(requirements)) {
+                    const [, named] = this.runner.computeParameters(
+                        requirement,
+                        atTime
+                    );
+                    if (named.enabled === undefined || named.enabled) {
+                        if (named.set !== undefined)
+                            value = named.set as SpellInfo[T];
+
+                        if (
+                            named.add !== undefined &&
+                            isNumber(value) &&
+                            isNumber(named.add)
+                        ) {
+                            value = (value + named.add) as SpellInfo[T];
+                        }
+
+                        if (
+                            named.percent !== undefined &&
+                            isNumber(value) &&
+                            isNumber(named.percent)
+                        ) {
+                            value = ((value * named.percent) /
+                                100) as SpellInfo[T];
                         }
                     }
                 }
@@ -641,6 +603,7 @@ export class OvaleDataClass {
         }
         return value;
     }
+
     /**
      *
      * @param spellId
@@ -653,78 +616,28 @@ export class OvaleDataClass {
     GetSpellInfoPropertyNumber(
         spellId: number,
         atTime: number | undefined,
-        property: keyof SpellInfo,
+        property: SpellInfoNumberProperty,
         targetGUID: string | undefined,
         splitRatio?: boolean
     ): number[] {
-        targetGUID =
-            targetGUID ||
-            this.ovaleGuid.UnitGUID(
-                this.baseState.next.defaultTarget || "target"
-            );
         let si = this.spellInfo[spellId];
+        if (!si) return [];
 
-        let ratioParam = `${property}_percent` as keyof SpellInfo;
-        let ratio = si && <number>si[ratioParam];
-        if (ratio) {
+        let ratioParam = `${property}_percent` as SpellInfoNumberProperty; // TODO TS 4.1
+        let ratio = this.getSpellInfoProperty(si, atTime, ratioParam);
+        if (ratio !== undefined) {
             ratio = ratio / 100;
         } else {
             ratio = 1;
         }
-        if (atTime) {
-            let ratioRequirements = si && si.require[ratioParam];
-            if (ratioRequirements) {
-                for (const [v, rArray] of pairs(ratioRequirements)) {
-                    if (isLuaArray(rArray)) {
-                        for (const [, requirement] of ipairs<any>(rArray)) {
-                            let [verified] = this.requirement.CheckRequirements(
-                                spellId,
-                                atTime,
-                                requirement,
-                                1,
-                                targetGUID
-                            );
-                            if (verified) {
-                                if (ratio != 0) {
-                                    ratio = ratio * (tonumber(v) / 100 || 1);
-                                } else {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        let value = (si && <number>si[property]) || 0;
-        if (ratio != 0) {
-            let addParam = `add_${property}` as keyof SpellInfo;
-            let addProperty = si && <number>si[addParam];
+
+        let value = this.getSpellInfoProperty(si, atTime, property);
+
+        if (ratio != 0 && value !== undefined) {
+            let addParam = `add_${property}` as SpellInfoNumberProperty; // TODO TS 4.1
+            let addProperty = this.getSpellInfoProperty(si, atTime, addParam);
             if (addProperty) {
                 value = value + addProperty;
-            }
-            if (atTime) {
-                let addRequirements = si && si.require[addParam];
-                if (addRequirements) {
-                    for (const [v, rArray] of pairs(addRequirements)) {
-                        if (isLuaArray(rArray)) {
-                            for (const [, requirement] of ipairs<any>(rArray)) {
-                                let [
-                                    verified,
-                                ] = this.requirement.CheckRequirements(
-                                    spellId,
-                                    atTime,
-                                    requirement,
-                                    1,
-                                    targetGUID
-                                );
-                                if (verified) {
-                                    value = value + (tonumber(v) || 0);
-                                }
-                            }
-                        }
-                    }
-                }
             }
         } else {
             // If ratio is 0, value must be 0.

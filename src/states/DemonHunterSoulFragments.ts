@@ -1,12 +1,9 @@
 import { OvaleAuraClass } from "./Aura";
-import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { tonumber } from "@wowts/lua";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OneTimeMessage } from "../tools";
 import { OvalePaperDollClass } from "./PaperDoll";
 
 let SOUL_FRAGMENTS_BUFF_ID = 203981;
@@ -30,7 +27,6 @@ export class OvaleDemonHunterSoulFragmentsClass {
     constructor(
         private ovaleAura: OvaleAuraClass,
         private ovale: OvaleClass,
-        private requirement: OvaleRequirement,
         private ovalePaperDoll: OvalePaperDollClass
     ) {
         this.module = ovale.createModule(
@@ -48,22 +44,12 @@ export class OvaleDemonHunterSoulFragmentsClass {
                 this.COMBAT_LOG_EVENT_UNFILTERED
             );
         }
-        this.requirement.RegisterRequirement(
-            "soulfragments_min",
-            this.RequireSoulFragmentsHandler
-        );
-        this.requirement.RegisterRequirement(
-            "soulfragments_max",
-            this.RequireSoulFragmentsHandler
-        );
     };
 
     private OnDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
             this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
-        this.requirement.UnregisterRequirement("soulfragments_min");
-        this.requirement.UnregisterRequirement("soulfragments_max");
     };
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
         if (!this.ovalePaperDoll.IsSpecialization("vengeance")) {
@@ -149,32 +135,4 @@ export class OvaleDemonHunterSoulFragmentsClass {
         );
         return (aura && this.ovaleAura.IsActiveAura(aura, atTime)) || false;
     }
-    private RequireSoulFragmentsHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let countString: string = "";
-        if (index) {
-            countString = <string>tokens[index];
-            index = index + 1;
-        }
-        if (countString) {
-            let count = tonumber(countString) || 1;
-            let actualCount = this.SoulFragments(atTime);
-            verified =
-                (requirement == "soulfragments_min" && count <= actualCount) ||
-                (requirement == "soulfragments_max" && count >= actualCount);
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a count argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
 }

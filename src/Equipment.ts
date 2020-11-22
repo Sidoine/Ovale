@@ -7,6 +7,7 @@ import {
     ipairs,
     kpairs,
     LuaObj,
+    type,
 } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import {
@@ -17,6 +18,7 @@ import {
     GetInventorySlotInfo,
     INVSLOT_FIRST_EQUIPPED,
     INVSLOT_LAST_EQUIPPED,
+    GetItemCooldown,
 } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
 import { isNumber } from "./tools";
@@ -25,6 +27,13 @@ import { OvaleClass } from "./Ovale";
 import { OvaleDebugClass } from "./Debug";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
 import { OptionUiAll } from "./acegui-helpers";
+import {
+    Compare,
+    OvaleConditionClass,
+    TestBoolean,
+    TestValue,
+} from "./Condition";
+import { OvaleDataClass } from "./Data";
 
 let OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot: 0,
@@ -109,7 +118,8 @@ export class OvaleEquipmentClass {
     constructor(
         private ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
-        ovaleProfiler: OvaleProfilerClass
+        ovaleProfiler: OvaleProfilerClass,
+        private OvaleData: OvaleDataClass
     ) {
         this.module = ovale.createModule(
             "OvaleEquipment",
@@ -126,6 +136,21 @@ export class OvaleEquipmentClass {
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId; // Should already match but in case Blizzard ever changes the slotIds
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
         }
+    }
+
+    registerConditions(ovaleCondition: OvaleConditionClass) {
+        ovaleCondition.RegisterCondition(
+            "hasequippeditem",
+            false,
+            this.hasEquippedItem
+        );
+        ovaleCondition.RegisterCondition("hasshield", false, this.hasShield);
+        ovaleCondition.RegisterCondition("hastrinket", false, this.hasTrinket);
+        ovaleCondition.RegisterCondition(
+            "itemcooldown",
+            false,
+            this.ItemCooldown
+        );
     }
 
     private OnInitialize = () => {
@@ -396,6 +421,137 @@ export class OvaleEquipmentClass {
         }
         return concat(this.output, "\n");
     }
+
+    /**  Test if the player has a particular item equipped.
+	 @name HasEquippedItem
+	 @paramsig boolean
+	 @param item Item to be checked whether it is equipped.
+	 @param yesno Optional. If yes, then return true if the item is equipped. If no, then return true if it isn't equipped.
+	     Default is yes.
+	     Valid values: yes, no.
+     */
+    private hasEquippedItem = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [itemId, yesno] = [positionalParams[1], positionalParams[2]];
+        let boolean = false;
+        let slotId;
+        if (type(itemId) == "number") {
+            slotId = this.HasEquippedItem(itemId);
+            if (slotId) {
+                boolean = true;
+            }
+        } else if (this.OvaleData.itemList[itemId]) {
+            for (const [, v] of pairs(this.OvaleData.itemList[itemId])) {
+                slotId = this.HasEquippedItem(v);
+                if (slotId) {
+                    boolean = true;
+                    break;
+                }
+            }
+        }
+        return TestBoolean(boolean, yesno);
+    };
+
+    /** Test if the player has a shield equipped.
+	 @name HasShield
+	 @paramsig boolean
+	 @param yesno Optional. If yes, then return true if a shield is equipped. If no, then return true if it isn't equipped.
+	     Default is yes.
+	     Valid values: yes, no.
+	 @return A boolean value.
+	 @usage
+	 if HasShield() Spell(shield_wall)
+     */
+    private hasShield = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let yesno = positionalParams[1];
+        let boolean = this.HasShield();
+        return TestBoolean(boolean, yesno);
+    };
+
+    /** Test if the player has a particular trinket equipped.
+	 @name HasTrinket
+	 @paramsig boolean
+	 @param id The item ID of the trinket or the name of an item list.
+	 @param yesno Optional. If yes, then return true if the trinket is equipped. If no, then return true if it isn't equipped.
+	     Default is yes.
+	     Valid values: yes, no.
+	 @return A boolean value.
+	 @usage
+	 ItemList(rune_of_reorigination 94532 95802 96546)
+	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
+	     Spell(rake)
+     */
+    private hasTrinket = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
+        let boolean: boolean | undefined = undefined;
+        if (type(trinketId) == "number") {
+            boolean = this.HasTrinket(trinketId);
+        } else if (this.OvaleData.itemList[trinketId]) {
+            for (const [, v] of pairs(this.OvaleData.itemList[trinketId])) {
+                boolean = this.HasTrinket(v);
+                if (boolean) {
+                    break;
+                }
+            }
+        }
+        return TestBoolean(boolean !== undefined, yesno);
+    };
+
+    /** Get the cooldown time in seconds of an item, e.g., trinket.
+	 @name ItemCooldown
+	 @paramsig number or boolean
+	 @param id The item ID or the equipped slot name.
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @return The number of seconds.
+	 @return A boolean value for the result of the comparison.
+	 @usage
+	 if not ItemCooldown(ancient_petrified_seed) > 0
+	     Spell(berserk_cat)
+	 if not ItemCooldown(Trinket0Slot) > 0
+	     Spell(berserk_cat)
+     */
+    private ItemCooldown = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [itemId, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        if (itemId && type(itemId) != "number") {
+            itemId = this.GetEquippedItemBySlotName(itemId);
+        }
+        if (itemId) {
+            let [start, duration] = GetItemCooldown(itemId);
+            if (start > 0 && duration > 0) {
+                return TestValue(
+                    start,
+                    start + duration,
+                    duration,
+                    start,
+                    -1,
+                    comparator,
+                    limit
+                );
+            }
+        }
+        return Compare(0, comparator, limit);
+    };
+
     /* Removed for simplicity as I don't think anyone uses this.  If it does need to be added back then GET_ITEM_INFO_RECEIVED will need to be as well.
 const GetItemLevel = function(slotId) {
     OvaleEquipment.StartProfiling("OvaleEquipment_GetItemLevel");

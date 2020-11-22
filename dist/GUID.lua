@@ -14,6 +14,8 @@ local UnitGUID = UnitGUID
 local UnitName = UnitName
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local ReturnConstant = __Condition.ReturnConstant
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isString = __tools.isString
 local PET_UNIT = {}
 do
     PET_UNIT["player"] = "pet"
@@ -133,10 +135,12 @@ __exports.OvaleGUIDClass = __class(nil, {
         self.petGUID = {}
         self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
         self.getGuid = function(_, namedParameters)
-            return ReturnConstant(self:UnitGUID(namedParameters.target or "target"))
+            local target = (isString(namedParameters.target) and namedParameters.target) or "target"
+            return ReturnConstant(self:UnitGUID(target))
         end
         self.getTargetGuid = function(_, namedParameters)
-            return ReturnConstant(self:UnitGUID((namedParameters.target or "target") .. "target"))
+            local target = (isString(namedParameters.target) and namedParameters.target) or "target"
+            return ReturnConstant(self:UnitGUID(target .. "target"))
         end
         self.OnInitialize = function()
             self.module:RegisterEvent("ARENA_OPPONENT_UPDATE", self.ARENA_OPPONENT_UPDATE)

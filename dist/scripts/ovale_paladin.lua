@@ -13,8 +13,8 @@ __exports.registerPaladin = function(OvaleScripts)
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=protection)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(protection)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(protection)))
 
 AddFunction protectioninterruptactions
 {
@@ -36,7 +36,7 @@ AddFunction protectionuseitemactions
 
 AddFunction protectiongetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(rebuke) texture(misc_arrowlup help=l(not_in_melee_range))
+ if checkboxon(opt_melee_range) and not target.inrange(rebuke) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 ### actions.standard
@@ -266,39 +266,39 @@ AddFunction protection_defaultcdpostconditions
 
 ### Protection icons.
 
-AddCheckBox(opt_paladin_protection_aoe l(aoe) default specialization=protection)
+AddCheckBox(opt_paladin_protection_aoe l(aoe) default enabled=(specialization(protection)))
 
-AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
+AddIcon enabled=(not checkboxon(opt_paladin_protection_aoe) and specialization(protection)) enemies=1 help=shortcd
 {
  if not incombat() protectionprecombatshortcdactions()
  protection_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
+AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and specialization(protection)) help=shortcd
 {
  if not incombat() protectionprecombatshortcdactions()
  protection_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=protection
+AddIcon enabled=(specialization(protection)) enemies=1 help=main
 {
  if not incombat() protectionprecombatmainactions()
  protection_defaultmainactions()
 }
 
-AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
+AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and specialization(protection)) help=aoe
 {
  if not incombat() protectionprecombatmainactions()
  protection_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=cd specialization=protection
+AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and not specialization(protection)) enemies=1 help=cd
 {
  if not incombat() protectionprecombatcdactions()
  protection_defaultcdactions()
 }
 
-AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
+AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and specialization(protection)) help=cd
 {
  if not incombat() protectionprecombatcdactions()
  protection_defaultcdactions()
@@ -356,9 +356,9 @@ AddFunction ds_castable
  enemies() >= 2 or buffpresent(empyrean_power_buff) and target.debuffexpires(judgment_debuff) and buffexpires(divine_purpose) or enemies() >= 2 and buffpresent(crusade) and buffstacks(crusade) < 10
 }
 
-AddCheckBox(opt_interrupt l(interrupt) default specialization=retribution)
-AddCheckBox(opt_melee_range l(not_in_melee_range) specialization=retribution)
-AddCheckBox(opt_shield_of_vengeance spellname(shield_of_vengeance) specialization=retribution)
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(retribution)))
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(retribution)))
+AddCheckBox(opt_shield_of_vengeance spellname(shield_of_vengeance) enabled=(specialization(retribution)))
 
 AddFunction retributioninterruptactions
 {
@@ -378,7 +378,7 @@ AddFunction retributionuseitemactions
 
 AddFunction retributiongetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(rebuke) texture(misc_arrowlup help=l(not_in_melee_range))
+ if checkboxon(opt_melee_range) and not target.inrange(rebuke) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 AddFunction retributiontimetohpg
@@ -695,39 +695,39 @@ AddFunction retribution_defaultcdpostconditions
 
 ### Retribution icons.
 
-AddCheckBox(opt_paladin_retribution_aoe l(aoe) default specialization=retribution)
+AddCheckBox(opt_paladin_retribution_aoe l(aoe) default enabled=(specialization(retribution)))
 
-AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=shortcd specialization=retribution
+AddIcon enabled=(not checkboxon(opt_paladin_retribution_aoe) and specialization(retribution)) enemies=1 help=shortcd
 {
  if not incombat() retributionprecombatshortcdactions()
  retribution_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_paladin_retribution_aoe help=shortcd specialization=retribution
+AddIcon enabled=(checkboxon(opt_paladin_retribution_aoe) and specialization(retribution)) help=shortcd
 {
  if not incombat() retributionprecombatshortcdactions()
  retribution_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=retribution
+AddIcon enabled=(specialization(retribution)) enemies=1 help=main
 {
  if not incombat() retributionprecombatmainactions()
  retribution_defaultmainactions()
 }
 
-AddIcon checkbox=opt_paladin_retribution_aoe help=aoe specialization=retribution
+AddIcon enabled=(checkboxon(opt_paladin_retribution_aoe) and specialization(retribution)) help=aoe
 {
  if not incombat() retributionprecombatmainactions()
  retribution_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=cd specialization=retribution
+AddIcon enabled=(checkboxon(opt_paladin_retribution_aoe) and not specialization(retribution)) enemies=1 help=cd
 {
  if not incombat() retributionprecombatcdactions()
  retribution_defaultcdactions()
 }
 
-AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
+AddIcon enabled=(checkboxon(opt_paladin_retribution_aoe) and specialization(retribution)) help=cd
 {
  if not incombat() retributionprecombatcdactions()
  retribution_defaultcdactions()

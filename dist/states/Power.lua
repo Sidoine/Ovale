@@ -7,10 +7,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ceil = math.ceil
 local INFINITY = math.huge
 local floor = math.floor
-local ipairs = ipairs
 local pairs = pairs
-local tostring = tostring
-local tonumber = tonumber
 local kpairs = pairs
 local lower = string.lower
 local concat = table.concat
@@ -25,7 +22,6 @@ local Enum = Enum
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
-local isLuaArray = __tools.isLuaArray
 local OneTimeMessage = __tools.OneTimeMessage
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
@@ -74,14 +70,12 @@ __exports.PRIMARY_POWER = {
     mana = true
 }
 __exports.OvalePowerClass = __class(States, {
-    constructor = function(self, ovaleDebug, ovale, ovaleProfiler, ovaleData, ovaleFuture, baseState, ovaleAura, ovalePaperDoll, requirement, ovaleSpellBook, combat)
+    constructor = function(self, ovaleDebug, ovale, ovaleProfiler, ovaleData, ovaleFuture, baseState, ovalePaperDoll, ovaleSpellBook, combat)
         self.ovale = ovale
         self.ovaleData = ovaleData
         self.ovaleFuture = ovaleFuture
         self.baseState = baseState
-        self.ovaleAura = ovaleAura
         self.ovalePaperDoll = ovalePaperDoll
-        self.requirement = requirement
         self.ovaleSpellBook = ovaleSpellBook
         self.combat = combat
         self.POWER_INFO = {}
@@ -99,14 +93,8 @@ __exports.OvalePowerClass = __class(States, {
             self.module:RegisterMessage("Ovale_StanceChanged", self.EventHandler)
             self.module:RegisterMessage("Ovale_TalentsChanged", self.EventHandler)
             self:initializePower()
-            for powerType in pairs(self.POWER_INFO) do
-                self.requirement:RegisterRequirement(powerType, self.RequirePowerHandler)
-            end
         end
         self.OnDisable = function()
-            for powerType in pairs(self.POWER_INFO) do
-                self.requirement:UnregisterRequirement(powerType)
-            end
             self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
             self.module:UnregisterEvent("PLAYER_LEVEL_UP")
             self.module:UnregisterEvent("UNIT_DISPLAYPOWER")
@@ -157,15 +145,26 @@ __exports.OvalePowerClass = __class(States, {
                 self:UpdatePowerRegen(event)
             end
         end
-        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            return self:getPowerRequirementAt(self:GetState(atTime), spellId, atTime, requirement, tokens, index, targetGUID)
-        end
         self.CopySpellcastInfo = function(mod, spellcast, dest)
             for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
                 if spellcast[powerType] then
                     dest[powerType] = spellcast[powerType]
                 end
             end
+        end
+        self.ApplySpellStartCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvalePower_ApplySpellStartCast")
+            if isChanneled then
+                self:ApplyPowerCost(spellId, targetGUID, startCast, spellcast)
+            end
+            self.profiler:StopProfiling("OvalePower_ApplySpellStartCast")
+        end
+        self.ApplySpellAfterCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+            self.profiler:StartProfiling("OvalePower_ApplySpellAfterCast")
+            if  not isChanneled then
+                self:ApplyPowerCost(spellId, targetGUID, endCast, spellcast)
+            end
+            self.profiler:StopProfiling("OvalePower_ApplySpellAfterCast")
         end
         States.constructor(self, PowerState)
         self.module = ovale:createModule("OvalePower", self.OnInitialize, self.OnDisable, aceEvent)
@@ -395,20 +394,6 @@ __exports.OvalePowerClass = __class(States, {
             self.next.power[powerType] = nil
         end
     end,
-    ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvalePower_ApplySpellStartCast")
-        if isChanneled then
-            self:ApplyPowerCost(spellId, targetGUID, startCast, spellcast)
-        end
-        self.profiler:StopProfiling("OvalePower_ApplySpellStartCast")
-    end,
-    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        self.profiler:StartProfiling("OvalePower_ApplySpellAfterCast")
-        if  not isChanneled then
-            self:ApplyPowerCost(spellId, targetGUID, endCast, spellcast)
-        end
-        self.profiler:StopProfiling("OvalePower_ApplySpellAfterCast")
-    end,
     ApplyPowerCost = function(self, spellId, targetGUID, atTime, spellcast)
         self.profiler:StartProfiling("OvalePower_state_ApplyPowerCost")
         local si = self.ovaleData.spellInfo[spellId]
@@ -471,6 +456,16 @@ __exports.OvalePowerClass = __class(States, {
         end
         return power
     end,
+    hasPowerFor = function(self, spellInfo, atTime)
+        for _, powerType in kpairs(self.POWER_TYPE) do
+            local cost = self.ovaleData:getSpellInfoProperty(spellInfo, atTime, powerType)
+            self.tracer:Log("Spell has cost of %s for %s", cost, powerType)
+            if cost ~= nil and cost > self:getPowerAt(self:GetState(atTime), powerType, atTime) then
+                return false
+            end
+        end
+        return true
+    end,
     getPowerCostAt = function(self, state, spellId, powerType, atTime, targetGUID, maximumCost)
         self.profiler:StartProfiling("OvalePower_PowerCost")
         local spellCost = 0
@@ -479,22 +474,6 @@ __exports.OvalePowerClass = __class(States, {
         if si and si[powerType] then
             local cost, ratio = self.ovaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
             if ratio and ratio ~= 0 then
-                local addRequirements = si and si.require and si.require["add_" .. powerType .. "_from_aura"]
-                if addRequirements then
-                    for v, rArray in pairs(addRequirements) do
-                        if isLuaArray(rArray) then
-                            for _, requirement in ipairs(rArray) do
-                                local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                                if verified then
-                                    local aura = self.ovaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                                    if aura and self.ovaleAura:IsActiveAura(aura, atTime) then
-                                        cost = cost + (tonumber(v) or 0) * aura.stacks
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
                 local maxCostParam = "max_" .. powerType
                 local maxCost = si[maxCostParam]
                 if maxCost then
@@ -506,28 +485,12 @@ __exports.OvalePowerClass = __class(States, {
                     end
                 end
                 spellCost = (cost > 0 and floor(cost * ratio)) or ceil(cost * ratio)
-                local refund = si["refund_" .. powerType] or 0
+                local parameter = "refund_" .. powerType
+                local refund = self.ovaleData:getSpellInfoProperty(si, atTime, parameter)
                 if refund == "cost" then
                     spellRefund = spellCost
-                else
-                    local refundRequirements = si and si.require["refund_" .. powerType]
-                    if refundRequirements then
-                        for v, rArray in pairs(refundRequirements) do
-                            if isLuaArray(rArray) then
-                                for _, requirement in ipairs(rArray) do
-                                    local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                                    if verified then
-                                        if v == "cost" then
-                                            spellRefund = spellCost
-                                        elseif isNumber(v) then
-                                        end
-                                        refund = refund + (tonumber(v) or 0)
-                                        break
-                                    end
-                                end
-                            end
-                        end
-                    end
+                elseif isNumber(refund) then
+                    spellRefund = refund
                 end
             end
         else
@@ -538,41 +501,6 @@ __exports.OvalePowerClass = __class(States, {
         end
         self.profiler:StopProfiling("OvalePower_PowerCost")
         return spellCost, spellRefund
-    end,
-    getPowerRequirementAt = function(self, state, spellId, atTime, requirement, tokens, index, targetGUID)
-        local verified = false
-        local baseCost = tokens[index]
-        index = index + 1
-        if baseCost then
-            if baseCost > 0 then
-                local powerType = requirement
-                local cost = self:getPowerCostAt(state, spellId, powerType, atTime, targetGUID)
-                if cost > 0 then
-                    local power = self:getPowerAt(state, powerType, atTime)
-                    if power >= cost then
-                        verified = true
-                    end
-                    self.tracer:Log("   Has power %f %s", power, powerType)
-                else
-                    verified = true
-                end
-                if cost > 0 then
-                    local result = (verified and "passed") or "FAILED"
-                    self.tracer:Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result)
-                end
-            else
-                verified = true
-            end
-        else
-            OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
-            OneTimeMessage(tostring(index))
-            if isLuaArray(tokens) then
-                for k, v in pairs(tokens) do
-                    OneTimeMessage(k .. " = " .. tostring(v))
-                end
-            end
-        end
-        return verified, requirement, index
     end,
     getTimeToPowerStateAt = function(self, state, spellId, atTime, targetGUID, powerType, extraPower)
         local seconds = 0

@@ -1,8 +1,6 @@
 import { L } from "../Localization";
-import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { pairs, tonumber, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
-import { sub } from "@wowts/string";
+import { pairs, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
 import {
     GetNumShapeshiftForms,
@@ -11,14 +9,14 @@ import {
     GetSpellInfo,
 } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { isString, OneTimeMessage } from "../tools";
 import { States, StateModule } from "../State";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { OvaleDebugClass } from "../Debug";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleProfilerClass, Profiler } from "../Profiler";
 import { OvaleDataClass } from "../Data";
 import { OptionUiAll } from "../acegui-helpers";
+import { OvaleConditionClass, TestBoolean } from "../Condition";
 
 const [druidCatForm] = GetSpellInfo(768);
 const [druidTravelForm] = GetSpellInfo(783);
@@ -80,14 +78,12 @@ export class OvaleStanceClass
     stanceId: LuaObj<number> = {};
     private module: AceModule & AceEvent;
     private profiler: Profiler;
-    private tracer: Tracer;
 
     constructor(
         ovaleDebug: OvaleDebugClass,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleData: OvaleDataClass,
-        private requirement: OvaleRequirement
+        private ovaleData: OvaleDataClass
     ) {
         super(StanceData);
         this.module = ovale.createModule(
@@ -97,7 +93,6 @@ export class OvaleStanceClass
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
-        this.tracer = ovaleDebug.create(this.module.GetName());
         let debugOptions: LuaObj<OptionUiAll> = {
             stance: {
                 name: L["Stances"],
@@ -120,6 +115,31 @@ export class OvaleStanceClass
         }
     }
 
+    public registerConditions(ovaleCondition: OvaleConditionClass) {
+        ovaleCondition.RegisterCondition("stance", false, this.Stance);
+    }
+
+    /** Test if the player is in a given stance.
+	 @name Stance
+	 @paramsig boolean
+	 @param stance The stance name or a number representing the stance index.
+	 @param yesno Optional. If yes, then return true if the player is in the given stance. If no, then return true otherwise.
+	     Default is yes.
+	     Valid values: yes, no.
+	 @return A boolean value.
+	 @usage
+	 unless Stance(druid_bear_form) Spell(bear_form)
+     */
+    private Stance = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [stance, yesno] = [positionalParams[1], positionalParams[2]];
+        let boolean = this.IsStance(stance, atTime);
+        return TestBoolean(boolean, yesno);
+    };
+
     private OnInitialize = () => {
         this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateStances);
         this.module.RegisterEvent(
@@ -132,13 +152,8 @@ export class OvaleStanceClass
         );
         this.module.RegisterMessage("Ovale_SpellsChanged", this.UpdateStances);
         this.module.RegisterMessage("Ovale_TalentsChanged", this.UpdateStances);
-        this.requirement.RegisterRequirement(
-            "stance",
-            this.RequireStanceHandler
-        );
     };
     private OnDisable = () => {
-        this.requirement.UnregisterRequirement("stance");
         this.module.UnregisterEvent("PLAYER_ALIVE");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
@@ -224,48 +239,6 @@ export class OvaleStanceClass
         this.ShapeshiftEventHandler();
         this.ready = true;
     };
-    RequireStanceHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified = false;
-        let stance = tokens[index];
-        index = index + 1;
-
-        if (stance) {
-            let isBang = false;
-            if (isString(stance) && sub(stance, 1, 1) === "!") {
-                isBang = true;
-                stance = sub(stance, 2);
-            }
-            stance = tonumber(stance) || stance;
-            let isStance = this.IsStance(stance, atTime);
-            if ((!isBang && isStance) || (isBang && !isStance)) {
-                verified = true;
-            }
-            let result = (verified && "passed") || "FAILED";
-            if (isBang) {
-                this.tracer.Log(
-                    "    Require NOT stance '%s': %s",
-                    stance,
-                    result
-                );
-            } else {
-                this.tracer.Log("    Require stance '%s': %s", stance, result);
-            }
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a stance argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
-    };
-
     InitializeState() {
         this.next.stance = 0;
     }
@@ -275,14 +248,14 @@ export class OvaleStanceClass
         this.next.stance = this.current.stance;
         this.profiler.StopProfiling("OvaleStance_ResetState");
     }
-    ApplySpellAfterCast(
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleStance_ApplySpellAfterCast");
         let stance = this.ovaleData.GetSpellInfoProperty(
             spellId,
@@ -297,5 +270,5 @@ export class OvaleStanceClass
             this.next.stance = stance;
         }
         this.profiler.StopProfiling("OvaleStance_ApplySpellAfterCast");
-    }
+    };
 }

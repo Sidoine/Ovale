@@ -1,4 +1,4 @@
-import test from "ava";
+import { test, expect } from "@jest/globals";
 import {
     SpellData,
     SpellEffectData,
@@ -98,55 +98,51 @@ function createFakeSpellEffect(
     };
 }
 
-test("parseDescription with no placeholder", (t) => {
-    t.is(
+test("parseDescription with no placeholder", () => {
+    expect(
         parseDescription(
             "Stunned.",
             createFakeSpell({}),
             new Map<number, SpellData>()
-        ),
-        "Stunned."
-    );
+        )
+    ).toBe("Stunned.");
 });
 
-test("parseDescription with duration in same spell", (t) => {
+test("parseDescription with duration in same spell", () => {
     const spell = createFakeSpell({ duration: 18000 });
-    t.is(
+    expect(
         parseDescription(
             "Stuns target for $d.",
             spell,
             new Map<number, SpellData>()
-        ),
-        "Stuns target for 18 seconds."
-    );
+        )
+    ).toBe("Stuns target for 18 seconds.");
 });
 
-test("parseDescription with reference to a spell effect", (t) => {
+test("parseDescription with reference to a spell effect", () => {
     const spell = createFakeSpell({});
     spell.spellEffects = [createFakeSpellEffect({ sp_coeff: 0.3 })];
 
-    t.is(
+    expect(
         parseDescription(
             "Stuns target for $s1.",
             spell,
             new Map<number, SpellData>()
-        ),
-        "Stuns target for (30% of Spell Power)."
-    );
+        )
+    ).toBe("Stuns target for (30% of Spell Power).");
 });
 
-test("parseDescription with reference to another spell", (t) => {
+test("parseDescription with reference to another spell", () => {
     const spell = createFakeSpell({});
     const otherSpell = createFakeSpell({ duration: 18000, id: 4998 });
     const spells = new Map<number, SpellData>();
     spells.set(otherSpell.id, otherSpell);
-    t.is(
-        parseDescription("Stuns target for $4998d.", spell, spells),
+    expect(parseDescription("Stuns target for $4998d.", spell, spells)).toBe(
         "Stuns target for 18 seconds."
     );
 });
 
-test("parseDescription where description is the description of another spell", (t) => {
+test("parseDescription where description is the description of another spell", () => {
     const spell = createFakeSpell({});
     const otherSpell = createFakeSpell({
         duration: 18000,
@@ -155,8 +151,7 @@ test("parseDescription where description is the description of another spell", (
     });
     const spells = new Map<number, SpellData>();
     spells.set(otherSpell.id, otherSpell);
-    t.is(
-        parseDescription("$@spelldesc4998", spell, spells),
+    expect(parseDescription("$@spelldesc4998", spell, spells)).toBe(
         "Stuns target for 18 seconds."
     );
 });

@@ -1,7 +1,14 @@
-import test from "ava";
+import { test, expect } from "@jest/globals";
 import { IoC } from "../ioc";
+function assertDefined<T>(a: T | undefined): asserts a is T {
+    expect(a).toBeDefined();
+}
 
-test("parse decimal number", (t) => {
+function assertIs<T extends string>(a: string, b: T): asserts a is T {
+    expect(a).toBe(b);
+}
+
+test("parse decimal number", () => {
     // Arrange
     const code = `deathknight="test"
 spec=blood
@@ -14,20 +21,21 @@ actions=/potion,if=buff.test.stack>=0.1`;
     const result = simulationcraft.ParseProfile(code);
 
     // Assert
-    t.is(result!.actionList![1].type, "action_list");
-    t.is(result!.actionList![1].child![1].type, "action");
-    const ifNode = result!.actionList![1].child![1].modifiers!.if!;
-    t.is(ifNode.type, "operator");
-    if (ifNode.type !== "operator") return;
-    t.is(ifNode.operatorType, "compare");
-    t.is(ifNode.operator, ">=");
+    assertDefined(result);
+    assertDefined(result.actionList);
+    assertIs(result.actionList[1].type, "action_list");
+    assertIs(result.actionList[1].child[1].type, "action");
+    const ifNode = result.actionList[1].child[1].modifiers.if;
+    assertDefined(ifNode);
+    assertIs(ifNode.type, "operator");
+    assertIs(ifNode.operatorType, "compare");
+    assertIs(ifNode.operator, ">=");
     const valueNode = ifNode.child[2];
-    t.is(valueNode.type, "number");
-    if (valueNode.type !== "number") return;
-    t.is(valueNode.value, 0.1);
+    assertIs(valueNode.type, "number");
+    expect(valueNode.value).toBe(0.1);
 });
 
-test("parse sequence", (t) => {
+test("parse sequence", () => {
     // Arrange
     const code = `deathknight="test"
     spec=blood
@@ -40,8 +48,8 @@ actions=/sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.
     const result = simulationcraft.ParseProfile(code);
 
     // Assert
-    t.is(ioc.debug.warning, undefined);
-    t.not(result, undefined);
+    expect(ioc.debug.warning).toBeUndefined();
+    expect(result).toBeDefined();
 });
 
 // test("parse cycle_targets", t => {

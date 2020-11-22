@@ -1,6 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
+local __AST = LibStub:GetLibrary("ovale/AST")
+local isAstNodeWithChildren = __AST.isAstNodeWithChildren
 local type = type
 local ipairs = ipairs
 local wipe = wipe
@@ -31,7 +33,7 @@ local function PreOrderTraversalMark(node)
         if node.type == "add_function" then
             self_functionDefined[node.name] = true
         end
-        if node.child then
+        if isAstNodeWithChildren(node) then
             for _, childNode in ipairs(node.child) do
                 PreOrderTraversalMark(childNode)
             end
@@ -144,7 +146,7 @@ __exports.Sweep = function(node)
             end
         end
         isChanged = isChanged or changed or  not  not isSwept
-    elseif node.type == "wait" then
+    elseif node.type == "simc_wait" then
         isChanged, isSwept = __exports.Sweep(node.child[1])
     end
     return isChanged, isSwept
@@ -203,7 +205,7 @@ __exports.Generator = __class(nil, {
         ]]
         local code = format(fmt, camelSpecialization, concat(lines, "\n"))
         local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-        if node then
+        if node and node.type == "add_function" then
             insert(child, 1, node)
             annotation.functionTag[node.name] = "cd"
         end
@@ -535,7 +537,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("death_strike")
@@ -555,7 +557,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("chaos_strike")
@@ -571,7 +573,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("shear")
@@ -591,7 +593,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("mangle")
@@ -614,7 +616,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("raptor_strike")
@@ -631,7 +633,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("revive_pet")
@@ -647,7 +649,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("tiger_palm")
@@ -711,7 +713,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("rebuke")
@@ -731,7 +733,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("kick")
@@ -752,7 +754,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol("feral_lunge")
@@ -773,7 +775,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "cd"
                 annotation:AddSymbol("bloodlust")
@@ -799,7 +801,7 @@ __exports.Generator = __class(nil, {
             end
             local code = format(fmt, camelSpecialization, charge, charge, charge, charge)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "shortcd"
                 annotation:AddSymbol(charge)
@@ -818,7 +820,7 @@ __exports.Generator = __class(nil, {
             ]]
             local code = format(fmt, camelSpecialization)
             local node = self.ovaleAst:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-            if node then
+            if node and node.type == "add_function" then
                 insert(child, 1, node)
                 annotation.functionTag[node.name] = "cd"
                 count = count + 1
@@ -838,7 +840,7 @@ __exports.Generator = __class(nil, {
             defaultText = ""
         end
         local fmt = [[
-            AddCheckBox(opt_%s SpellName(%s)%s specialization=%s)
+            AddCheckBox(opt_%s SpellName(%s)%s enabled=(specialization(%s)))
         ]]
         local code = format(fmt, skill, skill, defaultText, annotation.specialization)
         local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
@@ -852,7 +854,7 @@ __exports.Generator = __class(nil, {
             count = count + self:AddOptionalSkillCheckBox(child, annotation, data, skill)
         end
         local nodeList = annotation.astAnnotation.nodeList
-        local ifSpecialization = "specialization=" .. annotation.specialization
+        local ifSpecialization = "enabled=(specialization(" .. annotation.specialization .. "))"
         if annotation.using_apl and next(annotation.using_apl) then
             for name in pairs(annotation.using_apl) do
                 if name ~= "normal" then

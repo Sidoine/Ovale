@@ -51,11 +51,11 @@ import { Parser } from "./simulationcraft/parser";
 import { Generator } from "./simulationcraft/generator";
 import { Unparser } from "./simulationcraft/unparser";
 import { Splitter } from "./simulationcraft/splitter";
-import { OvaleRequirement } from "./Requirement";
 import { OvaleCombatClass } from "./states/combat";
 import { Covenant } from "./states/covenant";
 import { Runeforge } from "./states/runeforge";
 import { Conduit } from "./states/conduit";
+import { Runner } from "./runner";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -92,7 +92,6 @@ export class IoC {
     public power: OvalePowerClass;
     public profiler: OvaleProfilerClass;
     public recount: OvaleRecountClass;
-    public requirement: OvaleRequirement;
     public runes: OvaleRunesClass;
     public score: OvaleScoreClass;
     public scripts: OvaleScriptsClass;
@@ -120,12 +119,22 @@ export class IoC {
         this.options = new OvaleOptionsClass(this.ovale);
         this.debug = new OvaleDebugClass(this.ovale, this.options);
         this.profiler = new OvaleProfilerClass(this.options, this.ovale);
+        this.lastSpell = new LastSpell();
+        this.baseState = new BaseState();
+        this.condition = new OvaleConditionClass();
+        const runner = new Runner(
+            this.profiler,
+            this.debug,
+            this.baseState,
+            this.condition
+        );
+        this.data = new OvaleDataClass(runner);
         this.equipment = new OvaleEquipmentClass(
             this.ovale,
             this.debug,
-            this.profiler
+            this.profiler,
+            this.data
         );
-        this.lastSpell = new LastSpell();
         this.paperDoll = new OvalePaperDollClass(
             this.equipment,
             this.ovale,
@@ -133,15 +142,7 @@ export class IoC {
             this.profiler,
             this.lastSpell
         );
-        this.baseState = new BaseState();
-        this.condition = new OvaleConditionClass();
         this.guid = new OvaleGUIDClass(this.ovale, this.debug, this.condition);
-        this.requirement = new OvaleRequirement(this.baseState, this.guid);
-        this.data = new OvaleDataClass(
-            this.baseState,
-            this.guid,
-            this.requirement
-        );
         this.spellBook = new OvaleSpellBookClass(
             this.ovale,
             this.debug,
@@ -154,8 +155,7 @@ export class IoC {
             this.ovale,
             this.debug,
             this.profiler,
-            this.spellBook,
-            this.requirement
+            this.spellBook
         );
         this.demonHunterSigils = new OvaleSigilClass(
             this.paperDoll,
@@ -174,15 +174,13 @@ export class IoC {
             this.debug,
             this.ovale,
             this.profiler,
-            this.spellBook,
-            this.requirement
+            this.spellBook
         );
         this.stance = new OvaleStanceClass(
             this.debug,
             this.ovale,
             this.profiler,
-            this.data,
-            this.requirement
+            this.data
         );
         this.enemies = new OvaleEnemiesClass(
             this.guid,
@@ -203,22 +201,19 @@ export class IoC {
             this.debug,
             this.profiler,
             this.stance,
-            this.requirement,
-            this.spellBook
+            this.spellBook,
+            runner
         );
         this.health = new OvaleHealthClass(
             this.guid,
-            this.baseState,
             this.ovale,
             this.options,
             this.debug,
-            this.profiler,
-            this.requirement
+            this.profiler
         );
         this.lossOfControl = new OvaleLossOfControlClass(
             this.ovale,
-            this.debug,
-            this.requirement
+            this.debug
         );
         this.azeriteEssence = new OvaleAzeriteEssenceClass(
             this.ovale,
@@ -232,8 +227,7 @@ export class IoC {
         const combat = new OvaleCombatClass(
             this.ovale,
             this.debug,
-            this.spellBook,
-            this.requirement
+            this.spellBook
         );
         this.scripts = new OvaleScriptsClass(
             this.ovale,
@@ -257,7 +251,6 @@ export class IoC {
         );
         this.compile = new OvaleCompileClass(
             this.azeriteArmor,
-            this.equipment,
             this.ast,
             this.condition,
             this.cooldown,
@@ -268,8 +261,7 @@ export class IoC {
             this.options,
             this.ovale,
             this.score,
-            this.spellBook,
-            this.stance
+            this.spellBook
         );
         this.power = new OvalePowerClass(
             this.debug,
@@ -278,9 +270,7 @@ export class IoC {
             this.data,
             this.future,
             this.baseState,
-            this.aura,
             this.paperDoll,
-            this.requirement,
             this.spellBook,
             combat
         );
@@ -332,7 +322,6 @@ export class IoC {
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
             this.ovale,
-            this.requirement,
             this.paperDoll
         );
         this.runes = new OvaleRunesClass(
@@ -355,7 +344,7 @@ export class IoC {
             this.debug,
             this.profiler,
             this.data,
-            this.requirement
+            this.power
         );
         this.bestAction = new OvaleBestActionClass(
             this.equipment,
@@ -363,10 +352,6 @@ export class IoC {
             this.data,
             this.cooldown,
             this.state,
-            this.baseState,
-            this.paperDoll,
-            this.compile,
-            this.condition,
             this.ovale,
             this.guid,
             this.power,
@@ -376,7 +361,8 @@ export class IoC {
             this.debug,
             this.variables,
             this.runes,
-            this.spells
+            this.spells,
+            runner
         );
         this.frame = new OvaleFrameModuleClass(
             this.state,
@@ -387,11 +373,11 @@ export class IoC {
             this.ovale,
             this.options,
             this.debug,
-            this.guid,
             this.spellFlash,
             this.spellBook,
             this.bestAction,
-            combat
+            combat,
+            runner
         );
         this.dataBroker = new OvaleDataBrokerClass(
             this.paperDoll,
@@ -443,9 +429,7 @@ export class IoC {
         this.conditions = new OvaleConditions(
             this.condition,
             this.data,
-            this.compile,
             this.paperDoll,
-            this.azeriteArmor,
             this.azeriteEssence,
             this.aura,
             this.baseState,
@@ -457,9 +441,7 @@ export class IoC {
             this.damageTaken,
             this.power,
             this.enemies,
-            this.variables,
             this.lastSpell,
-            this.equipment,
             this.health,
             this.options,
             this.lossOfControl,
@@ -467,9 +449,7 @@ export class IoC {
             this.totem,
             this.demonHunterSigils,
             this.demonHunterSoulFragments,
-            this.bestAction,
             this.runes,
-            this.stance,
             this.bossMod,
             this.spells
         );
@@ -501,5 +481,8 @@ export class IoC {
         this.aura.registerConditions(this.condition);
         this.future.registerConditions(this.condition);
         this.stagger.registerConditions(this.condition);
+        this.paperDoll.registerConditions(this.condition);
+        this.equipment.registerConditions(this.condition);
+        this.azeriteArmor.registerConditions(this.condition);
     }
 }

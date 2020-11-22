@@ -1,4 +1,4 @@
-import { AstNode, OvaleASTClass } from "../AST";
+import { AstNode, isAstNodeWithChildren, OvaleASTClass } from "../AST";
 import {
     type,
     LuaObj,
@@ -35,7 +35,7 @@ function PreOrderTraversalMark(node: AstNode) {
         if (node.type == "add_function") {
             self_functionDefined[node.name] = true;
         }
-        if (node.child) {
+        if (isAstNodeWithChildren(node)) {
             for (const [, childNode] of ipairs(node.child)) {
                 PreOrderTraversalMark(childNode);
             }
@@ -159,7 +159,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
             }
         }
         isChanged = isChanged || changed || !!isSwept;
-    } else if (node.type == "wait") {
+    } else if (node.type == "simc_wait") {
         [isChanged, isSwept] = Sweep(node.child[1]);
     }
     return [isChanged, isSwept];
@@ -239,7 +239,7 @@ export class Generator {
             nodeList,
             annotation.astAnnotation
         );
-        if (node) {
+        if (node && node.type === "add_function") {
             insert(child, 1, node);
             annotation.functionTag[node.name] = "cd";
         }
@@ -601,7 +601,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("death_strike");
@@ -629,7 +629,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("chaos_strike");
@@ -653,7 +653,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("shear");
@@ -678,7 +678,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("mangle");
@@ -706,7 +706,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("raptor_strike");
@@ -728,7 +728,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("revive_pet");
@@ -749,7 +749,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("tiger_palm");
@@ -833,7 +833,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type == "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("rebuke");
@@ -858,7 +858,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("kick");
@@ -884,7 +884,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol("feral_lunge");
@@ -910,7 +910,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "cd";
                 annotation.AddSymbol("bloodlust");
@@ -948,7 +948,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.AddSymbol(charge);
@@ -972,7 +972,7 @@ export class Generator {
                 nodeList,
                 annotation.astAnnotation
             );
-            if (node) {
+            if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "cd";
                 count = count + 1;
@@ -998,7 +998,7 @@ export class Generator {
             defaultText = "";
         }
         let fmt = `
-            AddCheckBox(opt_%s SpellName(%s)%s specialization=%s)
+            AddCheckBox(opt_%s SpellName(%s)%s enabled=(specialization(%s)))
         `;
         let code = format(
             fmt,
@@ -1034,7 +1034,7 @@ export class Generator {
                 );
         }
         let nodeList = annotation.astAnnotation.nodeList;
-        let ifSpecialization = `specialization=${annotation.specialization}`;
+        let ifSpecialization = `enabled=(specialization(${annotation.specialization}))`;
         if (annotation.using_apl && next(annotation.using_apl)) {
             for (const [name] of pairs(annotation.using_apl)) {
                 if (name != "normal") {

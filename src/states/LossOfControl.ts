@@ -1,14 +1,12 @@
-import { Tokens, OvaleRequirement } from "../Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { C_LossOfControl, GetTime } from "@wowts/wow-mock";
 import { LuaArray, pairs } from "@wowts/lua";
 import { insert } from "@wowts/table";
-import { sub, upper, format } from "@wowts/string";
+import { upper, format } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { StateModule } from "../State";
-import { OneTimeMessage } from "../tools";
 
 interface LossOfControlEventInfo {
     locType: string;
@@ -22,11 +20,7 @@ export class OvaleLossOfControlClass implements StateModule {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    constructor(
-        ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
-        private requirement: OvaleRequirement
-    ) {
+    constructor(ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
         this.module = ovale.createModule(
             "OvaleLossOfControl",
             this.OnInitialize,
@@ -42,16 +36,11 @@ export class OvaleLossOfControlClass implements StateModule {
             "LOSS_OF_CONTROL_ADDED",
             this.LOSS_OF_CONTROL_ADDED
         );
-        this.requirement.RegisterRequirement(
-            "lossofcontrol",
-            this.RequireLossOfControlHandler
-        );
     };
     private OnDisable = () => {
         this.tracer.Debug("Disabled LossOfControl module");
         this.lossOfControlHistory = {};
         this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
-        this.requirement.UnregisterRequirement("lossofcontrol");
     };
     private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
         this.tracer.Debug(
@@ -74,35 +63,6 @@ export class OvaleLossOfControlClass implements StateModule {
             };
             insert(this.lossOfControlHistory, data);
         }
-    };
-    RequireLossOfControlHandler = (
-        spellId: number,
-        atTime: number,
-        requirement: string,
-        tokens: Tokens,
-        index: number,
-        targetGUID: string | undefined
-    ): [boolean, string, number] => {
-        let verified: boolean = false;
-        let locType = <string>tokens[index];
-        index = index + 1;
-
-        if (locType) {
-            let required = true;
-            if (sub(locType, 1, 1) === "!") {
-                required = false;
-                locType = sub(locType, 2);
-            }
-
-            let hasLoss = this.HasLossOfControl(locType, atTime);
-            verified = (required && hasLoss) || (!required && !hasLoss);
-        } else {
-            OneTimeMessage(
-                "Warning: requirement '%s' is missing a locType argument.",
-                requirement
-            );
-        }
-        return [verified, requirement, index];
     };
     HasLossOfControl = (locType: string, atTime: number) => {
         let lowestStartTime: number | undefined = undefined;

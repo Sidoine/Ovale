@@ -17,7 +17,7 @@ export function registerWarlock(OvaleScripts: OvaleScriptsClass) {
 Include(ovale_common)
 Include(ovale_warlock_spells)
 
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=affliction)
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(affliction)))
 
 AddFunction afflictionuseitemactions
 {
@@ -215,7 +215,7 @@ AddFunction affliction_defaultmainactions
    #drain_life,if=buff.inevitable_demise.stack>30
    if buffstacks(inevitable_demise_buff) > 30 spell(drain_life)
    #drain_life,if=buff.inevitable_demise_az.stack>30
-   if buffstacks(inevitable_demise_az_buff) > 30 spell(drain_life)
+   if debuffstacks(inevitable_demise_debuff) > 30 spell(drain_life)
    #drain_soul
    spell(drain_soul)
    #shadow_bolt
@@ -249,7 +249,7 @@ AddFunction affliction_defaultshortcdactions
 
 AddFunction affliction_defaultshortcdpostconditions
 {
- soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity_buff) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or buffstacks(inevitable_demise_az_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity_buff) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or debuffstacks(inevitable_demise_debuff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 AddFunction affliction_defaultcdactions
@@ -277,44 +277,44 @@ AddFunction affliction_defaultcdactions
 
 AddFunction affliction_defaultcdpostconditions
 {
- spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity_buff) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or buffstacks(inevitable_demise_az_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity_buff) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or debuffstacks(inevitable_demise_debuff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### Affliction icons.
 
-AddCheckBox(opt_warlock_affliction_aoe l(aoe) default specialization=affliction)
+AddCheckBox(opt_warlock_affliction_aoe l(aoe) default enabled=(specialization(affliction)))
 
-AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
+AddIcon enabled=(not checkboxon(opt_warlock_affliction_aoe) and specialization(affliction)) enemies=1 help=shortcd
 {
  if not incombat() afflictionprecombatshortcdactions()
  affliction_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=affliction
+AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affliction)) help=shortcd
 {
  if not incombat() afflictionprecombatshortcdactions()
  affliction_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=affliction
+AddIcon enabled=(specialization(affliction)) enemies=1 help=main
 {
  if not incombat() afflictionprecombatmainactions()
  affliction_defaultmainactions()
 }
 
-AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
+AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affliction)) help=aoe
 {
  if not incombat() afflictionprecombatmainactions()
  affliction_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
+AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and not specialization(affliction)) enemies=1 help=cd
 {
  if not incombat() afflictionprecombatcdactions()
  affliction_defaultcdactions()
 }
 
-AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
+AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affliction)) help=cd
 {
  if not incombat() afflictionprecombatcdactions()
  affliction_defaultcdactions()
@@ -341,8 +341,8 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # guardian_of_azeroth
 # haunt
 # haunt_talent
-# inevitable_demise_az_buff
 # inevitable_demise_buff
+# inevitable_demise_debuff
 # malefic_rapture
 # memory_of_lucid_dreams
 # phantom_singularity
@@ -388,7 +388,7 @@ AddFunction tyrant_ready
  0
 }
 
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=demonology)
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(demonology)))
 
 AddFunction demonologyuseitemactions
 {
@@ -563,7 +563,7 @@ AddFunction demonologyoff_gcdcdactions
  unless demonduration(demonic_tyrant) > 0 and spell(berserking)
  {
   #potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
-  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(unbridled_fury_item usable=1)
   #blood_fury,if=pet.demonic_tyrant.active
   if demonduration(demonic_tyrant) > 0 spell(blood_fury)
   #fireblood,if=pet.demonic_tyrant.active
@@ -769,39 +769,39 @@ AddFunction demonology_defaultcdpostconditions
 
 ### Demonology icons.
 
-AddCheckBox(opt_warlock_demonology_aoe l(aoe) default specialization=demonology)
+AddCheckBox(opt_warlock_demonology_aoe l(aoe) default enabled=(specialization(demonology)))
 
-AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
+AddIcon enabled=(not checkboxon(opt_warlock_demonology_aoe) and specialization(demonology)) enemies=1 help=shortcd
 {
  if not incombat() demonologyprecombatshortcdactions()
  demonology_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonology
+AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and specialization(demonology)) help=shortcd
 {
  if not incombat() demonologyprecombatshortcdactions()
  demonology_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=demonology
+AddIcon enabled=(specialization(demonology)) enemies=1 help=main
 {
  if not incombat() demonologyprecombatmainactions()
  demonology_defaultmainactions()
 }
 
-AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
+AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and specialization(demonology)) help=aoe
 {
  if not incombat() demonologyprecombatmainactions()
  demonology_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
+AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and not specialization(demonology)) enemies=1 help=cd
 {
  if not incombat() demonologyprecombatcdactions()
  demonology_defaultcdactions()
 }
 
-AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
+AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and specialization(demonology)) help=cd
 {
  if not incombat() demonologyprecombatcdactions()
  demonology_defaultcdactions()
@@ -872,7 +872,7 @@ AddFunction pool_soul_shards
  enemies() > 1 and spellcooldown(havoc) <= 10 or spellcooldown(summon_infernal) <= 15 and hastalent(dark_soul_instability_talent) and spellcooldown(dark_soul_instability) <= 15 or hastalent(dark_soul_instability_talent) and spellcooldown(dark_soul_instability) <= 15 and { spellcooldown(summon_infernal) > target.timetodie() or spellcooldown(summon_infernal) + spellcooldownduration(summon_infernal) > target.timetodie() }
 }
 
-AddCheckBox(opt_use_consumables l(opt_use_consumables) default specialization=destruction)
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(destruction)))
 
 AddFunction destructionuseitemactions
 {
@@ -1048,7 +1048,7 @@ AddFunction destructioncdscdactions
  #dark_soul_instability
  spell(dark_soul_instability)
  #potion,if=pet.infernal.active
- if demonduration(infernal) > 0 and checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+ if demonduration(infernal) > 0 and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(unbridled_fury_item usable=1)
 
  unless demonduration(infernal) > 0 and spell(berserking)
  {
@@ -1295,39 +1295,39 @@ AddFunction destruction_defaultcdpostconditions
 
 ### Destruction icons.
 
-AddCheckBox(opt_warlock_destruction_aoe l(aoe) default specialization=destruction)
+AddCheckBox(opt_warlock_destruction_aoe l(aoe) default enabled=(specialization(destruction)))
 
-AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
+AddIcon enabled=(not checkboxon(opt_warlock_destruction_aoe) and specialization(destruction)) enemies=1 help=shortcd
 {
  if not incombat() destructionprecombatshortcdactions()
  destruction_defaultshortcdactions()
 }
 
-AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruction
+AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(destruction)) help=shortcd
 {
  if not incombat() destructionprecombatshortcdactions()
  destruction_defaultshortcdactions()
 }
 
-AddIcon enemies=1 help=main specialization=destruction
+AddIcon enabled=(specialization(destruction)) enemies=1 help=main
 {
  if not incombat() destructionprecombatmainactions()
  destruction_defaultmainactions()
 }
 
-AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
+AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(destruction)) help=aoe
 {
  if not incombat() destructionprecombatmainactions()
  destruction_defaultmainactions()
 }
 
-AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
+AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and not specialization(destruction)) enemies=1 help=cd
 {
  if not incombat() destructionprecombatcdactions()
  destruction_defaultcdactions()
 }
 
-AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
+AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(destruction)) help=cd
 {
  if not incombat() destructionprecombatcdactions()
  destruction_defaultcdactions()

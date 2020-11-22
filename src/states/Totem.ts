@@ -115,14 +115,14 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         }
     }
 
-    ApplySpellAfterCast(
+    ApplySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
         endCast: number,
         isChanneled: boolean,
         spellcast: SpellCast
-    ) {
+    ) => {
         this.profiler.StartProfiling("OvaleTotem_ApplySpellAfterCast");
         if (TOTEM_CLASS[this.ovale.playerClass]) {
             this.debug.Log(
@@ -136,7 +136,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             }
         }
         this.profiler.StopProfiling("OvaleTotem_ApplySpellAfterCast");
-    }
+    };
 
     IsActiveTotem(totem: Totem, atTime: number) {
         if (!totem) return false;

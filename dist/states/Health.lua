@@ -2,8 +2,6 @@ local __exports = LibStub:NewLibrary("ovale/states/Health", 80300)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local sub = string.sub
-local tonumber = tonumber
 local wipe = wipe
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
@@ -29,11 +27,9 @@ local CLEU_HEAL_EVENT = {
     SPELL_PERIODIC_HEAL = true
 }
 __exports.OvaleHealthClass = __class(nil, {
-    constructor = function(self, ovaleGuid, baseState, ovale, ovaleOptions, ovaleDebug, ovaleProfiler, requirement)
+    constructor = function(self, ovaleGuid, ovale, ovaleOptions, ovaleDebug, ovaleProfiler)
         self.ovaleGuid = ovaleGuid
-        self.baseState = baseState
         self.ovaleOptions = ovaleOptions
-        self.requirement = requirement
         self.health = {}
         self.maxHealth = {}
         self.absorb = {}
@@ -54,14 +50,8 @@ __exports.OvaleHealthClass = __class(nil, {
             self.module:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.UpdateAbsorb)
             self.module:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", self.UpdateAbsorb)
             self.module:RegisterMessage("Ovale_UnitChanged", self.Ovale_UnitChanged)
-            self.requirement:RegisterRequirement("health_pct", self.RequireHealthPercentHandler)
-            self.requirement:RegisterRequirement("pet_health_pct", self.RequireHealthPercentHandler)
-            self.requirement:RegisterRequirement("target_health_pct", self.RequireHealthPercentHandler)
         end
         self.OnDisable = function()
-            self.requirement:UnregisterRequirement("health_pct")
-            self.requirement:UnregisterRequirement("pet_health_pct")
-            self.requirement:UnregisterRequirement("target_health_pct")
             self.module:UnregisterEvent("PLAYER_REGEN_ENABLED")
             self.module:UnregisterEvent("PLAYER_TARGET_CHANGED")
             self.module:UnregisterEvent("UNIT_HEALTH")
@@ -183,54 +173,6 @@ __exports.OvaleHealthClass = __class(nil, {
                 end
             end
             self.profiler:StopProfiling("OvaleHealth_UpdateHealth")
-        end
-        self.RequireHealthPercentHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local verified = false
-            local threshold = tokens[index]
-            index = index + 1
-            if threshold then
-                local isBang = false
-                if sub(threshold, 1, 1) == "!" then
-                    isBang = true
-                    threshold = sub(threshold, 2)
-                end
-                local thresholdValue = tonumber(threshold) or 0
-                local guid, unitId
-                if sub(requirement, 1, 7) == "target_" then
-                    if targetGUID then
-                        guid = targetGUID
-                        local result = self.ovaleGuid:GUIDUnit(guid)
-                        unitId = result or "target"
-                    else
-                        unitId = self.baseState.next.defaultTarget or "target"
-                    end
-                elseif sub(requirement, 1, 4) == "pet_" then
-                    unitId = "pet"
-                else
-                    unitId = "player"
-                end
-                guid = guid or self.ovaleGuid:UnitGUID(unitId)
-                local health = self:UnitHealth(unitId, guid) or 0
-                local maxHealth = self:UnitHealthMax(unitId, guid)
-                local healthPercent
-                if maxHealth == 0 then
-                    healthPercent = 100
-                else
-                    healthPercent = (health / maxHealth) * 100 or 100
-                end
-                if ( not isBang and healthPercent <= thresholdValue) or (isBang and healthPercent > thresholdValue) then
-                    verified = true
-                end
-                local result = (verified and "passed") or "FAILED"
-                if isBang then
-                    self.tracer:Log("    Require %s health > %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
-                else
-                    self.tracer:Log("    Require %s health <= %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
-                end
-            else
-                OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
-            end
-            return verified, requirement, index
         end
         self.module = ovale:createModule("OvaleHealth", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create(self.module:GetName())

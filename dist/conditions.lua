@@ -15,7 +15,6 @@ local ipairs = ipairs
 local pairs = pairs
 local type = type
 local GetBuildInfo = GetBuildInfo
-local GetItemCooldown = GetItemCooldown
 local GetItemCount = GetItemCount
 local GetNumTrackingTypes = GetNumTrackingTypes
 local GetTime = GetTime
@@ -45,8 +44,6 @@ local UnitPowerMax = UnitPowerMax
 local UnitRace = UnitRace
 local huge = math.huge
 local min = math.min
-local __AST = LibStub:GetLibrary("ovale/AST")
-local isNodeType = __AST.isNodeType
 local lower = string.lower
 local upper = string.upper
 local sub = string.sub
@@ -72,21 +69,7 @@ local FROST_FEVER_DEBUFF = 55095
 local STEADY_FOCUS = 177668
 __exports.OvaleConditions = __class(nil, {
     ComputeParameter = function(self, spellId, paramName, atTime)
-        local si = self.OvaleData:GetSpellInfo(spellId)
-        if si and si[paramName] then
-            local name = si[paramName]
-            local node = self.OvaleCompile:GetFunctionNode(name)
-            if node then
-                local _, element = self.OvaleBestAction:Compute(node.child[1], atTime)
-                if element and isNodeType(element, "value") then
-                    local value = element.value + (atTime - element.origin) * element.rate
-                    return value
-                end
-            else
-                return si[paramName]
-            end
-        end
-        return nil
+        return self.OvaleData:GetSpellInfoProperty(spellId, atTime, paramName, nil)
     end,
     GetHastedTime = function(self, seconds, haste)
         seconds = seconds or 0
@@ -242,11 +225,9 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return ParseCondition(namedParams, self.baseState, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
+    constructor = function(self, ovaleCondition, OvaleData, OvalePaperDoll, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvalePower, OvaleEnemies, lastSpell, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleRunes, OvaleBossMod, OvaleSpells)
         self.OvaleData = OvaleData
-        self.OvaleCompile = OvaleCompile
         self.OvalePaperDoll = OvalePaperDoll
-        self.OvaleAzerite = OvaleAzerite
         self.OvaleAzeriteEssence = OvaleAzeriteEssence
         self.OvaleAura = OvaleAura
         self.baseState = baseState
@@ -258,9 +239,7 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleDamageTaken = OvaleDamageTaken
         self.OvalePower = OvalePower
         self.OvaleEnemies = OvaleEnemies
-        self.variables = variables
         self.lastSpell = lastSpell
-        self.OvaleEquipment = OvaleEquipment
         self.OvaleHealth = OvaleHealth
         self.ovaleOptions = ovaleOptions
         self.OvaleLossOfControl = OvaleLossOfControl
@@ -268,9 +247,7 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleTotem = OvaleTotem
         self.OvaleSigil = OvaleSigil
         self.OvaleDemonHunterSoulFragments = OvaleDemonHunterSoulFragments
-        self.OvaleBestAction = OvaleBestAction
         self.OvaleRunes = OvaleRunes
-        self.OvaleStance = OvaleStance
         self.OvaleBossMod = OvaleBossMod
         self.OvaleSpells = OvaleSpells
         self.ArmorSetBonus = function(positionalParams, namedParams, atTime)
@@ -283,16 +260,6 @@ __exports.OvaleConditions = __class(nil, {
             local value = 0
             OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
             return Compare(value, comparator, limit)
-        end
-        self.AzeriteTraitRank = function(positionalParams, namedParams, atTime)
-            local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleAzerite:TraitRank(spellId)
-            return Compare(value, comparator, limit)
-        end
-        self.HasAzeriteTrait = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
-            local value = self.OvaleAzerite:HasTrait(spellId)
-            return TestBoolean(value, yesno)
         end
         self.AzeriteEssenceIsMajor = function(positionalParams, namedParams, atTime)
             local essenceId, yesno = positionalParams[1], positionalParams[2]
@@ -875,64 +842,14 @@ __exports.OvaleConditions = __class(nil, {
             end
             return Compare(0, comparator, limit)
         end
-        self.GetState = function(positionalParams, namedParams, atTime)
-            local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.variables:GetState(name)
-            return Compare(value, comparator, limit)
-        end
-        self.GetStateDuration = function(positionalParams, namedParams, atTime)
-            local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.variables:GetStateDuration(name)
-            return Compare(value, comparator, limit)
-        end
         self.Glyph = function(positionalParams, namedParams, atTime)
             local _, yesno = positionalParams[1], positionalParams[2]
             return TestBoolean(false, yesno)
-        end
-        self.HasEquippedItem = function(positionalParams, namedParams, atTime)
-            local itemId, yesno = positionalParams[1], positionalParams[2]
-            local boolean = false
-            local slotId
-            if type(itemId) == "number" then
-                slotId = self.OvaleEquipment:HasEquippedItem(itemId)
-                if slotId then
-                    boolean = true
-                end
-            elseif self.OvaleData.itemList[itemId] then
-                for _, v in pairs(self.OvaleData.itemList[itemId]) do
-                    slotId = self.OvaleEquipment:HasEquippedItem(v)
-                    if slotId then
-                        boolean = true
-                        break
-                    end
-                end
-            end
-            return TestBoolean(boolean, yesno)
         end
         self.HasFullControlCondition = function(positionalParams, namedParams, atTime)
             local yesno = positionalParams[1]
             local boolean = HasFullControl()
             return TestBoolean(boolean, yesno)
-        end
-        self.HasShield = function(positionalParams, namedParams, atTime)
-            local yesno = positionalParams[1]
-            local boolean = self.OvaleEquipment:HasShield()
-            return TestBoolean(boolean, yesno)
-        end
-        self.HasTrinket = function(positionalParams, namedParams, atTime)
-            local trinketId, yesno = positionalParams[1], positionalParams[2]
-            local boolean = nil
-            if type(trinketId) == "number" then
-                boolean = self.OvaleEquipment:HasTrinket(trinketId)
-            elseif self.OvaleData.itemList[trinketId] then
-                for _, v in pairs(self.OvaleData.itemList[trinketId]) do
-                    boolean = self.OvaleEquipment:HasTrinket(v)
-                    if boolean then
-                        break
-                    end
-                end
-            end
-            return TestBoolean(boolean ~= nil, yesno)
         end
         self.Health = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2]
@@ -1110,19 +1027,6 @@ __exports.OvaleConditions = __class(nil, {
             local itemId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = GetItemCount(itemId, false, true)
             return Compare(value, comparator, limit)
-        end
-        self.ItemCooldown = function(positionalParams, namedParams, atTime)
-            local itemId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            if itemId and type(itemId) ~= "number" then
-                itemId = self.OvaleEquipment:GetEquippedItemBySlotName(itemId)
-            end
-            if itemId then
-                local start, duration = GetItemCooldown(itemId)
-                if start > 0 and duration > 0 then
-                    return TestValue(start, start + duration, duration, start, -1, comparator, limit)
-                end
-            end
-            return Compare(0, comparator, limit)
         end
         self.ItemCount = function(positionalParams, namedParams, atTime)
             local itemId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
@@ -1631,11 +1535,6 @@ __exports.OvaleConditions = __class(nil, {
             local boolean = isUsable or noMana
             return TestBoolean(boolean, yesno)
         end
-        self.Stance = function(positionalParams, namedParams, atTime)
-            local stance, yesno = positionalParams[1], positionalParams[2]
-            local boolean = self.OvaleStance:IsStance(stance, atTime)
-            return TestBoolean(boolean, yesno)
-        end
         self.Stealthed = function(positionalParams, namedParams, atTime)
             local yesno = positionalParams[1]
             local boolean = self.OvaleAura:GetAura("player", "stealthed_buff", atTime, "HELPFUL") ~= nil or IsStealthed()
@@ -1992,8 +1891,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("stacktimeto", false, self.stackTimeTo)
         ovaleCondition:RegisterCondition("armorsetbonus", false, self.ArmorSetBonus)
         ovaleCondition:RegisterCondition("armorsetparts", false, self.ArmorSetParts)
-        ovaleCondition:RegisterCondition("hasazeritetrait", false, self.HasAzeriteTrait)
-        ovaleCondition:RegisterCondition("azeritetraitrank", false, self.AzeriteTraitRank)
         ovaleCondition:RegisterCondition("azeriteessenceismajor", false, self.AzeriteEssenceIsMajor)
         ovaleCondition:RegisterCondition("azeriteessenceisminor", false, self.AzeriteEssenceIsMinor)
         ovaleCondition:RegisterCondition("azeriteessenceisenabled", false, self.AzeriteEssenceIsEnabled)
@@ -2071,13 +1968,8 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("focuscastingregen", false, self.FocusCastingRegen)
         ovaleCondition:RegisterCondition("gcd", false, self.GCD)
         ovaleCondition:RegisterCondition("gcdremaining", false, self.GCDRemaining)
-        ovaleCondition:RegisterCondition("getstate", false, self.GetState)
-        ovaleCondition:RegisterCondition("getstateduration", false, self.GetStateDuration)
         ovaleCondition:RegisterCondition("glyph", false, self.Glyph)
-        ovaleCondition:RegisterCondition("hasequippeditem", false, self.HasEquippedItem)
         ovaleCondition:RegisterCondition("hasfullcontrol", false, self.HasFullControlCondition)
-        ovaleCondition:RegisterCondition("hasshield", false, self.HasShield)
-        ovaleCondition:RegisterCondition("hastrinket", false, self.HasTrinket)
         ovaleCondition:RegisterCondition("health", false, self.Health)
         ovaleCondition:RegisterCondition("life", false, self.Health)
         ovaleCondition:RegisterCondition("effectivehealth", false, self.EffectiveHealth)
@@ -2104,7 +1996,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("isrooted", false, self.IsRooted)
         ovaleCondition:RegisterCondition("isstunned", false, self.IsStunned)
         ovaleCondition:RegisterCondition("itemcharges", false, self.ItemCharges)
-        ovaleCondition:RegisterCondition("itemcooldown", false, self.ItemCooldown)
         ovaleCondition:RegisterCondition("itemcount", false, self.ItemCount)
         ovaleCondition:RegisterCondition("lastdamage", false, self.LastDamage)
         ovaleCondition:RegisterCondition("lastspelldamage", false, self.LastDamage)
@@ -2208,7 +2099,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("spellknown", true, self.SpellKnown)
         ovaleCondition:RegisterCondition("spellmaxcharges", true, self.SpellMaxCharges)
         ovaleCondition:RegisterCondition("spellusable", true, self.SpellUsable)
-        ovaleCondition:RegisterCondition("stance", false, self.Stance)
         ovaleCondition:RegisterCondition("isstealthed", false, self.Stealthed)
         ovaleCondition:RegisterCondition("stealthed", false, self.Stealthed)
         ovaleCondition:RegisterCondition("lastswing", false, self.LastSwing)

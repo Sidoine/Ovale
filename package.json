@@ -4,14 +4,13 @@
     "description": "",
     "main": "dist/index.js",
     "scripts": {
-        "test": "ava",
+        "test": "jest",
         "prepare": "tstolua -p tsconfig.lua.json",
         "prepare-tools": "tsc",
         "simc": "node dist/src/utils/importsimc.js ../../simc",
         "dbc": "node dist/src/utils/dbc.js",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",
-        "watch-test": "ava --watch",
         "coverage": "nyc --reporter=lcovonly ava"
     },
     "author": "",
@@ -52,10 +51,10 @@
     "devDependencies": {
         "@types/csv-parse": "^1.2.2",
         "@wowts/tstolua": "^1.10.2",
-        "ava": "^3.12.1",
+        "jest": "^26.6.3",
+        "ts-jest": "^26.4.4",
         "csv-parse": "^4.12.0",
         "eslint": "^7.9.0",
-        "nyc": "^12",
         "typemoq": "^2.1.0"
     },
     "repository": {

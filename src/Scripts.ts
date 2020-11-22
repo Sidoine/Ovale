@@ -23,7 +23,7 @@ let DISABLED_DESCRIPTION = L["Disabled"];
 
 export type ScriptType = "script" | "include";
 
-interface Script {
+export interface Script {
     type?: ScriptType;
     desc?: string;
     className?: ClassId;

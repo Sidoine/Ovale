@@ -4,14 +4,10 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local type = type
 local ipairs = ipairs
 local pairs = pairs
-local tonumber = tonumber
 local wipe = wipe
-local kpairs = pairs
 local find = string.find
 local __tools = LibStub:GetLibrary("ovale/tools")
-local isLuaArray = __tools.isLuaArray
-local isString = __tools.isString
-local OneTimeMessage = __tools.OneTimeMessage
+local isNumber = __tools.isNumber
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
     ["DEMONHUNTER"] = true,
@@ -80,12 +76,9 @@ local STAT_USE_NAMES = {
     [4] = "trinket_stat",
     [5] = "trinket_stack_proc"
 }
-local tempTokens = {}
 __exports.OvaleDataClass = __class(nil, {
-    constructor = function(self, baseState, ovaleGuid, requirement)
-        self.baseState = baseState
-        self.ovaleGuid = ovaleGuid
-        self.requirement = requirement
+    constructor = function(self, runner)
+        self.runner = runner
         self.STAT_NAMES = STAT_NAMES
         self.STAT_SHORTNAME = STAT_SHORTNAME
         self.STAT_USE_NAMES = STAT_USE_NAMES
@@ -350,101 +343,39 @@ __exports.OvaleDataClass = __class(nil, {
         return tag, invokesGCD
     end,
     CheckSpellAuraData = function(self, auraId, spellData, atTime, guid)
-        guid = guid or self.ovaleGuid:UnitGUID("player")
-        local index, value, data
-        local spellDataArray = nil
-        if isLuaArray(spellData) then
-            spellDataArray = spellData
-            value = spellData[1]
-            index = 2
-        else
-            value = spellData
-        end
-        if value == "count" then
-            local N
-            if index then
-                N = spellDataArray[index]
-                index = index + 1
-            end
-            if N then
-                data = tonumber(N)
-            else
-                OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
-            end
-        elseif value == "extend" then
-            local seconds
-            if index then
-                seconds = spellDataArray[index]
-                index = index + 1
-            end
-            if seconds then
-                data = tonumber(seconds)
-            else
-                OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
-            end
-        else
-            local asNumber = tonumber(value)
-            value = asNumber or value
-        end
-        local verified = true
-        if index then
-            verified = self.requirement:CheckRequirements(auraId, atTime, spellDataArray, index, guid)
-        end
-        return verified, value, data
-    end,
-    CheckSpellInfo = function(self, spellId, atTime, targetGUID)
-        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
-        local verified = true
-        local requirement
-        for name, handler in pairs(self.requirement.nowRequirements) do
-            local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
-            if value then
-                if  not isString(value) and isLuaArray(value) then
-                    verified, requirement = handler(spellId, atTime, name, value, 1, targetGUID)
-                else
-                    tempTokens[1] = value
-                    verified, requirement = handler(spellId, atTime, name, tempTokens, 1, targetGUID)
-                end
-                if  not verified then
-                    break
-                end
-            end
-        end
-        return verified, requirement
+        local _, named = self.runner:computeParameters(spellData, atTime)
+        return named
     end,
     GetItemInfoProperty = function(self, itemId, atTime, property)
-        local targetGUID = self.ovaleGuid:UnitGUID("player")
         local ii = self:ItemInfo(itemId)
-        local value = ii and ii[property]
-        local requirements = ii and ii.require[property]
-        if requirements then
-            for v, rArray in pairs(requirements) do
-                if isLuaArray(rArray) then
-                    for _, requirement in ipairs(rArray) do
-                        local verified = self.requirement:CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            value = tonumber(v) or v
-                            break
-                        end
-                    end
-                end
-            end
+        if ii then
+            return self:getSpellInfoProperty(ii, atTime, property)
         end
-        return value
+        return nil
     end,
     GetSpellInfoProperty = function(self, spellId, atTime, property, targetGUID)
-        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
-        local value = si and si[property]
-        local requirements = si and si.require[property]
-        if requirements then
-            for v, rArray in kpairs(requirements) do
-                if isLuaArray(rArray) then
-                    for _, requirement in ipairs(rArray) do
-                        local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            value = tonumber(v) or v
-                            break
+        if si then
+            return self:getSpellInfoProperty(si, atTime, property)
+        end
+        return nil
+    end,
+    getSpellInfoProperty = function(self, si, atTime, property)
+        local value = si[property]
+        if atTime then
+            local requirements = si.require[property]
+            if requirements then
+                for _, requirement in ipairs(requirements) do
+                    local _, named = self.runner:computeParameters(requirement, atTime)
+                    if named.enabled == nil or named.enabled then
+                        if named.set ~= nil then
+                            value = named.set
+                        end
+                        if named.add ~= nil and isNumber(value) and isNumber(named.add) then
+                            value = (value + named.add)
+                        end
+                        if named.percent ~= nil and isNumber(value) and isNumber(named.percent) then
+                            value = ((value * named.percent) / 100)
                         end
                     end
                 end
@@ -453,55 +384,23 @@ __exports.OvaleDataClass = __class(nil, {
         return value
     end,
     GetSpellInfoPropertyNumber = function(self, spellId, atTime, property, targetGUID, splitRatio)
-        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
+        if  not si then
+            return 
+        end
         local ratioParam = property .. "_percent"
-        local ratio = si and si[ratioParam]
-        if ratio then
+        local ratio = self:getSpellInfoProperty(si, atTime, ratioParam)
+        if ratio ~= nil then
             ratio = ratio / 100
         else
             ratio = 1
         end
-        if atTime then
-            local ratioRequirements = si and si.require[ratioParam]
-            if ratioRequirements then
-                for v, rArray in pairs(ratioRequirements) do
-                    if isLuaArray(rArray) then
-                        for _, requirement in ipairs(rArray) do
-                            local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                if ratio ~= 0 then
-                                    ratio = ratio * (tonumber(v) / 100 or 1)
-                                else
-                                    break
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        local value = (si and si[property]) or 0
-        if ratio ~= 0 then
+        local value = self:getSpellInfoProperty(si, atTime, property)
+        if ratio ~= 0 and value ~= nil then
             local addParam = "add_" .. property
-            local addProperty = si and si[addParam]
+            local addProperty = self:getSpellInfoProperty(si, atTime, addParam)
             if addProperty then
                 value = value + addProperty
-            end
-            if atTime then
-                local addRequirements = si and si.require[addParam]
-                if addRequirements then
-                    for v, rArray in pairs(addRequirements) do
-                        if isLuaArray(rArray) then
-                            for _, requirement in ipairs(rArray) do
-                                local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                                if verified then
-                                    value = value + (tonumber(v) or 0)
-                                end
-                            end
-                        end
-                    end
-                end
             end
         else
             value = 0

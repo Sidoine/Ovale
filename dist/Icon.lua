@@ -4,17 +4,17 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local format = string.format
-local find = string.find
-local sub = string.sub
 local next = next
 local tostring = tostring
 local _G = _G
-local kpairs = pairs
 local GetTime = GetTime
 local PlaySoundFile = PlaySoundFile
 local CreateFrame = CreateFrame
 local GameTooltip = GameTooltip
 local huge = math.huge
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
+local isString = __tools.isString
 local INFINITY = huge
 local COOLDOWN_THRESHOLD = 0.1
 __exports.OvaleIcon = __class(nil, {
@@ -104,21 +104,21 @@ __exports.OvaleIcon = __class(nil, {
         end
         self.frame:Show()
     end,
-    Update = function(self, element, startTime, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend)
-        self.actionType = actionType
-        self.actionId = actionId
+    Update = function(self, element, startTime)
+        self.actionType = element.actionType
+        self.actionId = element.actionId
         self.value = nil
         local now = GetTime()
         local profile = self.ovaleOptions.db.profile
-        if startTime and actionTexture then
+        if startTime and element.actionTexture then
             local cd = self.cd
             local resetCooldown = false
             if startTime > now then
                 local duration = cd:GetCooldownDuration()
-                if duration == 0 and self.texture == actionTexture and self.cooldownStart and self.cooldownEnd then
+                if duration == 0 and self.texture == element.actionTexture and self.cooldownStart and self.cooldownEnd then
                     resetCooldown = true
                 end
-                if self.texture ~= actionTexture or  not self.cooldownStart or  not self.cooldownEnd then
+                if self.texture ~= element.actionTexture or  not self.cooldownStart or  not self.cooldownEnd then
                     self.cooldownStart = now
                     self.cooldownEnd = startTime
                     resetCooldown = true
@@ -132,7 +132,7 @@ __exports.OvaleIcon = __class(nil, {
                     self.cooldownEnd = startTime
                     resetCooldown = true
                 end
-                self.texture = actionTexture
+                self.texture = element.actionTexture
             else
                 self.cooldownStart = nil
                 self.cooldownEnd = nil
@@ -150,26 +150,34 @@ __exports.OvaleIcon = __class(nil, {
                 self.cd:Hide()
             end
             self.icone:Show()
-            self.icone:SetTexture(actionTexture)
-            if actionUsable then
+            self.icone:SetTexture(element.actionTexture)
+            if element.actionUsable then
                 self.icone:SetAlpha(1)
             else
                 self.icone:SetAlpha(0.5)
             end
-            if element then
-                if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
+            local options = element.options
+            if options then
+                if options.nored ~= 1 and element.actionResourceExtend and element.actionResourceExtend > 0 then
                     self.icone:SetVertexColor(0.75, 0.2, 0.2)
                 else
                     self.icone:SetVertexColor(1, 1, 1)
                 end
-                self.actionHelp = element.namedParams.help
+                if isString(options.help) then
+                    self.actionHelp = options.help
+                end
                 if  not (self.cooldownStart and self.cooldownEnd) then
                     self.lastSound = nil
                 end
-                if element.namedParams.sound and  not self.lastSound then
-                    local delay = element.namedParams.soundtime or 0.5
+                if options.sound and  not self.lastSound then
+                    local delay
+                    if isNumber(options.soundtime) then
+                        delay = options.soundtime
+                    else
+                        delay = 0.5
+                    end
                     if now >= startTime - delay then
-                        self.lastSound = element.namedParams.sound
+                        self.lastSound = options.sound
                         PlaySoundFile(self.lastSound)
                     end
                 end
@@ -190,7 +198,7 @@ __exports.OvaleIcon = __class(nil, {
                 self.shouldClick = false
                 self.frame:SetChecked(false)
             end
-            if (profile.apparence.numeric or self.namedParams.text == "always") and startTime > now then
+            if (profile.apparence.numeric or (self.namedParams and self.namedParams.text and self.namedParams.text.type == "string" and self.namedParams.text.value == "always")) and startTime > now then
                 self.remains:SetFormattedText("%.1f", startTime - now)
                 self.remains:Show()
             else
@@ -198,24 +206,24 @@ __exports.OvaleIcon = __class(nil, {
             end
             if profile.apparence.raccourcis then
                 self.shortcut:Show()
-                self.shortcut:SetText(actionShortcut)
+                self.shortcut:SetText(element.actionShortcut)
             else
                 self.shortcut:Hide()
             end
-            if actionInRange == nil then
+            if element.actionInRange == nil then
                 self.rangeIndicator:Hide()
-            elseif actionInRange then
+            elseif element.actionInRange then
                 self.rangeIndicator:SetVertexColor(0.6, 0.6, 0.6)
                 self.rangeIndicator:Show()
             else
                 self.rangeIndicator:SetVertexColor(1, 0.1, 0.1)
                 self.rangeIndicator:Show()
             end
-            if element and element.namedParams.text then
-                self.focusText:SetText(tostring(element.namedParams.text))
+            if options and options.text then
+                self.focusText:SetText(tostring(options.text))
                 self.focusText:Show()
-            elseif actionTarget and actionTarget ~= "target" then
-                self.focusText:SetText(actionTarget)
+            elseif element.actionTarget and element.actionTarget ~= "target" then
+                self.focusText:SetText(element.actionTarget)
                 self.focusText:Show()
             else
                 self.focusText:Hide()
@@ -246,19 +254,6 @@ __exports.OvaleIcon = __class(nil, {
         self.positionalParams = positionalParams
         self.namedParams = namedParams
         self.actionButton = false
-        if secure then
-            for k, v in kpairs(namedParams) do
-                local index = find(k, "spell")
-                if index then
-                    local prefix = sub(k, 1, index - 1)
-                    local suffix = sub(k, index + 5)
-                    self.frame:SetAttribute(prefix .. "type" .. suffix, "spell")
-                    self.frame:SetAttribute("unit", self.namedParams.target or "target")
-                    self.frame:SetAttribute(k, self.ovaleSpellBook:GetSpellName(v) or "Unknown spell")
-                    self.actionButton = true
-                end
-            end
-        end
     end,
     SetRemainsFont = function(self, color)
         self.remains:SetTextColor(color.r, color.g, color.b, 1)

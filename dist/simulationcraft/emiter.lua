@@ -14,7 +14,7 @@ local kpairs = pairs
 local ipairs = ipairs
 local tostring = tostring
 local __AST = LibStub:GetLibrary("ovale/AST")
-local isNodeType = __AST.isNodeType
+local isAstNodeWithChildren = __AST.isAstNodeWithChildren
 local format = string.format
 local gmatch = string.gmatch
 local find = string.find
@@ -32,6 +32,7 @@ local OvaleFunctionName = __texttools.OvaleFunctionName
 local __statesPower = LibStub:GetLibrary("ovale/states/Power")
 local POOLED_RESOURCE = __statesPower.POOLED_RESOURCE
 local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local MakeString = __tools.MakeString
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local function IsTotem(name)
@@ -128,24 +129,21 @@ __exports.Emiter = __class(nil, {
                     if syncParseNode then
                         local syncActionNode = self.EmitAction(syncParseNode, nodeList, annotation, action)
                         if syncActionNode then
-                            local syncActionType = syncActionNode.type
-                            if syncActionType == "action" then
+                            if syncActionNode.type == "action" then
                                 node = syncActionNode
-                            elseif syncActionType == "custom_function" then
+                            elseif syncActionNode.type == "custom_function" then
                                 node = syncActionNode
-                            elseif syncActionType == "if" or syncActionType == "unless" then
+                            elseif syncActionNode.type == "if" or syncActionNode.type == "unless" then
                                 local lhsNode = syncActionNode.child[1]
-                                if syncActionType == "unless" then
-                                    local notNode = self.ovaleAst:NewNode(nodeList, true)
-                                    notNode.type = "logical"
+                                if syncActionNode.type == "unless" then
+                                    local notNode = self.ovaleAst:newNodeWithChildren("logical", annotation.astAnnotation)
                                     notNode.expressionType = "unary"
                                     notNode.operator = "not"
                                     notNode.child[1] = lhsNode
                                     lhsNode = notNode
                                 end
                                 local rhsNode = syncActionNode.child[2]
-                                local andNode = self.ovaleAst:NewNode(nodeList, true)
-                                andNode.type = "logical"
+                                local andNode = self.ovaleAst:newNodeWithChildren("logical", annotation.astAnnotation)
                                 andNode.expressionType = "binary"
                                 andNode.operator = "and"
                                 andNode.child[1] = lhsNode
@@ -180,8 +178,7 @@ __exports.Emiter = __class(nil, {
                         conditionNode = rhsNode
                     else
                         local lhsNode = conditionNode
-                        conditionNode = self.ovaleAst:NewNode(nodeList, true)
-                        conditionNode.type = "logical"
+                        conditionNode = self.ovaleAst:newNodeWithChildren("logical", annotation.astAnnotation)
                         conditionNode.expressionType = "binary"
                         conditionNode.operator = "and"
                         conditionNode.child[1] = lhsNode
@@ -193,8 +190,7 @@ __exports.Emiter = __class(nil, {
                 if conditionNode then
                     local lhsNode = conditionNode
                     local rhsNode = extraConditionNode
-                    conditionNode = self.ovaleAst:NewNode(nodeList, true)
-                    conditionNode.type = "logical"
+                    conditionNode = self.ovaleAst:newNodeWithChildren("logical", annotation.astAnnotation)
                     conditionNode.expressionType = "binary"
                     conditionNode.operator = "and"
                     conditionNode.child[1] = lhsNode
@@ -204,7 +200,7 @@ __exports.Emiter = __class(nil, {
                 end
             end
             if conditionNode then
-                local node = self.ovaleAst:NewNode(nodeList, true)
+                local node = self.ovaleAst:newNodeWithChildren("if", annotation.astAnnotation)
                 node.type = "if"
                 node.child[1] = conditionNode
                 node.child[2] = bodyNode
@@ -222,15 +218,12 @@ __exports.Emiter = __class(nil, {
             local node = annotation.variable[name]
             local group
             if  not node then
-                node = self.ovaleAst:NewNode(nodeList, true)
+                group = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
+                node = self.ovaleAst:newNodeWithBodyAndParameters("add_function", annotation.astAnnotation, group)
                 annotation.variable[name] = node
-                node.type = "add_function"
                 node.name = name
-                group = self.ovaleAst:NewNode(nodeList, true)
-                group.type = "group"
-                node.child[1] = group
             else
-                group = node.child[1]
+                group = node.body
             end
             annotation.currentVariable = node
             if  not modifiers.value then
@@ -289,23 +282,19 @@ __exports.Emiter = __class(nil, {
             local node = annotation.variable[name]
             local group
             if  not node then
-                node = self.ovaleAst:NewNode(nodeList, true)
+                group = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
+                node = self.ovaleAst:newNodeWithBodyAndParameters("add_function", annotation.astAnnotation, group)
                 annotation.variable[name] = node
-                node.type = "add_function"
                 node.name = name
-                group = self.ovaleAst:NewNode(nodeList, true)
-                group.type = "group"
-                node.child[1] = group
             else
-                group = node.child[1]
+                group = node.body
             end
             annotation.currentVariable = node
             if  not modifiers.condition or  not modifiers.value or  not modifiers.value_else then
                 self.tracer:Error("Modifier missing in if")
                 return 
             end
-            local ifNode = self.ovaleAst:NewNode(nodeList, true)
-            ifNode.type = "if"
+            local ifNode = self.ovaleAst:newNodeWithChildren("if", annotation.astAnnotation)
             local condition = self:Emit(modifiers.condition, nodeList, annotation, nil)
             local value = self:Emit(modifiers.value, nodeList, annotation, nil)
             if  not condition or  not value then
@@ -314,8 +303,7 @@ __exports.Emiter = __class(nil, {
             ifNode.child[1] = condition
             ifNode.child[2] = value
             insert(group.child, ifNode)
-            local elseNode = self.ovaleAst:NewNode(nodeList, true)
-            elseNode.type = "unless"
+            local elseNode = self.ovaleAst:newNodeWithChildren("unless", annotation.astAnnotation)
             elseNode.child[1] = ifNode.child[1]
             local valueElse = self:Emit(modifiers.value_else, nodeList, annotation, nil)
             if  not valueElse then
@@ -589,8 +577,7 @@ __exports.Emiter = __class(nil, {
                     bodyCode = "texture(INV_Pet_ExitBattle text=cancel)"
                     isSpellAction = false
                 elseif action == "pool_resource" then
-                    bodyNode = self.ovaleAst:NewNode(nodeList)
-                    bodyNode.type = "simc_pool_resource"
+                    bodyNode = self.ovaleAst:NewNode("simc_pool_resource", annotation.astAnnotation)
                     bodyNode.for_next = modifiers.for_next ~= nil
                     if modifiers.extra_amount then
                         bodyNode.extra_amount = tonumber(self.unparser:Unparse(modifiers.extra_amount))
@@ -666,8 +653,7 @@ __exports.Emiter = __class(nil, {
                         local seconds = tonumber(self.unparser:Unparse(modifiers.sec))
                         if seconds then
                         else
-                            bodyNode = self.ovaleAst:NewNode(nodeList)
-                            bodyNode.type = "simc_wait"
+                            bodyNode = self.ovaleAst:newNodeWithChildren("simc_wait", annotation.astAnnotation)
                             local expressionNode = self:Emit(modifiers.sec, nodeList, annotation, action)
                             if expressionNode then
                                 local code = self.ovaleAst:Unparse(expressionNode)
@@ -706,14 +692,12 @@ __exports.Emiter = __class(nil, {
             return node
         end
         self.EmitActionList = function(parseNode, nodeList, annotation)
-            local groupNode = self.ovaleAst:NewNode(nodeList, true)
-            groupNode.type = "group"
+            local groupNode = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
             local child = groupNode.child
             local poolResourceNode
             local emit = true
             for _, actionNode in ipairs(parseNode.child) do
-                local commentNode = self.ovaleAst:NewNode(nodeList)
-                commentNode.type = "comment"
+                local commentNode = self.ovaleAst:NewNode("comment", annotation.astAnnotation)
                 commentNode.comment = actionNode.action
                 child[#child + 1] = commentNode
                 if emit then
@@ -733,7 +717,7 @@ __exports.Emiter = __class(nil, {
                             child[#child + 1] = statementNode
                             local bodyNode
                             local poolingConditionNode
-                            if statementNode.child then
+                            if isAstNodeWithChildren(statementNode) then
                                 poolingConditionNode = statementNode.child[1]
                                 bodyNode = statementNode.child[2]
                             else
@@ -759,58 +743,53 @@ __exports.Emiter = __class(nil, {
                                 local code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition)
                                 local conditionNode = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                                 if conditionNode then
-                                    if statementNode.child and poolingConditionNode then
+                                    if isAstNodeWithChildren(statementNode) and poolingConditionNode then
                                         local rhsNode = conditionNode
-                                        conditionNode = self.ovaleAst:NewNode(nodeList, true)
-                                        conditionNode.type = "logical"
+                                        conditionNode = self.ovaleAst:newNodeWithChildren("logical", annotation.astAnnotation)
                                         conditionNode.expressionType = "binary"
                                         conditionNode.operator = "and"
                                         conditionNode.child[1] = poolingConditionNode
                                         conditionNode.child[2] = rhsNode
                                     end
-                                    local restNode = self.ovaleAst:NewNode(nodeList, true)
-                                    child[#child + 1] = restNode
+                                    local restNodeType
                                     if statementNode.type == "unless" then
-                                        restNode.type = "if"
+                                        restNodeType = "if"
                                     else
-                                        restNode.type = "unless"
+                                        restNodeType = "unless"
                                     end
+                                    local restNode = self.ovaleAst:newNodeWithChildren(restNodeType, annotation.astAnnotation)
+                                    child[#child + 1] = restNode
                                     restNode.child[1] = conditionNode
-                                    restNode.child[2] = self.ovaleAst:NewNode(nodeList, true)
-                                    restNode.child[2].type = "group"
+                                    restNode.child[2] = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                                     child = restNode.child[2].child
                                 end
                             end
                             poolResourceNode = nil
                         elseif statementNode.type == "simc_wait" then
-                        elseif statementNode.simc_wait then
-                            local restNode = self.ovaleAst:NewNode(nodeList, true)
+                        elseif (statementNode.type == "if" or statementNode.type == "unless") and statementNode.simc_wait then
+                            local restNode = self.ovaleAst:newNodeWithChildren("unless", annotation.astAnnotation)
                             child[#child + 1] = restNode
                             restNode.type = "unless"
                             restNode.child[1] = statementNode.child[1]
-                            restNode.child[2] = self.ovaleAst:NewNode(nodeList, true)
-                            restNode.child[2].type = "group"
+                            restNode.child[2] = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                             child = restNode.child[2].child
                         else
                             child[#child + 1] = statementNode
-                            if statementNode.simc_pool_resource then
+                            if (statementNode.type == "if" or statementNode.type == "unless") and statementNode.simc_pool_resource then
                                 if statementNode.type == "if" then
                                     statementNode.type = "unless"
                                 elseif statementNode.type == "unless" then
                                     statementNode.type = "if"
                                 end
-                                statementNode.child[2] = self.ovaleAst:NewNode(nodeList, true)
-                                statementNode.child[2].type = "group"
+                                statementNode.child[2] = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                                 child = statementNode.child[2].child
                             end
                         end
                     end
                 end
             end
-            local node = self.ovaleAst:NewNode(nodeList, true)
-            node.type = "add_function"
+            local node = self.ovaleAst:newNodeWithBodyAndParameters("add_function", annotation.astAnnotation, groupNode)
             node.name = OvaleFunctionName(parseNode.name, annotation)
-            node.child[1] = groupNode
             return node
         end
         self.EmitExpression = function(parseNode, nodeList, annotation, action)
@@ -828,11 +807,10 @@ __exports.Emiter = __class(nil, {
                     if operator then
                         local rhsNode = self:Emit(parseNode.child[1], nodeList, annotation, action)
                         if rhsNode then
-                            if operator == "-" and isNodeType(rhsNode, "value") then
+                            if operator == "-" and rhsNode.type == "value" then
                                 rhsNode.value = -1 * rhsNode.value
                             else
-                                node = self.ovaleAst:NewNode(nodeList, true)
-                                node.type = opInfo[1]
+                                node = self.ovaleAst:newNodeWithChildren(opInfo[1], annotation.astAnnotation)
                                 node.expressionType = "unary"
                                 node.operator = operator
                                 node.precedence = opInfo[2]
@@ -895,8 +873,7 @@ __exports.Emiter = __class(nil, {
                         local lhsNode = self:Emit(parseNode.child[1], nodeList, annotation, action)
                         local rhsNode = self:Emit(parseNode.child[2], nodeList, annotation, action)
                         if lhsNode and rhsNode then
-                            node = self.ovaleAst:NewNode(nodeList, true)
-                            node.type = opInfo[1]
+                            node = self.ovaleAst:newNodeWithChildren(opInfo[1], annotation.astAnnotation)
                             node.expressionType = "binary"
                             node.operator = operator
                             node.child[1] = lhsNode
@@ -919,8 +896,7 @@ __exports.Emiter = __class(nil, {
             else
                 msg = msg or MakeString("Warning: Operator '%s' is not implemented.", parseNode.operator)
                 self.tracer:Print(msg)
-                local stringNode = self.ovaleAst:NewNode(nodeList)
-                stringNode.type = "string"
+                local stringNode = self.ovaleAst:NewNode("string", annotation.astAnnotation)
                 stringNode.value = "FIXME_" .. parseNode.operator
                 return stringNode
             end
@@ -932,15 +908,13 @@ __exports.Emiter = __class(nil, {
                 node = self:Emit(parseNode.child[1], nodeList, annotation, action)
             else
                 self.tracer:Print("Warning: Function '%s' is not implemented.", parseNode.name)
-                node = self.ovaleAst:NewNode(nodeList)
-                node.type = "variable"
+                node = self.ovaleAst:NewNode("variable", annotation.astAnnotation)
                 node.name = "FIXME_" .. parseNode.name
             end
             return node
         end
         self.EmitNumber = function(parseNode, nodeList, annotation, action)
-            local node = self.ovaleAst:NewNode(nodeList)
-            node.type = "value"
+            local node = self.ovaleAst:NewNode("value", annotation.astAnnotation)
             node.value = parseNode.value
             node.origin = 0
             node.rate = 0
@@ -1032,8 +1006,8 @@ __exports.Emiter = __class(nil, {
             end
             if  not node then
                 self.tracer:Print("Warning: Variable '%s' is not implemented.", parseNode.name)
-                node = self.ovaleAst:newFunction(nodeList, "message", true)
-                node.rawPositionalParams[1] = self.ovaleAst:newString(nodeList, parseNode.name .. " is not implemented")
+                node = self.ovaleAst:newFunction("message", annotation.astAnnotation)
+                node.rawPositionalParams[1] = self.ovaleAst:newString(annotation.astAnnotation, parseNode.name .. " is not implemented")
             end
             return node
         end
@@ -2254,15 +2228,14 @@ __exports.Emiter = __class(nil, {
                 if  not name then
                     self.tracer:Error("Unable to parse variable name in EmitOperandVariable")
                 elseif annotation.currentVariable and annotation.currentVariable.name == name then
-                    local group = annotation.currentVariable.child[1]
+                    local group = annotation.currentVariable.body
                     if #group.child == 0 then
                         node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
                     else
                         node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
                     end
                 else
-                    node = self.ovaleAst:NewNode(nodeList)
-                    node.type = "function"
+                    node = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
                     node.name = name
                 end
             end
@@ -2340,6 +2313,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
+        self:AddDisambiguation("inevitable_demise_az_buff", "inevitable_demise_debuff", "WARLOCK")
         self:AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
         self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
@@ -2395,10 +2369,14 @@ __exports.Emiter = __class(nil, {
             end
             local parameters = {}
             if info.extraParameter then
-                insert(parameters, self.ovaleAst:newValue(nodeList, info.extraParameter))
+                if isNumber(info.extraParameter) then
+                    insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, info.extraParameter))
+                else
+                    insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, info.extraParameter))
+                end
             end
             if info.extraSymbol then
-                insert(parameters, self.ovaleAst:newValue(nodeList, info.extraSymbol))
+                insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, info.extraSymbol))
                 annotation:AddSymbol(info.extraSymbol)
             end
             while modifier do
@@ -2414,7 +2392,7 @@ __exports.Emiter = __class(nil, {
                     elseif modifierParameters.type == 0 then
                         name = name .. modifierName
                     elseif modifierParameters.type == 2 then
-                        insert(parameters, self.ovaleAst:newValue(nodeList, modifierName))
+                        insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
                     elseif modifierParameters.type == 4 then
                         name = modifierName
                     end
@@ -2425,7 +2403,11 @@ __exports.Emiter = __class(nil, {
                         annotation.options[modifierName] = true
                     end
                     if modifierParameters.extraParameter then
-                        insert(parameters, self.ovaleAst:newValue(nodeList, modifierParameters.extraParameter))
+                        if isNumber(modifierParameters.extraParameter) then
+                            insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, modifierParameters.extraParameter))
+                        else
+                            insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierParameters.extraParameter))
+                        end
                     end
                 elseif info.symbol ~= nil then
                     if info.symbol ~= "" then
@@ -2433,21 +2415,20 @@ __exports.Emiter = __class(nil, {
                     end
                     modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
                     self:AddSymbol(annotation, modifier)
-                    insert(parameters, self.ovaleAst:newValue(nodeList, modifier))
+                    insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, modifier))
                 else
                     self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. name)
                     return nil
                 end
                 modifier = tokenIterator()
             end
+            local result = self.ovaleAst:newFunction(name, annotation.astAnnotation)
             if #parameters > 0 then
-                local result = self.ovaleAst:newFunction(nodeList, name, true)
                 for k, v in ipairs(parameters) do
                     result.rawPositionalParams[k] = v
                 end
-                return result
             end
-            return self.ovaleAst:newFunction(nodeList, name)
+            return result
         end
         return nil
     end,

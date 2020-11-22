@@ -262,9 +262,8 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
     end,
     EmitAST = function(self, profile)
         local nodeList = {}
-        local ast = self.ovaleAst:NewNode(nodeList, true)
+        local ast = self.ovaleAst:newNodeWithChildren("script", profile.annotation.astAnnotation)
         local child = ast.child
-        ast.type = "script"
         local annotation = profile.annotation
         local ok = true
         if profile.actionList then
@@ -288,33 +287,30 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         ]]
             local dictionaryCode = format(dictionaryFormat, lower(annotation.classId), self.ovaleOptions.db.profile.overrideCode or "")
             local dictionaryAST = self.ovaleAst:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
-            if dictionaryAST then
+            if dictionaryAST and dictionaryAST.type == "script" then
                 dictionaryAST.annotation = dictionaryAnnotation
                 annotation.dictionaryAST = dictionaryAST
                 annotation.dictionary = dictionaryAnnotation.definition
                 self.ovaleAst:PropagateConstants(dictionaryAST)
                 self.ovaleAst:PropagateStrings(dictionaryAST)
-                self.ovaleAst:FlattenParameters(dictionaryAST)
                 ResetControls()
                 self.ovaleCompile:EvaluateScript(dictionaryAST, true)
             end
             for _, node in ipairs(profile.actionList) do
                 local addFunctionNode = self.emiter.EmitActionList(node, nodeList, annotation, nil)
-                if addFunctionNode then
+                if addFunctionNode and addFunctionNode.type == "add_function" then
                     if node.name == "_default" and  not annotation.interrupt then
                         local defaultInterrupt = classInfos[annotation.classId][annotation.specialization]
                         if defaultInterrupt and defaultInterrupt.interrupt then
-                            local interruptCall = self.ovaleAst:NewNode(nodeList)
-                            interruptCall.type = "custom_function"
+                            local interruptCall = self.ovaleAst:newNodeWithParameters("custom_function", annotation.astAnnotation)
                             interruptCall.name = lower(LowerSpecialization(annotation) .. "InterruptActions")
                             annotation.interrupt = annotation.classId
                             annotation[defaultInterrupt.interrupt] = annotation.classId
-                            insert(addFunctionNode.child[1].child, 1, interruptCall)
+                            insert(addFunctionNode.body.child, 1, interruptCall)
                         end
                     end
                     local actionListName = gsub(node.name, "^_+", "")
-                    local commentNode = self.ovaleAst:NewNode(nodeList)
-                    commentNode.type = "comment"
+                    local commentNode = self.ovaleAst:NewNode("comment", annotation.astAnnotation)
                     commentNode.comment = "## actions." .. actionListName
                     child[#child + 1] = commentNode
                     for _, tag in pairs(OVALE_TAGS) do
@@ -339,11 +335,10 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             local lowerclass = lower(className)
             local aoeToggle = "opt_" .. lowerclass .. "_" .. specialization .. "_aoe"
             do
-                local commentNode = self.ovaleAst:NewNode(nodeList)
-                commentNode.type = "comment"
+                local commentNode = self.ovaleAst:NewNode("comment", annotation.astAnnotation)
                 commentNode.comment = "## " .. CamelCase(specialization) .. " icons."
                 insert(child, commentNode)
-                local code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization)
+                local code = format("AddCheckBox(%s L(AOE) default enabled=(specialization(%s)))", aoeToggle, specialization)
                 local node = self.ovaleAst:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
                 if node then
                     insert(child, node)
@@ -351,7 +346,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon checkbox=!%s enemies=1 help=shortcd specialization=%s
+				AddIcon enabled=(not checkboxon(%s) and specialization(%s)) enemies=1 help=shortcd
 				{
 					%s
 				}
@@ -364,7 +359,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon checkbox=%s help=shortcd specialization=%s
+				AddIcon enabled=(checkboxon(%s) and specialization(%s)) help=shortcd
 				{
 					%s
 				}
@@ -377,7 +372,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon enemies=1 help=main specialization=%s
+				AddIcon enemies=1 help=main enabled=(specialization(%s))
 				{
 					%s
 				}
@@ -390,7 +385,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon checkbox=%s help=aoe specialization=%s
+				AddIcon help=aoe enabled=(checkboxon(%s) and specialization(%s))
 				{
 					%s
 				}
@@ -403,7 +398,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon checkbox=!%s enemies=1 help=cd specialization=%s
+				AddIcon enemies=1 help=cd enabled=(checkboxon(%s) and not specialization(%s))
 				{
 					%s
 				}
@@ -416,7 +411,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             end
             do
                 local fmt = [[
-				AddIcon checkbox=%s help=cd specialization=%s
+				AddIcon enabled=(checkboxon(%s) and specialization(%s)) help=cd
 				{
 					%s
 				}
@@ -486,7 +481,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
             output[#output + 1] = "### Required symbols"
             sort(profile.annotation.symbolList)
             for _, symbol in ipairs(profile.annotation.symbolList) do
-                if  not tonumber(symbol) and profile.annotation.dictionary and  not profile.annotation.dictionary[symbol] and  not self.ovaleData.buffSpellList[symbol] then
+                if  not tonumber(symbol) and  not profile.annotation.dictionary[symbol] and  not self.ovaleData.buffSpellList[symbol] then
                     self.tracer:Print("Warning: Symbol '%s' not defined", symbol)
                 end
                 output[#output + 1] = "# " .. symbol

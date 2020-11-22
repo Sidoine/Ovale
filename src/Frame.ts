@@ -3,7 +3,7 @@ import AceGUI, {
     AceGUIWidgetDropDown,
 } from "@wowts/ace_gui-3.0";
 import Masque, { MasqueSkinGroup } from "@wowts/masque";
-import { Element, OvaleBestActionClass } from "./BestAction";
+import { OvaleBestActionClass } from "./BestAction";
 import { OvaleCompileClass } from "./Compile";
 import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleStateClass } from "./State";
@@ -11,16 +11,7 @@ import { OvaleIcon } from "./Icon";
 import { OvaleEnemiesClass } from "./states/Enemies";
 import { lists, checkBoxes } from "./Controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import {
-    lualength,
-    LuaArray,
-    ipairs,
-    next,
-    pairs,
-    wipe,
-    type,
-    LuaObj,
-} from "@wowts/lua";
+import { LuaArray, ipairs, next, pairs, wipe, type, LuaObj } from "@wowts/lua";
 import { match } from "@wowts/string";
 import {
     CreateFrame,
@@ -39,24 +30,25 @@ import { huge } from "@wowts/math";
 import { AceGUIRegisterAsContainer } from "./acegui-helpers";
 import { OvaleFutureClass } from "./states/Future";
 import { BaseState } from "./BaseState";
-import { AstNode } from "./AST";
+import { AstNodeSnapshot } from "./AST";
 import { OvaleClass } from "./Ovale";
 import { OvaleOptionsClass } from "./Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "./Debug";
-import { OvaleGUIDClass } from "./GUID";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleCombatClass } from "./states/combat";
-import { OneTimeMessage, PrintOneTimeMessages } from "./tools";
+import { isNumber, OneTimeMessage, PrintOneTimeMessages } from "./tools";
+import { Runner } from "./runner";
 
 let strmatch = match;
 let INFINITY = huge;
+const BARRE = 8;
 
 interface Action {
     secure?: boolean;
     secureIcons: LuaArray<OvaleIcon>;
     icons: LuaArray<OvaleIcon>;
-    spellId?: number;
+    spellId?: number | string;
     waitStart?: number;
     left: number;
     top: number;
@@ -142,6 +134,32 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         return 0;
     }
 
+    private goNextIcon(
+        action: Action,
+        left: number,
+        top: number
+    ): [left: number, top: number] {
+        const BARRE = 8;
+        const profile = this.ovaleOptions.db.profile;
+        const margin = profile.apparence.margin;
+        const width = action.scale * 36 + margin;
+        const height = action.scale * 36 + margin;
+        if (profile.apparence.vertical) {
+            action.left = top;
+            action.top = -left - BARRE - margin;
+            action.dx = width;
+            action.dy = 0;
+        } else {
+            action.left = left;
+            action.top = -top - BARRE - margin;
+            action.dx = 0;
+            action.dy = height;
+        }
+        // top = top + height;
+        left = left + width;
+        return [left, top];
+    }
+
     UpdateVisibility() {
         this.visible = true;
         let profile = this.ovaleOptions.db.profile;
@@ -197,16 +215,30 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             const profile = this.ovaleOptions.db.profile;
             const iconNodes = this.ovaleCompile.GetIconNodes();
+            let left = 0;
+            let top = 0;
+            let maxHeight = 0;
+
             for (const [k, node] of ipairs(iconNodes)) {
-                if (node.namedParams && node.namedParams.target) {
-                    this.baseState.current.defaultTarget = <string>(
-                        node.namedParams.target
+                const action = this.actions[k];
+                if (
+                    node.rawNamedParams.target &&
+                    node.rawNamedParams.target.type === "string"
+                ) {
+                    this.tracer.Debug(
+                        `Default target is ${node.rawNamedParams.target.value}`
                     );
+                    this.baseState.current.defaultTarget =
+                        node.rawNamedParams.target.value;
                 } else {
                     this.baseState.current.defaultTarget = "target";
                 }
-                if (node.namedParams && node.namedParams.enemies) {
-                    this.ovaleEnemies.next.enemies = node.namedParams.enemies;
+                if (
+                    node.rawNamedParams.enemies &&
+                    node.rawNamedParams.enemies.type === "value"
+                ) {
+                    this.ovaleEnemies.next.enemies =
+                        node.rawNamedParams.enemies.value;
                 } else {
                     this.ovaleEnemies.next.enemies = undefined;
                 }
@@ -220,102 +252,111 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 ) {
                     atTime = this.baseState.next.currentTime;
                 }
-                let [timeSpan, element] = this.ovaleBestAction.GetAction(
+                const [, namedParameters] = this.runner.computeParameters(
                     node,
                     atTime
                 );
-                let start;
-                if (element && element.offgcd) {
-                    start = timeSpan.NextTime(this.baseState.next.currentTime);
+                if (
+                    namedParameters.enabled === undefined ||
+                    namedParameters.enabled
+                ) {
+                    [left, top] = this.goNextIcon(action, left, top);
+                    action.icons[1].Show();
+                    let element = this.ovaleBestAction.GetAction(node, atTime);
+                    let start;
+                    if (element.type === "action" && element.offgcd) {
+                        start = element.timeSpan.NextTime(
+                            this.baseState.next.currentTime
+                        );
+                    } else {
+                        start = element.timeSpan.NextTime(atTime);
+                    }
+                    if (profile.apparence.enableIcons) {
+                        this.UpdateActionIcon(action, element, start || 0);
+                    }
+                    if (profile.apparence.spellFlash.enabled) {
+                        this.ovaleSpellFlash.Flash(
+                            node.cachedParams.named.flash as string | undefined,
+                            node.cachedParams.named.help as string | undefined,
+                            element,
+                            start || 0
+                        );
+                    }
                 } else {
-                    start = timeSpan.NextTime(atTime);
-                }
-                if (profile.apparence.enableIcons) {
-                    this.UpdateActionIcon(
-                        node,
-                        this.actions[k],
-                        element,
-                        start || 0
-                    );
-                }
-                if (profile.apparence.spellFlash.enabled) {
-                    this.ovaleSpellFlash.Flash(node, element, start || 0);
+                    action.icons[1].Hide();
                 }
             }
+            this.updateBarSize(left, maxHeight);
             wipe(this.ovale.refreshNeeded);
             this.ovaleDebug.UpdateTrace();
             PrintOneTimeMessages();
             this.timeSinceLastUpdate = 0;
         }
     }
+
     UpdateActionIcon(
-        node: AstNode,
         action: Action,
-        element: Element | undefined,
+        element: AstNodeSnapshot,
         start: number,
         now?: number
     ) {
         const profile = this.ovaleOptions.db.profile;
         let icons = (action.secure && action.secureIcons) || action.icons;
         now = now || GetTime();
-        if (element && element.type == "value") {
+        if (element.type == "value") {
             let value;
-            if (element.value && element.origin && element.rate) {
-                value =
-                    <number>element.value +
-                    (now - element.origin) * element.rate;
+            if (isNumber(element.value) && element.origin && element.rate) {
+                value = element.value + (now - element.origin) * element.rate;
             }
             this.tracer.Log("GetAction: start=%s, value=%f", start, value);
-            let actionTexture;
-            if (node.namedParams && node.namedParams.texture) {
-                actionTexture = node.namedParams.texture;
-            }
-            icons[1].SetValue(value, actionTexture);
-            if (lualength(icons) > 1) {
-                icons[2].Update(element, undefined);
-            }
-        } else {
-            let [
-                actionTexture,
-                actionInRange,
-                actionCooldownStart,
-                actionCooldownDuration,
-                actionUsable,
-                actionShortcut,
-                actionIsCurrent,
-                actionEnable,
-                actionType,
-                actionId,
-                actionTarget,
-                actionResourceExtend,
-            ] = this.ovaleBestAction.GetActionInfo(element, now);
-            if (actionResourceExtend && actionResourceExtend > 0) {
-                if (actionCooldownDuration && actionCooldownDuration > 0) {
+            // let actionTexture;
+            // if (node.texture) {
+            //     actionTexture = node.namedParams.texture;
+            // }
+            icons[1].SetValue(value, undefined);
+            // if (lualength(icons) > 1) {
+            //     icons[2].Update(element, undefined);
+            // }
+        } else if (element.type === "none") {
+            icons[1].SetValue(undefined, undefined);
+        } else if (element.type === "action") {
+            if (
+                element.actionResourceExtend &&
+                element.actionResourceExtend > 0
+            ) {
+                if (
+                    element.actionCooldownDuration &&
+                    element.actionCooldownDuration > 0
+                ) {
                     this.tracer.Log(
                         "Extending cooldown of spell ID '%s' for primary resource by %fs.",
-                        actionId,
-                        actionResourceExtend
+                        element.actionId,
+                        element.actionResourceExtend
                     );
-                    actionCooldownDuration =
-                        actionCooldownDuration + actionResourceExtend;
+                    element.actionCooldownDuration =
+                        element.actionCooldownDuration +
+                        element.actionResourceExtend;
                 } else if (
-                    element &&
-                    element.namedParams.pool_resource &&
-                    element.namedParams.pool_resource == 1
+                    element.options &&
+                    element.options.pool_resource == 1
                 ) {
                     this.tracer.Log(
                         "Delaying spell ID '%s' for primary resource by %fs.",
-                        actionId,
-                        actionResourceExtend
+                        element.actionId,
+                        element.actionResourceExtend
                     );
-                    start = start + actionResourceExtend;
+                    start = start + element.actionResourceExtend;
                 }
             }
 
-            this.tracer.Log("GetAction: start=%s, id=%s", start, actionId);
+            this.tracer.Log(
+                "GetAction: start=%s, id=%s",
+                start,
+                element.actionId
+            );
             if (
-                actionType == "spell" &&
-                actionId == this.ovaleFuture.next.currentCast.spellId &&
+                element.actionType == "spell" &&
+                element.actionId == this.ovaleFuture.next.currentCast.spellId &&
                 start &&
                 this.ovaleFuture.next.nextCast &&
                 start < this.ovaleFuture.next.nextCast
@@ -324,34 +365,20 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             if (
                 start &&
-                node.namedParams.nocd &&
-                now < start - node.namedParams.nocd
+                element.options &&
+                isNumber(element.options.nocd) &&
+                now < start - element.options.nocd
             ) {
                 icons[1].Update(element, undefined);
             } else {
-                icons[1].Update(
-                    element,
-                    start,
-                    actionTexture,
-                    actionInRange,
-                    actionCooldownStart,
-                    actionCooldownDuration,
-                    actionUsable,
-                    actionShortcut,
-                    actionIsCurrent,
-                    actionEnable,
-                    actionType,
-                    actionId,
-                    actionTarget,
-                    actionResourceExtend
-                );
+                icons[1].Update(element, start);
             }
-            if (actionType == "spell") {
-                action.spellId = <number>actionId;
+            if (element.actionType == "spell") {
+                action.spellId = element.actionId;
             } else {
                 action.spellId = undefined;
             }
-            if (start && start <= now && actionUsable) {
+            if (start && start <= now && element.actionUsable) {
                 action.waitStart = action.waitStart || now;
             } else {
                 action.waitStart = undefined;
@@ -387,72 +414,82 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     );
                 }
             }
-            if (
-                node.namedParams.size != "small" &&
-                !node.namedParams.nocd &&
-                profile.apparence.predictif
-            ) {
-                if (start) {
-                    this.tracer.Log("****Second icon %s", start);
-                    const target = this.ovaleGuid.UnitGUID(
-                        actionTarget || "target"
-                    );
-                    if (target)
-                        this.ovaleFuture.ApplySpell(
-                            <number>actionId,
-                            target,
-                            start
-                        );
-                    let atTime = this.ovaleFuture.next.nextCast;
-                    if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
-                        atTime = this.baseState.next.currentTime;
-                    }
-                    let [
-                        timeSpan,
-                        nextElement,
-                    ] = this.ovaleBestAction.GetAction(node, atTime);
-                    if (nextElement && nextElement.offgcd) {
-                        start =
-                            timeSpan.NextTime(
-                                this.baseState.next.currentTime
-                            ) || huge;
-                    } else {
-                        start = timeSpan.NextTime(atTime) || huge;
-                    }
-                    const [
-                        actionTexture2,
-                        actionInRange2,
-                        actionCooldownStart2,
-                        actionCooldownDuration2,
-                        actionUsable2,
-                        actionShortcut2,
-                        actionIsCurrent2,
-                        actionEnable2,
-                        actionType2,
-                        actionId2,
-                        actionTarget2,
-                        actionResourceExtend2,
-                    ] = this.ovaleBestAction.GetActionInfo(nextElement, start);
-                    icons[2].Update(
-                        nextElement,
-                        start,
-                        actionTexture2,
-                        actionInRange2,
-                        actionCooldownStart2,
-                        actionCooldownDuration2,
-                        actionUsable2,
-                        actionShortcut2,
-                        actionIsCurrent2,
-                        actionEnable2,
-                        actionType2,
-                        actionId2,
-                        actionTarget2,
-                        actionResourceExtend2
-                    );
-                } else {
-                    icons[2].Update(element, undefined);
-                }
-            }
+            // if (
+            //     node.namedParams.size != "small" &&
+            //     !node.namedParams.nocd &&
+            //     profile.apparence.predictif
+            // ) {
+            //     if (start) {
+            //         this.tracer.Log("****Second icon %s", start);
+            //         const target = this.ovaleGuid.UnitGUID(
+            //             actionTarget || "target"
+            //         );
+            //         if (target)
+            //             this.ovaleFuture.ApplySpell(
+            //                 <number>actionId,
+            //                 target,
+            //                 start
+            //             );
+            //         let atTime = this.ovaleFuture.next.nextCast;
+            //         if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
+            //             atTime = this.baseState.next.currentTime;
+            //         }
+            //         let [
+            //             timeSpan,
+            //             nextElement,
+            //         ] = this.ovaleBestAction.GetAction(node, atTime);
+            //         if (nextElement && nextElement.offgcd) {
+            //             start =
+            //                 timeSpan.NextTime(
+            //                     this.baseState.next.currentTime
+            //                 ) || huge;
+            //         } else {
+            //             start = timeSpan.NextTime(atTime) || huge;
+            //         }
+            //         const [
+            //             actionTexture2,
+            //             actionInRange2,
+            //             actionCooldownStart2,
+            //             actionCooldownDuration2,
+            //             actionUsable2,
+            //             actionShortcut2,
+            //             actionIsCurrent2,
+            //             actionEnable2,
+            //             actionType2,
+            //             actionId2,
+            //             actionTarget2,
+            //             actionResourceExtend2,
+            //         ] = this.ovaleBestAction.GetActionInfo(nextElement, start);
+            //         icons[2].Update(
+            //             nextElement,
+            //             start,
+            //             actionTexture2,
+            //             actionInRange2,
+            //             actionCooldownStart2,
+            //             actionCooldownDuration2,
+            //             actionUsable2,
+            //             actionShortcut2,
+            //             actionIsCurrent2,
+            //             actionEnable2,
+            //             actionType2,
+            //             actionId2,
+            //             actionTarget2,
+            //             actionResourceExtend2
+            //         );
+            //     } else {
+            //         icons[2].Update(element, undefined);
+            //     }
+            // }
+        }
+
+        if (!profile.apparence.moving) {
+            icons[1].SetPoint(
+                "TOPLEFT",
+                this.frame,
+                "TOPLEFT",
+                action.left / action.scale,
+                action.top / action.scale
+            );
         }
     }
 
@@ -613,7 +650,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         let maxHeight = 0;
         let maxWidth = 0;
         let top = 0;
-        let BARRE = 8;
         let margin = profile.apparence.margin;
         let iconNodes = this.ovaleCompile.GetIconNodes();
         for (const [k, node] of ipairs(iconNodes)) {
@@ -632,8 +668,9 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             let width, height, newScale;
             let nbIcons;
             if (
-                node.namedParams != undefined &&
-                node.namedParams.size == "small"
+                node.rawNamedParams.size != undefined &&
+                node.rawNamedParams.size.type === "string" &&
+                node.rawNamedParams.size.value === "small"
             ) {
                 newScale = profile.apparence.smallIconScale;
                 width = newScale * 36 + margin;
@@ -645,7 +682,9 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 height = newScale * 36 + margin;
                 if (
                     profile.apparence.predictif &&
-                    node.namedParams.type != "value"
+                    node.rawNamedParams.type !== undefined &&
+                    node.rawNamedParams.type.type === "string" &&
+                    node.rawNamedParams.type.value !== "value"
                 ) {
                     nbIcons = 2;
                 } else {
@@ -668,10 +707,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 action.dx = 0;
                 action.dy = height;
             }
-            action.secure = node.secure;
+            action.secure =
+                node.rawNamedParams.secure &&
+                node.rawNamedParams.secure.type === "value";
             for (let l = 1; l <= nbIcons; l += 1) {
                 let icon: OvaleIcon;
-                if (!node.secure) {
+                if (!action.secure) {
                     if (!action.icons[l]) {
                         action.icons[l] = new OvaleIcon(
                             `Icon${k}n${l}`,
@@ -698,19 +739,14 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 if (l > 1) {
                     scale = scale * profile.apparence.secondIconScale;
                 }
-                icon.SetPoint(
-                    "TOPLEFT",
-                    this.frame,
-                    "TOPLEFT",
-                    (action.left + (l - 1) * action.dx) / scale,
-                    (action.top - (l - 1) * action.dy) / scale
-                );
                 icon.SetScale(scale);
                 icon.SetRemainsFont(profile.apparence.remainsFontColor);
                 icon.SetFontScale(profile.apparence.fontScale);
-                icon.SetParams(node.positionalParams, node.namedParams);
+                icon.SetParams(node.rawPositionalParams, node.rawNamedParams);
                 icon.SetHelp(
-                    (node.namedParams != undefined && node.namedParams.help) ||
+                    (node.rawNamedParams.help != undefined &&
+                        node.rawNamedParams.help.type === "string" &&
+                        node.rawNamedParams.help.value) ||
                         undefined
                 );
                 icon.SetRangeIndicator(profile.apparence.targetText);
@@ -734,7 +770,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         }
 
         this.content.SetAlpha(profile.apparence.optionsAlpha);
+        this.updateBarSize(maxWidth, maxHeight);
+    }
 
+    private updateBarSize(maxWidth: number, maxHeight: number) {
+        const profile = this.ovaleOptions.db.profile;
+        const margin = profile.apparence.margin;
         if (profile.apparence.vertical) {
             this.barre.SetWidth(maxHeight - margin);
             this.barre.SetHeight(BARRE);
@@ -787,11 +828,11 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         private ovaleDebug: OvaleDebugClass,
-        private ovaleGuid: OvaleGUIDClass,
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
-        private combat: OvaleCombatClass
+        private combat: OvaleCombatClass,
+        private runner: Runner
     ) {
         super();
         let hider = CreateFrame(
@@ -926,11 +967,11 @@ export class OvaleFrameModuleClass {
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         private ovaleDebug: OvaleDebugClass,
-        private ovaleGuid: OvaleGUIDClass,
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
-        combat: OvaleCombatClass
+        combat: OvaleCombatClass,
+        runner: Runner
     ) {
         this.module = ovale.createModule(
             "OvaleFrame",
@@ -948,11 +989,11 @@ export class OvaleFrameModuleClass {
             this.ovale,
             this.ovaleOptions,
             this.ovaleDebug,
-            this.ovaleGuid,
             this.ovaleSpellFlash,
             this.ovaleSpellBook,
             this.ovaleBestAction,
-            combat
+            combat,
+            runner
         );
     }
 }

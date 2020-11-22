@@ -9,9 +9,7 @@ import {
 import { writeFileSync } from "fs";
 import { SpellInfo } from "../Data";
 import { PowerType as OvalePowerType } from "../states/Power";
-import { ConditionNamedParameters } from "../AST";
 import { debug } from "console";
-import { RequirementName } from "../Requirement";
 
 export interface CustomAura {
     id: number;
@@ -24,15 +22,16 @@ export interface CustomAuras {
 }
 
 export interface CustomSpellDataIf {
-    conditions?: ConditionNamedParameters;
+    conditions?: string;
     spellInfo?: SpellInfo;
 }
 
 export interface CustomSpellRequire {
-    condition: RequirementName;
-    not?: boolean;
+    condition: "hastalent" | "stealthed";
     property: keyof SpellInfo;
     value: string | number;
+    talentId?: number;
+    not?: boolean;
 }
 
 export interface CustomSpellData {
@@ -43,7 +42,6 @@ export interface CustomSpellData {
     spellInfo: SpellInfo;
     auras?: CustomAuras;
     customSpellInfo?: SpellInfo;
-    conditions?: ConditionNamedParameters;
     nextRank?: number;
     replace?: number;
     require: CustomSpellRequire[];
@@ -162,8 +160,8 @@ export function convertFromSpellData(
         require.push({
             condition: "stealthed",
             property: "unusable",
-            not: true,
             value: 1,
+            not: true,
         });
     }
 
@@ -241,11 +239,14 @@ export function convertFromSpellData(
     if (playerAuras.length > 0) auras.player = playerAuras;
     if (targetAuras.length > 0) auras.target = targetAuras;
 
-    const conditions: ConditionNamedParameters = {};
-    let hasConditions = false;
     if (spell.talent) {
-        conditions.talent = spell.talent.id;
-        hasConditions = true;
+        require.push({
+            condition: "hastalent",
+            talentId: spell.talent.id,
+            property: "unusable",
+            value: 1,
+            not: true,
+        });
     }
 
     const customSpellData: CustomSpellData = {
@@ -259,9 +260,6 @@ export function convertFromSpellData(
         replace: spell.replace_spell_id,
         require,
     };
-    if (hasConditions) {
-        customSpellData.conditions = conditions;
-    }
     return customSpellData;
 }
 

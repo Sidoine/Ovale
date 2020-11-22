@@ -1,7 +1,12 @@
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../states/PaperDoll";
 import { LuaObj, LuaArray, pairs, lualength, ipairs, kpairs } from "@wowts/lua";
-import { AstNode, NodeType, AstAnnotation } from "../AST";
+import {
+    NodeType,
+    AstAnnotation,
+    AstAddFunctionNode,
+    AstScriptNode,
+} from "../AST";
 import { TypeCheck } from "../tools";
 import { OvaleDataClass } from "../Data";
 
@@ -604,6 +609,19 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         symbol: "",
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },
+    ["druid"]: {
+        name: "checkboxon",
+        modifiers: {
+            catweave_bear: {
+                type: MiscOperandModifierType.Parameter,
+                createOptions: true,
+            },
+            owlweave_bear: {
+                type: MiscOperandModifierType.Parameter,
+                createOptions: true,
+            },
+        },
+    },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
     ["exsanguinated"]: {
@@ -947,8 +965,8 @@ export class Annotation implements InterruptAnnotation {
     nodeList?: LuaArray<ParseNode>;
 
     astAnnotation: AstAnnotation;
-    dictionaryAST?: any;
-    dictionary: LuaObj<number> = {};
+    dictionaryAST?: AstScriptNode;
+    dictionary: LuaObj<number | string> = {};
     supportingFunctionCount?: number;
     supportingInterruptCount?: number;
     supportingControlCount?: number;
@@ -959,8 +977,8 @@ export class Annotation implements InterruptAnnotation {
     sync?: LuaObj<ActionParseNode>;
 
     using_apl?: LuaObj<boolean>;
-    currentVariable?: AstNode;
-    variable: LuaObj<AstNode> = {};
+    currentVariable?: AstAddFunctionNode;
+    variable: LuaObj<AstAddFunctionNode> = {};
 
     trap_launcher?: string;
     interrupt?: string;
