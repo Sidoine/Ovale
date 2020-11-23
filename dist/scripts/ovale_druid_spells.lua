@@ -3,16 +3,26 @@ if not __exports then return end
 __exports.registerDruidSpells = function(OvaleScripts)
     local name = "ovale_druid_spells"
     local desc = "[9.0] Ovale: Druid baseline spells"
-    local code = [[Define(adaptive_swarm 325748)
+    local code = [[Define(adaptive_swarm_damage 325733)
 # Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
-  SpellInfo(adaptive_swarm duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
-  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
-  SpellAddTargetDebuff(adaptive_swarm adaptive_swarm add=1)
-Define(adaptive_swarm_debuff 325733)
-# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
-  SpellInfo(adaptive_swarm_debuff duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
+  SpellInfo(adaptive_swarm_damage duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec and damage over time from the caster increased by w2.
-  SpellAddTargetDebuff(adaptive_swarm_debuff adaptive_swarm_debuff add=1)
+  SpellAddTargetDebuff(adaptive_swarm_damage adaptive_swarm_damage add=1)
+Define(adaptive_swarm_heal 325748)
+# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
+  SpellInfo(adaptive_swarm_heal duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
+  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
+  SpellAddTargetDebuff(adaptive_swarm_heal adaptive_swarm_heal add=1)
+Define(balance_of_all_things_arcane_buff 339946)
+# Entering Eclipse increases your critical strike chance with Arcane or Nature spells by 339943s1*339943u, decreasing by 339943s1 every 339943t2 sec.
+  SpellInfo(balance_of_all_things_arcane_buff duration=5 max_stacks=5 gcd=0 offgcd=1 tick=1)
+  # Critical strike chance with Arcane spells increased w1.
+  SpellAddBuff(balance_of_all_things_arcane_buff balance_of_all_things_arcane_buff add=1)
+Define(balance_of_all_things_nature_buff 339943)
+# Entering Eclipse increases your critical strike chance with Arcane or Nature spells by 339943s1*339943u, decreasing by 339943s1 every 339943t2 sec.
+  SpellInfo(balance_of_all_things_nature_buff duration=5 max_stacks=5 gcd=0 offgcd=1 tick=1)
+  # Critical strike chance with Nature spells increased w1.
+  SpellAddBuff(balance_of_all_things_nature_buff balance_of_all_things_nature_buff add=1)
 Define(barkskin 22812)
 # Your skin becomes as tough as bark, reducing all damage you take by s1 and preventing damage from delaying your spellcasts. Lasts 8 seconds.rnrnUsable while stunned, frozen, incapacitated, feared, or asleep, and in all shapeshift forms.
   SpellInfo(barkskin cd=60 duration=8 gcd=0 offgcd=1 tick=1)
@@ -186,6 +196,11 @@ Define(ironfur 192081)
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
   # Armor increased by w1*AGI/100.
   SpellAddBuff(ironfur ironfur add=1)
+Define(kindred_empowerment_energize 327139)
+# Energize your bonded partner, granting them 327139s1 of your damage as additional Arcane damage, healing, or absorption.
+  SpellInfo(kindred_empowerment_energize duration=10 gcd=0 offgcd=1 tick=0.5)
+  # Energizing @auracaster, granting them s1 of all damage you deal as Kindred Empowerment.
+  SpellAddBuff(kindred_empowerment_energize kindred_empowerment_energize add=1)
 Define(kindred_spirits 56315)
 # Increases your maximum Focus and your pet's maximum Focus by (25 of Spell Power).
   SpellInfo(kindred_spirits gcd=0 offgcd=1)
@@ -478,6 +493,8 @@ Define(fury_of_elune_talent 20) #21193
 # Calls down a beam of pure celestial energy that follows the enemy, dealing up to <dmg> Astral damage over 8 seconds within its area. Damage reduced on secondary targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
 Define(heart_of_the_wild_talent 12) #18577
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
+Define(incarnation_chosen_of_elune_talent 15) #21702
+# An improved Moonkin Form that grants the benefits of Celestial Alignment, and s2 critical strike chance.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
 Define(incarnation_guardian_of_ursoc_talent 15) #22388
 # An improved Bear Form that grants the benefits of Berserk, causes Mangle to hit up to (25 of Spell Power) targets, and increases maximum health by s5.rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
 Define(incarnation_king_of_the_jungle_talent 15) #21704

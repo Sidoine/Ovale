@@ -217,6 +217,11 @@ function fixIdentifier(identifier: string, spellId: number) {
 fixIdentifier("shining_light_free_buff", 327510);
 fixIdentifier("sun_kings_blessing_ready_buff", 333315);
 fixIdentifier("clearcasting_channel_buff", 277726);
+fixIdentifier("balance_of_all_things_arcane_buff", 339946);
+fixIdentifier("balance_of_all_things_nature_buff", 339943);
+fixIdentifier("adaptive_swarm_damage", 325733);
+fixIdentifier("adaptive_swarm_heal", 325748);
+fixIdentifier("kindred_empowerment_energize", 327139);
 
 // TODO add _cat/_bear using required stance
 fixIdentifier("wild_charge_bear", 16979);

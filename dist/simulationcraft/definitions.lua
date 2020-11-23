@@ -315,12 +315,35 @@ __exports.MISC_OPERAND = {
     },
     ["death_knight"] = {
         symbol = "enchant",
+        name = "checkboxon",
         modifiers = {
             runeforge = {
                 type = 4,
                 name = "weaponenchantpresent"
+            },
+            disable_aotd = {
+                type = 2,
+                name = "disable_aotd",
+                createOptions = true
+            },
+            fwounded_targets = {
+                type = 4,
+                code = "buffcountonany",
+                extraSymbol = "festering_wound_debuff"
             }
         }
+    },
+    ["death_and_decay"] = {
+        modifiers = {
+            ticking = {
+                type = 4,
+                name = "buffpresent"
+            }
+        },
+        extraSymbol = "death_and_decay"
+    },
+    ["demon_soul_fragments"] = {
+        name = "soulfragments"
     },
     ["desired_targets"] = {
         name = "enemies",
@@ -359,9 +382,17 @@ __exports.MISC_OPERAND = {
                 name = "buffpresent",
                 extraSymbol = "eclipse_solar"
             },
+            solar_in_1 = {
+                type = 4,
+                code = "counter(solar) = 1"
+            },
             solar_next = {
                 type = 4,
                 code = "counter(solar) = 1"
+            },
+            lunar_in_1 = {
+                type = 4,
+                code = "counter(lunar) = 1"
             },
             lunar_next = {
                 type = 4,
@@ -548,10 +579,6 @@ __exports.MISC_OPERAND = {
     },
     ["time_to_shard"] = {
         name = "timetoshard"
-    },
-    ["wound_spender"] = {
-        name = "spell",
-        extraSymbol = "scourge_strike"
     }
 }
 __exports.RUNE_OPERAND = {

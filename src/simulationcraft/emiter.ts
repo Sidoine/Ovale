@@ -289,6 +289,37 @@ export class Emiter {
             "potion_of_unbridled_fury_buff"
         );
         this.AddDisambiguation("swipe_bear", "swipe", "DRUID");
+        this.AddDisambiguation(
+            "wound_spender",
+            "scourge_strike",
+            "DEATHKNIGHT"
+        );
+        this.AddDisambiguation("any_dnd", "death_and_decay", "DEATHKNIGHT");
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_tree_of_life_talent",
+            "DRUID",
+            "restoration"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_guardian_of_ursoc_talent",
+            "DRUID",
+            "guardian"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_chosen_of_elune_talent",
+            "DRUID",
+            "balance"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_king_of_the_jungle_talent",
+            "DRUID",
+            "feral"
+        );
+        this.AddDisambiguation("ca_inc", "celestial_alignment", "DRUID");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -1173,6 +1204,12 @@ export class Emiter {
                     action as keyof typeof interruptsClasses
                 ] = className;
                 annotation.interrupt = className;
+                isSpellAction = false;
+            } else if (
+                className === "DEMONHUNTER" &&
+                action === "pick_up_fragment"
+            ) {
+                bodyCode = "texture(spell_shadow_soulgem text=pickup)";
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "pulverize") {
                 let debuffName = "thrash_bear_debuff";
@@ -2774,7 +2811,11 @@ export class Emiter {
 
             let code;
             let buffName;
-            if (this.isDaemon(name)) {
+            if (name === "out_of_range") {
+                if (property == "up") {
+                    code = "not target.inrange()";
+                }
+            } else if (this.isDaemon(name)) {
                 buffName = name;
                 if (property === "remains") {
                     code = `demonduration(${buffName})`;
@@ -2894,6 +2935,14 @@ export class Emiter {
                     );
                 } else if (property == "improved") {
                     code = format("%sImproved(%s%s)", prefix, buffName);
+                } else if (property === "stack_value") {
+                    code = format(
+                        "%s%sStacks(%s%s)",
+                        target,
+                        prefix,
+                        buffName,
+                        any
+                    );
                 } else if (property == "value") {
                     code = format(
                         "%s%sAmount(%s%s)",
@@ -2912,7 +2961,7 @@ export class Emiter {
                     nodeList,
                     annotation.astAnnotation
                 );
-                this.AddSymbol(annotation, buffName);
+                if (buffName) this.AddSymbol(annotation, buffName);
             }
         }
         return node;
@@ -3762,8 +3811,8 @@ export class Emiter {
             specialization == "havoc"
         ) {
             code =
-                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis_havoc) == 0";
-            this.AddSymbol(annotation, "metamorphosis_havoc");
+                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0";
+            this.AddSymbol(annotation, "metamorphosis");
         } else if (
             className == "DRUID" &&
             operand == "buff.wild_charge_movement.down"
@@ -3779,6 +3828,10 @@ export class Emiter {
             this.AddSymbol(annotation, spellName);
         } else if (className == "DRUID" && operand == "solar_wrath.ap_check") {
             let spellName = "solar_wrath";
+            code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
+            this.AddSymbol(annotation, spellName);
+        } else if (className == "DRUID" && operand == "starfire.ap_check") {
+            let spellName = "starfire";
             code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "HUNTER" && operand == "buff.careful_aim.up") {

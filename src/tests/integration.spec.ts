@@ -1,6 +1,6 @@
 import { test, expect } from "@jest/globals";
 import { IoC } from "../ioc";
-import { ipairs, lualength } from "@wowts/lua";
+import { ipairs, lualength, pairs } from "@wowts/lua";
 import {
     eventDispatcher,
     DEFAULT_CHAT_FRAME,
@@ -84,15 +84,14 @@ function integrationTest(name: string) {
     checkNoMessage();
 }
 
-test("sc_t25_warrior_fury", () => {
-    integrationTest("sc_t25_warrior_fury");
-});
+// test("sc_t25_warrior_fury", () => {
+//     integrationTest("sc_t25_warrior_fury");
+// });
 
-// for (const [name, script] of pairs(mainIoC.scripts.script)) {
-//     if (!script.className || script.type !== "script") continue;
-//     if (name !== "sc_t25_warrior_fury") continue;
+for (const [name, script] of pairs(mainIoC.scripts.script)) {
+    if (!script.className || script.type !== "script") continue;
 
-//     test(`Test ${name} script`, () => {
-//         integrationTest(script);
-//     });
-// }
+    test(`Test ${name} script`, () => {
+        integrationTest(name);
+    });
+}

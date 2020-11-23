@@ -270,6 +270,10 @@ Define(rime_frost 316838)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
+Define(scourge_strike 55090)
+# An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
+  SpellInfo(scourge_strike runes=1 runicpower=-10)
+
 Define(soul_reaper 343294)
 # Strike an enemy for s1 Shadow damage and afflict the enemy with Soul Reaper. rnrnAfter 5 seconds, if the target is below s3 health this effect will explode dealing an additional 343295s1 Shadow damage to the target. If the enemy that yields experience or honor dies while afflicted by Soul Reaper, gain Runic Corruption.
   SpellInfo(soul_reaper runes=1 runicpower=-10 cd=6 duration=5 tick=5)

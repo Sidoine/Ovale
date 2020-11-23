@@ -621,12 +621,35 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["cp_max_spend"]: { name: "maxcombopoints" },
     ["death_knight"]: {
         symbol: "enchant",
+        name: "checkboxon",
         modifiers: {
             runeforge: {
                 type: MiscOperandModifierType.Replace,
                 name: "weaponenchantpresent",
             },
+            disable_aotd: {
+                type: MiscOperandModifierType.Parameter,
+                name: "disable_aotd",
+                createOptions: true,
+            },
+            fwounded_targets: {
+                type: MiscOperandModifierType.Replace,
+                code: "buffcountonany",
+                extraSymbol: "festering_wound_debuff",
+            },
         },
+    },
+    ["death_and_decay"]: {
+        modifiers: {
+            ticking: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffpresent",
+            },
+        },
+        extraSymbol: "death_and_decay",
+    },
+    ["demon_soul_fragments"]: {
+        name: "soulfragments", // GREATER/demon
     },
     ["desired_targets"]: {
         name: "enemies",
@@ -662,9 +685,17 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 name: "buffpresent",
                 extraSymbol: "eclipse_solar",
             },
+            solar_in_1: {
+                type: MiscOperandModifierType.Replace,
+                code: "counter(solar) = 1",
+            },
             solar_next: {
                 type: MiscOperandModifierType.Replace,
                 code: "counter(solar) = 1",
+            },
+            lunar_in_1: {
+                type: MiscOperandModifierType.Replace,
+                code: "counter(lunar) = 1",
             },
             lunar_next: {
                 type: MiscOperandModifierType.Replace,
@@ -787,10 +818,6 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     },
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },
-    ["wound_spender"]: {
-        name: "spell",
-        extraSymbol: "scourge_strike",
-    },
 };
 export let RUNE_OPERAND: LuaObj<string> = {
     ["rune"]: "rune",

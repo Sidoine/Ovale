@@ -369,6 +369,9 @@ __exports.Emiter = __class(nil, {
                     annotation[action] = className
                     annotation.interrupt = className
                     isSpellAction = false
+                elseif className == "DEMONHUNTER" and action == "pick_up_fragment" then
+                    bodyCode = "texture(spell_shadow_soulgem text=pickup)"
+                    isSpellAction = false
                 elseif className == "DRUID" and action == "pulverize" then
                     local debuffName = "thrash_bear_debuff"
                     self:AddSymbol(annotation, debuffName)
@@ -1241,7 +1244,11 @@ __exports.Emiter = __class(nil, {
                 end
                 local code
                 local buffName
-                if self:isDaemon(name) then
+                if name == "out_of_range" then
+                    if property == "up" then
+                        code = "not target.inrange()"
+                    end
+                elseif self:isDaemon(name) then
                     buffName = name
                     if property == "remains" then
                         code = "demonduration(" .. buffName .. ")"
@@ -1297,6 +1304,8 @@ __exports.Emiter = __class(nil, {
                         code = format("%s%sRefreshable(%s)", target, prefix, buffName)
                     elseif property == "improved" then
                         code = format("%sImproved(%s%s)", prefix, buffName)
+                    elseif property == "stack_value" then
+                        code = format("%s%sStacks(%s%s)", target, prefix, buffName, any)
                     elseif property == "value" then
                         code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
                     end
@@ -1304,7 +1313,9 @@ __exports.Emiter = __class(nil, {
                 if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    self:AddSymbol(annotation, buffName)
+                    if buffName then
+                        self:AddSymbol(annotation, buffName)
+                    end
                 end
             end
             return node
@@ -1823,8 +1834,8 @@ __exports.Emiter = __class(nil, {
                 self:AddSymbol(annotation, "nemesis_talent")
                 self:AddSymbol(annotation, "nemesis")
             elseif className == "DEMONHUNTER" and operand == "cooldown.metamorphosis.ready" and specialization == "havoc" then
-                code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis_havoc) == 0"
-                self:AddSymbol(annotation, "metamorphosis_havoc")
+                code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0"
+                self:AddSymbol(annotation, "metamorphosis")
             elseif className == "DRUID" and operand == "buff.wild_charge_movement.down" then
                 code = "True(wild_charge_movement_down)"
             elseif className == "DRUID" and operand == "eclipse_dir.lunar" then
@@ -1837,6 +1848,10 @@ __exports.Emiter = __class(nil, {
                 self:AddSymbol(annotation, spellName)
             elseif className == "DRUID" and operand == "solar_wrath.ap_check" then
                 local spellName = "solar_wrath"
+                code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
+                self:AddSymbol(annotation, spellName)
+            elseif className == "DRUID" and operand == "starfire.ap_check" then
+                local spellName = "starfire"
                 code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
                 self:AddSymbol(annotation, spellName)
             elseif className == "HUNTER" and operand == "buff.careful_aim.up" then
@@ -2329,6 +2344,13 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
         self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury_buff")
         self:AddDisambiguation("swipe_bear", "swipe", "DRUID")
+        self:AddDisambiguation("wound_spender", "scourge_strike", "DEATHKNIGHT")
+        self:AddDisambiguation("any_dnd", "death_and_decay", "DEATHKNIGHT")
+        self:AddDisambiguation("incarnation_talent", "incarnation_tree_of_life_talent", "DRUID", "restoration")
+        self:AddDisambiguation("incarnation_talent", "incarnation_guardian_of_ursoc_talent", "DRUID", "guardian")
+        self:AddDisambiguation("incarnation_talent", "incarnation_chosen_of_elune_talent", "DRUID", "balance")
+        self:AddDisambiguation("incarnation_talent", "incarnation_king_of_the_jungle_talent", "DRUID", "feral")
+        self:AddDisambiguation("ca_inc", "celestial_alignment", "DRUID")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

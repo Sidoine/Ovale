@@ -100,6 +100,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
         this.estimated = true;
     }
     SoulFragments(atTime: number) {
+        // TODO Need to add parameters greater and demon
         let stacks = this.GetSoulFragmentsBuffStacks(atTime);
         if (this.estimated) {
             if (atTime - (this.atTime || 0) < 1.2) {
