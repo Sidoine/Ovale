@@ -751,6 +751,8 @@ export interface AstFunctionNode
         | "help"
         | "count"
         | "any"
+        | "max"
+        | "tagged"
     > {
     name: string;
 }
@@ -766,7 +768,9 @@ const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
     extra_amount: true,
     help: true,
     count: true,
-    any: true
+    any: true,
+    max: true,
+    tagged: true,
 };
 
 export interface AstStringNode extends AstBaseNode<"string"> {

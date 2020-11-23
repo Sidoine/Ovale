@@ -175,7 +175,6 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-  SpellInfo(shadow_bolt replaced_by=incinerate)
 Define(inevitable_demise_buff 273522)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
   SpellInfo(inevitable_demise_buff gcd=0 offgcd=1)
@@ -235,6 +234,7 @@ Define(seed_of_corruption 27243)
 Define(shadow_bolt 686)
 # Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]?a32388[rnrnApplies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.][] 
   SpellInfo(shadow_bolt)
+  SpellRequire(shadow_bolt replaced_by set=incinerate enabled=(specialization(destruction)))
 Define(shadowburn 17877)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
   SpellInfo(shadowburn soulshards=1 cd=12 duration=5)

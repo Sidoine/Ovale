@@ -116,7 +116,6 @@ Define(chimaera_shot_marksmanship 342049)
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
   SpellInfo(cobra_shot focus=35)
-  SpellInfo(steady_shot replaced_by=cobra_shot)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
@@ -197,6 +196,11 @@ Define(in_the_rhythm 272733)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
   SpellInfo(kill_command focus=30 cd=7.5)
+Define(kill_command_survival 259489)
+# Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
+  SpellInfo(kill_command_survival cd=6 focus=-15)
+  # Your next ?s259387[Mongoose Bite][Raptor Strike] deals s1 increased damage.
+  SpellAddBuff(kill_command_survival tip_of_the_spear_buff add=1)
 Define(kill_shot 320976)
 # You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
   SpellInfo(kill_shot focus=10 cd=10)
@@ -229,6 +233,9 @@ Define(mongoose_fury 259388)
 Define(multishot 2643)
 # Fires several missiles, hitting up to I targets within A2 yards of your current target for s2 Physical damage?s115939[ and triggering Beast Cleave][].?s19434[rnrn|cFFFFFFFFGenerates 213363s1 Focus per target hit.|r][]
   SpellInfo(multishot focus=40)
+Define(multishot_marksmanship 257620)
+# Fires several missiles, hitting your current target and up to I enemies within A1 yards for s1 Physical damage.
+  SpellInfo(multishot_marksmanship focus=20)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -246,6 +253,7 @@ Define(precise_shots_buff 260242)
   # Damage of ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot increased by s1.
   SpellAddBuff(precise_shots_buff precise_shots_buff add=1)
   SpellAddBuff(precise_shots_buff arcane_shot add=1)
+  SpellAddBuff(precise_shots_buff multishot_marksmanship add=1)
   SpellAddBuff(precise_shots_buff chimaera_shot_marksmanship add=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
@@ -313,6 +321,7 @@ Define(steady_focus_buff 193534)
 Define(steady_shot 56641)
 # A steady shot that causes s1 Physical damage.rnrnUsable while moving.?s321018[rnrn|cFFFFFFFFGenerates s2 Focus.][]
   SpellInfo(steady_shot)
+  SpellRequire(steady_shot replaced_by set=cobra_shot enabled=(specialization(beast_mastery)))
 Define(steel_trap 162488)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
   SpellInfo(steel_trap cd=30)

@@ -28,6 +28,7 @@ local isNumber = __tools.isNumber
 local isString = __tools.isString
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local ParseCondition = __Condition.ParseCondition
+local ReturnConstant = __Condition.ReturnConstant
 local ReturnValue = __Condition.ReturnValue
 local strlower = lower
 local tconcat = concat
@@ -326,6 +327,9 @@ __exports.OvaleAuraClass = __class(States, {
             end
             return ReturnValue(0, aura.ending, 1)
         end
+        self.ticksGainedOnRefresh = function()
+            return ReturnConstant(0)
+        end
         self.ApplySpellStartCast = function(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
             self.profiler:StartProfiling("OvaleAura_ApplySpellStartCast")
             if isChanneled then
@@ -392,6 +396,7 @@ __exports.OvaleAuraClass = __class(States, {
     end,
     registerConditions = function(self, condition)
         condition:RegisterCondition("bufflastexpire", true, self.buffLastExpire)
+        condition:RegisterCondition("ticksgainedonrefresh", true, self.ticksGainedOnRefresh)
     end,
     IsWithinAuraLag = function(self, time1, time2, factor)
         factor = factor or 1
@@ -572,7 +577,7 @@ __exports.OvaleAuraClass = __class(States, {
                         local auraTable = (self.ovaleGuid:IsPlayerPet(guid) and si.aura.pet) or si.aura.target
                         if auraTable and auraTable[filter] then
                             local spellData = auraTable[filter][auraId]
-                            if spellData.cachedParams.named.refresh_keep_snapshot and (spellData.cachedParams.named.enabled == nil or spellData.cachedParams.named.enabled) then
+                            if spellData and spellData.cachedParams.named.refresh_keep_snapshot and (spellData.cachedParams.named.enabled == nil or spellData.cachedParams.named.enabled) then
                                 keepSnapshot = true
                             end
                         end

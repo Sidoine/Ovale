@@ -158,7 +158,7 @@ __exports.OvaleBestActionClass = __class(nil, {
         local result = element.result
         local si = self.ovaleData.spellInfo[spellId]
         local replacedSpellId = nil
-        if si and si.replaced_by then
+        if si then
             local replacement = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "replaced_by", targetGUID)
             if replacement then
                 replacedSpellId = spellId

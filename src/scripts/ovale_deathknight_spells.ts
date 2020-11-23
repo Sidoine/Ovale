@@ -212,11 +212,9 @@ Define(icy_talons_buff 194879)
   SpellInfo(icy_talons_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
   # Attack speed increased s1.
   SpellAddBuff(icy_talons_buff icy_talons_buff add=1)
-Define(killing_machine_buff 51124)
-# Your auto attack has a chance to cause your next Obliterate ?s207230[or Frostscythe ][]to be a guaranteed critical strike.
-  SpellInfo(killing_machine_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
-  # Guaranteed critical strike on your next Obliterate?s207230[ or Frostscythe][].
-  SpellAddBuff(killing_machine_buff killing_machine_buff add=1)
+Define(killing_machine_frost 317214)
+# Your next Obliterate also deals Frost damage.
+  SpellInfo(killing_machine_frost gcd=0 offgcd=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -268,11 +266,10 @@ Define(remorseless_winter 196770)
 Define(remorseless_winter_buff 196771)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter_buff gcd=0 offgcd=1)
-Define(rime_buff 59052)
-# Your next Howling Blast will consume no Runes, generate no Runic Power, and deal s2 additional damage.
-  SpellInfo(rime_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Howling Blast will consume no Runes, generate no Runic Power, and deals s2 additional damage.
-  SpellAddBuff(rime_buff rime_buff add=1)
+Define(rime_frost 316838)
+# Increases Howling Blasts damage done by an additional s1.
+  SpellInfo(rime_frost gcd=0 offgcd=1)
+  SpellAddBuff(rime_frost rime_frost add=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
@@ -400,6 +397,8 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
 Define(unholy_pact_talent 17) #22534
 # Dark Transformation creates an unholy pact between you and your pet, igniting flaming chains that deal 319236s1*s2 Shadow damage over s2 sec to enemies between you and your pet. rnrnWhile active, your strength is increased by 319255s1.
+Define(fallen_crusader_enchant 3368)
+Define(razorice_enchant 3370)
 Define(dribbling_inkpod_item 169319)
 Define(potion_of_unbridled_fury_item 169299)
 Define(biting_cold_runeforge 6945)

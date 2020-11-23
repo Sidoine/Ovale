@@ -17,7 +17,7 @@ import {
     AzeriteEmpoweredItemSelectionUpdatedEvent,
     PlayerEnteringWorldEvent,
 } from "@wowts/wow-mock";
-import { OvaleEquipmentClass } from "../Equipment";
+import { OvaleEquipmentClass } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleDebugClass } from "../Debug";

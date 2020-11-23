@@ -56,7 +56,12 @@ Define(demon_spikes 203720)
 Define(demons_bite 344859)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
   SpellInfo(demons_bite)
+  SpellRequire(demons_bite replaced_by set=demons_bite_debuff enabled=(specialization(havoc)))
+  SpellRequire(demons_bite replaced_by set=shear enabled=(specialization(vengeance)))
 
+Define(demons_bite_debuff 162243)
+# Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
+  SpellInfo(demons_bite_debuff fury=-25)
 Define(disrupt 183752)
 # Interrupts the enemy's spellcasting and locks them from that school of magic for 3 seconds.|cFFFFFFFF?s183782[rnrnGenerates 218903s1 Fury on a successful interrupt.][]|r
   SpellInfo(disrupt cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -97,10 +102,10 @@ Define(fel_eruption 211881)
   SpellRequire(fel_eruption unusable set=1 enabled=(not hastalent(fel_eruption_talent)))
   # Stunned.
   SpellAddTargetDebuff(fel_eruption fel_eruption add=1)
-Define(fel_rush 320416)
-# Fel Rush gains an additional charge.
-  SpellInfo(fel_rush gcd=0 offgcd=1)
-  SpellAddBuff(fel_rush fel_rush add=1)
+Define(fel_rush_havoc 343017)
+# Fel Rush damage increased by s1.
+  SpellInfo(fel_rush_havoc gcd=0 offgcd=1)
+  SpellAddBuff(fel_rush_havoc fel_rush_havoc add=1)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]
   SpellInfo(felblade cd=15)
@@ -215,7 +220,6 @@ Define(ripple_in_space 299306)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2 Fury.|r
   SpellInfo(shear fury=-10)
-  SpellInfo(demons_bite replaced_by=shear)
 Define(sigil_of_chains 202138)
 # Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
   SpellInfo(sigil_of_chains cd=90 duration=2)
@@ -321,8 +325,8 @@ Define(arcane_torrent 202719)
 Define(frailty_debuff 247456)
     SpellInfo(frailty_debuff duration=20)
 #spirit_bomb
-    SpellRequire(spirit_bomb unusable 1=soulfragments_max,0)
-	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
+    SpellRequire(spirit_bomb unusable set=1 enabled=(soulfragments() == 0))
+	SpellAddTargetDebuff(spirit_bomb frailty_debuff add=1)
     ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", nil, name, desc, code, "include")
 end

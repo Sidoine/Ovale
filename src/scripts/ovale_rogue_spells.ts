@@ -14,6 +14,7 @@ Define(ambush 8676)
 # Ambush the target, causing s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(ambush energy=50 gcd=1 combopoints=-2)
   SpellRequire(ambush unusable set=1 enabled=(not stealthed()))
+  SpellRequire(ambush replaced_by set=shadowstrike enabled=(specialization(subtlety)))
 Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -121,7 +122,6 @@ Define(deathly_shadows_buff 341202)
 Define(dispatch 2098)
 # Finishing move that dispatches the enemy, dealing damage per combo point:rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
   SpellInfo(dispatch energy=35 combopoints=1 gcd=1)
-  SpellInfo(eviscerate replaced_by=dispatch)
 Define(dreadblades 343142)
 # Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
   SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1)
@@ -134,12 +134,13 @@ Define(echoing_reprimand 323547)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
   SpellInfo(envenom energy=35 combopoints=1 duration=1 gcd=1)
-  SpellInfo(eviscerate replaced_by=envenom)
   # Poison application chance increased by s2.?s340081[rnPoison critical strikes generate 340426s1 Energy.][]
   SpellAddBuff(envenom envenom add=1)
 Define(eviscerate 196819)
 # Finishing move that disembowels the target, causing damage per combo point.?s231716[ Targets with Find Weakness suffer an additional 231716s1 damage as Shadow.][]rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
   SpellInfo(eviscerate energy=35 combopoints=1 gcd=1)
+  SpellRequire(eviscerate replaced_by set=envenom enabled=(specialization(assassination)))
+  SpellRequire(eviscerate replaced_by set=dispatch enabled=(specialization(outlaw)))
 Define(exsanguinate 200806)
 # Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
   SpellInfo(exsanguinate energy=25 cd=45 gcd=1)
@@ -366,7 +367,6 @@ Define(shadowstrike 185438)
 # Strike the target, dealing s1 Physical damage.rnrnWhile Stealthed, you strike through the shadows and appear behind your target up to 5+245623s1 yds away, dealing 245623s2 additional damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(shadowstrike energy=40 gcd=1 combopoints=-2)
   SpellRequire(shadowstrike unusable set=1 enabled=(not stealthed()))
-  SpellInfo(ambush replaced_by=shadowstrike)
 Define(shiv 5938)
 # Attack with your ?s319032[your poisoned blades][off-hand], dealing sw1 Physical damage, and applying a concentrated form of your ?a3408[Crippling Poison, reducing movement speed by 115196s1 for 5 seconds.]?a5761[Numbing Poison, dispelling all enrage effects.][]?(!a3408&!a5761)[active Non-Lethal poison.][]rn?s319032[rnYour Nature damage done against the target is increased by 319504s1 for 9 seconds.rn][]rn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(shiv energy=20 cd=25 gcd=1 combopoints=-1)

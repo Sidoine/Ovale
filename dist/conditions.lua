@@ -20,7 +20,6 @@ local GetNumTrackingTypes = GetNumTrackingTypes
 local GetTime = GetTime
 local GetTrackingInfo = GetTrackingInfo
 local GetUnitSpeed = GetUnitSpeed
-local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local HasFullControl = HasFullControl
 local IsStealthed = IsStealthed
 local UnitCastingInfo = UnitCastingInfo
@@ -1779,24 +1778,6 @@ __exports.OvaleConditions = __class(nil, {
             end
             return Compare(value, comparator, limit)
         end
-        self.WeaponEnchantExpires = function(positionalParams, namedParams, atTime)
-            local hand, seconds = positionalParams[1], positionalParams[2]
-            seconds = seconds or 0
-            local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration = GetWeaponEnchantInfo()
-            local now = GetTime()
-            if hand == "mainhand" or hand == "main" then
-                if hasMainHandEnchant then
-                    mainHandExpiration = mainHandExpiration / 1000
-                    return now + mainHandExpiration - seconds, INFINITY
-                end
-            elseif hand == "offhand" or hand == "off" then
-                if hasOffHandEnchant then
-                    offHandExpiration = offHandExpiration / 1000
-                    return now + offHandExpiration - seconds, INFINITY
-                end
-            end
-            return 0, INFINITY
-        end
         self.SigilCharging = function(positionalParams, namedParams, atTime)
             local charging = false
             for _, v in ipairs(positionalParams) do
@@ -2135,7 +2116,6 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("maxtraveltime", true, self.TravelTime)
         ovaleCondition:RegisterCondition("true", false, self.True)
         ovaleCondition:RegisterCondition("weapondps", false, self.WeaponDPS)
-        ovaleCondition:RegisterCondition("weaponenchantexpires", false, self.WeaponEnchantExpires)
         ovaleCondition:RegisterCondition("sigilcharging", false, self.SigilCharging)
         ovaleCondition:RegisterCondition("isbossfight", false, self.IsBossFight)
         ovaleCondition:RegisterCondition("race", false, self.Race)

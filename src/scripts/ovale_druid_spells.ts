@@ -27,11 +27,16 @@ Define(bear_form 5487)
   SpellAddBuff(bear_form bear_form add=1)
   # Armor increased by w4.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
   SpellAddTargetDebuff(bear_form bear_form add=1)
-Define(berserk 50334)
+Define(berserk_bear 50334)
 # Go berserk for 15 seconds, reducing the cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration by s1 and the cost of Ironfur by s3.
-  SpellInfo(berserk cd=180 duration=15 gcd=0 offgcd=1)
+  SpellInfo(berserk_bear cd=180 duration=15 gcd=0 offgcd=1)
   # Cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration are reduced by w1. Ironfur cost reduced by w3.
-  SpellAddBuff(berserk berserk add=1)
+  SpellAddBuff(berserk_bear berserk_bear add=1)
+Define(berserk_cat 106951)
+# Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
+  SpellInfo(berserk_cat cd=180 duration=20 gcd=0 offgcd=1)
+  # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
+  SpellAddBuff(berserk_cat berserk_cat add=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -220,6 +225,11 @@ Define(mighty_bash 5211)
 Define(moonfire 8921)
 # A quick beam of lunar light burns the enemy for (20 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 12 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(moonfire rage=0 lunarpower=0)
+Define(moonfire_cat 155625)
+# A quick beam of lunar light burns the enemy for s2 Arcane damage and then an additional o1 Arcane damage over 16 seconds.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
+  SpellInfo(moonfire_cat energy=30 duration=16 gcd=1 combopoints=-1 tick=2)
+  # Suffering w1 Arcane damage every t1 sec.
+  SpellAddTargetDebuff(moonfire_cat moonfire_cat add=1)
 Define(moonfire_debuff 164812)
 # A quick beam of lunar light burns the enemy for (20 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 12 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(moonfire_debuff duration=12 gcd=0 offgcd=1 tick=2)
@@ -384,6 +394,9 @@ Define(sunfire 93402)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
   SpellInfo(swipe gcd=1)
+Define(swipe_cat 106785)
+# Swipe up to s4 nearby enemies, inflicting s3 Physical damage.?a231283[ Deals s2 increased damage against bleeding targets.][]rnrn|cFFFFFFFFAwards s1 combo lpoint:points;.|r
+  SpellInfo(swipe_cat energy=35 gcd=1 combopoints=-1)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
@@ -392,6 +405,11 @@ Define(thorns 305496)
   SpellInfo(thorns cd=0.5 gcd=0 offgcd=1)
   # Deals Nature damage to attackers when hit by melee attacks and reduces their movement speed.
   SpellAddBuff(thorns thorns add=1)
+Define(thrash_cat 106830)
+# Strikes all nearby enemies, dealing m1 Bleed damage and an additional o2 Bleed damage over 15 seconds.rnrn|cFFFFFFFFAwards 211141s1 combo lpoint:points;.|r
+  SpellInfo(thrash_cat energy=40 duration=15 gcd=1 tick=3)
+  # Bleeding for w2 damage every t2 sec.
+  SpellAddTargetDebuff(thrash_cat thrash_cat add=1)
 Define(tigers_fury 5217)
 # Instantly restores s2 Energy, and increases the damage of all your attacks by s1 for their full duration. Lasts 10 seconds.
   SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
@@ -422,11 +440,17 @@ Define(warrior_of_elune 202425)
   SpellRequire(warrior_of_elune unusable set=1 enabled=(not hastalent(warrior_of_elune_talent)))
   # Starfire is instant cast and generates s2 increased Astral Power.
   SpellAddBuff(warrior_of_elune warrior_of_elune add=1)
-Define(wild_charge 16979)
+Define(wild_charge_bear 16979)
 # Charge to an enemy, immobilizing them for 4 seconds.
-  SpellInfo(wild_charge cd=15 gcd=0 offgcd=1)
+  SpellInfo(wild_charge_bear cd=15 gcd=0 offgcd=1)
   # Immobilized.
-  SpellAddBuff(wild_charge wild_charge add=1)
+  SpellAddBuff(wild_charge_bear wild_charge_bear add=1)
+
+Define(wild_charge_cat 49376)
+# Leap behind an enemy, dazing them for 3 seconds.
+  SpellInfo(wild_charge_cat cd=15 gcd=0 offgcd=1)
+  # Dazed.
+  SpellAddBuff(wild_charge_cat wild_charge_cat add=1)
 
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
@@ -434,6 +458,10 @@ Define(worldvein_resonance 298606)
 Define(wrath 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath lunarpower=0)
+SpellList(eclipse_any eclipse_lunar eclipse_solar)
+SpellList(starsurge_empowerment_buff lunar_empowerment solar_empowerment)
+SpellList(bs_inc_buff incarnation_king_of_the_jungle incarnation_guardian_of_ursoc berserk_bear berserk_cat)
+SpellList(bt_buffs bt_swipe_buff bt_thrash_buff bt_shred_buff bt_brutal_slash_buff bt_moonfire_buff bt_rake_buff)
 Define(balance_affinity_talent 7) #22163
 # You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628rn@spellicon197630 @spellname197630rn@spellicon132469@spellname132469
 Define(bloodtalons_talent 20) #21649
@@ -486,6 +514,12 @@ Define(twin_moons_talent 17) #21712
 # Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
 Define(warrior_of_elune_talent 2) #22386
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
+Define(bt_brutal_slash_buff -202028)
+Define(bt_moonfire_buff -155625)
+Define(bt_rake_buff -1822)
+Define(bt_shred_buff -5221)
+Define(bt_swipe_buff -106785)
+Define(bt_thrash_buff -106830)
 Define(superior_battle_potion_of_intellect_item 168498)
 Define(superior_battle_potion_of_agility_item 168489)
 Define(dawning_sun_trait 276152)
@@ -501,25 +535,41 @@ Define(precise_alignment_conduit 262)
     `;
 // END
     code += `
-    SpellInfo(berserk_0 replaced_by=incarnation_guardian_of_ursoc talent=incarnation_guardian_of_ursoc_talent specialization=guardian)
+    SpellRequire(berserk_0 replaced_by set=incarnation_guardian_of_ursoc enabled=(talent(incarnation_guardian_of_ursoc_talent)))
 Define(frenzied_regeneration 22842)
     SpellInfo(frenzied_regeneration duration=3)
-    SpellInfo(frenzied_regeneration max_charges=2 charge_cd=30 specialization=guardian)
-    SpellInfo(frenzied_regeneration cd=30 specialization=!guardian)
-    SpellAddBuff(frenzied_regeneration frenzied_regeneration=1)
-    SpellRequire(frenzied_regeneration unusable 1=stance,!druid_bear_form)
+    # TODO max_charges not implemented SpellRequire(frenzied_regeneration max_charges set=2 enabled=(specialization(guardian)))
+    SpellRequire(frenzied_regeneration charge_cd set=30 enabled=(specialization(guardian)))
+    SpellRequire(frenzied_regeneration cd set=30 enabled=(not specialization(guardian)))
+    SpellAddBuff(frenzied_regeneration frenzied_regeneration add=1)
+    SpellRequire(frenzied_regeneration unusable set=1 enabled=(not stance(druid_bear_form)))
     
-    SpellRequire(incapacitating_roar unusable 1=stance,!druid_bear_form)
+    SpellRequire(incapacitating_roar unusable set=1 enabled=(not stance(druid_bear_form)))
 Define(thrash_bear 77758)
-    SpellAddBuff(thrash_bear earthwarden_buff=1 talent=earthwarden_talent)
-    SpellAddTargetDebuff(thrash_bear thrash_bear_debuff=1)
+    SpellAddBuff(thrash_bear earthwarden_buff add=1 enabled=(talent(earthwarden_talent)))
+    SpellAddTargetDebuff(thrash_bear thrash_bear_debuff add=1)
 Define(thrash_bear_debuff 192090)
     SpellInfo(thrash_bear_debuff duration=15 max_stacks=3)
-    SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
-    SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
+    SpellRequire(pulverize unusable set=1 enabled=(not targetdebuffpresent(thrash_bear_debuff)))
+    SpellAddTargetDebuff(pulverize thrash_bear_debuff add=-2)
   
 SpellInfo(starfire inccounter=solar resetcounter=lunar)
 SpellInfo(wrath inccounter=lunar resetcounter=solar)
+  SpellAddBuff(starfire eclipse_solar set=1 enabled=(counter(solar) == 1))
+  SpellAddBuff(wrath eclipse_lunar set=1 enabled=(counter(lunar) == 1))
+
+SpellAddBuff(swipe_cat bt_swipe_buff add=1)
+  SpellInfo(bt_swipe_buff duration=6)
+SpellAddBuff(thrash_cat bt_thrash_buff add=1)
+  SpellInfo(bt_thrash_buff duration=6)
+SpellAddBuff(shred bt_shred_buff add=1)
+  SpellInfo(bt_shred_buff duration=6)
+SpellAddBuff(brutal_slash bt_brutal_slash_buff add=1)
+  SpellInfo(bt_brutal_slash_buff duration=6)
+SpellAddBuff(moonfire_cat bt_moonfire_buff add=1)
+  SpellInfo(bt_moonfire_buff duration=6)
+SpellAddBuff(rake bt_rake_buff add=1)
+  SpellInfo(bt_rake_buff duration=6)
     `;
     OvaleScripts.RegisterScript(
         "DRUID",

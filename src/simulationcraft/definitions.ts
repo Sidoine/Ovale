@@ -6,6 +6,7 @@ import {
     AstAnnotation,
     AstAddFunctionNode,
     AstScriptNode,
+    AstFunctionNode,
 } from "../AST";
 import { TypeCheck } from "../tools";
 import { OvaleDataClass } from "../Data";
@@ -540,13 +541,17 @@ export const enum MiscOperandModifierType {
     Parameter,
     Remove,
     Replace,
+    Code,
 }
 
 interface MiscOperandModifier {
     name?: string;
     type: MiscOperandModifierType;
     extraParameter?: number | string;
+    extraSymbol?: string;
     createOptions?: boolean;
+    code?: string;
+    symbolsInCode?: LuaArray<string>;
 }
 
 const powerModifiers: LuaObj<MiscOperandModifier> = {
@@ -570,6 +575,10 @@ export interface MiscOperand {
     modifiers?: LuaObj<MiscOperandModifier>;
     symbol?: string;
     extraParameter?: number | string;
+    extraNamedParameter?: {
+        name: keyof AstFunctionNode["rawNamedParams"];
+        value: number | string;
+    };
     extraSymbol?: string;
     code?: string;
     symbolsInCode?: LuaArray<string>;
@@ -577,6 +586,7 @@ export interface MiscOperand {
 
 export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
+    ["active_bt_triggers"]: { name: "buffcount", extraSymbol: "bt_buffs" },
     ["animacharged_cp"]: { name: "maxcombopoints" },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["ca_active"]: {
@@ -609,6 +619,19 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         symbol: "",
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },
+    ["death_knight"]: {
+        symbol: "enchant",
+        modifiers: {
+            runeforge: {
+                type: MiscOperandModifierType.Replace,
+                name: "weaponenchantpresent",
+            },
+        },
+    },
+    ["desired_targets"]: {
+        name: "enemies",
+        extraNamedParameter: { name: "tagged", value: 1 },
+    },
     ["druid"]: {
         name: "checkboxon",
         modifiers: {
@@ -619,6 +642,48 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             owlweave_bear: {
                 type: MiscOperandModifierType.Parameter,
                 createOptions: true,
+            },
+            ticks_gained_on_refresh: {
+                type: MiscOperandModifierType.Replace,
+                name: "ticksgainedonrefresh",
+            },
+        },
+        symbol: "",
+    },
+    ["eclipse"]: {
+        modifiers: {
+            in_lunar: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffpresent",
+                extraSymbol: "eclipse_lunar",
+            },
+            in_solar: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffpresent",
+                extraSymbol: "eclipse_solar",
+            },
+            solar_next: {
+                type: MiscOperandModifierType.Replace,
+                code: "counter(solar) = 1",
+            },
+            lunar_next: {
+                type: MiscOperandModifierType.Replace,
+                code: "counter(lunar) = 1",
+            },
+            any_next: {
+                type: MiscOperandModifierType.Code,
+                code: "counter(lunar) + counter(solar) = 1",
+            },
+            in_any: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffpresent",
+                extraSymbol: "eclipse_any",
+            },
+            in_both: {
+                type: MiscOperandModifierType.Code,
+                code:
+                    "buffpresent(eclipse_solar) and buffpresent(eclipse_lunar)",
+                symbolsInCode: { 1: "eclipse_solar", 2: "eclipse_lunar" },
             },
         },
     },
@@ -649,6 +714,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         name: "inflighttotarget",
         extraSymbol: "hot_streak",
     },
+    ["interpolated_fight_remains"]: { name: "fightremains" },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
     ["level"]: { name: "level" },
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
@@ -721,6 +787,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     },
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },
+    ["wound_spender"]: {
+        name: "spell",
+        extraSymbol: "scourge_strike",
+    },
 };
 export let RUNE_OPERAND: LuaObj<string> = {
     ["rune"]: "rune",

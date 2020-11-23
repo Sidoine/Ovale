@@ -41,6 +41,7 @@ import {
     ConditionResult,
     OvaleConditionClass,
     ParseCondition,
+    ReturnConstant,
     ReturnValue,
 } from "../Condition";
 import { OvaleOptionsClass } from "../Options";
@@ -360,6 +361,11 @@ export class OvaleAuraClass extends States<AuraInterface> {
             "bufflastexpire",
             true,
             this.buffLastExpire
+        );
+        condition.RegisterCondition(
+            "ticksgainedonrefresh",
+            true,
+            this.ticksGainedOnRefresh
         );
     }
 
@@ -739,6 +745,11 @@ export class OvaleAuraClass extends States<AuraInterface> {
         return ReturnValue(0, aura.ending, 1);
     };
 
+    private ticksGainedOnRefresh: ConditionFunction = () => {
+        // TODO see sc_druid.cpp
+        return ReturnConstant(0);
+    };
+
     IsActiveAura(aura: Aura, atTime: number): aura is Aura {
         let boolean = false;
         atTime = atTime || this.baseState.next.currentTime;
@@ -893,6 +904,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                         if (auraTable && auraTable[filter]) {
                             let spellData = auraTable[filter][auraId];
                             if (
+                                spellData &&
                                 spellData.cachedParams.named
                                     .refresh_keep_snapshot &&
                                 (spellData.cachedParams.named.enabled ===

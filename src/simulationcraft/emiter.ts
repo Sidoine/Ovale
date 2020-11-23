@@ -230,7 +230,6 @@ export class Emiter {
             "inevitable_demise_debuff",
             "WARLOCK"
         );
-        this.AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian");
         this.AddDisambiguation(
             "dark_soul",
             "dark_soul_misery",
@@ -289,6 +288,7 @@ export class Emiter {
             "unbridled_fury_buff",
             "potion_of_unbridled_fury_buff"
         );
+        this.AddDisambiguation("swipe_bear", "swipe", "DRUID");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -342,7 +342,6 @@ export class Emiter {
         let info = MISC_OPERAND[miscOperand];
         if (info) {
             let modifier = tokenIterator();
-            let name = info.name || miscOperand;
             if (info.code) {
                 if (info.symbolsInCode) {
                     for (const [_, symbol] of ipairs(info.symbolsInCode)) {
@@ -358,11 +357,17 @@ export class Emiter {
                     return undefined;
                 }
             }
-            let parameters: LuaArray<AstNode> = {};
+
+            const result = this.ovaleAst.newNodeWithParameters(
+                "function",
+                annotation.astAnnotation
+            );
+            result.name = info.name || miscOperand;
+
             if (info.extraParameter) {
                 if (isNumber(info.extraParameter)) {
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newValue(
                             annotation.astAnnotation,
                             info.extraParameter
@@ -370,7 +375,7 @@ export class Emiter {
                     );
                 } else {
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newString(
                             annotation.astAnnotation,
                             info.extraParameter
@@ -378,9 +383,27 @@ export class Emiter {
                     );
                 }
             }
+            if (info.extraNamedParameter) {
+                if (isNumber(info.extraNamedParameter.value)) {
+                    result.rawNamedParams[
+                        info.extraNamedParameter.name
+                    ] = this.ovaleAst.newValue(
+                        annotation.astAnnotation,
+                        info.extraNamedParameter.value
+                    );
+                } else {
+                    result.rawNamedParams[
+                        info.extraNamedParameter.name
+                    ] = this.ovaleAst.newString(
+                        annotation.astAnnotation,
+                        info.extraNamedParameter.value
+                    );
+                }
+            }
+
             if (info.extraSymbol) {
                 insert(
-                    parameters,
+                    result.rawPositionalParams,
                     this.ovaleAst.newVariable(
                         annotation.astAnnotation,
                         info.extraSymbol
@@ -393,28 +416,46 @@ export class Emiter {
                     this.tracer.Warning(
                         `Use of ${modifier} for ${operand} but no modifier has been registered`
                     );
+                    this.ovaleAst.Release(result);
                     return undefined;
                 }
                 const modifierParameters =
                     info.modifiers && info.modifiers[modifier];
                 if (modifierParameters) {
                     const modifierName = modifierParameters.name || modifier;
-                    if (
+                    if (modifierParameters.code) {
+                        if (modifierParameters.symbolsInCode) {
+                            for (const [_, symbol] of ipairs(
+                                modifierParameters.symbolsInCode
+                            )) {
+                                annotation.AddSymbol(symbol);
+                            }
+                            this.ovaleAst.Release(result);
+                            const [newCode] = this.ovaleAst.ParseCode(
+                                "expression",
+                                modifierParameters.code,
+                                nodeList,
+                                annotation.astAnnotation
+                            );
+                            if (newCode) return newCode;
+                            return undefined;
+                        }
+                    } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Prefix
                     ) {
-                        name = modifierName + name;
+                        result.name = modifierName + result.name;
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Suffix
                     ) {
-                        name += modifierName;
+                        result.name += modifierName;
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Parameter
                     ) {
                         insert(
-                            parameters,
+                            result.rawPositionalParams,
                             this.ovaleAst.newString(
                                 annotation.astAnnotation,
                                 modifierName
@@ -424,7 +465,7 @@ export class Emiter {
                         modifierParameters.type ===
                         MiscOperandModifierType.Replace
                     ) {
-                        name = modifierName;
+                        result.name = modifierName;
                     }
                     if (modifierParameters.createOptions) {
                         if (!annotation.options) annotation.options = {};
@@ -433,7 +474,7 @@ export class Emiter {
                     if (modifierParameters.extraParameter) {
                         if (isNumber(modifierParameters.extraParameter)) {
                             insert(
-                                parameters,
+                                result.rawPositionalParams,
                                 this.ovaleAst.newValue(
                                     annotation.astAnnotation,
                                     modifierParameters.extraParameter
@@ -441,13 +482,23 @@ export class Emiter {
                             );
                         } else {
                             insert(
-                                parameters,
+                                result.rawPositionalParams,
                                 this.ovaleAst.newString(
                                     annotation.astAnnotation,
                                     modifierParameters.extraParameter
                                 )
                             );
                         }
+                    }
+                    if (modifierParameters.extraSymbol) {
+                        insert(
+                            result.rawPositionalParams,
+                            this.ovaleAst.newVariable(
+                                annotation.astAnnotation,
+                                modifierParameters.extraSymbol
+                            )
+                        );
+                        annotation.AddSymbol(modifierParameters.extraSymbol);
                     }
                 } else if (info.symbol !== undefined) {
                     if (info.symbol !== "") {
@@ -461,7 +512,7 @@ export class Emiter {
                     );
                     this.AddSymbol(annotation, modifier);
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newVariable(
                             annotation.astAnnotation,
                             modifier
@@ -469,22 +520,15 @@ export class Emiter {
                     );
                 } else {
                     this.tracer.Warning(
-                        `Modifier parameters not found for ${modifier} in ${name}`
+                        `Modifier parameters not found for ${modifier} in ${result.name}`
                     );
+                    this.ovaleAst.Release(result);
                     return undefined;
                 }
 
                 modifier = tokenIterator();
             }
-            const result = this.ovaleAst.newFunction(
-                name,
-                annotation.astAnnotation
-            );
-            if (lualength(parameters) > 0) {
-                for (const [k, v] of ipairs(parameters)) {
-                    result.rawPositionalParams[k] = v;
-                }
-            }
+
             return result;
         }
 
@@ -983,7 +1027,7 @@ export class Emiter {
             );
             return;
         }
-        if (op === "min") {
+        if (op === "min" || op === "max") {
             // TODO
             this.EmitVariableAdd(
                 name,
@@ -994,7 +1038,7 @@ export class Emiter {
                 action
             );
         } else {
-            this.tracer.Error(`Unknown cycling_variable operator {op}`);
+            this.tracer.Error(`Unknown cycling_variable operator ${op}`);
         }
     }
 

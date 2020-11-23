@@ -2314,7 +2314,6 @@ __exports.Emiter = __class(nil, {
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
         self:AddDisambiguation("inevitable_demise_az_buff", "inevitable_demise_debuff", "WARLOCK")
-        self:AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
         self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
         self:AddDisambiguation("ashvanes_razor_coral", "razor_coral")
@@ -2329,6 +2328,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("hyperthread_wristwraps_300142", "hyperthread_wristwraps", "MAGE", "fire")
         self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
         self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury_buff")
+        self:AddDisambiguation("swipe_bear", "swipe", "DRUID")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2354,7 +2354,6 @@ __exports.Emiter = __class(nil, {
         local info = MISC_OPERAND[miscOperand]
         if info then
             local modifier = tokenIterator()
-            local name = info.name or miscOperand
             if info.code then
                 if info.symbolsInCode then
                     for _, symbol in ipairs(info.symbolsInCode) do
@@ -2367,34 +2366,55 @@ __exports.Emiter = __class(nil, {
                     return nil
                 end
             end
-            local parameters = {}
+            local result = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
+            result.name = info.name or miscOperand
             if info.extraParameter then
                 if isNumber(info.extraParameter) then
-                    insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, info.extraParameter))
+                    insert(result.rawPositionalParams, self.ovaleAst:newValue(annotation.astAnnotation, info.extraParameter))
                 else
-                    insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, info.extraParameter))
+                    insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, info.extraParameter))
+                end
+            end
+            if info.extraNamedParameter then
+                if isNumber(info.extraNamedParameter.value) then
+                    result.rawNamedParams[info.extraNamedParameter.name] = self.ovaleAst:newValue(annotation.astAnnotation, info.extraNamedParameter.value)
+                else
+                    result.rawNamedParams[info.extraNamedParameter.name] = self.ovaleAst:newString(annotation.astAnnotation, info.extraNamedParameter.value)
                 end
             end
             if info.extraSymbol then
-                insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, info.extraSymbol))
+                insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, info.extraSymbol))
                 annotation:AddSymbol(info.extraSymbol)
             end
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
+                    self.ovaleAst:Release(result)
                     return nil
                 end
                 local modifierParameters = info.modifiers and info.modifiers[modifier]
                 if modifierParameters then
                     local modifierName = modifierParameters.name or modifier
-                    if modifierParameters.type == 1 then
-                        name = modifierName .. name
+                    if modifierParameters.code then
+                        if modifierParameters.symbolsInCode then
+                            for _, symbol in ipairs(modifierParameters.symbolsInCode) do
+                                annotation:AddSymbol(symbol)
+                            end
+                            self.ovaleAst:Release(result)
+                            local newCode = self.ovaleAst:ParseCode("expression", modifierParameters.code, nodeList, annotation.astAnnotation)
+                            if newCode then
+                                return newCode
+                            end
+                            return nil
+                        end
+                    elseif modifierParameters.type == 1 then
+                        result.name = modifierName .. result.name
                     elseif modifierParameters.type == 0 then
-                        name = name .. modifierName
+                        result.name = result.name .. modifierName
                     elseif modifierParameters.type == 2 then
-                        insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
+                        insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
                     elseif modifierParameters.type == 4 then
-                        name = modifierName
+                        result.name = modifierName
                     end
                     if modifierParameters.createOptions then
                         if  not annotation.options then
@@ -2404,10 +2424,14 @@ __exports.Emiter = __class(nil, {
                     end
                     if modifierParameters.extraParameter then
                         if isNumber(modifierParameters.extraParameter) then
-                            insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, modifierParameters.extraParameter))
+                            insert(result.rawPositionalParams, self.ovaleAst:newValue(annotation.astAnnotation, modifierParameters.extraParameter))
                         else
-                            insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierParameters.extraParameter))
+                            insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, modifierParameters.extraParameter))
                         end
+                    end
+                    if modifierParameters.extraSymbol then
+                        insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifierParameters.extraSymbol))
+                        annotation:AddSymbol(modifierParameters.extraSymbol)
                     end
                 elseif info.symbol ~= nil then
                     if info.symbol ~= "" then
@@ -2415,18 +2439,13 @@ __exports.Emiter = __class(nil, {
                     end
                     modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
                     self:AddSymbol(annotation, modifier)
-                    insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, modifier))
+                    insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifier))
                 else
-                    self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. name)
+                    self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. result.name)
+                    self.ovaleAst:Release(result)
                     return nil
                 end
                 modifier = tokenIterator()
-            end
-            local result = self.ovaleAst:newFunction(name, annotation.astAnnotation)
-            if #parameters > 0 then
-                for k, v in ipairs(parameters) do
-                    result.rawPositionalParams[k] = v
-                end
             end
             return result
         end
@@ -2443,10 +2462,10 @@ __exports.Emiter = __class(nil, {
             self.tracer:Error("Unable to parse name of variable in %s", modifiers.name)
             return 
         end
-        if op == "min" then
+        if op == "min" or op == "max" then
             self.EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode, action)
         else
-            self.tracer:Error([[Unknown cycling_variable operator {op}]])
+            self.tracer:Error("Unknown cycling_variable operator " .. op)
         end
     end,
     isDaemon = function(self, name)

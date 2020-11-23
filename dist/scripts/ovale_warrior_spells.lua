@@ -203,6 +203,9 @@ Define(rend 772)
   SpellRequire(rend unusable set=1 enabled=(not hastalent(rend_talent)))
   # Bleeding for w2 damage every t2 sec. Taking w3 increased critical damage from @auracaster.
   SpellAddTargetDebuff(rend rend add=1)
+Define(revenge 6572)
+# Swing in a wide arc, dealing s1 Physical damage to all enemies in front of you. Deals reduced damage beyond <cap> targets.rnrnYour successful dodges and parries have a chance to make your next Revenge cost no Rage.
+  SpellInfo(revenge rage=20)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
@@ -227,6 +230,7 @@ Define(skullsplitter 260643)
 Define(slam 1464)
 # Slams an opponent, causing s1 Physical damage.
   SpellInfo(slam rage=20)
+  SpellRequire(slam replaced_by set=revenge enabled=(specialization(protection)))
 Define(storm_bolt 107570)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
   SpellInfo(storm_bolt cd=30)

@@ -28,7 +28,6 @@ import {
     GetTime,
     GetTrackingInfo,
     GetUnitSpeed,
-    GetWeaponEnchantInfo,
     HasFullControl,
     IsStealthed,
     UnitCastingInfo,
@@ -6274,46 +6273,6 @@ l    */
         return Compare(value, comparator, limit);
     };
 
-    /** Test if the weapon imbue on the given weapon has expired or will expire after a given number of seconds.
-	 @name WeaponEnchantExpires
-	 @paramsig boolean
-	 @param hand Sets which hand weapon.
-	     Valid values: main, off.
-	 @param seconds Optional. The maximum number of seconds before the weapon imbue should expire.
-	     Defaults to 0 (zero).
-	 @return A boolean value.
-	 @usage
-	 if WeaponEnchantExpires(main) Spell(windfury_weapon)
-     */
-    private WeaponEnchantExpires = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ): ConditionResult => {
-        let [hand, seconds] = [positionalParams[1], positionalParams[2]];
-        seconds = seconds || 0;
-        let [
-            hasMainHandEnchant,
-            mainHandExpiration,
-            ,
-            hasOffHandEnchant,
-            offHandExpiration,
-        ] = GetWeaponEnchantInfo();
-        let now = GetTime();
-        if (hand == "mainhand" || hand == "main") {
-            if (hasMainHandEnchant) {
-                mainHandExpiration = mainHandExpiration / 1000;
-                return [now + mainHandExpiration - seconds, INFINITY];
-            }
-        } else if (hand == "offhand" || hand == "off") {
-            if (hasOffHandEnchant) {
-                offHandExpiration = offHandExpiration / 1000;
-                return [now + offHandExpiration - seconds, INFINITY];
-            }
-        }
-        return [0, INFINITY];
-    };
-
     /** Test if a sigil is charging
 	 @name SigilCharging
 	 @paramsig boolean
@@ -7404,11 +7363,6 @@ l    */
         );
         ovaleCondition.RegisterCondition("true", false, this.True);
         ovaleCondition.RegisterCondition("weapondps", false, this.WeaponDPS);
-        ovaleCondition.RegisterCondition(
-            "weaponenchantexpires",
-            false,
-            this.WeaponEnchantExpires
-        );
         ovaleCondition.RegisterCondition(
             "sigilcharging",
             false,

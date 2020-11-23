@@ -27,10 +27,11 @@ export interface CustomSpellDataIf {
 }
 
 export interface CustomSpellRequire {
-    condition: "hastalent" | "stealthed";
+    condition: "hastalent" | "stealthed" | "specialization";
     property: keyof SpellInfo;
     value: string | number;
     talentId?: number;
+    specializationName?: string[];
     not?: boolean;
 }
 
@@ -43,7 +44,6 @@ export interface CustomSpellData {
     auras?: CustomAuras;
     customSpellInfo?: SpellInfo;
     nextRank?: number;
-    replace?: number;
     require: CustomSpellRequire[];
 }
 
@@ -249,6 +249,32 @@ export function convertFromSpellData(
         });
     }
 
+    if (spell.replaced_by) {
+        for (const replacedById of spell.replaced_by) {
+            const replacedBy = spellDataById.get(replacedById);
+            if (!replacedBy) throw Error(`Spell ${replacedById} not found`);
+            if (replacedBy.talent) {
+                require.push({
+                    condition: "hastalent",
+                    talentId: replacedBy.talent.id,
+                    property: "replaced_by",
+                    value: replacedBy.identifier,
+                });
+            } else if (replacedBy.specializationName.length > 0) {
+                require.push({
+                    condition: "specialization",
+                    specializationName: replacedBy.specializationName,
+                    property: "replaced_by",
+                    value: replacedBy.identifier,
+                });
+            } else {
+                throw Error(
+                    `Unknown replace condition in ${replacedBy.name} [${replacedBy.id}]`
+                );
+            }
+        }
+    }
+
     const customSpellData: CustomSpellData = {
         id: spell.id,
         identifier: spell.identifier,
@@ -257,7 +283,6 @@ export function convertFromSpellData(
         auras: auras,
         tooltip: spell.tooltip ? spell.tooltip : undefined,
         nextRank: spell.nextRank ? spell.nextRank.id : undefined,
-        replace: spell.replace_spell_id,
         require,
     };
     return customSpellData;

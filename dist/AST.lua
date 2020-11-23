@@ -305,7 +305,9 @@ local checkFunctionParameters = {
     extra_amount = true,
     help = true,
     count = true,
-    any = true
+    any = true,
+    max = true,
+    tagged = true
 }
 local TokenizeComment = function(token)
     return "comment", token

@@ -255,6 +255,10 @@ __exports.MISC_OPERAND = {
     ["active_enemies"] = {
         name = "enemies"
     },
+    ["active_bt_triggers"] = {
+        name = "buffcount",
+        extraSymbol = "bt_buffs"
+    },
     ["animacharged_cp"] = {
         name = "maxcombopoints"
     },
@@ -309,6 +313,22 @@ __exports.MISC_OPERAND = {
     ["cp_max_spend"] = {
         name = "maxcombopoints"
     },
+    ["death_knight"] = {
+        symbol = "enchant",
+        modifiers = {
+            runeforge = {
+                type = 4,
+                name = "weaponenchantpresent"
+            }
+        }
+    },
+    ["desired_targets"] = {
+        name = "enemies",
+        extraNamedParameter = {
+            name = "tagged",
+            value = 1
+        }
+    },
     ["druid"] = {
         name = "checkboxon",
         modifiers = {
@@ -319,6 +339,50 @@ __exports.MISC_OPERAND = {
             owlweave_bear = {
                 type = 2,
                 createOptions = true
+            },
+            ticks_gained_on_refresh = {
+                type = 4,
+                name = "ticksgainedonrefresh"
+            }
+        },
+        symbol = ""
+    },
+    ["eclipse"] = {
+        modifiers = {
+            in_lunar = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_lunar"
+            },
+            in_solar = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_solar"
+            },
+            solar_next = {
+                type = 4,
+                code = "counter(solar) = 1"
+            },
+            lunar_next = {
+                type = 4,
+                code = "counter(lunar) = 1"
+            },
+            any_next = {
+                type = 5,
+                code = "counter(lunar) + counter(solar) = 1"
+            },
+            in_any = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_any"
+            },
+            in_both = {
+                type = 5,
+                code = "buffpresent(eclipse_solar) and buffpresent(eclipse_lunar)",
+                symbolsInCode = {
+                    [1] = "eclipse_solar",
+                    [2] = "eclipse_lunar"
+                }
             }
         }
     },
@@ -370,6 +434,9 @@ __exports.MISC_OPERAND = {
     ["hot_streak_spells_in_flight"] = {
         name = "inflighttotarget",
         extraSymbol = "hot_streak"
+    },
+    ["interpolated_fight_remains"] = {
+        name = "fightremains"
     },
     ["insanity"] = {
         name = "insanity",
@@ -481,6 +548,10 @@ __exports.MISC_OPERAND = {
     },
     ["time_to_shard"] = {
         name = "timetoshard"
+    },
+    ["wound_spender"] = {
+        name = "spell",
+        extraSymbol = "scourge_strike"
     }
 }
 __exports.RUNE_OPERAND = {

@@ -21,7 +21,7 @@ import { OvaleDemonHunterDemonicClass } from "./states/DemonHunterDemonic";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./states/DemonHunterSigils";
 import { OvaleEnemiesClass } from "./states/Enemies";
-import { OvaleEquipmentClass } from "./Equipment";
+import { OvaleEquipmentClass } from "./states/Equipment";
 import { OvaleFrameModuleClass } from "./Frame";
 import { OvaleFutureClass } from "./states/Future";
 import { OvaleGUIDClass } from "./GUID";

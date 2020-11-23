@@ -78,16 +78,18 @@ Define(blood_fury 20572)
 Define(blood_of_the_enemy 297969)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy)
-Define(brain_freeze_buff 190446)
-# Frostbolt has a m1 chance to empower your next Flurry to be instant cast?a231584[,][ and] deal 190446s2 increased damage?a231584[, and apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen][].
-  SpellInfo(brain_freeze_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Flurry is instant cast?a231584[,][ and] deals s2 increased damage?a231584[, and will apply Winter's Chill on the target][].
-  SpellAddBuff(brain_freeze_buff brain_freeze_buff add=1)
-Define(clearcasting_buff 16870)
-# Your healing over time from Lifebloom has a (25 of Spell Power) chance to cause a Clearcasting state, making your next ?a155577[155577m1+1 Regrowths][Regrowth] cost no mana.
-  SpellInfo(clearcasting_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Regrowth is free?s155577[ and heals for an additonal w2][].
-  SpellAddBuff(clearcasting_buff clearcasting_buff add=1)
+Define(brain_freeze_frost 231584)
+# Brain Freeze causes your next Flurry to  apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen.
+  SpellInfo(brain_freeze_frost gcd=0 offgcd=1)
+  SpellAddBuff(brain_freeze_frost brain_freeze_frost add=1)
+Define(clearcasting_arcane_0 321420)
+# Clearcasting can stack up to s1 additional times.
+  SpellInfo(clearcasting_arcane_0 gcd=0 offgcd=1)
+  SpellAddBuff(clearcasting_arcane_0 clearcasting_arcane_0 add=1)
+Define(clearcasting_arcane_1 321758)
+# When Clearcast, Arcane Missiles fires s2 additional lmissile:missiles;.
+  SpellInfo(clearcasting_arcane_1 gcd=0 offgcd=1)
+  SpellAddBuff(clearcasting_arcane_1 clearcasting_arcane_1 add=1)
 Define(clearcasting_channel_buff 277726)
   SpellInfo(clearcasting_channel_buff duration=18 gcd=0 offgcd=1)
   SpellAddBuff(clearcasting_channel_buff clearcasting_channel_buff add=1)
@@ -426,6 +428,7 @@ Define(winters_chill 228358)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
+SpellList(clearcasting_arcane clearcasting_arcane_0 clearcasting_arcane_1)
 Define(alexstraszas_fury_talent 11) #22465
 # Dragon's Breath always critically strikes for s2 increased critical strike damage and contributes to Hot Streak. rnrnAdditionally, damage done by your next Pyroblast or Flamestrike is increased by 334277s1.
 Define(amplification_talent 1) #22458

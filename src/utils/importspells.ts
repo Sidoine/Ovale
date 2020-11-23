@@ -1,10 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
-import {
-    SpecializationName,
-    OVALE_SPECIALIZATION_NAME,
-} from "../states/PaperDoll";
+import { SpecializationName } from "../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
 import * as parse from "csv-parse/lib/sync";
 import { SpellShapeshift } from "./types";
@@ -958,6 +955,7 @@ export interface SpellData {
     spellAttributes: SpellAttribute[];
     classFlags: number[];
     replace_spell_id?: number;
+    replaced_by?: number[];
 }
 
 export interface SpellEffectData {
@@ -1588,13 +1586,23 @@ export function getSpellData(directory: string) {
             spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
-            if (specSpell[3]) spell.replace_spell_id = getNumber(specSpell[3]);
+            if (specSpell[3]) {
+                spell.replace_spell_id = getNumber(specSpell[3]);
+                const replaced = spellDataById.get(spell.replace_spell_id);
+                if (replaced) {
+                    if (!replaced.replaced_by) replaced.replaced_by = [];
+                    replaced.replaced_by.push(spell.id);
+                }
+            }
             if (className !== "PET") {
-                const specName =
-                    OVALE_SPECIALIZATION_NAME[className][
-                        <1 | 2 | 3 | 4>(specIndex + 1)
-                    ];
-                if (specName) spell.specializationName.push(specName);
+                const specName = specIdToSpecName.get(specIndex);
+                if (specName) {
+                    spell.specializationName.push(specName);
+                } else if (specIndex !== 1446) {
+                    throw Error(
+                        `Unknown spec ${specIndex} for class ${classIndex}`
+                    );
+                }
             }
         }
     }

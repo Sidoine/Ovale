@@ -1,7 +1,7 @@
 import { Tracer, OvaleDebugClass } from "../Debug";
 import { Profiler, OvaleProfilerClass } from "../Profiler";
 import { OvaleClass } from "../Ovale";
-import { OvaleEquipmentClass } from "../Equipment";
+import { OvaleEquipmentClass } from "./Equipment";
 import { States, StateModule } from "../State";
 import {
     SpellCast,

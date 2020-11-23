@@ -75,6 +75,10 @@ Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
+Define(holy_fire 14914)
+# Consumes the enemy in Holy flames that cause (150 of Spell Power) Holy damage and an additional o2 Holy damage over 7 seconds.?a231687[ Stacks up to u times.][]
+  SpellInfo(holy_fire cd=10 duration=7 max_stacks=1 tick=1)
+
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -85,6 +89,7 @@ Define(memory_of_lucid_dreams 299300)
 Define(mind_blast 8092)
 # Blasts the target's mind for (97.92 of Spell Power) Shadow damage?s231682[, preventing the next <shield> damage they deal][].?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=15 insanity=0)
+  SpellRequire(mind_blast replaced_by set=holy_fire enabled=(specialization(holy)))
 Define(mind_bomb 205369)
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 6 seconds.
   SpellInfo(mind_bomb cd=30 duration=2)
@@ -205,8 +210,6 @@ Define(surrender_to_madness 319952)
   SpellRequire(surrender_to_madness unusable set=1 enabled=(not hastalent(surrender_to_madness_talent)))
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness add=1)
-  # Mind Blast has an additional charge.rn?s193225[Spell damage dealt increased by w16.][Spell damage dealt increased by w1.]rn?s341240[Critical strike chance increased by w4.][]?s193225[ Losing w3/500 Insanity every sec.][]
-  SpellAddBuff(surrender_to_madness voidform_buff add=1)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddTargetDebuff(surrender_to_madness surrender_to_madness add=1)
 Define(the_unbound_force 299321)
@@ -222,10 +225,10 @@ Define(vampiric_touch 34914)
   SpellInfo(vampiric_touch duration=21 insanity=-500 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(vampiric_touch vampiric_touch add=1)
-Define(void_bolt 228266)
-# For the duration of Voidform, your Void Eruption ability is replaced by Void Bolt:rnrn@spelltooltip205448
-  SpellInfo(void_bolt gcd=0 offgcd=1)
-  SpellAddBuff(void_bolt void_bolt add=1)
+Define(void_bolt_shadow 231688)
+# Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
+  SpellInfo(void_bolt_shadow gcd=0 offgcd=1)
+  SpellAddBuff(void_bolt_shadow void_bolt_shadow add=1)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing (64.60000000000001 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.
   SpellInfo(void_eruption cd=90)
@@ -237,11 +240,10 @@ Define(void_torrent 263165)
   SpellAddBuff(void_torrent void_torrent add=1)
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddTargetDebuff(void_torrent void_torrent add=1)
-Define(voidform_buff 194249)
+Define(voidform_shadow 228264)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
-  SpellInfo(voidform_buff duration=15 gcd=0 offgcd=1 tick=1)
-  # Mind Blast has an additional charge.rn?s193225[Spell damage dealt increased by w16.][Spell damage dealt increased by w1.]rn?s341240[Critical strike chance increased by w4.][]?s193225[ Losing w3/500 Insanity every sec.][]
-  SpellAddBuff(voidform_buff voidform_buff add=1)
+  SpellInfo(voidform_shadow gcd=0 offgcd=1)
+  SpellAddBuff(voidform_shadow voidform_shadow add=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
