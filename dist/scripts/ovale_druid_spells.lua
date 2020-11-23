@@ -3,16 +3,16 @@ if not __exports then return end
 __exports.registerDruidSpells = function(OvaleScripts)
     local name = "ovale_druid_spells"
     local desc = "[9.0] Ovale: Druid baseline spells"
-    local code = [[Define(adaptive_swarm_damage 325733)
+    local code = [[Define(adaptive_swarm 325748)
+# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
+  SpellInfo(adaptive_swarm duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
+  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
+  SpellAddTargetDebuff(adaptive_swarm adaptive_swarm add=1)
+Define(adaptive_swarm_damage 325733)
 # Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
   SpellInfo(adaptive_swarm_damage duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec and damage over time from the caster increased by w2.
   SpellAddTargetDebuff(adaptive_swarm_damage adaptive_swarm_damage add=1)
-Define(adaptive_swarm_heal 325748)
-# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
-  SpellInfo(adaptive_swarm_heal duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
-  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
-  SpellAddTargetDebuff(adaptive_swarm_heal adaptive_swarm_heal add=1)
 Define(balance_of_all_things_arcane_buff 339946)
 # Entering Eclipse increases your critical strike chance with Arcane or Nature spells by 339943s1*339943u, decreasing by 339943s1 every 339943t2 sec.
   SpellInfo(balance_of_all_things_arcane_buff duration=5 max_stacks=5 gcd=0 offgcd=1 tick=1)
@@ -529,12 +529,14 @@ Define(twin_moons_talent 17) #21712
 # Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
 Define(warrior_of_elune_talent 2) #22386
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
+Define(lunar_empowerment 292664)
+Define(solar_empowerment 292663)
 Define(bt_brutal_slash_buff -202028)
-Define(bt_moonfire_buff -155625)
-Define(bt_rake_buff -1822)
-Define(bt_shred_buff -5221)
 Define(bt_swipe_buff -106785)
 Define(bt_thrash_buff -106830)
+Define(bt_shred_buff -5221)
+Define(bt_moonfire_buff -155625)
+Define(bt_rake_buff -1822)
 Define(superior_battle_potion_of_intellect_item 168498)
 Define(superior_battle_potion_of_agility_item 168489)
 Define(dawning_sun_trait 276152)
@@ -567,10 +569,10 @@ Define(thrash_bear_debuff 192090)
     SpellRequire(pulverize unusable set=1 enabled=(not targetdebuffpresent(thrash_bear_debuff)))
     SpellAddTargetDebuff(pulverize thrash_bear_debuff add=-2)
   
-SpellInfo(starfire inccounter=solar resetcounter=lunar)
-SpellInfo(wrath inccounter=lunar resetcounter=solar)
-  SpellAddBuff(starfire eclipse_solar set=1 enabled=(counter(solar) == 1))
-  SpellAddBuff(wrath eclipse_lunar set=1 enabled=(counter(lunar) == 1))
+SpellInfo(starfire inccounter="solar" resetcounter="lunar")
+SpellInfo(wrath inccounter="lunar" resetcounter="solar")
+  SpellAddBuff(starfire eclipse_solar set=1 enabled=(counter("solar") == 1))
+  SpellAddBuff(wrath eclipse_lunar set=1 enabled=(counter("lunar") == 1))
 
 SpellAddBuff(swipe_cat bt_swipe_buff add=1)
   SpellInfo(bt_swipe_buff duration=6)

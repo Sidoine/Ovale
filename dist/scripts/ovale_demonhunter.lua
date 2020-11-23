@@ -410,9 +410,9 @@ AddFunction havoccooldownshortcdpostconditions
 AddFunction havoccooldowncdactions
 {
  #metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<25
- if not { hastalent(demonic_talent) or pooling_for_meta() } and { not covenant(venthyr) or not target.debuffpresent(sinful_brand) } or target.timetodie() < 25 spell(metamorphosis)
+ if not { hastalent(demonic_talent) or pooling_for_meta() } and { not iscovenant(venthyr) or not target.debuffpresent(sinful_brand) } or target.timetodie() < 25 spell(metamorphosis)
  #metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled&level<54|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
- if hastalent(demonic_talent) and { not hasazeritetrait(chaotic_transformation_trait) and level() < 54 or spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } } and { not covenant(venthyr) or not target.debuffpresent(sinful_brand) } spell(metamorphosis)
+ if hastalent(demonic_talent) and { not hasazeritetrait(chaotic_transformation_trait) and level() < 54 or spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } } and { not iscovenant(venthyr) or not target.debuffpresent(sinful_brand) } spell(metamorphosis)
 
  unless not target.debuffpresent(sinful_brand) and spell(sinful_brand) or spell(the_hunt)
  {

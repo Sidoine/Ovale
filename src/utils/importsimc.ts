@@ -220,7 +220,7 @@ fixIdentifier("clearcasting_channel_buff", 277726);
 fixIdentifier("balance_of_all_things_arcane_buff", 339946);
 fixIdentifier("balance_of_all_things_nature_buff", 339943);
 fixIdentifier("adaptive_swarm_damage", 325733);
-fixIdentifier("adaptive_swarm_heal", 325748);
+// fixIdentifier("adaptive_swarm_heal", 325748);
 fixIdentifier("kindred_empowerment_energize", 327139);
 
 // TODO add _cat/_bear using required stance
@@ -360,8 +360,9 @@ for (const filename of files) {
                 const spellList = spellData.spellLists.get(symbol);
                 if (spellList) {
                     for (const spell of spellList) {
-                        if (classSpells.indexOf(spell.id) < 0)
-                            classSpells.push(spell.id);
+                        if (customIdentifierById.has(spell.id))
+                            addId(custom, spell.id);
+                        else addId(classSpells, spell.id);
                     }
                     if (spellLists.indexOf(symbol) < 0) spellLists.push(symbol);
                     continue;
@@ -509,7 +510,9 @@ ${limitLine2}
         const spellId = remainingsSpellIds.pop();
         if (!spellId) continue;
         const spell = spellData.spellDataById.get(spellId);
-        if (!spell) continue;
+        if (!spell) {
+            continue;
+        }
         if (spell.replaced_by) {
             for (const replacedBy of spell.replaced_by) {
                 if (

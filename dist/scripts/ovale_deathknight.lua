@@ -267,7 +267,7 @@ AddFunction blood_defaultcdactions
    #use_item,name=razdunks_big_red_button
    blooduseitemactions()
    #use_item,effect_name=cyclotronic_blast,if=cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>cast_time
-   if spellcooldown(dancing_rune_weapon) > 0 and not buffpresent(dancing_rune_weapon_buff) and timetorunes(4) > casttime(use_item) blooduseitemactions()
+   if spellcooldown(dancing_rune_weapon) > 0 and not buffpresent(dancing_rune_weapon_buff) and timetorunes(4) > 0 blooduseitemactions()
    #use_item,name=azsharas_font_of_power,if=(cooldown.dancing_rune_weapon.remains<5&target.time_to_die>15)|(target.time_to_die<34)
    if spellcooldown(dancing_rune_weapon) < 5 and target.timetodie() > 15 or target.timetodie() < 34 blooduseitemactions()
    #use_item,name=merekthas_fang,if=(cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>3)&!raid_event.adds.exists|raid_event.adds.in>15
@@ -1363,9 +1363,9 @@ AddFunction unholyaoe_setupmainpostconditions
 AddFunction unholyaoe_setupshortcdactions
 {
  #any_dnd,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
- if checkboxon(festering_wound_debuff) == enemies() or false(raid_event_adds_exists) and 0 <= 11 spell(death_and_decay)
+ if buffcountonany == enemies() or false(raid_event_adds_exists) and 0 <= 11 spell(death_and_decay)
  #any_dnd,if=death_knight.fwounded_targets>=5
- if checkboxon(festering_wound_debuff) >= 5 spell(death_and_decay)
+ if buffcountonany >= 5 spell(death_and_decay)
 }
 
 AddFunction unholyaoe_setupshortcdpostconditions
@@ -1379,7 +1379,7 @@ AddFunction unholyaoe_setupcdactions
 
 AddFunction unholyaoe_setupcdpostconditions
 {
- { checkboxon(festering_wound_debuff) == enemies() or false(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or checkboxon(festering_wound_debuff) >= 5 and spell(death_and_decay) or { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ { buffcountonany == enemies() or false(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 ### actions.aoe_burst
@@ -1387,11 +1387,11 @@ AddFunction unholyaoe_setupcdpostconditions
 AddFunction unholyaoe_burstmainactions
 {
  #epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 10 + checkboxon(festering_wound_debuff) * 3 and checkboxon(festering_wound_debuff) < 6 and not pooling_for_gargoyle() spell(epidemic)
+ if runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() spell(epidemic)
  #epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 25 and checkboxon(festering_wound_debuff) > 5 and not pooling_for_gargoyle() spell(epidemic)
+ if runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() spell(epidemic)
  #epidemic,if=!death_knight.fwounded_targets&!variable.pooling_for_gargoyle
- if not checkboxon(festering_wound_debuff) and not pooling_for_gargoyle() spell(epidemic)
+ if not buffcountonany and not pooling_for_gargoyle() spell(epidemic)
  #wound_spender
  spell(scourge_strike)
  #epidemic,if=!variable.pooling_for_gargoyle
@@ -1408,7 +1408,7 @@ AddFunction unholyaoe_burstshortcdactions
 
 AddFunction unholyaoe_burstshortcdpostconditions
 {
- runicpowerdeficit() < 10 + checkboxon(festering_wound_debuff) * 3 and checkboxon(festering_wound_debuff) < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and checkboxon(festering_wound_debuff) > 5 and not pooling_for_gargoyle() and spell(epidemic) or not checkboxon(festering_wound_debuff) and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or not buffcountonany and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 AddFunction unholyaoe_burstcdactions
@@ -1417,7 +1417,7 @@ AddFunction unholyaoe_burstcdactions
 
 AddFunction unholyaoe_burstcdpostconditions
 {
- runicpowerdeficit() < 10 + checkboxon(festering_wound_debuff) * 3 and checkboxon(festering_wound_debuff) < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and checkboxon(festering_wound_debuff) > 5 and not pooling_for_gargoyle() and spell(epidemic) or not checkboxon(festering_wound_debuff) and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or not buffcountonany and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 ### actions.default

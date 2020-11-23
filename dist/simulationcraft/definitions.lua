@@ -302,7 +302,7 @@ __exports.MISC_OPERAND = {
         extraSymbol = "consecration"
     },
     ["covenant"] = {
-        name = "covenant",
+        name = "iscovenant",
         modifiers = {
             enabled = {
                 type = 3
@@ -383,24 +383,24 @@ __exports.MISC_OPERAND = {
                 extraSymbol = "eclipse_solar"
             },
             solar_in_1 = {
-                type = 4,
-                code = "counter(solar) = 1"
+                type = 5,
+                code = "counter(solar) == 1"
             },
             solar_next = {
-                type = 4,
-                code = "counter(solar) = 1"
+                type = 5,
+                code = "counter(solar) == 1"
             },
             lunar_in_1 = {
                 type = 4,
-                code = "counter(lunar) = 1"
+                code = "counter(lunar) == 1"
             },
             lunar_next = {
                 type = 4,
-                code = "counter(lunar) = 1"
+                code = "counter(lunar) == 1"
             },
             any_next = {
                 type = 5,
-                code = "counter(lunar) + counter(solar) = 1"
+                code = "counter(lunar) + counter(solar) == 1"
             },
             in_any = {
                 type = 4,
@@ -562,15 +562,15 @@ __exports.MISC_OPERAND = {
         modifiers = {
             all = {
                 name = "stealthed_buff",
-                type = 2
+                type = 6
             },
             rogue = {
-                type = 2,
+                type = 6,
                 name = "rogue_stealthed_buff"
             },
             mantle = {
                 name = "mantle_stealthed_buff",
-                type = 2
+                type = 6
             }
         }
     },

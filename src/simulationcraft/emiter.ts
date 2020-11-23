@@ -320,6 +320,11 @@ export class Emiter {
             "feral"
         );
         this.AddDisambiguation("ca_inc", "celestial_alignment", "DRUID");
+        this.AddDisambiguation(
+            "adaptive_swarm_heal",
+            "adaptive_swarm",
+            "DRUID"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -461,16 +466,16 @@ export class Emiter {
                             )) {
                                 annotation.AddSymbol(symbol);
                             }
-                            this.ovaleAst.Release(result);
-                            const [newCode] = this.ovaleAst.ParseCode(
-                                "expression",
-                                modifierParameters.code,
-                                nodeList,
-                                annotation.astAnnotation
-                            );
-                            if (newCode) return newCode;
-                            return undefined;
                         }
+                        this.ovaleAst.Release(result);
+                        const [newCode] = this.ovaleAst.ParseCode(
+                            "expression",
+                            modifierParameters.code,
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                        if (newCode) return newCode;
+                        return undefined;
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Prefix
@@ -492,6 +497,18 @@ export class Emiter {
                                 modifierName
                             )
                         );
+                    } else if (
+                        modifierParameters.type ===
+                        MiscOperandModifierType.Symbol
+                    ) {
+                        insert(
+                            result.rawPositionalParams,
+                            this.ovaleAst.newVariable(
+                                annotation.astAnnotation,
+                                modifierName
+                            )
+                        );
+                        annotation.AddSymbol(modifierName);
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Replace
@@ -824,15 +841,12 @@ export class Emiter {
             group = node.body;
         }
         annotation.currentVariable = node;
-        if (!modifiers.value) {
-            this.tracer.Error("'value' modifier is undefined");
-            return;
-        }
-        let value = this.Emit(modifiers.value, nodeList, annotation, action);
-        if (!value) return;
+        let value =
+            modifiers.value &&
+            this.Emit(modifiers.value, nodeList, annotation, action);
         let newNode = this.EmitConditionNode(
             nodeList,
-            value,
+            value || this.ovaleAst.newValue(annotation.astAnnotation, 0),
             conditionNode,
             parseNode,
             annotation,
@@ -1124,7 +1138,7 @@ export class Emiter {
                 parseNode,
                 action
             );
-        } else if (op == "set") {
+        } else if (op == "set" || op === "reset") {
             this.EmitNamedVariable(
                 name,
                 nodeList,
@@ -1152,8 +1166,6 @@ export class Emiter {
                 parseNode,
                 action
             );
-        } else if (op === "reset") {
-            // TODO need to refactor code to allow this kind of thing
         } else {
             this.tracer.Error("Unknown variable operator '%s'.", op);
         }
@@ -2504,7 +2516,9 @@ export class Emiter {
         } else if (property == "cast_regen") {
             code = format("FocusCastingRegen(%s)", name);
         } else if (property == "cast_time") {
-            code = format("CastTime(%s)", name);
+            if (name === "use_item") code = "0";
+            // TODO
+            else code = format("CastTime(%s)", name);
         } else if (property == "charges") {
             code = format("Charges(%s)", name);
         } else if (property == "max_charges") {
@@ -2514,7 +2528,11 @@ export class Emiter {
         } else if (property === "channeling") {
             code = format("channeling(%s)", name);
         } else if (property == "cooldown") {
-            code = format("SpellCooldown(%s)", name);
+            if (name === "use_item") {
+                code = format("ItemCooldown(trinket0slot)");
+            } else {
+                code = format("SpellCooldown(%s)", name);
+            }
         } else if (property == "cooldown_react") {
             code = format("not SpellCooldown(%s) > 0", name);
         } else if (property == "cost") {
@@ -4426,32 +4444,35 @@ export class Emiter {
                 this.tracer.Error(
                     "Unable to parse variable name in EmitOperandVariable"
                 );
-            } else if (
-                annotation.currentVariable &&
-                annotation.currentVariable.name == name
-            ) {
-                let group = annotation.currentVariable.body;
-                if (lualength(group.child) == 0) {
-                    [node] = this.ovaleAst.ParseCode(
-                        "expression",
-                        "0",
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                } else {
-                    [node] = this.ovaleAst.ParseCode(
-                        "group",
-                        this.ovaleAst.Unparse(group),
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                }
             } else {
-                node = this.ovaleAst.newNodeWithParameters(
-                    "function",
-                    annotation.astAnnotation
-                );
-                node.name = name;
+                if (truthy(match(name, "^%d"))) name = "_" + name;
+                if (
+                    annotation.currentVariable &&
+                    annotation.currentVariable.name == name
+                ) {
+                    let group = annotation.currentVariable.body;
+                    if (lualength(group.child) == 0) {
+                        [node] = this.ovaleAst.ParseCode(
+                            "expression",
+                            "0",
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    } else {
+                        [node] = this.ovaleAst.ParseCode(
+                            "group",
+                            this.ovaleAst.Unparse(group),
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    }
+                } else {
+                    node = this.ovaleAst.newNodeWithParameters(
+                        "function",
+                        annotation.astAnnotation
+                    );
+                    node.name = name;
+                }
             }
         }
         return node;

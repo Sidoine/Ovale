@@ -226,15 +226,8 @@ __exports.Emiter = __class(nil, {
                 group = node.body
             end
             annotation.currentVariable = node
-            if  not modifiers.value then
-                self.tracer:Error("'value' modifier is undefined")
-                return 
-            end
-            local value = self:Emit(modifiers.value, nodeList, annotation, action)
-            if  not value then
-                return 
-            end
-            local newNode = self.EmitConditionNode(nodeList, value, conditionNode, parseNode, annotation, action, modifiers)
+            local value = modifiers.value and self:Emit(modifiers.value, nodeList, annotation, action)
+            local newNode = self.EmitConditionNode(nodeList, value or self.ovaleAst:newValue(annotation.astAnnotation, 0), conditionNode, parseNode, annotation, action, modifiers)
             if newNode.type == "if" then
                 insert(group.child, 1, newNode)
             else
@@ -333,13 +326,12 @@ __exports.Emiter = __class(nil, {
                 self.EmitVariableMax(name, nodeList, annotation, modifier, parseNode, action)
             elseif op == "add" then
                 self.EmitVariableAdd(name, nodeList, annotation, modifier, parseNode, action)
-            elseif op == "set" then
+            elseif op == "set" or op == "reset" then
                 self.EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
             elseif op == "setif" then
                 self.EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
             elseif op == "sub" then
                 self.EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action)
-            elseif op == "reset" then
             else
                 self.tracer:Error("Unknown variable operator '%s'.", op)
             end
@@ -1053,7 +1045,11 @@ __exports.Emiter = __class(nil, {
             elseif property == "cast_regen" then
                 code = format("FocusCastingRegen(%s)", name)
             elseif property == "cast_time" then
-                code = format("CastTime(%s)", name)
+                if name == "use_item" then
+                    code = "0"
+                else
+                    code = format("CastTime(%s)", name)
+                end
             elseif property == "charges" then
                 code = format("Charges(%s)", name)
             elseif property == "max_charges" then
@@ -1063,7 +1059,11 @@ __exports.Emiter = __class(nil, {
             elseif property == "channeling" then
                 code = format("channeling(%s)", name)
             elseif property == "cooldown" then
-                code = format("SpellCooldown(%s)", name)
+                if name == "use_item" then
+                    code = format("ItemCooldown(trinket0slot)")
+                else
+                    code = format("SpellCooldown(%s)", name)
+                end
             elseif property == "cooldown_react" then
                 code = format("not SpellCooldown(%s) > 0", name)
             elseif property == "cost" then
@@ -2242,16 +2242,21 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 if  not name then
                     self.tracer:Error("Unable to parse variable name in EmitOperandVariable")
-                elseif annotation.currentVariable and annotation.currentVariable.name == name then
-                    local group = annotation.currentVariable.body
-                    if #group.child == 0 then
-                        node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
-                    else
-                        node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
-                    end
                 else
-                    node = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
-                    node.name = name
+                    if match(name, "^%d") then
+                        name = "_" .. name
+                    end
+                    if annotation.currentVariable and annotation.currentVariable.name == name then
+                        local group = annotation.currentVariable.body
+                        if #group.child == 0 then
+                            node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
+                        else
+                            node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
+                        end
+                    else
+                        node = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
+                        node.name = name
+                    end
                 end
             end
             return node
@@ -2351,6 +2356,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("incarnation_talent", "incarnation_chosen_of_elune_talent", "DRUID", "balance")
         self:AddDisambiguation("incarnation_talent", "incarnation_king_of_the_jungle_talent", "DRUID", "feral")
         self:AddDisambiguation("ca_inc", "celestial_alignment", "DRUID")
+        self:AddDisambiguation("adaptive_swarm_heal", "adaptive_swarm", "DRUID")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2422,19 +2428,22 @@ __exports.Emiter = __class(nil, {
                             for _, symbol in ipairs(modifierParameters.symbolsInCode) do
                                 annotation:AddSymbol(symbol)
                             end
-                            self.ovaleAst:Release(result)
-                            local newCode = self.ovaleAst:ParseCode("expression", modifierParameters.code, nodeList, annotation.astAnnotation)
-                            if newCode then
-                                return newCode
-                            end
-                            return nil
                         end
+                        self.ovaleAst:Release(result)
+                        local newCode = self.ovaleAst:ParseCode("expression", modifierParameters.code, nodeList, annotation.astAnnotation)
+                        if newCode then
+                            return newCode
+                        end
+                        return nil
                     elseif modifierParameters.type == 1 then
                         result.name = modifierName .. result.name
                     elseif modifierParameters.type == 0 then
                         result.name = result.name .. modifierName
                     elseif modifierParameters.type == 2 then
                         insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
+                    elseif modifierParameters.type == 6 then
+                        insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifierName))
+                        annotation:AddSymbol(modifierName)
                     elseif modifierParameters.type == 4 then
                         result.name = modifierName
                     end

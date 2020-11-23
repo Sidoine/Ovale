@@ -900,7 +900,7 @@ AddFunction marksmanship_defaultcdactions
  #use_item,name=lurkers_insidious_gift,if=cooldown.trueshot.remains_guess<15|target.time_to_die<30
  if spellcooldown(trueshot) < 15 or target.timetodie() < 30 marksmanshipuseitemactions()
  #use_item,name=azsharas_font_of_power,if=(target.time_to_die>cooldown+34|target.health.pct<20|target.time_to_pct_20<15)&cooldown.trueshot.remains_guess<15|target.time_to_die<35
- if { target.timetodie() > spellcooldown(use_item) + 34 or target.healthpercent() < 20 or target.timetohealthpercent(20) < 15 } and spellcooldown(trueshot) < 15 or target.timetodie() < 35 marksmanshipuseitemactions()
+ if { target.timetodie() > itemcooldown(trinket0slot) + 34 or target.healthpercent() < 20 or target.timetohealthpercent(20) < 15 } and spellcooldown(trueshot) < 15 or target.timetodie() < 35 marksmanshipuseitemactions()
  #use_item,name=lustrous_golden_plumage,if=cooldown.trueshot.remains_guess<5|target.time_to_die<20
  if spellcooldown(trueshot) < 5 or target.timetodie() < 20 marksmanshipuseitemactions()
  #use_item,name=galecallers_boon,if=buff.trueshot.remains>14|!talent.calling_the_shots.enabled|target.time_to_die<10
@@ -1086,10 +1086,7 @@ AddFunction survivalsummonpet
 
 AddFunction survivalgetinmeleerange
 {
- if checkboxon(opt_melee_range) and not target.inrange(raptor_strike)
- {
-  texture(misc_arrowlup help=(l(not_in_melee_range)))
- }
+ if checkboxon(opt_melee_range) and not target.inrange(raptor_strike) texture(misc_arrowlup help=(l(not_in_melee_range)))
 }
 
 ### actions.wfi

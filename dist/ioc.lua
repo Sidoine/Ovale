@@ -203,5 +203,7 @@ __exports.IoC = __class(nil, {
         self.paperDoll:registerConditions(self.condition)
         self.equipment:registerConditions(self.condition)
         self.azeriteArmor:registerConditions(self.condition)
+        self.stagger:registerConditions(self.condition)
+        self.stance:registerConditions(self.condition)
     end,
 })

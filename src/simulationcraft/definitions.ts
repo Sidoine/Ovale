@@ -542,6 +542,7 @@ export const enum MiscOperandModifierType {
     Remove,
     Replace,
     Code,
+    Symbol,
 }
 
 interface MiscOperandModifier {
@@ -612,7 +613,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         extraSymbol: "consecration",
     },
     ["covenant"]: {
-        name: "covenant",
+        name: "iscovenant",
         modifiers: {
             enabled: { type: MiscOperandModifierType.Remove },
         },
@@ -686,24 +687,24 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 extraSymbol: "eclipse_solar",
             },
             solar_in_1: {
-                type: MiscOperandModifierType.Replace,
-                code: "counter(solar) = 1",
+                type: MiscOperandModifierType.Code,
+                code: "counter(solar) == 1",
             },
             solar_next: {
-                type: MiscOperandModifierType.Replace,
-                code: "counter(solar) = 1",
+                type: MiscOperandModifierType.Code,
+                code: "counter(solar) == 1",
             },
             lunar_in_1: {
                 type: MiscOperandModifierType.Replace,
-                code: "counter(lunar) = 1",
+                code: "counter(lunar) == 1",
             },
             lunar_next: {
                 type: MiscOperandModifierType.Replace,
-                code: "counter(lunar) = 1",
+                code: "counter(lunar) == 1",
             },
             any_next: {
                 type: MiscOperandModifierType.Code,
-                code: "counter(lunar) + counter(solar) = 1",
+                code: "counter(lunar) + counter(solar) == 1",
             },
             in_any: {
                 type: MiscOperandModifierType.Replace,
@@ -804,15 +805,15 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         modifiers: {
             all: {
                 name: "stealthed_buff",
-                type: MiscOperandModifierType.Parameter,
+                type: MiscOperandModifierType.Symbol,
             },
             rogue: {
-                type: MiscOperandModifierType.Parameter,
+                type: MiscOperandModifierType.Symbol,
                 name: "rogue_stealthed_buff",
             },
             mantle: {
                 name: "mantle_stealthed_buff",
-                type: MiscOperandModifierType.Parameter,
+                type: MiscOperandModifierType.Symbol,
             },
         },
     },
