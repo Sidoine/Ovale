@@ -3,16 +3,16 @@ if not __exports then return end
 __exports.registerDruidSpells = function(OvaleScripts)
     local name = "ovale_druid_spells"
     local desc = "[9.0] Ovale: Druid baseline spells"
-    local code = [[Define(adaptive_swarm 325748)
-# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
-  SpellInfo(adaptive_swarm duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
-  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
-  SpellAddTargetDebuff(adaptive_swarm adaptive_swarm add=1)
-Define(adaptive_swarm_damage 325733)
+    local code = [[Define(adaptive_swarm_damage 325733)
 # Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
   SpellInfo(adaptive_swarm_damage duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec and damage over time from the caster increased by w2.
   SpellAddTargetDebuff(adaptive_swarm_damage adaptive_swarm_damage add=1)
+Define(adaptive_swarm_heal 325748)
+# Command a swarm that heals 325748o1 or deals 325733o1 Shadow damage over 12 seconds to a target, and increases the effectiveness of your periodic effects on them by 325748s2.rnrnUpon expiration, jumps to a target within s2 yards, alternating between friend and foe up to s1 times.
+  SpellInfo(adaptive_swarm_heal duration=12 max_stacks=5 gcd=0 offgcd=1 tick=2)
+  # Restoring w1 health every t1 sec and healing over time from the caster increased by w2.
+  SpellAddTargetDebuff(adaptive_swarm_heal adaptive_swarm_heal add=1)
 Define(balance_of_all_things_arcane_buff 339946)
 # Entering Eclipse increases your critical strike chance with Arcane or Nature spells by 339943s1*339943u, decreasing by 339943s1 every 339943t2 sec.
   SpellInfo(balance_of_all_things_arcane_buff duration=5 max_stacks=5 gcd=0 offgcd=1 tick=1)
@@ -471,10 +471,13 @@ Define(worldvein_resonance 298606)
 Define(wrath 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath lunarpower=0)
+SpellList(adaptive_swarm adaptive_swarm_damage adaptive_swarm_heal)
 SpellList(eclipse_any eclipse_lunar eclipse_solar)
 SpellList(starsurge_empowerment_buff lunar_empowerment solar_empowerment)
+SpellList(berserk berserk_cat berserk_bear)
 SpellList(bs_inc_buff incarnation_king_of_the_jungle incarnation_guardian_of_ursoc berserk_bear berserk_cat)
 SpellList(bt_buffs bt_swipe_buff bt_thrash_buff bt_shred_buff bt_brutal_slash_buff bt_moonfire_buff bt_rake_buff)
+SpellList(wild_charge wild_charge_bear wild_charge_cat)
 Define(balance_affinity_talent 7) #22163
 # You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628rn@spellicon197630 @spellname197630rn@spellicon132469@spellname132469
 Define(bloodtalons_talent 20) #21649

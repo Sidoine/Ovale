@@ -2659,6 +2659,7 @@ export class OvaleASTClass {
         );
         node.keyword = keyword;
         node.name = name;
+        annotation.definition[name] = name;
         return node;
     };
     private ParseNumber = (

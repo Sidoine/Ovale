@@ -1311,6 +1311,7 @@ __exports.OvaleASTClass = __class(nil, {
             node = self:newNodeWithParameters("list", annotation, positionalParams, namedParams)
             node.keyword = keyword
             node.name = name
+            annotation.definition[name] = name
             return node
         end
         self.ParseNumber = function(tokenStream, annotation)

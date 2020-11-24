@@ -210,6 +210,7 @@ addSpellList(
 function fixIdentifier(identifier: string, spellId: number) {
     const spell = spellData.spellDataById.get(spellId);
     if (spell) {
+        delete spellData.identifiers[spell.identifier];
         spell.identifier = identifier;
         spellData.identifiers[identifier] = spellId;
     }
@@ -220,7 +221,7 @@ fixIdentifier("clearcasting_channel_buff", 277726);
 fixIdentifier("balance_of_all_things_arcane_buff", 339946);
 fixIdentifier("balance_of_all_things_nature_buff", 339943);
 fixIdentifier("adaptive_swarm_damage", 325733);
-// fixIdentifier("adaptive_swarm_heal", 325748);
+fixIdentifier("adaptive_swarm_heal", 325748);
 fixIdentifier("kindred_empowerment_energize", 327139);
 
 // TODO add _cat/_bear using required stance
@@ -231,6 +232,10 @@ fixIdentifier("swipe_cat", 106785);
 fixIdentifier("moonfire_cat", 155625);
 fixIdentifier("berserk_cat", 106951);
 fixIdentifier("berserk_bear", 50334);
+
+addSpellList("wild_charge", "wild_charge_bear", "wild_charge_cat");
+addSpellList("adaptive_swarm", "adaptive_swarm_damage", "adaptive_swarm_heal");
+addSpellList("berserk", "berserk_cat", "berserk_bear");
 
 const customIdentifierById = new Map<
     number,
