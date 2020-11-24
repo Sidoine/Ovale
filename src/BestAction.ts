@@ -332,11 +332,12 @@ export class OvaleBestActionClass {
                     );
                 }
             }
+            if (si.casttime) {
+                result.castTime = si.casttime;
+            }
         }
 
-        if (si.casttime) {
-            result.castTime = si.casttime;
-        } else {
+        if (!si || !si.casttime) {
             result.castTime = this.OvaleSpellBook.GetCastTime(spellId);
         }
         result.actionTarget = target;

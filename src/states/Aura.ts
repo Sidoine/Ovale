@@ -1208,6 +1208,9 @@ export class OvaleAuraClass extends States<AuraInterface> {
         if (atTime && (!aura || aura.serial < this.next.auraSerial)) {
             aura = GetAura(this.current.aura, guid, auraId, casterGUID);
         }
+        if (aura) {
+            this.debug.Log("Found aura with stack = %d", aura.stacks);
+        }
         return aura;
     }
 
@@ -1494,7 +1497,12 @@ export class OvaleAuraClass extends States<AuraInterface> {
                     auraFound.stacks
                 );
             } else {
-                this.debug.Log("Aura %s is missing on %s.", auraId, guid);
+                this.debug.Log(
+                    "Aura %s is missing on %s (mine=%s).",
+                    auraId,
+                    guid,
+                    mine
+                );
             }
         }
         return auraFound;

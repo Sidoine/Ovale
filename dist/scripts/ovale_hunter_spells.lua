@@ -15,7 +15,6 @@ Define(aimed_shot 19434)
 Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
-  SpellAddBuff(ancestral_call ancestral_call add=1)
 Define(arcane_shot 185358)
 # A quick shot that causes sw2 Arcane damage.
   SpellInfo(arcane_shot focus=40)
@@ -44,7 +43,10 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2)
   SpellRequire(barrage unusable set=1 enabled=(not hastalent(barrage_talent_marksmanship)))
-
+  SpellAddBuff(barrage barrage_buff add=1)
+Define(barrage_buff 120361)
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
+  SpellInfo(barrage_buff gcd=0 offgcd=1)
 Define(beast_cleave_buff 118455)
 # After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
   SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
@@ -85,11 +87,9 @@ Define(bloodshed 321530)
 # Command your pet to tear into your target, causing your target to bleed for <damage> over 18 seconds and increase all damage taken from your pet by 321538s2 for 18 seconds.
   SpellInfo(bloodshed cd=60)
   SpellRequire(bloodshed unusable set=1 enabled=(not hastalent(bloodshed_talent)))
-Define(blur_of_talons_buff 277969)
+Define(blur_of_talons 277969)
 # During Coordinated Assault, ?s259387[Mongoose Bite][Raptor Strike] increases your Agility by s1 and your Speed by s2 for 6 seconds. Stacks up to 277969u times.
-  SpellInfo(blur_of_talons_buff duration=6 max_stacks=5 gcd=0 offgcd=1)
-  # Agility increased by w1. Speed increased by w2.
-  SpellAddBuff(blur_of_talons_buff blur_of_talons_buff add=1)
+  SpellInfo(blur_of_talons duration=6 max_stacks=5 gcd=0 offgcd=1)
 Define(butchery 212436)
 # Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
   SpellInfo(butchery focus=30 cd=9)
@@ -101,8 +101,14 @@ Define(chakrams 259391)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
   SpellInfo(chakrams focus=15 cd=20)
   SpellRequire(chakrams unusable set=1 enabled=(not hastalent(chakrams_talent)))
-
-
+  SpellAddBuff(chakrams chakrams_buff add=1)
+  SpellAddTargetDebuff(chakrams chakrams_debuff add=1)
+Define(chakrams_buff 267605)
+# Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for 259396s1 Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
+  SpellInfo(chakrams_buff cd=20 duration=5)
+Define(chakrams_debuff 259398)
+# @spelldesc259381
+  SpellInfo(chakrams_debuff gcd=0 offgcd=1)
 Define(chimaera_shot 53209)
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
   SpellInfo(chimaera_shot cd=15)
@@ -132,17 +138,18 @@ Define(cyclotronic_blast 293491)
   SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
   # Burning for o1 Fire damage.
   SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast add=1)
-Define(dance_of_death_buff 274443)
+Define(dance_of_death_buff 274441)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
-  SpellInfo(dance_of_death_buff duration=8 gcd=0 offgcd=1)
-  # Increases Agility by w1.
-  SpellAddBuff(dance_of_death_buff dance_of_death_buff add=1)
+  SpellInfo(dance_of_death_buff gcd=0 offgcd=1)
 Define(dire_beast 120679)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
   SpellInfo(dire_beast cd=20 duration=8)
   SpellRequire(dire_beast unusable set=1 enabled=(not hastalent(dire_beast_talent)))
-
-  SpellAddTargetDebuff(dire_beast dire_beast add=1)
+  # Haste increased by s1.
+  SpellAddBuff(dire_beast dire_beast_buff add=1)
+Define(dire_beast_buff 281036)
+# Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
+  SpellInfo(dire_beast_buff duration=8 gcd=0 offgcd=1)
 Define(double_tap 260402)
 # Your next Aimed Shot will fire a second time instantly at s4 power without consuming Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
   SpellInfo(double_tap cd=60 duration=15)
@@ -166,15 +173,16 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(frenzy_buff 138895)
 # Haste increased by s1 for 10 seconds.
   SpellInfo(frenzy_buff duration=10 max_stacks=5 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(frenzy_buff frenzy_buff add=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(guardian_of_azeroth_buff 295855)
 # Each time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
   SpellInfo(guardian_of_azeroth_buff duration=60 max_stacks=5 gcd=0 offgcd=1)
@@ -183,14 +191,22 @@ Define(guardian_of_azeroth_buff 295855)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
   SpellInfo(harpoon cd=1 charge_cd=30 duration=3 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(harpoon harpoon_debuff add=1)
   # Rooted.
   SpellAddTargetDebuff(harpoon harpoon add=1)
+Define(harpoon_debuff 186260)
+# Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
+  SpellInfo(harpoon_debuff gcd=0 offgcd=1)
 Define(in_the_rhythm 272733)
 # When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
   SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(in_the_rhythm in_the_rhythm add=1)
-
+  SpellAddTargetDebuff(in_the_rhythm in_the_rhythm_debuff add=1)
+Define(in_the_rhythm_debuff 264198)
+# When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
+  SpellInfo(in_the_rhythm_debuff gcd=0 offgcd=1)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
   SpellInfo(kill_command focus=30 cd=7.5)
@@ -210,7 +226,10 @@ Define(latent_poison 273286)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-
+  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
+Define(lights_judgment_debuff 256893)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
+  SpellInfo(lights_judgment_debuff cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -245,14 +264,9 @@ Define(pheromone_bomb 270332)
 Define(potion_of_unbridled_fury_buff 300717)
 # Deal s1 Fire damage to your current target.
   SpellInfo(potion_of_unbridled_fury_buff gcd=0 offgcd=1)
-Define(precise_shots_buff 260242)
+Define(precise_shots 260240)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
-  SpellInfo(precise_shots_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
-  # Damage of ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot increased by s1.
-  SpellAddBuff(precise_shots_buff precise_shots_buff add=1)
-  SpellAddBuff(precise_shots_buff arcane_shot add=1)
-  SpellAddBuff(precise_shots_buff multishot_marksmanship add=1)
-  SpellAddBuff(precise_shots_buff chimaera_shot_marksmanship add=1)
+  SpellInfo(precise_shots gcd=0 offgcd=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
@@ -277,10 +291,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 304038)
+Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff reckless_force_buff add=1)
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
 Define(reckless_force_counter 302917)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_counter duration=60 max_stacks=20 gcd=0 offgcd=1)
@@ -289,7 +302,6 @@ Define(reckless_force_counter 302917)
 Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3)
-  SpellAddBuff(revive_pet revive_pet add=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
@@ -310,7 +322,6 @@ Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=120 duration=12)
   SpellRequire(stampede unusable set=1 enabled=(not hastalent(stampede_talent)))
-  SpellAddBuff(stampede stampede add=1)
 Define(steady_focus_buff 193534)
 # Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
   SpellInfo(steady_focus_buff duration=15 gcd=0 offgcd=1)
@@ -324,15 +335,16 @@ Define(steel_trap 162488)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
   SpellInfo(steel_trap cd=30)
   SpellRequire(steel_trap unusable set=1 enabled=(not hastalent(steel_trap_talent)))
-
+  SpellAddTargetDebuff(steel_trap steel_trap_debuff_unused_0 add=1)
+Define(steel_trap_debuff_unused_0 162496)
+# Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
+  SpellInfo(steel_trap_debuff_unused_0 duration=60 gcd=0 offgcd=1)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
 Define(tip_of_the_spear_buff 260286)
 # Kill Command increases the damage of your next ?s259387[Mongoose Bite][Raptor Strike] by 260286s1, stacking up to 260286u times.
   SpellInfo(tip_of_the_spear_buff duration=10 max_stacks=3 gcd=0 offgcd=1)
-  # Your next ?s259387[Mongoose Bite][Raptor Strike] deals s1 increased damage.
-  SpellAddBuff(tip_of_the_spear_buff tip_of_the_spear_buff add=1)
 Define(trick_shots_buff 257622)
 # When Multi-Shot hits s2 or more targets, your next Aimed Shot or Rapid Fire will ricochet and hit up to s1 additional targets for s4 of normal damage.
   SpellInfo(trick_shots_buff duration=20 gcd=0 offgcd=1)
@@ -343,21 +355,19 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15 gcd=0 offgcd=1)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot add=1)
-Define(unerring_vision_buff 274447)
+Define(unerring_vision 274446)
 # While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
-  SpellInfo(unerring_vision_buff duration=5 max_stacks=10 gcd=0 offgcd=1)
-  # Critical Strike increased by w1.
-  SpellAddBuff(unerring_vision_buff unerring_vision_buff add=1)
-
+  SpellInfo(unerring_vision duration=10 max_stacks=2 gcd=0 offgcd=1 tick=1)
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 gcd=0 offgcd=1)
-  # Your next Serpent Sting costs no Focus, and will deal s1 increased initial damage.
-  SpellAddBuff(vipers_venom_buff vipers_venom_buff add=1)
 Define(volatile_bomb 271045)
 # Hurl a bomb at the target, exploding for 271048s1 Fire damage in a cone and coating enemies in volatile wildfire, scorching them for 271049o1 Fire damage over 6 seconds.rnrnVolatile Bomb causes an extra explosion for 260231s1 Fire damage against targets affected by Serpent Sting, and refreshes your Serpent Stings when it explodes.
   SpellInfo(volatile_bomb cd=18)
-
+  SpellAddTargetDebuff(volatile_bomb volatile_bomb_debuff add=1)
+Define(volatile_bomb_debuff 271047)
+# Hurl a bomb at the target, exploding for 271048s1 Fire damage in a cone and coating enemies in volatile wildfire, scorching them for 271049o1 Fire damage over 6 seconds.rnrnVolatile Bomb causes an extra explosion for 260231s1 Fire damage against targets affected by Serpent Sting, and refreshes your Serpent Stings when it explodes.
+  SpellInfo(volatile_bomb_debuff duration=0.5 gcd=0 offgcd=1)
 Define(volley 260243)
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
   SpellInfo(volley cd=45 duration=6 tick=0.5)
@@ -379,11 +389,8 @@ Define(wildfire_bomb_debuff 265163)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
-Define(worldvein_resonance_buff 313310)
-# Concentrate energy into the Heart of Azeroth, immediately causing s1 Lifeblood Shards to erupt from the nearby ground for 12 seconds, and incease the primary stat gained from Lifeblood Shards by 313310s1 for 18 seconds.rnrn@spellicon295078@spellname295114rnGrants you and any other ally using Worldvein Resonance 295078s5 primary stat while within 295078s2 yds of the Lifeblood Shard. You can benefit from a maximum of 295137u Lifeblood Shards at a time.
-  SpellInfo(worldvein_resonance_buff duration=18 gcd=0 offgcd=1)
-  # Primary stat gained from Lifeblood Shards increased by w1.
-  SpellAddBuff(worldvein_resonance_buff worldvein_resonance_buff add=1)
+Define(worldvein_resonance_buff 295206)
+  SpellInfo(worldvein_resonance_buff gcd=0 offgcd=1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
 Define(alpha_predator_talent 3) #22296

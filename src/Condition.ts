@@ -99,7 +99,7 @@ export function ParseCondition(
     namedParams: NamedParameters,
     baseState: BaseState,
     defaultTarget?: string
-): [string, AuraType | undefined, boolean] {
+): [target: string, filter: AuraType | undefined, mine: boolean] {
     let target =
         (isString(namedParams.target) && namedParams.target) ||
         defaultTarget ||
@@ -120,10 +120,6 @@ export function ParseCondition(
     let mine = true;
     if (namedParams.any && namedParams.any == 1) {
         mine = false;
-    } else {
-        if (!namedParams.any && namedParams.mine && namedParams.mine != 1) {
-            mine = false;
-        }
     }
     return [target, filter, mine];
 }

@@ -231,10 +231,11 @@ __exports.OvaleBestActionClass = __class(nil, {
                     self.tracer:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, result.actionResourceExtend)
                 end
             end
+            if si.casttime then
+                result.castTime = si.casttime
+            end
         end
-        if si.casttime then
-            result.castTime = si.casttime
-        else
+        if  not si or  not si.casttime then
             result.castTime = self.OvaleSpellBook:GetCastTime(spellId)
         end
         result.actionTarget = target

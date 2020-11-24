@@ -86,7 +86,7 @@ AddFunction discipline_defaultmainactions
  #purge_the_wicked,if=!ticking
  if not target.debuffpresent(purge_the_wicked_debuff) spell(purge_the_wicked)
  #shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
- if not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
+ if not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
  #schism
  spell(schism)
  #mind_blast
@@ -96,7 +96,7 @@ AddFunction discipline_defaultmainactions
  #purge_the_wicked,if=remains<(duration*0.3)
  if target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 spell(purge_the_wicked)
  #shadow_word_pain,if=remains<(duration*0.3)&!talent.purge_the_wicked.enabled
- if buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
+ if target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
  #power_word_solace
  spell(power_word_solace)
  #divine_star,if=mana.pct>80
@@ -123,7 +123,7 @@ AddFunction discipline_defaultshortcdactions
   #shadow_covenant
   spell(shadow_covenant)
 
-  unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
+  unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
   {
    #shadow_word_death
    spell(shadow_word_death)
@@ -133,7 +133,7 @@ AddFunction discipline_defaultshortcdactions
 
 AddFunction discipline_defaultshortcdpostconditions
 {
- spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+ spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
 }
 
 AddFunction discipline_defaultcdactions
@@ -164,7 +164,7 @@ AddFunction discipline_defaultcdactions
 
 AddFunction discipline_defaultcdpostconditions
 {
- hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(bag_of_tricks) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not buffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or buffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+ hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(bag_of_tricks) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
 }
 
 ### Discipline icons.
@@ -299,7 +299,7 @@ AddFunction shadowuseitemactions
 AddFunction shadowprecombatmainactions
 {
  #shadowform,if=!buff.shadowform.up
- if not buffpresent(shadowform) spell(shadowform)
+ if not buffpresent(shadowform) and buffexpires(shadowform) spell(shadowform)
  #variable,name=mind_sear_cutoff,op=set,value=1
  #vampiric_touch
  spell(vampiric_touch)
@@ -315,7 +315,7 @@ AddFunction shadowprecombatshortcdactions
 
 AddFunction shadowprecombatshortcdpostconditions
 {
- not buffpresent(shadowform) and spell(shadowform) or spell(vampiric_touch)
+ not buffpresent(shadowform) and buffexpires(shadowform) and spell(shadowform) or spell(vampiric_touch)
 }
 
 AddFunction shadowprecombatcdactions
@@ -327,7 +327,7 @@ AddFunction shadowprecombatcdactions
  #potion
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
 
- unless not buffpresent(shadowform) and spell(shadowform)
+ unless not buffpresent(shadowform) and buffexpires(shadowform) and spell(shadowform)
  {
   #use_item,name=azsharas_font_of_power
   shadowuseitemactions()
@@ -336,7 +336,7 @@ AddFunction shadowprecombatcdactions
 
 AddFunction shadowprecombatcdpostconditions
 {
- not buffpresent(shadowform) and spell(shadowform) or spell(vampiric_touch)
+ not buffpresent(shadowform) and buffexpires(shadowform) and spell(shadowform) or spell(vampiric_touch)
 }
 
 ### actions.main

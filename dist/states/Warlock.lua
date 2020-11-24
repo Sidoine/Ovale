@@ -112,7 +112,7 @@ __exports.OvaleWarlockClass = __class(nil, {
         end
         self.impsSpawnedDuring = function(positionalParams, namedParams, atTime)
             local ms, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local delay = ms / 1000
+            local delay = (ms or 0) / 1000
             local impsSpawned = 0
             if self.future.next.currentCast.spellId == 105174 then
                 local soulshards = self.power.current.power["soulshards"] or 0

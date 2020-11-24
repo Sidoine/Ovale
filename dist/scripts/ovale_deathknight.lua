@@ -1162,7 +1162,7 @@ AddFunction unholyprecombatmainpostconditions
 AddFunction unholyprecombatshortcdactions
 {
  #raise_dead
- spell(raise_dead)
+ if buffexpires(raise_dead) spell(raise_dead)
 }
 
 AddFunction unholyprecombatshortcdpostconditions
@@ -1181,7 +1181,7 @@ AddFunction unholyprecombatcdactions
 
 AddFunction unholyprecombatcdpostconditions
 {
- spell(raise_dead)
+ buffexpires(raise_dead) and spell(raise_dead)
 }
 
 ### actions.generic_aoe

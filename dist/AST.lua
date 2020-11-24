@@ -87,6 +87,7 @@ __exports.checkSpellInfo = {
     combopoints = true,
     damage = true,
     duration = true,
+    effect = true,
     energy = true,
     focus = true,
     forcecd = true,

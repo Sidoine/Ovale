@@ -511,6 +511,17 @@ ${limitLine2}
     const talentIds = talentsByClass.get(className) || [];
     const spells: CustomSpellData[] = [];
     const remainingsSpellIds = spellIds.concat();
+    const addSpells = (addedIds: number[]) => {
+        for (const spellId of addedIds) {
+            if (
+                remainingsSpellIds.indexOf(spellId) < 0 &&
+                spellIds.indexOf(spellId) < 0
+            ) {
+                remainingsSpellIds.push(spellId);
+                spellIds.push(spellId);
+            }
+        }
+    };
     while (remainingsSpellIds.length) {
         const spellId = remainingsSpellIds.pop();
         if (!spellId) continue;
@@ -519,13 +530,7 @@ ${limitLine2}
             continue;
         }
         if (spell.replaced_by) {
-            for (const replacedBy of spell.replaced_by) {
-                if (
-                    remainingsSpellIds.indexOf(replacedBy) < 0 &&
-                    spellIds.indexOf(replacedBy) < 0
-                )
-                    remainingsSpellIds.push(replacedBy);
-            }
+            addSpells(spell.replaced_by);
         }
 
         const customSpell = convertFromSpellData(
@@ -533,16 +538,15 @@ ${limitLine2}
             spellData.spellDataById
         );
         spells.push(customSpell);
-        // if (customSpell.auras) {
-        //     for (const t in customSpell.auras) {
-        //         const target = t as keyof CustomAuras;
-        //         for (const aura of customSpell.auras[target]) {
-        //             if (spells.every(x => x.id !== aura.id) && spellIds.indexOf(aura.id) < 0) {
-        //                 spellIds.push(aura.id);
-        //             }
-        //         }
-        //     }
-        // }
+        if (customSpell.auras) {
+            for (const t in customSpell.auras) {
+                const target = t as keyof CustomAuras;
+                const auras = customSpell.auras[target];
+                if (auras) {
+                    addSpells(auras.map((x) => x.id));
+                }
+            }
+        }
     }
 
     const sortedSpells = spells.sort((x, y) =>

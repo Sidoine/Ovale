@@ -104,6 +104,7 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     combopoints: true,
     damage: true,
     duration: true,
+    effect: true,
     energy: true,
     focus: true,
     forcecd: true,

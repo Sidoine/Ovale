@@ -737,6 +737,7 @@ export class OvaleConditions {
             positionalParams,
             namedParams
         );
+        
         let aura = this.OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         if (aura) {
             let [gain, , ending] = [aura.gain, aura.start, aura.ending];

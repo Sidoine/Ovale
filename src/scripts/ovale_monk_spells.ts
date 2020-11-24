@@ -8,7 +8,6 @@ export function registerMonkSpells(OvaleScripts: OvaleScriptsClass) {
     let code = `Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
-  SpellAddBuff(ancestral_call ancestral_call add=1)
 Define(arcane_torrent 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
@@ -25,16 +24,12 @@ Define(black_ox_brew 115399)
 Define(blackout_combo_buff 228563)
 # Blackout Kick also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnCelestial Brew: Pauses Stagger damage for s4 sec.
   SpellInfo(blackout_combo_buff duration=15 gcd=0 offgcd=1)
-  # Your next ability is empowered.
-  SpellAddBuff(blackout_combo_buff blackout_combo_buff add=1)
 Define(blackout_kick 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and granting Shuffle for s2 sec][].
   SpellInfo(blackout_kick cd=4)
 Define(blackout_kick_aura 116768)
 # You have a m1 chance when you Tiger Palm to cause your next Blackout Kick to cost no Chi within 15 seconds.
   SpellInfo(blackout_kick_aura duration=15 gcd=0 offgcd=1)
-  # Your next Blackout Kick costs no Chi.
-  SpellAddBuff(blackout_kick_aura blackout_kick_aura add=1)
 Define(blood_fury 20572)
 # Increases your attack power by s1 for 15 seconds.
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
@@ -68,8 +63,6 @@ Define(chi_burst 123986)
 Define(chi_energy 337571)
 # Whenever you deal damage to a target with Fists of Fury, you gain a stack of Chi Energy up to a maximum of m2 stacks.rnrnUsing Spinning Crane Kick will cause the energy to detonate in a Chi Explosion, dealing 337342s1 damage to all enemies within 337342A1 yards. The damage is increased by 337571m1 for each stack of Chi Energy.
   SpellInfo(chi_energy duration=45 max_stacks=30 gcd=0 offgcd=1)
-  # Increases the damage done by your next Chi Explosion by s1.rnrnChi Explosion is triggered whenever you use Spinning Crane Kick.
-  SpellAddBuff(chi_energy chi_energy add=1)
 Define(chi_wave 115098)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
   SpellInfo(chi_wave cd=15)
@@ -82,19 +75,20 @@ Define(concentrated_flame 295368)
 Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink gcd=0 offgcd=1)
-
+  # Falling below 296964M~1 health will cause Conductive Ink to inflict 296963s1*(1+@versadmg) Nature damage.
+  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger add=1)
+Define(conductive_ink_buff_trigger 302565)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_buff_trigger duration=120 max_stacks=999 gcd=0 offgcd=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1)
   SpellRequire(dampen_harm unusable set=1 enabled=(not hastalent(dampen_harm_talent)))
   # Damage taken reduced by m2 to m3 for d, with larger attacks being reduced by more.
   SpellAddBuff(dampen_harm dampen_harm add=1)
-Define(dance_of_chiji_buff 286587)
+Define(dance_of_chiji_buff 325202)
 # Spending Chi has a chance to make your next Spinning Crane Kick free and deal s1 additional damage.
   SpellInfo(dance_of_chiji_buff duration=15 gcd=0 offgcd=1)
-  # Your next Spinning Crane Kick is free and deals w1 additional damage.
-  SpellAddBuff(dance_of_chiji_buff dance_of_chiji_buff add=1)
-
 Define(diffuse_magic 122783)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
   SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1)
@@ -104,8 +98,6 @@ Define(diffuse_magic 122783)
 Define(elusive_brawler 195630)
 # Each time you are hit by a melee attack, or hit with Blackout Kick, you gain stacking (100 of Spell Power).1 increased Dodge chance until your next successful Dodge.rnrnAlso increases your attack power by (100 of Spell Power).1.
   SpellInfo(elusive_brawler duration=10 max_stacks=100 gcd=0 offgcd=1)
-  # Dodge chance increased by w1.
-  SpellAddBuff(elusive_brawler elusive_brawler add=1)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
   SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=0 offgcd=1 chi=-2)
@@ -122,20 +114,28 @@ Define(fist_of_the_white_tiger 261947)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1)
   SpellRequire(fist_of_the_white_tiger unusable set=1 enabled=(not hastalent(fist_of_the_white_tiger_talent)))
-
+  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_buff add=1)
+  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_buff_unused_0 add=1)
+Define(fist_of_the_white_tiger_buff 261977)
+# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
+  SpellInfo(fist_of_the_white_tiger_buff gcd=0 offgcd=1)
+Define(fist_of_the_white_tiger_buff_unused_0 261978)
+# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
+  SpellInfo(fist_of_the_white_tiger_buff_unused_0 gcd=0 offgcd=1 chi=-3)
 Define(fists_of_fury 113656)
 # Pummels all targets in front of you, dealing 5*s5 damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
-  # w3 damage every t3 sec. ?s125671[Parrying all attacks.][]
-  SpellAddBuff(fists_of_fury fists_of_fury add=1)
 Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
-  SpellAddBuff(flying_serpent_kick flying_serpent_kick add=1)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(fortifying_brew 243435)
 # Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
   SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
@@ -149,11 +149,9 @@ Define(fortifying_brew_buff 120954)
 Define(gift_of_the_ox 124502)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
   SpellInfo(gift_of_the_ox gcd=0 offgcd=1)
-  SpellAddBuff(gift_of_the_ox gift_of_the_ox add=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(invoke_niuzao_the_black_ox 132578)
 # Summons an effigy of Niuzao, the Black Ox for 25 seconds. Niuzao attacks your primary target, and frequently Stomps, damaging all nearby enemies?s322740[ for 227291s1 plus 322740s1 of Stagger damage you have recently purified.][.]rnrnWhile active, s2 of damage delayed by Stagger is instead Staggered by Niuzao.
   SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=25)
@@ -162,7 +160,6 @@ Define(invoke_niuzao_the_black_ox 132578)
 Define(invoke_xuen_the_white_tiger 123904)
 # Summons an effigy of Xuen, the White Tiger for 24 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.?s323999[rnrnEvery 323999s1 sec, Xuen strikes your enemies with Empowered Tiger Lightning dealing 323999s2 of the damage you have dealt to those targets in the last 323999s1 sec.][]
   SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=24 gcd=1 tick=4)
-  SpellAddBuff(invoke_xuen_the_white_tiger invoke_xuen_the_white_tiger add=1)
 Define(keg_smash 121253)
 # Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
@@ -176,7 +173,10 @@ Define(leg_sweep 119381)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-
+  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
+Define(lights_judgment_debuff 256893)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
+  SpellInfo(lights_judgment_debuff cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -210,7 +210,10 @@ Define(ripple_in_space 299306)
 Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
   SpellInfo(rising_sun_kick chi=2 cd=10)
-
+  SpellAddTargetDebuff(rising_sun_kick rising_sun_kick_debuff add=1)
+Define(rising_sun_kick_debuff 185099)
+# Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
+  SpellInfo(rising_sun_kick_debuff gcd=0 offgcd=1)
 Define(rushing_jade_wind 116847)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75)
@@ -238,8 +241,13 @@ Define(spear_hand_strike 116705)
 Define(spinning_crane_kick 322729)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
   SpellInfo(spinning_crane_kick energy=25 duration=1.5 channel=1.5 tick=0.5)
+  # Attacking all nearby enemies for Physical damage every 101546t1 sec.rnrnMovement speed reduced by s2.
+  SpellAddBuff(spinning_crane_kick spinning_crane_kick_buff add=1)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick spinning_crane_kick add=1)
+Define(spinning_crane_kick_buff 107270)
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+  SpellInfo(spinning_crane_kick_buff gcd=0 offgcd=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
   SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=0 offgcd=1)
@@ -270,7 +278,6 @@ Define(whirling_dragon_punch 152175)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
   SpellInfo(whirling_dragon_punch cd=24 duration=1 gcd=1 tick=0.25)
   SpellRequire(whirling_dragon_punch unusable set=1 enabled=(not hastalent(whirling_dragon_punch_talent)))
-  SpellAddBuff(whirling_dragon_punch whirling_dragon_punch add=1)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)

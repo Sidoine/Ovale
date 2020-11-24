@@ -198,26 +198,39 @@ export function convertFromSpellData(
 
     let buffAdded = false;
     let debuffAdded = false;
-    if (spell.name === "Ambush") {
+    if (spell.name === "Arcane Intellect") {
         debug;
     }
     const playerAuras: CustomAura[] = [];
     const targetAuras: CustomAura[] = [];
-    if (spell.spellEffects) {
+    if (spell.spellEffects && !spell.triggered_by) {
         for (const effect of spell.spellEffects) {
             if (effect.trigger_spell_id) {
                 if (isFriendlyTarget(effect.targeting_1)) {
-                    playerAuras.push({
-                        id: effect.trigger_spell_id,
-                        stacks: 1,
-                    });
+                    if (
+                        playerAuras.every(
+                            (x) => x.id !== effect.trigger_spell_id
+                        )
+                    )
+                        playerAuras.push({
+                            id: effect.trigger_spell_id,
+                            stacks: 1,
+                        });
                 } else {
-                    targetAuras.push({
-                        id: effect.trigger_spell_id,
-                        stacks: 1,
-                    });
+                    if (
+                        targetAuras.every(
+                            (x) => x.id !== effect.trigger_spell_id
+                        )
+                    )
+                        targetAuras.push({
+                            id: effect.trigger_spell_id,
+                            stacks: 1,
+                        });
                 }
-            } else if (effect.type === EffectType.E_APPLY_AURA) {
+            } else if (
+                effect.type === EffectType.E_APPLY_AURA &&
+                spell.tooltip
+            ) {
                 if (isFriendlyTarget(effect.targeting_1)) {
                     if (!buffAdded) {
                         buffAdded = true;
@@ -231,7 +244,7 @@ export function convertFromSpellData(
         }
     }
 
-    if (!buffAdded && !debuffAdded && spell.tooltip) {
+    if (!buffAdded && !debuffAdded && spell.tooltip && !spell.triggered_by) {
         playerAuras.push({ id: spell.id, stacks: 1 });
     }
 

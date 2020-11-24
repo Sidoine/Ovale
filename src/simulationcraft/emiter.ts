@@ -1695,6 +1695,31 @@ export class Emiter {
             } else if (action == "heart_essence") {
                 bodyCode = `Spell(296208)`;
                 isSpellAction = false;
+            } else if (parseNode.actionListName === "precombat") {
+                const definition = annotation.dictionary[action];
+                if (isNumber(definition)) {
+                    const spellInfo = this.ovaleData.GetSpellInfo(definition);
+                    if (spellInfo && spellInfo.aura) {
+                        for (const [, info] of kpairs(
+                            spellInfo.aura.player.HELPFUL
+                        )) {
+                            if (info.buffSpellId) {
+                                const buffSpellInfo = this.ovaleData.GetSpellInfo(
+                                    info.buffSpellId
+                                );
+                                if (
+                                    buffSpellInfo &&
+                                    (!buffSpellInfo.duration ||
+                                        buffSpellInfo.duration > 59)
+                                ) {
+                                    conditionCode = `buffexpires(${
+                                        info.buffName || info.buffSpellId
+                                    })`;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             if (isSpellAction) {
                 this.AddSymbol(annotation, action);
@@ -2493,8 +2518,23 @@ export class Emiter {
             className,
             specialization
         );
-        let prefix = (truthy(find(buffName, "_debuff$")) && "Debuff") || "Buff";
-        let buffTarget = (prefix == "Debuff" && "target.") || target;
+        const buffSpellId = annotation.dictionary[buffName];
+        let prefix;
+        let buffTarget;
+        if (buffSpellId && isNumber(buffSpellId)) {
+            const buffSpellInfo = this.ovaleData.GetSpellInfo(buffSpellId);
+            if (buffSpellInfo) {
+                if (buffSpellInfo.effect === "HARMFUL") {
+                    prefix = "Debuff";
+                } else if (buffSpellInfo.effect === "HELPFUL") {
+                    prefix = "Buff";
+                }
+            }
+        }
+
+        if (!prefix)
+            prefix = (truthy(find(buffName, "_debuff$")) && "Debuff") || "Buff";
+        buffTarget = (prefix == "Debuff" && "target.") || target;
         let talentName = `${name}_talent`;
         [talentName] = this.Disambiguate(
             annotation,

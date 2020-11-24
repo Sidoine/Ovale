@@ -6,7 +6,6 @@ __exports.registerPriestSpells = function(OvaleScripts)
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
-  SpellAddBuff(ancestral_call ancestral_call add=1)
 Define(arcane_torrent 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
@@ -16,7 +15,10 @@ Define(ascended_blast 325283)
 Define(ascended_nova 325020)
 # Release a powerful burst of anima, dealing up to (74 of Spell Power) Arcane damage, based on the number of enemies, and (24 of Spell Power) healing to up to 325041s2 allies within A1 yds.rnrnGrants s3 lstack:stacks; of Boon of the Ascended for each target damaged.
   SpellInfo(ascended_nova gcd=1)
-
+  SpellAddBuff(ascended_nova ascended_nova_buff add=1)
+Define(ascended_nova_buff 325041)
+# Release a powerful burst of anima, dealing up to (74 of Spell Power) Arcane damage, based on the number of enemies, and (24 of Spell Power) healing to up to 325041s2 allies within A1 yds.rnrnGrants s3 lstack:stacks; of Boon of the Ascended for each target damaged.
+  SpellInfo(ascended_nova_buff gcd=0 offgcd=1)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -71,18 +73,25 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(holy_fire 14914)
 # Consumes the enemy in Holy flames that cause (150 of Spell Power) Holy damage and an additional o2 Holy damage over 7 seconds.?a231687[ Stacks up to u times.][]
   SpellInfo(holy_fire cd=10 duration=7 max_stacks=1 tick=1)
-
+  # w2 Holy damage every t2 seconds.
+  SpellAddTargetDebuff(holy_fire holy_fire add=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-
+  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
+Define(lights_judgment_debuff 256893)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
+  SpellInfo(lights_judgment_debuff cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -108,12 +117,16 @@ Define(mind_sear 48045)
   SpellInfo(mind_sear duration=4.5 channel=4.5 tick=0.75)
   # Causing Shadow damage to all targets within 49821a2 yards every t1 sec.
   SpellAddBuff(mind_sear mind_sear add=1)
-
+  # Causing shadow damage to all targets within a2 yards.
+  SpellAddTargetDebuff(mind_sear mind_sear_debuff add=1)
+Define(mind_sear_debuff 49821)
+# Corrosive shadow energy radiates from the target, dealing (12.6 of Spell Power)*s2 Shadow damage over 4.5 seconds to all enemies within 49821a2 yards of the target.?s137033[rnrn|cFFFFFFFFGenerates s2*208232s1/100 Insanity over the duration per target hit.|r][]
+  SpellInfo(mind_sear_debuff gcd=0 offgcd=1)
 Define(mindbender 200174)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
   SpellInfo(mindbender cd=60 duration=15)
   SpellRequire(mindbender unusable set=1 enabled=(not hastalent(mindbender_talent)))
-
+# Unknown spell id 41967
 Define(penance 47540)
 # Launches a volley of holy light at the target, causing ?s193134[(40 of Spell Power)*4][(40 of Spell Power)*3] Holy damage to an enemy or ?s193134[(125 of Spell Power)*4][(125 of Spell Power)*3] healing to an ally over 2 seconds. Castable while moving.
   SpellInfo(penance cd=9 channel=0)
@@ -135,8 +148,6 @@ Define(purge_the_wicked 204197)
 Define(purge_the_wicked_debuff 204213)
 # Cleanses the target with fire, causing (24.8 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
   SpellInfo(purge_the_wicked_debuff duration=20 gcd=0 offgcd=1 tick=2)
-  # w1 Fire damage every t1 seconds.
-  SpellAddTargetDebuff(purge_the_wicked_debuff purge_the_wicked_debuff add=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
@@ -165,7 +176,11 @@ Define(shadow_covenant 314867)
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
   SpellInfo(shadow_covenant cd=30)
   SpellRequire(shadow_covenant unusable set=1 enabled=(not hastalent(shadow_covenant_talent)))
-
+  # Shadow spells deal w2 increased damage and healing, but cannot cast Holy spells.
+  SpellAddBuff(shadow_covenant shadow_covenant_buff add=1)
+Define(shadow_covenant_buff 322105)
+# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
+  SpellInfo(shadow_covenant_buff duration=9 gcd=0 offgcd=1)
 Define(shadow_crash 342834)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=45 insanity=-800)
@@ -175,8 +190,6 @@ Define(shadow_crash 342834)
 Define(shadow_crash_debuff 342835)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash_debuff duration=15 max_stacks=2 gcd=0 offgcd=1)
-  # Damage taken from the Priests' Shadow Crash increased by w2.
-  SpellAddTargetDebuff(shadow_crash_debuff shadow_crash_debuff add=1)
 Define(shadow_word_death 32379)
 # A word of dark binding that inflicts (85 of Spell Power) Shadow damage to the target. If the target is not killed by Shadow Word: Death, the caster takes damage equal to the damage inflicted upon the target.rnrnDamage increased by s3 to targets below s2 health.?c3[][]?s81749[rnrnDoes not trigger Atonement.][]
   SpellInfo(shadow_word_death cd=30)
@@ -188,6 +201,7 @@ Define(shadow_word_pain 589)
 Define(shadowfiend 34433)
 # Summons a shadowy fiend to attack the target for 15 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
   SpellInfo(shadowfiend cd=180 duration=15)
+# Unknown spell id 41967
   # 343726
   SpellAddBuff(shadowfiend shadowfiend add=1)
 Define(shadowform 232698)
@@ -195,6 +209,7 @@ Define(shadowform 232698)
   SpellInfo(shadowform)
   # Spell damage dealt increased by s1.
   SpellAddBuff(shadowform shadowform add=1)
+# Unknown spell id 210195
 Define(silence 15487)
 # Silences the target, preventing them from casting spells for 4 seconds. Against non-players, also interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(silence cd=45 duration=4 gcd=0 offgcd=1)
@@ -203,23 +218,30 @@ Define(silence 15487)
 Define(smite 262861)
 # Smite deals s1 increased damage.
   SpellInfo(smite gcd=0 offgcd=1)
-  SpellAddBuff(smite smite add=1)
 Define(surrender_to_madness 319952)
 # Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
   SpellInfo(surrender_to_madness cd=90 duration=25)
   SpellRequire(surrender_to_madness unusable set=1 enabled=(not hastalent(surrender_to_madness_talent)))
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness add=1)
+  # Mind Blast has an additional charge.rn?s193225[Spell damage dealt increased by w16.][Spell damage dealt increased by w1.]rn?s341240[Critical strike chance increased by w4.][]?s193225[ Losing w3/500 Insanity every sec.][]
+  SpellAddBuff(surrender_to_madness voidform_unused_0 add=1)
+  SpellAddBuff(surrender_to_madness surrender_to_madness_buff add=1)
+  SpellAddBuff(surrender_to_madness surrender_to_madness_buff_unused_0 add=1)
+  SpellAddTargetDebuff(surrender_to_madness void_eruption_unused_0 add=1)
+  SpellAddTargetDebuff(surrender_to_madness void_eruption_unused_1 add=1)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddTargetDebuff(surrender_to_madness surrender_to_madness add=1)
+Define(surrender_to_madness_buff 342839)
+  SpellInfo(surrender_to_madness_buff duration=15 gcd=0 offgcd=1)
+Define(surrender_to_madness_buff_unused_0 342840)
+  SpellInfo(surrender_to_madness_buff_unused_0 duration=10 gcd=0 offgcd=1)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
-Define(unfurling_darkness_buff 341282)
+Define(unfurling_darkness_buff 341291)
 # After casting Vampiric Touch on a target, your next Vampiric Touch within 8 seconds is instant cast and deals (105.4 of Spell Power) Shadow damage immediately.rnrnThis effect cannot occur more than once every 15 seconds.
-  SpellInfo(unfurling_darkness_buff duration=8 gcd=0 offgcd=1)
-  # Your next Vampiric Touch is instant cast and deals an additional 34914s4 Shadow damage upon application.
-  SpellAddBuff(unfurling_darkness_buff unfurling_darkness_buff add=1)
+  SpellInfo(unfurling_darkness_buff duration=15 gcd=0 offgcd=1)
 Define(vampiric_touch 34914)
 # A touch of darkness that causes 34914o2 Shadow damage over 21 seconds, and heals you for e2*100 of damage dealt.rn?s322116[rnIf Vampiric Touch is dispelled, the dispeller flees in Horror for 3 seconds.rn][]rn|cFFFFFFFFGenerates m3/100 Insanity.|r
   SpellInfo(vampiric_touch duration=21 insanity=-500 tick=3)
@@ -228,22 +250,34 @@ Define(vampiric_touch 34914)
 Define(void_bolt_shadow 231688)
 # Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
   SpellInfo(void_bolt_shadow gcd=0 offgcd=1)
-  SpellAddBuff(void_bolt_shadow void_bolt_shadow add=1)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing (64.60000000000001 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.
   SpellInfo(void_eruption cd=90)
+Define(void_eruption_unused_0 228360)
+# Releases an explosive blast of pure void energy, activating Voidform and causing (64.60000000000001 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.
+  SpellInfo(void_eruption_unused_0 gcd=0 offgcd=1)
+Define(void_eruption_unused_1 228361)
+# Releases an explosive blast of pure void energy, activating Voidform and causing (64.60000000000001 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.
+  SpellInfo(void_eruption_unused_1 gcd=0 offgcd=1)
 Define(void_torrent 263165)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
   SpellInfo(void_torrent cd=30 duration=3 channel=3 tick=1)
   SpellRequire(void_torrent unusable set=1 enabled=(not hastalent(void_torrent_talent)))
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddBuff(void_torrent void_torrent add=1)
+  # |cFFFFFFFFGenerates s1*s2/100 Insanity over d.|r
+  SpellAddBuff(void_torrent void_torrent_buff add=1)
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddTargetDebuff(void_torrent void_torrent add=1)
+Define(void_torrent_buff 289577)
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+  SpellInfo(void_torrent_buff duration=3.9 gcd=0 offgcd=1 tick=0.975)
 Define(voidform_shadow 228264)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
   SpellInfo(voidform_shadow gcd=0 offgcd=1)
-  SpellAddBuff(voidform_shadow voidform_shadow add=1)
+Define(voidform_unused_0 194249)
+# Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
+  SpellInfo(voidform_unused_0 duration=15 gcd=0 offgcd=1 tick=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)

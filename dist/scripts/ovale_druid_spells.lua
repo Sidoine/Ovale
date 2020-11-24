@@ -40,9 +40,13 @@ Define(berserk_bear 50334)
   SpellInfo(berserk_bear cd=180 duration=15 gcd=0 offgcd=1)
   # Cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration are reduced by w1. Ironfur cost reduced by w3.
   SpellAddBuff(berserk_bear berserk_bear add=1)
+Define(berserk_buff 343216)
+# Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
+  SpellInfo(berserk_buff gcd=0 offgcd=1 combopoints=-1)
 Define(berserk_cat 106951)
 # Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellInfo(berserk_cat cd=180 duration=20 gcd=0 offgcd=1)
+  SpellAddBuff(berserk_cat berserk_buff add=1)
   # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellAddBuff(berserk_cat berserk_cat add=1)
 Define(berserking 59621)
@@ -83,8 +87,6 @@ Define(celestial_alignment 194223)
 Define(clearcasting_buff 16870)
 # Your healing over time from Lifebloom has a (25 of Spell Power) chance to cause a Clearcasting state, making your next ?a155577[155577m1+1 Regrowths][Regrowth] cost no mana.
   SpellInfo(clearcasting_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Regrowth is free?s155577[ and heals for an additonal w2][].
-  SpellAddBuff(clearcasting_buff clearcasting_buff add=1)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
@@ -93,18 +95,22 @@ Define(concentrated_flame 295368)
 Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink gcd=0 offgcd=1)
-
+  # Falling below 296964M~1 health will cause Conductive Ink to inflict 296963s1*(1+@versadmg) Nature damage.
+  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger add=1)
+Define(conductive_ink_buff_trigger 302565)
+# Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink_buff_trigger duration=120 max_stacks=999 gcd=0 offgcd=1)
 Define(convoke_the_spirits 323764)
 # Call upon the Night Fae for an eruption of energy, channeling a rapid flurry of s2 Druid spells and abilities over 4 seconds.rnrnYou will cast ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake and Thrash on appropriate nearby targets, favoring your current shapeshift form.
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.333)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits add=1)
-Define(dawning_sun_buff 276154)
+Define(dawning_sun 276154)
 # Starfire increases the damage of your Wrath by s1 for 8 seconds.
-  SpellInfo(dawning_sun_buff duration=8 gcd=0 offgcd=1)
-  # Increases the damage of Wrath by w1.
-  SpellAddBuff(dawning_sun_buff dawning_sun_buff add=1)
-
+  SpellInfo(dawning_sun duration=8 gcd=0 offgcd=1)
+Define(dazed 50259)
+# Leap behind an enemy, dazing them for 3 seconds.
+  SpellInfo(dazed duration=3 gcd=0 offgcd=1)
 Define(eclipse_lunar 48518)
 # Casting s1 lStarfire:Starfires; empowers Wrath for 15 seconds. Casting s1 lWrath:Wraths; empowers Starfire for 15 seconds. These Eclipses occur in alternation.rnrn@spellicon48517 @spellname48517rnWrath cast time reduced 48517s1 and damage increased 48517s2.rnrn@spellicon48518 @spellname48518rnStarfire cast time reduced 48518s1 and critical strike chance increased 48518s2.
   SpellInfo(eclipse_lunar duration=15 gcd=0 offgcd=1)
@@ -122,7 +128,6 @@ Define(feral_frenzy 274837)
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
   SpellInfo(feral_frenzy energy=25 cd=45 duration=1 gcd=1 tick=0.2)
   SpellRequire(feral_frenzy unusable set=1 enabled=(not hastalent(feral_frenzy_talent)))
-  SpellAddBuff(feral_frenzy feral_frenzy add=1)
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a102543[s2*(1+(25 of Spell Power)/100)][s2] additional Energy to increase damage by up to 100.rnrn?s202031[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
   SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
@@ -130,13 +135,20 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20)
   SpellRequire(force_of_nature unusable set=1 enabled=(not hastalent(force_of_nature_talent)))
   # Granting s5/10*d Astral Power over d.
   SpellAddBuff(force_of_nature force_of_nature add=1)
-
+  SpellAddTargetDebuff(force_of_nature force_of_nature_debuff add=1)
+Define(force_of_nature_debuff 248280)
+# Summons a stand of s2 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.
+  SpellInfo(force_of_nature_debuff duration=10 gcd=0 offgcd=1)
 Define(full_moon 202771)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(full_moon cd=15 lunarpower=-40)
@@ -154,7 +166,6 @@ Define(galactic_guardian_buff 213708)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(half_moon 202768)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=15 lunarpower=-20)
@@ -163,6 +174,9 @@ Define(heart_of_the_wild 108291)
   SpellInfo(heart_of_the_wild cd=300 duration=45)
   # Damage of your Balance spells increased by s1, and Starsurge is instant.
   SpellAddBuff(heart_of_the_wild heart_of_the_wild add=1)
+Define(immobilized 45334)
+# Charge to an enemy, immobilizing them for 4 seconds.
+  SpellInfo(immobilized duration=4 gcd=0 offgcd=1)
 Define(incapacitating_roar 99)
 # Shift into Bear Form and invoke the spirit of Ursol to let loose a deafening roar, incapacitating all enemies within A1 yards for 3 seconds. Damage will cancel the effect.
   SpellInfo(incapacitating_roar cd=30 duration=3)
@@ -183,19 +197,28 @@ Define(incarnation_king_of_the_jungle 102543)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
   SpellInfo(incarnation_king_of_the_jungle cd=180 duration=30 gcd=0 offgcd=1)
   SpellRequire(incarnation_king_of_the_jungle unusable set=1 enabled=(not hastalent(incarnation_king_of_the_jungle_talent)))
+  SpellAddBuff(incarnation_king_of_the_jungle berserk_buff add=1)
   # Rake and Shred deal damage as though you were stealthed.rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.rnrnEnergy costs reduced by w2.
   SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle add=1)
+  # Allows the use of Prowl even while in combat.
+  SpellAddBuff(incarnation_king_of_the_jungle jungle_stalker add=1)
 Define(iron_jaws 276026)
 # Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
   SpellInfo(iron_jaws duration=30 gcd=0 offgcd=1)
   # Your next Maim will deal an additional w1 damage per combo point.
   SpellAddBuff(iron_jaws iron_jaws add=1)
-
+  SpellAddTargetDebuff(iron_jaws iron_jaws_debuff add=1)
+Define(iron_jaws_debuff 276021)
+# Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
+  SpellInfo(iron_jaws_debuff gcd=0 offgcd=1)
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
   # Armor increased by w1*AGI/100.
   SpellAddBuff(ironfur ironfur add=1)
+Define(jungle_stalker 252071)
+# An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
+  SpellInfo(jungle_stalker duration=30 gcd=0 offgcd=1)
 Define(kindred_empowerment_energize 327139)
 # Energize your bonded partner, granting them 327139s1 of your damage as additional Arcane damage, healing, or absorption.
   SpellInfo(kindred_empowerment_energize duration=10 gcd=0 offgcd=1 tick=0.5)
@@ -204,12 +227,10 @@ Define(kindred_empowerment_energize 327139)
 Define(kindred_spirits 56315)
 # Increases your maximum Focus and your pet's maximum Focus by (25 of Spell Power).
   SpellInfo(kindred_spirits gcd=0 offgcd=1)
-  SpellAddBuff(kindred_spirits kindred_spirits add=1)
 Define(lunar_inspiration 155580)
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
   SpellInfo(lunar_inspiration gcd=0 offgcd=1)
   SpellRequire(lunar_inspiration unusable set=1 enabled=(not hastalent(lunar_inspiration_talent)))
-  SpellAddBuff(lunar_inspiration lunar_inspiration add=1)
 Define(lycaras_fleeting_glimpse 340060)
 # Every s1 sec while in combat, cast a spell based on your form:rnrnNo Form: @spellname48438rnCat Form: @spellname285381rnBear Form: @spellname22812rnMoonkin Form: @spellname191034rnTravel Form: @spellname77764
   SpellInfo(lycaras_fleeting_glimpse duration=5 gcd=0 offgcd=1 tick=1)
@@ -305,8 +326,6 @@ Define(rake 1822)
 Define(rake_debuff 155722)
 # Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 15 seconds.?s48484[ Reduces the target's movement speed by 58180s1 for 12 seconds.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 4 seconds, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
-  # Bleeding for w1 damage every t1 seconds.
-  SpellAddTargetDebuff(rake_debuff rake_debuff add=1)
 Define(ravenous_frenzy 323546)
 # For 20 seconds, Druid spells you cast increase your damage and healing by s1, and haste by s3, stacking.rnrnIf you spend s9/10 sec idle, the Frenzy overcomes you, consuming s3 of your health per stack, stunning you for 1 second, and ending.
   SpellInfo(ravenous_frenzy cd=180 duration=20 max_stacks=99 gcd=0 offgcd=1 tick=0.1)
@@ -322,10 +341,9 @@ Define(razor_coral_debuff 303568)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 304038)
+Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff reckless_force_buff add=1)
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 4 seconds*2 secrn   2 points: o1*3 over 4 seconds*3 secrn   3 points: o1*4 over 4 seconds*4 secrn   4 points: o1*5 over 4 seconds*5 secrn   5 points: o1*6 over 4 seconds*6 sec
   SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
@@ -337,8 +355,6 @@ Define(ripple_in_space 299306)
 Define(savage_combatant_buff 340613)
 # Mangle increases the damage of your next Maul by |cFFFFFFFFs1.1|r, stacking up to 340613u.
   SpellInfo(savage_combatant_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
-  # Your next Maul deals w1 increased damage.
-  SpellAddBuff(savage_combatant_buff savage_combatant_buff add=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 gcd=1 tick=2)
@@ -361,12 +377,14 @@ Define(solar_beam 78675)
   SpellInfo(solar_beam cd=60 duration=8 gcd=0 offgcd=1)
   # Silenced.
   SpellAddBuff(solar_beam solar_beam add=1)
-
+  # Interrupted.
+  SpellAddTargetDebuff(solar_beam solar_beam_debuff add=1)
+Define(solar_beam_debuff 97547)
+# You summon a beam of solar light over the enemy target's location, interrupting the enemy target and silencing all enemy targets under the beam while it is active. Solar Beam lasts for 8 seconds.
+  SpellInfo(solar_beam_debuff duration=5 gcd=0 offgcd=1 interrupt=1)
 Define(solstice_buff 343648)
 # During the first 6 seconds of every Eclipse, Shooting Stars fall 343648s1 more often.
   SpellInfo(solstice_buff duration=6 gcd=0 offgcd=1)
-  # Shooting Stars fall w1 more often.
-  SpellAddBuff(solstice_buff solstice_buff add=1)
 Define(starfall 191034)
 # Calls down waves of falling stars upon enemies within 50286A1 yds, dealing <damage> Astral damage over 8 seconds.?s327541[rnrnExtends the duration of active Moonfires and Sunfires by 327541s1 sec.][]
   SpellInfo(starfall lunarpower=50 duration=8 tick=8)
@@ -379,7 +397,6 @@ Define(starlord 202345)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
   SpellInfo(starlord gcd=0 offgcd=1)
   SpellRequire(starlord unusable set=1 enabled=(not hastalent(starlord_talent)))
-  SpellAddBuff(starlord starlord add=1)
 Define(starlord_buff 279709)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
   SpellInfo(starlord_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
@@ -397,8 +414,6 @@ Define(stellar_flare 202347)
 Define(sudden_ambush_buff 340698)
 # Finishing moves have a |cFFFFFFFFs1.1|r chance per combo point spent to make your next Rake or Shred deal damage as though you were stealthed. 
   SpellInfo(sudden_ambush_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Rake or Shred will deal damage as though you were stealthed.
-  SpellAddBuff(sudden_ambush_buff sudden_ambush_buff add=1)
 Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(sunfire lunarpower=0)
@@ -431,17 +446,17 @@ Define(tigers_fury 5217)
 Define(timeworn_dreambinder_buff 340049)
 # Starsurge and Starfall reduce the cost of Starsurge and Starfall by 340049s1 and increase their damage by 340049s2 for 5 seconds, stacking up to 340049u times.
   SpellInfo(timeworn_dreambinder_buff duration=5 max_stacks=2 gcd=0 offgcd=1)
-  # Cost of Starsurge and Starfall reduced by w1, and their damage increased by w2.
-  SpellAddBuff(timeworn_dreambinder_buff timeworn_dreambinder_buff add=1)
-Define(tooth_and_claw_buff 135601)
+Define(tooth_and_claw_buff 135286)
 # Autoattacks have a s1 chance to empower your next Maul, stacking up to 135286u times.rnrnEmpowered Maul deals 135286s1 increased damage and reduces the target's damage to you by 135601s2 for 6 seconds.
-  SpellInfo(tooth_and_claw_buff duration=6 gcd=0 offgcd=1)
-  # Dealing w1 reduced damage to @auracaster.
-  SpellAddTargetDebuff(tooth_and_claw_buff tooth_and_claw_buff add=1)
+  SpellInfo(tooth_and_claw_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
 Define(typhoon 132469)
 # Blasts targets within 61391a1 yards in front of you with a violent Typhoon, knocking them back and dazing them for 6 seconds. Usable in all shapeshift forms.
   SpellInfo(typhoon cd=30)
-
+  # Dazed.
+  SpellAddTargetDebuff(typhoon typhoon_debuff add=1)
+Define(typhoon_debuff 61391)
+# Summon a violent Typhoon that strikes targets in front of the caster within 61391a1 yards, knocking them back and dazing them for 6 seconds.
+  SpellInfo(typhoon_debuff duration=6 gcd=0 offgcd=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -458,13 +473,15 @@ Define(wild_charge_bear 16979)
   SpellInfo(wild_charge_bear cd=15 gcd=0 offgcd=1)
   # Immobilized.
   SpellAddBuff(wild_charge_bear wild_charge_bear add=1)
-
+  # Immobilized.
+  SpellAddTargetDebuff(wild_charge_bear immobilized add=1)
 Define(wild_charge_cat 49376)
 # Leap behind an enemy, dazing them for 3 seconds.
   SpellInfo(wild_charge_cat cd=15 gcd=0 offgcd=1)
   # Dazed.
   SpellAddBuff(wild_charge_cat wild_charge_cat add=1)
-
+  # Dazed.
+  SpellAddTargetDebuff(wild_charge_cat dazed add=1)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)

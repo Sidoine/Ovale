@@ -781,6 +781,7 @@ __exports.Annotation = __class(nil, {
         self.specialization = specialization
         self.consumables = {}
         self.taggedFunctionName = {}
+        self.functionTag = {}
         self.dictionary = {}
         self.variable = {}
         self.symbolList = {}

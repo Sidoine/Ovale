@@ -340,6 +340,7 @@ export interface ActionParseNode extends BaseParseNode {
     name: string;
     action: string;
     modifiers: Modifiers;
+    actionListName: string;
 }
 
 interface BaseParseNodeWithChilds<T extends ParseNode> extends BaseParseNode {
@@ -1059,7 +1060,7 @@ export class Annotation implements InterruptAnnotation {
     ranged?: ClassType;
     position?: string;
     taggedFunctionName: LuaObj<boolean> = {};
-    functionTag?: any;
+    functionTag: LuaObj<"cd" | "shortcd"> = {};
     nodeList?: LuaArray<ParseNode>;
 
     astAnnotation: AstAnnotation;

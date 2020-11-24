@@ -293,6 +293,8 @@ export class OvaleCompileClass {
             const filter = auraInfo.filter;
             const tbl = auraTable[filter] || {};
             tbl[node.buffSpellId] = node;
+            const buff = this.ovaleData.SpellInfo(node.buffSpellId);
+            buff.effect = auraInfo.filter;
         }
         return ok;
     }

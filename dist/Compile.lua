@@ -279,6 +279,8 @@ __exports.OvaleCompileClass = __class(nil, {
             local filter = auraInfo.filter
             local tbl = auraTable[filter] or {}
             tbl[node.buffSpellId] = node
+            local buff = self.ovaleData:SpellInfo(node.buffSpellId)
+            buff.effect = auraInfo.filter
         end
         return ok
     end,

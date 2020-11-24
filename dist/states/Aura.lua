@@ -715,6 +715,9 @@ __exports.OvaleAuraClass = __class(States, {
         if atTime and ( not aura or aura.serial < self.next.auraSerial) then
             aura = __exports.GetAura(self.current.aura, guid, auraId, casterGUID)
         end
+        if aura then
+            self.debug:Log("Found aura with stack = %d", aura.stacks)
+        end
         return aura
     end,
     DebugUnitAuras = function(self, unitId, filter, atTime)
@@ -880,7 +883,7 @@ __exports.OvaleAuraClass = __class(States, {
             if auraFound then
                 self.debug:Log("Aura %s found on %s with (%s, %s) [stacks=%d]", auraId, guid, auraFound.start, auraFound.ending, auraFound.stacks)
             else
-                self.debug:Log("Aura %s is missing on %s.", auraId, guid)
+                self.debug:Log("Aura %s is missing on %s (mine=%s).", auraId, guid, mine)
             end
         end
         return auraFound

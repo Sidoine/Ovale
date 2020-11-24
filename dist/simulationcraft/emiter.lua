@@ -660,6 +660,21 @@ __exports.Emiter = __class(nil, {
                 elseif action == "heart_essence" then
                     bodyCode = [[Spell(296208)]]
                     isSpellAction = false
+                elseif parseNode.actionListName == "precombat" then
+                    local definition = annotation.dictionary[action]
+                    if isNumber(definition) then
+                        local spellInfo = self.ovaleData:GetSpellInfo(definition)
+                        if spellInfo and spellInfo.aura then
+                            for _, info in kpairs(spellInfo.aura.player.HELPFUL) do
+                                if info.buffSpellId then
+                                    local buffSpellInfo = self.ovaleData:GetSpellInfo(info.buffSpellId)
+                                    if buffSpellInfo and ( not buffSpellInfo.duration or buffSpellInfo.duration > 59) then
+                                        conditionCode = "buffexpires(" .. (info.buffName or info.buffSpellId) .. ")"
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
                 if isSpellAction then
                     self:AddSymbol(annotation, action)
@@ -1027,8 +1042,23 @@ __exports.Emiter = __class(nil, {
             target = (target and target .. ".") or ""
             local buffName = name .. "_debuff"
             buffName = self:Disambiguate(annotation, buffName, className, specialization)
-            local prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
-            local buffTarget = (prefix == "Debuff" and "target.") or target
+            local buffSpellId = annotation.dictionary[buffName]
+            local prefix
+            local buffTarget
+            if buffSpellId and isNumber(buffSpellId) then
+                local buffSpellInfo = self.ovaleData:GetSpellInfo(buffSpellId)
+                if buffSpellInfo then
+                    if buffSpellInfo.effect == "HARMFUL" then
+                        prefix = "Debuff"
+                    elseif buffSpellInfo.effect == "HELPFUL" then
+                        prefix = "Buff"
+                    end
+                end
+            end
+            if  not prefix then
+                prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
+            end
+            buffTarget = (prefix == "Debuff" and "target.") or target
             local talentName = name .. "_talent"
             talentName = self:Disambiguate(annotation, talentName, className, specialization)
             local symbol = name
