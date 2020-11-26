@@ -9,7 +9,6 @@ export function registerDeathKnightSpells(OvaleScripts: OvaleScriptsClass) {
     let code = `Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
-  SpellAddBuff(ancestral_call ancestral_call add=1)
 Define(anima_of_death 294926)
 # Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
   SpellInfo(anima_of_death cd=150)
@@ -19,15 +18,23 @@ Define(apocalypse 275699)
 Define(arcane_pulse 260364)
 # Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
   SpellInfo(arcane_pulse cd=180 gcd=1)
-
+  # Reduces movement speed by w1.
+  SpellAddBuff(arcane_pulse arcane_pulse_buff add=1)
+Define(arcane_pulse_buff 260369)
+# Reduces movement speed by s1.
+  SpellInfo(arcane_pulse_buff duration=12 gcd=0 offgcd=1)
 Define(arcane_torrent 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
 Define(army_of_the_dead 42650)
 # Summons a legion of ghouls who swarms your enemies, fighting anything they can for 30 seconds.
   SpellInfo(army_of_the_dead runes=1 runicpower=-10 cd=480 duration=4 tick=0.5)
+  SpellAddBuff(army_of_the_dead army_of_the_dead_buff add=1)
   # Summoning ghouls.
   SpellAddBuff(army_of_the_dead army_of_the_dead add=1)
+Define(army_of_the_dead_buff 42651)
+# Summons a legion of ghouls who swarms your enemies, fighting anything they can for 30 seconds.
+  SpellInfo(army_of_the_dead_buff duration=30 gcd=0 offgcd=1)
 Define(asphyxiate 221562)
 # Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 5 seconds.
   SpellInfo(asphyxiate cd=45 duration=5)
@@ -69,18 +76,26 @@ Define(bonestorm 194844)
 # A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
   SpellInfo(bonestorm runicpower=10 cd=60 duration=1 tick=1)
   SpellRequire(bonestorm unusable set=1 enabled=(not hastalent(bonestorm_talent)))
+  SpellAddBuff(bonestorm bonestorm_buff add=1)
   # Dealing 196528s1 Shadow damage to nearby enemies every t3 sec, and healing for 196545s1 of maximum health for each target hit (up to s1*s4).
   SpellAddBuff(bonestorm bonestorm add=1)
+Define(bonestorm_buff 196528)
+# A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
+  SpellInfo(bonestorm_buff gcd=0 offgcd=1)
 Define(breath_of_sindragosa 152279)
 # Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
   SpellInfo(breath_of_sindragosa cd=120 gcd=0 offgcd=1 tick=1)
   SpellRequire(breath_of_sindragosa unusable set=1 enabled=(not hastalent(breath_of_sindragosa_talent)))
   SpellAddBuff(breath_of_sindragosa breath_of_sindragosa_buff add=1)
+  SpellAddBuff(breath_of_sindragosa breath_of_sindragosa_buff_unused_0 add=1)
   # Continuously dealing Frost damage every t1 sec to enemies in a cone in front of you.
   SpellAddBuff(breath_of_sindragosa breath_of_sindragosa add=1)
 Define(breath_of_sindragosa_buff 155166)
 # Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
   SpellInfo(breath_of_sindragosa_buff gcd=0 offgcd=1)
+Define(breath_of_sindragosa_buff_unused_0 303753)
+# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
+  SpellInfo(breath_of_sindragosa_buff_unused_0 gcd=0 offgcd=1 runes=-2)
 Define(chains_of_ice 45524)
 # Shackles the target with frozen chains, reducing movement speed by s1 for 8 seconds.
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
@@ -100,7 +115,9 @@ Define(consumption 274156)
 # Strikes up to s3 enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
   SpellInfo(consumption cd=30)
   SpellRequire(consumption unusable set=1 enabled=(not hastalent(consumption_talent)))
-
+  SpellAddBuff(consumption consumption_buff_unused_0 add=1)
+Define(consumption_buff_unused_0 274893)
+  SpellInfo(consumption_buff_unused_0 gcd=0 offgcd=1)
 Define(crimson_scourge_buff 81141)
 # Your auto attacks on targets infected with your Blood Plague have a chance to make your next Death and Decay cost no runes and reset its cooldown.
   SpellInfo(crimson_scourge_buff duration=15 gcd=0 offgcd=1)
@@ -109,8 +126,7 @@ Define(crimson_scourge_buff 81141)
 Define(dancing_rune_weapon 49028)
 # Summons a rune weapon for 8 seconds that mirrors your melee attacks and bolsters your defenses.rnrnWhile active, you gain 81256s1 parry chance.
   SpellInfo(dancing_rune_weapon cd=120 duration=13)
-
-  SpellAddTargetDebuff(dancing_rune_weapon dancing_rune_weapon add=1)
+# Unknown spell id 1206
 Define(dancing_rune_weapon_buff 81256)
 # Summons a rune weapon for 8 seconds that mirrors your melee attacks and bolsters your defenses.rnrnWhile active, you gain 81256s1 parry chance.
   SpellInfo(dancing_rune_weapon_buff duration=8 gcd=0 offgcd=1)
@@ -124,19 +140,16 @@ Define(dark_transformation 63560)
 Define(death_and_decay 43265)
 # Corrupts the targeted ground, causing 52212m1*11 Shadow damage over 10 seconds to targets within the area.?!c2[rnrnWhile you remain within the area, your ][]?s223829&!c2[Necrotic Strike and ][]?c1[Heart Strike will hit up to 188290m3 additional targets.]?s207311&!c2[Clawing Shadows will hit up to 55090s4-1 enemies near the target.]?!c2[Scourge Strike will hit up to 55090s4-1 enemies near the target.][]
   SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 duration=10 tick=1)
-  SpellAddBuff(death_and_decay death_and_decay add=1)
 Define(death_coil 47541)
 # Fires a blast of unholy energy at the target, causing 47632s1 Shadow damage to an enemy or healing an Undead ally for 47633s1 health.?s316941[rnrnReduces the cooldown of Dark Transformation by s2/1000 sec.][]
   SpellInfo(death_coil runicpower=40)
 Define(death_strike 278223)
 # Death Strike's cost is reduced by s3/-10, and its healing is increased by s1.
   SpellInfo(death_strike gcd=0 offgcd=1)
-  SpellAddBuff(death_strike death_strike add=1)
 Define(defile 152280)
 # Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
   SpellInfo(defile runes=1 runicpower=-10 cd=20 duration=10 tick=1)
   SpellRequire(defile unusable set=1 enabled=(not hastalent(defile_talent)))
-  SpellAddBuff(defile defile add=1)
 Define(empower_rune_weapon 47568)
 # Empower your rune weapon, gaining s3 Haste and generating s1 LRune:Runes; and m2/10 Runic Power instantly and every t1 sec for 20 seconds.
   SpellInfo(empower_rune_weapon cd=120 duration=20 gcd=0 offgcd=1 tick=5)
@@ -169,7 +182,18 @@ Define(frost_fever_debuff 55095)
 Define(frost_strike 49143)
 # Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
   SpellInfo(frost_strike runicpower=25)
-
+  SpellAddTargetDebuff(frost_strike frost_strike_debuff add=1)
+  SpellAddTargetDebuff(frost_strike frost_strike_offhand add=1)
+  SpellAddTargetDebuff(frost_strike frost_strike_debuff_unused_0 add=1)
+Define(frost_strike_debuff 222026)
+# Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
+  SpellInfo(frost_strike_debuff gcd=0 offgcd=1)
+Define(frost_strike_debuff_unused_0 325464)
+# Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
+  SpellInfo(frost_strike_debuff_unused_0 gcd=0 offgcd=1)
+Define(frost_strike_offhand 66196)
+# Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
+  SpellInfo(frost_strike_offhand gcd=0 offgcd=1)
 Define(frostscythe 207230)
 # A sweeping attack that strikes up to s5 enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
   SpellInfo(frostscythe runes=1 runicpower=-10)
@@ -192,8 +216,6 @@ Define(heart_strike 206930)
 Define(hemostasis_buff 273947)
 # Each enemy hit by Blood Boil increases the damage and healing done by your next Death Strike by 273947s1, stacking up to 273947u times.
   SpellInfo(hemostasis_buff duration=15 max_stacks=5 gcd=0 offgcd=1)
-  # Damage and healing done by your next Death Strike increased by s1.
-  SpellAddBuff(hemostasis_buff hemostasis_buff add=1)
 Define(horn_of_winter 57330)
 # Blow the Horn of Winter, gaining s1 LRune:Runes; and generating s2/10 Runic Power.
   SpellInfo(horn_of_winter cd=45 runes=-2 runicpower=-25)
@@ -210,17 +232,16 @@ Define(hypothermic_presence 321995)
 Define(icy_talons_buff 194879)
 # Your Runic Power spending abilities increase your melee attack speed by 194879s1 for 6 seconds, stacking up to 194879u times.
   SpellInfo(icy_talons_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
-  # Attack speed increased s1.
-  SpellAddBuff(icy_talons_buff icy_talons_buff add=1)
-Define(killing_machine_buff 51124)
-# Your auto attack has a chance to cause your next Obliterate ?s207230[or Frostscythe ][]to be a guaranteed critical strike.
-  SpellInfo(killing_machine_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
-  # Guaranteed critical strike on your next Obliterate?s207230[ or Frostscythe][].
-  SpellAddBuff(killing_machine_buff killing_machine_buff add=1)
+Define(killing_machine_frost 317214)
+# Your next Obliterate also deals Frost damage.
+  SpellInfo(killing_machine_frost gcd=0 offgcd=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-
+  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
+Define(lights_judgment_debuff 256893)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
+  SpellInfo(lights_judgment_debuff cd=150)
 Define(marrowrend 195182)
 # Smash the target, dealing s2 Physical damage and generating s3 charges of Bone Shield.rnrn|Tinterfaceiconsability_deathknight_boneshield.blp:24|t |cFFFFFFFFBone Shield|rrnSurrounds you with a barrier of whirling bones, increasing Armor by s1*STR/100?s316746[, and your Haste by s4][]. Each melee attack against you consumes a charge. Lasts 30 seconds or until all charges are consumed.
   SpellInfo(marrowrend runes=2 runicpower=-20)
@@ -233,7 +254,18 @@ Define(mind_freeze 47528)
 Define(obliterate 49020)
 # A brutal attack ?owb==0[that deals <2hDamage> Physical damage.][with both weapons that deals a total of <dualWieldDamage> Physical damage.]
   SpellInfo(obliterate runes=2 runicpower=-20)
-
+  SpellAddTargetDebuff(obliterate obliterate_debuff add=1)
+  SpellAddTargetDebuff(obliterate obliterate_offhand add=1)
+  SpellAddTargetDebuff(obliterate obliterate_debuff_unused_0 add=1)
+Define(obliterate_debuff 222024)
+# A brutal attack ?owb==0[that deals <2hDamage> Physical damage.][with both weapons that deals a total of <dualWieldDamage> Physical damage.]rn
+  SpellInfo(obliterate_debuff gcd=0 offgcd=1)
+Define(obliterate_debuff_unused_0 325461)
+# A brutal attack ?owb==0[that deals <2hDamage> Physical damage.][with both weapons that deals a total of <dualWieldDamage> Physical damage.]rn
+  SpellInfo(obliterate_debuff_unused_0 gcd=0 offgcd=1)
+Define(obliterate_offhand 66198)
+# A brutal attack ?owb==0[that deals <2hDamage> Physical damage.][with both weapons that deals a total of <dualWieldDamage> Physical damage.]
+  SpellInfo(obliterate_offhand gcd=0 offgcd=1)
 Define(outbreak 77575)
 # Deals s1 Shadow damage to the target and infects all nearby enemies with Virulent Plague.rnrn|Tinterfaceiconsability_creature_disease_02.blp:24|t |cFFFFFFFFVirulent Plague|rrnA disease that deals o Shadow damage over 27 seconds. It erupts when the infected target dies, dealing 191685s1 Shadow damage to nearby enemies.
   SpellInfo(outbreak runes=1 runicpower=-10)
@@ -268,14 +300,19 @@ Define(remorseless_winter 196770)
 Define(remorseless_winter_buff 196771)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter_buff gcd=0 offgcd=1)
-Define(rime_buff 59052)
-# Your next Howling Blast will consume no Runes, generate no Runic Power, and deal s2 additional damage.
-  SpellInfo(rime_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Howling Blast will consume no Runes, generate no Runic Power, and deals s2 additional damage.
-  SpellAddBuff(rime_buff rime_buff add=1)
+Define(rime_frost 316838)
+# Increases Howling Blasts damage done by an additional s1.
+  SpellInfo(rime_frost gcd=0 offgcd=1)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
+Define(scourge_strike 55090)
+# An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
+  SpellInfo(scourge_strike runes=1 runicpower=-10)
+  SpellAddTargetDebuff(scourge_strike scourge_strike_debuff add=1)
+Define(scourge_strike_debuff 70890)
+# An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
+  SpellInfo(scourge_strike_debuff gcd=0 offgcd=1)
 Define(soul_reaper 343294)
 # Strike an enemy for s1 Shadow damage and afflict the enemy with Soul Reaper. rnrnAfter 5 seconds, if the target is below s3 health this effect will explode dealing an additional 343295s1 Shadow damage to the target. If the enemy that yields experience or honor dies while afflicted by Soul Reaper, gain Runic Corruption.
   SpellInfo(soul_reaper runes=1 runicpower=-10 cd=6 duration=5 tick=5)
@@ -285,13 +322,15 @@ Define(soul_reaper 343294)
 Define(sudden_doom_buff 81340)
 # Your auto attacks have a chance to make your next Death Coil?s207317[ or Epidemic][] cost no Runic Power.
   SpellInfo(sudden_doom_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
-  # Your next Death Coil?s207317[ or Epidemic][] consumes no Runic Power.
-  SpellAddBuff(sudden_doom_buff sudden_doom_buff add=1)
 Define(summon_gargoyle 49206)
 # Summon a Gargoyle into the area to bombard the target for 30 seconds.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
   SpellInfo(summon_gargoyle cd=180 duration=35)
   SpellRequire(summon_gargoyle unusable set=1 enabled=(not hastalent(summon_gargoyle_talent)))
-
+  # Runic Power is being fed to the Gargoyle.
+  SpellAddBuff(summon_gargoyle summon_gargoyle_buff add=1)
+Define(summon_gargoyle_buff 61777)
+# A Gargoyle flies into the area and bombards the target with Shadow damage.
+  SpellInfo(summon_gargoyle_buff duration=30 gcd=0 offgcd=1)
 Define(tombstone 219809)
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for 8 seconds.
   SpellInfo(tombstone cd=60 duration=8 runicpower=0)
@@ -308,18 +347,19 @@ Define(unholy_blight 115989)
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
   SpellInfo(unholy_blight runes=1 runicpower=-10 cd=45 duration=6 tick=1)
   SpellRequire(unholy_blight unusable set=1 enabled=(not hastalent(unholy_blight_talent)))
+  # Suffering sw1 Shadow damage every t1 sec and taking increased damage from @auracaster's minions.
+  SpellAddBuff(unholy_blight unholy_blight_buff add=1)
   # Surrounded by a vile swarm of insects, infecting enemies within 115994a1 yds with Virulent Plauge and an unholy disease that increases the damage your minions deal to them.
   SpellAddBuff(unholy_blight unholy_blight add=1)
+Define(unholy_blight_buff 115994)
+# Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
+  SpellInfo(unholy_blight_buff duration=14 max_stacks=4 gcd=0 offgcd=1 tick=2)
 Define(unholy_strength 53365)
 # Affixes your rune weapon with a rune that has a chance to heal you for 53365s2 and increase total Strength by 53365s1 for 15 seconds.
   SpellInfo(unholy_strength duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Strength increased by s1.
-  SpellAddBuff(unholy_strength unholy_strength add=1)
 Define(unleashed_frenzy_buff 338501)
 # Frost Strike increases your strength by |cFFFFFFFFs1.1|r for 6 seconds, stacks up to 338501u times.
   SpellInfo(unleashed_frenzy_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
-  # Strength increased by w1.1.
-  SpellAddBuff(unleashed_frenzy_buff unleashed_frenzy_buff add=1)
 Define(vampiric_blood 55233)
 # Embrace your undeath, increasing your maximum health by s4 and increasing all healing and absorbs received by s1 for 10 seconds.
   SpellInfo(vampiric_blood cd=90 duration=10 gcd=0 offgcd=1)
@@ -328,8 +368,6 @@ Define(vampiric_blood 55233)
 Define(virulent_plague 191587)
 # A disease that deals o Shadow damage over 27 seconds. It erupts when the infected target dies, dealing 191685s1 Shadow damage to nearby enemies.
   SpellInfo(virulent_plague duration=27 gcd=0 offgcd=1 tick=3)
-  # Suffering w1 Shadow damage every t1 sec.rnErupts for 191685s1 damage split among all nearby enemies when the infected dies.
-  SpellAddTargetDebuff(virulent_plague virulent_plague add=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -400,6 +438,8 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
 Define(unholy_pact_talent 17) #22534
 # Dark Transformation creates an unholy pact between you and your pet, igniting flaming chains that deal 319236s1*s2 Shadow damage over s2 sec to enemies between you and your pet. rnrnWhile active, your strength is increased by 319255s1.
+Define(fallen_crusader_enchant 3368)
+Define(razorice_enchant 3370)
 Define(dribbling_inkpod_item 169319)
 Define(potion_of_unbridled_fury_item 169299)
 Define(biting_cold_runeforge 6945)

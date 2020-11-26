@@ -316,6 +316,7 @@ __exports.Runner = __class(nil, {
                 self:copyResult(group.result, bestElement)
                 self.tracer:Log("[%d]    group best action remains %s at %s", group.nodeId, self:resultToString(group.result), timeSpan)
             else
+                setResultType(group.result, "none")
                 self.tracer:Log("[%d]    group no best action returns %s at %s", group.nodeId, self:resultToString(group.result), timeSpan)
             end
             self.profiler:StopProfiling("OvaleBestAction_ComputeGroup")

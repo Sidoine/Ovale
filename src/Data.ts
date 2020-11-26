@@ -179,6 +179,7 @@ export interface SpellInfoValues extends Powers {
     learn?: number;
     pertrait?: number;
     proc?: number;
+    effect?: "HELPFUL" | "HARMFUL";
 }
 
 export type SpellInfoNumberProperty = {

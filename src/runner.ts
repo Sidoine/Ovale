@@ -887,6 +887,8 @@ export class Runner {
                 timeSpan
             );
         } else {
+            setResultType(group.result, "none");
+
             this.tracer.Log(
                 "[%d]    group no best action returns %s at %s",
                 group.nodeId,

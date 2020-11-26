@@ -267,7 +267,7 @@ AddFunction blood_defaultcdactions
    #use_item,name=razdunks_big_red_button
    blooduseitemactions()
    #use_item,effect_name=cyclotronic_blast,if=cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>cast_time
-   if spellcooldown(dancing_rune_weapon) > 0 and not buffpresent(dancing_rune_weapon_buff) and timetorunes(4) > casttime(use_item) blooduseitemactions()
+   if spellcooldown(dancing_rune_weapon) > 0 and not buffpresent(dancing_rune_weapon_buff) and timetorunes(4) > 0 blooduseitemactions()
    #use_item,name=azsharas_font_of_power,if=(cooldown.dancing_rune_weapon.remains<5&target.time_to_die>15)|(target.time_to_die<34)
    if spellcooldown(dancing_rune_weapon) < 5 and target.timetodie() > 15 or target.timetodie() < 34 blooduseitemactions()
    #use_item,name=merekthas_fang,if=(cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>3)&!raid_event.adds.exists|raid_event.adds.in>15
@@ -434,19 +434,19 @@ AddFunction froststandardmainactions
  #remorseless_winter,if=talent.gathering_storm.enabled|conduit.everfrost.enabled|runeforge.biting_cold.equipped
  if hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) spell(remorseless_winter)
  #glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
- if not message("death_knight.runeforge.razorice is not implemented") and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } spell(glacial_advance)
+ if not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } spell(glacial_advance)
  #frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
  if spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) spell(frost_strike)
  #frost_strike,if=conduit.unleashed_frenzy.enabled&buff.unleashed_frenzy.remains<3|conduit.eradicating_blow.enabled&buff.eradicating_blow.stack=2
  if conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 spell(frost_strike)
  #howling_blast,if=buff.rime.up
- if buffpresent(rime_buff) spell(howling_blast)
+ if buffpresent(rime_frost) spell(howling_blast)
  #obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse.enabled
  if not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) spell(obliterate)
  #frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
  if runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 spell(frost_strike)
  #frostscythe,if=buff.killing_machine.up&rune.time_to_4>=gcd
- if buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() spell(frostscythe)
+ if buffpresent(killing_machine_frost) and timetorunes(4) >= gcd() spell(frostscythe)
  #obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
  if runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 spell(obliterate)
  #frost_strike
@@ -459,7 +459,7 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not message("death_knight.runeforge.razorice is not implemented") and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
+ unless { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_frost) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -468,12 +468,12 @@ AddFunction froststandardshortcdactions
 
 AddFunction froststandardshortcdpostconditions
 {
- { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not message("death_knight.runeforge.razorice is not implemented") and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
+ { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_frost) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike)
 }
 
 AddFunction froststandardcdactions
 {
- unless { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not message("death_knight.runeforge.razorice is not implemented") and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ unless { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_frost) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -482,7 +482,7 @@ AddFunction froststandardcdactions
 
 AddFunction froststandardcdpostconditions
 {
- { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not message("death_knight.runeforge.razorice is not implemented") and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_buff) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ { hastalent(gathering_storm_talent) or conduit(everfrost_conduit) or equippedruneforge(biting_cold_runeforge) } and spell(remorseless_winter) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or { conduit(unleashed_frenzy_conduit) and buffremaining(unleashed_frenzy_buff) < 3 or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or not buffpresent(frozen_pulse_buff) and hastalent(frozen_pulse_talent) and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or buffpresent(killing_machine_frost) and timetorunes(4) >= gcd() and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.precombat
@@ -524,23 +524,23 @@ AddFunction frostobliterationmainactions
  #remorseless_winter,if=talent.gathering_storm.enabled&active_enemies>=3
  if hastalent(gathering_storm_talent) and enemies() >= 3 spell(remorseless_winter)
  #howling_blast,if=!dot.frost_fever.ticking&!buff.killing_machine.up
- if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) spell(howling_blast)
+ if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_frost) spell(howling_blast)
  #frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2
- if buffpresent(killing_machine_buff) and enemies() >= 2 spell(frostscythe)
+ if buffpresent(killing_machine_frost) and enemies() >= 2 spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react|!buff.rime.up&spell_targets.howling_blast>=3
- if buffpresent(killing_machine_buff) or not buffpresent(rime_buff) and enemies() >= 3 spell(obliterate)
+ if buffpresent(killing_machine_frost) or not buffpresent(rime_frost) and enemies() >= 3 spell(obliterate)
  #glacial_advance,if=spell_targets.glacial_advance>=2&(runic_power.deficit<10|rune.time_to_2>gcd)|(debuff.razorice.stack<5|debuff.razorice.remains<15)
  if enemies() >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 15 spell(glacial_advance)
  #frost_strike,if=conduit.eradicating_blow.enabled&buff.eradicating_blow.stack=2&active_enemies=1
  if conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 and enemies() == 1 spell(frost_strike)
  #howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
- if buffpresent(rime_buff) and enemies() >= 2 spell(howling_blast)
+ if buffpresent(rime_frost) and enemies() >= 2 spell(howling_blast)
  #glacial_advance,if=spell_targets.glacial_advance>=2
  if enemies() >= 2 spell(glacial_advance)
  #frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit<10|rune.time_to_2>gcd|!buff.rime.up
- if runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_buff) spell(frost_strike)
+ if runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_frost) spell(frost_strike)
  #howling_blast,if=buff.rime.up
- if buffpresent(rime_buff) spell(howling_blast)
+ if buffpresent(rime_frost) spell(howling_blast)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice
  spell(obliterate)
 }
@@ -555,7 +555,7 @@ AddFunction frostobliterationshortcdactions
 
 AddFunction frostobliterationshortcdpostconditions
 {
- hastalent(gathering_storm_talent) and enemies() >= 3 and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or { buffpresent(killing_machine_buff) or not buffpresent(rime_buff) and enemies() >= 3 } and spell(obliterate) or { enemies() >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 15 } and spell(glacial_advance) or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 and enemies() == 1 and spell(frost_strike) or buffpresent(rime_buff) and enemies() >= 2 and spell(howling_blast) or enemies() >= 2 and spell(glacial_advance) or { runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_buff) } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or spell(obliterate)
+ hastalent(gathering_storm_talent) and enemies() >= 3 and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe) or { buffpresent(killing_machine_frost) or not buffpresent(rime_frost) and enemies() >= 3 } and spell(obliterate) or { enemies() >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 15 } and spell(glacial_advance) or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 and enemies() == 1 and spell(frost_strike) or buffpresent(rime_frost) and enemies() >= 2 and spell(howling_blast) or enemies() >= 2 and spell(glacial_advance) or { runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_frost) } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or spell(obliterate)
 }
 
 AddFunction frostobliterationcdactions
@@ -564,7 +564,7 @@ AddFunction frostobliterationcdactions
 
 AddFunction frostobliterationcdpostconditions
 {
- hastalent(gathering_storm_talent) and enemies() >= 3 and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or { buffpresent(killing_machine_buff) or not buffpresent(rime_buff) and enemies() >= 3 } and spell(obliterate) or { enemies() >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 15 } and spell(glacial_advance) or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 and enemies() == 1 and spell(frost_strike) or buffpresent(rime_buff) and enemies() >= 2 and spell(howling_blast) or enemies() >= 2 and spell(glacial_advance) or { runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_buff) } and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or spell(obliterate)
+ hastalent(gathering_storm_talent) and enemies() >= 3 and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe) or { buffpresent(killing_machine_frost) or not buffpresent(rime_frost) and enemies() >= 3 } and spell(obliterate) or { enemies() >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice) < 5 or target.debuffremaining(razorice) < 15 } and spell(glacial_advance) or conduit(eradicating_blow_conduit) and buffstacks(eradicating_blow) == 2 and enemies() == 1 and spell(frost_strike) or buffpresent(rime_frost) and enemies() >= 2 and spell(howling_blast) or enemies() >= 2 and spell(glacial_advance) or { runicpowerdeficit() < 10 or timetorunes(2) > gcd() or not buffpresent(rime_frost) } and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or spell(obliterate)
 }
 
 ### actions.cooldowns
@@ -643,7 +643,7 @@ AddFunction frostcooldownscdactions
     #frostwyrms_fury,if=active_enemies>=2&cooldown.pillar_of_frost.remains+15>target.time_to_die|fight_remains<gcd
     if enemies() >= 2 and spellcooldown(pillar_of_frost) + 15 > target.timetodie() or fightremains() < gcd() spell(frostwyrms_fury)
     #frostwyrms_fury,if=talent.obliteration.enabled&!buff.pillar_of_frost.up&((buff.unholy_strength.up|!death_knight.runeforge.fallen_crusader)&(debuff.razorice.stack=5|!death_knight.runeforge.razorice))
-    if hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffpresent(unholy_strength) or not message("death_knight.runeforge.fallen_crusader is not implemented") } and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } spell(frostwyrms_fury)
+    if hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffpresent(unholy_strength) or not weaponenchantpresent(fallen_crusader_enchant) } and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } spell(frostwyrms_fury)
    }
   }
  }
@@ -695,11 +695,11 @@ AddFunction frostbos_tickingmainactions
  #remorseless_winter,if=talent.gathering_storm.enabled|active_enemies>=2
  if hastalent(gathering_storm_talent) or enemies() >= 2 spell(remorseless_winter)
  #howling_blast,if=buff.rime.up
- if buffpresent(rime_buff) spell(howling_blast)
+ if buffpresent(rime_frost) spell(howling_blast)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=rune.time_to_4<gcd|runic_power<=45
  if timetorunes(4) < gcd() or runicpower() <= 45 spell(obliterate)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2
- if buffpresent(killing_machine_buff) and enemies() >= 2 spell(frostscythe)
+ if buffpresent(killing_machine_frost) and enemies() >= 2 spell(frostscythe)
  #frostscythe,if=spell_targets.frostscythe>=2
  if enemies() >= 2 spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>25|rune>3
@@ -712,7 +712,7 @@ AddFunction frostbos_tickingmainpostconditions
 
 AddFunction frostbos_tickingshortcdactions
 {
- unless runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe)
+ unless runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_frost) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe)
  {
   #horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
   if runicpowerdeficit() >= 40 and timetorunes(3) > gcd() spell(horn_of_winter)
@@ -721,12 +721,12 @@ AddFunction frostbos_tickingshortcdactions
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
+ runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_frost) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
 }
 
 AddFunction frostbos_tickingcdactions
 {
- unless runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
+ unless runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_frost) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if runicpowerdeficit() > 50 spell(arcane_torrent)
@@ -735,7 +735,7 @@ AddFunction frostbos_tickingcdactions
 
 AddFunction frostbos_tickingcdpostconditions
 {
- runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_buff) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_buff) and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
+ runicpower() <= 40 and spell(obliterate) or { hastalent(gathering_storm_talent) or enemies() >= 2 } and spell(remorseless_winter) or buffpresent(rime_frost) and spell(howling_blast) or { timetorunes(4) < gcd() or runicpower() <= 45 } and spell(obliterate) or buffpresent(killing_machine_frost) and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies() >= 2 and spell(frostscythe) or { runicpowerdeficit() > 25 or runecount() > 3 } and spell(obliterate)
 }
 
 ### actions.bos_pooling
@@ -743,7 +743,7 @@ AddFunction frostbos_tickingcdpostconditions
 AddFunction frostbos_poolingmainactions
 {
  #howling_blast,if=buff.rime.up
- if buffpresent(rime_buff) spell(howling_blast)
+ if buffpresent(rime_frost) spell(howling_blast)
  #remorseless_winter,if=talent.gathering_storm.enabled&rune>=5|active_enemies>=2
  if hastalent(gathering_storm_talent) and runecount() >= 5 or enemies() >= 2 spell(remorseless_winter)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>=25
@@ -753,7 +753,7 @@ AddFunction frostbos_poolingmainactions
  #frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit<20&cooldown.pillar_of_frost.remains>5
  if runicpowerdeficit() < 20 and spellcooldown(pillar_of_frost) > 5 spell(frost_strike)
  #frostscythe,if=buff.killing_machine.up&runic_power.deficit>(15+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
- if buffpresent(killing_machine_buff) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 spell(frostscythe)
+ if buffpresent(killing_machine_frost) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 spell(frostscythe)
  #frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
  if runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)
@@ -774,7 +774,7 @@ AddFunction frostbos_poolingshortcdactions
 
 AddFunction frostbos_poolingshortcdpostconditions
 {
- buffpresent(rime_buff) and spell(howling_blast) or { hastalent(gathering_storm_talent) and runecount() >= 5 or enemies() >= 2 } and spell(remorseless_winter) or runicpowerdeficit() >= 25 and spell(obliterate) or runicpowerdeficit() < 20 and enemies() >= 2 and spellcooldown(pillar_of_frost) > 5 and spell(glacial_advance) or runicpowerdeficit() < 20 and spellcooldown(pillar_of_frost) > 5 and spell(frost_strike) or buffpresent(killing_machine_buff) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and enemies() >= 2 and spell(glacial_advance) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and spell(frost_strike)
+ buffpresent(rime_frost) and spell(howling_blast) or { hastalent(gathering_storm_talent) and runecount() >= 5 or enemies() >= 2 } and spell(remorseless_winter) or runicpowerdeficit() >= 25 and spell(obliterate) or runicpowerdeficit() < 20 and enemies() >= 2 and spellcooldown(pillar_of_frost) > 5 and spell(glacial_advance) or runicpowerdeficit() < 20 and spellcooldown(pillar_of_frost) > 5 and spell(frost_strike) or buffpresent(killing_machine_frost) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and enemies() >= 2 and spell(glacial_advance) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and spell(frost_strike)
 }
 
 AddFunction frostbos_poolingcdactions
@@ -783,7 +783,7 @@ AddFunction frostbos_poolingcdactions
 
 AddFunction frostbos_poolingcdpostconditions
 {
- buffpresent(rime_buff) and spell(howling_blast) or { hastalent(gathering_storm_talent) and runecount() >= 5 or enemies() >= 2 } and spell(remorseless_winter) or runicpowerdeficit() >= 25 and spell(obliterate) or runicpowerdeficit() < 20 and enemies() >= 2 and spellcooldown(pillar_of_frost) > 5 and spell(glacial_advance) or runicpowerdeficit() < 20 and spellcooldown(pillar_of_frost) > 5 and spell(frost_strike) or buffpresent(killing_machine_buff) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and enemies() >= 2 and spell(glacial_advance) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and spell(frost_strike)
+ buffpresent(rime_frost) and spell(howling_blast) or { hastalent(gathering_storm_talent) and runecount() >= 5 or enemies() >= 2 } and spell(remorseless_winter) or runicpowerdeficit() >= 25 and spell(obliterate) or runicpowerdeficit() < 20 and enemies() >= 2 and spellcooldown(pillar_of_frost) > 5 and spell(glacial_advance) or runicpowerdeficit() < 20 and spellcooldown(pillar_of_frost) > 5 and spell(frost_strike) or buffpresent(killing_machine_frost) and runicpowerdeficit() > 15 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and enemies() >= 2 and spell(frostscythe) or runicpowerdeficit() >= 35 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and enemies() >= 2 and spell(glacial_advance) or spellcooldown(pillar_of_frost) > timetorunes(4) and runicpowerdeficit() < 40 and spell(frost_strike)
 }
 
 ### actions.aoe
@@ -797,9 +797,9 @@ AddFunction frostaoemainactions
  #frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
  if spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) spell(frost_strike)
  #howling_blast,if=buff.rime.up
- if buffpresent(rime_buff) spell(howling_blast)
+ if buffpresent(rime_frost) spell(howling_blast)
  #frostscythe,if=buff.killing_machine.up
- if buffpresent(killing_machine_buff) spell(frostscythe)
+ if buffpresent(killing_machine_frost) spell(frostscythe)
  #glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
  if runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 spell(glacial_advance)
  #frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
@@ -822,7 +822,7 @@ AddFunction frostaoemainpostconditions
 
 AddFunction frostaoeshortcdactions
 {
- unless hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
+ unless hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -831,12 +831,12 @@ AddFunction frostaoeshortcdactions
 
 AddFunction frostaoeshortcdpostconditions
 {
- hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
+ hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
 }
 
 AddFunction frostaoecdactions
 {
- unless hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
+ unless hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -845,7 +845,7 @@ AddFunction frostaoecdactions
 
 AddFunction frostaoecdpostconditions
 {
- hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(killing_machine_buff) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
+ hastalent(gathering_storm_talent) and spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_frost) and spell(howling_blast) or buffpresent(killing_machine_frost) and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.default
@@ -864,9 +864,9 @@ AddFunction frost_defaultmainactions
  unless frostcooldownsmainpostconditions()
  {
   #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&(buff.cold_heart.stack>=10&(debuff.razorice.stack=5|!death_knight.runeforge.razorice)|fight_remains<=gcd)
-  if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } frostcold_heartmainactions()
+  if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } frostcold_heartmainactions()
 
-  unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartmainpostconditions()
+  unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartmainpostconditions()
   {
    #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
    if buffpresent(breath_of_sindragosa_buff) frostbos_tickingmainactions()
@@ -900,7 +900,7 @@ AddFunction frost_defaultmainactions
 
 AddFunction frost_defaultmainpostconditions
 {
- frostcooldownsmainpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartmainpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingmainpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingmainpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationmainpostconditions() or enemies() >= 2 and frostaoemainpostconditions() or froststandardmainpostconditions()
+ frostcooldownsmainpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartmainpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingmainpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingmainpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationmainpostconditions() or enemies() >= 2 and frostaoemainpostconditions() or froststandardmainpostconditions()
 }
 
 AddFunction frost_defaultshortcdactions
@@ -916,9 +916,9 @@ AddFunction frost_defaultshortcdactions
   unless frostcooldownsshortcdpostconditions()
   {
    #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&(buff.cold_heart.stack>=10&(debuff.razorice.stack=5|!death_knight.runeforge.razorice)|fight_remains<=gcd)
-   if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } frostcold_heartshortcdactions()
+   if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } frostcold_heartshortcdactions()
 
-   unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartshortcdpostconditions()
+   unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartshortcdpostconditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if buffpresent(breath_of_sindragosa_buff) frostbos_tickingshortcdactions()
@@ -953,7 +953,7 @@ AddFunction frost_defaultshortcdactions
 
 AddFunction frost_defaultshortcdpostconditions
 {
- not target.debuffpresent(frost_fever_debuff) and { hastalent(icecap_talent) or spellcooldown(breath_of_sindragosa) > 15 or hastalent(obliteration_talent) and spellcooldown(pillar_of_frost) < target.debuffremaining(frost_fever_debuff) } and spell(howling_blast) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and enemies() >= 2 and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(glacial_advance) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(frost_strike) or frostcooldownsshortcdpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartshortcdpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingshortcdpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingshortcdpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationshortcdpostconditions() or enemies() >= 2 and frostaoeshortcdpostconditions() or froststandardshortcdpostconditions()
+ not target.debuffpresent(frost_fever_debuff) and { hastalent(icecap_talent) or spellcooldown(breath_of_sindragosa) > 15 or hastalent(obliteration_talent) and spellcooldown(pillar_of_frost) < target.debuffremaining(frost_fever_debuff) } and spell(howling_blast) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and enemies() >= 2 and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(glacial_advance) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(frost_strike) or frostcooldownsshortcdpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartshortcdpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingshortcdpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingshortcdpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationshortcdpostconditions() or enemies() >= 2 and frostaoeshortcdpostconditions() or froststandardshortcdpostconditions()
 }
 
 AddFunction frost_defaultcdactions
@@ -968,9 +968,9 @@ AddFunction frost_defaultcdactions
   unless frostcooldownscdpostconditions()
   {
    #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&(buff.cold_heart.stack>=10&(debuff.razorice.stack=5|!death_knight.runeforge.razorice)|fight_remains<=gcd)
-   if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } frostcold_heartcdactions()
+   if hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } frostcold_heartcdactions()
 
-   unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartcdpostconditions()
+   unless hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartcdpostconditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if buffpresent(breath_of_sindragosa_buff) frostbos_tickingcdactions()
@@ -1005,7 +1005,7 @@ AddFunction frost_defaultcdactions
 
 AddFunction frost_defaultcdpostconditions
 {
- not target.debuffpresent(frost_fever_debuff) and { hastalent(icecap_talent) or spellcooldown(breath_of_sindragosa) > 15 or hastalent(obliteration_talent) and spellcooldown(pillar_of_frost) < target.debuffremaining(frost_fever_debuff) } and spell(howling_blast) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and enemies() >= 2 and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(glacial_advance) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(frost_strike) or frostcooldownscdpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not message("death_knight.runeforge.razorice is not implemented") } or fightremains() <= gcd() } and frostcold_heartcdpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingcdpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingcdpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationcdpostconditions() or enemies() >= 2 and frostaoecdpostconditions() or froststandardcdpostconditions()
+ not target.debuffpresent(frost_fever_debuff) and { hastalent(icecap_talent) or spellcooldown(breath_of_sindragosa) > 15 or hastalent(obliteration_talent) and spellcooldown(pillar_of_frost) < target.debuffremaining(frost_fever_debuff) } and spell(howling_blast) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and enemies() >= 2 and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(glacial_advance) or buffremaining(icy_talons_buff) <= gcd() and buffpresent(icy_talons_buff) and { not hastalent(breath_of_sindragosa_talent) or spellcooldown(breath_of_sindragosa) > 15 } and spell(frost_strike) or frostcooldownscdpostconditions() or hastalent(cold_heart_talent) and { buffstacks(cold_heart_buff) >= 10 and { target.debuffstacks(razorice) == 5 or not weaponenchantpresent(razorice_enchant) } or fightremains() <= gcd() } and frostcold_heartcdpostconditions() or buffpresent(breath_of_sindragosa_buff) and frostbos_tickingcdpostconditions() or hastalent(breath_of_sindragosa_talent) and spellcooldown(breath_of_sindragosa) < 10 and frostbos_poolingcdpostconditions() or buffpresent(pillar_of_frost) and hastalent(obliteration_talent) and frostobliterationcdpostconditions() or enemies() >= 2 and frostaoecdpostconditions() or froststandardcdpostconditions()
 }
 
 ### Frost icons.
@@ -1068,6 +1068,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)
 # eradicating_blow
 # eradicating_blow_conduit
 # everfrost_conduit
+# fallen_crusader_enchant
 # fireblood
 # frost_fever_debuff
 # frost_strike
@@ -1083,7 +1084,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)
 # hypothermic_presence
 # icecap_talent
 # icy_talons_buff
-# killing_machine_buff
+# killing_machine_frost
 # lights_judgment
 # mind_freeze
 # obliterate
@@ -1092,9 +1093,10 @@ AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)
 # potion_of_unbridled_fury_item
 # raise_dead
 # razorice
+# razorice_enchant
 # remorseless_winter
 # remorseless_winter_buff
-# rime_buff
+# rime_frost
 # runic_attenuation_talent
 # unholy_strength
 # unleashed_frenzy_buff
@@ -1124,6 +1126,7 @@ AddFunction pooling_for_gargoyle
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(unholy)))
 AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(unholy)))
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(unholy)))
+AddCheckBox(disable_aotd l(disable_aotd) default enabled=(specialization(unholy)))
 
 AddFunction unholyinterruptactions
 {
@@ -1159,7 +1162,7 @@ AddFunction unholyprecombatmainpostconditions
 AddFunction unholyprecombatshortcdactions
 {
  #raise_dead
- spell(raise_dead)
+ if buffexpires(raise_dead) spell(raise_dead)
 }
 
 AddFunction unholyprecombatshortcdpostconditions
@@ -1178,7 +1181,7 @@ AddFunction unholyprecombatcdactions
 
 AddFunction unholyprecombatcdpostconditions
 {
- spell(raise_dead)
+ buffexpires(raise_dead) and spell(raise_dead)
 }
 
 ### actions.generic_aoe
@@ -1190,7 +1193,7 @@ AddFunction unholygeneric_aoemainactions
  #epidemic,if=!variable.pooling_for_gargoyle
  if not pooling_for_gargoyle() spell(epidemic)
  #wound_spender,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains)
- if { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } spell(wound_spender)
+ if { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } spell(scourge_strike)
  #festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
  if target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_debuff) < 1 spell(festering_strike)
  #festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1
@@ -1207,7 +1210,7 @@ AddFunction unholygeneric_aoeshortcdactions
 
 AddFunction unholygeneric_aoeshortcdpostconditions
 {
- buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(wound_spender) or { target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike)
+ buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike)
 }
 
 AddFunction unholygeneric_aoecdactions
@@ -1216,7 +1219,7 @@ AddFunction unholygeneric_aoecdactions
 
 AddFunction unholygeneric_aoecdpostconditions
 {
- buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(wound_spender) or { target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike)
+ buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_debuff) or target.debuffstacks(festering_wound_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike)
 }
 
 ### actions.generic
@@ -1230,11 +1233,11 @@ AddFunction unholygenericmainactions
  #defile,if=cooldown.apocalypse.remains
  if spellcooldown(apocalypse) > 0 spell(defile)
  #wound_spender,if=debuff.festering_wound.stack>4
- if target.debuffstacks(festering_wound_debuff) > 4 spell(wound_spender)
+ if target.debuffstacks(festering_wound_debuff) > 4 spell(scourge_strike)
  #wound_spender,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
- if target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } spell(wound_spender)
+ if target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } spell(scourge_strike)
  #wound_spender,if=debuff.festering_wound.up&talent.unholy_blight.enabled&cooldown.unholy_blight.remains>5&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!cooldown.apocalypse.ready&!raid_event.adds.exists
- if target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) spell(wound_spender)
+ if target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) spell(scourge_strike)
  #death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
  if runicpowerdeficit() < 20 and not pooling_for_gargoyle() spell(death_coil)
  #festering_strike,if=debuff.festering_wound.stack<1
@@ -1257,7 +1260,7 @@ AddFunction unholygenericshortcdactions
 
 AddFunction unholygenericshortcdpostconditions
 {
- { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.present() } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or spellcooldown(apocalypse) > 0 and spell(defile) or target.debuffstacks(festering_wound_debuff) > 4 and spell(wound_spender) or target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(wound_spender) or target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) and spell(wound_spender) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and spellcooldown(apocalypse) < 3 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not false(raid_event_adds_exists) and spellcooldown(apocalypse) == 0 and { spellcooldown(unholy_blight) < 3 or target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
+ { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.present() } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or spellcooldown(apocalypse) > 0 and spell(defile) or target.debuffstacks(festering_wound_debuff) > 4 and spell(scourge_strike) or target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(scourge_strike) or target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and spellcooldown(apocalypse) < 3 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not false(raid_event_adds_exists) and spellcooldown(apocalypse) == 0 and { spellcooldown(unholy_blight) < 3 or target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
 }
 
 AddFunction unholygenericcdactions
@@ -1266,7 +1269,7 @@ AddFunction unholygenericcdactions
 
 AddFunction unholygenericcdpostconditions
 {
- { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.present() } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or spellcooldown(apocalypse) > 0 and spell(defile) or target.debuffstacks(festering_wound_debuff) > 4 and spell(wound_spender) or target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(wound_spender) or target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) and spell(wound_spender) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and spellcooldown(apocalypse) < 3 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not false(raid_event_adds_exists) and spellcooldown(apocalypse) == 0 and { spellcooldown(unholy_blight) < 3 or target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
+ { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.present() } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or spellcooldown(apocalypse) > 0 and spell(defile) or target.debuffstacks(festering_wound_debuff) > 4 and spell(scourge_strike) or target.debuffpresent(festering_wound_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(scourge_strike) or target.debuffpresent(festering_wound_debuff) and hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 5 and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not spellcooldown(apocalypse) == 0 and not false(raid_event_adds_exists) and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and spellcooldown(apocalypse) < 3 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or false(raid_event_adds_exists) } and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 4 and hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and not conduit(convocation_of_the_dead_conduit) and not false(raid_event_adds_exists) and spellcooldown(apocalypse) == 0 and { spellcooldown(unholy_blight) < 3 or target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
 }
 
 ### actions.cooldowns
@@ -1286,7 +1289,7 @@ AddFunction unholycooldownsmainpostconditions
 AddFunction unholycooldownsshortcdactions
 {
  #unholy_blight,if=!raid_event.adds.exists&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)&(cooldown.apocalypse.ready&(debuff.festering_wound.stack>=4|rune>=3)|cooldown.apocalypse.remains)&!raid_event.adds.exists
- if not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or message("death_knight.disable_aotd is not implemented") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) spell(unholy_blight)
+ if not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) spell(unholy_blight)
  #unholy_blight,if=raid_event.adds.exists&(active_enemies>=2|raid_event.adds.in>15)
  if false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } spell(unholy_blight)
  #dark_transformation,if=!raid_event.adds.exists&cooldown.unholy_blight.remains&(!runeforge.deadliest_coil.equipped|runeforge.deadliest_coil.equipped&(!buff.dark_transformation.up&!talent.unholy_pact.enabled|talent.unholy_pact.enabled))
@@ -1298,7 +1301,7 @@ AddFunction unholycooldownsshortcdactions
  #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&((!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled)|talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&dot.unholy_blight.remains)
  if enemies() == 1 and target.debuffstacks(festering_wound_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and target.debuffremaining(unholy_blight) } spell(apocalypse)
  #apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
- if enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not message("death_and_decay.ticking is not implemented") spell(apocalypse)
+ if enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not buffpresent(death_and_decay) spell(apocalypse)
  #unholy_assault,if=active_enemies=1&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead.enabled)
  if enemies() == 1 and target.debuffstacks(festering_wound_debuff) < 2 and { pet.present() or conduit(convocation_of_the_dead_conduit) } spell(unholy_assault)
  #unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
@@ -1325,7 +1328,7 @@ AddFunction unholycooldownscdactions
  #army_of_the_dead,if=cooldown.unholy_blight.remains<5&talent.unholy_blight.enabled|!talent.unholy_blight.enabled
  if spellcooldown(unholy_blight) < 5 and hastalent(unholy_blight_talent) or not hastalent(unholy_blight_talent) spell(army_of_the_dead)
 
- unless not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or message("death_knight.disable_aotd is not implemented") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) and spell(unholy_blight) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(unholy_blight) or not false(raid_event_adds_exists) and spellcooldown(unholy_blight) > 0 and { not equippedruneforge(deadliest_coil_runeforge) or equippedruneforge(deadliest_coil_runeforge) and { not buffpresent(dark_transformation) and not hastalent(unholy_pact_talent) or hastalent(unholy_pact_talent) } } and spell(dark_transformation) or not false(raid_event_adds_exists) and not hastalent(unholy_blight_talent) and spell(dark_transformation) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and target.debuffremaining(unholy_blight) } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not message("death_and_decay.ticking is not implemented") and spell(apocalypse)
+ unless not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) and spell(unholy_blight) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(unholy_blight) or not false(raid_event_adds_exists) and spellcooldown(unholy_blight) > 0 and { not equippedruneforge(deadliest_coil_runeforge) or equippedruneforge(deadliest_coil_runeforge) and { not buffpresent(dark_transformation) and not hastalent(unholy_pact_talent) or hastalent(unholy_pact_talent) } } and spell(dark_transformation) or not false(raid_event_adds_exists) and not hastalent(unholy_blight_talent) and spell(dark_transformation) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and target.debuffremaining(unholy_blight) } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse)
  {
   #summon_gargoyle,if=runic_power.deficit<14
   if runicpowerdeficit() < 14 spell(summon_gargoyle)
@@ -1334,17 +1337,13 @@ AddFunction unholycooldownscdactions
 
 AddFunction unholycooldownscdpostconditions
 {
- not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or message("death_knight.disable_aotd is not implemented") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) and spell(unholy_blight) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(unholy_blight) or not false(raid_event_adds_exists) and spellcooldown(unholy_blight) > 0 and { not equippedruneforge(deadliest_coil_runeforge) or equippedruneforge(deadliest_coil_runeforge) and { not buffpresent(dark_transformation) and not hastalent(unholy_pact_talent) or hastalent(unholy_pact_talent) } } and spell(dark_transformation) or not false(raid_event_adds_exists) and not hastalent(unholy_blight_talent) and spell(dark_transformation) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and target.debuffremaining(unholy_blight) } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not message("death_and_decay.ticking is not implemented") and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) < 2 and { pet.present() or conduit(convocation_of_the_dead_conduit) } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead) or spell(296208)
+ not false(raid_event_adds_exists) and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(apocalypse) == 0 and { target.debuffstacks(festering_wound_debuff) >= 4 or runecount() >= 3 } or spellcooldown(apocalypse) > 0 } and not false(raid_event_adds_exists) and spell(unholy_blight) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(unholy_blight) or not false(raid_event_adds_exists) and spellcooldown(unholy_blight) > 0 and { not equippedruneforge(deadliest_coil_runeforge) or equippedruneforge(deadliest_coil_runeforge) and { not buffpresent(dark_transformation) and not hastalent(unholy_pact_talent) or hastalent(unholy_pact_talent) } } and spell(dark_transformation) or not false(raid_event_adds_exists) and not hastalent(unholy_blight_talent) and spell(dark_transformation) or false(raid_event_adds_exists) and { enemies() >= 2 or 600 > 15 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) or conduit(convocation_of_the_dead_conduit) or hastalent(unholy_blight_talent) and not hastalent(army_of_the_damned_talent) and target.debuffremaining(unholy_blight) } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_debuff) < 2 and { pet.present() or conduit(convocation_of_the_dead_conduit) } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_debuff) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead) or spell(296208)
 }
 
 ### actions.aoe_setup
 
 AddFunction unholyaoe_setupmainactions
 {
- #any_dnd,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
- if message("death_knight.fwounded_targets is not implemented") == enemies() or false(raid_event_adds_exists) and 0 <= 11 spell(any_dnd)
- #any_dnd,if=death_knight.fwounded_targets>=5
- if message("death_knight.fwounded_targets is not implemented") >= 5 spell(any_dnd)
  #epidemic,if=!variable.pooling_for_gargoyle&runic_power.deficit<20|buff.sudden_doom.react
  if not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) spell(epidemic)
  #festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3
@@ -1363,11 +1362,15 @@ AddFunction unholyaoe_setupmainpostconditions
 
 AddFunction unholyaoe_setupshortcdactions
 {
+ #any_dnd,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
+ if buffcountonany == enemies() or false(raid_event_adds_exists) and 0 <= 11 spell(death_and_decay)
+ #any_dnd,if=death_knight.fwounded_targets>=5
+ if buffcountonany >= 5 spell(death_and_decay)
 }
 
 AddFunction unholyaoe_setupshortcdpostconditions
 {
- { message("death_knight.fwounded_targets is not implemented") == enemies() or false(raid_event_adds_exists) and 0 <= 11 } and spell(any_dnd) or message("death_knight.fwounded_targets is not implemented") >= 5 and spell(any_dnd) or { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 AddFunction unholyaoe_setupcdactions
@@ -1376,7 +1379,7 @@ AddFunction unholyaoe_setupcdactions
 
 AddFunction unholyaoe_setupcdpostconditions
 {
- { message("death_knight.fwounded_targets is not implemented") == enemies() or false(raid_event_adds_exists) and 0 <= 11 } and spell(any_dnd) or message("death_knight.fwounded_targets is not implemented") >= 5 and spell(any_dnd) or { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ { buffcountonany == enemies() or false(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or { not pooling_for_gargoyle() and runicpowerdeficit() < 20 or buffpresent(sudden_doom_buff) } and spell(epidemic) or target.debuffstacks(festering_wound_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 ### actions.aoe_burst
@@ -1384,13 +1387,13 @@ AddFunction unholyaoe_setupcdpostconditions
 AddFunction unholyaoe_burstmainactions
 {
  #epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 10 + message("death_knight.fwounded_targets is not implemented") * 3 and message("death_knight.fwounded_targets is not implemented") < 6 and not pooling_for_gargoyle() spell(epidemic)
+ if runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() spell(epidemic)
  #epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 25 and message("death_knight.fwounded_targets is not implemented") > 5 and not pooling_for_gargoyle() spell(epidemic)
+ if runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() spell(epidemic)
  #epidemic,if=!death_knight.fwounded_targets&!variable.pooling_for_gargoyle
- if not message("death_knight.fwounded_targets is not implemented") and not pooling_for_gargoyle() spell(epidemic)
+ if not buffcountonany and not pooling_for_gargoyle() spell(epidemic)
  #wound_spender
- spell(wound_spender)
+ spell(scourge_strike)
  #epidemic,if=!variable.pooling_for_gargoyle
  if not pooling_for_gargoyle() spell(epidemic)
 }
@@ -1405,7 +1408,7 @@ AddFunction unholyaoe_burstshortcdactions
 
 AddFunction unholyaoe_burstshortcdpostconditions
 {
- runicpowerdeficit() < 10 + message("death_knight.fwounded_targets is not implemented") * 3 and message("death_knight.fwounded_targets is not implemented") < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and message("death_knight.fwounded_targets is not implemented") > 5 and not pooling_for_gargoyle() and spell(epidemic) or not message("death_knight.fwounded_targets is not implemented") and not pooling_for_gargoyle() and spell(epidemic) or spell(wound_spender) or not pooling_for_gargoyle() and spell(epidemic)
+ runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or not buffcountonany and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 AddFunction unholyaoe_burstcdactions
@@ -1414,7 +1417,7 @@ AddFunction unholyaoe_burstcdactions
 
 AddFunction unholyaoe_burstcdpostconditions
 {
- runicpowerdeficit() < 10 + message("death_knight.fwounded_targets is not implemented") * 3 and message("death_knight.fwounded_targets is not implemented") < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and message("death_knight.fwounded_targets is not implemented") > 5 and not pooling_for_gargoyle() and spell(epidemic) or not message("death_knight.fwounded_targets is not implemented") and not pooling_for_gargoyle() and spell(epidemic) or spell(wound_spender) or not pooling_for_gargoyle() and spell(epidemic)
+ runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or not buffcountonany and not pooling_for_gargoyle() and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 ### actions.default
@@ -1433,19 +1436,19 @@ AddFunction unholy_defaultmainactions
  unless unholycooldownsmainpostconditions()
  {
   #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile.enabled|cooldown.defile.remains<10&talent.defile.enabled)&!death_and_decay.ticking
-  if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") unholyaoe_setupmainactions()
+  if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupmainactions()
 
-  unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupmainpostconditions()
+  unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions()
   {
    #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-   if enemies() >= 2 and message("death_and_decay.ticking is not implemented") unholyaoe_burstmainactions()
+   if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstmainactions()
 
-   unless enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstmainpostconditions()
+   unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions()
    {
     #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile.enabled|cooldown.defile.remains>10&talent.defile.enabled))
-    if enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoemainactions()
+    if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoemainactions()
 
-    unless enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions()
+    unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions()
     {
      #call_action_list,name=generic,if=active_enemies=1
      if enemies() == 1 unholygenericmainactions()
@@ -1457,7 +1460,7 @@ AddFunction unholy_defaultmainactions
 
 AddFunction unholy_defaultmainpostconditions
 {
- unholycooldownsmainpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupmainpostconditions() or enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstmainpostconditions() or enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions() or enemies() == 1 and unholygenericmainpostconditions()
+ unholycooldownsmainpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions() or enemies() == 1 and unholygenericmainpostconditions()
 }
 
 AddFunction unholy_defaultshortcdactions
@@ -1478,19 +1481,19 @@ AddFunction unholy_defaultshortcdactions
    unless unholycooldownsshortcdpostconditions()
    {
     #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile.enabled|cooldown.defile.remains<10&talent.defile.enabled)&!death_and_decay.ticking
-    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") unholyaoe_setupshortcdactions()
+    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupshortcdactions()
 
-    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupshortcdpostconditions()
+    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions()
     {
      #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-     if enemies() >= 2 and message("death_and_decay.ticking is not implemented") unholyaoe_burstshortcdactions()
+     if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstshortcdactions()
 
-     unless enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstshortcdpostconditions()
+     unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions()
      {
       #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile.enabled|cooldown.defile.remains>10&talent.defile.enabled))
-      if enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoeshortcdactions()
+      if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoeshortcdactions()
 
-      unless enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions()
+      unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions()
       {
        #call_action_list,name=generic,if=active_enemies=1
        if enemies() == 1 unholygenericshortcdactions()
@@ -1504,7 +1507,7 @@ AddFunction unholy_defaultshortcdactions
 
 AddFunction unholy_defaultshortcdpostconditions
 {
- { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and spell(berserking) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not false(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and enemies() >= 2 and spell(outbreak) or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
+ { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and spell(berserking) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not false(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and enemies() >= 2 and spell(outbreak) or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
 }
 
 AddFunction unholy_defaultcdactions
@@ -1535,19 +1538,19 @@ AddFunction unholy_defaultcdactions
    unless unholycooldownscdpostconditions()
    {
     #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile.enabled|cooldown.defile.remains<10&talent.defile.enabled)&!death_and_decay.ticking
-    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") unholyaoe_setupcdactions()
+    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupcdactions()
 
-    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupcdpostconditions()
+    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions()
     {
      #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-     if enemies() >= 2 and message("death_and_decay.ticking is not implemented") unholyaoe_burstcdactions()
+     if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstcdactions()
 
-     unless enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstcdpostconditions()
+     unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions()
      {
       #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile.enabled|cooldown.defile.remains>10&talent.defile.enabled))
-      if enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoecdactions()
+      if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoecdactions()
 
-      unless enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions()
+      unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions()
       {
        #call_action_list,name=generic,if=active_enemies=1
        if enemies() == 1 unholygenericcdactions()
@@ -1561,7 +1564,7 @@ AddFunction unholy_defaultcdactions
 
 AddFunction unholy_defaultcdpostconditions
 {
- { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and spell(berserking) or buffpresent(unholy_strength) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not false(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and enemies() >= 2 and spell(outbreak) or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not message("death_and_decay.ticking is not implemented") and unholyaoe_setupcdpostconditions() or enemies() >= 2 and message("death_and_decay.ticking is not implemented") and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not message("death_and_decay.ticking is not implemented") and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
+ { pet.present() or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { pet.present() or spellcooldown(army_of_the_dead) > target.timetodie() } } and spell(berserking) or buffpresent(unholy_strength) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not false(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and enemies() >= 2 and spell(outbreak) or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
 }
 
 ### Unholy icons.
@@ -1606,7 +1609,6 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
 
 ### Required symbols
 # ancestral_call
-# any_dnd
 # apocalypse
 # arcane_pulse
 # arcane_torrent
@@ -1633,6 +1635,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
 # outbreak
 # potion_of_unbridled_fury_item
 # raise_dead
+# scourge_strike
 # soul_reaper
 # sudden_doom_buff
 # summon_gargoyle
@@ -1644,7 +1647,6 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
 # unholy_strength
 # virulent_plague
 # war_stomp
-# wound_spender
 ]]
         OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
     end

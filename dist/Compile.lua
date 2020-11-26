@@ -22,8 +22,7 @@ local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 local function getFunctionCallString(node)
-    local functionCall = node.name
-    return functionCall
+    return node.asString or node.name
 end
 __exports.RequireValue = function(value)
     local required = sub(tostring(value), 1, 1) ~= "!"
@@ -280,6 +279,8 @@ __exports.OvaleCompileClass = __class(nil, {
             local filter = auraInfo.filter
             local tbl = auraTable[filter] or {}
             tbl[node.buffSpellId] = node
+            local buff = self.ovaleData:SpellInfo(node.buffSpellId)
+            buff.effect = auraInfo.filter
         end
         return ok
     end,
@@ -342,6 +343,7 @@ __exports.OvaleCompileClass = __class(nil, {
                         local power = si[k] or 0
                         (si)[k] = power + realValue
                     else
+                        self.tracer:Error("Unexpected value type %s in a addpower SpellInfo parameter (should be value)", v.type)
                         ok = false
                         break
                     end
@@ -349,6 +351,7 @@ __exports.OvaleCompileClass = __class(nil, {
                     if v.type == "value" or v.type == "string" then
                         (si)[k] = v.value
                     else
+                        self.tracer:Error("Unexpected value type %s in a SpellInfo parameter (should be value or string)", v.type)
                         ok = false
                         break
                     end

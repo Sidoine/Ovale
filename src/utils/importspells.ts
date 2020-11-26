@@ -1,10 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
-import {
-    SpecializationName,
-    OVALE_SPECIALIZATION_NAME,
-} from "../states/PaperDoll";
+import { SpecializationName } from "../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
 import * as parse from "csv-parse/lib/sync";
 import { SpellShapeshift } from "./types";
@@ -958,6 +955,8 @@ export interface SpellData {
     spellAttributes: SpellAttribute[];
     classFlags: number[];
     replace_spell_id?: number;
+    replaced_by?: number[];
+    triggered_by?: number[];
 }
 
 export interface SpellEffectData {
@@ -1169,6 +1168,7 @@ export function isFriendlyTarget(targetId: number) {
         case 42:
         case 45:
         case 56:
+        case 118:
             return true;
         default:
             return false;
@@ -1588,13 +1588,23 @@ export function getSpellData(directory: string) {
             spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
-            if (specSpell[3]) spell.replace_spell_id = getNumber(specSpell[3]);
+            if (specSpell[3]) {
+                spell.replace_spell_id = getNumber(specSpell[3]);
+                const replaced = spellDataById.get(spell.replace_spell_id);
+                if (replaced) {
+                    if (!replaced.replaced_by) replaced.replaced_by = [];
+                    replaced.replaced_by.push(spell.id);
+                }
+            }
             if (className !== "PET") {
-                const specName =
-                    OVALE_SPECIALIZATION_NAME[className][
-                        <1 | 2 | 3 | 4>(specIndex + 1)
-                    ];
-                if (specName) spell.specializationName.push(specName);
+                const specName = specIdToSpecName.get(specIndex);
+                if (specName) {
+                    spell.specializationName.push(specName);
+                } else if (specIndex !== 1446) {
+                    throw Error(
+                        `Unknown spec ${specIndex} for class ${classIndex}`
+                    );
+                }
             }
         }
     }
@@ -1662,23 +1672,39 @@ export function getSpellData(directory: string) {
         if (spellEffect.trigger_spell_id) {
             // for some weird reason, Azerite Essence are considered buffs instead of spells
             if (spell.rank_str === "Azerite Essence") continue;
-            const triggerSpell = spellDataById.get(
+            const triggeredSpell = spellDataById.get(
                 spellEffect.trigger_spell_id
             );
-            if (!triggerSpell) {
+            if (!triggeredSpell) {
                 // console.log(`Can't find spell ${spellEffect.trigger_spell_id}`);
                 continue;
             }
-            if (
-                triggerSpell.name === spell.name &&
-                triggerSpell.id !== spell.id
-            ) {
-                if (!triggerSpell.tooltip) triggerSpell.identifierScore--;
+            if (spellEffect.trigger_spell_id !== spellEffect.spell_id) {
+                if (!triggeredSpell.triggered_by)
+                    triggeredSpell.triggered_by = [];
+                triggeredSpell.triggered_by.push(spellEffect.spell_id);
+            }
 
-                if (isFriendlyTarget(spellEffect.targeting_1)) {
-                    triggerSpell.identifier += "_buff";
-                } else {
-                    triggerSpell.identifier += "_debuff";
+            if (
+                triggeredSpell.name === spell.name &&
+                triggeredSpell.id !== spell.id
+            ) {
+                if (!triggeredSpell.tooltip) triggeredSpell.identifierScore--;
+
+                if (
+                    spell.identifier.endsWith("_buff") ||
+                    spell.identifier.endsWith("_debuff")
+                ) {
+                    spell.identifier += "_trigger";
+                } else if (
+                    !triggeredSpell.identifier.endsWith("_buff") &&
+                    !triggeredSpell.identifier.endsWith("_debuff")
+                ) {
+                    if (isFriendlyTarget(spellEffect.targeting_1)) {
+                        triggeredSpell.identifier += "_buff";
+                    } else {
+                        triggeredSpell.identifier += "_debuff";
+                    }
                 }
             }
         }
@@ -1763,7 +1789,12 @@ export function getSpellData(directory: string) {
     function getRandomIdentifier(spell: SpellData, other: SpellData) {
         let identifier = spell.identifier;
         if (spell.tooltip && !other.tooltip) {
-            if (spell.spellEffects) {
+            if (
+                spell.spellEffects &&
+                !identifier.endsWith("_buff") &&
+                !identifier.endsWith("_debuff") &&
+                !spell.spellEffects.some((x) => x.trigger_spell_id)
+            ) {
                 if (
                     spell.spellEffects.some((x) =>
                         isFriendlyTarget(x.targeting_1)

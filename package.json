@@ -46,7 +46,7 @@
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
-        "@wowts/wow-mock": "^1.24.2"
+        "@wowts/wow-mock": "^1.25.0"
     },
     "devDependencies": {
         "@types/csv-parse": "^1.2.2",

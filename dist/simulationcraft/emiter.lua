@@ -226,15 +226,8 @@ __exports.Emiter = __class(nil, {
                 group = node.body
             end
             annotation.currentVariable = node
-            if  not modifiers.value then
-                self.tracer:Error("'value' modifier is undefined")
-                return 
-            end
-            local value = self:Emit(modifiers.value, nodeList, annotation, action)
-            if  not value then
-                return 
-            end
-            local newNode = self.EmitConditionNode(nodeList, value, conditionNode, parseNode, annotation, action, modifiers)
+            local value = modifiers.value and self:Emit(modifiers.value, nodeList, annotation, action)
+            local newNode = self.EmitConditionNode(nodeList, value or self.ovaleAst:newValue(annotation.astAnnotation, 0), conditionNode, parseNode, annotation, action, modifiers)
             if newNode.type == "if" then
                 insert(group.child, 1, newNode)
             else
@@ -333,13 +326,12 @@ __exports.Emiter = __class(nil, {
                 self.EmitVariableMax(name, nodeList, annotation, modifier, parseNode, action)
             elseif op == "add" then
                 self.EmitVariableAdd(name, nodeList, annotation, modifier, parseNode, action)
-            elseif op == "set" then
+            elseif op == "set" or op == "reset" then
                 self.EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
             elseif op == "setif" then
                 self.EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
             elseif op == "sub" then
                 self.EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action)
-            elseif op == "reset" then
             else
                 self.tracer:Error("Unknown variable operator '%s'.", op)
             end
@@ -368,6 +360,9 @@ __exports.Emiter = __class(nil, {
                     bodyCode = camelSpecialization .. "InterruptActions()"
                     annotation[action] = className
                     annotation.interrupt = className
+                    isSpellAction = false
+                elseif className == "DEMONHUNTER" and action == "pick_up_fragment" then
+                    bodyCode = "texture(spell_shadow_soulgem text=pickup)"
                     isSpellAction = false
                 elseif className == "DRUID" and action == "pulverize" then
                     local debuffName = "thrash_bear_debuff"
@@ -665,6 +660,21 @@ __exports.Emiter = __class(nil, {
                 elseif action == "heart_essence" then
                     bodyCode = [[Spell(296208)]]
                     isSpellAction = false
+                elseif parseNode.actionListName == "precombat" then
+                    local definition = annotation.dictionary[action]
+                    if isNumber(definition) then
+                        local spellInfo = self.ovaleData:GetSpellInfo(definition)
+                        if spellInfo and spellInfo.aura then
+                            for _, info in kpairs(spellInfo.aura.player.HELPFUL) do
+                                if info.buffSpellId then
+                                    local buffSpellInfo = self.ovaleData:GetSpellInfo(info.buffSpellId)
+                                    if buffSpellInfo and ( not buffSpellInfo.duration or buffSpellInfo.duration > 59) then
+                                        conditionCode = "buffexpires(" .. (info.buffName or info.buffSpellId) .. ")"
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
                 if isSpellAction then
                     self:AddSymbol(annotation, action)
@@ -1032,8 +1042,23 @@ __exports.Emiter = __class(nil, {
             target = (target and target .. ".") or ""
             local buffName = name .. "_debuff"
             buffName = self:Disambiguate(annotation, buffName, className, specialization)
-            local prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
-            local buffTarget = (prefix == "Debuff" and "target.") or target
+            local buffSpellId = annotation.dictionary[buffName]
+            local prefix
+            local buffTarget
+            if buffSpellId and isNumber(buffSpellId) then
+                local buffSpellInfo = self.ovaleData:GetSpellInfo(buffSpellId)
+                if buffSpellInfo then
+                    if buffSpellInfo.effect == "HARMFUL" then
+                        prefix = "Debuff"
+                    elseif buffSpellInfo.effect == "HELPFUL" then
+                        prefix = "Buff"
+                    end
+                end
+            end
+            if  not prefix then
+                prefix = (find(buffName, "_debuff$") and "Debuff") or "Buff"
+            end
+            buffTarget = (prefix == "Debuff" and "target.") or target
             local talentName = name .. "_talent"
             talentName = self:Disambiguate(annotation, talentName, className, specialization)
             local symbol = name
@@ -1050,7 +1075,11 @@ __exports.Emiter = __class(nil, {
             elseif property == "cast_regen" then
                 code = format("FocusCastingRegen(%s)", name)
             elseif property == "cast_time" then
-                code = format("CastTime(%s)", name)
+                if name == "use_item" then
+                    code = "0"
+                else
+                    code = format("CastTime(%s)", name)
+                end
             elseif property == "charges" then
                 code = format("Charges(%s)", name)
             elseif property == "max_charges" then
@@ -1060,7 +1089,11 @@ __exports.Emiter = __class(nil, {
             elseif property == "channeling" then
                 code = format("channeling(%s)", name)
             elseif property == "cooldown" then
-                code = format("SpellCooldown(%s)", name)
+                if name == "use_item" then
+                    code = format("ItemCooldown(trinket0slot)")
+                else
+                    code = format("SpellCooldown(%s)", name)
+                end
             elseif property == "cooldown_react" then
                 code = format("not SpellCooldown(%s) > 0", name)
             elseif property == "cost" then
@@ -1241,7 +1274,11 @@ __exports.Emiter = __class(nil, {
                 end
                 local code
                 local buffName
-                if self:isDaemon(name) then
+                if name == "out_of_range" then
+                    if property == "up" then
+                        code = "not target.inrange()"
+                    end
+                elseif self:isDaemon(name) then
                     buffName = name
                     if property == "remains" then
                         code = "demonduration(" .. buffName .. ")"
@@ -1297,6 +1334,8 @@ __exports.Emiter = __class(nil, {
                         code = format("%s%sRefreshable(%s)", target, prefix, buffName)
                     elseif property == "improved" then
                         code = format("%sImproved(%s%s)", prefix, buffName)
+                    elseif property == "stack_value" then
+                        code = format("%s%sStacks(%s%s)", target, prefix, buffName, any)
                     elseif property == "value" then
                         code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
                     end
@@ -1304,7 +1343,9 @@ __exports.Emiter = __class(nil, {
                 if code then
                     annotation.astAnnotation = annotation.astAnnotation or {}
                     node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    self:AddSymbol(annotation, buffName)
+                    if buffName then
+                        self:AddSymbol(annotation, buffName)
+                    end
                 end
             end
             return node
@@ -1823,8 +1864,8 @@ __exports.Emiter = __class(nil, {
                 self:AddSymbol(annotation, "nemesis_talent")
                 self:AddSymbol(annotation, "nemesis")
             elseif className == "DEMONHUNTER" and operand == "cooldown.metamorphosis.ready" and specialization == "havoc" then
-                code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis_havoc) == 0"
-                self:AddSymbol(annotation, "metamorphosis_havoc")
+                code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0"
+                self:AddSymbol(annotation, "metamorphosis")
             elseif className == "DRUID" and operand == "buff.wild_charge_movement.down" then
                 code = "True(wild_charge_movement_down)"
             elseif className == "DRUID" and operand == "eclipse_dir.lunar" then
@@ -1837,6 +1878,10 @@ __exports.Emiter = __class(nil, {
                 self:AddSymbol(annotation, spellName)
             elseif className == "DRUID" and operand == "solar_wrath.ap_check" then
                 local spellName = "solar_wrath"
+                code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
+                self:AddSymbol(annotation, spellName)
+            elseif className == "DRUID" and operand == "starfire.ap_check" then
+                local spellName = "starfire"
                 code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
                 self:AddSymbol(annotation, spellName)
             elseif className == "HUNTER" and operand == "buff.careful_aim.up" then
@@ -2227,16 +2272,21 @@ __exports.Emiter = __class(nil, {
                 local name = tokenIterator()
                 if  not name then
                     self.tracer:Error("Unable to parse variable name in EmitOperandVariable")
-                elseif annotation.currentVariable and annotation.currentVariable.name == name then
-                    local group = annotation.currentVariable.body
-                    if #group.child == 0 then
-                        node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
-                    else
-                        node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
-                    end
                 else
-                    node = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
-                    node.name = name
+                    if match(name, "^%d") then
+                        name = "_" .. name
+                    end
+                    if annotation.currentVariable and annotation.currentVariable.name == name then
+                        local group = annotation.currentVariable.body
+                        if #group.child == 0 then
+                            node = self.ovaleAst:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
+                        else
+                            node = self.ovaleAst:ParseCode("group", self.ovaleAst:Unparse(group), nodeList, annotation.astAnnotation)
+                        end
+                    else
+                        node = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
+                        node.name = name
+                    end
                 end
             end
             return node
@@ -2314,7 +2364,6 @@ __exports.Emiter = __class(nil, {
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
         self:AddDisambiguation("inevitable_demise_az_buff", "inevitable_demise_debuff", "WARLOCK")
-        self:AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
         self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
         self:AddDisambiguation("ashvanes_razor_coral", "razor_coral")
@@ -2329,6 +2378,15 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("hyperthread_wristwraps_300142", "hyperthread_wristwraps", "MAGE", "fire")
         self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
         self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury_buff")
+        self:AddDisambiguation("swipe_bear", "swipe", "DRUID")
+        self:AddDisambiguation("wound_spender", "scourge_strike", "DEATHKNIGHT")
+        self:AddDisambiguation("any_dnd", "death_and_decay", "DEATHKNIGHT")
+        self:AddDisambiguation("incarnation_talent", "incarnation_tree_of_life_talent", "DRUID", "restoration")
+        self:AddDisambiguation("incarnation_talent", "incarnation_guardian_of_ursoc_talent", "DRUID", "guardian")
+        self:AddDisambiguation("incarnation_talent", "incarnation_chosen_of_elune_talent", "DRUID", "balance")
+        self:AddDisambiguation("incarnation_talent", "incarnation_king_of_the_jungle_talent", "DRUID", "feral")
+        self:AddDisambiguation("ca_inc", "celestial_alignment", "DRUID")
+        self:AddDisambiguation("adaptive_swarm_heal", "adaptive_swarm", "DRUID")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]
@@ -2354,7 +2412,6 @@ __exports.Emiter = __class(nil, {
         local info = MISC_OPERAND[miscOperand]
         if info then
             local modifier = tokenIterator()
-            local name = info.name or miscOperand
             if info.code then
                 if info.symbolsInCode then
                     for _, symbol in ipairs(info.symbolsInCode) do
@@ -2367,34 +2424,58 @@ __exports.Emiter = __class(nil, {
                     return nil
                 end
             end
-            local parameters = {}
+            local result = self.ovaleAst:newNodeWithParameters("function", annotation.astAnnotation)
+            result.name = info.name or miscOperand
             if info.extraParameter then
                 if isNumber(info.extraParameter) then
-                    insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, info.extraParameter))
+                    insert(result.rawPositionalParams, self.ovaleAst:newValue(annotation.astAnnotation, info.extraParameter))
                 else
-                    insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, info.extraParameter))
+                    insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, info.extraParameter))
+                end
+            end
+            if info.extraNamedParameter then
+                if isNumber(info.extraNamedParameter.value) then
+                    result.rawNamedParams[info.extraNamedParameter.name] = self.ovaleAst:newValue(annotation.astAnnotation, info.extraNamedParameter.value)
+                else
+                    result.rawNamedParams[info.extraNamedParameter.name] = self.ovaleAst:newString(annotation.astAnnotation, info.extraNamedParameter.value)
                 end
             end
             if info.extraSymbol then
-                insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, info.extraSymbol))
+                insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, info.extraSymbol))
                 annotation:AddSymbol(info.extraSymbol)
             end
             while modifier do
                 if  not info.modifiers and info.symbol == nil then
                     self.tracer:Warning("Use of " .. modifier .. " for " .. operand .. " but no modifier has been registered")
+                    self.ovaleAst:Release(result)
                     return nil
                 end
                 local modifierParameters = info.modifiers and info.modifiers[modifier]
                 if modifierParameters then
                     local modifierName = modifierParameters.name or modifier
-                    if modifierParameters.type == 1 then
-                        name = modifierName .. name
+                    if modifierParameters.code then
+                        if modifierParameters.symbolsInCode then
+                            for _, symbol in ipairs(modifierParameters.symbolsInCode) do
+                                annotation:AddSymbol(symbol)
+                            end
+                        end
+                        self.ovaleAst:Release(result)
+                        local newCode = self.ovaleAst:ParseCode("expression", modifierParameters.code, nodeList, annotation.astAnnotation)
+                        if newCode then
+                            return newCode
+                        end
+                        return nil
+                    elseif modifierParameters.type == 1 then
+                        result.name = modifierName .. result.name
                     elseif modifierParameters.type == 0 then
-                        name = name .. modifierName
+                        result.name = result.name .. modifierName
                     elseif modifierParameters.type == 2 then
-                        insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
+                        insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, modifierName))
+                    elseif modifierParameters.type == 6 then
+                        insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifierName))
+                        annotation:AddSymbol(modifierName)
                     elseif modifierParameters.type == 4 then
-                        name = modifierName
+                        result.name = modifierName
                     end
                     if modifierParameters.createOptions then
                         if  not annotation.options then
@@ -2404,10 +2485,14 @@ __exports.Emiter = __class(nil, {
                     end
                     if modifierParameters.extraParameter then
                         if isNumber(modifierParameters.extraParameter) then
-                            insert(parameters, self.ovaleAst:newValue(annotation.astAnnotation, modifierParameters.extraParameter))
+                            insert(result.rawPositionalParams, self.ovaleAst:newValue(annotation.astAnnotation, modifierParameters.extraParameter))
                         else
-                            insert(parameters, self.ovaleAst:newString(annotation.astAnnotation, modifierParameters.extraParameter))
+                            insert(result.rawPositionalParams, self.ovaleAst:newString(annotation.astAnnotation, modifierParameters.extraParameter))
                         end
+                    end
+                    if modifierParameters.extraSymbol then
+                        insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifierParameters.extraSymbol))
+                        annotation:AddSymbol(modifierParameters.extraSymbol)
                     end
                 elseif info.symbol ~= nil then
                     if info.symbol ~= "" then
@@ -2415,18 +2500,13 @@ __exports.Emiter = __class(nil, {
                     end
                     modifier = self:Disambiguate(annotation, modifier, annotation.classId, annotation.specialization)
                     self:AddSymbol(annotation, modifier)
-                    insert(parameters, self.ovaleAst:newVariable(annotation.astAnnotation, modifier))
+                    insert(result.rawPositionalParams, self.ovaleAst:newVariable(annotation.astAnnotation, modifier))
                 else
-                    self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. name)
+                    self.tracer:Warning("Modifier parameters not found for " .. modifier .. " in " .. result.name)
+                    self.ovaleAst:Release(result)
                     return nil
                 end
                 modifier = tokenIterator()
-            end
-            local result = self.ovaleAst:newFunction(name, annotation.astAnnotation)
-            if #parameters > 0 then
-                for k, v in ipairs(parameters) do
-                    result.rawPositionalParams[k] = v
-                end
             end
             return result
         end
@@ -2443,10 +2523,10 @@ __exports.Emiter = __class(nil, {
             self.tracer:Error("Unable to parse name of variable in %s", modifiers.name)
             return 
         end
-        if op == "min" then
+        if op == "min" or op == "max" then
             self.EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode, action)
         else
-            self.tracer:Error([[Unknown cycling_variable operator {op}]])
+            self.tracer:Error("Unknown cycling_variable operator " .. op)
         end
     end,
     isDaemon = function(self, name)

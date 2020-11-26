@@ -1,6 +1,6 @@
 import { OvaleActionBarClass } from "./ActionBar";
 import { OvaleDataClass } from "./Data";
-import { OvaleEquipmentClass, SlotName } from "./Equipment";
+import { OvaleEquipmentClass, SlotName } from "./states/Equipment";
 import { OvaleStateClass } from "./State";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, tonumber } from "@wowts/lua";
@@ -198,7 +198,7 @@ export class OvaleBestActionClass {
         const result = element.result;
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
-        if (si && si.replaced_by) {
+        if (si) {
             let replacement = this.ovaleData.GetSpellInfoProperty(
                 spellId,
                 atTime,
@@ -332,11 +332,12 @@ export class OvaleBestActionClass {
                     );
                 }
             }
+            if (si.casttime) {
+                result.castTime = si.casttime;
+            }
         }
 
-        if (si.casttime) {
-            result.castTime = si.casttime;
-        } else {
+        if (!si || !si.casttime) {
             result.castTime = this.OvaleSpellBook.GetCastTime(spellId);
         }
         result.actionTarget = target;

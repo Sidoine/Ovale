@@ -50,12 +50,7 @@ import { OvaleScoreClass } from "./Score";
 const NUMBER_PATTERN = "^%-?%d+%.?%d*$";
 
 function getFunctionCallString(node: AstFunctionNode) {
-    let functionCall = node.name;
-    // TODO
-    // if (node.paramsAsString) {
-    //     functionCall = `${node.name}(${node.paramsAsString})`;
-    // }
-    return functionCall;
+    return node.asString || node.name;
 }
 
 export function RequireValue(
@@ -298,6 +293,8 @@ export class OvaleCompileClass {
             const filter = auraInfo.filter;
             const tbl = auraTable[filter] || {};
             tbl[node.buffSpellId] = node;
+            const buff = this.ovaleData.SpellInfo(node.buffSpellId);
+            buff.effect = auraInfo.filter;
         }
         return ok;
     }
@@ -376,6 +373,10 @@ export class OvaleCompileClass {
                         let power = <number>si[k as keyof SpellInfo] || 0;
                         (<any>si)[k] = power + realValue;
                     } else {
+                        this.tracer.Error(
+                            "Unexpected value type %s in a addpower SpellInfo parameter (should be value)",
+                            v.type
+                        );
                         ok = false;
                         break;
                     }
@@ -383,6 +384,10 @@ export class OvaleCompileClass {
                     if (v.type === "value" || v.type === "string")
                         (si as any)[k] = v.value;
                     else {
+                        this.tracer.Error(
+                            "Unexpected value type %s in a SpellInfo parameter (should be value or string)",
+                            v.type
+                        );
                         ok = false;
                         break;
                     }

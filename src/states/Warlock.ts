@@ -215,7 +215,7 @@ export class OvaleWarlockClass implements StateModule {
             positionalParams[2],
             positionalParams[3],
         ];
-        let delay = ms / 1000;
+        let delay = (ms || 0) / 1000;
         let impsSpawned = 0;
         // check for hand of guldan
         if (this.future.next.currentCast.spellId == Spells.HandOfGuldan) {

@@ -9,7 +9,6 @@ __exports.registerPaladinSpells = function(OvaleScripts)
 Define(ashen_hallow 316958)
 # Hallow the target area for 30 seconds. Enemies in the area suffer up to (55.00000000000001 of Spell Power)*30 seconds/t2 Shadow damage, and allies are healed for up to (42 of Spell Power)*30 seconds/t2, reduced if there are more than s1 targets.rnrnWithin the Hallow, you may use Hammer of Wrath on any target, and its damage is increased by 330382s2.
   SpellInfo(ashen_hallow cd=240 duration=30 tick=2)
-  SpellAddBuff(ashen_hallow ashen_hallow add=1)
 Define(avengers_shield 31935)
 # Hurls your shield at an enemy target, dealing s1 Holy damage?a231665[, interrupting and silencing the non-Player target for 3 seconds][], and then jumping to x1-1 additional nearby enemies.rnrn|cFFFFFFFFGenerates s4 Holy Power?s337261[, and 337270s1 additional when it damages a target for the first time][].
   SpellInfo(avengers_shield cd=15 duration=3 interrupt=1 holypower=-1)
@@ -31,7 +30,6 @@ Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6)
   SpellRequire(blinding_light unusable set=1 enabled=(not hastalent(blinding_light_talent)))
-  SpellAddBuff(blinding_light blinding_light add=1)
 Define(consecration 26573)
 # Consecrates the land beneath you, causing 81297s1*9 Holy damage over 12 seconds to enemies who enter the area. Limit s2.
   SpellInfo(consecration cd=9 duration=12 tick=1)
@@ -46,7 +44,6 @@ Define(crusade 231895)
 Define(crusader_strike 231667)
 # Crusader Strike now has s1+1 charges.
   SpellInfo(crusader_strike gcd=0 offgcd=1)
-  SpellAddBuff(crusader_strike crusader_strike add=1)
 Define(divine_purpose 223819)
 # Holy Power abilities have a s1 chance to make your next Holy Power ability free and deal 223819s2 increased damage and healing.
   SpellInfo(divine_purpose duration=12 gcd=0 offgcd=1)
@@ -58,12 +55,9 @@ Define(divine_storm 53385)
 Define(divine_toll 304971)
 # Instantly cast Holy Shock, Avenger's Shield, or Judgment on up to s1 targets within A2 yds (based on your current specialization).
   SpellInfo(divine_toll cd=60)
-Define(empyrean_power_buff 286393)
-# Your attacks have a chance to make your next Divine Storm free and deal s1 additional damage.
+Define(empyrean_power_buff 326733)
+# Crusader Strike has a s1 chance to make your next Divine Storm free and deal 326733s1 additional damage.
   SpellInfo(empyrean_power_buff duration=15 gcd=0 offgcd=1)
-  # Your next Divine Storm is free and deals w1 additional damage.
-  SpellAddBuff(empyrean_power_buff empyrean_power_buff add=1)
-
 Define(execution_sentence 343527)
 # A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
   SpellInfo(execution_sentence holypower=3 cd=60 duration=8 tick=8)
@@ -83,10 +77,13 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(hammer_of_justice 853)
 # Stuns the target for 6 seconds.
   SpellInfo(hammer_of_justice cd=60 duration=6)
@@ -115,7 +112,10 @@ Define(judgment_debuff 197277)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-
+  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
+Define(lights_judgment_debuff 256893)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
+  SpellInfo(lights_judgment_debuff cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -141,10 +141,9 @@ Define(razor_coral_debuff 303568)
 Define(rebuke 96231)
 # Interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
-Define(reckless_force_buff 304038)
+Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff reckless_force_buff add=1)
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
   SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
@@ -183,7 +182,11 @@ Define(vanquishers_hammer 328204)
 Define(vengeful_shock 340006)
 # Avenger's Shield causes your target to take |cFFFFFFFFs1.1|r increased Holy damage from you for 5 seconds.
   SpellInfo(vengeful_shock gcd=0 offgcd=1)
-
+  # Suffering w1 more Holy damage.
+  SpellAddBuff(vengeful_shock vengeful_shock_buff add=1)
+Define(vengeful_shock_buff 340007)
+# Avenger's Shield causes your target to take |cFFFFFFFFs1.1|r increased Holy damage from you for 5 seconds.
+  SpellInfo(vengeful_shock_buff duration=5 max_stacks=1 gcd=0 offgcd=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing s1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds. Damage reduced on secondary targets.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-3)

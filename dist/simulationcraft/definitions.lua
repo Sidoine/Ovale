@@ -255,6 +255,10 @@ __exports.MISC_OPERAND = {
     ["active_enemies"] = {
         name = "enemies"
     },
+    ["active_bt_triggers"] = {
+        name = "buffcount",
+        extraSymbol = "bt_buffs"
+    },
     ["animacharged_cp"] = {
         name = "maxcombopoints"
     },
@@ -298,7 +302,7 @@ __exports.MISC_OPERAND = {
         extraSymbol = "consecration"
     },
     ["covenant"] = {
-        name = "covenant",
+        name = "iscovenant",
         modifiers = {
             enabled = {
                 type = 3
@@ -308,6 +312,45 @@ __exports.MISC_OPERAND = {
     },
     ["cp_max_spend"] = {
         name = "maxcombopoints"
+    },
+    ["death_knight"] = {
+        symbol = "enchant",
+        name = "checkboxon",
+        modifiers = {
+            runeforge = {
+                type = 4,
+                name = "weaponenchantpresent"
+            },
+            disable_aotd = {
+                type = 2,
+                name = "disable_aotd",
+                createOptions = true
+            },
+            fwounded_targets = {
+                type = 4,
+                code = "buffcountonany",
+                extraSymbol = "festering_wound_debuff"
+            }
+        }
+    },
+    ["death_and_decay"] = {
+        modifiers = {
+            ticking = {
+                type = 4,
+                name = "buffpresent"
+            }
+        },
+        extraSymbol = "death_and_decay"
+    },
+    ["demon_soul_fragments"] = {
+        name = "soulfragments"
+    },
+    ["desired_targets"] = {
+        name = "enemies",
+        extraNamedParameter = {
+            name = "tagged",
+            value = 1
+        }
     },
     ["druid"] = {
         name = "checkboxon",
@@ -319,6 +362,58 @@ __exports.MISC_OPERAND = {
             owlweave_bear = {
                 type = 2,
                 createOptions = true
+            },
+            ticks_gained_on_refresh = {
+                type = 4,
+                name = "ticksgainedonrefresh"
+            }
+        },
+        symbol = ""
+    },
+    ["eclipse"] = {
+        modifiers = {
+            in_lunar = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_lunar"
+            },
+            in_solar = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_solar"
+            },
+            solar_in_1 = {
+                type = 5,
+                code = "counter(solar) == 1"
+            },
+            solar_next = {
+                type = 5,
+                code = "counter(solar) == 1"
+            },
+            lunar_in_1 = {
+                type = 4,
+                code = "counter(lunar) == 1"
+            },
+            lunar_next = {
+                type = 4,
+                code = "counter(lunar) == 1"
+            },
+            any_next = {
+                type = 5,
+                code = "counter(lunar) + counter(solar) == 1"
+            },
+            in_any = {
+                type = 4,
+                name = "buffpresent",
+                extraSymbol = "eclipse_any"
+            },
+            in_both = {
+                type = 5,
+                code = "buffpresent(eclipse_solar) and buffpresent(eclipse_lunar)",
+                symbolsInCode = {
+                    [1] = "eclipse_solar",
+                    [2] = "eclipse_lunar"
+                }
             }
         }
     },
@@ -370,6 +465,9 @@ __exports.MISC_OPERAND = {
     ["hot_streak_spells_in_flight"] = {
         name = "inflighttotarget",
         extraSymbol = "hot_streak"
+    },
+    ["interpolated_fight_remains"] = {
+        name = "fightremains"
     },
     ["insanity"] = {
         name = "insanity",
@@ -464,15 +562,15 @@ __exports.MISC_OPERAND = {
         modifiers = {
             all = {
                 name = "stealthed_buff",
-                type = 2
+                type = 6
             },
             rogue = {
-                type = 2,
+                type = 6,
                 name = "rogue_stealthed_buff"
             },
             mantle = {
                 name = "mantle_stealthed_buff",
-                type = 2
+                type = 6
             }
         }
     },
@@ -683,6 +781,7 @@ __exports.Annotation = __class(nil, {
         self.specialization = specialization
         self.consumables = {}
         self.taggedFunctionName = {}
+        self.functionTag = {}
         self.dictionary = {}
         self.variable = {}
         self.symbolList = {}

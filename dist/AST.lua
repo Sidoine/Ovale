@@ -87,6 +87,7 @@ __exports.checkSpellInfo = {
     combopoints = true,
     damage = true,
     duration = true,
+    effect = true,
     energy = true,
     focus = true,
     forcecd = true,
@@ -305,7 +306,9 @@ local checkFunctionParameters = {
     extra_amount = true,
     help = true,
     count = true,
-    any = true
+    any = true,
+    max = true,
+    tagged = true
 }
 local TokenizeComment = function(token)
     return "comment", token
@@ -956,6 +959,12 @@ __exports.OvaleASTClass = __class(nil, {
                     else
                         return nil
                     end
+                elseif token == "{" then
+                    local expression = self:parseGroup(tokenStream, annotation)
+                    if  not expression then
+                        return nil
+                    end
+                    node = expression
                 else
                     local simpleExpression = self:ParseSimpleExpression(tokenStream, annotation)
                     if  not simpleExpression then
@@ -1107,7 +1116,7 @@ __exports.OvaleASTClass = __class(nil, {
             tokenType = tokenStream:Peek()
             while tokenType and tokenType ~= "}" do
                 local statementNode
-                statementNode = self:ParseStatement(tokenStream, annotation)
+                statementNode = self.ParseStatement(tokenStream, annotation)
                 if statementNode then
                     child[#child + 1] = statementNode
                     tokenType = tokenStream:Peek()
@@ -1131,11 +1140,11 @@ __exports.OvaleASTClass = __class(nil, {
                 return nil
             end
             local conditionNode, bodyNode
-            conditionNode = self.ParseExpression(tokenStream, annotation)
+            conditionNode = self.ParseStatement(tokenStream, annotation)
             if  not conditionNode then
                 return nil
             end
-            bodyNode = self:ParseStatement(tokenStream, annotation)
+            bodyNode = self.ParseStatement(tokenStream, annotation)
             if  not bodyNode then
                 return nil
             end
@@ -1303,6 +1312,7 @@ __exports.OvaleASTClass = __class(nil, {
             node = self:newNodeWithParameters("list", annotation, positionalParams, namedParams)
             node.keyword = keyword
             node.name = name
+            annotation.definition[name] = name
             return node
         end
         self.ParseNumber = function(tokenStream, annotation)
@@ -1511,6 +1521,40 @@ __exports.OvaleASTClass = __class(nil, {
             end
             return node
         end
+        self.ParseStatement = function(tokenStream, annotation)
+            local node
+            local tokenType, token = tokenStream:Peek()
+            if tokenType then
+                if token == "{" then
+                    local i = 1
+                    local count = 0
+                    while tokenType do
+                        if token == "{" then
+                            count = count + 1
+                        elseif token == "}" then
+                            count = count - 1
+                        end
+                        i = i + 1
+                        tokenType, token = tokenStream:Peek(i)
+                        if count == 0 then
+                            break
+                        end
+                    end
+                    if  not tokenType or BINARY_OPERATOR[token] then
+                        node = self.ParseExpression(tokenStream, annotation)
+                    else
+                        node = self:parseGroup(tokenStream, annotation)
+                    end
+                elseif token == "if" then
+                    node = self.ParseIf(tokenStream, annotation)
+                elseif token == "unless" then
+                    node = self.ParseUnless(tokenStream, annotation)
+                else
+                    node = self.ParseExpression(tokenStream, annotation)
+                end
+            end
+            return node
+        end
         self.ParseString = function(tokenStream, annotation)
             local value
             local tokenType, token = tokenStream:Peek()
@@ -1547,7 +1591,7 @@ __exports.OvaleASTClass = __class(nil, {
             if  not conditionNode then
                 return nil
             end
-            bodyNode = self:ParseStatement(tokenStream, annotation)
+            bodyNode = self.ParseStatement(tokenStream, annotation)
             if  not bodyNode then
                 return nil
             end
@@ -1583,7 +1627,7 @@ __exports.OvaleASTClass = __class(nil, {
             ["comment"] = self.ParseComment,
             ["custom_function"] = self.ParseFunction,
             ["define"] = self.ParseDefine,
-            ["expression"] = self.ParseExpression,
+            ["expression"] = self.ParseStatement,
             ["function"] = self.ParseFunction,
             ["group"] = self.ParseGroup,
             ["icon"] = self.ParseAddIcon,
@@ -1747,6 +1791,15 @@ __exports.OvaleASTClass = __class(nil, {
             end
             return result
         end
+    end,
+    parseGroup = function(self, tokenStream, annotation)
+        local group = self.ParseGroup(tokenStream, annotation)
+        if group and #group.child == 1 then
+            local result = group.child[1]
+            self.nodesPool:Release(group)
+            return result
+        end
+        return group
     end,
     ParseParameters = function(self, tokenStream, methodName, annotation, maxNumberOfParameters, namedParameters)
         local positionalParams = self.rawPositionalParametersPool:Get()
@@ -1921,44 +1974,6 @@ __exports.OvaleASTClass = __class(nil, {
             return nil
         end
         return keyword
-    end,
-    ParseStatement = function(self, tokenStream, annotation)
-        local node
-        local tokenType, token = tokenStream:Peek()
-        if tokenType then
-            if token == "{" then
-                local i = 1
-                local count = 0
-                while tokenType do
-                    if token == "{" then
-                        count = count + 1
-                    elseif token == "}" then
-                        count = count - 1
-                    end
-                    i = i + 1
-                    tokenType, token = tokenStream:Peek(i)
-                    if count == 0 then
-                        break
-                    end
-                end
-                if tokenType then
-                    if BINARY_OPERATOR[token] then
-                        node = self.ParseExpression(tokenStream, annotation)
-                    else
-                        node = self.ParseGroup(tokenStream, annotation)
-                    end
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected end of script.")
-                end
-            elseif token == "if" then
-                node = self.ParseIf(tokenStream, annotation)
-            elseif token == "unless" then
-                node = self.ParseUnless(tokenStream, annotation)
-            else
-                node = self.ParseExpression(tokenStream, annotation)
-            end
-        end
-        return node
     end,
     newFunction = function(self, name, annotation)
         local node = self:newNodeWithParameters("function", annotation)

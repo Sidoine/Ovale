@@ -59,7 +59,7 @@
    <Script file="conditions.lua"/>
    <Script file="states\AzeriteArmor.lua"/>
    <Script file="states\PaperDoll.lua"/>
-   <Script file="Equipment.lua"/>
+   <Script file="states\Equipment.lua"/>
    <Script file="states\combat.lua"/>
    <Script file="GUID.lua"/>
    <Script file="Pool.lua"/>

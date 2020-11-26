@@ -104,6 +104,7 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     combopoints: true,
     damage: true,
     duration: true,
+    effect: true,
     energy: true,
     focus: true,
     forcecd: true,
@@ -751,6 +752,8 @@ export interface AstFunctionNode
         | "help"
         | "count"
         | "any"
+        | "max"
+        | "tagged"
     > {
     name: string;
 }
@@ -766,7 +769,9 @@ const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
     extra_amount: true,
     help: true,
     count: true,
-    any: true
+    any: true,
+    max: true,
+    tagged: true,
 };
 
 export interface AstStringNode extends AstBaseNode<"string"> {
@@ -2116,6 +2121,10 @@ export class OvaleASTClass {
                 } else {
                     return undefined;
                 }
+            } else if (token === "{") {
+                const expression = this.parseGroup(tokenStream, annotation);
+                if (!expression) return undefined;
+                node = expression;
             } else {
                 const simpleExpression = this.ParseSimpleExpression(
                     tokenStream,
@@ -2306,6 +2315,16 @@ export class OvaleASTClass {
         return node;
     };
 
+    private parseGroup(tokenStream: OvaleLexer, annotation: AstAnnotation) {
+        const group = this.ParseGroup(tokenStream, annotation);
+        if (group && lualength(group.child) === 1) {
+            const result = group.child[1];
+            this.nodesPool.Release(group);
+            return result;
+        }
+        return group;
+    }
+
     private ParseGroup: ParserFunction<AstGroupNode> = (
         tokenStream,
         annotation
@@ -2356,7 +2375,7 @@ export class OvaleASTClass {
             return undefined;
         }
         let conditionNode, bodyNode;
-        conditionNode = this.ParseExpression(tokenStream, annotation);
+        conditionNode = this.ParseStatement(tokenStream, annotation);
         if (!conditionNode) return undefined;
         bodyNode = this.ParseStatement(tokenStream, annotation);
         if (!bodyNode) return undefined;
@@ -2641,6 +2660,7 @@ export class OvaleASTClass {
         );
         node.keyword = keyword;
         node.name = name;
+        annotation.definition[name] = name;
         return node;
     };
     private ParseNumber = (
@@ -3291,10 +3311,10 @@ export class OvaleASTClass {
         return node;
     };
 
-    private ParseStatement(
+    private ParseStatement = (
         tokenStream: OvaleLexer,
         annotation: AstAnnotation
-    ): AstNode | undefined {
+    ): AstNode | undefined => {
         let node;
         let [tokenType, token] = tokenStream.Peek();
         if (tokenType) {
@@ -3313,17 +3333,10 @@ export class OvaleASTClass {
                         break;
                     }
                 }
-                if (tokenType) {
-                    if (BINARY_OPERATOR[token as OperatorType]) {
-                        node = this.ParseExpression(tokenStream, annotation);
-                    } else {
-                        node = this.ParseGroup(tokenStream, annotation);
-                    }
+                if (!tokenType || BINARY_OPERATOR[token as OperatorType]) {
+                    node = this.ParseExpression(tokenStream, annotation);
                 } else {
-                    this.SyntaxError(
-                        tokenStream,
-                        "Syntax error: unexpected end of script."
-                    );
+                    node = this.parseGroup(tokenStream, annotation);
                 }
             } else if (token == "if") {
                 node = this.ParseIf(tokenStream, annotation);
@@ -3334,7 +3347,7 @@ export class OvaleASTClass {
             }
         }
         return node;
-    }
+    };
     private ParseString: ParserFunction<AstStringNode | AstFunctionNode> = (
         tokenStream,
         annotation
@@ -3430,7 +3443,7 @@ export class OvaleASTClass {
         ["comment"]: this.ParseComment,
         ["custom_function"]: this.ParseFunction,
         ["define"]: this.ParseDefine,
-        ["expression"]: this.ParseExpression,
+        ["expression"]: this.ParseStatement,
         ["function"]: this.ParseFunction,
         ["group"]: this.ParseGroup,
         ["icon"]: this.ParseAddIcon,

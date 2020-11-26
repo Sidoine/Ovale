@@ -10,7 +10,7 @@
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/src/utils/importsimc.js",
             "protocol": "inspector",
-            "args": ["../../simc/", "T25_Warrior_Fury.simc"],
+            "args": ["../../simc/", "T25_Mage_Arcane.simc"],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {

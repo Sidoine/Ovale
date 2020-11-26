@@ -36,12 +36,9 @@ Define(blood_of_the_enemy 297969)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
-Define(cascading_calamity_buff 275378)
+Define(cascading_calamity 275378)
 # Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
-  SpellInfo(cascading_calamity_buff duration=15 gcd=0 offgcd=1)
-  # Grants w1 Haste.
-  SpellAddBuff(cascading_calamity_buff cascading_calamity_buff add=1)
-
+  SpellInfo(cascading_calamity duration=15 gcd=0 offgcd=1)
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
   SpellInfo(cataclysm cd=30)
@@ -50,7 +47,6 @@ Define(channel_demonfire 196447)
 # Launches s1 bolts of felfire over 3 seconds at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals (19.36 of Spell Power) Fire damage to the target and (7.7 of Spell Power) Fire damage to nearby enemies.
   SpellInfo(channel_demonfire cd=25 duration=3 channel=3 tick=0.2)
   SpellRequire(channel_demonfire unusable set=1 enabled=(not hastalent(channel_demonfire_talent)))
-  SpellAddBuff(channel_demonfire channel_demonfire add=1)
 Define(chaos_bolt 116858)
 # Unleashes a devastating blast of chaos, dealing a critical strike for 2*(120 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
   SpellInfo(chaos_bolt soulshards=2)
@@ -65,12 +61,16 @@ Define(conflagrate 17962)
 Define(corruption 172)
 # Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
   SpellInfo(corruption)
-
+  # Suffering w1 Shadow damage every t1 sec.
+  SpellAddTargetDebuff(corruption corruption_debuff_unused_3 add=1)
 Define(corruption_debuff 13530)
 # Corrupts the target, causing o1 damage over 3 seconds.
   SpellInfo(corruption_debuff duration=3 tick=1)
   # Inflicts s1 Shadow damage every t1 sec.
   SpellAddTargetDebuff(corruption_debuff corruption_debuff add=1)
+Define(corruption_debuff_unused_3 146739)
+# Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
+  SpellInfo(corruption_debuff_unused_3 duration=14 gcd=0 offgcd=1 tick=2)
 Define(dark_soul_instability 113858)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
   SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 gcd=0 offgcd=1)
@@ -118,13 +118,20 @@ Define(eradication 196412)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
   SpellInfo(eradication gcd=0 offgcd=1)
   SpellRequire(eradication unusable set=1 enabled=(not hastalent(eradication_talent)))
-
+  # Damage taken from the Warlock increased by s1.
+  SpellAddBuff(eradication eradication_buff add=1)
+Define(eradication_buff 196414)
+# Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
+  SpellInfo(eradication_buff duration=7 gcd=0 offgcd=1)
 Define(explosive_potential 275398)
 # When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
   SpellInfo(explosive_potential duration=15 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(explosive_potential explosive_potential add=1)
-
+  SpellAddTargetDebuff(explosive_potential explosive_potential_debuff add=1)
+Define(explosive_potential_debuff 275395)
+# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
+  SpellInfo(explosive_potential_debuff gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -132,6 +139,10 @@ Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
   SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
+Define(focused_azerite_beam_unused_0 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(grimoire_felguard 111898)
 # Summons a Felguard who attacks the target for 17 seconds that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
   SpellInfo(grimoire_felguard soulshards=1 cd=120 duration=17)
@@ -140,11 +151,14 @@ Define(grimoire_of_sacrifice 108503)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (43.75 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
   SpellInfo(grimoire_of_sacrifice cd=30)
   SpellRequire(grimoire_of_sacrifice unusable set=1 enabled=(not hastalent(grimoire_of_sacrifice_talent)))
-
+  # Sacrificed your demon pet to gain its command demon ability.rnrnYour spells sometimes deal additional Shadow damage.
+  SpellAddBuff(grimoire_of_sacrifice grimoire_of_sacrifice_buff_trigger add=1)
+Define(grimoire_of_sacrifice_buff_trigger 196099)
+# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (43.75 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
+  SpellInfo(grimoire_of_sacrifice_buff_trigger duration=3600 gcd=0 offgcd=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth add=1)
 Define(hand_of_guldan 105174)
 # Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
   SpellInfo(hand_of_guldan soulshards=1)
@@ -173,20 +187,19 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-  SpellInfo(shadow_bolt replaced_by=incinerate)
 Define(inevitable_demise_buff 273522)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
   SpellInfo(inevitable_demise_buff gcd=0 offgcd=1)
-  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff add=1)
 Define(inevitable_demise_debuff 273521)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
   SpellInfo(inevitable_demise_debuff gcd=0 offgcd=1)
-  SpellAddBuff(inevitable_demise_debuff inevitable_demise_buff add=1)
+Define(infernal_awakening 22703)
+# An infernal falls from the sky, dealing (60 of Spell Power) Fire damage to all targets, stunning them for 2 seconds.
+  SpellInfo(infernal_awakening duration=2 gcd=0 offgcd=1)
 Define(inner_demons 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
   SpellInfo(inner_demons gcd=0 offgcd=1 tick=12)
   SpellRequire(inner_demons unusable set=1 enabled=(not hastalent(inner_demons_talent)))
-  SpellAddBuff(inner_demons inner_demons add=1)
 Define(malefic_rapture 324536)
 # Your damaging periodic effects erupt on all targets, causing <damage> Shadow damage per effect.
   SpellInfo(malefic_rapture soulshards=1)
@@ -218,10 +231,9 @@ Define(rain_of_fire 5740)
 Define(reaping_flames 310690)
 # Burn your target with a bolt of Azerite, dealing 310712s3 Fire damage. If the target has less than s2 health?a310705[ or more than 310705s1 health][], the cooldown is reduced by s3 sec.?a310710[rnrnIf Reaping Flames kills an enemy, its cooldown is lowered to 310710s2 sec and it will deal 310710s1 increased damage on its next use.][]
   SpellInfo(reaping_flames cd=45)
-Define(reckless_force_buff 304038)
+Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
-  SpellInfo(reckless_force_buff gcd=0 offgcd=1)
-  SpellAddBuff(reckless_force_buff reckless_force_buff add=1)
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
@@ -233,6 +245,7 @@ Define(seed_of_corruption 27243)
 Define(shadow_bolt 686)
 # Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]?a32388[rnrnApplies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.][] 
   SpellInfo(shadow_bolt)
+  SpellRequire(shadow_bolt replaced_by set=incinerate enabled=(specialization(destruction)))
 Define(shadowburn 17877)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
   SpellInfo(shadowburn soulshards=1 cd=12 duration=5)
@@ -270,7 +283,12 @@ Define(summon_imp 688)
 Define(summon_infernal 1122)
 # Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
   SpellInfo(summon_infernal cd=180 duration=0.25)
-
+  # Stunned.
+  SpellAddTargetDebuff(summon_infernal infernal_awakening add=1)
+  SpellAddTargetDebuff(summon_infernal summon_infernal_debuff add=1)
+Define(summon_infernal_debuff 111685)
+# Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
+  SpellInfo(summon_infernal_debuff duration=30 gcd=0 offgcd=1)
 Define(summon_vilefiend 264119)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15)

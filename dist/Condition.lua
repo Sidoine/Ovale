@@ -66,10 +66,6 @@ __exports.ParseCondition = function(namedParams, baseState, defaultTarget)
     local mine = true
     if namedParams.any and namedParams.any == 1 then
         mine = false
-    else
-        if  not namedParams.any and namedParams.mine and namedParams.mine ~= 1 then
-            mine = false
-        end
     end
     return target, filter, mine
 end

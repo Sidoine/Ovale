@@ -183,7 +183,7 @@ test("ast: itemrequire", () => {
 test("ast: addcheckbox", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const astNode = ast.ParseCode(
+    const [astNode] = ast.ParseCode(
         "script",
         "AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(blood)))",
         {},
@@ -197,7 +197,7 @@ test("ast: addcheckbox", () => {
 test("ast: spellaura", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const astNode = ast.ParseCode(
+    const [astNode] = ast.ParseCode(
         "script",
         "SpellAddBuff(bloodthirst bloodthirst_buff set=1)",
         {},
@@ -206,4 +206,17 @@ test("ast: spellaura", () => {
 
     // Assert
     assertDefined(astNode);
+});
+
+test("if in {}", () => {
+    const { ast, astAnnotation } = makeAst();
+    const [astNode] = ast.ParseCode(
+        "expression",
+        `if { if 0 == 30 and equippedruneforge(disciplinary_command_runeforge) 50 } == 30 10`,
+        {},
+        astAnnotation
+    );
+    // Assert
+    assertDefined(astNode);
+    assertIs(astNode.type, "if");
 });

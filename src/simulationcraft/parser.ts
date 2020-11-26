@@ -205,7 +205,8 @@ export class Parser {
     private ParseAction(
         action: string,
         nodeList: LuaArray<ParseNode>,
-        annotation: Annotation
+        annotation: Annotation,
+        actionListName: string
     ): ActionParseNode | undefined {
         let stream = action;
         {
@@ -326,6 +327,7 @@ export class Parser {
         node.type = "action";
         node.action = action;
         node.name = name;
+        node.actionListName = actionListName;
         node.modifiers = modifiers;
         annotation.sync = annotation.sync || {};
         annotation.sync[name] = annotation.sync[name] || node;
@@ -342,7 +344,12 @@ export class Parser {
     ) {
         let child = self_childrenPool.Get() as LuaArray<ActionParseNode>;
         for (const action of gmatch(actionList, "[^/]+")) {
-            const actionNode = this.ParseAction(action, nodeList, annotation);
+            const actionNode = this.ParseAction(
+                action,
+                nodeList,
+                annotation,
+                name
+            );
             if (!actionNode) {
                 self_childrenPool.Release(child);
                 return undefined;

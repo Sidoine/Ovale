@@ -230,7 +230,6 @@ export class Emiter {
             "inevitable_demise_debuff",
             "WARLOCK"
         );
-        this.AddDisambiguation("berserk_bear", "berserk", "DRUID", "guardian");
         this.AddDisambiguation(
             "dark_soul",
             "dark_soul_misery",
@@ -289,6 +288,43 @@ export class Emiter {
             "unbridled_fury_buff",
             "potion_of_unbridled_fury_buff"
         );
+        this.AddDisambiguation("swipe_bear", "swipe", "DRUID");
+        this.AddDisambiguation(
+            "wound_spender",
+            "scourge_strike",
+            "DEATHKNIGHT"
+        );
+        this.AddDisambiguation("any_dnd", "death_and_decay", "DEATHKNIGHT");
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_tree_of_life_talent",
+            "DRUID",
+            "restoration"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_guardian_of_ursoc_talent",
+            "DRUID",
+            "guardian"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_chosen_of_elune_talent",
+            "DRUID",
+            "balance"
+        );
+        this.AddDisambiguation(
+            "incarnation_talent",
+            "incarnation_king_of_the_jungle_talent",
+            "DRUID",
+            "feral"
+        );
+        this.AddDisambiguation("ca_inc", "celestial_alignment", "DRUID");
+        this.AddDisambiguation(
+            "adaptive_swarm_heal",
+            "adaptive_swarm",
+            "DRUID"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -342,7 +378,6 @@ export class Emiter {
         let info = MISC_OPERAND[miscOperand];
         if (info) {
             let modifier = tokenIterator();
-            let name = info.name || miscOperand;
             if (info.code) {
                 if (info.symbolsInCode) {
                     for (const [_, symbol] of ipairs(info.symbolsInCode)) {
@@ -358,11 +393,17 @@ export class Emiter {
                     return undefined;
                 }
             }
-            let parameters: LuaArray<AstNode> = {};
+
+            const result = this.ovaleAst.newNodeWithParameters(
+                "function",
+                annotation.astAnnotation
+            );
+            result.name = info.name || miscOperand;
+
             if (info.extraParameter) {
                 if (isNumber(info.extraParameter)) {
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newValue(
                             annotation.astAnnotation,
                             info.extraParameter
@@ -370,7 +411,7 @@ export class Emiter {
                     );
                 } else {
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newString(
                             annotation.astAnnotation,
                             info.extraParameter
@@ -378,9 +419,27 @@ export class Emiter {
                     );
                 }
             }
+            if (info.extraNamedParameter) {
+                if (isNumber(info.extraNamedParameter.value)) {
+                    result.rawNamedParams[
+                        info.extraNamedParameter.name
+                    ] = this.ovaleAst.newValue(
+                        annotation.astAnnotation,
+                        info.extraNamedParameter.value
+                    );
+                } else {
+                    result.rawNamedParams[
+                        info.extraNamedParameter.name
+                    ] = this.ovaleAst.newString(
+                        annotation.astAnnotation,
+                        info.extraNamedParameter.value
+                    );
+                }
+            }
+
             if (info.extraSymbol) {
                 insert(
-                    parameters,
+                    result.rawPositionalParams,
                     this.ovaleAst.newVariable(
                         annotation.astAnnotation,
                         info.extraSymbol
@@ -393,28 +452,46 @@ export class Emiter {
                     this.tracer.Warning(
                         `Use of ${modifier} for ${operand} but no modifier has been registered`
                     );
+                    this.ovaleAst.Release(result);
                     return undefined;
                 }
                 const modifierParameters =
                     info.modifiers && info.modifiers[modifier];
                 if (modifierParameters) {
                     const modifierName = modifierParameters.name || modifier;
-                    if (
+                    if (modifierParameters.code) {
+                        if (modifierParameters.symbolsInCode) {
+                            for (const [_, symbol] of ipairs(
+                                modifierParameters.symbolsInCode
+                            )) {
+                                annotation.AddSymbol(symbol);
+                            }
+                        }
+                        this.ovaleAst.Release(result);
+                        const [newCode] = this.ovaleAst.ParseCode(
+                            "expression",
+                            modifierParameters.code,
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                        if (newCode) return newCode;
+                        return undefined;
+                    } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Prefix
                     ) {
-                        name = modifierName + name;
+                        result.name = modifierName + result.name;
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Suffix
                     ) {
-                        name += modifierName;
+                        result.name += modifierName;
                     } else if (
                         modifierParameters.type ===
                         MiscOperandModifierType.Parameter
                     ) {
                         insert(
-                            parameters,
+                            result.rawPositionalParams,
                             this.ovaleAst.newString(
                                 annotation.astAnnotation,
                                 modifierName
@@ -422,9 +499,21 @@ export class Emiter {
                         );
                     } else if (
                         modifierParameters.type ===
+                        MiscOperandModifierType.Symbol
+                    ) {
+                        insert(
+                            result.rawPositionalParams,
+                            this.ovaleAst.newVariable(
+                                annotation.astAnnotation,
+                                modifierName
+                            )
+                        );
+                        annotation.AddSymbol(modifierName);
+                    } else if (
+                        modifierParameters.type ===
                         MiscOperandModifierType.Replace
                     ) {
-                        name = modifierName;
+                        result.name = modifierName;
                     }
                     if (modifierParameters.createOptions) {
                         if (!annotation.options) annotation.options = {};
@@ -433,7 +522,7 @@ export class Emiter {
                     if (modifierParameters.extraParameter) {
                         if (isNumber(modifierParameters.extraParameter)) {
                             insert(
-                                parameters,
+                                result.rawPositionalParams,
                                 this.ovaleAst.newValue(
                                     annotation.astAnnotation,
                                     modifierParameters.extraParameter
@@ -441,13 +530,23 @@ export class Emiter {
                             );
                         } else {
                             insert(
-                                parameters,
+                                result.rawPositionalParams,
                                 this.ovaleAst.newString(
                                     annotation.astAnnotation,
                                     modifierParameters.extraParameter
                                 )
                             );
                         }
+                    }
+                    if (modifierParameters.extraSymbol) {
+                        insert(
+                            result.rawPositionalParams,
+                            this.ovaleAst.newVariable(
+                                annotation.astAnnotation,
+                                modifierParameters.extraSymbol
+                            )
+                        );
+                        annotation.AddSymbol(modifierParameters.extraSymbol);
                     }
                 } else if (info.symbol !== undefined) {
                     if (info.symbol !== "") {
@@ -461,7 +560,7 @@ export class Emiter {
                     );
                     this.AddSymbol(annotation, modifier);
                     insert(
-                        parameters,
+                        result.rawPositionalParams,
                         this.ovaleAst.newVariable(
                             annotation.astAnnotation,
                             modifier
@@ -469,22 +568,15 @@ export class Emiter {
                     );
                 } else {
                     this.tracer.Warning(
-                        `Modifier parameters not found for ${modifier} in ${name}`
+                        `Modifier parameters not found for ${modifier} in ${result.name}`
                     );
+                    this.ovaleAst.Release(result);
                     return undefined;
                 }
 
                 modifier = tokenIterator();
             }
-            const result = this.ovaleAst.newFunction(
-                name,
-                annotation.astAnnotation
-            );
-            if (lualength(parameters) > 0) {
-                for (const [k, v] of ipairs(parameters)) {
-                    result.rawPositionalParams[k] = v;
-                }
-            }
+
             return result;
         }
 
@@ -749,15 +841,12 @@ export class Emiter {
             group = node.body;
         }
         annotation.currentVariable = node;
-        if (!modifiers.value) {
-            this.tracer.Error("'value' modifier is undefined");
-            return;
-        }
-        let value = this.Emit(modifiers.value, nodeList, annotation, action);
-        if (!value) return;
+        let value =
+            modifiers.value &&
+            this.Emit(modifiers.value, nodeList, annotation, action);
         let newNode = this.EmitConditionNode(
             nodeList,
-            value,
+            value || this.ovaleAst.newValue(annotation.astAnnotation, 0),
             conditionNode,
             parseNode,
             annotation,
@@ -983,7 +1072,7 @@ export class Emiter {
             );
             return;
         }
-        if (op === "min") {
+        if (op === "min" || op === "max") {
             // TODO
             this.EmitVariableAdd(
                 name,
@@ -994,7 +1083,7 @@ export class Emiter {
                 action
             );
         } else {
-            this.tracer.Error(`Unknown cycling_variable operator {op}`);
+            this.tracer.Error(`Unknown cycling_variable operator ${op}`);
         }
     }
 
@@ -1049,7 +1138,7 @@ export class Emiter {
                 parseNode,
                 action
             );
-        } else if (op == "set") {
+        } else if (op == "set" || op === "reset") {
             this.EmitNamedVariable(
                 name,
                 nodeList,
@@ -1077,8 +1166,6 @@ export class Emiter {
                 parseNode,
                 action
             );
-        } else if (op === "reset") {
-            // TODO need to refactor code to allow this kind of thing
         } else {
             this.tracer.Error("Unknown variable operator '%s'.", op);
         }
@@ -1129,6 +1216,12 @@ export class Emiter {
                     action as keyof typeof interruptsClasses
                 ] = className;
                 annotation.interrupt = className;
+                isSpellAction = false;
+            } else if (
+                className === "DEMONHUNTER" &&
+                action === "pick_up_fragment"
+            ) {
+                bodyCode = "texture(spell_shadow_soulgem text=pickup)";
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "pulverize") {
                 let debuffName = "thrash_bear_debuff";
@@ -1602,6 +1695,31 @@ export class Emiter {
             } else if (action == "heart_essence") {
                 bodyCode = `Spell(296208)`;
                 isSpellAction = false;
+            } else if (parseNode.actionListName === "precombat") {
+                const definition = annotation.dictionary[action];
+                if (isNumber(definition)) {
+                    const spellInfo = this.ovaleData.GetSpellInfo(definition);
+                    if (spellInfo && spellInfo.aura) {
+                        for (const [, info] of kpairs(
+                            spellInfo.aura.player.HELPFUL
+                        )) {
+                            if (info.buffSpellId) {
+                                const buffSpellInfo = this.ovaleData.GetSpellInfo(
+                                    info.buffSpellId
+                                );
+                                if (
+                                    buffSpellInfo &&
+                                    (!buffSpellInfo.duration ||
+                                        buffSpellInfo.duration > 59)
+                                ) {
+                                    conditionCode = `buffexpires(${
+                                        info.buffName || info.buffSpellId
+                                    })`;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             if (isSpellAction) {
                 this.AddSymbol(annotation, action);
@@ -2400,8 +2518,23 @@ export class Emiter {
             className,
             specialization
         );
-        let prefix = (truthy(find(buffName, "_debuff$")) && "Debuff") || "Buff";
-        let buffTarget = (prefix == "Debuff" && "target.") || target;
+        const buffSpellId = annotation.dictionary[buffName];
+        let prefix;
+        let buffTarget;
+        if (buffSpellId && isNumber(buffSpellId)) {
+            const buffSpellInfo = this.ovaleData.GetSpellInfo(buffSpellId);
+            if (buffSpellInfo) {
+                if (buffSpellInfo.effect === "HARMFUL") {
+                    prefix = "Debuff";
+                } else if (buffSpellInfo.effect === "HELPFUL") {
+                    prefix = "Buff";
+                }
+            }
+        }
+
+        if (!prefix)
+            prefix = (truthy(find(buffName, "_debuff$")) && "Debuff") || "Buff";
+        buffTarget = (prefix == "Debuff" && "target.") || target;
         let talentName = `${name}_talent`;
         [talentName] = this.Disambiguate(
             annotation,
@@ -2423,7 +2556,9 @@ export class Emiter {
         } else if (property == "cast_regen") {
             code = format("FocusCastingRegen(%s)", name);
         } else if (property == "cast_time") {
-            code = format("CastTime(%s)", name);
+            if (name === "use_item") code = "0";
+            // TODO
+            else code = format("CastTime(%s)", name);
         } else if (property == "charges") {
             code = format("Charges(%s)", name);
         } else if (property == "max_charges") {
@@ -2433,7 +2568,11 @@ export class Emiter {
         } else if (property === "channeling") {
             code = format("channeling(%s)", name);
         } else if (property == "cooldown") {
-            code = format("SpellCooldown(%s)", name);
+            if (name === "use_item") {
+                code = format("ItemCooldown(trinket0slot)");
+            } else {
+                code = format("SpellCooldown(%s)", name);
+            }
         } else if (property == "cooldown_react") {
             code = format("not SpellCooldown(%s) > 0", name);
         } else if (property == "cost") {
@@ -2730,7 +2869,11 @@ export class Emiter {
 
             let code;
             let buffName;
-            if (this.isDaemon(name)) {
+            if (name === "out_of_range") {
+                if (property == "up") {
+                    code = "not target.inrange()";
+                }
+            } else if (this.isDaemon(name)) {
                 buffName = name;
                 if (property === "remains") {
                     code = `demonduration(${buffName})`;
@@ -2850,6 +2993,14 @@ export class Emiter {
                     );
                 } else if (property == "improved") {
                     code = format("%sImproved(%s%s)", prefix, buffName);
+                } else if (property === "stack_value") {
+                    code = format(
+                        "%s%sStacks(%s%s)",
+                        target,
+                        prefix,
+                        buffName,
+                        any
+                    );
                 } else if (property == "value") {
                     code = format(
                         "%s%sAmount(%s%s)",
@@ -2868,7 +3019,7 @@ export class Emiter {
                     nodeList,
                     annotation.astAnnotation
                 );
-                this.AddSymbol(annotation, buffName);
+                if (buffName) this.AddSymbol(annotation, buffName);
             }
         }
         return node;
@@ -3718,8 +3869,8 @@ export class Emiter {
             specialization == "havoc"
         ) {
             code =
-                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis_havoc) == 0";
-            this.AddSymbol(annotation, "metamorphosis_havoc");
+                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0";
+            this.AddSymbol(annotation, "metamorphosis");
         } else if (
             className == "DRUID" &&
             operand == "buff.wild_charge_movement.down"
@@ -3735,6 +3886,10 @@ export class Emiter {
             this.AddSymbol(annotation, spellName);
         } else if (className == "DRUID" && operand == "solar_wrath.ap_check") {
             let spellName = "solar_wrath";
+            code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
+            this.AddSymbol(annotation, spellName);
+        } else if (className == "DRUID" && operand == "starfire.ap_check") {
+            let spellName = "starfire";
             code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "HUNTER" && operand == "buff.careful_aim.up") {
@@ -4329,32 +4484,35 @@ export class Emiter {
                 this.tracer.Error(
                     "Unable to parse variable name in EmitOperandVariable"
                 );
-            } else if (
-                annotation.currentVariable &&
-                annotation.currentVariable.name == name
-            ) {
-                let group = annotation.currentVariable.body;
-                if (lualength(group.child) == 0) {
-                    [node] = this.ovaleAst.ParseCode(
-                        "expression",
-                        "0",
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                } else {
-                    [node] = this.ovaleAst.ParseCode(
-                        "group",
-                        this.ovaleAst.Unparse(group),
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                }
             } else {
-                node = this.ovaleAst.newNodeWithParameters(
-                    "function",
-                    annotation.astAnnotation
-                );
-                node.name = name;
+                if (truthy(match(name, "^%d"))) name = "_" + name;
+                if (
+                    annotation.currentVariable &&
+                    annotation.currentVariable.name == name
+                ) {
+                    let group = annotation.currentVariable.body;
+                    if (lualength(group.child) == 0) {
+                        [node] = this.ovaleAst.ParseCode(
+                            "expression",
+                            "0",
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    } else {
+                        [node] = this.ovaleAst.ParseCode(
+                            "group",
+                            this.ovaleAst.Unparse(group),
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    }
+                } else {
+                    node = this.ovaleAst.newNodeWithParameters(
+                        "function",
+                        annotation.astAnnotation
+                    );
+                    node.name = name;
+                }
             }
         }
         return node;

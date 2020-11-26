@@ -47,8 +47,8 @@ local __statesDemonHunterSigils = LibStub:GetLibrary("ovale/states/DemonHunterSi
 local OvaleSigilClass = __statesDemonHunterSigils.OvaleSigilClass
 local __statesEnemies = LibStub:GetLibrary("ovale/states/Enemies")
 local OvaleEnemiesClass = __statesEnemies.OvaleEnemiesClass
-local __Equipment = LibStub:GetLibrary("ovale/Equipment")
-local OvaleEquipmentClass = __Equipment.OvaleEquipmentClass
+local __statesEquipment = LibStub:GetLibrary("ovale/states/Equipment")
+local OvaleEquipmentClass = __statesEquipment.OvaleEquipmentClass
 local __Frame = LibStub:GetLibrary("ovale/Frame")
 local OvaleFrameModuleClass = __Frame.OvaleFrameModuleClass
 local __statesFuture = LibStub:GetLibrary("ovale/states/Future")
@@ -204,5 +204,7 @@ __exports.IoC = __class(nil, {
         self.paperDoll:registerConditions(self.condition)
         self.equipment:registerConditions(self.condition)
         self.azeriteArmor:registerConditions(self.condition)
+        self.stagger:registerConditions(self.condition)
+        self.stance:registerConditions(self.condition)
     end,
 })

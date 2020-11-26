@@ -19,21 +19,26 @@ import {
     INVSLOT_FIRST_EQUIPPED,
     INVSLOT_LAST_EQUIPPED,
     GetItemCooldown,
+    GetWeaponEnchantInfo,
+    GetTime,
 } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
-import { isNumber } from "./tools";
+import { isNumber } from "../tools";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleClass } from "./Ovale";
-import { OvaleDebugClass } from "./Debug";
-import { Profiler, OvaleProfilerClass } from "./Profiler";
-import { OptionUiAll } from "./acegui-helpers";
+import { OvaleClass } from "../Ovale";
+import { OvaleDebugClass } from "../Debug";
+import { Profiler, OvaleProfilerClass } from "../Profiler";
+import { OptionUiAll } from "../acegui-helpers";
 import {
     Compare,
+    ConditionFunction,
+    ConditionResult,
     OvaleConditionClass,
     TestBoolean,
     TestValue,
-} from "./Condition";
-import { OvaleDataClass } from "./Data";
+} from "../Condition";
+import { OvaleDataClass } from "../Data";
+import { huge } from "@wowts/math";
 
 let OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot: 0,
@@ -150,6 +155,16 @@ export class OvaleEquipmentClass {
             "itemcooldown",
             false,
             this.ItemCooldown
+        );
+        ovaleCondition.RegisterCondition(
+            "weaponenchantexpires",
+            false,
+            this.WeaponEnchantExpires
+        );
+        ovaleCondition.RegisterCondition(
+            "weaponenchantpresent",
+            false,
+            this.weaponEnchantPresent
         );
     }
 
@@ -552,6 +567,61 @@ export class OvaleEquipmentClass {
         return Compare(0, comparator, limit);
     };
 
+    /** Get the number of seconds since the enchantment has expired
+     */
+    private WeaponEnchantExpires: ConditionFunction = (
+        positionalParams
+    ): ConditionResult => {
+        const expectedEnchantmentId = positionalParams[1];
+        let hand = positionalParams[2];
+        let [
+            hasMainHandEnchant,
+            mainHandExpiration,
+            enchantmentId,
+            hasOffHandEnchant,
+            offHandExpiration,
+        ] = GetWeaponEnchantInfo();
+        const now = GetTime();
+        if (hand == "main" || hand === undefined) {
+            if (hasMainHandEnchant && expectedEnchantmentId === enchantmentId) {
+                mainHandExpiration = mainHandExpiration / 1000;
+                return [now + mainHandExpiration, huge];
+            }
+        } else if (hand == "offhand" || hand == "off") {
+            if (hasOffHandEnchant) {
+                offHandExpiration = offHandExpiration / 1000;
+                return [now + offHandExpiration, huge];
+            }
+        }
+        return [0, huge];
+    };
+
+    /** Get the number of seconds since the enchantment has expired
+     */
+    private weaponEnchantPresent: ConditionFunction = (positionalParams) => {
+        const expectedEnchantmentId = positionalParams[1];
+        let hand = positionalParams[2];
+        let [
+            hasMainHandEnchant,
+            mainHandExpiration,
+            enchantmentId,
+            hasOffHandEnchant,
+            offHandExpiration,
+        ] = GetWeaponEnchantInfo();
+        const now = GetTime();
+        if (hand == "main" || hand === undefined) {
+            if (hasMainHandEnchant && expectedEnchantmentId === enchantmentId) {
+                mainHandExpiration = mainHandExpiration / 1000;
+                return [0, now + mainHandExpiration];
+            }
+        } else if (hand == "offhand" || hand == "off") {
+            if (hasOffHandEnchant) {
+                offHandExpiration = offHandExpiration / 1000;
+                return [0, now + offHandExpiration];
+            }
+        }
+        return [];
+    };
     /* Removed for simplicity as I don't think anyone uses this.  If it does need to be added back then GET_ITEM_INFO_RECEIVED will need to be as well.
 const GetItemLevel = function(slotId) {
     OvaleEquipment.StartProfiling("OvaleEquipment_GetItemLevel");

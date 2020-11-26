@@ -159,7 +159,7 @@ __exports.Parser = __class(nil, {
         end
         self.tracer:Warning(concat(context, " "))
     end,
-    ParseAction = function(self, action, nodeList, annotation)
+    ParseAction = function(self, action, nodeList, annotation, actionListName)
         local stream = action
         do
             stream = gsub(stream, "||", "|")
@@ -232,6 +232,7 @@ __exports.Parser = __class(nil, {
         node.type = "action"
         node.action = action
         node.name = name
+        node.actionListName = actionListName
         node.modifiers = modifiers
         annotation.sync = annotation.sync or {}
         annotation.sync[name] = annotation.sync[name] or node
@@ -240,7 +241,7 @@ __exports.Parser = __class(nil, {
     ParseActionList = function(self, name, actionList, nodeList, annotation)
         local child = self_childrenPool:Get()
         for action in gmatch(actionList, "[^/]+") do
-            local actionNode = self:ParseAction(action, nodeList, annotation)
+            local actionNode = self:ParseAction(action, nodeList, annotation, name)
             if  not actionNode then
                 self_childrenPool:Release(child)
                 return nil
