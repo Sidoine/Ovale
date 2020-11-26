@@ -234,19 +234,16 @@ Define(condensed_lifeforce_essence_id 14)
 Define(vengeful_shock_conduit 195)
     ]]
     code = code .. [[
-
-    
-    
 Define(blinding_light_talent 9)
 Define(divine_shield 642)
 	SpellInfo(divine_shield cd=300 duration=8)
-  SpellRequire(divine_shield cd add=-90 enabled=(hastalent(unbreakable_spirit_talent)))
+    SpellRequire(divine_shield cd add=-90 enabled=(hastalent(unbreakable_spirit_talent)))
 	SpellAddBuff(divine_shield divine_shield add=1)
 	SpellRequire(divine_shield unusable set=1 enabled=(debuffpresent(forbearance_debuff)))
 Define(forbearance_debuff 25771)
     SpellInfo(forbearance_debuff duration=30)
 #hammer_of_wrath
-    SpellRequire(hammer_of_wrath unusable set=1 enabled=(targethealthpercent() > 20))
+    SpellRequire(hammer_of_wrath unusable set=1 enabled=(not (targethealthpercent() <= 20 or (level()>=58 and buffpresent(avenging_wrath)))))
 Define(lay_on_hands 633)
     SpellInfo(lay_on_hands cd=600)
     SpellRequire(lay_on_hands cd add=-180 enabled=(hastalent(unbreakable_spirit_talent)))
