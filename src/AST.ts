@@ -754,6 +754,7 @@ export interface AstFunctionNode
         | "any"
         | "max"
         | "tagged"
+        | "physical"
     > {
     name: string;
 }
@@ -772,6 +773,7 @@ const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
     any: true,
     max: true,
     tagged: true,
+    physical: true,
 };
 
 export interface AstStringNode extends AstBaseNode<"string"> {
