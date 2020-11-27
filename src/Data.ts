@@ -314,8 +314,10 @@ export class OvaleDataClass {
         },
         stealthed_buff: {
             [SpellId.stealth]: true,
+            [115191]: true,
             [SpellId.prowl]: true,
             [SpellId.vanish]: true,
+            [11327]: true,
             [SpellId.shadowmeld]: true,
             [SpellId.incarnation_king_of_the_jungle]: true,
             [SpellId.subterfuge]: true,
@@ -324,7 +326,9 @@ export class OvaleDataClass {
         },
         rogue_stealthed_buff: {
             [SpellId.stealth]: true,
+            [115191]: true,
             [SpellId.vanish]: true,
+            [11327]: true,
             [SpellId.shadow_dance]: true,
             [SpellId.subterfuge]: true,
         },

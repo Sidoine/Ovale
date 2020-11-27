@@ -558,8 +558,12 @@ Define(perforated_veins_conduit 248)
   SpellAddTargetDebuff(exsanguinate rupture_exsanguinated add=1 enabled=(targetdebuffpresent(rupture))) # TODO if_target_debuff is not implemented
   SpellAddTargetDebuff(exsanguinate garrote_exsanguinated add=1 enabled=(targetdebuffpresent(garrote)))
   
+  SpellDamageBuff(garrote 115191 set=1.8 enabled=(hastalent(subterfuge_talent)))
+  SpellDamageBuff(garrote subterfuge set=1.8 enabled=(hastalent(subterfuge_talent)))
+  SpellDamageBuff(garrote 11327 set=1.8 enabled=(hastalent(subterfuge_talent)))
 
   SpellRequire(slice_and_dice unusable set=1 enabled=(buffremains(slice_and_dice)>(combopoints()+1)*6))
+
   SpellRequire(stealth unusable set=1 enabled=(stealthed()))
   SpellRequire(stealth unusable set=1 enabled=(incombat()))
   `;
