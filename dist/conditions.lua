@@ -688,14 +688,26 @@ __exports.OvaleConditions = __class(nil, {
             local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = 0
             if interval > 0 then
+                local total, _ = self.OvaleDamageTaken:GetRecentDamage(interval)
+                value = total
+            end
+            return Compare(value, comparator, limit)
+        end
+        self.MagicDamageTaken = function(positionalParams, namedParams, atTime)
+            local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local value = 0
+            if interval > 0 then
+                local _, totalMagic = self.OvaleDamageTaken:GetRecentDamage(interval)
+                value = totalMagic
+            end
+            return Compare(value, comparator, limit)
+        end
+        self.PhysicalDamageTaken = function(positionalParams, namedParams, atTime)
+            local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local value = 0
+            if interval > 0 then
                 local total, totalMagic = self.OvaleDamageTaken:GetRecentDamage(interval)
-                if namedParams.magic == 1 then
-                    value = totalMagic
-                elseif namedParams.physical == 1 then
-                    value = total - totalMagic
-                else
-                    value = total
-                end
+                value = total - totalMagic
             end
             return Compare(value, comparator, limit)
         end
@@ -1934,6 +1946,10 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("damage", false, self.Damage)
         ovaleCondition:RegisterCondition("damagetaken", false, self.DamageTaken)
         ovaleCondition:RegisterCondition("incomingdamage", false, self.DamageTaken)
+        ovaleCondition:RegisterCondition("magicdamagetaken", false, self.MagicDamageTaken)
+        ovaleCondition:RegisterCondition("incomingmagicdamage", false, self.MagicDamageTaken)
+        ovaleCondition:RegisterCondition("physicaldamagetaken", false, self.PhysicalDamageTaken)
+        ovaleCondition:RegisterCondition("incomingphysicaldamage", false, self.PhysicalDamageTaken)
         ovaleCondition:RegisterCondition("diseasesremaining", false, self.DiseasesRemaining)
         ovaleCondition:RegisterCondition("diseasesticking", false, self.DiseasesTicking)
         ovaleCondition:RegisterCondition("diseasesanyticking", false, self.DiseasesAnyTicking)
