@@ -1584,24 +1584,17 @@ export class OvaleConditions {
         return Compare(value, comparator, limit);
     };
 
-    /**  Get the damage taken by the player in the previous time interval.
+    /**  Get the total damage taken by the player in the previous time interval.
 	 @name DamageTaken
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
-	 @param magic Optional. By default, all damage is counted. Set "magic=1" to count only magic damage.
-	     Defaults to magic=0.
-	     Valid values: 0, 1
-	 @param physical Optional. By default, all damage is counted. Set "physical=1" to count only physical damage.
-	     Defaults to physical=0.
-	     Valid values: 0, 1
 	 @return The amount of damage taken in the previous interval.
 	 @return A boolean value for the result of the comparison.
 	 @see IncomingDamage
 	 @usage
 	 if DamageTaken(5) > 50000 Spell(death_strike)
-	 if DamageTaken(5 magic=1) > 0 Spell(antimagic_shell)
      */
     private DamageTaken = (
         positionalParams: LuaArray<any>,
@@ -1618,13 +1611,71 @@ export class OvaleConditions {
             let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
                 interval
             );
-            if (namedParams.magic == 1) {
-                value = totalMagic;
-            } else if (namedParams.physical == 1) {
-                value = total - totalMagic;
-            } else {
-                value = total;
-            }
+            value = total;
+        }
+        return Compare(value, comparator, limit);
+    };
+
+    /**  Get the magic damage taken by the player in the previous time interval.
+	 @name MagicDamageTaken
+	 @paramsig number or boolean
+	 @param interval The number of seconds before now.
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @return The amount of magic damage taken in the previous interval.
+	 @return A boolean value for the result of the comparison.
+	 @see IncomingMagicDamage
+	 @usage
+	 if MagicDamageTaken(1.5) > 0 Spell(antimagic_shell)
+     */
+    private MagicDamageTaken = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [interval, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        let value = 0;
+        if (interval > 0) {
+            let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+                interval
+            );
+            value = totalMagic;
+        }
+        return Compare(value, comparator, limit);
+    };
+
+    /**  Get the physical damage taken by the player in the previous time interval.
+	 @name PhysicalDamageTaken
+	 @paramsig number or boolean
+	 @param interval The number of seconds before now.
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @return The amount of physical damage taken in the previous interval.
+	 @return A boolean value for the result of the comparison.
+	 @see IncomingPhysicalDamage
+	 @usage
+	 if PhysicalDamageTaken(1.5) > 0 Spell(shield_block)
+     */
+    private PhysicalDamageTaken = (
+        positionalParams: LuaArray<any>,
+        namedParams: LuaObj<any>,
+        atTime: number
+    ) => {
+        let [interval, comparator, limit] = [
+            positionalParams[1],
+            positionalParams[2],
+            positionalParams[3],
+        ];
+        let value = 0;
+        if (interval > 0) {
+            let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+                interval
+            );
+            value = total - totalMagic;
         }
         return Compare(value, comparator, limit);
     };
@@ -6773,6 +6824,26 @@ l    */
             "incomingdamage",
             false,
             this.DamageTaken
+        );
+        ovaleCondition.RegisterCondition(
+            "magicdamagetaken",
+            false,
+            this.MagicDamageTaken
+        );
+        ovaleCondition.RegisterCondition(
+            "incomingmagicdamage",
+            false,
+            this.MagicDamageTaken
+        );
+        ovaleCondition.RegisterCondition(
+            "physicaldamagetaken",
+            false,
+            this.PhysicalDamageTaken
+        );
+        ovaleCondition.RegisterCondition(
+            "incomingphysicaldamage",
+            false,
+            this.PhysicalDamageTaken
         );
         ovaleCondition.RegisterCondition(
             "diseasesremaining",
