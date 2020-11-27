@@ -1608,7 +1608,7 @@ export class OvaleConditions {
         ];
         let value = 0;
         if (interval > 0) {
-            let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+            let [total,] = this.OvaleDamageTaken.GetRecentDamage(
                 interval
             );
             value = total;
@@ -1640,7 +1640,7 @@ export class OvaleConditions {
         ];
         let value = 0;
         if (interval > 0) {
-            let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+            let [_, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
                 interval
             );
             value = totalMagic;
