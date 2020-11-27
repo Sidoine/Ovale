@@ -559,6 +559,7 @@ Define(perforated_veins_conduit 248)
   SpellAddTargetDebuff(exsanguinate garrote_exsanguinated add=1 enabled=(targetdebuffpresent(garrote)))
   
 
+  SpellRequire(slice_and_dice unusable set=1 enabled=(buffremains(slice_and_dice)>(combopoints()+1)*6))
   SpellRequire(stealth unusable set=1 enabled=(stealthed()))
   SpellRequire(stealth unusable set=1 enabled=(incombat()))
   `;
