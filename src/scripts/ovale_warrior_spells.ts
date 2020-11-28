@@ -375,7 +375,7 @@ Define(blood_of_the_enemy_essence_id 23)
 // END
 
     code += `
-SpellRequire(execute unusable set=1 enabled=(targetHealthPercent() > 20))
+SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
   `;
 
     OvaleScripts.RegisterScript(

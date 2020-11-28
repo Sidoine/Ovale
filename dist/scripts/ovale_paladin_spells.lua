@@ -246,7 +246,7 @@ Define(divine_shield 642)
 Define(forbearance_debuff 25771)
     SpellInfo(forbearance_debuff duration=30)
 #hammer_of_wrath
-    SpellRequire(hammer_of_wrath unusable set=1 enabled=(not (targethealthpercent() <= 20 or (level()>=58 and buffpresent(avenging_wrath)))))
+    SpellRequire(hammer_of_wrath unusable set=1 enabled=(target.healthpercent() > 20 and (level()<58 or not buffpresent(avenging_wrath))))
 Define(lay_on_hands 633)
     SpellInfo(lay_on_hands cd=600)
     SpellRequire(lay_on_hands cd add=-180 enabled=(hastalent(unbreakable_spirit_talent)))

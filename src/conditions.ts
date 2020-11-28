@@ -177,7 +177,7 @@ export class OvaleConditions {
 	@usage
 	if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 	    Spell(ferocious_bite)
-	if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
+	if ArmorSetParts(T13 more 1) and target.HealthPercent(less 60)
 	    Spell(ferocious_bite) */
     private ArmorSetParts = (
         positionalParams: LuaArray<any>,
