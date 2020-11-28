@@ -308,8 +308,7 @@ local checkFunctionParameters = {
     count = true,
     any = true,
     max = true,
-    tagged = true,
-    physical = true
+    tagged = true
 }
 local TokenizeComment = function(token)
     return "comment", token
