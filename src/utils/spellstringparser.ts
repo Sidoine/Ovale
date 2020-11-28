@@ -1,14 +1,19 @@
 import { SpellData } from "./importspells";
 
 function getDuration(duration: number) {
-    return `${duration/1000} second${duration > 1000 ? 's' : ''}`;
+    return `${duration / 1000} second${duration > 1000 ? "s" : ""}`;
 }
 
-function parseToken(token: string, spell: SpellData, spellDataById: Map<number, SpellData>) {
+function parseToken(
+    token: string,
+    spell: SpellData,
+    spellDataById: Map<number, SpellData>
+) {
     const otherSpellDesc = token.match(/^@spelldesc(\d+)$/);
     if (otherSpellDesc) {
         const otherSpell = spellDataById.get(parseInt(otherSpellDesc[1]));
-        if (otherSpell && otherSpell.desc && otherSpell !== spell) return parseDescription(otherSpell.desc, otherSpell, spellDataById);
+        if (otherSpell && otherSpell.desc && otherSpell !== spell)
+            return parseDescription(otherSpell.desc, otherSpell, spellDataById);
     }
 
     const reference = token.match(/^\d+/);
@@ -18,7 +23,7 @@ function parseToken(token: string, spell: SpellData, spellDataById: Map<number, 
         if (!referenceSpell) return undefined;
         spell = referenceSpell;
     }
-    if (token === 'd') {
+    if (token === "d") {
         return getDuration(spell.duration);
     }
     const match = token.match(/^s(\d)$/);
@@ -34,8 +39,15 @@ function parseToken(token: string, spell: SpellData, spellDataById: Map<number, 
     return undefined;
 }
 
-export function parseDescription(description: string, spell: SpellData, spellDataById: Map<number, SpellData>) {
+export function parseDescription(
+    description: string,
+    spell: SpellData,
+    spellDataById: Map<number, SpellData>
+) {
     if (!description) return undefined;
-    description = description.replace(/\$(@?[a-z0-9]+)/g, (complete, token) => parseToken(token, spell, spellDataById) || complete);
+    description = description.replace(
+        /\$(@?[a-z0-9]+)/g,
+        (complete, token) => parseToken(token, spell, spellDataById) || complete
+    );
     return description;
 }

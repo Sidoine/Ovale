@@ -1,10 +1,10 @@
-import { States, StateModule } from "../State";
+import { States, StateModule } from "../engine/State";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { Tracer, OvaleDebugClass } from "../Debug";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
 import { GetTime } from "@wowts/wow-mock";
-import { OvaleSpellBookClass } from "../SpellBook";
+import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaObj, LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
@@ -13,12 +13,12 @@ import {
     Compare,
     ConditionFunction,
     ReturnConstant,
-} from "../Condition";
+} from "../engine/Condition";
 import { huge } from "@wowts/math";
 
 export class CombatState {
-    inCombat: boolean = false;
-    combatStartTime: number = 0;
+    inCombat = false;
+    combatStartTime = 0;
 }
 
 export class OvaleCombatClass
@@ -104,7 +104,7 @@ export class OvaleCombatClass
 
     private handlePlayerRegenDisabled = (event: string) => {
         this.tracer.Debug(event, "Entering combat.");
-        let now = GetTime();
+        const now = GetTime();
         this.current.inCombat = true;
         this.current.combatStartTime = now;
         this.ovale.needRefresh();
@@ -113,7 +113,7 @@ export class OvaleCombatClass
 
     private handlePlayerRegenEnabled = (event: string) => {
         this.tracer.Debug(event, "Leaving combat.");
-        let now = GetTime();
+        const now = GetTime();
         this.current.inCombat = false;
         this.ovale.needRefresh();
         this.module.SendMessage("Ovale_CombatEnded", now);
@@ -134,8 +134,8 @@ export class OvaleCombatClass
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let yesno = positionalParams[1];
-        let boolean = this.isInCombat(atTime);
+        const yesno = positionalParams[1];
+        const boolean = this.isInCombat(atTime);
         return TestBoolean(boolean, yesno);
     };
 
@@ -154,9 +154,9 @@ export class OvaleCombatClass
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         if (this.isInCombat(atTime)) {
-            let start = this.GetState(atTime).combatStartTime;
+            const start = this.GetState(atTime).combatStartTime;
             return TestValue(start, huge, 0, start, 1, comparator, limit);
         }
         return Compare(0, comparator, limit);

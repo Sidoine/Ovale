@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/definitions", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/definitions", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs

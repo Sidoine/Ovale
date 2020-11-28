@@ -4,7 +4,7 @@ import { LuaArray, lualength, LuaObj, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { StateModule } from "../State";
+import { StateModule } from "../engine/State";
 import { OvaleCombatClass } from "./combat";
 import {
     Compare,
@@ -13,18 +13,18 @@ import {
     OvaleConditionClass,
     ParseCondition,
     ReturnValueBetween,
-} from "../Condition";
+} from "../engine/Condition";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleHealthClass } from "./Health";
-import { isNumber } from "../tools";
-import { BaseState } from "../BaseState";
+import { isNumber } from "../tools/tools";
+import { BaseState } from "./BaseState";
 
 const LIGHT_STAGGER = 124275;
 const MODERATE_STAGGER = 124274;
 const HEAVY_STAGGER = 124273;
 
 let self_serial = 1;
-let MAX_LENGTH = 30;
+const MAX_LENGTH = 30;
 export class OvaleStaggerClass implements StateModule {
     staggerTicks: LuaArray<number> = {};
     private module: AceModule & AceEvent;
@@ -86,7 +86,7 @@ export class OvaleStaggerClass implements StateModule {
         }
     };
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -129,7 +129,7 @@ export class OvaleStaggerClass implements StateModule {
         if (!countTicks || countTicks == 0 || countTicks < 0) countTicks = 1;
 
         let damage = 0;
-        let arrLen = lualength(this.staggerTicks);
+        const arrLen = lualength(this.staggerTicks);
 
         if (arrLen < 1) return 0;
 
@@ -155,7 +155,7 @@ export class OvaleStaggerClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [target] = ParseCondition(namedParams, this.baseState);
+        const [target] = ParseCondition(namedParams, this.baseState);
         return this.getAnyStaggerAura(target, atTime);
     };
 
@@ -173,9 +173,9 @@ export class OvaleStaggerClass implements StateModule {
             aura = this.aura.GetAura(target, LIGHT_STAGGER, atTime, "HARMFUL");
         }
         if (aura && this.aura.IsActiveAura(aura, atTime)) {
-            let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
-            let stagger = UnitStagger(target);
-            let rate = (-1 * stagger) / (ending - start);
+            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
+            const stagger = UnitStagger(target);
+            const rate = (-1 * stagger) / (ending - start);
             return ReturnValueBetween(gain, ending, 0, ending, rate);
         }
         return [];
@@ -186,7 +186,7 @@ export class OvaleStaggerClass implements StateModule {
         namedParams,
         atTime
     ) => {
-        let [target] = ParseCondition(namedParams, this.baseState);
+        const [target] = ParseCondition(namedParams, this.baseState);
         let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
             target,
             atTime
@@ -206,7 +206,7 @@ export class OvaleStaggerClass implements StateModule {
         namedParams,
         atTime
     ) => {
-        let [target] = ParseCondition(namedParams, this.baseState);
+        const [target] = ParseCondition(namedParams, this.baseState);
         let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
             target,
             atTime
@@ -242,12 +242,12 @@ export class OvaleStaggerClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [count, comparator, limit] = [
+        const [count, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[2],
         ];
-        let damage = this.LastTickDamage(count);
+        const damage = this.LastTickDamage(count);
         return Compare(damage, comparator, limit);
     };
 }

@@ -1,6 +1,6 @@
 {
     "name": "ovale",
-    "version": "8.3.0",
+    "version": "9.0.0",
     "description": "",
     "main": "dist/index.js",
     "scripts": {
@@ -11,7 +11,9 @@
         "dbc": "node dist/src/utils/dbc.js",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",
-        "coverage": "nyc --reporter=lcovonly ava"
+        "coverage": "nyc --reporter=lcovonly ava",
+        "lint": "eslint src --ext .ts",
+        "prettier": "prettier --write src"
     },
     "author": "",
     "license": "ISC",
@@ -38,11 +40,11 @@
         "@wowts/lib_range_check-2.0": "^1.0.0",
         "@wowts/lib_text_dump-1.0": "^1.0.1",
         "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
-        "@wowts/lua": "^1.4.1",
+        "@wowts/lua": "^1.5.0",
         "@wowts/masque": "^1.0.1",
         "@wowts/math": "^1.1.0",
         "@wowts/recount": "^1.1.0",
-        "@wowts/string": "^1.1.0",
+        "@wowts/string": "^1.1.1",
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
@@ -50,11 +52,14 @@
     },
     "devDependencies": {
         "@types/csv-parse": "^1.2.2",
-        "@wowts/tstolua": "^1.10.2",
-        "jest": "^26.6.3",
-        "ts-jest": "^26.4.4",
+        "@typescript-eslint/eslint-plugin": "^4.8.2",
+        "@typescript-eslint/parser": "^4.8.2",
+        "@wowts/tstolua": "^1.11.4",
         "csv-parse": "^4.12.0",
-        "eslint": "^7.9.0",
+        "eslint": "^7.14.0",
+        "jest": "^26.6.3",
+        "prettier": "^2.2.0",
+        "ts-jest": "^26.4.4",
         "typemoq": "^2.1.0"
     },
     "repository": {

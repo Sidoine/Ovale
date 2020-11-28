@@ -1,4 +1,4 @@
-import { OvalePool } from "../Pool";
+import { OvalePool } from "../tools/Pool";
 import { lualength, LuaObj, LuaArray, pairs } from "@wowts/lua";
 import { remove, insert } from "@wowts/table";
 import { Powers } from "./Power";
@@ -99,7 +99,7 @@ export class LastSpell {
             spellcast = this.lastGCDSpellcast;
         }
         for (let i = lualength(this.queue); i >= 1; i += -1) {
-            let sc = this.queue[i];
+            const sc = this.queue[i];
             if (sc.success) {
                 if (
                     spellcast === undefined ||
@@ -117,7 +117,7 @@ export class LastSpell {
             dest.damageMultiplier = spellcast.damageMultiplier;
         }
         for (const [, mod] of pairs(this.modules)) {
-            let func = mod.CopySpellcastInfo;
+            const func = mod.CopySpellcastInfo;
             if (func) {
                 func(spellcast, dest);
             }
@@ -141,7 +141,7 @@ export class LastSpell {
             spellcast = this.lastGCDSpellcast;
         }
         for (let i = lualength(this.queue); i >= 1; i += -1) {
-            let sc = this.queue[i];
+            const sc = this.queue[i];
             if (sc.success) {
                 if (
                     !spellcast ||

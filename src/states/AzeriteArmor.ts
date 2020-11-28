@@ -20,12 +20,12 @@ import {
 import { OvaleEquipmentClass } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../Debug";
-import { AceEventHandler } from "../tools";
-import { OptionUiAll } from "../acegui-helpers";
-import { Compare, OvaleConditionClass, TestBoolean } from "../Condition";
+import { OvaleDebugClass } from "../engine/Debug";
+import { AceEventHandler } from "../tools/tools";
+import { OptionUiAll } from "../ui/acegui-helpers";
+import { Compare, OvaleConditionClass, TestBoolean } from "../engine/Condition";
 
-let azeriteSlots: LuaArray<boolean> = {
+const azeriteSlots: LuaArray<boolean> = {
     [1]: true,
     [3]: true,
     [5]: true,
@@ -108,48 +108,46 @@ export class OvaleAzeriteArmor {
     };
 
     private ItemChanged = () => {
-        let slotId = this.OvaleEquipment.lastChangedSlot;
+        const slotId = this.OvaleEquipment.lastChangedSlot;
         if (slotId != undefined && azeriteSlots[slotId]) {
             this.UpdateTraits();
         }
     };
 
-    private AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED: AceEventHandler<
-        AzeriteEmpoweredItemSelectionUpdatedEvent
-    > = () => {
+    private AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED: AceEventHandler<AzeriteEmpoweredItemSelectionUpdatedEvent> = () => {
         this.UpdateTraits();
     };
 
-    private PLAYER_ENTERING_WORLD: AceEventHandler<
-        PlayerEnteringWorldEvent
-    > = () => {
+    private PLAYER_ENTERING_WORLD: AceEventHandler<PlayerEnteringWorldEvent> = () => {
         this.UpdateTraits();
     };
 
     UpdateTraits() {
         this.self_traits = {};
         for (const [slotId] of pairs(azeriteSlots)) {
-            let itemSlot = ItemLocation.CreateFromEquipmentSlot(slotId);
+            const itemSlot = ItemLocation.CreateFromEquipmentSlot(slotId);
             if (
                 C_Item.DoesItemExist(itemSlot) &&
                 C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(itemSlot)
             ) {
-                let allTraits = C_AzeriteEmpoweredItem.GetAllTierInfo(itemSlot);
+                const allTraits = C_AzeriteEmpoweredItem.GetAllTierInfo(
+                    itemSlot
+                );
                 for (const [, traitsInRow] of pairs(allTraits)) {
                     for (const [, powerId] of pairs(
                         traitsInRow.azeritePowerIDs
                     )) {
-                        let isEnabled = C_AzeriteEmpoweredItem.IsPowerSelected(
+                        const isEnabled = C_AzeriteEmpoweredItem.IsPowerSelected(
                             itemSlot,
                             powerId
                         );
                         if (isEnabled) {
-                            let powerInfo = C_AzeriteEmpoweredItem.GetPowerInfo(
+                            const powerInfo = C_AzeriteEmpoweredItem.GetPowerInfo(
                                 powerId
                             );
-                            let [name] = GetSpellInfo(powerInfo.spellID);
+                            const [name] = GetSpellInfo(powerInfo.spellID);
                             if (this.self_traits[powerInfo.spellID]) {
-                                let rank = this.self_traits[powerInfo.spellID]
+                                const rank = this.self_traits[powerInfo.spellID]
                                     .rank;
                                 this.self_traits[powerInfo.spellID].rank =
                                     rank + 1;
@@ -181,7 +179,7 @@ export class OvaleAzeriteArmor {
 
     DebugTraits() {
         wipe(this.output);
-        let array: LuaArray<string> = {};
+        const array: LuaArray<string> = {};
         for (const [k, v] of pairs(this.self_traits)) {
             insert(array, `${tostring(v.name)}: ${tostring(k)} (${v.rank})`);
         }
@@ -197,12 +195,12 @@ export class OvaleAzeriteArmor {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [spellId, comparator, limit] = [
+        const [spellId, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
-        let value = this.TraitRank(spellId);
+        const value = this.TraitRank(spellId);
         return Compare(value, comparator, limit);
     };
     private HasAzeriteTrait = (
@@ -210,8 +208,8 @@ export class OvaleAzeriteArmor {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
-        let value = this.HasTrait(spellId);
+        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const value = this.HasTrait(spellId);
         return TestBoolean(value, yesno);
     };
 }

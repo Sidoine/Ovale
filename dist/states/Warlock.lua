@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Warlock", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Warlock", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -8,8 +8,8 @@ local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
 local pow = math.pow
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local Compare = __Condition.Compare
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local Compare = __engineCondition.Compare
 local CUSTOM_AURAS = {
     [80240] = {
         customId = -80240,

@@ -1,14 +1,14 @@
 import { ipairs, LuaArray, tonumber, unpack } from "@wowts/lua";
 import { concat, insert } from "@wowts/table";
 import { C_LegendaryCrafting, RuneforgePowerState } from "@wowts/wow-mock";
-import { OptionUiGroup } from "../acegui-helpers";
+import { OptionUiGroup } from "../ui/acegui-helpers";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
-} from "../Condition";
-import { OvaleDebugClass } from "../Debug";
-import { isNumber, OneTimeMessage } from "../tools";
+} from "../engine/Condition";
+import { OvaleDebugClass } from "../engine/Debug";
+import { isNumber, OneTimeMessage } from "../tools/tools";
 
 export class Runeforge {
     private debugOptions: OptionUiGroup = {
@@ -24,7 +24,7 @@ export class Runeforge {
                     const ids = C_LegendaryCrafting.GetRuneforgePowers(
                         undefined
                     );
-                    let output: LuaArray<string> = {};
+                    const output: LuaArray<string> = {};
                     for (const [, v] of ipairs(ids)) {
                         const runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(
                             v

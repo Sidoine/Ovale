@@ -23,12 +23,12 @@ import {
     GetTime,
 } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
-import { isNumber } from "../tools";
+import { isNumber } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../Debug";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { OptionUiAll } from "../acegui-helpers";
+import { OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { OptionUiAll } from "../ui/acegui-helpers";
 import {
     Compare,
     ConditionFunction,
@@ -36,11 +36,11 @@ import {
     OvaleConditionClass,
     TestBoolean,
     TestValue,
-} from "../Condition";
-import { OvaleDataClass } from "../Data";
+} from "../engine/Condition";
+import { OvaleDataClass } from "../engine/Data";
 import { huge } from "@wowts/math";
 
-let OVALE_SLOTID_BY_SLOTNAME = {
+const OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot: 0,
     headslot: 1,
     neckslot: 2,
@@ -62,7 +62,7 @@ let OVALE_SLOTID_BY_SLOTNAME = {
     tabardslot: 19,
 };
 export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
-let OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
+const OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
 
 type WeaponType =
     | "INVTYPE_WEAPON"
@@ -74,13 +74,13 @@ type WeaponType =
     | "INVTYPE_RANGED";
 type WeaponMap = { [key in WeaponType]?: boolean };
 
-let OVALE_ONE_HANDED_WEAPON: WeaponMap = {
+const OVALE_ONE_HANDED_WEAPON: WeaponMap = {
     INVTYPE_WEAPON: true,
     INVTYPE_WEAPONOFFHAND: true,
     INVTYPE_WEAPONMAINHAND: true,
 };
 
-let OVALE_RANGED_WEAPON: WeaponMap = {
+const OVALE_RANGED_WEAPON: WeaponMap = {
     INVTYPE_RANGEDRIGHT: true,
     INVTYPE_RANGED: true,
 };
@@ -137,7 +137,7 @@ export class OvaleEquipmentClass {
             ovaleDebug.defaultOptions.args[k] = v;
         }
         for (const [slotName] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
-            let [invSlotId] = GetInventorySlotInfo(slotName);
+            const [invSlotId] = GetInventorySlotInfo(slotName);
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId; // Should already match but in case Blizzard ever changes the slotIds
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
         }
@@ -189,7 +189,7 @@ export class OvaleEquipmentClass {
         hasItem: number
     ) => {
         this.profiler.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-        let changed = this.UpdateItemBySlot(slotId);
+        const changed = this.UpdateItemBySlot(slotId);
         if (changed) {
             this.lastChangedSlot = slotId;
             //this.UpdateArmorSetCount();
@@ -214,7 +214,7 @@ export class OvaleEquipmentClass {
     }
     GetEquippedItemBySlotName(slotName: SlotName): number | undefined {
         if (slotName) {
-            let slotId = OVALE_SLOTID_BY_SLOTNAME[slotName];
+            const slotId = OVALE_SLOTID_BY_SLOTNAME[slotName];
             if (slotId != undefined) {
                 return this.equippedItemBySlot[
                     OVALE_SLOTID_BY_SLOTNAME[slotName]
@@ -332,24 +332,30 @@ export class OvaleEquipmentClass {
         return false;
     }
     UpdateItemBySlot(slotId: number) {
-        let prevItemId = this.equippedItemBySlot[slotId];
+        const prevItemId = this.equippedItemBySlot[slotId];
         if (prevItemId) {
             delete this.equippedItemById[prevItemId];
             //this.equippedItemLevels[prevItemId] = undefined;
         }
-        let newItemId = GetInventoryItemID("player", slotId);
+        const newItemId = GetInventoryItemID("player", slotId);
         if (newItemId) {
             this.equippedItemById[newItemId] = slotId;
             this.equippedItemBySlot[slotId] = newItemId;
             //this.equippedItemLevels[newItemId] = GetDetailedItemLevelInfo(newItemId);
             if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
-                let [itemEquipLoc, dps] = this.UpdateWeapons(slotId, newItemId);
+                const [itemEquipLoc, dps] = this.UpdateWeapons(
+                    slotId,
+                    newItemId
+                );
                 this.mainHandItemType = itemEquipLoc;
                 this.mainHandDPS = dps;
             } else if (
                 slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
             ) {
-                let [itemEquipLoc, dps] = this.UpdateWeapons(slotId, newItemId);
+                const [itemEquipLoc, dps] = this.UpdateWeapons(
+                    slotId,
+                    newItemId
+                );
                 this.offHandItemType = itemEquipLoc;
                 this.offHandDPS = dps;
             }
@@ -372,11 +378,11 @@ export class OvaleEquipmentClass {
         return false;
     }
     UpdateWeapons(slotId: number, itemId: number): [WeaponType, number] {
-        let [, , , itemEquipLoc] = GetItemInfoInstant(itemId);
+        const [, , , itemEquipLoc] = GetItemInfoInstant(itemId);
         let dps = 0;
-        let itemLink = GetInventoryItemLink("player", slotId);
+        const itemLink = GetInventoryItemLink("player", slotId);
         if (itemLink) {
-            let stats = GetItemStats(itemLink);
+            const stats = GetItemStats(itemLink);
             if (stats) {
                 dps = stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"] || 0;
             }
@@ -408,7 +414,7 @@ export class OvaleEquipmentClass {
 
     DebugEquipment() {
         wipe(this.output);
-        let array: LuaArray<string> = {};
+        const array: LuaArray<string> = {};
         /*
         for (let slotId = INVSLOT_FIRST_EQUIPPED; slotId <= INVSLOT_LAST_EQUIPPED; slotId += 1) {
             let slot = tostring(OVALE_SLOTNAME_BY_SLOTID[slotId])
@@ -417,8 +423,8 @@ export class OvaleEquipmentClass {
             tinsert(array, `${slot}: ${itemid}`)
         }*/
         for (const [slotId, slotName] of ipairs(OVALE_SLOTNAME_BY_SLOTID)) {
-            let itemId = this.equippedItemBySlot[slotId] || "";
-            let shortSlotName = sub(slotName, 1, -5);
+            const itemId = this.equippedItemBySlot[slotId] || "";
+            const shortSlotName = sub(slotName, 1, -5);
             insert(array, `${shortSlotName}: ${itemId}`);
         }
         insert(array, `\n`);
@@ -450,7 +456,7 @@ export class OvaleEquipmentClass {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [itemId, yesno] = [positionalParams[1], positionalParams[2]];
+        const [itemId, yesno] = [positionalParams[1], positionalParams[2]];
         let boolean = false;
         let slotId;
         if (type(itemId) == "number") {
@@ -485,8 +491,8 @@ export class OvaleEquipmentClass {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let yesno = positionalParams[1];
-        let boolean = this.HasShield();
+        const yesno = positionalParams[1];
+        const boolean = this.HasShield();
         return TestBoolean(boolean, yesno);
     };
 
@@ -508,7 +514,7 @@ export class OvaleEquipmentClass {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
+        const [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
         let boolean: boolean | undefined = undefined;
         if (type(trinketId) == "number") {
             boolean = this.HasTrinket(trinketId);
@@ -551,7 +557,7 @@ export class OvaleEquipmentClass {
             itemId = this.GetEquippedItemBySlotName(itemId);
         }
         if (itemId) {
-            let [start, duration] = GetItemCooldown(itemId);
+            const [start, duration] = GetItemCooldown(itemId);
             if (start > 0 && duration > 0) {
                 return TestValue(
                     start,
@@ -573,7 +579,7 @@ export class OvaleEquipmentClass {
         positionalParams
     ): ConditionResult => {
         const expectedEnchantmentId = positionalParams[1];
-        let hand = positionalParams[2];
+        const hand = positionalParams[2];
         let [
             hasMainHandEnchant,
             mainHandExpiration,
@@ -600,7 +606,7 @@ export class OvaleEquipmentClass {
      */
     private weaponEnchantPresent: ConditionFunction = (positionalParams) => {
         const expectedEnchantmentId = positionalParams[1];
-        let hand = positionalParams[2];
+        const hand = positionalParams[2];
         let [
             hasMainHandEnchant,
             mainHandExpiration,

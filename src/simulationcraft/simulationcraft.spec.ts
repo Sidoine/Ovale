@@ -1,12 +1,6 @@
 import { test, expect } from "@jest/globals";
 import { IoC } from "../ioc";
-function assertDefined<T>(a: T | undefined): asserts a is T {
-    expect(a).toBeDefined();
-}
-
-function assertIs<T extends string>(a: string, b: T): asserts a is T {
-    expect(a).toBe(b);
-}
+import { assertDefined, assertIs } from "../tests/helpers";
 
 test("parse decimal number", () => {
     // Arrange

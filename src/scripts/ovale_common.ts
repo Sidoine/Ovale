@@ -1,9 +1,9 @@
-import { OvaleScriptsClass } from "../Scripts";
+import { OvaleScriptsClass } from "../engine/Scripts";
 
 export function registerCommon(OvaleScripts: OvaleScriptsClass) {
-    let name = "ovale_common";
-    let desc = "[9.0] Ovale: Common spell definitions";
-    let code = `
+    const name = "ovale_common";
+    const desc = "[9.0] Ovale: Common spell definitions";
+    const code = `
 
 # Essences
 Define(concentrated_flame_burn_debuff 295368)

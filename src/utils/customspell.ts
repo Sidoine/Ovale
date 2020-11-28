@@ -7,7 +7,7 @@ import {
     isFriendlyTarget,
 } from "./importspells";
 import { writeFileSync } from "fs";
-import { SpellInfo } from "../Data";
+import { SpellInfo } from "../engine/Data";
 import { PowerType as OvalePowerType } from "../states/Power";
 import { debug } from "console";
 
@@ -151,7 +151,7 @@ export function convertFromSpellData(
         spellInfo.channel = spell.duration / 1000;
     }
 
-    let require: CustomSpellRequire[] = [];
+    const require: CustomSpellRequire[] = [];
 
     if (
         hasAttribute(spell, SpellAttributes.SX_REQ_STEALTH) ||

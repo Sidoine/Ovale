@@ -12,7 +12,7 @@ import {
     OperandParseNode,
 } from "./definitions";
 import { tostring, lualength, pairs, tonumber, kpairs } from "@wowts/lua";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 import { self_outputPool } from "./text-tools";
 import { concat } from "@wowts/table";
 
@@ -20,7 +20,7 @@ function GetPrecedence(node: ParseNode) {
     if (node.type !== "operator") return 0;
     let precedence = node.precedence;
     if (!precedence) {
-        let operator = node.operator;
+        const operator = node.operator;
         if (operator) {
             if (
                 node.expressionType == "unary" &&
@@ -51,9 +51,9 @@ export class Unparser {
 
     public Unparse(node: ParseNode) {
         // TODO
-        let visitor = this.UNPARSE_VISITOR[node.type] as UnparseFunction<
-            ParseNode
-        >;
+        const visitor = this.UNPARSE_VISITOR[
+            node.type
+        ] as UnparseFunction<ParseNode>;
         if (!visitor) {
             this.tracer.Error(
                 "Unable to unparse node of type '%s'.",
@@ -64,21 +64,21 @@ export class Unparser {
         }
     }
     private UnparseAction: UnparseFunction<ActionParseNode> = (node) => {
-        let output = self_outputPool.Get();
+        const output = self_outputPool.Get();
         output[lualength(output) + 1] = node.name;
         for (const [modifier, expressionNode] of kpairs(node.modifiers)) {
             output[lualength(output) + 1] = `${modifier}=${this.Unparse(
                 expressionNode
             )}`;
         }
-        let s = concat(output, ",");
+        const s = concat(output, ",");
         self_outputPool.Release(output);
         return s;
     };
     private UnparseActionList: UnparseFunction<ActionListParseNode> = (
         node
     ) => {
-        let output = self_outputPool.Get();
+        const output = self_outputPool.Get();
         let listName;
         if (node.name == "_default") {
             listName = "action";
@@ -87,22 +87,22 @@ export class Unparser {
         }
         output[lualength(output) + 1] = "";
         for (const [i, actionNode] of pairs(node.child)) {
-            let operator = (tonumber(i) == 1 && "=") || "+=/";
+            const operator = (tonumber(i) == 1 && "=") || "+=/";
             output[
                 lualength(output) + 1
             ] = `${listName}${operator}${this.Unparse(actionNode)}`;
         }
-        let s = concat(output, "\n");
+        const s = concat(output, "\n");
         self_outputPool.Release(output);
         return s;
     };
     private UnparseExpression: UnparseFunction<OperatorParseNode> = (node) => {
         let expression;
-        let precedence = GetPrecedence(node);
+        const precedence = GetPrecedence(node);
         if (node.expressionType == "unary") {
             let rhsExpression;
-            let rhsNode = node.child[1];
-            let rhsPrecedence = GetPrecedence(rhsNode);
+            const rhsNode = node.child[1];
+            const rhsPrecedence = GetPrecedence(rhsNode);
             if (rhsPrecedence && precedence >= rhsPrecedence) {
                 rhsExpression = `(${this.Unparse(rhsNode)})`;
             } else {
@@ -111,15 +111,15 @@ export class Unparser {
             expression = `${node.operator}${rhsExpression}`;
         } else if (node.expressionType == "binary") {
             let lhsExpression, rhsExpression;
-            let lhsNode = node.child[1];
-            let lhsPrecedence = GetPrecedence(lhsNode);
+            const lhsNode = node.child[1];
+            const lhsPrecedence = GetPrecedence(lhsNode);
             if (lhsPrecedence && lhsPrecedence < precedence) {
                 lhsExpression = `(${this.Unparse(lhsNode)})`;
             } else {
                 lhsExpression = this.Unparse(lhsNode);
             }
-            let rhsNode = node.child[2];
-            let rhsPrecedence = GetPrecedence(rhsNode);
+            const rhsNode = node.child[2];
+            const rhsPrecedence = GetPrecedence(rhsNode);
             if (rhsPrecedence && precedence > rhsPrecedence) {
                 rhsExpression = `(${this.Unparse(rhsNode)})`;
             } else if (rhsPrecedence && precedence == rhsPrecedence) {

@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../GUID";
+import { OvaleGUIDClass } from "../engine/GUID";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer, Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
@@ -12,18 +12,18 @@ import {
     COMBATLOG_OBJECT_REACTION_FRIENDLY,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
-import { States } from "../State";
+import { States } from "../engine/State";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { Tracer, OvaleDebugClass } from "../Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
 
-let GROUP_MEMBER = bor(
+const GROUP_MEMBER = bor(
     COMBATLOG_OBJECT_AFFILIATION_MINE,
     COMBATLOG_OBJECT_AFFILIATION_PARTY,
     COMBATLOG_OBJECT_AFFILIATION_RAID
 );
-let CLEU_TAG_SUFFIXES = {
+const CLEU_TAG_SUFFIXES = {
     1: "_DAMAGE",
     2: "_MISSED",
     3: "_AURA_APPLIED",
@@ -37,22 +37,22 @@ let CLEU_TAG_SUFFIXES = {
     11: "_DRAIN",
     12: "_LEECH",
 };
-let CLEU_AUTOATTACK: LuaObj<boolean> = {
+const CLEU_AUTOATTACK: LuaObj<boolean> = {
     RANGED_DAMAGE: true,
     RANGED_MISSED: true,
     SWING_DAMAGE: true,
     SWING_MISSED: true,
 };
-let CLEU_UNIT_REMOVED: LuaObj<boolean> = {
+const CLEU_UNIT_REMOVED: LuaObj<boolean> = {
     UNIT_DESTROYED: true,
     UNIT_DIED: true,
     UNIT_DISSIPATES: true,
 };
-let self_enemyName: LuaObj<string> = {};
-let self_enemyLastSeen: LuaObj<number> = {};
-let self_taggedEnemyLastSeen: LuaObj<number> = {};
+const self_enemyName: LuaObj<string> = {};
+const self_enemyLastSeen: LuaObj<number> = {};
+const self_taggedEnemyLastSeen: LuaObj<number> = {};
 let self_reaperTimer: Timer | undefined = undefined;
-let REAP_INTERVAL = 3;
+const REAP_INTERVAL = 3;
 const IsTagEvent = function (cleuEvent: string) {
     let isTagEvent = false;
     if (CLEU_AUTOATTACK[cleuEvent]) {
@@ -130,7 +130,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     };
 
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -143,7 +143,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             destFlags,
         ] = CombatLogGetCurrentEventInfo();
         if (CLEU_UNIT_REMOVED[cleuEvent]) {
-            let now = GetTime();
+            const now = GetTime();
             this.RemoveEnemy(cleuEvent, destGUID, now, true);
         } else if (
             sourceGUID &&
@@ -162,7 +162,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                         IsTagEvent(cleuEvent)
                     )
                 ) {
-                    let now = GetTime();
+                    const now = GetTime();
                     this.AddEnemy(cleuEvent, sourceGUID, sourceName, now);
                 }
             } else if (
@@ -170,7 +170,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 !IsFriendly(destFlags) &&
                 IsTagEvent(cleuEvent)
             ) {
-                let now = GetTime();
+                const now = GetTime();
                 let isPlayerTag;
                 if (sourceGUID == this.ovale.playerGUID) {
                     isPlayerTag = true;
@@ -190,7 +190,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     };
     private RemoveInactiveEnemies = () => {
         this.profiler.StartProfiling("OvaleEnemies_RemoveInactiveEnemies");
-        let now = GetTime();
+        const now = GetTime();
         for (const [guid, timestamp] of pairs(self_enemyLastSeen)) {
             if (now - timestamp > REAP_INTERVAL) {
                 this.RemoveEnemy("REAPED", guid, now);
@@ -250,7 +250,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     ) {
         this.profiler.StartProfiling("OvaleEnemies_RemoveEnemy");
         if (guid) {
-            let name = self_enemyName[guid];
+            const name = self_enemyName[guid];
             let changed = false;
             if (self_enemyLastSeen[guid]) {
                 delete self_enemyLastSeen[guid];
@@ -289,8 +289,8 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     ) {
         this.profiler.StartProfiling("OvaleEnemies_RemoveTaggedEnemy");
         if (guid) {
-            let name = self_enemyName[guid];
-            let tagged = self_taggedEnemyLastSeen[guid];
+            const name = self_enemyName[guid];
+            const tagged = self_taggedEnemyLastSeen[guid];
             if (tagged) {
                 delete self_taggedEnemyLastSeen[guid];
                 if (this.current.taggedEnemies > 0) {
@@ -312,8 +312,8 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     }
     DebugEnemies() {
         for (const [guid, seen] of pairs(self_enemyLastSeen)) {
-            let name = self_enemyName[guid];
-            let tagged = self_taggedEnemyLastSeen[guid];
+            const name = self_enemyName[guid];
+            const tagged = self_taggedEnemyLastSeen[guid];
             if (tagged) {
                 this.tracer.Print(
                     "Tagged enemy %s (%s) last seen at %f",

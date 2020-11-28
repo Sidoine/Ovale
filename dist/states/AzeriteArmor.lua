@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/AzeriteArmor", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/AzeriteArmor", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -13,9 +13,9 @@ local C_Item = C_Item
 local ItemLocation = ItemLocation
 local C_AzeriteEmpoweredItem = C_AzeriteEmpoweredItem
 local GetSpellInfo = GetSpellInfo
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local Compare = __Condition.Compare
-local TestBoolean = __Condition.TestBoolean
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local Compare = __engineCondition.Compare
+local TestBoolean = __engineCondition.TestBoolean
 local azeriteSlots = {
     [1] = true,
     [3] = true,

@@ -1,9 +1,15 @@
 import { LuaArray } from "@wowts/lua";
 import { test, beforeEach, expect } from "@jest/globals";
 import { IMock, Mock } from "typemoq";
-import { AstAnnotation, AstFunctionNode, AstNode, OvaleASTClass } from "../AST";
-import { OvaleDataClass } from "../Data";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import {
+    AstAnnotation,
+    AstFunctionNode,
+    AstNode,
+    AstNodeSnapshot,
+    OvaleASTClass,
+} from "../engine/AST";
+import { OvaleDataClass } from "../engine/Data";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 import { Annotation, OperandParseNode } from "./definitions";
 import { Emiter } from "./emiter";
 import { Unparser } from "./unparser";
@@ -116,7 +122,7 @@ test("emiter unknown function (call one time message instead)", () => {
         nodeId: 0,
         rawNamedParams: {},
         rawPositionalParams: {},
-        result: {} as any,
+        result: {} as AstNodeSnapshot,
         type: "function",
     };
     context.ast

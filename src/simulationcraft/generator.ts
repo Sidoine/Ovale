@@ -1,4 +1,4 @@
-import { AstNode, isAstNodeWithChildren, OvaleASTClass } from "../AST";
+import { AstNode, isAstNodeWithChildren, OvaleASTClass } from "../engine/AST";
 import {
     type,
     LuaObj,
@@ -19,10 +19,10 @@ import {
     self_outputPool,
 } from "./text-tools";
 import { format } from "@wowts/string";
-import { OvaleDataClass } from "../Data";
+import { OvaleDataClass } from "../engine/Data";
 
-let self_functionDefined: LuaObj<boolean> = {};
-let self_functionUsed: LuaObj<boolean> = {};
+const self_functionDefined: LuaObj<boolean> = {};
+const self_functionUsed: LuaObj<boolean> = {};
 
 function isNode(n: any): n is AstNode {
     return type(n) == "table";
@@ -72,11 +72,11 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
     ) {
         [isChanged, isSwept] = [true, true];
     } else if (node.type == "group" || node.type == "script") {
-        let child = node.child;
+        const child = node.child;
         let index = lualength(child);
         while (index > 0) {
-            let childNode = child[index];
-            let [changed, swept] = Sweep(childNode);
+            const childNode = child[index];
+            const [changed, swept] = Sweep(childNode);
             if (isNode(swept)) {
                 if (swept.type == "group") {
                     // Directly insert a replacement group's statements in place of the replaced node.
@@ -85,7 +85,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
                         insert(child, index, swept.child[k]);
                     }
                     if (node.type == "group") {
-                        let count = SweepComments(child, index);
+                        const count = SweepComments(child, index);
                         index = index - count;
                     }
                 } else {
@@ -94,7 +94,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
             } else if (swept) {
                 remove(child, index);
                 if (node.type == "group") {
-                    let count = SweepComments(child, index);
+                    const count = SweepComments(child, index);
                     index = index - count;
                 }
             }
@@ -122,9 +122,9 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
         [isChanged, isSwept] = Sweep(node.child[2]);
     } else if (node.type == "logical") {
         if (node.expressionType == "binary") {
-            let [lhsNode, rhsNode] = [node.child[1], node.child[2]];
+            const [lhsNode, rhsNode] = [node.child[1], node.child[2]];
             for (const [index, childNode] of ipairs(node.child)) {
-                let [changed, swept] = Sweep(childNode);
+                const [changed, swept] = Sweep(childNode);
                 if (isNode(swept)) {
                     node.child[index] = swept;
                 } else if (swept) {
@@ -187,13 +187,13 @@ export class Generator {
         annotation: Annotation,
         interrupts: LuaArray<Spell>
     ) {
-        let nodeList = annotation.astAnnotation.nodeList;
-        let camelSpecialization = LowerSpecialization(annotation);
-        let spells = interrupts || {};
+        const nodeList = annotation.astAnnotation.nodeList;
+        const camelSpecialization = LowerSpecialization(annotation);
+        const spells = interrupts || {};
         sort(spells, function (a, b) {
             return tonumber(a.order || 0) >= tonumber(b.order || 0);
         });
-        let lines: LuaArray<string> = {};
+        const lines: LuaArray<string> = {};
         for (const [, spell] of pairs(spells)) {
             annotation.AddSymbol(spell.name);
             if (spell.addSymbol != undefined) {
@@ -201,7 +201,7 @@ export class Generator {
                     annotation.AddSymbol(v);
                 }
             }
-            let conditions: LuaArray<string> = {};
+            const conditions: LuaArray<string> = {};
             if (spell.range == undefined) {
                 insert(conditions, format("target.InRange(%s)", spell.name));
             } else if (spell.range != "") {
@@ -223,7 +223,7 @@ export class Generator {
             line = `${line}${format("Spell(%s)", spell.name)}`;
             insert(lines, line);
         }
-        let fmt = `
+        const fmt = `
             AddFunction %sInterruptActions
             {
                 if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
@@ -232,8 +232,8 @@ export class Generator {
                 }
             }
         `;
-        let code = format(fmt, camelSpecialization, concat(lines, "\n"));
-        let [node] = this.ovaleAst.ParseCode(
+        const code = format(fmt, camelSpecialization, concat(lines, "\n"));
+        const [node] = this.ovaleAst.ParseCode(
             "add_function",
             code,
             nodeList,
@@ -249,8 +249,8 @@ export class Generator {
         child: LuaArray<AstNode>,
         annotation: Annotation
     ) {
-        let interrupts = {};
-        let className = annotation.classId;
+        const interrupts = {};
+        const className = annotation.classId;
 
         if (this.ovaleData.PANDAREN_CLASSES[className]) {
             insert(interrupts, {
@@ -585,17 +585,17 @@ export class Generator {
         annotation: Annotation
     ) {
         let count = 0;
-        let nodeList = annotation.astAnnotation.nodeList;
-        let camelSpecialization = LowerSpecialization(annotation);
+        const nodeList = annotation.astAnnotation.nodeList;
+        const camelSpecialization = LowerSpecialization(annotation);
         if (annotation.melee == "DEATHKNIGHT") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -612,7 +612,7 @@ export class Generator {
             annotation.melee == "DEMONHUNTER" &&
             annotation.specialization == "havoc"
         ) {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
@@ -622,8 +622,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -640,14 +640,14 @@ export class Generator {
             annotation.melee == "DEMONHUNTER" &&
             annotation.specialization == "vengeance"
         ) {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -661,7 +661,7 @@ export class Generator {
             }
         }
         if (annotation.melee == "DRUID") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
@@ -671,8 +671,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -690,7 +690,7 @@ export class Generator {
             }
         }
         if (annotation.melee == "HUNTER") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(raptor_strike)
@@ -699,8 +699,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -721,8 +721,8 @@ export class Generator {
                     if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -736,14 +736,14 @@ export class Generator {
             }
         }
         if (annotation.melee == "MONK") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -757,13 +757,13 @@ export class Generator {
             }
         }
         if (annotation.time_to_hpg_heal == "PALADIN") {
-            let code = `
+            const code = `
                 AddFunction HolyTimeToHPG
                 {
                     SpellCooldown(crusader_strike holy_shock judgment)
                 }
             `;
-            let [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -778,13 +778,13 @@ export class Generator {
             }
         }
         if (annotation.time_to_hpg_melee == "PALADIN") {
-            let code = `
+            const code = `
                 AddFunction RetributionTimeToHPG
                 {
                     SpellCooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
                 }
             `;
-            let [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -799,14 +799,14 @@ export class Generator {
             }
         }
         if (annotation.time_to_hpg_tank == "PALADIN") {
-            let code = `
+            const code = `
                 AddFunction ProtectionTimeToHPG
                 {
                     if Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike holy_wrath judgment)
                     if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
                 }
             `;
-            let [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -820,14 +820,14 @@ export class Generator {
             count = count + 1;
         }
         if (annotation.melee == "PALADIN") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -841,7 +841,7 @@ export class Generator {
             }
         }
         if (annotation.melee == "ROGUE") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
@@ -851,8 +851,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -867,7 +867,7 @@ export class Generator {
             }
         }
         if (annotation.melee == "SHAMAN") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) 
@@ -877,8 +877,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -893,7 +893,7 @@ export class Generator {
             }
         }
         if (annotation.bloodlust == "SHAMAN") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sBloodlust
                 {
                     if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
@@ -903,8 +903,8 @@ export class Generator {
                     }
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -919,7 +919,7 @@ export class Generator {
             }
         }
         if (annotation.melee == "WARRIOR") {
-            let fmt = `
+            const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
                     if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
@@ -934,7 +934,7 @@ export class Generator {
             if (annotation.specialization == "protection") {
                 charge = "intercept";
             }
-            let code = format(
+            const code = format(
                 fmt,
                 camelSpecialization,
                 charge,
@@ -942,7 +942,7 @@ export class Generator {
                 charge,
                 charge
             );
-            let [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -958,15 +958,15 @@ export class Generator {
             }
         }
         if (annotation.use_item) {
-            let fmt = `
+            const fmt = `
                 AddFunction %sUseItemActions
                 {
                     Item(Trinket0Slot usable=1 text=13)
                     Item(Trinket1Slot usable=1 text=14)
                 }
             `;
-            let code = format(fmt, camelSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, camelSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -987,7 +987,7 @@ export class Generator {
         data: any,
         skill: keyof Annotation
     ) {
-        let nodeList = annotation.astAnnotation.nodeList;
+        const nodeList = annotation.astAnnotation.nodeList;
         if (data.class != annotation[skill]) {
             return 0;
         }
@@ -997,17 +997,17 @@ export class Generator {
         } else {
             defaultText = "";
         }
-        let fmt = `
+        const fmt = `
             AddCheckBox(opt_%s SpellName(%s)%s enabled=(specialization(%s)))
         `;
-        let code = format(
+        const code = format(
             fmt,
             skill,
             skill,
             defaultText,
             annotation.specialization
         );
-        let [node] = this.ovaleAst.ParseCode(
+        const [node] = this.ovaleAst.ParseCode(
             "checkbox",
             code,
             nodeList,
@@ -1033,16 +1033,16 @@ export class Generator {
                     <keyof typeof OPTIONAL_SKILLS>skill
                 );
         }
-        let nodeList = annotation.astAnnotation.nodeList;
-        let ifSpecialization = `enabled=(specialization(${annotation.specialization}))`;
+        const nodeList = annotation.astAnnotation.nodeList;
+        const ifSpecialization = `enabled=(specialization(${annotation.specialization}))`;
         if (annotation.using_apl && next(annotation.using_apl)) {
             for (const [name] of pairs(annotation.using_apl)) {
                 if (name != "normal") {
-                    let fmt = `
+                    const fmt = `
                         AddListItem(opt_using_apl %s "%s APL")
                     `;
-                    let code = format(fmt, name, name);
-                    let [node] = this.ovaleAst.ParseCode(
+                    const code = format(fmt, name, name);
+                    const [node] = this.ovaleAst.ParseCode(
                         "list_item",
                         code,
                         nodeList,
@@ -1052,10 +1052,10 @@ export class Generator {
                 }
             }
             {
-                let code = `
+                const code = `
                     AddListItem(opt_using_apl normal L(normal_apl) default)
                 `;
-                let [node] = this.ovaleAst.ParseCode(
+                const [node] = this.ovaleAst.ParseCode(
                     "list_item",
                     code,
                     nodeList,
@@ -1066,11 +1066,11 @@ export class Generator {
         }
         if (annotation.options) {
             for (const [v] of pairs(annotation.options)) {
-                let fmt = `
+                const fmt = `
                     AddCheckBox(${v} L(${v}) default %s)
                 `;
-                let code = format(fmt, ifSpecialization);
-                let [node] = this.ovaleAst.ParseCode(
+                const code = format(fmt, ifSpecialization);
+                const [node] = this.ovaleAst.ParseCode(
                     "checkbox",
                     code,
                     nodeList,
@@ -1081,17 +1081,17 @@ export class Generator {
             }
         }
         if (annotation.use_legendary_ring) {
-            let legendaryRing = annotation.use_legendary_ring;
-            let fmt = `
+            const legendaryRing = annotation.use_legendary_ring;
+            const fmt = `
                 AddCheckBox(opt_%s ItemName(%s) default %s)
             `;
-            let code = format(
+            const code = format(
                 fmt,
                 legendaryRing,
                 legendaryRing,
                 ifSpecialization
             );
-            let [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.ParseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1102,11 +1102,11 @@ export class Generator {
             count = count + 1;
         }
         if (annotation.opt_use_consumables) {
-            let fmt = `
+            const fmt = `
                 AddCheckBox(opt_use_consumables L(opt_use_consumables) default %s)
             `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, ifSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1116,11 +1116,11 @@ export class Generator {
             count = count + 1;
         }
         if (annotation.melee) {
-            let fmt = `
+            const fmt = `
                 AddCheckBox(opt_melee_range L(not_in_melee_range) %s)
             `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, ifSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1130,11 +1130,11 @@ export class Generator {
             count = count + 1;
         }
         if (annotation.interrupt) {
-            let fmt = `
+            const fmt = `
                 AddCheckBox(opt_interrupt L(interrupt) default %s)
             `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, ifSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1144,11 +1144,11 @@ export class Generator {
             count = count + 1;
         }
         if (annotation.opt_priority_rotation) {
-            let fmt = `
+            const fmt = `
                 AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
             `;
-            let code = format(fmt, ifSpecialization);
-            let [node] = this.ovaleAst.ParseCode(
+            const code = format(fmt, ifSpecialization);
+            const [node] = this.ovaleAst.ParseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1165,21 +1165,21 @@ export class Generator {
         }
     }
     public GenerateIconBody(tag: string, profile: Profile) {
-        let annotation = profile.annotation;
-        let precombatName = OvaleFunctionName("precombat", annotation);
-        let defaultName = OvaleFunctionName("_default", annotation);
-        let [precombatBodyName] = OvaleTaggedFunctionName(precombatName, tag);
-        let [defaultBodyName] = OvaleTaggedFunctionName(defaultName, tag);
+        const annotation = profile.annotation;
+        const precombatName = OvaleFunctionName("precombat", annotation);
+        const defaultName = OvaleFunctionName("_default", annotation);
+        const [precombatBodyName] = OvaleTaggedFunctionName(precombatName, tag);
+        const [defaultBodyName] = OvaleTaggedFunctionName(defaultName, tag);
         let mainBodyCode;
         if (annotation.using_apl && next(annotation.using_apl)) {
-            let output = self_outputPool.Get();
+            const output = self_outputPool.Get();
             output[lualength(output) + 1] = format(
                 "if List(opt_using_apl normal) %s()",
                 defaultBodyName
             );
             for (const [name] of pairs(annotation.using_apl)) {
-                let aplName = OvaleFunctionName(<string>name, annotation);
-                let [aplBodyName] = OvaleTaggedFunctionName(aplName, tag);
+                const aplName = OvaleFunctionName(<string>name, annotation);
+                const [aplBodyName] = OvaleTaggedFunctionName(aplName, tag);
                 output[lualength(output) + 1] = format(
                     "if List(opt_using_apl %s) %s()",
                     name,
@@ -1193,7 +1193,7 @@ export class Generator {
         }
         let code;
         if (profile["actions.precombat"]) {
-            let fmt = `
+            const fmt = `
                 if not InCombat() %s()
                 %s
             `;

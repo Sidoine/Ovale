@@ -7,9 +7,9 @@ import {
     AstAddFunctionNode,
     AstScriptNode,
     AstFunctionNode,
-} from "../AST";
-import { TypeCheck } from "../tools";
-import { OvaleDataClass } from "../Data";
+} from "../engine/AST";
+import { TypeCheck } from "../tools/tools";
+import { OvaleDataClass } from "../engine/Data";
 
 export type ClassRole = "tank" | "spell" | "attack";
 export type ClassType = string;
@@ -436,7 +436,7 @@ export interface Profile extends ProfileStrings, ProfileLists {
     annotation: Annotation;
 }
 
-export let KEYWORD: LuaObj<boolean> = {};
+export const KEYWORD: LuaObj<boolean> = {};
 export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
@@ -501,14 +501,14 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["wait_on_ready"]: true,
     ["weapon"]: true,
 };
-export let LITTERAL_MODIFIER: LuaObj<boolean> = {
+export const LITTERAL_MODIFIER: LuaObj<boolean> = {
     ["name"]: true,
 };
-export let FUNCTION_KEYWORD: LuaObj<boolean> = {
+export const FUNCTION_KEYWORD: LuaObj<boolean> = {
     ["ceil"]: true,
     ["floor"]: true,
 };
-export let SPECIAL_ACTION: LuaObj<boolean> = {
+export const SPECIAL_ACTION: LuaObj<boolean> = {
     ["apply_poison"]: true,
     ["auto_attack"]: true,
     ["call_action_list"]: true,
@@ -821,10 +821,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },
 };
-export let RUNE_OPERAND: LuaObj<string> = {
+export const RUNE_OPERAND: LuaObj<string> = {
     ["rune"]: "rune",
 };
-export let CONSUMABLE_ITEMS: LuaObj<boolean> = {
+export const CONSUMABLE_ITEMS: LuaObj<boolean> = {
     ["potion"]: true,
     ["food"]: true,
     ["flask"]: true,
@@ -841,7 +841,7 @@ export let CONSUMABLE_ITEMS: LuaObj<boolean> = {
         KEYWORD[keyword] = value;
     }
 }
-export let UNARY_OPERATOR: {
+export const UNARY_OPERATOR: {
     [k in SimcUnaryOperatorType]: { 1: "logical" | "arithmetic"; 2: number };
 } = {
     ["!"]: {
@@ -857,7 +857,7 @@ export let UNARY_OPERATOR: {
         2: 50,
     },
 };
-export let BINARY_OPERATOR: {
+export const BINARY_OPERATOR: {
     [k in SimcBinaryOperatorType]: {
         1: "logical" | "compare" | "arithmetic";
         2: number;
@@ -1021,7 +1021,7 @@ export function checkOptionalSkill(
     className: string,
     specialization: string
 ): action is keyof typeof OPTIONAL_SKILLS {
-    let data = OPTIONAL_SKILLS[<keyof typeof OPTIONAL_SKILLS>action];
+    const data = OPTIONAL_SKILLS[<keyof typeof OPTIONAL_SKILLS>action];
     if (!data) {
         return false;
     }
@@ -1118,8 +1118,8 @@ export class Annotation implements InterruptAnnotation {
     }
 
     public AddSymbol(symbol: string) {
-        let symbolTable = this.symbolTable || {};
-        let symbolList = this.symbolList;
+        const symbolTable = this.symbolTable || {};
+        const symbolList = this.symbolList;
         if (
             !symbolTable[symbol] &&
             !this.ovaleData.DEFAULT_SPELL_LIST[symbol]

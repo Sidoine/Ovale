@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Equipment", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Equipment", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -20,12 +20,12 @@ local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local GetTime = GetTime
 local concat = table.concat
 local insert = table.insert
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local Compare = __Condition.Compare
-local TestBoolean = __Condition.TestBoolean
-local TestValue = __Condition.TestValue
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local Compare = __engineCondition.Compare
+local TestBoolean = __engineCondition.TestBoolean
+local TestValue = __engineCondition.TestValue
 local huge = math.huge
 local OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot = 0,

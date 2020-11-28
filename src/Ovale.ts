@@ -1,14 +1,14 @@
-import { L } from "./Localization";
+import { L } from "./ui/Localization";
 import { NewAddon, AceModule } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, wipe, LuaArray, LuaObj, _G } from "@wowts/lua";
 import { UnitClass, UnitGUID, ClassId } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { Library } from "@wowts/tslib";
-import { ClearOneTimeMessages } from "./tools";
+import { ClearOneTimeMessages } from "./tools/tools";
 
-let MAX_REFRESH_INTERVALS = 500;
-let self_refreshIntervals: LuaArray<number> = {};
+const MAX_REFRESH_INTERVALS = 500;
+const self_refreshIntervals: LuaArray<number> = {};
 let self_refreshIndex = 1;
 
 export type Constructor<T> = new (...args: any[]) => T;
@@ -20,13 +20,13 @@ export const MSG_PREFIX = name;
 
 export class OvaleClass extends OvaleBase {
     playerClass: ClassId = "WARRIOR";
-    playerGUID: string = "";
+    playerGUID = "";
     refreshNeeded: LuaObj<boolean> = {};
 
     constructor() {
         super();
         _G["BINDING_HEADER_OVALE"] = "Ovale";
-        let toggleCheckBox = L["Inverser la boîte à cocher "];
+        const toggleCheckBox = L["Inverser la boîte à cocher "];
         _G["BINDING_NAME_OVALE_CHECKBOX0"] = `${toggleCheckBox}(1)`;
         _G["BINDING_NAME_OVALE_CHECKBOX1"] = `${toggleCheckBox}(2)`;
         _G["BINDING_NAME_OVALE_CHECKBOX2"] = `${toggleCheckBox}(3)`;
@@ -79,7 +79,7 @@ export class OvaleClass extends OvaleBase {
                 count = count + 1;
             }
         }
-        let avgRefresh = (count > 0 && sumRefresh / count) || 0;
+        const avgRefresh = (count > 0 && sumRefresh / count) || 0;
         return [avgRefresh, minRefresh, maxRefresh, count];
     }
 

@@ -41,7 +41,7 @@ function outputType(field: DbcField) {
 
 function outputField(field: DbcField) {
     if (field.elements) {
-        let fields: string[] = [];
+        const fields: string[] = [];
         for (let i = 1; i <= field.elements; i++) {
             fields.push(`    ${field.field}_${i}: ${outputType(field)}`);
         }

@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __AST = LibStub:GetLibrary("ovale/AST")
-local isAstNodeWithChildren = __AST.isAstNodeWithChildren
+local __engineAST = LibStub:GetLibrary("ovale/engine/AST")
+local isAstNodeWithChildren = __engineAST.isAstNodeWithChildren
 local type = type
 local ipairs = ipairs
 local wipe = wipe

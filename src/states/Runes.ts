@@ -1,5 +1,5 @@
 import { OvaleClass } from "../Ovale";
-import { States, StateModule } from "../State";
+import { States, StateModule } from "../engine/State";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, LuaArray, wipe } from "@wowts/lua";
 import { GetRuneCooldown, GetTime } from "@wowts/wow-mock";
@@ -7,14 +7,14 @@ import { huge } from "@wowts/math";
 import { sort } from "@wowts/table";
 import { SpellCast, PaperDollSnapshot } from "./LastSpell";
 import { AceModule } from "@wowts/tsaddon";
-import { Tracer, OvaleDebugClass } from "../Debug";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { OvaleDataClass } from "../Data";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { OvaleDataClass } from "../engine/Data";
 import { OvalePowerClass } from "./Power";
 import { OvalePaperDollClass } from "./PaperDoll";
 
-let EMPOWER_RUNE_WEAPON = 47568;
-let RUNE_SLOTS = 6;
+const EMPOWER_RUNE_WEAPON = 47568;
+const RUNE_SLOTS = 6;
 
 interface Rune {
     startCooldown: number;
@@ -29,7 +29,7 @@ class RuneData {
     rune: LuaArray<Rune> = {};
 }
 
-let usedRune: LuaArray<number> = {};
+const usedRune: LuaArray<number> = {};
 
 export class OvaleRunesClass extends States<RuneData> implements StateModule {
     private module: AceModule & AceEvent;
@@ -107,8 +107,8 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
     };
     UpdateRune(slot: number) {
         this.profiler.StartProfiling("OvaleRunes_UpdateRune");
-        let rune = this.current.rune[slot];
-        let [start, duration] = GetRuneCooldown(slot);
+        const rune = this.current.rune[slot];
+        const [start, duration] = GetRuneCooldown(slot);
         if (start && duration) {
             if (start > 0) {
                 rune.startCooldown = start;
@@ -132,9 +132,9 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         }
     };
     DebugRunes() {
-        let now = GetTime();
+        const now = GetTime();
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-            let rune = this.current.rune[slot];
+            const rune = this.current.rune[slot];
             if (IsActiveRune(rune, now)) {
                 this.tracer.Print("rune[%d] is active.", slot);
             } else {
@@ -156,7 +156,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
     ResetState() {
         this.profiler.StartProfiling("OvaleRunes_ResetState");
         for (const [slot, rune] of ipairs(this.current.rune)) {
-            let stateRune = this.next.rune[slot];
+            const stateRune = this.next.rune[slot];
             stateRune.endCooldown = rune.endCooldown;
             stateRune.startCooldown = rune.startCooldown;
         }
@@ -203,7 +203,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
     };
 
     ApplyRuneCost(spellId: number, atTime: number, spellcast: SpellCast) {
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         if (si) {
             let count = si.runes || 0;
             while (count > 0) {
@@ -213,7 +213,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         }
     }
     ReactivateRune(slot: number, atTime: number) {
-        let rune = this.next.rune[slot];
+        const rune = this.next.rune[slot];
         if (rune.startCooldown > atTime) {
             rune.startCooldown = atTime;
         }
@@ -223,7 +223,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         this.profiler.StartProfiling("OvaleRunes_state_ConsumeRune");
         let consumedRune: Rune | undefined;
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-            let rune = this.next.rune[slot];
+            const rune = this.next.rune[slot];
             if (IsActiveRune(rune, atTime)) {
                 consumedRune = rune;
                 break;
@@ -232,20 +232,21 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         if (consumedRune) {
             let start = atTime;
             for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-                let rune = this.next.rune[slot];
+                const rune = this.next.rune[slot];
                 if (rune.endCooldown > start) {
                     start = rune.endCooldown;
                 }
             }
-            let duration =
+            const duration =
                 10 /
                 this.ovalePaperDoll.GetSpellCastSpeedPercentMultiplier(
                     snapshot
                 );
             consumedRune.startCooldown = start;
             consumedRune.endCooldown = start + duration;
-            let runicpower = (this.ovalePower.next.power.runicpower || 0) + 10;
-            let maxi = this.ovalePower.current.maxPower.runicpower;
+            const runicpower =
+                (this.ovalePower.next.power.runicpower || 0) + 10;
+            const maxi = this.ovalePower.current.maxPower.runicpower;
             this.ovalePower.next.power.runicpower =
                 (runicpower < maxi && runicpower) || maxi;
         }
@@ -258,7 +259,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         let count = 0;
         let [startCooldown, endCooldown] = [huge, huge];
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-            let rune = state.rune[slot];
+            const rune = state.rune[slot];
             if (IsActiveRune(rune, atTime)) {
                 count = count + 1;
             } else if (rune.endCooldown < endCooldown) {
@@ -278,7 +279,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         let count = 0;
         let [startCooldown, endCooldown] = [huge, huge];
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-            let rune = state.rune[slot];
+            const rune = state.rune[slot];
             if (!IsActiveRune(rune, atTime)) {
                 count = count + 1;
                 if (rune.endCooldown < endCooldown) {
@@ -308,7 +309,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         const state = this.GetState(atTime);
         this.profiler.StartProfiling("OvaleRunes_state_GetRunesCooldown");
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
-            let rune = state.rune[slot];
+            const rune = state.rune[slot];
             usedRune[slot] = rune.endCooldown - atTime;
         }
         sort(usedRune);

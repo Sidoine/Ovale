@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Lexer = LibStub:GetLibrary("ovale/Lexer")
-local OvaleLexer = __Lexer.OvaleLexer
+local __engineLexer = LibStub:GetLibrary("ovale/engine/Lexer")
+local OvaleLexer = __engineLexer.OvaleLexer
 local tostring = tostring
 local tonumber = tonumber
 local ipairs = ipairs
@@ -20,10 +20,10 @@ local gsub = string.gsub
 local gmatch = string.gmatch
 local sub = string.sub
 local concat = table.concat
-local __Pool = LibStub:GetLibrary("ovale/Pool")
-local OvalePool = __Pool.OvalePool
-local __tools = LibStub:GetLibrary("ovale/tools")
-local checkToken = __tools.checkToken
+local __toolsPool = LibStub:GetLibrary("ovale/tools/Pool")
+local OvalePool = __toolsPool.OvalePool
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local checkToken = __toolstools.checkToken
 local self_childrenPool = OvalePool("OvaleSimulationCraft_childrenPool")
 local SelfPool = __class(OvalePool, {
     constructor = function(self)
@@ -143,8 +143,8 @@ __exports.Parser = __class(nil, {
             self_pool:Release(node)
         end
     end,
-    SyntaxError = function(self, tokenStream, ...)
-        self.tracer:Warning(...)
+    SyntaxError = function(self, tokenStream, pattern, ...)
+        self.tracer:Warning(pattern, ...)
         local context = {
             [1] = "Next tokens:"
         }
@@ -227,8 +227,7 @@ __exports.Parser = __class(nil, {
                 return nil
             end
         end
-        local node
-        node = NewNode(nodeList)
+        local node = NewNode(nodeList)
         node.type = "action"
         node.action = action
         node.name = name
@@ -248,8 +247,7 @@ __exports.Parser = __class(nil, {
             end
             child[#child + 1] = actionNode
         end
-        local node
-        node = NewNode(nodeList)
+        local node = NewNode(nodeList)
         node.type = "action_list"
         node.name = name
         node.child = child
@@ -370,8 +368,7 @@ __exports.Parser = __class(nil, {
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.", token)
             return nil
         end
-        local node
-        node = newNodeWithChild(nodeList)
+        local node = newNodeWithChild(nodeList)
         node.type = "function"
         node.name = name
         node.child[1] = argumentNode
@@ -415,7 +412,7 @@ __exports.Parser = __class(nil, {
         end
         return name, expressionNode
     end,
-    ParseNumber = function(self, tokenStream, nodeList, annotation)
+    ParseNumber = function(self, tokenStream, nodeList)
         local value
         local tokenType, token = tokenStream:Consume()
         if tokenType == "number" then
@@ -424,8 +421,7 @@ __exports.Parser = __class(nil, {
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.", token)
             return nil
         end
-        local node
-        node = NewNode(nodeList)
+        local node = NewNode(nodeList)
         node.type = "number"
         node.value = value
         return node
@@ -445,8 +441,7 @@ __exports.Parser = __class(nil, {
             self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing OPERAND; operand expected.", token)
             return nil
         end
-        local node
-        node = NewNode(nodeList)
+        local node = NewNode(nodeList)
         node.type = "operand"
         node.name = name
         node.rune = RUNE_OPERAND[name]
@@ -490,7 +485,7 @@ __exports.Parser = __class(nil, {
             return nil
         end
         if tokenType == "number" then
-            node = self:ParseNumber(tokenStream, nodeList, annotation)
+            node = self:ParseNumber(tokenStream, nodeList)
         elseif tokenType == "keyword" then
             if FUNCTION_KEYWORD[token] then
                 node = self:ParseFunction(tokenStream, nodeList, annotation)

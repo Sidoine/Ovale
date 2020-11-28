@@ -1,11 +1,11 @@
-local __exports = LibStub:NewLibrary("ovale/states/conduit", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/conduit", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local unpack = unpack
 local C_Soulbinds = C_Soulbinds
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local ReturnBoolean = __Condition.ReturnBoolean
-local ReturnConstant = __Condition.ReturnConstant
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local ReturnBoolean = __engineCondition.ReturnBoolean
+local ReturnConstant = __engineCondition.ReturnConstant
 __exports.Conduit = __class(nil, {
     constructor = function(self, debug)
         self.debugOptions = {

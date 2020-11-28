@@ -37,8 +37,8 @@ import {
     AstAddFunctionNode,
     AstGroupNode,
     isAstNodeWithChildren,
-} from "../AST";
-import { Tracer, OvaleDebugClass } from "../Debug";
+} from "../engine/AST";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
 import {
     format,
     gmatch,
@@ -50,7 +50,7 @@ import {
     len,
     upper,
 } from "@wowts/string";
-import { OvaleDataClass } from "../Data";
+import { OvaleDataClass } from "../engine/Data";
 import { insert } from "@wowts/table";
 import {
     LowerSpecialization,
@@ -59,7 +59,7 @@ import {
 } from "./text-tools";
 import { POOLED_RESOURCE } from "../states/Power";
 import { Unparser } from "./unparser";
-import { isNumber, MakeString } from "../tools";
+import { isNumber, MakeString } from "../tools/tools";
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../states/PaperDoll";
 
@@ -144,7 +144,7 @@ export class Emiter {
             return [`${name}_${specialization}`, _type];
         }
 
-        let [disname, distype] = this.GetPerClassSpecialization(
+        const [disname, distype] = this.GetPerClassSpecialization(
             this.EMIT_DISAMBIGUATION,
             name,
             className,
@@ -152,7 +152,7 @@ export class Emiter {
         );
         if (!disname) {
             if (!annotation.dictionary[name]) {
-                let otherName =
+                const otherName =
                     (truthy(match(name, "_buff$")) &&
                         gsub(name, "_buff$", "")) ||
                     (truthy(match(name, "_debuff$")) &&
@@ -161,7 +161,7 @@ export class Emiter {
                 if (annotation.dictionary[otherName]) {
                     return [otherName, _type];
                 }
-                let potionName = gsub(name, "potion_of_", "");
+                const potionName = gsub(name, "potion_of_", "");
                 if (annotation.dictionary[potionName]) {
                     return [potionName, _type];
                 }
@@ -339,9 +339,9 @@ export class Emiter {
         action: string | undefined
     ) {
         // TODO
-        let visitor = this.EMIT_VISITOR[parseNode.type] as EmitVisitor<
-            ParseNode
-        >;
+        const visitor = this.EMIT_VISITOR[
+            parseNode.type
+        ] as EmitVisitor<ParseNode>;
         if (!visitor) {
             this.tracer.Error(
                 "Unable to emit node of type '%s'.",
@@ -353,8 +353,8 @@ export class Emiter {
     }
 
     private AddSymbol(annotation: Annotation, symbol: string) {
-        let symbolTable = annotation.symbolTable || {};
-        let symbolList = annotation.symbolList || {};
+        const symbolTable = annotation.symbolTable || {};
+        const symbolList = annotation.symbolList || {};
         if (
             !symbolTable[symbol] &&
             !this.ovaleData.DEFAULT_SPELL_LIST[symbol]
@@ -375,7 +375,7 @@ export class Emiter {
     ): AstNode | undefined {
         const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         const miscOperand = tokenIterator();
-        let info = MISC_OPERAND[miscOperand];
+        const info = MISC_OPERAND[miscOperand];
         if (info) {
             let modifier = tokenIterator();
             if (info.code) {
@@ -592,16 +592,16 @@ export class Emiter {
         modifiers: Modifiers
     ) => {
         let node: AstNode | undefined, code;
-        let className = annotation.classId;
-        let specialization = annotation.specialization;
+        const className = annotation.classId;
+        const specialization = annotation.specialization;
         if (modifier == "if") {
             node = this.Emit(parseNode, nodeList, annotation, action);
         } else if (modifier == "target_if") {
             node = this.Emit(parseNode, nodeList, annotation, action);
         } else if (modifier == "five_stacks" && action == "focus_fire") {
-            let value = tonumber(this.unparser.Unparse(parseNode));
+            const value = tonumber(this.unparser.Unparse(parseNode));
             if (value == 1) {
-                let buffName = "pet_frenzy_buff";
+                const buffName = "pet_frenzy_buff";
                 this.AddSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= 5", buffName);
             }
@@ -610,7 +610,7 @@ export class Emiter {
                 this.AddSymbol(annotation, action);
                 const node = this.Emit(parseNode, nodeList, annotation, action);
                 if (!node) return undefined;
-                let expressionCode = this.ovaleAst.Unparse(node);
+                const expressionCode = this.ovaleAst.Unparse(node);
                 code = format(
                     "TimeSincePreviousSpell(%s) > %s",
                     action,
@@ -618,7 +618,7 @@ export class Emiter {
                 );
             }
         } else if (modifier == "max_cycle_targets") {
-            let [debuffName] = this.Disambiguate(
+            const [debuffName] = this.Disambiguate(
                 annotation,
                 `${action}_debuff`,
                 className,
@@ -627,7 +627,7 @@ export class Emiter {
             this.AddSymbol(annotation, debuffName);
             const node = this.Emit(parseNode, nodeList, annotation, action);
             if (!node) return undefined;
-            let expressionCode = this.ovaleAst.Unparse(node);
+            const expressionCode = this.ovaleAst.Unparse(node);
             code = format(
                 "DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s",
                 debuffName,
@@ -635,26 +635,26 @@ export class Emiter {
                 expressionCode
             );
         } else if (modifier == "max_energy") {
-            let value = tonumber(this.unparser.Unparse(parseNode));
+            const value = tonumber(this.unparser.Unparse(parseNode));
             if (value == 1) {
                 code = format("Energy() >= EnergyCost(%s max=1)", action);
             }
         } else if (modifier == "min_frenzy" && action == "focus_fire") {
-            let value = tonumber(this.unparser.Unparse(parseNode));
+            const value = tonumber(this.unparser.Unparse(parseNode));
             if (value) {
-                let buffName = "pet_frenzy_buff";
+                const buffName = "pet_frenzy_buff";
                 this.AddSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= %d", buffName, value);
             }
         } else if (modifier == "moving") {
-            let value = tonumber(this.unparser.Unparse(parseNode));
+            const value = tonumber(this.unparser.Unparse(parseNode));
             if (value == 0) {
                 code = "not Speed() > 0";
             } else {
                 code = "Speed() > 0";
             }
         } else if (modifier == "precombat") {
-            let value = tonumber(this.unparser.Unparse(parseNode));
+            const value = tonumber(this.unparser.Unparse(parseNode));
             if (value == 1) {
                 code = "not InCombat()";
             } else {
@@ -671,9 +671,9 @@ export class Emiter {
                 annotation.astAnnotation.sync &&
                 annotation.astAnnotation.sync[name];
             if (!node) {
-                let syncParseNode = annotation.sync && annotation.sync[name];
+                const syncParseNode = annotation.sync && annotation.sync[name];
                 if (syncParseNode) {
-                    let syncActionNode = this.EmitAction(
+                    const syncActionNode = this.EmitAction(
                         syncParseNode,
                         nodeList,
                         annotation,
@@ -690,7 +690,7 @@ export class Emiter {
                         ) {
                             let lhsNode = syncActionNode.child[1];
                             if (syncActionNode.type == "unless") {
-                                let notNode = this.ovaleAst.newNodeWithChildren(
+                                const notNode = this.ovaleAst.newNodeWithChildren(
                                     "logical",
                                     annotation.astAnnotation
                                 );
@@ -699,8 +699,8 @@ export class Emiter {
                                 notNode.child[1] = lhsNode;
                                 lhsNode = notNode;
                             }
-                            let rhsNode = syncActionNode.child[2];
-                            let andNode = this.ovaleAst.newNodeWithChildren(
+                            const rhsNode = syncActionNode.child[2];
+                            const andNode = this.ovaleAst.newNodeWithChildren(
                                 "logical",
                                 annotation.astAnnotation
                             );
@@ -755,7 +755,7 @@ export class Emiter {
     ) => {
         let conditionNode = undefined;
         for (const [modifier, expressionNode] of kpairs(parseNode.modifiers)) {
-            let rhsNode = this.EmitModifier(
+            const rhsNode = this.EmitModifier(
                 modifier,
                 expressionNode,
                 nodeList,
@@ -767,7 +767,7 @@ export class Emiter {
                 if (!conditionNode) {
                     conditionNode = rhsNode;
                 } else {
-                    let lhsNode = conditionNode;
+                    const lhsNode = conditionNode;
                     conditionNode = this.ovaleAst.newNodeWithChildren(
                         "logical",
                         annotation.astAnnotation
@@ -781,8 +781,8 @@ export class Emiter {
         }
         if (extraConditionNode) {
             if (conditionNode) {
-                let lhsNode = conditionNode;
-                let rhsNode = extraConditionNode;
+                const lhsNode = conditionNode;
+                const rhsNode = extraConditionNode;
                 conditionNode = this.ovaleAst.newNodeWithChildren(
                     "logical",
                     annotation.astAnnotation
@@ -796,7 +796,7 @@ export class Emiter {
             }
         }
         if (conditionNode) {
-            let node = this.ovaleAst.newNodeWithChildren(
+            const node = this.ovaleAst.newNodeWithChildren(
                 "if",
                 annotation.astAnnotation
             );
@@ -841,10 +841,10 @@ export class Emiter {
             group = node.body;
         }
         annotation.currentVariable = node;
-        let value =
+        const value =
             modifiers.value &&
             this.Emit(modifiers.value, nodeList, annotation, action);
-        let newNode = this.EmitConditionNode(
+        const newNode = this.EmitConditionNode(
             nodeList,
             value || this.ovaleAst.newValue(annotation.astAnnotation, 0),
             conditionNode,
@@ -877,10 +877,10 @@ export class Emiter {
             parseNode,
             action
         );
-        let valueNode = annotation.variable[name];
+        const valueNode = annotation.variable[name];
         valueNode.name = `${name}_value`;
         annotation.variable[valueNode.name] = valueNode;
-        let bodyCode = format(
+        const bodyCode = format(
             "AddFunction %s { if %s_value() > %s_min() %s_value() %s_min() }",
             name,
             name,
@@ -888,7 +888,7 @@ export class Emiter {
             name,
             name
         );
-        let [node] = this.ovaleAst.ParseCode(
+        const [node] = this.ovaleAst.ParseCode(
             "add_function",
             bodyCode,
             nodeList,
@@ -915,10 +915,10 @@ export class Emiter {
             parseNode,
             action
         );
-        let valueNode = annotation.variable[name];
+        const valueNode = annotation.variable[name];
         valueNode.name = `${name}_value`;
         annotation.variable[valueNode.name] = valueNode;
-        let bodyCode = format(
+        const bodyCode = format(
             "AddFunction %s { if %s_value() < %s_max() %s_value() %s_max() }",
             name,
             name,
@@ -926,7 +926,7 @@ export class Emiter {
             name,
             name
         );
-        let [node] = this.ovaleAst.ParseCode(
+        const [node] = this.ovaleAst.ParseCode(
             "add_function",
             bodyCode,
             nodeList,
@@ -946,7 +946,7 @@ export class Emiter {
         action: string
     ) => {
         // TODO
-        let valueNode = annotation.variable[name];
+        const valueNode = annotation.variable[name];
         if (valueNode) return;
         this.EmitNamedVariable(
             name,
@@ -967,7 +967,7 @@ export class Emiter {
         action: string
     ) => {
         // TODO
-        let valueNode = annotation.variable[name];
+        const valueNode = annotation.variable[name];
         if (valueNode) return;
         this.EmitNamedVariable(
             name,
@@ -1095,7 +1095,7 @@ export class Emiter {
         action: string,
         conditionNode?: AstNode
     ) => {
-        let op = (modifier.op && this.unparser.Unparse(modifier.op)) || "set";
+        const op = (modifier.op && this.unparser.Unparse(modifier.op)) || "set";
         if (!modifier.name) {
             this.tracer.Error("Modifier name is missing in %s", action);
             return;
@@ -1178,11 +1178,11 @@ export class Emiter {
         annotation
     ) => {
         let node: AstNode | undefined;
-        let canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
-        let className = annotation.classId;
-        let specialization = annotation.specialization;
-        let camelSpecialization = LowerSpecialization(annotation);
-        let role = annotation.role;
+        const canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
+        const className = annotation.classId;
+        const specialization = annotation.specialization;
+        const camelSpecialization = LowerSpecialization(annotation);
+        const role = annotation.role;
         let [action, type] = this.Disambiguate(
             annotation,
             canonicalizedName,
@@ -1192,16 +1192,17 @@ export class Emiter {
         );
         let bodyNode: AstNode | undefined;
         let conditionNode: AstNode | undefined;
-        if (action == "auto_attack" && !annotation.melee) {
-        } else if (action == "auto_shot") {
-        } else if (action == "choose_target") {
-        } else if (
-            action == "augmentation" ||
-            action == "flask" ||
-            action == "food"
+        if (
+            !(
+                (action == "auto_attack" && !annotation.melee) ||
+                action == "auto_shot" ||
+                action == "choose_target" ||
+                action == "augmentation" ||
+                action == "flask" ||
+                action == "food" ||
+                action == "snapshot_stats"
+            )
         ) {
-        } else if (action == "snapshot_stats") {
-        } else {
             // Most of this code is obsolete and should be cleaned or dispatched in the correct function
             let bodyCode, conditionCode;
             const expressionType = "expression";
@@ -1224,7 +1225,7 @@ export class Emiter {
                 bodyCode = "texture(spell_shadow_soulgem text=pickup)";
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "pulverize") {
-                let debuffName = "thrash_bear_debuff";
+                const debuffName = "thrash_bear_debuff";
                 this.AddSymbol(annotation, debuffName);
                 conditionCode = format(
                     "target.DebuffGain(%s) <= BaseDuration(%s)",
@@ -1236,7 +1237,7 @@ export class Emiter {
                 specialization == "guardian" &&
                 action == "rejuvenation"
             ) {
-                let spellName = "enhanced_rejuvenation";
+                const spellName = "enhanced_rejuvenation";
                 this.AddSymbol(annotation, spellName);
                 conditionCode = format("SpellKnown(%s)", spellName);
             } else if (className == "DRUID" && action == "wild_charge") {
@@ -1277,11 +1278,11 @@ export class Emiter {
                     action == "stop_burn_phase" ||
                     action == "stop_pyro_chain")
             ) {
-                let [stateAction, stateVariable] = match(
+                const [stateAction, stateVariable] = match(
                     action,
                     "([^_]+)_(.*)"
                 );
-                let value = (stateAction == "start" && 1) || 0;
+                const value = (stateAction == "start" && 1) || 0;
                 if (value == 0) {
                     conditionCode = format("GetState(%s) > 0", stateVariable);
                 } else {
@@ -1322,7 +1323,7 @@ export class Emiter {
                 action == "storm_earth_and_fire"
             ) {
                 conditionCode =
-                    "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)";
+                    "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire)";
                 annotation[action] = className;
             } else if (className == "MONK" && action == "touch_of_death") {
                 // conditionCode =
@@ -1361,9 +1362,9 @@ export class Emiter {
                 conditionCode = "EnergyDeficit() > 1";
             } else if (className == "ROGUE" && action == "apply_poison") {
                 if (modifiers.lethal) {
-                    let name = this.unparser.Unparse(modifiers.lethal);
+                    const name = this.unparser.Unparse(modifiers.lethal);
                     action = `${name}_poison`;
-                    let buffName = "lethal_poison_buff";
+                    const buffName = "lethal_poison_buff";
                     this.AddSymbol(annotation, buffName);
                     conditionCode = format(
                         "BuffRemaining(%s) < 1200",
@@ -1387,7 +1388,7 @@ export class Emiter {
                 className == "SHAMAN" &&
                 sub(action, 1, 11) == "ascendance_"
             ) {
-                let [buffName] = this.Disambiguate(
+                const [buffName] = this.Disambiguate(
                     annotation,
                     `${action}_buff`,
                     className,
@@ -1400,7 +1401,7 @@ export class Emiter {
                 annotation[action] = className;
                 isSpellAction = false;
             } else if (className == "SHAMAN" && action == "magma_totem") {
-                let spellName = "primal_strike";
+                const spellName = "primal_strike";
                 this.AddSymbol(annotation, spellName);
                 conditionCode = format("target.InRange(%s)", spellName);
             } else if (
@@ -1418,7 +1419,7 @@ export class Emiter {
                 conditionCode = "Enemies() > 1";
             } else if (className == "WARLOCK" && action == "service_pet") {
                 if (annotation.pet) {
-                    let spellName = `service_${annotation.pet}`;
+                    const spellName = `service_${annotation.pet}`;
                     this.AddSymbol(annotation, spellName);
                     bodyCode = format("Spell(%s)", spellName);
                 } else {
@@ -1428,7 +1429,7 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "WARLOCK" && action == "summon_pet") {
                 if (annotation.pet) {
-                    let spellName = `summon_${annotation.pet}`;
+                    const spellName = `summon_${annotation.pet}`;
                     this.AddSymbol(annotation, spellName);
                     bodyCode = format("Spell(%s)", spellName);
                 } else {
@@ -1469,7 +1470,7 @@ export class Emiter {
                 sub(action, 1, 7) == "execute"
             ) {
                 if (modifiers.target) {
-                    let target = tonumber(
+                    const target = tonumber(
                         this.unparser.Unparse(modifiers.target)
                     );
                     if (target) {
@@ -1524,9 +1525,12 @@ export class Emiter {
                 action == "swap_action_list"
             ) {
                 if (modifiers.name) {
-                    let name = this.unparser.Unparse(modifiers.name);
+                    const name = this.unparser.Unparse(modifiers.name);
                     if (name) {
-                        let functionName = OvaleFunctionName(name, annotation);
+                        const functionName = OvaleFunctionName(
+                            name,
+                            annotation
+                        );
                         bodyCode = `${functionName}()`;
                         if (
                             className == "MAGE" &&
@@ -1545,9 +1549,9 @@ export class Emiter {
                 }
             } else if (action == "cancel_buff") {
                 if (modifiers.name) {
-                    let spellName = this.unparser.Unparse(modifiers.name);
+                    const spellName = this.unparser.Unparse(modifiers.name);
                     if (spellName) {
-                        let [buffName] = this.Disambiguate(
+                        const [buffName] = this.Disambiguate(
                             annotation,
                             `${spellName}_buff`,
                             className,
@@ -1603,7 +1607,7 @@ export class Emiter {
                 isSpellAction = false;
             } else if (action == "stance") {
                 if (modifiers.choose) {
-                    let name = this.unparser.Unparse(modifiers.choose);
+                    const name = this.unparser.Unparse(modifiers.choose);
                     if (name) {
                         if (className == "MONK") {
                             action = `stance_of_the_${name}`;
@@ -1629,7 +1633,7 @@ export class Emiter {
                 // TODO use modifiers.slots
                 if (modifiers.slot) {
                     // use this slot only?
-                    let slot = this.unparser.Unparse(modifiers.slot);
+                    const slot = this.unparser.Unparse(modifiers.slot);
                     if (slot && truthy(match(slot, "finger"))) {
                         [legendaryRing] = this.Disambiguate(
                             annotation,
@@ -1670,23 +1674,22 @@ export class Emiter {
                 isSpellAction = false;
             } else if (action == "wait") {
                 if (modifiers.sec) {
-                    let seconds = tonumber(
+                    const seconds = tonumber(
                         this.unparser.Unparse(modifiers.sec)
                     );
-                    if (seconds) {
-                    } else {
+                    if (!seconds) {
                         bodyNode = this.ovaleAst.newNodeWithChildren(
                             "simc_wait",
                             annotation.astAnnotation
                         );
-                        let expressionNode = this.Emit(
+                        const expressionNode = this.Emit(
                             modifiers.sec,
                             nodeList,
                             annotation,
                             action
                         );
                         if (expressionNode) {
-                            let code = this.ovaleAst.Unparse(expressionNode);
+                            const code = this.ovaleAst.Unparse(expressionNode);
                             conditionCode = code + " > 0";
                         }
                     }
@@ -1775,7 +1778,7 @@ export class Emiter {
         nodeList,
         annotation
     ) => {
-        let groupNode = this.ovaleAst.newNodeWithChildren(
+        const groupNode = this.ovaleAst.newNodeWithChildren(
             "group",
             annotation.astAnnotation
         );
@@ -1783,14 +1786,14 @@ export class Emiter {
         let poolResourceNode;
         let emit = true;
         for (const [, actionNode] of ipairs(parseNode.child)) {
-            let commentNode = this.ovaleAst.NewNode(
+            const commentNode = this.ovaleAst.NewNode(
                 "comment",
                 annotation.astAnnotation
             );
             commentNode.comment = actionNode.action;
             child[lualength(child) + 1] = commentNode;
             if (emit) {
-                let statementNode = this.EmitAction(
+                const statementNode = this.EmitAction(
                     actionNode,
                     nodeList,
                     annotation,
@@ -1798,7 +1801,7 @@ export class Emiter {
                 );
                 if (statementNode) {
                     if (statementNode.type == "simc_pool_resource") {
-                        let powerType = POOLED_RESOURCE[annotation.classId];
+                        const powerType = POOLED_RESOURCE[annotation.classId];
                         if (powerType) {
                             if (statementNode.for_next) {
                                 poolResourceNode = statementNode;
@@ -1817,15 +1820,15 @@ export class Emiter {
                         } else {
                             bodyNode = statementNode;
                         }
-                        let powerType = CamelCase(poolResourceNode.powerType);
-                        let extra_amount = poolResourceNode.extra_amount;
+                        const powerType = CamelCase(poolResourceNode.powerType);
+                        const extra_amount = poolResourceNode.extra_amount;
                         if (extra_amount && poolingConditionNode) {
                             let code = this.ovaleAst.Unparse(
                                 poolingConditionNode
                             );
-                            let extraAmountPattern =
+                            const extraAmountPattern =
                                 powerType + "%(%) >= [%d.]+";
-                            let replaceString = format(
+                            const replaceString = format(
                                 "True(pool_%s %d)",
                                 poolResourceNode.powerType,
                                 extra_amount
@@ -1847,7 +1850,7 @@ export class Emiter {
                             bodyNode.rawPositionalParams &&
                             bodyNode.rawPositionalParams[1]
                         ) {
-                            let name = this.ovaleAst.Unparse(
+                            const name = this.ovaleAst.Unparse(
                                 bodyNode.rawPositionalParams[1]
                             );
                             let powerCondition;
@@ -1864,7 +1867,7 @@ export class Emiter {
                                     name
                                 );
                             }
-                            let code = format(
+                            const code = format(
                                 "SpellUsable(%s) and SpellCooldown(%s) < %s",
                                 name,
                                 name,
@@ -1881,7 +1884,7 @@ export class Emiter {
                                     isAstNodeWithChildren(statementNode) &&
                                     poolingConditionNode
                                 ) {
-                                    let rhsNode = conditionNode;
+                                    const rhsNode = conditionNode;
                                     conditionNode = this.ovaleAst.newNodeWithChildren(
                                         "logical",
                                         annotation.astAnnotation
@@ -1898,7 +1901,7 @@ export class Emiter {
                                     restNodeType = "unless";
                                 }
 
-                                let restNode = this.ovaleAst.newNodeWithChildren(
+                                const restNode = this.ovaleAst.newNodeWithChildren(
                                     restNodeType,
                                     annotation.astAnnotation
                                 );
@@ -1912,13 +1915,12 @@ export class Emiter {
                             }
                         }
                         poolResourceNode = undefined;
-                    } else if (statementNode.type == "simc_wait") {
                     } else if (
                         (statementNode.type === "if" ||
                             statementNode.type == "unless") &&
                         statementNode.simc_wait
                     ) {
-                        let restNode = this.ovaleAst.newNodeWithChildren(
+                        const restNode = this.ovaleAst.newNodeWithChildren(
                             "unless",
                             annotation.astAnnotation
                         );
@@ -1930,7 +1932,7 @@ export class Emiter {
                             annotation.astAnnotation
                         );
                         child = restNode.child[2].child;
-                    } else {
+                    } else if (statementNode.type !== "simc_wait") {
                         child[lualength(child) + 1] = statementNode;
                         if (
                             (statementNode.type === "if" ||
@@ -1971,7 +1973,7 @@ export class Emiter {
         let node: AstNode | undefined;
         let msg;
         if (parseNode.expressionType == "unary") {
-            let opInfo =
+            const opInfo =
                 UNARY_OPERATOR[parseNode.operator as SimcUnaryOperatorType];
             if (opInfo) {
                 let operator: OperatorType | undefined;
@@ -1981,7 +1983,7 @@ export class Emiter {
                     operator = parseNode.operator;
                 }
                 if (operator) {
-                    let rhsNode = this.Emit(
+                    const rhsNode = this.Emit(
                         parseNode.child[1],
                         nodeList,
                         annotation,
@@ -2004,7 +2006,7 @@ export class Emiter {
                 }
             }
         } else if (parseNode.expressionType == "binary") {
-            let opInfo =
+            const opInfo =
                 BINARY_OPERATOR[parseNode.operator as SimcBinaryOperatorType];
             if (opInfo) {
                 const parseNodeOperator = parseNode.operator as SimcBinaryOperatorType;
@@ -2080,13 +2082,13 @@ export class Emiter {
                         annotation.astAnnotation
                     );
                 } else if (operator) {
-                    let lhsNode = this.Emit(
+                    const lhsNode = this.Emit(
                         parseNode.child[1],
                         nodeList,
                         annotation,
                         action
                     );
-                    let rhsNode = this.Emit(
+                    const rhsNode = this.Emit(
                         parseNode.child[2],
                         nodeList,
                         annotation,
@@ -2172,7 +2174,7 @@ export class Emiter {
         annotation,
         action
     ) => {
-        let node = this.ovaleAst.NewNode("value", annotation.astAnnotation);
+        const node = this.ovaleAst.NewNode("value", annotation.astAnnotation);
         node.value = parseNode.value;
         node.origin = 0;
         node.rate = 0;
@@ -2492,7 +2494,7 @@ export class Emiter {
         let name;
         let property;
         if (sub(operand, 1, 7) == "action.") {
-            let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+            const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
             tokenIterator();
             name = tokenIterator();
             property = tokenIterator();
@@ -2505,7 +2507,7 @@ export class Emiter {
             return undefined;
         }
 
-        let [className, specialization] = [
+        const [className, specialization] = [
             annotation.classId,
             annotation.specialization,
         ];
@@ -2685,8 +2687,8 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "active_dot") {
             let name = tokenIterator();
             [name] = this.Disambiguate(
@@ -2702,10 +2704,10 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let prefix =
+            const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
             target = (target && `${target}.`) || "";
-            let code = format("%sCountOnAny(%s)", prefix, dotName);
+            const code = format("%sCountOnAny(%s)", prefix, dotName);
             if (code) {
                 [node] = this.ovaleAst.ParseCode(
                     "expression",
@@ -2728,12 +2730,12 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "azerite") {
             let code;
-            let name = tokenIterator();
-            let property = tokenIterator();
+            const name = tokenIterator();
+            const property = tokenIterator();
             if (property == "rank") {
                 code = format("AzeriteTraitRank(%s_trait)", name);
             } else if (property == "enabled") {
@@ -2762,12 +2764,12 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "essence") {
             let code;
-            let name = tokenIterator();
-            let property = tokenIterator();
+            const name = tokenIterator();
+            const property = tokenIterator();
 
             let essenceId = format("%s_essence_id", name);
             [essenceId] = this.Disambiguate(
@@ -2808,8 +2810,8 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "refreshable") {
             let buffName = `${action}_debuff`;
             [buffName] = this.Disambiguate(
@@ -2819,16 +2821,16 @@ export class Emiter {
                 annotation.specialization
             );
             let target;
-            let prefix =
+            const prefix =
                 (truthy(find(buffName, "_buff$")) && "Buff") || "Debuff";
             if (prefix == "Debuff") {
                 target = "target.";
             } else {
                 target = "";
             }
-            let any =
+            const any =
                 (this.ovaleData.DEFAULT_SPELL_LIST[buffName] && " any=1") || "";
-            let code = format("%sRefreshable(%s%s)", target, buffName, any);
+            const code = format("%sRefreshable(%s%s)", target, buffName, any);
             [node] = this.ovaleAst.ParseCode(
                 "expression",
                 code,
@@ -2853,8 +2855,8 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (
             token == "aura" ||
             token == "buff" ||
@@ -2908,7 +2910,7 @@ export class Emiter {
                         "Buff";
                 }
 
-                let any =
+                const any =
                     (this.ovaleData.DEFAULT_SPELL_LIST[buffName] && " any=1") ||
                     "";
 
@@ -3034,9 +3036,9 @@ export class Emiter {
         target
     ) => {
         let node;
-        let className = annotation.classId;
-        let specialization = annotation.specialization;
-        let camelSpecialization = LowerSpecialization(annotation);
+        const className = annotation.classId;
+        const specialization = annotation.specialization;
+        const camelSpecialization = LowerSpecialization(annotation);
         target = (target && `${target}.`) || "";
         let code;
         if (CHARACTER_PROPERTY[operand]) {
@@ -3050,7 +3052,7 @@ export class Emiter {
                 (annotation.position == "back" && "True(position_back)") ||
                 "False(position_back)";
         } else if (className == "MAGE" && operand == "incanters_flow_dir") {
-            let name = "incanters_flow_buff";
+            const name = "incanters_flow_buff";
             code = format("BuffDirection(%s)", name);
             this.AddSymbol(annotation, name);
         } else if (className == "PALADIN" && operand == "time_to_hpg") {
@@ -3070,13 +3072,13 @@ export class Emiter {
         } else if (operand == "rtb_buffs") {
             code = "BuffCount(roll_the_bones_buff)";
         } else if (className == "ROGUE" && operand == "anticipation_charges") {
-            let name = "anticipation_buff";
+            const name = "anticipation_buff";
             code = format("BuffStacks(%s)", name);
             this.AddSymbol(annotation, name);
         } else if (sub(operand, 1, 22) == "active_enemies_within.") {
             code = "Enemies()";
         } else if (truthy(find(operand, "^incoming_damage_"))) {
-            let [_seconds, measure] = match(
+            const [_seconds, measure] = match(
                 operand,
                 "^incoming_damage_([%d]+)(m?s?)$"
             );
@@ -3090,7 +3092,7 @@ export class Emiter {
                 code = format("IncomingDamage(%f)", seconds);
             }
         } else if (sub(operand, 1, 10) == "main_hand.") {
-            let weaponType = sub(operand, 11);
+            const weaponType = sub(operand, 11);
             if (weaponType == "1h") {
                 code = "HasWeapon(main type=one_handed)";
             } else if (weaponType == "2h") {
@@ -3099,7 +3101,7 @@ export class Emiter {
         } else if (operand == "mastery_value") {
             code = format("%sMasteryEffect() / 100", target);
         } else if (sub(operand, 1, 5) == "role.") {
-            let [role] = match(operand, "^role%.([%w_]+)");
+            const [role] = match(operand, "^role%.([%w_]+)");
             if (role && role == annotation.role) {
                 code = format("True(role_%s)", role);
             } else {
@@ -3138,12 +3140,12 @@ export class Emiter {
         action
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
 
         if (token == "cooldown") {
             let name = tokenIterator();
-            let property = tokenIterator();
+            const property = tokenIterator();
             let prefix;
             [name, prefix] = this.Disambiguate(
                 annotation,
@@ -3205,10 +3207,10 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "disease") {
-            let property = tokenIterator();
+            const property = tokenIterator();
             target = (target && `${target}.`) || "";
             let code;
             if (property == "max_ticking") {
@@ -3240,11 +3242,11 @@ export class Emiter {
         action?: string
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "ground_aoe") {
             let name = tokenIterator();
-            let property = tokenIterator();
+            const property = tokenIterator();
             [name] = this.Disambiguate(
                 annotation,
                 name,
@@ -3258,9 +3260,9 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let prefix =
+            const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
-            let target = (prefix == "Debuff" && "target.") || "";
+            const target = (prefix == "Debuff" && "target.") || "";
             let code;
             if (property == "remains") {
                 code = format("%s%sRemaining(%s)", target, prefix, dotName);
@@ -3287,11 +3289,11 @@ export class Emiter {
         target
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "dot") {
             let name = tokenIterator();
-            let property = tokenIterator();
+            const property = tokenIterator();
             [name] = this.Disambiguate(
                 annotation,
                 name,
@@ -3310,7 +3312,7 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let prefix =
+            const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
             target = (target && `${target}.`) || "";
             let code;
@@ -3365,11 +3367,11 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "glyph") {
             let name = tokenIterator();
-            let property = tokenIterator();
+            const property = tokenIterator();
             [name] = this.Disambiguate(
                 annotation,
                 name,
@@ -3409,18 +3411,18 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "pet") {
             let name = tokenIterator();
-            let property = tokenIterator();
+            const property = tokenIterator();
             [name] = this.Disambiguate(
                 annotation,
                 name,
                 annotation.classId,
                 annotation.specialization
             );
-            let isTotem = IsTotem(name);
+            const isTotem = IsTotem(name);
             let code;
             if (isTotem && property == "active") {
                 code = format("TotemPresent(%s)", name);
@@ -3429,8 +3431,8 @@ export class Emiter {
             } else if (property == "active") {
                 code = "pet.Present()";
             } else if (name == "buff") {
-                let pattern = format("^pet%%.([%%w_.]+)", operand);
-                let [petOperand] = match(operand, pattern);
+                const pattern = format("^pet%%.([%%w_.]+)", operand);
+                const [petOperand] = match(operand, pattern);
                 node = this.EmitOperandBuff(
                     petOperand,
                     parseNode,
@@ -3440,9 +3442,9 @@ export class Emiter {
                     "pet"
                 );
             } else {
-                let pattern = format("^pet%%.%s%%.([%%w_.]+)", name);
+                const pattern = format("^pet%%.%s%%.([%%w_.]+)", name);
                 let [petOperand] = match(operand, pattern);
-                let target = "pet";
+                const target = "pet";
                 if (petOperand) {
                     node = this.EmitOperandSpecial(
                         petOperand,
@@ -3552,8 +3554,8 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "prev" || token == "prev_gcd" || token == "prev_off_gcd") {
             let name = tokenIterator();
             let howMany = 1;
@@ -3606,12 +3608,12 @@ export class Emiter {
         let name;
         let property;
         if (sub(operand, 1, 11) == "raid_event.") {
-            let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+            const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
             tokenIterator();
             name = tokenIterator();
             property = tokenIterator();
         } else {
-            let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+            const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
             name = tokenIterator();
             property = tokenIterator();
         }
@@ -3665,10 +3667,10 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "race") {
-            let race = lower(tokenIterator());
+            const race = lower(tokenIterator());
             let code;
             if (race) {
                 let raceId = undefined;
@@ -3712,7 +3714,7 @@ export class Emiter {
                 code = "RuneCount()";
             }
         } else if (truthy(match(operand, "^rune.time_to_([%d]+)$"))) {
-            let runes = match(operand, "^rune.time_to_([%d]+)$");
+            const runes = match(operand, "^rune.time_to_([%d]+)$");
             code = format("TimeToRunes(%d)", runes);
         } else {
             return undefined;
@@ -3733,13 +3735,13 @@ export class Emiter {
         action
     ) => {
         let node;
-        let [setBonus] = match(operand, "^set_bonus%.(.*)$");
+        const [setBonus] = match(operand, "^set_bonus%.(.*)$");
         let code;
         if (setBonus) {
-            let tokenIterator = gmatch(setBonus, "[^_]+");
+            const tokenIterator = gmatch(setBonus, "[^_]+");
             let name = tokenIterator();
             let count = tokenIterator();
-            let role = tokenIterator();
+            const role = tokenIterator();
             if (name && count) {
                 let [setName, level] = match(name, "^(%a+)(%d*)$");
                 if (setName == "tier") {
@@ -3777,10 +3779,10 @@ export class Emiter {
         action
     ) => {
         let node;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "seal") {
-            let name = lower(tokenIterator());
+            const name = lower(tokenIterator());
             let code;
             if (name) {
                 code = format("Stance(paladin_seal_of_%s)", name);
@@ -3805,8 +3807,8 @@ export class Emiter {
         target
     ) => {
         let node: AstNode | undefined;
-        let className = annotation.classId;
-        let specialization = annotation.specialization;
+        const className = annotation.classId;
+        const specialization = annotation.specialization;
         target = (target && `${target}.`) || "";
         operand = lower(operand);
         let code;
@@ -3814,18 +3816,18 @@ export class Emiter {
             className == "DEATHKNIGHT" &&
             operand == "dot.breath_of_sindragosa.ticking"
         ) {
-            let buffName = "breath_of_sindragosa";
+            const buffName = "breath_of_sindragosa";
             code = format("BuffPresent(%s)", buffName);
             this.AddSymbol(annotation, buffName);
         } else if (
             className == "DEATHKNIGHT" &&
             sub(operand, 1, 24) == "pet.dancing_rune_weapon."
         ) {
-            let petOperand = sub(operand, 25);
-            let tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
-            let token = tokenIterator();
+            const petOperand = sub(operand, 25);
+            const tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
+            const token = tokenIterator();
             if (token == "active") {
-                let buffName = "dancing_rune_weapon_buff";
+                const buffName = "dancing_rune_weapon_buff";
                 code = format("BuffPresent(%s)", buffName);
                 this.AddSymbol(annotation, buffName);
             } else if (token == "dot") {
@@ -3881,15 +3883,15 @@ export class Emiter {
         } else if (className == "DRUID" && operand == "eclipse_dir.solar") {
             code = "EclipseDir() > 0";
         } else if (className == "DRUID" && operand == "max_fb_energy") {
-            let spellName = "ferocious_bite";
+            const spellName = "ferocious_bite";
             code = format("EnergyCost(%s max=1)", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "DRUID" && operand == "solar_wrath.ap_check") {
-            let spellName = "solar_wrath";
+            const spellName = "solar_wrath";
             code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "DRUID" && operand == "starfire.ap_check") {
-            let spellName = "starfire";
+            const spellName = "starfire";
             code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "HUNTER" && operand == "buff.careful_aim.up") {
@@ -3900,7 +3902,7 @@ export class Emiter {
             className == "HUNTER" &&
             operand == "buff.stampede.remains"
         ) {
-            let spellName = "stampede";
+            const spellName = "stampede";
             code = format("TimeSincePreviousSpell(%s) < 40", spellName);
             this.AddSymbol(annotation, spellName);
         } else if (className == "HUNTER" && operand == "lowest_vuln_within.5") {
@@ -3941,7 +3943,7 @@ export class Emiter {
             (operand == "burn_phase_duration" ||
                 operand == "pyro_chain_duration")
         ) {
-            let variable = sub(operand, 1, -10);
+            const variable = sub(operand, 1, -10);
             if (parseNode.asType == "boolean") {
                 code = format("GetStateDuration(%s) > 0", variable);
             } else {
@@ -3964,11 +3966,11 @@ export class Emiter {
             className == "MONK" &&
             sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target."
         ) {
-            let property = sub(operand, 36);
+            const property = sub(operand, 36);
             if (target == "") {
                 target = "target.";
             }
-            let debuffName = "storm_earth_and_fire_target_debuff";
+            const debuffName = "storm_earth_and_fire_target_debuff";
             this.AddSymbol(annotation, debuffName);
             if (property == "down") {
                 code = format("%sDebuffExpires(%s)", target, debuffName);
@@ -3976,7 +3978,7 @@ export class Emiter {
                 code = format("%sDebuffPresent(%s)", target, debuffName);
             }
         } else if (className == "MONK" && operand == "dot.zen_sphere.ticking") {
-            let buffName = "zen_sphere_buff";
+            const buffName = "zen_sphere_buff";
             code = format("BuffPresent(%s)", buffName);
             this.AddSymbol(annotation, buffName);
             // } else if (className == "MONK" && sub(operand, 1, 8) == "stagger.") {
@@ -4017,7 +4019,7 @@ export class Emiter {
             className == "PALADIN" &&
             operand == "dot.sacred_shield.remains"
         ) {
-            let buffName = "sacred_shield_buff";
+            const buffName = "sacred_shield_buff";
             code = format("BuffRemaining(%s)", buffName);
             this.AddSymbol(annotation, buffName);
         } else if (className == "PRIEST" && operand == "mind_harvest") {
@@ -4082,7 +4084,7 @@ export class Emiter {
             className == "SHAMAN" &&
             operand == "buff.resonance_totem.remains"
         ) {
-            let [spell] = this.Disambiguate(
+            const [spell] = this.Disambiguate(
                 annotation,
                 "totem_mastery",
                 annotation.classId,
@@ -4099,7 +4101,7 @@ export class Emiter {
             className == "WARLOCK" &&
             truthy(match(operand, "pet%.service_[a-z_]+%..+"))
         ) {
-            let [spellName, property] = match(
+            const [spellName, property] = match(
                 operand,
                 "pet%.(service_[a-z_]+)%.(.+)"
             );
@@ -4111,7 +4113,10 @@ export class Emiter {
             className == "WARLOCK" &&
             truthy(match(operand, "dot.unstable_affliction_([1-5]).remains"))
         ) {
-            let num = match(operand, "dot.unstable_affliction_([1-5]).remains");
+            const num = match(
+                operand,
+                "dot.unstable_affliction_([1-5]).remains"
+            );
             code = format(
                 "target.DebuffStacks(unstable_affliction_debuff) >= %s",
                 num
@@ -4125,7 +4130,10 @@ export class Emiter {
             className == "WARLOCK" &&
             truthy(match(operand, "pet%.[a-z_]+%..+"))
         ) {
-            let [spellName, property] = match(operand, "pet%.([a-z_]+)%.(.+)");
+            const [spellName, property] = match(
+                operand,
+                "pet%.([a-z_]+)%.(.+)"
+            );
             if (property == "remains") {
                 code = format("DemonDuration(%s)", spellName);
             } else if (property == "active") {
@@ -4150,7 +4158,7 @@ export class Emiter {
             className == "WARLOCK" &&
             truthy(match(operand, "imps_spawned_during.([%d]+)"))
         ) {
-            let ms = match(operand, "imps_spawned_during.([%d]+)");
+            const ms = match(operand, "imps_spawned_during.([%d]+)");
             code = format("ImpsSpawnedDuring(%d)", ms);
         } else if (
             className == "WARLOCK" &&
@@ -4178,22 +4186,22 @@ export class Emiter {
         } else if (operand == "debuff.casting.react") {
             code = `${target}IsInterruptible()`;
         } else if (operand == "debuff.casting.up") {
-            let t = (target == "" && "target.") || target;
+            const t = (target == "" && "target.") || target;
             code = `${t}IsInterruptible()`;
         } else if (operand == "debuff.flying.down") {
             code = `${target}True(debuff_flying_down)`;
         } else if (operand == "distance") {
             code = `${target}Distance()`;
         } else if (sub(operand, 1, 9) == "equipped.") {
-            let [name] = this.Disambiguate(
+            const [name] = this.Disambiguate(
                 annotation,
                 `${sub(operand, 10)}_item`,
                 className,
                 specialization
             );
-            let itemId = tonumber(name);
-            let itemName = name;
-            let item = (itemId && tostring(itemId)) || itemName;
+            const itemId = tonumber(name);
+            const itemName = name;
+            const item = (itemId && tostring(itemId)) || itemName;
             code = format("HasEquippedItem(%s)", item);
             this.AddSymbol(annotation, item);
         } else if (operand == "gcd.max") {
@@ -4201,15 +4209,15 @@ export class Emiter {
         } else if (operand == "gcd.remains") {
             code = "GCDRemaining()";
         } else if (sub(operand, 1, 15) == "legendary_ring.") {
-            let [name] = this.Disambiguate(
+            const [name] = this.Disambiguate(
                 annotation,
                 "legendary_ring",
                 className,
                 specialization
             );
-            let buffName = `${name}_buff`;
-            let properties = sub(operand, 16);
-            let tokenIterator = gmatch(properties, OPERAND_TOKEN_PATTERN);
+            const buffName = `${name}_buff`;
+            const properties = sub(operand, 16);
+            const tokenIterator = gmatch(properties, OPERAND_TOKEN_PATTERN);
             let token = tokenIterator();
             if (token == "cooldown") {
                 token = tokenIterator();
@@ -4238,7 +4246,7 @@ export class Emiter {
         } else if (operand == "time_to_die") {
             code = "target.TimeToDie()";
         } else if (sub(operand, 1, 10) == "using_apl.") {
-            let [aplName] = match(operand, "^using_apl%.([%w_]+)");
+            const [aplName] = match(operand, "^using_apl%.([%w_]+)");
             code = format("List(opt_using_apl %s)", aplName);
             annotation.using_apl = annotation.using_apl || {};
             annotation.using_apl[aplName] = true;
@@ -4246,7 +4254,7 @@ export class Emiter {
             code = "BuffCooldown(sephuzs_secret_buff)";
             this.AddSymbol(annotation, "sephuzs_secret_buff");
         } else if (operand == "is_add") {
-            let t = target || "target.";
+            const t = target || "target.";
             code = format("not %sClassification(worldboss)", t);
         } else if (operand == "priority_rotation") {
             code = "CheckBoxOn(opt_priority_rotation)";
@@ -4270,11 +4278,11 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "talent") {
-            let name = lower(tokenIterator());
-            let property = tokenIterator();
+            const name = lower(tokenIterator());
+            const property = tokenIterator();
             let talentName = `${name}_talent`;
             [talentName] = this.Disambiguate(
                 annotation,
@@ -4317,7 +4325,7 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         let target = tokenIterator();
         if (target === "self") target = "player";
         let property = tokenIterator();
@@ -4377,11 +4385,11 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "totem") {
-            let name = lower(tokenIterator());
-            let property = tokenIterator();
+            const name = lower(tokenIterator());
+            const property = tokenIterator();
             let code;
             if (property == "active") {
                 code = format("TotemPresent(%s)", name);
@@ -4408,14 +4416,14 @@ export class Emiter {
         action
     ) => {
         let node: AstNode | undefined;
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         if (token == "trinket") {
             let procType = tokenIterator();
             if (procType === "1" || procType === "2") {
                 procType = tokenIterator(); // TODO use trinket slot?
             }
-            let statName = tokenIterator();
+            const statName = tokenIterator();
             let code;
             if (procType === "cooldown") {
                 if (statName == "remains") {
@@ -4428,8 +4436,8 @@ export class Emiter {
             } else if (sub(procType, 1, 4) == "has_") {
                 code = format("True(trinket_%s_%s)", procType, statName);
             } else {
-                let property = statName;
-                let [buffName] = this.Disambiguate(
+                const property = statName;
+                const [buffName] = this.Disambiguate(
                     annotation,
                     procType + "_item",
                     annotation.classId,
@@ -4475,8 +4483,8 @@ export class Emiter {
         annotation,
         action
     ) => {
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let token = tokenIterator();
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
         let node: AstNode | undefined;
         if (token == "variable") {
             let name = tokenIterator();
@@ -4490,7 +4498,7 @@ export class Emiter {
                     annotation.currentVariable &&
                     annotation.currentVariable.name == name
                 ) {
-                    let group = annotation.currentVariable.body;
+                    const group = annotation.currentVariable.body;
                     if (lualength(group.child) == 0) {
                         [node] = this.ovaleAst.ParseCode(
                             "expression",
