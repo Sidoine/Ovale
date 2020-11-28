@@ -688,7 +688,7 @@ __exports.OvaleConditions = __class(nil, {
             local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = 0
             if interval > 0 then
-                local total, _ = self.OvaleDamageTaken:GetRecentDamage(interval)
+                local total = self.OvaleDamageTaken:GetRecentDamage(interval)
                 value = total
             end
             return Compare(value, comparator, limit)
