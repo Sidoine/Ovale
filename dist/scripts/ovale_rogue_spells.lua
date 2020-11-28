@@ -561,7 +561,7 @@ Define(perforated_veins_conduit 248)
   # Fix broken spell definitions inherited from Simulationcraft.
   Define(rupture_debuff 1943)
   Define(sepsis 328305)
-  SpellInfo(sepsis cd=90 energy=25 combopoints=-1))
+  SpellInfo(sepsis cd=90 energy=25 combopoints=-1)
 
   SpellRequire(slice_and_dice unusable set=1 enabled=(buffremains(slice_and_dice)>(combopoints()+1)*6))
 
