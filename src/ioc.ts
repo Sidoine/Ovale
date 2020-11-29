@@ -484,7 +484,7 @@ export class IoC {
         this.equipment.registerConditions(this.condition);
         this.azeriteArmor.registerConditions(this.condition);
         this.stagger.registerConditions(this.condition);
-        this.stance.registerConditions(this.condition
+        this.stance.registerConditions(this.condition);
         this.stagger.registerConditions(this.condition);
     }
 }
