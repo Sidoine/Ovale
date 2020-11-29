@@ -191,7 +191,10 @@ export class Runner {
         atTime: number
     ): AstNodeSnapshot {
         this.profiler.StartProfiling("OvaleBestAction_RecursiveCompute");
-        if (element.result.serial == -1) {
+        if (element.result.constant) {
+            // Constant value
+            return element.result;
+        } else if (element.result.serial == -1) {
             OneTimeMessage(
                 "Recursive call is not supported in '%s'. Please fix the script.",
                 element.asString || element.type
@@ -1227,10 +1230,11 @@ export class Runner {
             node.cachedParams.serial < this.self_serial
         ) {
             node.cachedParams.serial = this.self_serial;
-
             for (const [k, v] of ipairs(node.rawPositionalParams)) {
-                node.cachedParams.positional[k] =
-                    this.computeAsValue(v, atTime) || false;
+                node.cachedParams.positional[k] = this.computeAsValue(
+                    v,
+                    atTime
+                );
             }
         }
 

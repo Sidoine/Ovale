@@ -253,6 +253,7 @@ test("typed condition with only position parameters", () => {
     assertIs(astNode.rawPositionalParams[1].type, "string");
     assertDefined(astNode.rawPositionalParams[2]);
     assertIs(astNode.rawPositionalParams[2].type, "value");
+    expect(astNode.asString).toBe('test("example" 12)');
 });
 
 test("typed condition with only named parameters", () => {
@@ -306,12 +307,17 @@ test("typed condition with parameters with default values", () => {
                     defaultValue: "test",
                 },
                 2: {
+                    type: "string",
+                    name: "a",
+                    optional: true,
+                },
+                3: {
                     type: "number",
                     name: "b",
                     optional: true,
                     defaultValue: 14,
                 },
-                3: {
+                4: {
                     type: "boolean",
                     name: "c",
                     optional: true,
@@ -332,17 +338,17 @@ test("typed condition with parameters with default values", () => {
     assertDefined(astNode.rawPositionalParams[1]);
     assertIs(astNode.rawPositionalParams[1].type, "string");
     expect(astNode.rawPositionalParams[1].value).toBe("test");
-    assertDefined(astNode.rawPositionalParams[2]);
-    assertIs(astNode.rawPositionalParams[2].type, "value");
-    expect(astNode.rawPositionalParams[2].value).toBe(14);
     assertDefined(astNode.rawPositionalParams[3]);
-    assertIs(astNode.rawPositionalParams[3].type, "boolean");
-    expect(astNode.rawPositionalParams[3].value).toBe(true);
-    expect(astNode.asString).toEqual('test("test" 14 true)');
+    assertIs(astNode.rawPositionalParams[3].type, "value");
+    expect(astNode.rawPositionalParams[3].value).toBe(14);
+    assertDefined(astNode.rawPositionalParams[4]);
+    assertIs(astNode.rawPositionalParams[4].type, "boolean");
+    expect(astNode.rawPositionalParams[4].value).toBe(true);
+    expect(astNode.asString).toEqual("test()");
 });
 
 test("boolean node", () => {
-    // Arrrange
+    // Arrange
     const { ast, astAnnotation } = makeAst();
 
     // Act
@@ -367,4 +373,49 @@ test("boolean node", () => {
     assertDefined(right);
     assertIs(right.type, "boolean");
     expect(right.value).toBe(false);
+});
+
+test("unparse typed function with optional parameters", () => {
+    // Arrange
+    context.ovaleConditionMock
+        .setup((x) => x.getInfos("test"))
+        .returns(() => ({
+            func: () => [0, 12, "a"],
+            namedParameters: { a: 1, b: 2, c: 3 },
+            parameters: {
+                1: {
+                    type: "string",
+                    name: "a",
+                    optional: true,
+                    defaultValue: "test",
+                },
+                2: {
+                    type: "number",
+                    name: "b",
+                    optional: true,
+                    defaultValue: 14,
+                },
+                3: {
+                    type: "boolean",
+                    name: "c",
+                    optional: true,
+                    defaultValue: true,
+                },
+            },
+            returnValue: { name: "return", type: "string" },
+        }));
+    const { ast, astAnnotation } = makeAst();
+
+    // Act
+    const [astNode] = ast.ParseCode(
+        "expression",
+        `test(b=15)`,
+        {},
+        astAnnotation
+    );
+
+    // Assert
+    assertDefined(astNode);
+    assertIs(astNode.type, "typed_function");
+    expect(astNode.asString).toBe("test(b=15)");
 });

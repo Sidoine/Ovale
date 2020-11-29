@@ -1115,12 +1115,12 @@ AddFunction destructionaoeshortcdactions
    unless destructionessencesshortcdpostconditions()
    {
     #havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
-    if not false(target_is_target) and enemies() < 4 and enemies() > 1 spell(havoc)
+    if not never(target_is_target) and enemies() < 4 and enemies() > 1 spell(havoc)
 
     unless spell(rain_of_fire)
     {
      #havoc,cycle_targets=1,if=!(self.target=target)
-     if not player.guid() == target.guid() and enemies() > 1 spell(havoc)
+     if not player.targetguid() == target.guid() and enemies() > 1 spell(havoc)
 
      unless hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate)
      {
@@ -1155,7 +1155,7 @@ AddFunction destructionaoecdactions
 
 AddFunction destructionaoecdpostconditions
 {
- demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not false(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not player.guid() == target.guid() and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
+ demonduration(infernal) > 0 and { not spellcooldown(havoc) == 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not never(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not player.targetguid() == target.guid() and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft_buff) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft_buff) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
 }
 
 ### actions.default
@@ -1246,7 +1246,7 @@ AddFunction destruction_defaultshortcdactions
      unless destructionessencesshortcdpostconditions() or spell(channel_demonfire)
      {
       #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)
-      if not false(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 spell(havoc)
+      if not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 spell(havoc)
      }
     }
    }
@@ -1285,7 +1285,7 @@ AddFunction destruction_defaultcdactions
 
 AddFunction destruction_defaultcdpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or not false(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft_buff) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or buffexpires(backdraft_buff) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft_buff) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft_buff) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 ### Destruction icons.

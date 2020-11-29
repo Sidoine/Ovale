@@ -507,7 +507,9 @@ __exports.Runner = __class(nil, {
     end,
     RecursiveCompute = function(self, element, atTime)
         self.profiler:StartProfiling("OvaleBestAction_RecursiveCompute")
-        if element.result.serial == -1 then
+        if element.result.constant then
+            return element.result
+        elseif element.result.serial == -1 then
             OneTimeMessage("Recursive call is not supported in '%s'. Please fix the script.", element.asString or element.type)
             return element.result
         elseif element.result.serial and element.result.serial >= self.self_serial then
@@ -668,7 +670,7 @@ __exports.Runner = __class(nil, {
         if node.cachedParams.serial == nil or node.cachedParams.serial < self.self_serial then
             node.cachedParams.serial = self.self_serial
             for k, v in ipairs(node.rawPositionalParams) do
-                node.cachedParams.positional[k] = self:computeAsValue(v, atTime) or false
+                node.cachedParams.positional[k] = self:computeAsValue(v, atTime)
             end
         end
         return node.cachedParams.positional

@@ -732,7 +732,7 @@ __exports.Emiter = __class(nil, {
                             if extra_amount and poolingConditionNode then
                                 local code = self.ovaleAst:Unparse(poolingConditionNode)
                                 local extraAmountPattern = powerType .. "%(%) >= [%d.]+"
-                                local replaceString = format("True(pool_%s %d)", poolResourceNode.powerType, extra_amount)
+                                local replaceString = format("always(pool_%s %d)", poolResourceNode.powerType, extra_amount)
                                 code = gsub(code, extraAmountPattern, replaceString)
                                 poolingConditionNode = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
                             end
@@ -851,9 +851,9 @@ __exports.Emiter = __class(nil, {
                         end
                         local code
                         if name == "sim_target" then
-                            code = "True(target_is_sim_target)"
+                            code = "always(target_is_sim_target)"
                         elseif name == "target" then
-                            code = "False(target_is_target)"
+                            code = "never(target_is_target)"
                         else
                             code = format("target.Name(%s)", name)
                             self:AddSymbol(annotation, name)
@@ -866,9 +866,9 @@ __exports.Emiter = __class(nil, {
                     elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "sim_target" then
                         local code
                         if parseNode.operator == "=" then
-                            code = "True(target_is_sim_target)"
+                            code = "always(target_is_sim_target)"
                         else
-                            code = "False(target_is_sim_target)"
+                            code = "never(target_is_sim_target)"
                         end
                         annotation.astAnnotation = annotation.astAnnotation or {}
                         node = self.ovaleAst:ParseCode("expression", code, nodeList, annotation.astAnnotation)
@@ -1120,7 +1120,7 @@ __exports.Emiter = __class(nil, {
             elseif property == "in_flight_remains" then
                 code = "0"
             elseif property == "miss_react" then
-                code = "True(miss_react)"
+                code = "always(miss_react)"
             elseif property == "persistent_multiplier" or property == "pmultiplier" then
                 code = format("PersistentMultiplier(%s)", buffName)
             elseif property == "recharge_time" then
@@ -1353,9 +1353,9 @@ __exports.Emiter = __class(nil, {
             if CHARACTER_PROPERTY[operand] then
                 code = target .. CHARACTER_PROPERTY[operand]
             elseif operand == "position_front" then
-                code = (annotation.position == "front" and "True(position_front)") or "False(position_front)"
+                code = (annotation.position == "front" and "always(position_front)") or "never(position_front)"
             elseif operand == "position_back" then
-                code = (annotation.position == "back" and "True(position_back)") or "False(position_back)"
+                code = (annotation.position == "back" and "always(position_back)") or "never(position_back)"
             elseif className == "MAGE" and operand == "incanters_flow_dir" then
                 local name = "incanters_flow_buff"
                 code = format("BuffDirection(%s)", name)
@@ -1402,9 +1402,9 @@ __exports.Emiter = __class(nil, {
             elseif sub(operand, 1, 5) == "role." then
                 local role = match(operand, "^role%.([%w_]+)")
                 if role and role == annotation.role then
-                    code = format("True(role_%s)", role)
+                    code = format("always(role_%s)", role)
                 else
-                    code = format("False(role_%s)", role)
+                    code = format("never(role_%s)", role)
                 end
             elseif operand == "spell_haste" or operand == "stat.spell_haste" then
                 code = "100 / { 100 + SpellCastSpeedPercent() }"
@@ -1694,7 +1694,7 @@ __exports.Emiter = __class(nil, {
                 elseif property == "distance" then
                     code = "target.Distance()"
                 elseif property == "exists" then
-                    code = "False(raid_event_movement_exists)"
+                    code = "never(raid_event_movement_exists)"
                 elseif property == "remains" then
                     code = "0"
                 end
@@ -1704,7 +1704,7 @@ __exports.Emiter = __class(nil, {
                 elseif property == "count" then
                     code = "0"
                 elseif property == "exists" or property == "up" then
-                    code = "False(raid_event_adds_exists)"
+                    code = "never(raid_event_adds_exists)"
                 elseif property == "in" then
                     code = "600"
                 elseif property == "duration" then
@@ -1714,9 +1714,9 @@ __exports.Emiter = __class(nil, {
                 end
             elseif name == "invulnerable" then
                 if property == "up" then
-                    code = "False(raid_events_invulnerable_up)"
+                    code = "never(raid_events_invulnerable_up)"
                 elseif property == "exists" then
-                    code = "False(raid_event_invulnerable_exists)"
+                    code = "never(raid_event_invulnerable_exists)"
                 end
             end
             if code then
@@ -1860,7 +1860,7 @@ __exports.Emiter = __class(nil, {
                 code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0"
                 self:AddSymbol(annotation, "metamorphosis")
             elseif className == "DRUID" and operand == "buff.wild_charge_movement.down" then
-                code = "True(wild_charge_movement_down)"
+                code = "always(wild_charge_movement_down)"
             elseif className == "DRUID" and operand == "eclipse_dir.lunar" then
                 code = "EclipseDir() < 0"
             elseif className == "DRUID" and operand == "eclipse_dir.solar" then
@@ -1975,7 +1975,7 @@ __exports.Emiter = __class(nil, {
                 code = "target.DebuffPresent(exsanguinated)"
                 self:AddSymbol(annotation, "exsanguinated")
             elseif className == "ROGUE" and operand == "ss_buffed" then
-                code = "False(ss_buffed)"
+                code = "never(ss_buffed)"
             elseif className == "ROGUE" and operand == "non_ss_buffed_targets" then
                 code = "Enemies() - DebuffCountOnAny(garrote)"
                 self:AddSymbol(annotation, "garrote")
@@ -2047,8 +2047,6 @@ __exports.Emiter = __class(nil, {
             elseif operand == "debuff.casting.up" then
                 local t = (target == "" and "target.") or target
                 code = t .. "IsInterruptible()"
-            elseif operand == "debuff.flying.down" then
-                code = target .. "True(debuff_flying_down)"
             elseif operand == "distance" then
                 code = target .. "Distance()"
             elseif sub(operand, 1, 9) == "equipped." then
@@ -2226,7 +2224,7 @@ __exports.Emiter = __class(nil, {
                 elseif procType == "has_cooldown" then
                     code = "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }"
                 elseif sub(procType, 1, 4) == "has_" then
-                    code = format("True(trinket_%s_%s)", procType, statName)
+                    code = format("always(trinket_%s_%s)", procType, statName)
                 else
                     local property = statName
                     local buffName = self:Disambiguate(annotation, procType .. "_item", annotation.classId, annotation.specialization)

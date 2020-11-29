@@ -29,6 +29,7 @@ local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local checkToken = __toolstools.checkToken
 local isNumber = __toolstools.isNumber
 local __toolsTimeSpan = LibStub:GetLibrary("ovale/tools/TimeSpan")
+local EMPTY_SET = __toolsTimeSpan.EMPTY_SET
 local newTimeSpan = __toolsTimeSpan.newTimeSpan
 local KEYWORD = {
     ["and"] = true,
@@ -569,10 +570,42 @@ __exports.OvaleASTClass = __class(nil, {
             end
             return s
         end
+        self.unparseUndefined = function()
+            return "undefined"
+        end
         self.unparseTypedFunction = function(node)
             local s
             if self:HasParameters(node) then
-                s = format("%s(%s)", node.name, self:UnparseParameters(node.rawPositionalParams, nil, true))
+                s = node.name .. "("
+                if node.rawNamedParams.target and node.rawNamedParams.target.type == "string" then
+                    s = node.rawNamedParams.target.value .. "." .. s
+                end
+                local infos = self.ovaleCondition:getInfos(node.name)
+                if infos then
+                    local nameParameters = false
+                    local first = true
+                    for k, v in ipairs(infos.parameters) do
+                        local value = node.rawPositionalParams[k]
+                        if value then
+                            if v.name == "filter" or v.name == "target" or (v.defaultValue ~= nil and ((v.type == "boolean" and value.type == "boolean" and value.value == v.defaultValue) or (v.type == "number" and value.type == "value" and value.value == v.defaultValue) or (v.type == "string" and value.type == "string" and value.value == v.defaultValue))) then
+                                nameParameters = true
+                            else
+                                if first then
+                                    first = false
+                                else
+                                    s = s .. " "
+                                end
+                                if nameParameters then
+                                    s = s .. (v.name .. "=")
+                                end
+                                s = s .. self:unparseParameter(value)
+                            end
+                        else
+                            nameParameters = true
+                        end
+                    end
+                end
+                s = s .. ")"
             else
                 s = format("%s()", node.name)
             end
@@ -714,6 +747,7 @@ __exports.OvaleASTClass = __class(nil, {
             ["state"] = self.UnparseFunction,
             ["string"] = self.UnparseString,
             ["typed_function"] = self.unparseTypedFunction,
+            ["undefined"] = self.unparseUndefined,
             ["unless"] = self.UnparseUnless,
             ["value"] = self.UnparseValue,
             ["variable"] = self.UnparseVariable
@@ -1585,6 +1619,7 @@ __exports.OvaleASTClass = __class(nil, {
             end
             local node = self:NewNode("string", annotation)
             node.value = value
+            node.result.constant = true
             annotation.stringReference = annotation.stringReference or {}
             annotation.stringReference[#annotation.stringReference + 1] = node
             return node
@@ -1688,6 +1723,7 @@ __exports.OvaleASTClass = __class(nil, {
         if  not node then
             node = self:NewNode("value", annotation)
             node.value = value
+            node.result.constant = true
             node.origin = 0
             node.rate = 0
             annotation.numberFlyweight[value] = node
@@ -1848,6 +1884,8 @@ __exports.OvaleASTClass = __class(nil, {
                 elseif  not parameterInfos.optional then
                     self:SyntaxError(tokenStream, "Type error: parameter %s is required in %s function", parameterInfos.name, name)
                     return nil
+                else
+                    positionalParams[key] = self:newUndefined(annotation)
                 end
             else
                 if parameterInfos.type == "number" then
@@ -2080,6 +2118,7 @@ __exports.OvaleASTClass = __class(nil, {
     newString = function(self, annotation, value)
         local node = self:NewNode("string", annotation)
         node.value = value
+        node.result.constant = true
         return node
     end,
     newVariable = function(self, annotation, name)
@@ -2090,11 +2129,19 @@ __exports.OvaleASTClass = __class(nil, {
     newValue = function(self, annotation, value)
         local node = self:NewNode("value", annotation)
         node.value = value
+        node.result.constant = true
         return node
     end,
     newBoolean = function(self, annotation, value)
         local node = self:NewNode("boolean", annotation)
         node.value = value
+        node.result.constant = true
+        return node
+    end,
+    newUndefined = function(self, annotation)
+        local node = self:NewNode("undefined", annotation)
+        node.result.constant = true
+        node.result.timeSpan:copyFromArray(EMPTY_SET)
         return node
     end,
     internalNewNodeWithParameters = function(self, type, annotation, rawPositionalParameters, rawNamedParams)

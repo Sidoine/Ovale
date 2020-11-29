@@ -17,6 +17,9 @@ end
 __exports.isNumber = function(s)
     return type(s) == "number"
 end
+__exports.isBoolean = function(s)
+    return type(s) == "boolean"
+end
 __exports.isLuaArray = function(a)
     return type(a) == "table"
 end

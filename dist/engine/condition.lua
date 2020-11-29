@@ -30,6 +30,15 @@ __exports.getFunctionSignature = function(name, infos)
     return result .. ")"
 end
 __exports.OvaleConditionClass = __class(nil, {
+    constructor = function(self, baseState)
+        self.baseState = baseState
+        self.conditions = {}
+        self.actions = {}
+        self.spellBookConditions = {
+            spell = true
+        }
+        self.typedConditions = {}
+    end,
     RegisterCondition = function(self, name, isSpellBookCondition, func)
         self.conditions[name] = func
         if isSpellBookCondition then
@@ -44,8 +53,9 @@ __exports.OvaleConditionClass = __class(nil, {
             returnValue = returnParameters
         }
         for k, v in ipairs(infos.parameters) do
-            if v.name then
-                infos.namedParameters[v.name] = k
+            infos.namedParameters[v.name] = k
+            if v.name == "target" then
+                infos.targetIndex = k
             end
             if v.type == "string" and v.mapValues then
                 infos.replacements = infos.replacements or {}
@@ -73,6 +83,9 @@ __exports.OvaleConditionClass = __class(nil, {
                 end
             end
         end
+        if infos.targetIndex and (positionalParams[infos.targetIndex] == "target" or positionalParams[infos.targetIndex] == "cycle") then
+            positionalParams[infos.targetIndex] = self.baseState.next.defaultTarget
+        end
         return infos.func(atTime, unpack(positionalParams))
     end,
     registerAction = function(self, name, func)
@@ -96,14 +109,6 @@ __exports.OvaleConditionClass = __class(nil, {
     HasAny = function(self)
         return next(self.conditions) ~= nil
     end,
-    constructor = function(self)
-        self.conditions = {}
-        self.actions = {}
-        self.spellBookConditions = {
-            spell = true
-        }
-        self.typedConditions = {}
-    end
 })
 __exports.ParseCondition = function(namedParams, baseState, defaultTarget)
     local target = (isString(namedParams.target) and namedParams.target) or defaultTarget or "player"

@@ -7028,7 +7028,7 @@ l    */
             this.EnrageRemaining
         );
         ovaleCondition.RegisterCondition("exists", false, this.Exists);
-        ovaleCondition.RegisterCondition("false", false, this.False);
+        ovaleCondition.RegisterCondition("never", false, this.False);
         ovaleCondition.RegisterCondition(
             "focusregen",
             false,
@@ -7583,7 +7583,7 @@ l    */
             true,
             this.TravelTime
         );
-        ovaleCondition.RegisterCondition("true", false, this.True);
+        ovaleCondition.RegisterCondition("always", false, this.True);
         ovaleCondition.RegisterCondition("weapondps", false, this.WeaponDPS);
         ovaleCondition.RegisterCondition(
             "sigilcharging",

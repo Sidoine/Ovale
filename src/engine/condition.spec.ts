@@ -1,10 +1,14 @@
 import { test, expect } from "@jest/globals";
+import { Mock } from "typemoq";
+import { BaseState } from "../states/BaseState";
 import { assertDefined } from "../tests/helpers";
 import { OvaleConditionClass } from "./condition";
 
+const baseStateMock = Mock.ofType<BaseState>();
+
 test("call", () => {
     // Arrange
-    const condition = new OvaleConditionClass();
+    const condition = new OvaleConditionClass(baseStateMock.object);
     condition.register(
         "test",
         (atTime: number, a: number, b: string) => {
@@ -24,7 +28,7 @@ test("call", () => {
 
 test("getInfos", () => {
     // Arrange
-    const condition = new OvaleConditionClass();
+    const condition = new OvaleConditionClass(baseStateMock.object);
     condition.register(
         "test",
         (atTime: number, a: number, b: string | undefined) => {
@@ -49,7 +53,7 @@ test("getInfos", () => {
 
 test("call with replacement", () => {
     // Arrange
-    const condition = new OvaleConditionClass();
+    const condition = new OvaleConditionClass(baseStateMock.object);
     condition.register(
         "test",
         (atTime: number, a: string) => {

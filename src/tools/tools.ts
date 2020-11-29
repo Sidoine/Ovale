@@ -21,6 +21,10 @@ export function isNumber(s: unknown): s is number {
     return type(s) === "number";
 }
 
+export function isBoolean(s: unknown): s is number {
+    return type(s) === "boolean";
+}
+
 export function isLuaArray<T>(a: unknown): a is LuaArray<T> {
     return type(a) === "table";
 }

@@ -1829,7 +1829,7 @@ export class Emiter {
                             const extraAmountPattern =
                                 powerType + "%(%) >= [%d.]+";
                             const replaceString = format(
-                                "True(pool_%s %d)",
+                                "always(pool_%s %d)",
                                 poolResourceNode.powerType,
                                 extra_amount
                             );
@@ -2046,9 +2046,9 @@ export class Emiter {
                     }
                     let code;
                     if (name == "sim_target") {
-                        code = "True(target_is_sim_target)";
+                        code = "always(target_is_sim_target)";
                     } else if (name == "target") {
-                        code = "False(target_is_target)";
+                        code = "never(target_is_target)";
                     } else {
                         code = format("target.Name(%s)", name);
                         this.AddSymbol(annotation, name);
@@ -2070,9 +2070,9 @@ export class Emiter {
                 ) {
                     let code;
                     if (parseNode.operator == "=") {
-                        code = "True(target_is_sim_target)";
+                        code = "always(target_is_sim_target)";
                     } else {
-                        code = "False(target_is_sim_target)";
+                        code = "never(target_is_sim_target)";
                     }
                     annotation.astAnnotation = annotation.astAnnotation || {};
                     [node] = this.ovaleAst.ParseCode(
@@ -2614,7 +2614,7 @@ export class Emiter {
         } else if (property == "in_flight_remains") {
             code = "0";
         } else if (property == "miss_react") {
-            code = "True(miss_react)";
+            code = "always(miss_react)";
         } else if (
             property == "persistent_multiplier" ||
             property == "pmultiplier"
@@ -3045,12 +3045,12 @@ export class Emiter {
             code = `${target}${CHARACTER_PROPERTY[operand]}`;
         } else if (operand == "position_front") {
             code =
-                (annotation.position == "front" && "True(position_front)") ||
-                "False(position_front)";
+                (annotation.position == "front" && "always(position_front)") ||
+                "never(position_front)";
         } else if (operand == "position_back") {
             code =
-                (annotation.position == "back" && "True(position_back)") ||
-                "False(position_back)";
+                (annotation.position == "back" && "always(position_back)") ||
+                "never(position_back)";
         } else if (className == "MAGE" && operand == "incanters_flow_dir") {
             const name = "incanters_flow_buff";
             code = format("BuffDirection(%s)", name);
@@ -3103,9 +3103,9 @@ export class Emiter {
         } else if (sub(operand, 1, 5) == "role.") {
             const [role] = match(operand, "^role%.([%w_]+)");
             if (role && role == annotation.role) {
-                code = format("True(role_%s)", role);
+                code = format("always(role_%s)", role);
             } else {
-                code = format("False(role_%s)", role);
+                code = format("never(role_%s)", role);
             }
         } else if (operand == "spell_haste" || operand == "stat.spell_haste") {
             code = "100 / { 100 + SpellCastSpeedPercent() }";
@@ -3624,7 +3624,7 @@ export class Emiter {
             } else if (property == "distance") {
                 code = "target.Distance()";
             } else if (property == "exists") {
-                code = "False(raid_event_movement_exists)";
+                code = "never(raid_event_movement_exists)";
             } else if (property == "remains") {
                 code = "0";
             }
@@ -3634,7 +3634,7 @@ export class Emiter {
             } else if (property == "count") {
                 code = "0";
             } else if (property == "exists" || property == "up") {
-                code = "False(raid_event_adds_exists)";
+                code = "never(raid_event_adds_exists)";
             } else if (property == "in") {
                 code = "600";
             } else if (property == "duration") {
@@ -3644,9 +3644,9 @@ export class Emiter {
             }
         } else if (name == "invulnerable") {
             if (property == "up") {
-                code = "False(raid_events_invulnerable_up)";
+                code = "never(raid_events_invulnerable_up)";
             } else if (property === "exists") {
-                code = "False(raid_event_invulnerable_exists)";
+                code = "never(raid_event_invulnerable_exists)";
             }
         }
         if (code) {
@@ -3877,7 +3877,7 @@ export class Emiter {
             className == "DRUID" &&
             operand == "buff.wild_charge_movement.down"
         ) {
-            code = "True(wild_charge_movement_down)";
+            code = "always(wild_charge_movement_down)";
         } else if (className == "DRUID" && operand == "eclipse_dir.lunar") {
             code = "EclipseDir() < 0";
         } else if (className == "DRUID" && operand == "eclipse_dir.solar") {
@@ -4053,7 +4053,7 @@ export class Emiter {
         }
         // TODO: has garrote been casted out of stealth with shrouded suffocation azerite trait?
         else if (className == "ROGUE" && operand == "ss_buffed") {
-            code = "False(ss_buffed)";
+            code = "never(ss_buffed)";
         } else if (className == "ROGUE" && operand == "non_ss_buffed_targets") {
             code = "Enemies() - DebuffCountOnAny(garrote)";
             this.AddSymbol(annotation, "garrote");
@@ -4188,8 +4188,6 @@ export class Emiter {
         } else if (operand == "debuff.casting.up") {
             const t = (target == "" && "target.") || target;
             code = `${t}IsInterruptible()`;
-        } else if (operand == "debuff.flying.down") {
-            code = `${target}True(debuff_flying_down)`;
         } else if (operand == "distance") {
             code = `${target}Distance()`;
         } else if (sub(operand, 1, 9) == "equipped.") {
@@ -4434,7 +4432,7 @@ export class Emiter {
                 code =
                     "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
             } else if (sub(procType, 1, 4) == "has_") {
-                code = format("True(trinket_%s_%s)", procType, statName);
+                code = format("always(trinket_%s_%s)", procType, statName);
             } else {
                 const property = statName;
                 const [buffName] = this.Disambiguate(

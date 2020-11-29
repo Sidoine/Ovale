@@ -121,7 +121,7 @@ export class IoC {
         this.profiler = new OvaleProfilerClass(this.options, this.ovale);
         this.lastSpell = new LastSpell();
         this.baseState = new BaseState();
-        this.condition = new OvaleConditionClass();
+        this.condition = new OvaleConditionClass(this.baseState);
         const runner = new Runner(
             this.profiler,
             this.debug,

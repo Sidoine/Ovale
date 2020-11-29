@@ -31,7 +31,7 @@ import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
 import { SpellInfoProperty, SpellInfoValues } from "./data";
 import { HasteType } from "../states/PaperDoll";
 import { Result } from "../simulationcraft/definitions";
-import { newTimeSpan, OvaleTimeSpan } from "../tools/TimeSpan";
+import { EMPTY_SET, newTimeSpan, OvaleTimeSpan } from "../tools/TimeSpan";
 import { ActionType } from "./best-action";
 import { PowerType } from "../states/Power";
 
@@ -370,6 +370,7 @@ export interface NodeTypes {
     state: AstFunctionNode;
     string: AstStringNode;
     typed_function: AstTypedFunctionNode;
+    undefined: AstUndefinedNode;
     unless: AstUnlessNode;
     value: AstValueNode;
     variable: AstVariableNode;
@@ -398,6 +399,7 @@ interface BaseNodeValue {
      * been computed this frame
      */
     serial: number;
+    constant?: boolean;
 
     timeSpan: OvaleTimeSpan;
 }
@@ -550,6 +552,7 @@ export type AstNode =
     | AstSpellRequireNode
     | AstStringNode
     | AstTypedFunctionNode
+    | AstUndefinedNode
     | AstUnlessNode
     | AstValueNode
     | AstVariableNode;
@@ -825,6 +828,9 @@ interface AstDefineNode extends AstBaseNode<"define"> {
     name: string;
     value: string | number;
 }
+
+type AstUndefinedNode = AstBaseNode<"undefined">;
+
 // export interface AstNode {
 //     child: LuaArray<AstNode>;
 //     type: NodeType;
@@ -1161,6 +1167,7 @@ export class OvaleASTClass {
         if (!node) {
             node = this.NewNode("value", annotation);
             node.value = value;
+            node.result.constant = true;
             node.origin = 0;
             node.rate = 0;
             annotation.numberFlyweight[value] = node;
@@ -1427,20 +1434,56 @@ export class OvaleASTClass {
         }
         return s;
     };
+
+    private unparseUndefined: UnparserFunction<AstUndefinedNode> = () => {
+        return "undefined";
+    };
+
     private unparseTypedFunction: UnparserFunction<AstTypedFunctionNode> = (
         node
     ) => {
         let s;
         if (this.HasParameters(node)) {
-            s = format(
-                "%s(%s)",
-                node.name,
-                this.UnparseParameters(
-                    node.rawPositionalParams,
-                    undefined,
-                    true
-                )
-            );
+            s = node.name + "(";
+            if (
+                node.rawNamedParams.target &&
+                node.rawNamedParams.target.type === "string"
+            )
+                s = node.rawNamedParams.target.value + "." + s;
+            const infos = this.ovaleCondition.getInfos(node.name);
+            if (infos) {
+                let nameParameters = false;
+                let first = true;
+                for (const [k, v] of ipairs(infos.parameters)) {
+                    const value = node.rawPositionalParams[k];
+                    if (value) {
+                        if (
+                            v.name === "filter" ||
+                            v.name === "target" ||
+                            (v.defaultValue !== undefined &&
+                                ((v.type === "boolean" &&
+                                    value.type === "boolean" &&
+                                    value.value === v.defaultValue) ||
+                                    (v.type === "number" &&
+                                        value.type === "value" &&
+                                        value.value === v.defaultValue) ||
+                                    (v.type === "string" &&
+                                        value.type === "string" &&
+                                        value.value === v.defaultValue)))
+                        ) {
+                            nameParameters = true;
+                        } else {
+                            if (first) first = false;
+                            else s += " ";
+                            if (nameParameters) s += v.name + "=";
+                            s += this.unparseParameter(value);
+                        }
+                    } else {
+                        nameParameters = true;
+                    }
+                }
+            }
+            s += ")";
         } else {
             s = format("%s()", node.name);
         }
@@ -1715,6 +1758,7 @@ export class OvaleASTClass {
         ["state"]: this.UnparseFunction,
         ["string"]: this.UnparseString,
         ["typed_function"]: this.unparseTypedFunction,
+        ["undefined"]: this.unparseUndefined,
         ["unless"]: this.UnparseUnless,
         ["value"]: this.UnparseValue,
         ["variable"]: this.UnparseVariable,
@@ -2319,6 +2363,8 @@ export class OvaleASTClass {
                         name
                     );
                     return undefined;
+                } else {
+                    positionalParams[key] = this.newUndefined(annotation);
                 }
             } else {
                 if (parameterInfos.type === "number") {
@@ -3605,6 +3651,7 @@ export class OvaleASTClass {
 
         const node = this.NewNode("string", annotation);
         node.value = value;
+        node.result.constant = true;
         annotation.stringReference = annotation.stringReference || {};
         annotation.stringReference[
             lualength(annotation.stringReference) + 1
@@ -3698,6 +3745,7 @@ export class OvaleASTClass {
     public newString(annotation: AstAnnotation, value: string) {
         const node = this.NewNode("string", annotation);
         node.value = value;
+        node.result.constant = true;
         return node;
     }
 
@@ -3710,12 +3758,21 @@ export class OvaleASTClass {
     public newValue(annotation: AstAnnotation, value: number) {
         const node = this.NewNode("value", annotation);
         node.value = value;
+        node.result.constant = true;
         return node;
     }
 
     public newBoolean(annotation: AstAnnotation, value: boolean) {
         const node = this.NewNode("boolean", annotation);
         node.value = value;
+        node.result.constant = true;
+        return node;
+    }
+
+    public newUndefined(annotation: AstAnnotation) {
+        const node = this.NewNode("undefined", annotation);
+        node.result.constant = true;
+        node.result.timeSpan.copyFromArray(EMPTY_SET);
         return node;
     }
 

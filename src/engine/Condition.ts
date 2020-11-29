@@ -120,6 +120,8 @@ export interface FunctionInfos {
     returnValue: Pick<ParameterInfos, "type">;
     replacements?: LuaArray<{ index: number; mapValues: LuaObj<string> }>;
     func: (atTime: number, ...args: unknown[]) => ConditionResult;
+    // TODO should be better
+    targetIndex?: number;
 }
 
 export function getFunctionSignature(name: string, infos: FunctionInfos) {
@@ -138,6 +140,8 @@ export class OvaleConditionClass {
         spell: true,
     };
     private typedConditions: LuaObj<FunctionInfos> = {};
+
+    constructor(private baseState: BaseState) {}
 
     /**
      * Register a new condition
@@ -170,8 +174,9 @@ export class OvaleConditionClass {
             returnValue: returnParameters,
         };
         for (const [k, v] of ipairs(infos.parameters)) {
-            if (v.name) {
-                infos.namedParameters[v.name] = k;
+            infos.namedParameters[v.name] = k;
+            if (v.name === "target") {
+                infos.targetIndex = k;
             }
             if (v.type === "string" && v.mapValues) {
                 infos.replacements = infos.replacements || {};
@@ -198,6 +203,15 @@ export class OvaleConditionClass {
                     if (replacement) positionalParams[v.index] = replacement;
                 }
             }
+        }
+        if (
+            infos.targetIndex &&
+            (positionalParams[infos.targetIndex] === "target" ||
+                positionalParams[infos.targetIndex] === "cycle")
+        ) {
+            positionalParams[
+                infos.targetIndex
+            ] = this.baseState.next.defaultTarget;
         }
         return infos.func(atTime, ...unpack(positionalParams));
     }
