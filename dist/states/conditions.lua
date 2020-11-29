@@ -428,7 +428,7 @@ __exports.OvaleConditions = __class(nil, {
             return Compare(0, comparator, limit)
         end
         self.BuffExpires = function(positionalParams, namedParams, atTime)
-            local auraId, seconds = positionalParams[1], positionalParams[2]
+            local auraId, seconds = positionalParams[1], positionalParams[2] or 0
             local target, filter, mine = self:ParseCondition(positionalParams, namedParams)
             if  not isNumber(auraId) or  not isNumber(seconds) then
                 return 
