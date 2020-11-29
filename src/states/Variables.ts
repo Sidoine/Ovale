@@ -1,11 +1,15 @@
 import { LuaArray, LuaObj, pairs, wipe } from "@wowts/lua";
-import { StateModule } from "../State";
-import { BaseState } from "../BaseState";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { StateModule } from "../engine/State";
+import { BaseState } from "./BaseState";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 import { OvaleCombatClass } from "./combat";
-import { Compare, ConditionAction, OvaleConditionClass } from "../Condition";
+import {
+    Compare,
+    ConditionAction,
+    OvaleConditionClass,
+} from "../engine/Condition";
 import { huge } from "@wowts/math";
-import { setResultType } from "../AST";
+import { setResultType } from "../engine/AST";
 
 export class Variables implements StateModule {
     isState = true;
@@ -68,7 +72,7 @@ export class Variables implements StateModule {
         return this.futureVariable[name] || this.variable[name] || 0;
     }
     GetStateDuration(name: string) {
-        let lastEnable =
+        const lastEnable =
             this.futureLastEnable[name] ||
             this.lastEnable[name] ||
             this.baseState.next.currentTime;
@@ -76,7 +80,7 @@ export class Variables implements StateModule {
     }
     PutState(name: string, value: number, isFuture: boolean, atTime: number) {
         if (isFuture) {
-            let oldValue = this.GetState(name);
+            const oldValue = this.GetState(name);
             if (value != oldValue) {
                 this.tracer.Log(
                     "Setting future state: %s from %s to %s.",
@@ -88,7 +92,7 @@ export class Variables implements StateModule {
                 this.futureLastEnable[name] = atTime;
             }
         } else {
-            let oldValue = this.variable[name] || 0;
+            const oldValue = this.variable[name] || 0;
             if (value != oldValue) {
                 this.tracer.DebugTimestamp(
                     "Advancing combat state: %s from %s to %s.",
@@ -122,12 +126,12 @@ export class Variables implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [name, comparator, limit] = [
+        const [name, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
-        let value = this.GetState(name);
+        const value = this.GetState(name);
         return Compare(value, comparator, limit);
     };
 
@@ -145,12 +149,12 @@ export class Variables implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [name, comparator, limit] = [
+        const [name, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
-        let value = this.GetStateDuration(name);
+        const value = this.GetStateDuration(name);
         return Compare(value, comparator, limit);
     };
 

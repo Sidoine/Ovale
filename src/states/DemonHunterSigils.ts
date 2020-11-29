@@ -1,24 +1,24 @@
 import { OvalePaperDollClass } from "./PaperDoll";
-import { OvaleSpellBookClass } from "../SpellBook";
+import { OvaleSpellBookClass } from "./SpellBook";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { StateModule } from "../State";
+import { StateModule } from "../engine/State";
 
-let UPDATE_DELAY = 0.5;
-let SIGIL_ACTIVATION_TIME = 2;
+const UPDATE_DELAY = 0.5;
+const SIGIL_ACTIVATION_TIME = 2;
 type SigilType = "flame" | "silence" | "misery" | "chains";
-let activated_sigils: LuaObj<LuaArray<number>> = {};
+const activated_sigils: LuaObj<LuaArray<number>> = {};
 
 interface Sigil {
     type: SigilType;
     talent?: number;
 }
 
-let sigil_start: LuaArray<Sigil> = {
+const sigil_start: LuaArray<Sigil> = {
     [204513]: {
         type: "flame",
     },
@@ -39,7 +39,7 @@ let sigil_start: LuaArray<Sigil> = {
         type: "chains",
     },
 };
-let sigil_end: LuaArray<Sigil> = {
+const sigil_end: LuaArray<Sigil> = {
     [204598]: {
         type: "flame",
     },
@@ -53,7 +53,7 @@ let sigil_end: LuaArray<Sigil> = {
         type: "chains",
     },
 };
-let QUICKENED_SIGILS_TALENT = 14;
+const QUICKENED_SIGILS_TALENT = 14;
 export class OvaleSigilClass implements StateModule {
     private module: AceModule & AceEvent;
 
@@ -97,7 +97,7 @@ export class OvaleSigilClass implements StateModule {
         if (!this.ovalePaperDoll.IsSpecialization("vengeance")) {
             return;
         }
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -116,8 +116,8 @@ export class OvaleSigilClass implements StateModule {
             cleuEvent == "SPELL_AURA_APPLIED"
         ) {
             if (sigil_end[spellid] != undefined) {
-                let s = sigil_end[spellid];
-                let t = s.type;
+                const s = sigil_end[spellid];
+                const t = s.type;
                 remove(activated_sigils[t], 1);
             }
         }
@@ -136,11 +136,11 @@ export class OvaleSigilClass implements StateModule {
         if (unitId == undefined || unitId != "player") {
             return;
         }
-        let id = tonumber(spellId);
+        const id = tonumber(spellId);
         if (sigil_start[id] != undefined) {
-            let s = sigil_start[id];
-            let t = s.type;
-            let tal = s.talent || undefined;
+            const s = sigil_start[id];
+            const t = s.type;
+            const tal = s.talent || undefined;
             if (
                 tal == undefined ||
                 this.ovaleSpellBook.GetTalentPoints(tal) > 0

@@ -1,8 +1,8 @@
-import { Tracer, OvaleDebugClass } from "../Debug";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
 import { OvaleClass } from "../Ovale";
 import { OvaleEquipmentClass } from "./Equipment";
-import { States, StateModule } from "../State";
+import { States, StateModule } from "../engine/State";
 import {
     SpellCast,
     PaperDollSnapshot,
@@ -38,16 +38,16 @@ import {
     ClassId,
     SpecializationIndex,
 } from "@wowts/wow-mock";
-import { isNumber } from "../tools";
+import { isNumber } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
-} from "../Condition";
+} from "../engine/Condition";
 
-let OVALE_SPELLDAMAGE_SCHOOL: LuaObj<number> = {
+const OVALE_SPELLDAMAGE_SCHOOL: LuaObj<number> = {
     DEATHKNIGHT: 4,
     DEMONHUNTER: 3,
     DRUID: 4,
@@ -97,7 +97,7 @@ export type SpecializationName =
     | "arms"
     | "windwalker";
 
-export let OVALE_SPECIALIZATION_NAME: {
+export const OVALE_SPECIALIZATION_NAME: {
     [key in ClassId]: { [key in 1 | 2 | 3 | 4]?: SpecializationName };
 } = {
     DEATHKNIGHT: {
@@ -403,7 +403,7 @@ export class OvalePaperDollClass
     private UNIT_ATTACK_POWER = (event: string, unitId: string) => {
         if (unitId == "player" && !this.ovaleEquipement.HasRangedWeapon()) {
             this.profiler.StartProfiling("OvalePaperDoll_UpdateStats");
-            let [base, posBuff, negBuff] = UnitAttackPower(unitId);
+            const [base, posBuff, negBuff] = UnitAttackPower(unitId);
             this.current.attackPower = base + posBuff + negBuff;
             this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
@@ -414,7 +414,7 @@ export class OvalePaperDollClass
     private UNIT_RANGED_ATTACK_POWER = (unitId: string) => {
         if (unitId == "player" && this.ovaleEquipement.HasRangedWeapon()) {
             this.profiler.StartProfiling("OvalePaperDoll_UpdateStats");
-            let [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
+            const [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
             this.ovale.needRefresh();
             this.current.attackPower = base + posBuff + negBuff;
             this.current.snapshotTime = GetTime();
@@ -430,11 +430,7 @@ export class OvalePaperDollClass
         this.ovale.needRefresh();
         this.profiler.StopProfiling("OvalePaperDoll_UpdateStats");
     };
-    private PLAYER_LEVEL_UP = (
-        event: string,
-        level: string,
-        ...__args: any[]
-    ) => {
+    private PLAYER_LEVEL_UP = (event: string, level: string) => {
         this.profiler.StartProfiling("OvalePaperDoll_UpdateStats");
         this.level = tonumber(level) || UnitLevel("player");
         this.current.snapshotTime = GetTime();
@@ -454,7 +450,7 @@ export class OvalePaperDollClass
     };
     private UpdateDamage = () => {
         this.profiler.StartProfiling("OvalePaperDoll_UpdateDamage");
-        let damageMultiplier = this.GetAppropriateDamageMultiplier("player");
+        const damageMultiplier = this.GetAppropriateDamageMultiplier("player");
         // let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player"); // Could add back if we need something like calculating next swing
 
         // Appartently, if the character is not loaded, it returns 0
@@ -467,9 +463,9 @@ export class OvalePaperDollClass
     };
     UpdateSpecialization() {
         this.profiler.StartProfiling("OvalePaperDoll_UpdateSpecialization");
-        let newSpecialization = GetSpecialization();
+        const newSpecialization = GetSpecialization();
         if (this.specialization != newSpecialization) {
-            let oldSpecialization = this.specialization;
+            const oldSpecialization = this.specialization;
             this.specialization = newSpecialization;
             this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
@@ -553,7 +549,7 @@ export class OvalePaperDollClass
         updateAllStats?: boolean
     ) {
         snapshot = snapshot || this.current;
-        let nameTable = (updateAllStats && STAT_NAME) || SNAPSHOT_STAT_NAME;
+        const nameTable = (updateAllStats && STAT_NAME) || SNAPSHOT_STAT_NAME;
         for (const [, k] of ipairs(nameTable)) {
             const value = snapshot[k];
             if (value) target[k] = value;
@@ -567,7 +563,7 @@ export class OvalePaperDollClass
         atTime: number,
         state?: PaperDollSnapshot
     ) => {
-        let paperDollModule = state || this.current;
+        const paperDollModule = state || this.current;
         this.UpdateSnapshot(spellcast, paperDollModule, true);
     };
     InitializeState() {

@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/states/DamageTaken", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/DamageTaken", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Pool = LibStub:GetLibrary("ovale/Pool")
-local OvalePool = __Pool.OvalePool
-local __Queue = LibStub:GetLibrary("ovale/Queue")
-local OvaleQueue = __Queue.OvaleQueue
+local __toolsPool = LibStub:GetLibrary("ovale/tools/Pool")
+local OvalePool = __toolsPool.OvalePool
+local __toolsQueue = LibStub:GetLibrary("ovale/tools/Queue")
+local OvaleQueue = __toolsQueue.OvaleQueue
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local band = bit.band
 local bor = bit.bor

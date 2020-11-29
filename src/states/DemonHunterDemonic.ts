@@ -11,7 +11,7 @@ import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 
 const INFINITY = huge;
 const HAVOC_DEMONIC_TALENT_ID = 22547;
@@ -24,7 +24,7 @@ const HIDDEN_BUFF_EXTENDED_BY_DEMONIC = "Extended by Demonic";
 
 export class OvaleDemonHunterDemonicClass {
     playerGUID: string;
-    isDemonHunter: boolean = false;
+    isDemonHunter = false;
     isHavoc: boolean;
     hasDemonic: boolean;
 
@@ -90,7 +90,7 @@ export class OvaleDemonHunterDemonicClass {
         }
     };
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -109,7 +109,7 @@ export class OvaleDemonHunterDemonicClass {
             sourceGUID == this.playerGUID &&
             cleuEvent == "SPELL_CAST_SUCCESS"
         ) {
-            let [spellId, spellName] = [arg12, arg13];
+            const [spellId, spellName] = [arg12, arg13];
             if (HAVOC_EYE_BEAM_SPELL_ID == spellId) {
                 this.debug.Debug(
                     "Spell %d (%s) has successfully been cast. Gaining Aura (only during meta).",
@@ -123,7 +123,7 @@ export class OvaleDemonHunterDemonicClass {
             sourceGUID == this.playerGUID &&
             cleuEvent == "SPELL_AURA_REMOVED"
         ) {
-            let [spellId, spellName] = [arg12, arg13];
+            const [spellId, spellName] = [arg12, arg13];
             if (HAVOC_META_BUFF_ID == spellId) {
                 this.debug.Debug(
                     "Aura %d (%s) is removed. Dropping Aura.",
@@ -135,8 +135,8 @@ export class OvaleDemonHunterDemonicClass {
         }
     }
     GainAura() {
-        let now = GetTime();
-        let aura_meta = this.ovaleAura.GetAura(
+        const now = GetTime();
+        const aura_meta = this.ovaleAura.GetAura(
             "player",
             HAVOC_META_BUFF_ID,
             now,
@@ -150,8 +150,8 @@ export class OvaleDemonHunterDemonicClass {
                 HIDDEN_BUFF_ID,
                 this.playerGUID
             );
-            let duration = HIDDEN_BUFF_DURATION;
-            let ending = now + HIDDEN_BUFF_DURATION;
+            const duration = HIDDEN_BUFF_DURATION;
+            const ending = now + HIDDEN_BUFF_DURATION;
             this.ovaleAura.GainedAuraOnGUID(
                 this.playerGUID,
                 now,
@@ -178,7 +178,7 @@ export class OvaleDemonHunterDemonicClass {
         }
     }
     DropAura() {
-        let now = GetTime();
+        const now = GetTime();
         this.debug.Debug(
             "Removing '%s' (%d) buff on player %s.",
             HIDDEN_BUFF_EXTENDED_BY_DEMONIC,

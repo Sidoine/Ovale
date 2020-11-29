@@ -6,20 +6,20 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvalePaperDollClass } from "./PaperDoll";
 
-let SOUL_FRAGMENTS_BUFF_ID = 203981;
-let METAMORPHOSIS_BUFF_ID = 187827;
-let SOUL_FRAGMENT_SPELLS: LuaArray<number> = {
+const SOUL_FRAGMENTS_BUFF_ID = 203981;
+const METAMORPHOSIS_BUFF_ID = 187827;
+const SOUL_FRAGMENT_SPELLS: LuaArray<number> = {
     [225919]: 2, // Fracture
     [203782]: 1, // Shear
     [228477]: -2, // Soul Cleave
 };
-let SOUL_FRAGMENT_FINISHERS: LuaArray<boolean> = {
+const SOUL_FRAGMENT_FINISHERS: LuaArray<boolean> = {
     [247454]: true, // Spirit Bomb
     [263648]: true, // Soul Barrier
 };
 
 export class OvaleDemonHunterSoulFragmentsClass {
-    estimatedCount: number = 0;
+    estimatedCount = 0;
     atTime?: number;
     estimated?: boolean;
     private module: AceModule & AceEvent;
@@ -55,7 +55,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
         if (!this.ovalePaperDoll.IsSpecialization("vengeance")) {
             return;
         }
-        let [
+        const [
             ,
             subtype,
             ,
@@ -69,13 +69,13 @@ export class OvaleDemonHunterSoulFragmentsClass {
             ,
             spellID,
         ] = CombatLogGetCurrentEventInfo();
-        let me = this.ovale.playerGUID;
+        const me = this.ovale.playerGUID;
         if (sourceGUID == me) {
             if (
                 subtype == "SPELL_CAST_SUCCESS" &&
                 SOUL_FRAGMENT_SPELLS[spellID]
             ) {
-                let getTime = GetTime();
+                const getTime = GetTime();
                 let fragments = SOUL_FRAGMENT_SPELLS[spellID];
                 if (fragments > 0 && this.HasMetamorphosis(getTime)) {
                     fragments = fragments + 1;
@@ -91,7 +91,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
         }
     };
     AddPredictedSoulFragments(atTime: number, added: number) {
-        let currentCount = this.GetSoulFragmentsBuffStacks(atTime) || 0;
+        const currentCount = this.GetSoulFragmentsBuffStacks(atTime) || 0;
         this.SetPredictedSoulFragment(atTime, currentCount + added);
     }
     SetPredictedSoulFragment(atTime: number, count: number) {
@@ -112,14 +112,14 @@ export class OvaleDemonHunterSoulFragmentsClass {
         return stacks;
     }
     GetSoulFragmentsBuffStacks(atTime: number) {
-        let aura = this.ovaleAura.GetAura(
+        const aura = this.ovaleAura.GetAura(
             "player",
             SOUL_FRAGMENTS_BUFF_ID,
             atTime,
             "HELPFUL",
             true
         );
-        let stacks =
+        const stacks =
             (aura &&
                 this.ovaleAura.IsActiveAura(aura, atTime) &&
                 aura.stacks) ||
@@ -127,7 +127,7 @@ export class OvaleDemonHunterSoulFragmentsClass {
         return stacks;
     }
     HasMetamorphosis(atTime: number) {
-        let aura = this.ovaleAura.GetAura(
+        const aura = this.ovaleAura.GetAura(
             "player",
             METAMORPHOSIS_BUFF_ID,
             atTime,

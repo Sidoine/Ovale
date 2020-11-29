@@ -1,13 +1,13 @@
 import { unpack } from "@wowts/lua";
 import { C_Soulbinds } from "@wowts/wow-mock";
-import { OptionUiGroup } from "../acegui-helpers";
+import { OptionUiGroup } from "../ui/acegui-helpers";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
-} from "../Condition";
-import { OvaleDebugClass } from "../Debug";
+} from "../engine/Condition";
+import { OvaleDebugClass } from "../engine/Debug";
 
 export class Conduit {
     private debugOptions: OptionUiGroup = {

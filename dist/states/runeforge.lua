@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/runeforge", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/runeforge", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local ipairs = ipairs
@@ -7,11 +7,11 @@ local unpack = unpack
 local concat = table.concat
 local insert = table.insert
 local C_LegendaryCrafting = C_LegendaryCrafting
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local ReturnBoolean = __Condition.ReturnBoolean
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
-local OneTimeMessage = __tools.OneTimeMessage
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local ReturnBoolean = __engineCondition.ReturnBoolean
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
+local OneTimeMessage = __toolstools.OneTimeMessage
 __exports.Runeforge = __class(nil, {
     constructor = function(self, debug)
         self.debugOptions = {

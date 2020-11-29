@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/states/LastSpell", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/LastSpell", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Pool = LibStub:GetLibrary("ovale/Pool")
-local OvalePool = __Pool.OvalePool
+local __toolsPool = LibStub:GetLibrary("ovale/tools/Pool")
+local OvalePool = __toolsPool.OvalePool
 local pairs = pairs
 local remove = table.remove
 local insert = table.insert

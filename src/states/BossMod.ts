@@ -1,12 +1,12 @@
-import { Tracer, OvaleDebugClass } from "../Debug";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
 import { OvaleClass } from "../Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleCombatClass } from "./combat";
-let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
-let _DBM = _G["DBM"];
+const _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
+const _DBM = _G["DBM"];
 export class OvaleBossModClass {
     EngagedDBM: any = undefined;
     EngagedBigWigs: any = undefined;
@@ -69,15 +69,15 @@ export class OvaleBossModClass {
         if (!this.combat.isInCombat(atTime)) {
             return false;
         }
-        let dbmEngaged =
+        const dbmEngaged =
             _DBM != undefined &&
             this.EngagedDBM != undefined &&
             this.EngagedDBM.inCombat;
-        let bigWigsEngaged =
+        const bigWigsEngaged =
             _BigWigsLoader != undefined &&
             this.EngagedBigWigs != undefined &&
             this.EngagedBigWigs.isEngaged;
-        let neitherEngaged =
+        const neitherEngaged =
             _DBM == undefined &&
             _BigWigsLoader == undefined &&
             this.ScanTargets();

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Enemies", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Enemies", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -15,8 +15,8 @@ local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
 local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local GROUP_MEMBER = bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
 local CLEU_TAG_SUFFIXES = {
     [1] = "_DAMAGE",

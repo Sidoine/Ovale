@@ -5,8 +5,8 @@ import { insert } from "@wowts/table";
 import { upper, format } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass, Tracer } from "../Debug";
-import { StateModule } from "../State";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { StateModule } from "../engine/State";
 
 interface LossOfControlEventInfo {
     locType: string;
@@ -51,11 +51,11 @@ export class OvaleLossOfControlClass implements StateModule {
             ),
             C_LossOfControl.GetActiveLossOfControlData(eventIndex)
         );
-        let lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(
+        const lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(
             eventIndex
         );
         if (lossOfControlData) {
-            let data: LossOfControlEventInfo = {
+            const data: LossOfControlEventInfo = {
                 locType: upper(lossOfControlData.locType),
                 spellID: lossOfControlData.spellID,
                 startTime: lossOfControlData.startTime || GetTime(),

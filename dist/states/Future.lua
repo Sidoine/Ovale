@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Future", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Future", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __LastSpell = LibStub:GetLibrary("ovale/states/LastSpell")
@@ -21,12 +21,12 @@ local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitName = UnitName
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local ReturnValueBetween = __Condition.ReturnValueBetween
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local ReturnValueBetween = __engineCondition.ReturnValueBetween
 local strsub = sub
 local tremove = remove
 local self_timeAuraAdded = nil

@@ -1,13 +1,13 @@
-local __exports = LibStub:NewLibrary("ovale/states/Variables", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Variables", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 local wipe = wipe
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local Compare = __Condition.Compare
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local Compare = __engineCondition.Compare
 local huge = math.huge
-local __AST = LibStub:GetLibrary("ovale/AST")
-local setResultType = __AST.setResultType
+local __engineAST = LibStub:GetLibrary("ovale/engine/AST")
+local setResultType = __engineAST.setResultType
 __exports.Variables = __class(nil, {
     constructor = function(self, combat, baseState, ovaleDebug)
         self.combat = combat

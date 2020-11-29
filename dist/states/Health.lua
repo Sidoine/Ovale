@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Health", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Health", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -9,8 +9,8 @@ local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
-local __tools = LibStub:GetLibrary("ovale/tools")
-local OneTimeMessage = __tools.OneTimeMessage
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local OneTimeMessage = __toolstools.OneTimeMessage
 local INFINITY = huge
 local CLEU_DAMAGE_EVENT = {
     DAMAGE_SHIELD = true,

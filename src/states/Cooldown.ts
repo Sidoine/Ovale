@@ -1,19 +1,19 @@
-import { OvaleDataClass } from "../Data";
-import { OvaleSpellBookClass } from "../SpellBook";
+import { OvaleDataClass } from "../engine/Data";
+import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { next, pairs, LuaObj, kpairs } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
-import { States } from "../State";
+import { States } from "../engine/State";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../Debug";
-import { OvaleProfilerClass, Profiler } from "../Profiler";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
 
-let GLOBAL_COOLDOWN = 61304;
-let COOLDOWN_THRESHOLD = 0.1;
+const GLOBAL_COOLDOWN = 61304;
+const COOLDOWN_THRESHOLD = 0.1;
 // "Spell Haste" affects cast speed and spell GCD (spells, not melee abilities), but not hasted cooldowns (cd_haste in Ovale's SpellInfo)
 // "Melee Haste" is in game as "Attack Speed" and affects white swing speed only, not the GCD
 // "Ranged Haste" looks to be no longer used and matches "Melee Haste" usually, DK talent Icy Talons for example;  Suppression Aura in BWL does not affect Ranged Haste but does Melee Haste as of 7/29/18
@@ -160,7 +160,7 @@ export class OvaleCooldownClass
         if (unit == "player" || unit == "pet") {
             this.Update(event, unit);
             this.tracer.Debug("Resetting global cooldown.");
-            let cd = this.gcd;
+            const cd = this.gcd;
             cd.start = 0;
             cd.duration = 0;
         }
@@ -184,7 +184,7 @@ export class OvaleCooldownClass
         }
     }
     IsSharedCooldown(name: string | number) {
-        let spellTable = this.sharedCooldown[name];
+        const spellTable = this.sharedCooldown[name];
         return spellTable && next(spellTable) != undefined;
     }
     AddSharedCooldown(name: string, spellId: number) {
@@ -192,7 +192,7 @@ export class OvaleCooldownClass
         this.sharedCooldown[name][spellId] = true;
     }
     GetGlobalCooldown(now?: number): [number, number] {
-        let cd = this.gcd;
+        const cd = this.gcd;
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
             now = now || GetTime();
             if (now >= cd.start + cd.duration) {
@@ -206,13 +206,13 @@ export class OvaleCooldownClass
         atTime: number | undefined
     ): [number, number, boolean] {
         if (atTime) {
-            let cd = this.GetCD(spellId, atTime);
+            const cd = this.GetCD(spellId, atTime);
             return [cd.start, cd.duration, cd.enable];
         }
         let [cdStart, cdDuration, cdEnable] = [0, 0, true];
         if (this.sharedCooldown[spellId]) {
             for (const [id] of pairs(this.sharedCooldown[spellId])) {
-                let [start, duration, enable] = this.GetSpellCooldown(
+                const [start, duration, enable] = this.GetSpellCooldown(
                     id,
                     atTime
                 );
@@ -223,7 +223,7 @@ export class OvaleCooldownClass
             }
         } else {
             let start, duration, enable;
-            let [index, bookType] = this.ovaleSpellBook.GetSpellBookIndex(
+            const [index, bookType] = this.ovaleSpellBook.GetSpellBookIndex(
                 spellId
             );
 
@@ -240,7 +240,7 @@ export class OvaleCooldownClass
                 enable
             );
             if (start && start > 0) {
-                let [gcdStart, gcdDuration] = this.GetGlobalCooldown();
+                const [gcdStart, gcdDuration] = this.GetGlobalCooldown();
                 this.tracer.Log(
                     "GlobalCooldown is %d, %d",
                     gcdStart,
@@ -265,7 +265,7 @@ export class OvaleCooldownClass
     }
     GetBaseGCD(): [number, HasteType] {
         let gcd: number, haste: HasteType;
-        let baseGCD = BASE_GCD[this.ovale.playerClass];
+        const baseGCD = BASE_GCD[this.ovale.playerClass];
         if (baseGCD) {
             [gcd, haste] = [baseGCD[1], baseGCD[2]];
         } else {
@@ -279,7 +279,7 @@ export class OvaleCooldownClass
         }
     };
     SaveSpellcastInfo = (spellcast: SpellCast) => {
-        let spellId = spellcast.spellId;
+        const spellId = spellcast.spellId;
         if (spellId) {
             const gcd = this.ovaleData.GetSpellInfoProperty(
                 spellId,
@@ -296,7 +296,7 @@ export class OvaleCooldownClass
     GetCD(spellId: number, atTime: number) {
         this.profiler.StartProfiling("OvaleCooldown_state_GetCD");
         let cdName: string | number = spellId;
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         if (si && si.shared_cd) {
             cdName = si.shared_cd;
         }
@@ -311,7 +311,7 @@ export class OvaleCooldownClass
                 maxCharges: 0,
             };
         }
-        let cd = this.next.cd[cdName];
+        const cd = this.next.cd[cdName];
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
             this.tracer.Log(
                 "Didn't find an existing cd in next, look for one in current"
@@ -331,7 +331,7 @@ export class OvaleCooldownClass
             cd.start = start - COOLDOWN_THRESHOLD;
             cd.duration = duration;
             cd.enable = enable;
-            let [
+            const [
                 charges,
                 maxCharges,
                 chargeStart,
@@ -344,7 +344,7 @@ export class OvaleCooldownClass
                 cd.chargeDuration = chargeDuration;
             }
         }
-        let now = atTime;
+        const now = atTime;
         if (cd.start) {
             if (cd.start + cd.duration <= now) {
                 this.tracer.Log("Spell cooldown is in the past");
@@ -412,14 +412,14 @@ export class OvaleCooldownClass
                 duration
             );
             if (duration > 0) {
-                let haste = this.ovaleData.GetSpellInfoProperty(
+                const haste = this.ovaleData.GetSpellInfoProperty(
                     spellId,
                     atTime,
                     "cd_haste",
                     targetGUID
                 );
                 if (haste) {
-                    let multiplier = this.ovalePaperDoll.GetBaseHasteMultiplier(
+                    const multiplier = this.ovalePaperDoll.GetBaseHasteMultiplier(
                         this.ovalePaperDoll.next
                     );
                     duration = duration / multiplier;
@@ -433,7 +433,7 @@ export class OvaleCooldownClass
         spellId: number,
         atTime: number
     ): [number, number, number, number] {
-        let cd = this.GetCD(spellId, atTime);
+        const cd = this.GetCD(spellId, atTime);
         let [charges, maxCharges, chargeStart, chargeDuration] = [
             cd.charges,
             cd.maxCharges,
@@ -500,8 +500,8 @@ export class OvaleCooldownClass
 
     private ApplyCooldown(spellId: number, targetGUID: string, atTime: number) {
         this.profiler.StartProfiling("OvaleCooldown_state_ApplyCooldown");
-        let cd = this.GetCD(spellId, atTime);
-        let duration = this.GetSpellCooldownDuration(
+        const cd = this.GetCD(spellId, atTime);
+        const duration = this.GetSpellCooldownDuration(
             spellId,
             atTime,
             targetGUID

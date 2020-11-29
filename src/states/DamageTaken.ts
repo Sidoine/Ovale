@@ -1,5 +1,5 @@
-import { OvalePool } from "../Pool";
-import { OvaleQueue } from "../Queue";
+import { OvalePool } from "../tools/Pool";
+import { OvaleQueue } from "../tools/Queue";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { band, bor } from "@wowts/bit";
 import { sub } from "@wowts/string";
@@ -15,17 +15,17 @@ import {
 } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { Tracer, OvaleDebugClass } from "../Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
 
 interface Event {
     timestamp: number;
     damage: number;
     magic: boolean;
 }
-let self_pool = new OvalePool<Event>("OvaleDamageTaken_pool");
-let DAMAGE_TAKEN_WINDOW = 20;
-let SCHOOL_MASK_MAGIC = bor(
+const self_pool = new OvalePool<Event>("OvaleDamageTaken_pool");
+const DAMAGE_TAKEN_WINDOW = 20;
+const SCHOOL_MASK_MAGIC = bor(
     SCHOOL_MASK_ARCANE,
     SCHOOL_MASK_FIRE,
     SCHOOL_MASK_FROST,
@@ -73,7 +73,7 @@ export class OvaleDamageTakenClass {
     };
 
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -97,15 +97,15 @@ export class OvaleDamageTakenClass {
             this.profiler.StartProfiling(
                 "OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED"
             );
-            let now = GetTime();
-            let eventPrefix = sub(cleuEvent, 1, 6);
+            const now = GetTime();
+            const eventPrefix = sub(cleuEvent, 1, 6);
             if (eventPrefix == "SWING_") {
-                let amount = arg12;
+                const amount = arg12;
                 this.tracer.Debug("%s caused %d damage.", cleuEvent, amount);
                 this.AddDamageTaken(now, amount);
             } else if (eventPrefix == "RANGE_" || eventPrefix == "SPELL_") {
-                let [spellName, spellSchool, amount] = [arg13, arg14, arg15];
-                let isMagicDamage = band(spellSchool, SCHOOL_MASK_MAGIC) > 0;
+                const [spellName, spellSchool, amount] = [arg13, arg14, arg15];
+                const isMagicDamage = band(spellSchool, SCHOOL_MASK_MAGIC) > 0;
                 if (isMagicDamage) {
                     this.tracer.Debug(
                         "%s (%s) caused %d magic damage.",
@@ -138,7 +138,7 @@ export class OvaleDamageTakenClass {
         isMagicDamage?: boolean
     ) {
         this.profiler.StartProfiling("OvaleDamageTaken_AddDamageTaken");
-        let event = self_pool.Get();
+        const event = self_pool.Get();
         event.timestamp = timestamp;
         event.damage = damage;
         event.magic = isMagicDamage || false;
@@ -149,8 +149,8 @@ export class OvaleDamageTakenClass {
     }
 
     GetRecentDamage(interval: number) {
-        let now = GetTime();
-        let lowerBound = now - interval;
+        const now = GetTime();
+        const lowerBound = now - interval;
         this.RemoveExpiredEvents(now);
         let [total, totalMagic] = [0, 0];
         const iterator = this.damageEvent.FrontToBackIterator();
@@ -169,7 +169,7 @@ export class OvaleDamageTakenClass {
     RemoveExpiredEvents(timestamp: number) {
         this.profiler.StartProfiling("OvaleDamageTaken_RemoveExpiredEvents");
         while (true) {
-            let event = this.damageEvent.Back();
+            const event = this.damageEvent.Back();
             if (!event) {
                 break;
             }

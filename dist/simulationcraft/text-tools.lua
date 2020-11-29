@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/text-tools", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/text-tools", 90000)
 if not __exports then return end
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -11,8 +11,8 @@ local gsub = string.gsub
 local upper = string.upper
 local lower = string.lower
 local match = string.match
-local __Pool = LibStub:GetLibrary("ovale/Pool")
-local OvalePool = __Pool.OvalePool
+local __toolsPool = LibStub:GetLibrary("ovale/tools/Pool")
+local OvalePool = __toolsPool.OvalePool
 __exports.INDENT = {}
 do
     __exports.INDENT[0] = ""
@@ -46,7 +46,7 @@ local function _dumpvar(d, depth)
             return 
         end
         local t = type(d)
-        local str = d ~= nil and tostring(d) or ""
+        local str = (d ~= nil and tostring(d)) or ""
         if t == "table" then
             buffer = buffer .. format(" (%s) {\n", str)
             for k, v in pairs(d) do

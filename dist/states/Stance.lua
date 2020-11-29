@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/states/Stance", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Stance", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Localization = LibStub:GetLibrary("ovale/Localization")
-local L = __Localization.L
+local __uiLocalization = LibStub:GetLibrary("ovale/ui/Localization")
+local L = __uiLocalization.L
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local type = type
@@ -14,10 +14,10 @@ local GetNumShapeshiftForms = GetNumShapeshiftForms
 local GetShapeshiftForm = GetShapeshiftForm
 local GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local GetSpellInfo = GetSpellInfo
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local TestBoolean = __Condition.TestBoolean
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local TestBoolean = __engineCondition.TestBoolean
 local druidCatForm = GetSpellInfo(768)
 local druidTravelForm = GetSpellInfo(783)
 local druidAquaticForm = GetSpellInfo(1066)

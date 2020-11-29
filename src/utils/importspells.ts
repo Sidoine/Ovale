@@ -6,22 +6,23 @@ import { parseDescription } from "./spellstringparser";
 import * as parse from "csv-parse/lib/sync";
 import { SpellShapeshift } from "./types";
 
+type CellValue = string | number | CellValue[];
 interface AllData {
-    spell_data_t?: unknown[][];
-    specialization_spell_entry_t?: unknown[][];
-    spelleffect_data_t?: unknown[][];
-    spellpower_data_t?: unknown[][];
-    talent_data_t?: unknown[][];
-    azerite_power_entry_t?: unknown[][];
-    azerite_essence_entry_t?: unknown[][];
-    dbc_item_data_t?: unknown[][];
-    spelltext_data_t?: unknown[][];
-    runeforge_legendary_entry_t?: unknown[][];
-    conduit_entry_t?: unknown[][];
-    conduit_rank_entry_t?: unknown[][];
-    soulbind_ability_entry_t?: unknown[][];
-    covenant_ability_entry_t?: unknown[][];
-    active_class_spell_t?: unknown[][];
+    spell_data_t?: CellValue[][];
+    specialization_spell_entry_t?: CellValue[][];
+    spelleffect_data_t?: CellValue[][];
+    spellpower_data_t?: CellValue[][];
+    talent_data_t?: CellValue[][];
+    azerite_power_entry_t?: CellValue[][];
+    azerite_essence_entry_t?: CellValue[][];
+    dbc_item_data_t?: CellValue[][];
+    spelltext_data_t?: CellValue[][];
+    runeforge_legendary_entry_t?: CellValue[][];
+    conduit_entry_t?: CellValue[][];
+    conduit_rank_entry_t?: CellValue[][];
+    soulbind_ability_entry_t?: CellValue[][];
+    covenant_ability_entry_t?: CellValue[][];
+    active_class_spell_t?: CellValue[][];
 }
 
 const enum SpellAttribute {
@@ -1086,7 +1087,7 @@ export interface ItemData {
     // id_suffix_group: number;
     // id_scaling_distribution: number;
     id_artifact: number;
-    dbc_stats: {}[];
+    dbc_stats: unknown[];
     dbc_stats_count: number;
     id_curve: number;
 
@@ -1203,15 +1204,15 @@ function readFile(directory: string, fileName: string, output: AllData) {
         { encoding: "utf8" }
     );
 
-    function getColumns($data: string, start: number): [any[], number] {
-        const columns = [];
+    function getColumns($data: string, start: number): [CellValue[], number] {
+        const columns: CellValue[] = [];
         let i = start;
         for (; i < $data.length; i++) {
             i = skipComments($data, i);
             const c = $data[i];
             // const blabla = $data.substr(i, 20);
             if (c === '"') {
-                let start = ++i;
+                const start = ++i;
                 while ($data[i] !== '"' && i < $data.length) {
                     if ($data[i] === "\\") {
                         i++;
@@ -1222,7 +1223,7 @@ function readFile(directory: string, fileName: string, output: AllData) {
                 i++;
                 columns.push(text);
             } else if (c === "&") {
-                let start = i++;
+                const start = i++;
                 while ($data[i] !== "," && $data[i]) {
                     i++;
                 }
@@ -1233,7 +1234,7 @@ function readFile(directory: string, fileName: string, output: AllData) {
                     throw Error("Excepted nullptr");
                 i += nullptr.length;
             } else if ((c >= "0" && c <= "9") || c === "-") {
-                let start = i++;
+                const start = i++;
                 while (
                     ($data[i] >= "0" && $data[i] <= "9") ||
                     ($data[i] >= "a" && $data[i] <= "f") ||
@@ -1246,9 +1247,9 @@ function readFile(directory: string, fileName: string, output: AllData) {
                 const number = $data.substring(start, i);
                 columns.push(parseFloat(number));
             } else if (c === "{") {
-                const innerData = getColumns($data, i + 1);
-                columns.push(<(number | string)[]>innerData[0]);
-                i = innerData[1];
+                const [innerData, newIndex] = getColumns($data, i + 1);
+                columns.push(<(number | string)[]>innerData);
+                i = newIndex;
             } else if (c === "}") {
                 break;
             } else if (c === "h") {
@@ -1301,10 +1302,11 @@ function readFile(directory: string, fileName: string, output: AllData) {
             const name = match[1];
             if (name !== "const" && name !== "util" && name !== "hotfix") {
                 console.log(`add ${name} data`);
+                // eslint-disable-next-line prefer-const
                 let [columns, end] = getColumns(spellDataFile, endLine);
                 const existing = output[name as keyof AllData];
                 if (existing) columns = existing.concat(columns);
-                output[name as keyof AllData] = columns;
+                output[name as keyof AllData] = columns as CellValue[][];
                 index = end;
             } else {
                 index += 6;
@@ -1422,7 +1424,7 @@ export function getSpellData(directory: string) {
     }) as SpellShapeshift[];
     const spellShapeshiftById = toMap(spellShapeshift, (x) => x.id_spell);
 
-    let output: AllData = {};
+    const output: AllData = {};
     readFile(directory, "sc_spell_data", output);
     readFile(directory, "sc_talent_data", output);
     readFile(directory, "item_data", output);

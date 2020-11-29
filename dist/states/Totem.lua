@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Totem", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Totem", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -7,8 +7,8 @@ local pairs = pairs
 local kpairs = pairs
 local GetTotemInfo = GetTotemInfo
 local MAX_TOTEMS = MAX_TOTEMS
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local self_serial = 0
 local TOTEM_CLASS = {
     DRUID = true,

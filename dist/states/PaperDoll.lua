@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/states/PaperDoll", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/PaperDoll", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local tonumber = tonumber
 local ipairs = ipairs
@@ -30,11 +30,11 @@ local UnitStat = UnitStat
 local CR_CRIT_MELEE = CR_CRIT_MELEE
 local CR_HASTE_MELEE = CR_HASTE_MELEE
 local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local ReturnBoolean = __Condition.ReturnBoolean
-local ReturnConstant = __Condition.ReturnConstant
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local ReturnBoolean = __engineCondition.ReturnBoolean
+local ReturnConstant = __engineCondition.ReturnConstant
 local OVALE_SPELLDAMAGE_SCHOOL = {
     DEATHKNIGHT = 4,
     DEMONHUNTER = 3,
@@ -288,7 +288,7 @@ __exports.OvalePaperDollClass = __class(States, {
             self.ovale:needRefresh()
             self.profiler:StopProfiling("OvalePaperDoll_UpdateStats")
         end
-        self.PLAYER_LEVEL_UP = function(event, level, ...)
+        self.PLAYER_LEVEL_UP = function(event, level)
             self.profiler:StartProfiling("OvalePaperDoll_UpdateStats")
             self.level = tonumber(level) or UnitLevel("player")
             self.current.snapshotTime = GetTime()

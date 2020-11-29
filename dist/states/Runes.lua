@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/states/Runes", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Runes", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local wipe = wipe

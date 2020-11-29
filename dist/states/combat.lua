@@ -1,15 +1,15 @@
-local __exports = LibStub:NewLibrary("ovale/states/combat", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/combat", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local GetTime = GetTime
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local TestBoolean = __Condition.TestBoolean
-local TestValue = __Condition.TestValue
-local Compare = __Condition.Compare
-local ReturnConstant = __Condition.ReturnConstant
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local TestBoolean = __engineCondition.TestBoolean
+local TestValue = __engineCondition.TestValue
+local Compare = __engineCondition.Compare
+local ReturnConstant = __engineCondition.ReturnConstant
 local huge = math.huge
 __exports.CombatState = __class(nil, {
     constructor = function(self)

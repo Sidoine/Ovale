@@ -16,10 +16,10 @@ import {
     CustomAuras,
     CustomSpellData,
 } from "./customspell";
-import { SpellInfoProperty } from "../Data";
+import { SpellInfoProperty } from "../engine/Data";
 import { IoC } from "../ioc";
 
-let outputDirectory = "src/scripts";
+const outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
 const profilesDirectory = simcDirectory + "/profiles/Tier25";
 const SIMC_CLASS = [
@@ -38,9 +38,9 @@ const SIMC_CLASS = [
 ];
 
 function Canonicalize(s: string) {
-    let token = "xXxUnDeRsCoReXxX";
+    const token = "xXxUnDeRsCoReXxX";
     s = s.toLowerCase();
-    s = s.replace(/[\s\-\_\(\)\{\}\[\]]/g, token);
+    s = s.replace(/[\s\-_(){}[\]]/g, token);
     s = s.replace(/\./g, "");
     s = s.replace(/xXxUnDeRsCoReXxX/g, "_");
     s = s.replace("_+", "_");
@@ -86,7 +86,7 @@ const limitLine2 = "// ANY CHANGES MADE BELOW THIS POINT WILL BE LOST";
 function truncateFile(fileName: string) {
     const file = readFileSync(fileName, { encoding: "utf8" });
     const lines = file.split("\n");
-    let output: string[] = [];
+    const output: string[] = [];
     for (const line of lines) {
         if (line.indexOf(limitLine1) >= 0) {
             break;
@@ -101,12 +101,12 @@ function truncateFile(fileName: string) {
 
 const modifiedFiles = new Map<string, boolean>();
 
-let files: string[] = [];
+const files: string[] = [];
 const profileFile = process.argv[3];
 if (profileFile) {
     files.push(process.argv[3]);
 } else {
-    let dir = readdirSync(profilesDirectory);
+    const dir = readdirSync(profilesDirectory);
     for (const name of dir) {
         files.push(name);
     }
@@ -249,9 +249,9 @@ for (const [key, value] of customIdentifiers.entries()) {
 
 for (const filename of files) {
     if (!filename.startsWith("generate")) {
-        let output: string[] = [];
-        let inputName = profilesDirectory + "/" + filename;
-        let simc = readFileSync(inputName, { encoding: "utf8" });
+        const output: string[] = [];
+        const inputName = profilesDirectory + "/" + filename;
+        const simc = readFileSync(inputName, { encoding: "utf8" });
         if (simc.indexOf("optimal_raid=") < 0) {
             let source: string | undefined,
                 className: string | undefined,
@@ -266,7 +266,7 @@ for (const filename of files) {
                     }
                     if (!className) {
                         for (const simcClass of SIMC_CLASS) {
-                            let length = simcClass.length;
+                            const length = simcClass.length;
                             if (
                                 line.substring(0, length + 1) ==
                                 simcClass + "="
@@ -302,22 +302,22 @@ for (const filename of files) {
             eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
             registerScripts(ioc.scripts);
 
-            let profile = ioc.simulationCraft.ParseProfile(
+            const profile = ioc.simulationCraft.ParseProfile(
                 simc,
                 Object.assign({}, spellData.identifiers)
             );
             if (!profile) continue;
-            let profileName = profile.annotation.name.substring(
+            const profileName = profile.annotation.name.substring(
                 1,
                 profile.annotation.name.length - 1
             );
-            let name: string, desc: string;
+            let desc: string;
             if (source) {
                 desc = format("%s: %s", source, profileName);
             } else {
                 desc = profileName;
             }
-            name = Canonicalize(desc);
+            const name = Canonicalize(desc);
             output.push("");
             output.push("{");
             output.push(format('	const name = "sc_%s"', name));
@@ -340,22 +340,25 @@ for (const filename of files) {
 
             const outputFileName = "ovale_" + className.toLowerCase() + ".ts";
             console.log("Appending to " + outputFileName + ": " + name);
-            let outputName = outputDirectory + "/" + outputFileName;
+            const outputName = outputDirectory + "/" + outputFileName;
             if (!modifiedFiles.get(outputName)) {
                 modifiedFiles.set(outputName, true);
                 truncateFile(outputName);
             }
             writeFileSync(outputName, output.join("\n"), { flag: "a" });
 
-            let classSpells = getOrSet(spellsByClass, className);
-            let classTalents = getOrSet(talentsByClass, className);
-            let classItems = getOrSet(itemsByClass, className);
-            let azeriteTraits = getOrSet(azeriteTraitByClass, className);
-            let essences = getOrSet(essenceByClass, className);
-            let spellLists = getOrSet(spellListsByClass, className);
-            let runeforges = getOrSet(runeforgeByClass, className);
-            let conduits = getOrSet(conduitByClass, className);
-            let soulbindAbilities = getOrSet(soulbindAbilityByClass, className);
+            const classSpells = getOrSet(spellsByClass, className);
+            const classTalents = getOrSet(talentsByClass, className);
+            const classItems = getOrSet(itemsByClass, className);
+            const azeriteTraits = getOrSet(azeriteTraitByClass, className);
+            const essences = getOrSet(essenceByClass, className);
+            const spellLists = getOrSet(spellListsByClass, className);
+            const runeforges = getOrSet(runeforgeByClass, className);
+            const conduits = getOrSet(conduitByClass, className);
+            const soulbindAbilities = getOrSet(
+                soulbindAbilityByClass,
+                className
+            );
             const custom = getOrSet(customByClass, className);
 
             const identifiers = ipairs(profile.annotation.symbolList)
@@ -399,11 +402,11 @@ for (const filename of files) {
 }
 
 function getTooltip(spell: CustomSpellData | SpellData) {
-    return spell.tooltip && spell.tooltip.replace(/[\$\\{}%]/g, "");
+    return spell.tooltip && spell.tooltip.replace(/[$\\{}%]/g, "");
 }
 
 function getDesc(spell: CustomSpellData | SpellData) {
-    return spell.desc && spell.desc.replace(/[\$\\{}%]/g, "");
+    return spell.desc && spell.desc.replace(/[$\\{}%]/g, "");
 }
 
 function getBuffDefinition(
@@ -474,7 +477,7 @@ function getDefinition(
             parameter = spellData.talentsById.get(require.talentId)?.identifier;
             talentIds.push(require.talentId);
         } else if (require.specializationName) {
-            parameter = require.specializationName!.join(" ");
+            parameter = require.specializationName.join(" ");
         }
         output += `  SpellRequire(${customSpellData.identifier} ${
             require.property
@@ -502,6 +505,10 @@ function getDefinition(
 
 for (const file of modifiedFiles.keys()) {
     writeFileSync(file, "\n}", { encoding: "utf8", flag: "a" });
+}
+
+function isDefined<T>(t: T | undefined): t is T {
+    return t !== undefined;
 }
 
 for (const [className, spellIds] of spellsByClass) {
@@ -578,8 +585,8 @@ ${limitLine2}
 
     const talents = talentIds
         .map((x) => spellData.talentsById.get(x))
-        .filter((x) => x !== undefined)
-        .sort((x, y) => (x!.name > y!.name ? 1 : -1));
+        .filter(isDefined)
+        .sort((x, y) => (x.name > y.name ? 1 : -1));
     for (let i = 0; i < talents.length; i++) {
         const talent = talents[i];
         if (!talent) continue;
@@ -590,11 +597,11 @@ ${limitLine2}
         }
     }
 
-    function writeIds<T, U extends { identifier: string }>(
+    const writeIds = <T, U extends { identifier: string }>(
         idInSimc: Map<string, T[]>,
         repository: Map<T, U>,
         idProperty: keyof U
-    ) {
+    ) => {
         const ids = idInSimc.get(className);
         if (ids) {
             for (const id of ids) {
@@ -603,7 +610,7 @@ ${limitLine2}
                 output += `Define(${item.identifier} ${item[idProperty]})\n`;
             }
         }
-    }
+    };
 
     writeIds(customByClass, customIdentifierById, "id");
     writeIds(itemsByClass, spellData.itemsById, "id");

@@ -3,9 +3,9 @@ import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, LuaObj } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
 
-let CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
+const CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
     SPELL_DAMAGE: true,
     SPELL_PERIODIC_AURA: true,
 };
@@ -37,7 +37,7 @@ export class OvaleSpellDamageClass {
     };
 
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -59,7 +59,7 @@ export class OvaleSpellDamageClass {
                 "OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED"
             );
             if (CLEU_DAMAGE_EVENT[cleuEvent]) {
-                let [spellId, amount] = [arg12, arg15];
+                const [spellId, amount] = [arg12, arg15];
                 this.value[spellId] = amount;
                 this.ovale.needRefresh();
             }

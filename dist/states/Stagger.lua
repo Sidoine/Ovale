@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Stagger", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Stagger", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -7,12 +7,12 @@ local UnitStagger = UnitStagger
 local pairs = pairs
 local insert = table.insert
 local remove = table.remove
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local Compare = __Condition.Compare
-local ParseCondition = __Condition.ParseCondition
-local ReturnValueBetween = __Condition.ReturnValueBetween
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local Compare = __engineCondition.Compare
+local ParseCondition = __engineCondition.ParseCondition
+local ReturnValueBetween = __engineCondition.ReturnValueBetween
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
 local LIGHT_STAGGER = 124275
 local MODERATE_STAGGER = 124274
 local HEAVY_STAGGER = 124273

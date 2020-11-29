@@ -11,8 +11,8 @@ import { sort, insert, concat } from "@wowts/table";
 import { C_AzeriteEssence } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../Debug";
-import { OptionUiAll } from "../acegui-helpers";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OptionUiAll } from "../ui/acegui-helpers";
 
 interface Essence {
     name?: string;
@@ -87,15 +87,15 @@ export class OvaleAzeriteEssenceClass {
                 mileStoneInfo.unlocked &&
                 mileStoneInfo.slot !== undefined
             ) {
-                let essenceId = C_AzeriteEssence.GetMilestoneEssence(
+                const essenceId = C_AzeriteEssence.GetMilestoneEssence(
                     mileStoneInfo.ID
                 );
                 if (essenceId) {
-                    let essenceInfo = C_AzeriteEssence.GetEssenceInfo(
+                    const essenceInfo = C_AzeriteEssence.GetEssenceInfo(
                         essenceId
                     );
 
-                    let essenceData = {
+                    const essenceData = {
                         ID: essenceId,
                         name: essenceInfo.name,
                         rank: essenceInfo.rank,
@@ -115,7 +115,7 @@ export class OvaleAzeriteEssenceClass {
     };
 
     IsMajorEssence(essenceId: number) {
-        let essence = this.essences[essenceId];
+        const essence = this.essences[essenceId];
         if (essence) {
             return (essence.slot == 0 && true) || false;
         }
@@ -127,13 +127,13 @@ export class OvaleAzeriteEssenceClass {
     }
 
     EssenceRank(essenceId: number) {
-        let essence = this.essences[essenceId];
+        const essence = this.essences[essenceId];
         return (essence !== undefined && essence.rank) || 0;
     }
 
     DebugEssences() {
-        let output: LuaArray<string> = {};
-        let array: LuaArray<string> = {};
+        const output: LuaArray<string> = {};
+        const array: LuaArray<string> = {};
         for (const [k, v] of pairs(this.essences)) {
             insert(
                 array,

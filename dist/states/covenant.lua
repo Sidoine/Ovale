@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/states/covenant", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/covenant", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local C_Covenants = C_Covenants
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local ReturnBoolean = __Condition.ReturnBoolean
+local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
+local ReturnBoolean = __engineCondition.ReturnBoolean
 local ipairs = ipairs
 local unpack = unpack
 local concat = table.concat

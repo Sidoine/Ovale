@@ -1,4 +1,4 @@
-import { L } from "../Localization";
+import { L } from "../ui/Localization";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
@@ -9,14 +9,14 @@ import {
     GetSpellInfo,
 } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { States, StateModule } from "../State";
-import { OvaleDebugClass } from "../Debug";
+import { States, StateModule } from "../engine/State";
+import { OvaleDebugClass } from "../engine/Debug";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleProfilerClass, Profiler } from "../Profiler";
-import { OvaleDataClass } from "../Data";
-import { OptionUiAll } from "../acegui-helpers";
-import { OvaleConditionClass, TestBoolean } from "../Condition";
+import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
+import { OvaleDataClass } from "../engine/Data";
+import { OptionUiAll } from "../ui/acegui-helpers";
+import { OvaleConditionClass, TestBoolean } from "../engine/Condition";
 
 const [druidCatForm] = GetSpellInfo(768);
 const [druidTravelForm] = GetSpellInfo(783);
@@ -37,7 +37,7 @@ type Stance =
     | "druid_swift_flight_form"
     | "rogue_stealth";
 
-let SPELL_NAME_TO_STANCE: LuaObj<Stance> = {};
+const SPELL_NAME_TO_STANCE: LuaObj<Stance> = {};
 
 if (druidCatForm) SPELL_NAME_TO_STANCE[druidCatForm] = "druid_cat_form";
 if (druidTravelForm)
@@ -64,10 +64,10 @@ export const STANCE_NAME: { [key in Stance]: boolean } = {
     rogue_stealth: true,
 };
 
-let array = {};
+const array = {};
 
 class StanceData {
-    stance: number = 0;
+    stance = 0;
 }
 
 export class OvaleStanceClass
@@ -93,7 +93,7 @@ export class OvaleStanceClass
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
-        let debugOptions: LuaObj<OptionUiAll> = {
+        const debugOptions: LuaObj<OptionUiAll> = {
             stance: {
                 name: L["Stances"],
                 type: "group",
@@ -135,8 +135,8 @@ export class OvaleStanceClass
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [stance, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean = this.IsStance(stance, atTime);
+        const [stance, yesno] = [positionalParams[1], positionalParams[2]];
+        const boolean = this.IsStance(stance, atTime);
         return TestBoolean(boolean, yesno);
     };
 
@@ -216,13 +216,13 @@ export class OvaleStanceClass
         return false;
     }
     IsStanceSpell(spellId: number) {
-        let [name] = GetSpellInfo(spellId);
+        const [name] = GetSpellInfo(spellId);
         return !!(name && SPELL_NAME_TO_STANCE[name]);
     }
     ShapeshiftEventHandler() {
         this.profiler.StartProfiling("OvaleStance_ShapeshiftEventHandler");
-        let oldStance = this.current.stance;
-        let newStance = GetShapeshiftForm();
+        const oldStance = this.current.stance;
+        const newStance = GetShapeshiftForm();
         if (oldStance != newStance) {
             this.current.stance = newStance;
             this.ovale.needRefresh();

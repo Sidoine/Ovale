@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/states/Cooldown", 80300)
+local __exports = LibStub:NewLibrary("ovale/states/Cooldown", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -8,8 +8,8 @@ local kpairs = pairs
 local GetSpellCooldown = GetSpellCooldown
 local GetTime = GetTime
 local GetSpellCharges = GetSpellCharges
-local __State = LibStub:GetLibrary("ovale/State")
-local States = __State.States
+local __engineState = LibStub:GetLibrary("ovale/engine/State")
+local States = __engineState.States
 local GLOBAL_COOLDOWN = 61304
 local COOLDOWN_THRESHOLD = 0.1
 local BASE_GCD = {

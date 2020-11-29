@@ -1,8 +1,8 @@
-local __exports = LibStub:NewLibrary("ovale/Ovale", 80300)
+local __exports = LibStub:NewLibrary("ovale/Ovale", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Localization = LibStub:GetLibrary("ovale/Localization")
-local L = __Localization.L
+local __uiLocalization = LibStub:GetLibrary("ovale/ui/Localization")
+local L = __uiLocalization.L
 local __tsaddon = LibStub:GetLibrary("tsaddon", true)
 local NewAddon = __tsaddon.NewAddon
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -12,8 +12,8 @@ local _G = _G
 local UnitClass = UnitClass
 local UnitGUID = UnitGUID
 local huge = math.huge
-local __tools = LibStub:GetLibrary("ovale/tools")
-local ClearOneTimeMessages = __tools.ClearOneTimeMessages
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local ClearOneTimeMessages = __toolstools.ClearOneTimeMessages
 local MAX_REFRESH_INTERVALS = 500
 local self_refreshIntervals = {}
 local self_refreshIndex = 1

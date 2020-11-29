@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/emiter", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
@@ -13,8 +13,8 @@ local tonumber = tonumber
 local kpairs = pairs
 local ipairs = ipairs
 local tostring = tostring
-local __AST = LibStub:GetLibrary("ovale/AST")
-local isAstNodeWithChildren = __AST.isAstNodeWithChildren
+local __engineAST = LibStub:GetLibrary("ovale/engine/AST")
+local isAstNodeWithChildren = __engineAST.isAstNodeWithChildren
 local format = string.format
 local gmatch = string.gmatch
 local find = string.find
@@ -31,9 +31,9 @@ local CamelCase = __texttools.CamelCase
 local OvaleFunctionName = __texttools.OvaleFunctionName
 local __statesPower = LibStub:GetLibrary("ovale/states/Power")
 local POOLED_RESOURCE = __statesPower.POOLED_RESOURCE
-local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
-local MakeString = __tools.MakeString
+local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
+local isNumber = __toolstools.isNumber
+local MakeString = __toolstools.MakeString
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local function IsTotem(name)
     if sub(name, 1, 13) == "efflorescence" then
@@ -346,12 +346,7 @@ __exports.Emiter = __class(nil, {
             local action, type = self:Disambiguate(annotation, canonicalizedName, className, specialization, "spell")
             local bodyNode
             local conditionNode
-            if action == "auto_attack" and  not annotation.melee then
-            elseif action == "auto_shot" then
-            elseif action == "choose_target" then
-            elseif action == "augmentation" or action == "flask" or action == "food" then
-            elseif action == "snapshot_stats" then
-            else
+            if  not ((action == "auto_attack" and  not annotation.melee) or action == "auto_shot" or action == "choose_target" or action == "augmentation" or action == "flask" or action == "food" or action == "snapshot_stats") then
                 local bodyCode, conditionCode
                 local expressionType = "expression"
                 local modifiers = parseNode.modifiers
@@ -427,7 +422,7 @@ __exports.Emiter = __class(nil, {
                 elseif className == "MONK" and action == "nimble_brew" then
                     conditionCode = "IsFeared() or IsRooted() or IsStunned()"
                 elseif className == "MONK" and action == "storm_earth_and_fire" then
-                    conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
+                    conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire)"
                     annotation[action] = className
                 elseif className == "MONK" and action == "touch_of_death" then
                 elseif className == "MONK" and action == "whirling_dragon_punch" then
@@ -646,8 +641,7 @@ __exports.Emiter = __class(nil, {
                 elseif action == "wait" then
                     if modifiers.sec then
                         local seconds = tonumber(self.unparser:Unparse(modifiers.sec))
-                        if seconds then
-                        else
+                        if  not seconds then
                             bodyNode = self.ovaleAst:newNodeWithChildren("simc_wait", annotation.astAnnotation)
                             local expressionNode = self:Emit(modifiers.sec, nodeList, annotation, action)
                             if expressionNode then
@@ -775,7 +769,6 @@ __exports.Emiter = __class(nil, {
                                 end
                             end
                             poolResourceNode = nil
-                        elseif statementNode.type == "simc_wait" then
                         elseif (statementNode.type == "if" or statementNode.type == "unless") and statementNode.simc_wait then
                             local restNode = self.ovaleAst:newNodeWithChildren("unless", annotation.astAnnotation)
                             child[#child + 1] = restNode
@@ -783,7 +776,7 @@ __exports.Emiter = __class(nil, {
                             restNode.child[1] = statementNode.child[1]
                             restNode.child[2] = self.ovaleAst:newNodeWithChildren("group", annotation.astAnnotation)
                             child = restNode.child[2].child
-                        else
+                        elseif statementNode.type ~= "simc_wait" then
                             child[#child + 1] = statementNode
                             if (statementNode.type == "if" or statementNode.type == "unless") and statementNode.simc_pool_resource then
                                 if statementNode.type == "if" then

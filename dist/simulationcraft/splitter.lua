@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/simulationcraft/splitter", 80300)
+local __exports = LibStub:NewLibrary("ovale/simulationcraft/splitter", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local ipairs = ipairs

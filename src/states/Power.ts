@@ -1,4 +1,4 @@
-import { L } from "../Localization";
+import { L } from "../ui/Localization";
 import { SpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
@@ -16,28 +16,28 @@ import {
     MAX_COMBO_POINTS,
     ClassId,
 } from "@wowts/wow-mock";
-import { isNumber, OneTimeMessage } from "../tools";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { isNumber, OneTimeMessage } from "../tools/tools";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 import { OvaleFutureClass } from "./Future";
-import { BaseState } from "../BaseState";
+import { BaseState } from "./BaseState";
 import {
     OvaleDataClass,
     SpellInfo,
     SpellInfoNumberProperty,
     SpellInfoProperty,
-} from "../Data";
+} from "../engine/Data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { States, StateModule } from "../State";
-import { OvaleProfilerClass, Profiler } from "../Profiler";
+import { States, StateModule } from "../engine/State";
+import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
 import { OvalePaperDollClass } from "./PaperDoll";
-import { OvaleSpellBookClass } from "../SpellBook";
+import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleCombatClass } from "./combat";
-import { OptionUiAll } from "../acegui-helpers";
+import { OptionUiAll } from "../ui/acegui-helpers";
 
-let strlower = lower;
+const strlower = lower;
 
-let self_SpellcastInfoPowerTypes: LuaArray<PowerType> = {
+const self_SpellcastInfoPowerTypes: LuaArray<PowerType> = {
     1: "chi",
     2: "holypower",
 };
@@ -128,7 +128,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
         this.profiler = ovaleProfiler.create(this.module.GetName());
-        let debugOptions: LuaObj<OptionUiAll> = {
+        const debugOptions: LuaObj<OptionUiAll> = {
             power: {
                 name: L["Power"],
                 type: "group",
@@ -169,7 +169,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     };
 
     initializePower() {
-        let possiblePowerTypes: {
+        const possiblePowerTypes: {
             [k in ClassId]: { [k in PowerType]?: string };
         } = {
             DEATHKNIGHT: {
@@ -224,8 +224,8 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         };
 
         for (const [powerType, powerId] of pairs(Enum.PowerType)) {
-            let powerTypeLower = <PowerType>strlower(powerType);
-            let powerToken =
+            const powerTypeLower = <PowerType>strlower(powerType);
+            const powerToken =
                 this.ovale.playerClass != undefined &&
                 possiblePowerTypes[this.ovale.playerClass][powerTypeLower];
             if (powerToken) {
@@ -281,7 +281,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         powerToken: string
     ) => {
         if (unitId == "player") {
-            let powerType = this.POWER_TYPE[powerToken];
+            const powerType = this.POWER_TYPE[powerToken];
             if (powerType) {
                 this.UpdateMaxPower(event, powerType);
             }
@@ -294,7 +294,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         powerToken: string
     ) => {
         if (unitId == "player") {
-            let powerType = this.POWER_TYPE[powerToken];
+            const powerType = this.POWER_TYPE[powerToken];
             if (powerType) {
                 this.UpdatePower(event, powerType);
             }
@@ -310,9 +310,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     private UpdateMaxPower(event: string, powerType?: PowerType) {
         this.profiler.StartProfiling("OvalePower_UpdateMaxPower");
         if (powerType) {
-            let powerInfo = this.POWER_INFO[powerType];
+            const powerInfo = this.POWER_INFO[powerType];
             if (powerInfo) {
-                let maxPower = UnitPowerMax(
+                const maxPower = UnitPowerMax(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
@@ -324,7 +324,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             }
         } else {
             for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
-                let maxPower = UnitPowerMax(
+                const maxPower = UnitPowerMax(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
@@ -340,9 +340,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     private UpdatePower(event: string, powerType?: PowerType) {
         this.profiler.StartProfiling("OvalePower_UpdatePower");
         if (powerType) {
-            let powerInfo = this.POWER_INFO[powerType];
+            const powerInfo = this.POWER_INFO[powerType];
             if (powerInfo) {
-                let power = UnitPower(
+                const power = UnitPower(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
@@ -360,7 +360,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             }
         } else {
             for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
-                let power = UnitPower(
+                const power = UnitPower(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
@@ -385,16 +385,16 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     private UpdatePowerRegen(event: string) {
         this.profiler.StartProfiling("OvalePower_UpdatePowerRegen");
         for (const [powerType] of pairs(this.POWER_INFO)) {
-            let currentType = this.current.powerType;
+            const currentType = this.current.powerType;
             if (powerType == currentType) {
-                let [inactiveRegen, activeRegen] = GetPowerRegen();
+                const [inactiveRegen, activeRegen] = GetPowerRegen();
                 [
                     this.current.inactiveRegen[powerType],
                     this.current.activeRegen[powerType],
                 ] = [inactiveRegen, activeRegen];
                 this.ovale.needRefresh();
             } else if (powerType == "mana") {
-                let [inactiveRegen, activeRegen] = GetManaRegen();
+                const [inactiveRegen, activeRegen] = GetManaRegen();
                 [
                     this.current.inactiveRegen[powerType],
                     this.current.activeRegen[powerType],
@@ -416,8 +416,8 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     }
     private UpdatePowerType(event: string) {
         this.profiler.StartProfiling("OvalePower_UpdatePowerType");
-        let [powerId] = UnitPowerType("player");
-        let powerType = this.POWER_TYPE[powerId];
+        const [powerId] = UnitPowerType("player");
+        const powerType = this.POWER_TYPE[powerId];
         if (this.current.powerType != powerType) {
             this.current.powerType = powerType;
             this.ovale.needRefresh();
@@ -431,10 +431,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         const spellId = this.ovaleSpellBook.getKnownSpellId(spell);
         if (spellId) {
             const spellPowerCosts = GetSpellPowerCost(spellId);
-            let spellPowerCost = spellPowerCosts && spellPowerCosts[1];
+            const spellPowerCost = spellPowerCosts && spellPowerCosts[1];
             if (spellPowerCost) {
-                let cost = spellPowerCost.cost;
-                let typeId = spellPowerCost.type;
+                const cost = spellPowerCost.cost;
+                const typeId = spellPowerCost.type;
                 for (const [pt, p] of pairs(this.POWER_INFO)) {
                     if (
                         p.id == typeId &&
@@ -451,7 +451,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     }
 
     DebugPower() {
-        let array = {};
+        const array = {};
         insert(array, `Current Power Type: ${this.current.powerType}`);
         for (const [powerType, v] of pairs(this.current.power)) {
             insert(array, `\nPower Type: ${powerType}`);
@@ -555,9 +555,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         spellcast: SpellCast
     ) {
         this.profiler.StartProfiling("OvalePower_state_ApplyPowerCost");
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         {
-            let [cost, powerType] = this.GetSpellCost(spellId);
+            const [cost, powerType] = this.GetSpellCost(spellId);
             if (
                 cost &&
                 powerType &&
@@ -570,7 +570,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         if (si) {
             for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
-                let [cost, refund] = this.getPowerCostAt(
+                const [cost, refund] = this.getPowerCostAt(
                     this.next,
                     spellId,
                     powerInfo.type,
@@ -584,17 +584,17 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 if (refund) {
                     power = power + refund;
                 }
-                let seconds = this.ovaleFuture.next.nextCast - atTime;
+                const seconds = this.ovaleFuture.next.nextCast - atTime;
                 if (seconds > 0) {
-                    let powerRate =
+                    const powerRate =
                         this.getPowerRateAt(this.next, powerType, atTime) || 0;
                     power = power + powerRate * seconds;
                 }
-                let mini = powerInfo.mini || 0;
+                const mini = powerInfo.mini || 0;
                 if (mini && power < mini) {
                     power = mini;
                 }
-                let maxi = this.current.maxPower[powerType];
+                const maxi = this.current.maxPower[powerType];
                 if (maxi && power > maxi) {
                     power = maxi;
                 }
@@ -644,10 +644,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
     ): number {
         let power = state.power[powerType] || 0;
         if (atTime) {
-            let now = this.baseState.next.currentTime;
-            let seconds = atTime - now;
+            const now = this.baseState.next.currentTime;
+            const seconds = atTime - now;
             if (seconds > 0) {
-                let powerRate =
+                const powerRate =
                     this.getPowerRateAt(state, powerType, atTime) || 0;
                 power = power + powerRate * seconds;
             }
@@ -693,7 +693,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.profiler.StartProfiling("OvalePower_PowerCost");
         let spellCost = 0;
         let spellRefund = 0;
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         if (si && si[powerType]) {
             let [cost, ratio] = this.ovaleData.GetSpellInfoPropertyNumber(
                 spellId,
@@ -747,10 +747,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 //     }
                 // }
 
-                let maxCostParam = `max_${powerType}`;
-                let maxCost = si[maxCostParam as SpellInfoNumberProperty];
+                const maxCostParam = `max_${powerType}`;
+                const maxCost = si[maxCostParam as SpellInfoNumberProperty];
                 if (maxCost) {
-                    let power = this.getPowerAt(state, powerType, atTime);
+                    const power = this.getPowerAt(state, powerType, atTime);
                     if (power > maxCost || maximumCost) {
                         cost = maxCost;
                     } else if (power > cost) {
@@ -775,7 +775,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            let [cost] = this.GetSpellCost(spellId, powerType);
+            const [cost] = this.GetSpellCost(spellId, powerType);
             if (cost) {
                 spellCost = cost;
             }
@@ -811,12 +811,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 targetGUID
             );
             if (cost > 0) {
-                let power = this.getPowerAt(state, powerType, atTime);
+                const power = this.getPowerAt(state, powerType, atTime);
                 if (extraPower) {
                     cost = cost + extraPower;
                 }
                 if (power < cost) {
-                    let powerRate =
+                    const powerRate =
                         this.getPowerRateAt(state, powerType, atTime) || 0;
                     if (powerRate > 0) {
                         seconds = (cost - power) / powerRate;

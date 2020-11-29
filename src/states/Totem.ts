@@ -2,18 +2,18 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { OvaleStateClass, StateModule, States } from "../State";
+import { OvaleStateClass, StateModule, States } from "../engine/State";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { OvaleDataClass } from "../Data";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { OvaleDataClass } from "../engine/Data";
 import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
-import { OvaleSpellBookClass } from "../SpellBook";
-import { OvaleDebugClass, Tracer } from "../Debug";
+import { OvaleSpellBookClass } from "./SpellBook";
+import { OvaleDebugClass, Tracer } from "../engine/Debug";
 
 let self_serial = 0;
-let TOTEM_CLASS: LuaObj<boolean> = {
+const TOTEM_CLASS: LuaObj<boolean> = {
     DRUID: true,
     MAGE: true,
     MONK: true,
@@ -130,7 +130,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 spellId,
                 endCast
             );
-            let si = this.ovaleData.spellInfo[spellId];
+            const si = this.ovaleData.spellInfo[spellId];
             if (si && si.totem) {
                 this.SummonTotem(spellId, endCast);
             }
@@ -155,9 +155,9 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
 
     GetTotem(slot: number) {
         this.profiler.StartProfiling("OvaleTotem_state_GetTotem");
-        let totem = this.next.totems[slot];
+        const totem = this.next.totems[slot];
         if (totem && (!totem.serial || totem.serial < self_serial)) {
-            let [haveTotem, name, startTime, duration, icon] = GetTotemInfo(
+            const [haveTotem, name, startTime, duration, icon] = GetTotemInfo(
                 slot
             );
             if (haveTotem) {
@@ -181,14 +181,14 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     GetTotemInfo(spellId: number, atTime: number) {
         let start, ending;
         let count = 0;
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
             this.debug.Log("Spell %s is a totem spell", spellId);
             // it can take a while for the buffs to appear
             // so if the previous GCD spell is our totem, we assume the buffs are up
             let buffPresent = this.ovaleFuture.next.lastGCDSpellId == spellId;
             if (!buffPresent && si.buff_totem) {
-                let aura = this.ovaleAura.GetAura(
+                const aura = this.ovaleAura.GetAura(
                     "player",
                     si.buff_totem,
                     atTime,
@@ -199,10 +199,10 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                     false;
             }
             if (!si.buff_totem || buffPresent) {
-                let texture = this.ovaleSpellBook.GetSpellTexture(spellId);
-                let maxTotems = si.max_totems || MAX_TOTEMS + 1;
+                const texture = this.ovaleSpellBook.GetSpellTexture(spellId);
+                const maxTotems = si.max_totems || MAX_TOTEMS + 1;
                 for (const [slot] of ipairs(this.next.totems)) {
-                    let totem = this.GetTotem(slot);
+                    const totem = this.GetTotem(slot);
                     if (
                         this.IsActiveTotem(totem, atTime) &&
                         totem.icon == texture
@@ -229,16 +229,16 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     SummonTotem(spellId: number, atTime: number) {
         this.profiler.StartProfiling("OvaleTotem_state_SummonTotem");
 
-        let totemSlot = this.GetAvailableTotemSlot(spellId, atTime);
+        const totemSlot = this.GetAvailableTotemSlot(spellId, atTime);
         if (totemSlot) {
-            let [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
-            let duration = this.ovaleData.GetSpellInfoProperty(
+            const [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
+            const duration = this.ovaleData.GetSpellInfoProperty(
                 spellId,
                 atTime,
                 "duration",
                 undefined
             );
-            let totem = this.next.totems[totemSlot];
+            const totem = this.next.totems[totemSlot];
             totem.name = name;
             totem.start = atTime;
             totem.duration = duration || 15;
@@ -254,12 +254,12 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         );
         let availableSlot = undefined;
 
-        let si = this.ovaleData.spellInfo[spellId];
+        const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
-            let [, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
+            const [, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
 
             for (let i = 1; i <= MAX_TOTEMS + 1; i += 1) {
-                let totem = this.next.totems[i];
+                const totem = this.next.totems[i];
                 if (
                     availableSlot == undefined &&
                     (!this.IsActiveTotem(totem, atTime) ||
@@ -272,11 +272,11 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             // all slots are occupied, take the one with the smallest duration left
             if (availableSlot == undefined) {
                 availableSlot = 1;
-                let firstTotem = this.next.totems[1];
-                let smallestEndTime = firstTotem.start + firstTotem.duration;
+                const firstTotem = this.next.totems[1];
+                const smallestEndTime = firstTotem.start + firstTotem.duration;
                 for (let i = 2; i <= MAX_TOTEMS + 1; i += 1) {
-                    let totem = this.next.totems[i];
-                    let endTime = totem.start + totem.duration;
+                    const totem = this.next.totems[i];
+                    const endTime = totem.start + totem.duration;
 
                     if (endTime < smallestEndTime) {
                         availableSlot = i;

@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../GUID";
+import { OvaleGUIDClass } from "../engine/GUID";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { wipe, LuaObj } from "@wowts/lua";
 import {
@@ -11,13 +11,13 @@ import {
 import { huge } from "@wowts/math";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleOptionsClass } from "../Options";
-import { Profiler, OvaleProfilerClass } from "../Profiler";
-import { Tracer, OvaleDebugClass } from "../Debug";
-import { OneTimeMessage } from "../tools";
+import { OvaleOptionsClass } from "../ui/Options";
+import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { OneTimeMessage } from "../tools/tools";
 
-let INFINITY = huge;
-let CLEU_DAMAGE_EVENT = {
+const INFINITY = huge;
+const CLEU_DAMAGE_EVENT = {
     DAMAGE_SHIELD: true,
     DAMAGE_SPLIT: true,
     RANGE_DAMAGE: true,
@@ -27,7 +27,7 @@ let CLEU_DAMAGE_EVENT = {
     SWING_DAMAGE: true,
     ENVIRONMENTAL_DAMAGE: true,
 };
-let CLEU_HEAL_EVENT = {
+const CLEU_HEAL_EVENT = {
     SPELL_HEAL: true,
     SPELL_PERIODIC_HEAL: true,
 };
@@ -101,7 +101,7 @@ export class OvaleHealthClass {
         this.module.UnregisterMessage("Ovale_UnitChanged");
     };
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             timestamp,
             cleuEvent,
             ,
@@ -130,13 +130,13 @@ export class OvaleHealthClass {
                 amount = arg15;
             }
             this.tracer.Debug(cleuEvent, destGUID, amount);
-            let total = this.totalDamage[destGUID] || 0;
+            const total = this.totalDamage[destGUID] || 0;
             this.totalDamage[destGUID] = total + amount;
             healthUpdate = true;
         } else if (CLEU_HEAL_EVENT[<keyof typeof CLEU_HEAL_EVENT>cleuEvent]) {
-            let amount = arg15;
+            const amount = arg15;
             this.tracer.Debug(cleuEvent, destGUID, amount);
-            let total = this.totalHealing[destGUID] || 0;
+            const total = this.totalHealing[destGUID] || 0;
             this.totalHealing[destGUID] = total + amount;
             healthUpdate = true;
         }
@@ -199,9 +199,9 @@ export class OvaleHealthClass {
             return;
         }
 
-        let amount = func(unitId);
+        const amount = func(unitId);
         if (amount >= 0) {
-            let guid = this.ovaleGuid.UnitGUID(unitId);
+            const guid = this.ovaleGuid.UnitGUID(unitId);
             this.tracer.Debug(event, unitId, guid, amount);
             if (guid) {
                 db[guid] = amount;
@@ -233,9 +233,9 @@ export class OvaleHealthClass {
             return;
         }
 
-        let amount = func(unitId);
+        const amount = func(unitId);
         if (amount) {
-            let guid = this.ovaleGuid.UnitGUID(unitId);
+            const guid = this.ovaleGuid.UnitGUID(unitId);
             this.tracer.Debug(event, unitId, guid, amount);
             if (guid) {
                 if (amount > 0) {
@@ -309,19 +309,19 @@ export class OvaleHealthClass {
                     this.UnitAbsorb(unitId, guid) -
                     this.UnitHealAbsorb(unitId, guid);
             }
-            let maxHealth = this.UnitHealthMax(unitId, guid);
+            const maxHealth = this.UnitHealthMax(unitId, guid);
             if (health && maxHealth > 0) {
                 if (health == 0) {
                     timeToDie = 0;
                     delete this.firstSeen[guid];
                     delete this.lastUpdated[guid];
                 } else if (maxHealth > 5) {
-                    let [firstSeen, lastUpdated] = [
+                    const [firstSeen, lastUpdated] = [
                         this.firstSeen[guid],
                         this.lastUpdated[guid],
                     ];
-                    let damage = this.totalDamage[guid] || 0;
-                    let healing = this.totalHealing[guid] || 0;
+                    const damage = this.totalDamage[guid] || 0;
+                    const healing = this.totalHealing[guid] || 0;
                     if (
                         firstSeen &&
                         lastUpdated &&

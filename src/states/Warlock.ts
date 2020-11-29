@@ -5,11 +5,11 @@ import { find } from "@wowts/string";
 import { pow } from "@wowts/math";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { StateModule } from "../State";
+import { StateModule } from "../engine/State";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
-import { OvaleSpellBookClass } from "../SpellBook";
-import { Compare, OvaleConditionClass } from "../Condition";
+import { OvaleSpellBookClass } from "./SpellBook";
+import { Compare, OvaleConditionClass } from "../engine/Condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 
@@ -20,7 +20,7 @@ interface customAura {
     auraName: string;
 }
 
-let CUSTOM_AURAS: LuaArray<customAura> = {
+const CUSTOM_AURAS: LuaArray<customAura> = {
     [80240]: {
         customId: -80240,
         duration: 10,
@@ -48,7 +48,7 @@ const enum Spells {
 
 const INNER_DEMONS_TALENT = 17;
 
-let demonData: LuaArray<{ duration: number }> = {
+const demonData: LuaArray<{ duration: number }> = {
     [DemonId.WildImp]: {
         duration: 15,
     },
@@ -133,7 +133,7 @@ export class OvaleWarlockClass implements StateModule {
     };
 
     private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        let [
+        const [
             ,
             cleuEvent,
             ,
@@ -158,7 +158,7 @@ export class OvaleWarlockClass implements StateModule {
             );
             creatureId = tonumber(creatureId);
 
-            let now = GetTime();
+            const now = GetTime();
             for (const [id, v] of pairs(demonData)) {
                 if (id === creatureId) {
                     this.demonsCount[destGUID] = {
@@ -210,12 +210,12 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [ms, comparator, limit] = [
+        const [ms, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
-        let delay = (ms || 0) / 1000;
+        const delay = (ms || 0) / 1000;
         let impsSpawned = 0;
         // check for hand of guldan
         if (this.future.next.currentCast.spellId == Spells.HandOfGuldan) {
@@ -227,10 +227,10 @@ export class OvaleWarlockClass implements StateModule {
         }
 
         // inner demons talent
-        let talented =
+        const talented =
             this.ovaleSpellBook.GetTalentPoints(INNER_DEMONS_TALENT) > 0;
         if (talented) {
-            let value = this.getRemainingDemonDuration(
+            const value = this.getRemainingDemonDuration(
                 DemonId.InnerDemonsWildImp,
                 atTime + delay
             );
@@ -246,7 +246,7 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [creatureId, comparator, limit] = [
+        const [creatureId, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
@@ -265,12 +265,12 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [creatureId, comparator, limit] = [
+        const [creatureId, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
-        let value = this.getRemainingDemonDuration(creatureId, atTime);
+        const value = this.getRemainingDemonDuration(creatureId, atTime);
         return Compare(value, comparator, limit);
     };
 
@@ -278,7 +278,7 @@ export class OvaleWarlockClass implements StateModule {
         let max = 0;
         for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
-                let remaining = d.finish - atTime;
+                const remaining = d.finish - atTime;
                 if (remaining > max) {
                     max = remaining;
                 }
@@ -293,8 +293,8 @@ export class OvaleWarlockClass implements StateModule {
         duration: number,
         buffName: string
     ) {
-        let now = GetTime();
-        let expire = now + duration;
+        const now = GetTime();
+        const expire = now + duration;
         this.ovaleAura.GainedAuraOnGUID(
             this.ovale.playerGUID,
             now,
@@ -321,14 +321,14 @@ export class OvaleWarlockClass implements StateModule {
      */
     private getTimeToShard(now: number) {
         let value = 3600;
-        let creepingDeathTalent = 20;
-        let tickTime =
+        const creepingDeathTalent = 20;
+        const tickTime =
             2 /
             this.ovalePaperDoll.GetHasteMultiplier(
                 "spell",
                 this.ovalePaperDoll.next
             );
-        let [activeAgonies] = this.ovaleAura.AuraCount(
+        const [activeAgonies] = this.ovaleAura.AuraCount(
             980,
             "HARMFUL",
             true,
@@ -352,8 +352,8 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = this.getTimeToShard(atTime);
+        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        const value = this.getTimeToShard(atTime);
         return Compare(value, comparator, limit);
     };
 }
