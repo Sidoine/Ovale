@@ -6,8 +6,8 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
-} from "../engine/Condition";
-import { OvaleDebugClass } from "../engine/Debug";
+} from "../engine/condition";
+import { OvaleDebugClass } from "../engine/debug";
 
 export class Conduit {
     private debugOptions: OptionUiGroup = {

@@ -6,8 +6,8 @@ import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
-} from "../engine/Condition";
-import { OvaleDebugClass } from "../engine/Debug";
+} from "../engine/condition";
+import { OvaleDebugClass } from "../engine/debug";
 import { isNumber, OneTimeMessage } from "../tools/tools";
 
 export class Runeforge {

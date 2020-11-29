@@ -1,4 +1,4 @@
-import { OvaleScriptsClass } from "../engine/Scripts";
+import { OvaleScriptsClass } from "../engine/scripts";
 
 export function registerWarriorSpells(OvaleScripts: OvaleScriptsClass) {
     const name = "ovale_warrior_spells";

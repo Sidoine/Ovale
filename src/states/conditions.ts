@@ -13,8 +13,8 @@ import {
     ParseCondition,
     ReturnValueBetween,
     ParameterInfo,
-} from "../engine/Condition";
-import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/Data";
+} from "../engine/condition";
+import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
 import { HasteType, PaperDollData, OvalePaperDollClass } from "./PaperDoll";
 import { Aura, OvaleAuraClass } from "./Aura";
@@ -49,7 +49,7 @@ import {
     UnitRace,
 } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
-import { PositionalParameters, NamedParameters } from "../engine/AST";
+import { PositionalParameters, NamedParameters } from "../engine/ast";
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
@@ -57,7 +57,7 @@ import { BaseState } from "./BaseState";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "../ui/Frame";
-import { OvaleGUIDClass } from "../engine/GUID";
+import { OvaleGUIDClass } from "../engine/guid";
 import { OvaleDamageTakenClass } from "./DamageTaken";
 import { OvaleEnemiesClass } from "./Enemies";
 import { OvaleCooldownClass } from "./Cooldown";
@@ -1692,9 +1692,7 @@ export class OvaleConditions {
         ];
         let value = 0;
         if (interval > 0) {
-            const [total,] = this.OvaleDamageTaken.GetRecentDamage(
-                interval
-            );
+            const [total] = this.OvaleDamageTaken.GetRecentDamage(interval);
             value = total;
         }
         return Compare(value, comparator, limit);

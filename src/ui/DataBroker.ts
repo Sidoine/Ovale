@@ -2,7 +2,7 @@ import { L } from "./Localization";
 import LibDataBroker from "@wowts/lib_data_broker-1.1";
 import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
 import { OvaleOptionsClass } from "./Options";
-import { DEFAULT_NAME, OvaleScriptsClass } from "../engine/Scripts";
+import { DEFAULT_NAME, OvaleScriptsClass } from "../engine/scripts";
 import { OvaleVersionClass } from "./Version";
 import { OvaleFrameModuleClass } from "./Frame";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -19,7 +19,7 @@ import {
 import { OvalePaperDollClass } from "../states/PaperDoll";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/Debug";
+import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiAll } from "./acegui-helpers";
 
 const CLASS_ICONS = {

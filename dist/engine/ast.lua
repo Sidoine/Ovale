@@ -1,14 +1,14 @@
-local __exports = LibStub:NewLibrary("ovale/engine/AST", 90000)
+local __exports = LibStub:NewLibrary("ovale/engine/ast", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __uiLocalization = LibStub:GetLibrary("ovale/ui/Localization")
 local L = __uiLocalization.L
 local __toolsPool = LibStub:GetLibrary("ovale/tools/Pool")
 local OvalePool = __toolsPool.OvalePool
-local __Condition = LibStub:GetLibrary("ovale/engine/Condition")
-local getFunctionSignature = __Condition.getFunctionSignature
-local __Lexer = LibStub:GetLibrary("ovale/engine/Lexer")
-local OvaleLexer = __Lexer.OvaleLexer
+local __condition = LibStub:GetLibrary("ovale/engine/condition")
+local getFunctionSignature = __condition.getFunctionSignature
+local __lexer = LibStub:GetLibrary("ovale/engine/lexer")
+local OvaleLexer = __lexer.OvaleLexer
 local ipairs = ipairs
 local next = next
 local pairs = pairs

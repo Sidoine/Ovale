@@ -26,8 +26,8 @@ import { concat, insert } from "@wowts/table";
 import { isNumber } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/Debug";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { OvaleDebugClass } from "../engine/debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import {
     Compare,
@@ -36,8 +36,8 @@ import {
     OvaleConditionClass,
     TestBoolean,
     TestValue,
-} from "../engine/Condition";
-import { OvaleDataClass } from "../engine/Data";
+} from "../engine/condition";
+import { OvaleDataClass } from "../engine/data";
 import { huge } from "@wowts/math";
 
 const OVALE_SLOTID_BY_SLOTNAME = {

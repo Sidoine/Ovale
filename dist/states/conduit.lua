@@ -3,9 +3,9 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local unpack = unpack
 local C_Soulbinds = C_Soulbinds
-local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
-local ReturnBoolean = __engineCondition.ReturnBoolean
-local ReturnConstant = __engineCondition.ReturnConstant
+local __enginecondition = LibStub:GetLibrary("ovale/engine/condition")
+local ReturnBoolean = __enginecondition.ReturnBoolean
+local ReturnConstant = __enginecondition.ReturnConstant
 __exports.Conduit = __class(nil, {
     constructor = function(self, debug)
         self.debugOptions = {

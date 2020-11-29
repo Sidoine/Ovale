@@ -10,10 +10,10 @@ import {
     AstUnlessNode,
     OperatorType,
     OvaleASTClass,
-} from "../engine/AST";
+} from "../engine/ast";
 import { Annotation, TagPriority } from "./definitions";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleTaggedFunctionName } from "./text-tools";
 import { find, sub } from "@wowts/string";
 import { insert } from "@wowts/table";

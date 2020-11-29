@@ -2,15 +2,15 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { OvaleStateClass, StateModule, States } from "../engine/State";
+import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
-import { OvaleDataClass } from "../engine/Data";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 
 let self_serial = 0;
 const TOTEM_CLASS: LuaObj<boolean> = {

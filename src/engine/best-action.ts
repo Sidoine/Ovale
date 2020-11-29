@@ -1,7 +1,7 @@
-import { OvaleActionBarClass } from "./ActionBar";
-import { OvaleDataClass } from "./Data";
+import { OvaleActionBarClass } from "./action-bar";
+import { OvaleDataClass } from "./data";
 import { OvaleEquipmentClass, SlotName } from "../states/Equipment";
-import { OvaleStateClass } from "./State";
+import { OvaleStateClass } from "./state";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, tonumber } from "@wowts/lua";
 import {
@@ -24,19 +24,19 @@ import {
     NodeActionResult,
     NodeNoResult,
     setResultType,
-} from "./AST";
+} from "./ast";
 import { OvaleCooldownClass } from "../states/Cooldown";
 import { OvaleRunesClass } from "../states/Runes";
 import { OvaleSpellsClass } from "../states/Spells";
 import { isNumber, isString } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleGUIDClass } from "./GUID";
+import { OvaleGUIDClass } from "./guid";
 import { OvalePowerClass } from "../states/Power";
 import { OvaleFutureClass } from "../states/Future";
 import { OvaleSpellBookClass } from "../states/SpellBook";
-import { Profiler, OvaleProfilerClass } from "./Profiler";
-import { OvaleDebugClass, Tracer } from "./Debug";
+import { Profiler, OvaleProfilerClass } from "./profiler";
+import { OvaleDebugClass, Tracer } from "./debug";
 import { Variables } from "../states/Variables";
 import { ActionInfoHandler, Runner } from "./runner";
 

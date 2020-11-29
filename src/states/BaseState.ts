@@ -1,4 +1,4 @@
-import { StateModule, States } from "../engine/State";
+import { StateModule, States } from "../engine/state";
 import { GetTime } from "@wowts/wow-mock";
 
 class BaseStateData {

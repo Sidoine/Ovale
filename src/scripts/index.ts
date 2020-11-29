@@ -1,6 +1,6 @@
 import { registerCommon } from "./ovale_common";
 import { registerDeathKnightSpells } from "./ovale_deathknight_spells";
-import { OvaleScriptsClass } from "../engine/Scripts";
+import { OvaleScriptsClass } from "../engine/scripts";
 import { registerDeathKnight } from "./ovale_deathknight";
 import { registerDemonHunter } from "./ovale_demonhunter";
 import { registerDruid } from "./ovale_druid";

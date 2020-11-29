@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../engine/GUID";
+import { OvaleGUIDClass } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer, Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
@@ -12,11 +12,11 @@ import {
     COMBATLOG_OBJECT_REACTION_FRIENDLY,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
-import { States } from "../engine/State";
+import { States } from "../engine/state";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 
 const GROUP_MEMBER = bor(
     COMBATLOG_OBJECT_AFFILIATION_MINE,

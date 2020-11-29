@@ -1,6 +1,6 @@
 import { OvaleAuraClass } from "./Aura";
-import { OvaleDataClass } from "../engine/Data";
-import { OvaleGUIDClass } from "../engine/GUID";
+import { OvaleDataClass } from "../engine/data";
+import { OvaleGUIDClass } from "../engine/guid";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LastSpell, SpellCast, self_pool, createSpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -26,21 +26,21 @@ import {
     UnitName,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
-import { OvaleStateClass, States } from "../engine/State";
+import { OvaleStateClass, States } from "../engine/state";
 import { OvaleCooldownClass } from "./Cooldown";
 import { BaseState } from "./BaseState";
 import { isNumber } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnValueBetween,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { Runner } from "../engine/runner";
 
 const strsub = sub;

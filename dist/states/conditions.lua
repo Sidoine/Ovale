@@ -3,15 +3,15 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
-local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
-local TestValue = __engineCondition.TestValue
-local Compare = __engineCondition.Compare
-local TestBoolean = __engineCondition.TestBoolean
-local isComparator = __engineCondition.isComparator
-local ReturnValue = __engineCondition.ReturnValue
-local ReturnConstant = __engineCondition.ReturnConstant
-local ParseCondition = __engineCondition.ParseCondition
-local ReturnValueBetween = __engineCondition.ReturnValueBetween
+local __enginecondition = LibStub:GetLibrary("ovale/engine/condition")
+local TestValue = __enginecondition.TestValue
+local Compare = __enginecondition.Compare
+local TestBoolean = __enginecondition.TestBoolean
+local isComparator = __enginecondition.isComparator
+local ReturnValue = __enginecondition.ReturnValue
+local ReturnConstant = __enginecondition.ReturnConstant
+local ParseCondition = __enginecondition.ParseCondition
+local ReturnValueBetween = __enginecondition.ReturnValueBetween
 local ipairs = ipairs
 local pairs = pairs
 local type = type
@@ -714,7 +714,7 @@ __exports.OvaleConditions = __class(nil, {
             local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local value = 0
             if interval > 0 then
-                local total, _ = self.OvaleDamageTaken:GetRecentDamage(interval)
+                local total = self.OvaleDamageTaken:GetRecentDamage(interval)
                 value = total
             end
             return Compare(value, comparator, limit)

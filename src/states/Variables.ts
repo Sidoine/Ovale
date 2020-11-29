@@ -1,15 +1,15 @@
 import { LuaArray, LuaObj, pairs, wipe } from "@wowts/lua";
-import { StateModule } from "../engine/State";
+import { StateModule } from "../engine/state";
 import { BaseState } from "./BaseState";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleCombatClass } from "./combat";
 import {
     Compare,
     ConditionAction,
     OvaleConditionClass,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { huge } from "@wowts/math";
-import { setResultType } from "../engine/AST";
+import { setResultType } from "../engine/ast";
 
 export class Variables implements StateModule {
     isState = true;

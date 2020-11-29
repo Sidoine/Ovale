@@ -7,9 +7,9 @@ import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { ipairs, LuaArray, unpack } from "@wowts/lua";
-import { OvaleDebugClass } from "../engine/Debug";
+import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { concat, insert } from "@wowts/table";
 

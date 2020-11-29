@@ -1,9 +1,10 @@
 import { next, LuaObj, LuaArray, ipairs, unpack, pack } from "@wowts/lua";
 import { huge } from "@wowts/math";
 import { BaseState } from "../states/BaseState";
-import { PositionalParameters, NamedParameters, AstNodeSnapshot } from "./AST";
-import { AuraType } from "./Data";
+import { PositionalParameters, NamedParameters, AstNodeSnapshot } from "./ast";
+import { AuraType } from "./data";
 import { isString, KeyCheck } from "../tools/tools";
+import { insert } from "@wowts/table";
 const INFINITY = huge;
 
 export type ConditionResult = [
@@ -117,6 +118,7 @@ export interface FunctionInfos {
     parameters: LuaArray<ParameterInfos>;
     namedParameters: LuaObj<number>;
     returnValue: Pick<ParameterInfos, "type">;
+    replacements?: LuaArray<{ index: number; mapValues: LuaObj<string> }>;
     func: (atTime: number, ...args: unknown[]) => ConditionResult;
 }
 
@@ -171,6 +173,13 @@ export class OvaleConditionClass {
             if (v.name) {
                 infos.namedParameters[v.name] = k;
             }
+            if (v.type === "string" && v.mapValues) {
+                infos.replacements = infos.replacements || {};
+                insert(infos.replacements, {
+                    index: k,
+                    mapValues: v.mapValues,
+                });
+            }
         }
         this.typedConditions[name] = infos;
     }
@@ -180,10 +189,17 @@ export class OvaleConditionClass {
     }
 
     call(name: string, atTime: number, positionalParams: PositionalParameters) {
-        return this.typedConditions[name].func(
-            atTime,
-            ...unpack(positionalParams)
-        );
+        const infos = this.typedConditions[name];
+        if (infos.replacements) {
+            for (const [, v] of ipairs(infos.replacements)) {
+                const value = positionalParams[v.index];
+                if (value) {
+                    const replacement = v.mapValues[value as string];
+                    if (replacement) positionalParams[v.index] = replacement;
+                }
+            }
+        }
+        return infos.func(atTime, ...unpack(positionalParams));
     }
 
     registerAction(name: string, func: ConditionAction) {

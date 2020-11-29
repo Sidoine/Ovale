@@ -1,10 +1,10 @@
 import { test, expect, beforeAll } from "@jest/globals";
 import { Mock, It } from "typemoq";
-import { OvaleASTClass } from "./AST";
-import { OvaleConditionClass } from "./Condition";
-import { OvaleDebugClass, Tracer } from "./Debug";
-import { OvaleProfilerClass, Profiler } from "./Profiler";
-import { OvaleScriptsClass } from "./Scripts";
+import { OvaleASTClass } from "./ast";
+import { OvaleConditionClass } from "./condition";
+import { OvaleDebugClass, Tracer } from "./debug";
+import { OvaleProfilerClass, Profiler } from "./profiler";
+import { OvaleScriptsClass } from "./scripts";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { format } from "@wowts/string";
 import { assertDefined, assertIs } from "../tests/helpers";

@@ -17,7 +17,7 @@ import {
     ClassId,
 } from "@wowts/wow-mock";
 import { isNumber, OneTimeMessage } from "../tools/tools";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleFutureClass } from "./Future";
 import { BaseState } from "./BaseState";
 import {
@@ -25,11 +25,11 @@ import {
     SpellInfo,
     SpellInfoNumberProperty,
     SpellInfoProperty,
-} from "../engine/Data";
+} from "../engine/data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { States, StateModule } from "../engine/State";
-import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
+import { States, StateModule } from "../engine/state";
+import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleCombatClass } from "./combat";

@@ -1,5 +1,5 @@
 import { LuaObj, wipe } from "@wowts/lua";
-import { AstNode } from "./AST";
+import { AstNode } from "./ast";
 
 export interface CheckBox {
     text?: string;

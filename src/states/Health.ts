@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../engine/GUID";
+import { OvaleGUIDClass } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { wipe, LuaObj } from "@wowts/lua";
 import {
@@ -12,8 +12,8 @@ import { huge } from "@wowts/math";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleOptionsClass } from "../ui/Options";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { OneTimeMessage } from "../tools/tools";
 
 const INFINITY = huge;

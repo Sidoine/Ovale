@@ -1,8 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/states/PaperDoll", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __engineState = LibStub:GetLibrary("ovale/engine/State")
-local States = __engineState.States
+local __enginestate = LibStub:GetLibrary("ovale/engine/state")
+local States = __enginestate.States
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local tonumber = tonumber
 local ipairs = ipairs
@@ -32,9 +32,9 @@ local CR_HASTE_MELEE = CR_HASTE_MELEE
 local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
 local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isNumber = __toolstools.isNumber
-local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
-local ReturnBoolean = __engineCondition.ReturnBoolean
-local ReturnConstant = __engineCondition.ReturnConstant
+local __enginecondition = LibStub:GetLibrary("ovale/engine/condition")
+local ReturnBoolean = __enginecondition.ReturnBoolean
+local ReturnConstant = __enginecondition.ReturnConstant
 local OVALE_SPELLDAMAGE_SCHOOL = {
     DEATHKNIGHT = 4,
     DEMONHUNTER = 3,

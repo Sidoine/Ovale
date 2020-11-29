@@ -14,14 +14,14 @@ import {
     AstSpellRequireNode,
     SpellAuraKeyWord,
     AstScriptNode,
-} from "./AST";
-import { OvaleConditionClass } from "./Condition";
+} from "./ast";
+import { OvaleConditionClass } from "./condition";
 import { OvaleCooldownClass } from "../states/Cooldown";
-import { AuraType, OvaleDataClass, SpellAddAuras, SpellInfo } from "./Data";
+import { AuraType, OvaleDataClass, SpellAddAuras, SpellInfo } from "./data";
 import { OvalePaperDollClass } from "../states/PaperDoll";
 import { POWER_TYPES, PowerType } from "../states/Power";
 import { OvaleSpellBookClass } from "../states/SpellBook";
-import { checkBoxes, lists, ResetControls } from "./Controls";
+import { checkBoxes, lists, ResetControls } from "./controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     ipairs,
@@ -39,8 +39,8 @@ import { match, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 import { GetSpellInfo } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
-import { OvaleDebugClass, Tracer } from "./Debug";
-import { OvaleProfilerClass, Profiler } from "./Profiler";
+import { OvaleDebugClass, Tracer } from "./debug";
+import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleOptionsClass } from "../ui/Options";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";

@@ -1,4 +1,4 @@
-import { AstNode, isAstNodeWithChildren, OvaleASTClass } from "../engine/AST";
+import { AstNode, isAstNodeWithChildren, OvaleASTClass } from "../engine/ast";
 import {
     type,
     LuaObj,
@@ -19,7 +19,7 @@ import {
     self_outputPool,
 } from "./text-tools";
 import { format } from "@wowts/string";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 
 const self_functionDefined: LuaObj<boolean> = {};
 const self_functionUsed: LuaObj<boolean> = {};
@@ -65,11 +65,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
     let isChanged: boolean;
     let isSwept: boolean | AstNode;
     [isChanged, isSwept] = [false, false];
-    if (node.type == "add_function") {
-    } else if (
-        node.type == "custom_function" &&
-        !self_functionDefined[node.name]
-    ) {
+    if (node.type == "custom_function" && !self_functionDefined[node.name]) {
         [isChanged, isSwept] = [true, true];
     } else if (node.type == "group" || node.type == "script") {
         const child = node.child;

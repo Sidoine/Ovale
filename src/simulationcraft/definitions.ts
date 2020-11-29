@@ -7,9 +7,9 @@ import {
     AstAddFunctionNode,
     AstScriptNode,
     AstFunctionNode,
-} from "../engine/AST";
+} from "../engine/ast";
 import { TypeCheck } from "../tools/tools";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 
 export type ClassRole = "tank" | "spell" | "attack";
 export type ClassType = string;

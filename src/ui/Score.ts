@@ -13,7 +13,7 @@ import {
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "../states/Future";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { OvaleCombatClass } from "../states/combat";
 
 export type ScoreCallback = (

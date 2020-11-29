@@ -1,4 +1,4 @@
-import { OvaleScriptsClass } from "../engine/Scripts";
+import { OvaleScriptsClass } from "../engine/scripts";
 
 export function registerDruidSpells(OvaleScripts: OvaleScriptsClass) {
     const name = "ovale_druid_spells";

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/engine/Data", 90000)
+local __exports = LibStub:NewLibrary("ovale/engine/data", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local type = type

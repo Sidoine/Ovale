@@ -4,7 +4,7 @@ import { LuaArray, lualength, LuaObj, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { StateModule } from "../engine/State";
+import { StateModule } from "../engine/state";
 import { OvaleCombatClass } from "./combat";
 import {
     Compare,
@@ -13,7 +13,7 @@ import {
     OvaleConditionClass,
     ParseCondition,
     ReturnValueBetween,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleHealthClass } from "./Health";
 import { isNumber } from "../tools/tools";

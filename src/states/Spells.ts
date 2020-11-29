@@ -9,10 +9,10 @@ import {
 import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
-import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
-import { OvaleDataClass } from "../engine/Data";
-import { StateModule } from "../engine/State";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { OvaleProfilerClass, Profiler } from "../engine/profiler";
+import { OvaleDataClass } from "../engine/data";
+import { StateModule } from "../engine/state";
 import { OvalePowerClass } from "./Power";
 
 const WARRIOR_INCERCEPT_SPELLID = 198304;

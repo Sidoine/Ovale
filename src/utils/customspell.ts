@@ -7,7 +7,7 @@ import {
     isFriendlyTarget,
 } from "./importspells";
 import { writeFileSync } from "fs";
-import { SpellInfo } from "../engine/Data";
+import { SpellInfo } from "../engine/data";
 import { PowerType as OvalePowerType } from "../states/Power";
 import { debug } from "console";
 

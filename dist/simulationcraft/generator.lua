@@ -1,8 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/simulationcraft/generator", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __engineAST = LibStub:GetLibrary("ovale/engine/AST")
-local isAstNodeWithChildren = __engineAST.isAstNodeWithChildren
+local __engineast = LibStub:GetLibrary("ovale/engine/ast")
+local isAstNodeWithChildren = __engineast.isAstNodeWithChildren
 local type = type
 local ipairs = ipairs
 local wipe = wipe
@@ -61,8 +61,7 @@ __exports.Sweep = function(node)
     local isChanged
     local isSwept
     isChanged, isSwept = false, false
-    if node.type == "add_function" then
-    elseif node.type == "custom_function" and  not self_functionDefined[node.name] then
+    if node.type == "custom_function" and  not self_functionDefined[node.name] then
         isChanged, isSwept = true, true
     elseif node.type == "group" or node.type == "script" then
         local child = node.child

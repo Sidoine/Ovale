@@ -1,5 +1,5 @@
 import { L } from "../ui/Localization";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { OvaleClass } from "../Ovale";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -33,7 +33,7 @@ import {
     NUM_TALENT_COLUMNS,
 } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 

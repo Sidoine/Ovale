@@ -3,11 +3,11 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 local wipe = wipe
-local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
-local Compare = __engineCondition.Compare
+local __enginecondition = LibStub:GetLibrary("ovale/engine/condition")
+local Compare = __enginecondition.Compare
 local huge = math.huge
-local __engineAST = LibStub:GetLibrary("ovale/engine/AST")
-local setResultType = __engineAST.setResultType
+local __engineast = LibStub:GetLibrary("ovale/engine/ast")
+local setResultType = __engineast.setResultType
 __exports.Variables = __class(nil, {
     constructor = function(self, combat, baseState, ovaleDebug)
         self.combat = combat

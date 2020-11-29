@@ -20,10 +20,10 @@ import {
 import { OvaleEquipmentClass } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/Debug";
+import { OvaleDebugClass } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { Compare, OvaleConditionClass, TestBoolean } from "../engine/Condition";
+import { Compare, OvaleConditionClass, TestBoolean } from "../engine/condition";
 
 const azeriteSlots: LuaArray<boolean> = {
     [1]: true,

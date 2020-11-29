@@ -1,8 +1,8 @@
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
 import { OvaleEquipmentClass } from "./Equipment";
-import { States, StateModule } from "../engine/State";
+import { States, StateModule } from "../engine/state";
 import {
     SpellCast,
     PaperDollSnapshot,
@@ -45,7 +45,7 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
-} from "../engine/Condition";
+} from "../engine/condition";
 
 const OVALE_SPELLDAMAGE_SCHOOL: LuaObj<number> = {
     DEATHKNIGHT: 4,

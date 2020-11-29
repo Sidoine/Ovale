@@ -1,8 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/simulationcraft/parser", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __engineLexer = LibStub:GetLibrary("ovale/engine/Lexer")
-local OvaleLexer = __engineLexer.OvaleLexer
+local __enginelexer = LibStub:GetLibrary("ovale/engine/lexer")
+local OvaleLexer = __enginelexer.OvaleLexer
 local tostring = tostring
 local tonumber = tonumber
 local ipairs = ipairs

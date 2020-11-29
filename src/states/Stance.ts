@@ -9,14 +9,14 @@ import {
     GetSpellInfo,
 } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { States, StateModule } from "../engine/State";
-import { OvaleDebugClass } from "../engine/Debug";
+import { States, StateModule } from "../engine/state";
+import { OvaleDebugClass } from "../engine/debug";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleProfilerClass, Profiler } from "../engine/profiler";
+import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { OvaleConditionClass, TestBoolean } from "../engine/Condition";
+import { OvaleConditionClass, TestBoolean } from "../engine/condition";
 
 const [druidCatForm] = GetSpellInfo(768);
 const [druidTravelForm] = GetSpellInfo(783);

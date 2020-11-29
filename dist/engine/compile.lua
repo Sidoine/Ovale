@@ -1,12 +1,12 @@
-local __exports = LibStub:NewLibrary("ovale/engine/Compile", 90000)
+local __exports = LibStub:NewLibrary("ovale/engine/compile", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __statesPower = LibStub:GetLibrary("ovale/states/Power")
 local POWER_TYPES = __statesPower.POWER_TYPES
-local __Controls = LibStub:GetLibrary("ovale/engine/Controls")
-local checkBoxes = __Controls.checkBoxes
-local lists = __Controls.lists
-local ResetControls = __Controls.ResetControls
+local __controls = LibStub:GetLibrary("ovale/engine/controls")
+local checkBoxes = __controls.checkBoxes
+local lists = __controls.lists
+local ResetControls = __controls.ResetControls
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs

@@ -1,6 +1,6 @@
 import { test, expect } from "@jest/globals";
 import { assertDefined } from "../tests/helpers";
-import { OvaleConditionClass } from "./Condition";
+import { OvaleConditionClass } from "./condition";
 
 test("call", () => {
     // Arrange
@@ -45,4 +45,29 @@ test("getInfos", () => {
         2: { type: "string", name: "b", optional: true },
     });
     expect(result.namedParameters).toEqual({ a: 1, b: 2 });
+});
+
+test("call with replacement", () => {
+    // Arrange
+    const condition = new OvaleConditionClass();
+    condition.register(
+        "test",
+        (atTime: number, a: string) => {
+            return [0, 10, a];
+        },
+        { type: "string" },
+        {
+            type: "string",
+            name: "a",
+            optional: false,
+            mapValues: { original: "mapped" },
+        }
+    );
+
+    // Act
+    const result = condition.call("test", 0, { 1: "original" });
+
+    // Assert
+    assertDefined(result);
+    expect(result).toEqual([0, 10, "mapped"]);
 });

@@ -1,8 +1,8 @@
-import { States, StateModule } from "../engine/State";
+import { States, StateModule } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { GetTime } from "@wowts/wow-mock";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaObj, LuaArray } from "@wowts/lua";
@@ -13,7 +13,7 @@ import {
     Compare,
     ConditionFunction,
     ReturnConstant,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { huge } from "@wowts/math";
 
 export class CombatState {

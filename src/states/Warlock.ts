@@ -5,11 +5,11 @@ import { find } from "@wowts/string";
 import { pow } from "@wowts/math";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { StateModule } from "../engine/State";
+import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { Compare, OvaleConditionClass } from "../engine/Condition";
+import { Compare, OvaleConditionClass } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 

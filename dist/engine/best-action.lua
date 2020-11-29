@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/engine/BestAction", 90000)
+local __exports = LibStub:NewLibrary("ovale/engine/best-action", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -15,8 +15,8 @@ local IsCurrentAction = IsCurrentAction
 local IsItemInRange = IsItemInRange
 local IsUsableAction = IsUsableAction
 local IsUsableItem = IsUsableItem
-local __AST = LibStub:GetLibrary("ovale/engine/AST")
-local setResultType = __AST.setResultType
+local __ast = LibStub:GetLibrary("ovale/engine/ast")
+local setResultType = __ast.setResultType
 local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isNumber = __toolstools.isNumber
 local isString = __toolstools.isString

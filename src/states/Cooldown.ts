@@ -1,16 +1,16 @@
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { next, pairs, LuaObj, kpairs } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
-import { States } from "../engine/State";
+import { States } from "../engine/state";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
-import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 
 const GLOBAL_COOLDOWN = 61304;
 const COOLDOWN_THRESHOLD = 0.1;

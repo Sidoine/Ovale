@@ -11,7 +11,7 @@ import { sort, insert, concat } from "@wowts/table";
 import { C_AzeriteEssence } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
 interface Essence {

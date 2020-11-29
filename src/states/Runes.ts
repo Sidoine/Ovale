@@ -1,5 +1,5 @@
 import { OvaleClass } from "../Ovale";
-import { States, StateModule } from "../engine/State";
+import { States, StateModule } from "../engine/state";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, LuaArray, wipe } from "@wowts/lua";
 import { GetRuneCooldown, GetTime } from "@wowts/wow-mock";
@@ -7,9 +7,9 @@ import { huge } from "@wowts/math";
 import { sort } from "@wowts/table";
 import { SpellCast, PaperDollSnapshot } from "./LastSpell";
 import { AceModule } from "@wowts/tsaddon";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
-import { OvaleDataClass } from "../engine/Data";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
+import { OvaleDataClass } from "../engine/data";
 import { OvalePowerClass } from "./Power";
 import { OvalePaperDollClass } from "./PaperDoll";
 

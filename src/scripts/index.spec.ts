@@ -1,7 +1,7 @@
 import { test, expect } from "@jest/globals";
 import { It, Mock } from "typemoq";
 import { registerScripts } from "./index";
-import { OvaleScriptsClass } from "../engine/Scripts";
+import { OvaleScriptsClass } from "../engine/scripts";
 
 test("Test scripts", () => {
     // Arrange

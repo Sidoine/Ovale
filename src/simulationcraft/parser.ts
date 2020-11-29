@@ -1,4 +1,4 @@
-import { OvaleLexer, Tokenizer, TokenizerDefinition } from "../engine/Lexer";
+import { OvaleLexer, Tokenizer, TokenizerDefinition } from "../engine/lexer";
 import {
     LuaArray,
     tostring,
@@ -31,7 +31,7 @@ import {
     NumberParseNode,
 } from "./definitions";
 import { gsub, gmatch, sub } from "@wowts/string";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { concat } from "@wowts/table";
 import { OvalePool } from "../tools/Pool";
 import { checkToken } from "../tools/tools";

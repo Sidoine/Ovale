@@ -6,7 +6,7 @@ import { insert, remove } from "@wowts/table";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { StateModule } from "../engine/State";
+import { StateModule } from "../engine/state";
 
 const UPDATE_DELAY = 0.5;
 const SIGIL_ACTIVATION_TIME = 2;

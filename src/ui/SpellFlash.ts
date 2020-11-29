@@ -8,11 +8,11 @@ import {
     UnitIsDead,
     UnitCanAttack,
 } from "@wowts/wow-mock";
-import { AstNodeSnapshot } from "../engine/AST";
+import { AstNodeSnapshot } from "../engine/ast";
 import { SpellFlashOptions, OvaleOptionsClass } from "./Options";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { OvaleStanceClass } from "../states/Stance";
 import { OvaleCombatClass } from "../states/combat";

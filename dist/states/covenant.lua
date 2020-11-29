@@ -3,8 +3,8 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local C_Covenants = C_Covenants
-local __engineCondition = LibStub:GetLibrary("ovale/engine/Condition")
-local ReturnBoolean = __engineCondition.ReturnBoolean
+local __enginecondition = LibStub:GetLibrary("ovale/engine/condition")
+local ReturnBoolean = __enginecondition.ReturnBoolean
 local ipairs = ipairs
 local unpack = unpack
 local concat = table.concat

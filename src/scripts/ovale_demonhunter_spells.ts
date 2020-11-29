@@ -1,4 +1,4 @@
-import { OvaleScriptsClass } from "../engine/Scripts";
+import { OvaleScriptsClass } from "../engine/scripts";
 
 export function registerDemonHunterSpells(OvaleScripts: OvaleScriptsClass) {
     const name = "ovale_demonhunter_spells";

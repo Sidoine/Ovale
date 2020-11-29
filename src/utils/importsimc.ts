@@ -16,7 +16,7 @@ import {
     CustomAuras,
     CustomSpellData,
 } from "./customspell";
-import { SpellInfoProperty } from "../engine/Data";
+import { SpellInfoProperty } from "../engine/data";
 import { IoC } from "../ioc";
 
 const outputDirectory = "src/scripts";

@@ -1,5 +1,5 @@
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";

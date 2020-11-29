@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/engine/GUID", 90000)
+local __exports = LibStub:NewLibrary("ovale/engine/guid", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
@@ -12,8 +12,8 @@ local remove = table.remove
 local GetTime = GetTime
 local UnitGUID = UnitGUID
 local UnitName = UnitName
-local __Condition = LibStub:GetLibrary("ovale/engine/Condition")
-local ReturnConstant = __Condition.ReturnConstant
+local __condition = LibStub:GetLibrary("ovale/engine/condition")
+local ReturnConstant = __condition.ReturnConstant
 local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isString = __toolstools.isString
 local PET_UNIT = {}

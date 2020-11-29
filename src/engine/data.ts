@@ -16,7 +16,7 @@ import {
     AstItemRequireNode,
     AstSpellAuraListNode,
     AstSpellRequireNode,
-} from "./AST";
+} from "./ast";
 import { Runner } from "./runner";
 
 const BLOODELF_CLASSES: LuaObj<boolean> = {

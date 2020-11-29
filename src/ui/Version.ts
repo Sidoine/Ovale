@@ -1,5 +1,5 @@
 import { L } from "./Localization";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleClass, MSG_PREFIX } from "../Ovale";
 import aceComm, { AceComm } from "@wowts/ace_comm-3.0";

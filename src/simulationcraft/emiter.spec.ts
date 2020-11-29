@@ -7,9 +7,9 @@ import {
     AstNode,
     AstNodeSnapshot,
     OvaleASTClass,
-} from "../engine/AST";
-import { OvaleDataClass } from "../engine/Data";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+} from "../engine/ast";
+import { OvaleDataClass } from "../engine/data";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { Annotation, OperandParseNode } from "./definitions";
 import { Emiter } from "./emiter";
 import { Unparser } from "./unparser";

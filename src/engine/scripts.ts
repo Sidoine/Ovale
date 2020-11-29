@@ -11,7 +11,7 @@ import { GetNumSpecializations } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleOptionsClass } from "../ui/Options";
-import { OvaleDebugClass, Tracer } from "./Debug";
+import { OvaleDebugClass, Tracer } from "./debug";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
 export const DEFAULT_NAME = "Ovale";

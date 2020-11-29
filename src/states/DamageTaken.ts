@@ -15,8 +15,8 @@ import {
 } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 
 interface Event {
     timestamp: number;

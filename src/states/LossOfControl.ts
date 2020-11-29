@@ -5,8 +5,8 @@ import { insert } from "@wowts/table";
 import { upper, format } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
-import { StateModule } from "../engine/State";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { StateModule } from "../engine/state";
 
 interface LossOfControlEventInfo {
     locType: string;

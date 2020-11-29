@@ -12,7 +12,7 @@ import {
     OperandParseNode,
 } from "./definitions";
 import { tostring, lualength, pairs, tonumber, kpairs } from "@wowts/lua";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { self_outputPool } from "./text-tools";
 import { concat } from "@wowts/table";
 

@@ -14,10 +14,10 @@ import {
     UIPosition,
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { NodeActionResult, AstIconNode } from "../engine/AST";
+import { NodeActionResult, AstIconNode } from "../engine/ast";
 import { OvaleOptionsClass } from "./Options";
 import { OvaleSpellBookClass } from "../states/SpellBook";
-import { ActionType } from "../engine/BestAction";
+import { ActionType } from "../engine/best-action";
 import { isNumber, isString } from "../tools/tools";
 import { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
 const INFINITY = huge;

@@ -37,8 +37,8 @@ import {
     AstAddFunctionNode,
     AstGroupNode,
     isAstNodeWithChildren,
-} from "../engine/AST";
-import { Tracer, OvaleDebugClass } from "../engine/Debug";
+} from "../engine/ast";
+import { Tracer, OvaleDebugClass } from "../engine/debug";
 import {
     format,
     gmatch,
@@ -50,7 +50,7 @@ import {
     len,
     upper,
 } from "@wowts/string";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 import { insert } from "@wowts/table";
 import {
     LowerSpecialization,

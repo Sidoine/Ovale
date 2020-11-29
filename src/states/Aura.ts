@@ -1,16 +1,16 @@
 import { L } from "../ui/Localization";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvalePool } from "../tools/Pool";
-import { OvaleProfilerClass, Profiler } from "../engine/Profiler";
+import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import {
     OvaleDataClass,
     SpellAddAurasByType,
     AuraType,
     SpellInfo,
-} from "../engine/Data";
-import { OvaleGUIDClass } from "../engine/GUID";
+} from "../engine/data";
+import { OvaleGUIDClass } from "../engine/guid";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleStateClass, States } from "../engine/State";
+import { OvaleStateClass, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -43,7 +43,7 @@ import {
     ParseCondition,
     ReturnConstant,
     ReturnValue,
-} from "../engine/Condition";
+} from "../engine/condition";
 import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../ui/acegui-helpers";

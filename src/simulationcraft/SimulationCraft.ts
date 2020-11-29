@@ -2,8 +2,8 @@ import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "../ui/Localization";
 import { OvaleClass } from "../Ovale";
-import { AstNode, AstAnnotation, OvaleASTClass } from "../engine/AST";
-import { ResetControls } from "../engine/Controls";
+import { AstNode, AstAnnotation, OvaleASTClass } from "../engine/ast";
+import { ResetControls } from "../engine/controls";
 import { format, gmatch, gsub, lower, match, sub } from "@wowts/string";
 import {
     ipairs,
@@ -30,7 +30,7 @@ import {
     classInfos,
     ActionListParseNode,
 } from "./definitions";
-import { OvaleDataClass } from "../engine/Data";
+import { OvaleDataClass } from "../engine/data";
 import { Emiter } from "./emiter";
 import {
     print_r,
@@ -42,8 +42,8 @@ import {
 } from "./text-tools";
 import { Parser } from "./parser";
 import { Unparser } from "./unparser";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
-import { OvaleCompileClass } from "../engine/Compile";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { OvaleCompileClass } from "../engine/compile";
 import { Splitter } from "./splitter";
 import { Generator, Mark, Sweep } from "./generator";
 import { AceModule } from "@wowts/tsaddon";

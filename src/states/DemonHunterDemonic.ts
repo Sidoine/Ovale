@@ -11,7 +11,7 @@ import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/Debug";
+import { OvaleDebugClass, Tracer } from "../engine/debug";
 
 const INFINITY = huge;
 const HAVOC_DEMONIC_TALENT_ID = 22547;

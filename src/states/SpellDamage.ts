@@ -3,7 +3,7 @@ import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, LuaObj } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Profiler, OvaleProfilerClass } from "../engine/Profiler";
+import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 
 const CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
     SPELL_DAMAGE: true,

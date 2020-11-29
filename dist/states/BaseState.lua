@@ -1,8 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/states/BaseState", 90000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __engineState = LibStub:GetLibrary("ovale/engine/State")
-local States = __engineState.States
+local __enginestate = LibStub:GetLibrary("ovale/engine/state")
+local States = __enginestate.States
 local GetTime = GetTime
 local BaseStateData = __class(nil, {
     constructor = function(self)

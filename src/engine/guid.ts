@@ -13,12 +13,12 @@ import { insert, remove } from "@wowts/table";
 import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Tracer, OvaleDebugClass } from "./Debug";
+import { Tracer, OvaleDebugClass } from "./debug";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnConstant,
-} from "./Condition";
+} from "./condition";
 import { isString } from "../tools/tools";
 
 const PET_UNIT: LuaObj<string> = {};

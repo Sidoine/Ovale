@@ -1,15 +1,15 @@
 import { L } from "../ui/Localization";
 import { OvalePool } from "../tools/Pool";
-import { OvaleProfilerClass, Profiler } from "./Profiler";
-import { OvaleDebugClass, Tracer } from "./Debug";
-import { Tokenizer, TokenizerDefinition } from "./Lexer";
+import { OvaleProfilerClass, Profiler } from "./profiler";
+import { OvaleDebugClass, Tracer } from "./debug";
+import { Tokenizer, TokenizerDefinition } from "./lexer";
 import {
     FunctionInfos,
     getFunctionSignature,
     OvaleConditionClass,
-} from "./Condition";
-import { OvaleLexer, LexerFilter } from "./Lexer";
-import { OvaleScriptsClass } from "./Scripts";
+} from "./condition";
+import { OvaleLexer, LexerFilter } from "./lexer";
+import { OvaleScriptsClass } from "./scripts";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import {
     LuaArray,
@@ -28,11 +28,11 @@ import { format, gsub, lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
 import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
-import { SpellInfoProperty, SpellInfoValues } from "./Data";
+import { SpellInfoProperty, SpellInfoValues } from "./data";
 import { HasteType } from "../states/PaperDoll";
 import { Result } from "../simulationcraft/definitions";
 import { newTimeSpan, OvaleTimeSpan } from "../tools/TimeSpan";
-import { ActionType } from "./BestAction";
+import { ActionType } from "./best-action";
 import { PowerType } from "../states/Power";
 
 const KEYWORD: LuaObj<boolean> = {

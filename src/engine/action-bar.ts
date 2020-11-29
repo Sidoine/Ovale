@@ -1,6 +1,6 @@
 import { L } from "../ui/Localization";
-import { OvaleDebugClass, Tracer } from "./Debug";
-import { OvaleProfilerClass, Profiler } from "./Profiler";
+import { OvaleDebugClass, Tracer } from "./debug";
+import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";

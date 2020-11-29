@@ -31,12 +31,12 @@ import {
     NodeTypes,
     PositionalParameters,
     setResultType,
-} from "./AST";
+} from "./ast";
 import { BaseState } from "../states/BaseState";
-import { ActionType } from "./BestAction";
-import { OvaleConditionClass } from "./Condition";
-import { OvaleDebugClass, Tracer } from "./Debug";
-import { OvaleProfilerClass, Profiler } from "./Profiler";
+import { ActionType } from "./best-action";
+import { OvaleConditionClass } from "./condition";
+import { OvaleDebugClass, Tracer } from "./debug";
+import { OvaleProfilerClass, Profiler } from "./profiler";
 import {
     EMPTY_SET,
     newTimeSpan,
