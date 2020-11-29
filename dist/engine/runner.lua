@@ -668,9 +668,11 @@ __exports.Runner = __class(nil, {
     end,
     computePositionalParameters = function(self, node, atTime)
         if node.cachedParams.serial == nil or node.cachedParams.serial < self.self_serial then
+            self.tracer:Log("computing positional parameters")
             node.cachedParams.serial = self.self_serial
             for k, v in ipairs(node.rawPositionalParams) do
                 node.cachedParams.positional[k] = self:computeAsValue(v, atTime)
+                self.tracer:Log("Parameter %d is %s", k, tostring(node.cachedParams.positional[k]))
             end
         end
         return node.cachedParams.positional

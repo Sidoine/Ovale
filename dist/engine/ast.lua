@@ -31,6 +31,7 @@ local isNumber = __toolstools.isNumber
 local __toolsTimeSpan = LibStub:GetLibrary("ovale/tools/TimeSpan")
 local EMPTY_SET = __toolsTimeSpan.EMPTY_SET
 local newTimeSpan = __toolsTimeSpan.newTimeSpan
+local UNIVERSE = __toolsTimeSpan.UNIVERSE
 local KEYWORD = {
     ["and"] = true,
     ["if"] = true,
@@ -1617,9 +1618,7 @@ __exports.OvaleASTClass = __class(nil, {
                 self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
                 return nil
             end
-            local node = self:NewNode("string", annotation)
-            node.value = value
-            node.result.constant = true
+            local node = self:newString(annotation, value)
             annotation.stringReference = annotation.stringReference or {}
             annotation.stringReference[#annotation.stringReference + 1] = node
             return node
@@ -1721,11 +1720,7 @@ __exports.OvaleASTClass = __class(nil, {
         annotation.numberFlyweight = annotation.numberFlyweight or {}
         local node = annotation.numberFlyweight[value]
         if  not node then
-            node = self:NewNode("value", annotation)
-            node.value = value
-            node.result.constant = true
-            node.origin = 0
-            node.rate = 0
+            node = self:newValue(annotation, value)
             annotation.numberFlyweight[value] = node
         end
         return node
@@ -1880,6 +1875,9 @@ __exports.OvaleASTClass = __class(nil, {
                         positionalParams[key] = self:newValue(annotation, parameterInfos.defaultValue)
                     elseif parameterInfos.type == "boolean" then
                         positionalParams[key] = self:newBoolean(annotation, parameterInfos.defaultValue)
+                    else
+                        self:SyntaxError(tokenStream, "Type error: parameter type unknown in %s function", name)
+                        return nil
                     end
                 elseif  not parameterInfos.optional then
                     self:SyntaxError(tokenStream, "Type error: parameter %s is required in %s function", parameterInfos.name, name)
@@ -2119,6 +2117,10 @@ __exports.OvaleASTClass = __class(nil, {
         local node = self:NewNode("string", annotation)
         node.value = value
         node.result.constant = true
+        local result = node.result
+        result.timeSpan:copyFromArray(UNIVERSE)
+        result.type = "value"
+        result.value = value
         return node
     end,
     newVariable = function(self, annotation, name)
@@ -2130,12 +2132,22 @@ __exports.OvaleASTClass = __class(nil, {
         local node = self:NewNode("value", annotation)
         node.value = value
         node.result.constant = true
+        local result = node.result
+        result.type = "value"
+        result.value = value
+        result.timeSpan:copyFromArray(UNIVERSE)
+        result.origin = 0
+        result.rate = 0
         return node
     end,
     newBoolean = function(self, annotation, value)
         local node = self:NewNode("boolean", annotation)
         node.value = value
         node.result.constant = true
+        local result = node.result
+        result.timeSpan:copyFromArray(UNIVERSE)
+        result.type = "value"
+        result.value = value
         return node
     end,
     newUndefined = function(self, annotation)

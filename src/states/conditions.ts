@@ -735,7 +735,10 @@ export class OvaleConditions {
         namedParams,
         atTime
     ): ConditionResult => {
-        const [auraId, seconds] = [positionalParams[1], positionalParams[2] || 0] ;
+        const [auraId, seconds] = [
+            positionalParams[1],
+            positionalParams[2] || 0,
+        ];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams

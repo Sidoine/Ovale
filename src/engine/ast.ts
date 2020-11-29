@@ -31,7 +31,12 @@ import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
 import { SpellInfoProperty, SpellInfoValues } from "./data";
 import { HasteType } from "../states/PaperDoll";
 import { Result } from "../simulationcraft/definitions";
-import { EMPTY_SET, newTimeSpan, OvaleTimeSpan } from "../tools/TimeSpan";
+import {
+    EMPTY_SET,
+    newTimeSpan,
+    OvaleTimeSpan,
+    UNIVERSE,
+} from "../tools/TimeSpan";
 import { ActionType } from "./best-action";
 import { PowerType } from "../states/Power";
 
@@ -1165,11 +1170,7 @@ export class OvaleASTClass {
         annotation.numberFlyweight = annotation.numberFlyweight || {};
         let node = annotation.numberFlyweight[value];
         if (!node) {
-            node = this.NewNode("value", annotation);
-            node.value = value;
-            node.result.constant = true;
-            node.origin = 0;
-            node.rate = 0;
+            node = this.newValue(annotation, value);
             annotation.numberFlyweight[value] = node;
         }
         return node;
@@ -2354,6 +2355,13 @@ export class OvaleASTClass {
                             annotation,
                             parameterInfos.defaultValue
                         );
+                    } else {
+                        this.SyntaxError(
+                            tokenStream,
+                            "Type error: parameter type unknown in %s function",
+                            name
+                        );
+                        return undefined;
                     }
                 } else if (!parameterInfos.optional) {
                     this.SyntaxError(
@@ -3649,9 +3657,7 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        const node = this.NewNode("string", annotation);
-        node.value = value;
-        node.result.constant = true;
+        const node = this.newString(annotation, value);
         annotation.stringReference = annotation.stringReference || {};
         annotation.stringReference[
             lualength(annotation.stringReference) + 1
@@ -3746,6 +3752,10 @@ export class OvaleASTClass {
         const node = this.NewNode("string", annotation);
         node.value = value;
         node.result.constant = true;
+        const result = node.result as NodeValueResult;
+        result.timeSpan.copyFromArray(UNIVERSE);
+        result.type = "value";
+        result.value = value;
         return node;
     }
 
@@ -3759,6 +3769,12 @@ export class OvaleASTClass {
         const node = this.NewNode("value", annotation);
         node.value = value;
         node.result.constant = true;
+        const result = node.result as NodeValueResult;
+        result.type = "value";
+        result.value = value;
+        result.timeSpan.copyFromArray(UNIVERSE);
+        result.origin = 0;
+        result.rate = 0;
         return node;
     }
 
@@ -3766,6 +3782,10 @@ export class OvaleASTClass {
         const node = this.NewNode("boolean", annotation);
         node.value = value;
         node.result.constant = true;
+        const result = node.result as NodeValueResult;
+        result.timeSpan.copyFromArray(UNIVERSE);
+        result.type = "value";
+        result.value = value;
         return node;
     }
 

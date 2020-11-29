@@ -1229,11 +1229,17 @@ export class Runner {
             node.cachedParams.serial === undefined ||
             node.cachedParams.serial < this.self_serial
         ) {
+            this.tracer.Log("computing positional parameters");
             node.cachedParams.serial = this.self_serial;
             for (const [k, v] of ipairs(node.rawPositionalParams)) {
                 node.cachedParams.positional[k] = this.computeAsValue(
                     v,
                     atTime
+                );
+                this.tracer.Log(
+                    "Parameter %d is %s",
+                    k,
+                    tostring(node.cachedParams.positional[k])
                 );
             }
         }
