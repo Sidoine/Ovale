@@ -267,7 +267,7 @@ __exports.MISC_OPERAND = {
         modifiers = powerModifiers
     },
     ["ca_active"] = {
-        code = "talent(careful_aim_talent) and targethealthpercent() > 70",
+        code = "talent(careful_aim_talent) and target.healthpercent() > 70",
         symbolsInCode = {
             [1] = "careful_aim_talent"
         }

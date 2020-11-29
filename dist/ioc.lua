@@ -205,5 +205,6 @@ __exports.IoC = __class(nil, {
         self.azeriteArmor:registerConditions(self.condition)
         self.stagger:registerConditions(self.condition)
         self.stance:registerConditions(self.condition)
+        self.stagger:registerConditions(self.condition)
     end,
 })

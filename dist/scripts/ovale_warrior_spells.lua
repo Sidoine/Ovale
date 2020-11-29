@@ -371,7 +371,7 @@ Define(memory_of_lucid_dreams_essence_id 27)
 Define(blood_of_the_enemy_essence_id 23)
     ]]
     code = code .. [[
-SpellRequire(execute unusable set=1 enabled=(targetHealthPercent() > 20))
+SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
   ]]
     OvaleScripts:RegisterScript("WARRIOR", nil, name, desc, code, "include")
 end

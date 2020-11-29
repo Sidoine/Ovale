@@ -240,19 +240,16 @@ Define(vengeful_shock_conduit 195)
     `;
 // END
     code += `
-
-    
-    
 Define(blinding_light_talent 9)
 Define(divine_shield 642)
 	SpellInfo(divine_shield cd=300 duration=8)
-  SpellRequire(divine_shield cd add=-90 enabled=(hastalent(unbreakable_spirit_talent)))
+    SpellRequire(divine_shield cd add=-90 enabled=(hastalent(unbreakable_spirit_talent)))
 	SpellAddBuff(divine_shield divine_shield add=1)
 	SpellRequire(divine_shield unusable set=1 enabled=(debuffpresent(forbearance_debuff)))
 Define(forbearance_debuff 25771)
     SpellInfo(forbearance_debuff duration=30)
 #hammer_of_wrath
-    SpellRequire(hammer_of_wrath unusable set=1 enabled=(targethealthpercent() > 20))
+    SpellRequire(hammer_of_wrath unusable set=1 enabled=(target.healthpercent() > 20 and (level()<58 or not buffpresent(avenging_wrath))))
 Define(lay_on_hands 633)
     SpellInfo(lay_on_hands cd=600)
     SpellRequire(lay_on_hands cd add=-180 enabled=(hastalent(unbreakable_spirit_talent)))
@@ -269,7 +266,13 @@ Define(unbreakable_spirit_talent 10)
 
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
     SpellAddBuff(word_of_glory divine_purpose set=0)
-    
+#word_of_glory
+    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
+    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(shining_light_free_buff)))
+    SpellAddBuff(word_of_glory divine_purpose set=0)
+    SpellAddBuff(word_of_glory shining_light_free_buff set=0)
+Define(shining_light_free_buff 327510)
+    SpellInfo(shining_light_free_buff duration=30)
     `;
     OvaleScripts.RegisterScript(
         "PALADIN",
