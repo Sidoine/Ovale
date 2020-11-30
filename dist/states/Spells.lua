@@ -99,17 +99,20 @@ __exports.OvaleSpellsClass = __class(nil, {
     end,
     IsUsableSpell = function(self, spellId, atTime, targetGUID)
         self.profiler:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
-        local isUsable = self.OvaleSpellBook:IsKnownSpell(spellId)
-        local noMana = false
+        local isUsable, noMana = true, false
+        local isKnown = self.OvaleSpellBook:IsKnownSpell(spellId)
+        if  not isKnown then
+            isUsable, noMana = IsUsableSpell(spellId)
+            isKnown = isUsable
+            self.tracer:Log("Checked WoW API for spell %s. Returns [%s, %s]", spellId, isUsable, noMana)
+        end
         local si = self.ovaleData.spellInfo[spellId]
-        if si then
-            self.tracer:Log("Found spell info about %s (isUsable = %s)", spellId, isUsable)
-            if isUsable then
-                local unusable = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
-                if unusable ~= nil and unusable > 0 then
-                    self.tracer:Log("Spell ID '%s' is flagged as unusable.", spellId)
-                    isUsable = false
-                end
+        if si and isKnown then
+            self.tracer:Log("Found spell info about %s (isKnown = %s)", spellId, isKnown)
+            local unusable = self.ovaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
+            if unusable ~= nil and unusable > 0 then
+                self.tracer:Log("Spell ID '%s' is flagged as unusable.", spellId)
+                isUsable = false
             end
             if isUsable then
                 noMana =  not self.power:hasPowerFor(si, atTime)
@@ -119,18 +122,6 @@ __exports.OvaleSpellsClass = __class(nil, {
                 else
                     self.tracer:Log("Spell ID '%s' passed power requirements.", spellId)
                 end
-            end
-        else
-            self.tracer:Log("Look for spell info about %s in spell book", spellId)
-            local index, bookType = self.OvaleSpellBook:GetSpellBookIndex(spellId)
-            if index and bookType then
-                return IsUsableSpell(index, bookType)
-            elseif self.OvaleSpellBook:IsKnownSpell(spellId) then
-                local name = self.OvaleSpellBook:GetSpellName(spellId)
-                if  not name then
-                    return false, false
-                end
-                return IsUsableSpell(name)
             end
         end
         self.profiler:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
