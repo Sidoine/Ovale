@@ -3,10 +3,6 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __statesPower = LibStub:GetLibrary("ovale/states/Power")
 local POWER_TYPES = __statesPower.POWER_TYPES
-local __controls = LibStub:GetLibrary("ovale/engine/controls")
-local checkBoxes = __controls.checkBoxes
-local lists = __controls.lists
-local ResetControls = __controls.ResetControls
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
@@ -77,7 +73,7 @@ local auraTableDispatch = {
     }
 }
 __exports.OvaleCompileClass = __class(nil, {
-    constructor = function(self, ovaleAzerite, ovaleAst, ovaleCondition, ovaleCooldown, ovalePaperDoll, ovaleData, ovaleProfiler, ovaleDebug, ovaleOptions, ovale, ovaleScore, ovaleSpellBook)
+    constructor = function(self, ovaleAzerite, ovaleAst, ovaleCondition, ovaleCooldown, ovalePaperDoll, ovaleData, ovaleProfiler, ovaleDebug, ovaleOptions, ovale, ovaleScore, ovaleSpellBook, controls)
         self.ovaleAzerite = ovaleAzerite
         self.ovaleAst = ovaleAst
         self.ovaleCondition = ovaleCondition
@@ -89,6 +85,7 @@ __exports.OvaleCompileClass = __class(nil, {
         self.ovale = ovale
         self.ovaleScore = ovaleScore
         self.ovaleSpellBook = ovaleSpellBook
+        self.controls = controls
         self.serial = nil
         self.ast = nil
         self.self_serial = 0
@@ -117,9 +114,9 @@ __exports.OvaleCompileClass = __class(nil, {
             else
                 local control
                 if event == "Ovale_CheckBoxValueChanged" then
-                    control = checkBoxes[name]
+                    control = self.controls.checkBoxesByName[name]
                 elseif event == "Ovale_ListValueChanged" then
-                    control = checkBoxes[name]
+                    control = self.controls.listsByName[name]
                 end
                 if control and control.triggerEvaluation then
                     self.EventHandler(event)
@@ -138,23 +135,18 @@ __exports.OvaleCompileClass = __class(nil, {
     EvaluateAddCheckBox = function(self, node)
         local ok = true
         local name, positionalParams, namedParams = node.name, node.rawPositionalParams, node.rawNamedParams
-        local checkBox = checkBoxes[name]
-        if  not checkBox then
-            self.self_serial = self.self_serial + 1
-            self.tracer:Debug("New checkbox '%s': advance age to %d.", name, self.self_serial)
-        end
-        checkBox = checkBox or {}
-        if node.description.type == "string" then
-            checkBox.text = node.description.value
-        end
+        local description = (node.description.type == "string" and node.description.value) or node.name
+        local defaultValue = false
         for _, v in ipairs(positionalParams) do
             if v.type == "string" and v.value == "default" then
-                checkBox.checked = true
+                defaultValue = true
                 break
             end
         end
-        checkBox.enabled = namedParams.enabled
-        checkBoxes[name] = checkBox
+        if self.controls:addCheckBox(name, description, defaultValue, namedParams.enabled) then
+            self.self_serial = self.self_serial + 1
+            self.tracer:Debug("New checkbox '%s': advance age to %d.", name, self.self_serial)
+        end
         return ok
     end,
     EvaluateAddIcon = function(self, node)
@@ -165,26 +157,18 @@ __exports.OvaleCompileClass = __class(nil, {
         local ok = true
         local name, item, positionalParams, namedParams = node.name, node.item, node.rawPositionalParams, node.rawNamedParams
         if item then
-            local list = lists[name]
-            if  not (list and list.items and list.items[item]) then
-                self.self_serial = self.self_serial + 1
-                self.tracer:Debug("New list '%s': advance age to %d.", name, self.self_serial)
-            end
-            list = list or {
-                items = {},
-                default = nil
-            }
-            if node.description.type == "string" then
-                list.items[item] = node.description.value
-            end
+            local defaultValue = false
             for _, v in ipairs(positionalParams) do
                 if v.type == "string" and v.value == "default" then
-                    list.default = item
+                    defaultValue = true
                     break
                 end
             end
-            list.enabled = namedParams.enabled
-            lists[name] = list
+            local description = (node.description.type == "string" and node.description.value) or item
+            if self.controls:addListItem(name, item, description, defaultValue, namedParams.enabled) then
+                self.self_serial = self.self_serial + 1
+                self.tracer:Debug("New list '%s': advance age to %d.", name, self.self_serial)
+            end
         end
         return ok
     end,
@@ -411,7 +395,7 @@ __exports.OvaleCompileClass = __class(nil, {
         else
             self.tracer:Debug("No conditions. No need to compile.")
         end
-        ResetControls()
+        self.controls:reset()
         return self.ast
     end,
     EvaluateScript = function(self, ast, forceEvaluation)

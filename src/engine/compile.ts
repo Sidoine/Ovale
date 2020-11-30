@@ -21,7 +21,7 @@ import { AuraType, OvaleDataClass, SpellAddAuras, SpellInfo } from "./data";
 import { OvalePaperDollClass } from "../states/PaperDoll";
 import { POWER_TYPES, PowerType } from "../states/Power";
 import { OvaleSpellBookClass } from "../states/SpellBook";
-import { checkBoxes, lists, ResetControls } from "./controls";
+import { Controls } from "./controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     ipairs,
@@ -108,7 +108,8 @@ export class OvaleCompileClass {
         private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private controls: Controls
     ) {
         this.tracer = ovaleDebug.create("OvaleCompile");
         this.profiler = ovaleProfiler.create("OvaleCompile");
@@ -127,8 +128,25 @@ export class OvaleCompileClass {
             node.rawPositionalParams,
             node.rawNamedParams,
         ];
-        let checkBox = checkBoxes[name];
-        if (!checkBox) {
+        const description =
+            (node.description.type === "string" && node.description.value) ||
+            node.name;
+        let defaultValue = false;
+        for (const [, v] of ipairs(positionalParams)) {
+            if (v.type === "string" && v.value === "default") {
+                defaultValue = true;
+                break;
+            }
+        }
+
+        if (
+            this.controls.addCheckBox(
+                name,
+                description,
+                defaultValue,
+                namedParams.enabled
+            )
+        ) {
             this.self_serial = this.self_serial + 1;
             this.tracer.Debug(
                 "New checkbox '%s': advance age to %d.",
@@ -136,17 +154,6 @@ export class OvaleCompileClass {
                 this.self_serial
             );
         }
-        checkBox = checkBox || {};
-        if (node.description.type === "string")
-            checkBox.text = node.description.value;
-        for (const [, v] of ipairs(positionalParams)) {
-            if (v.type === "string" && v.value === "default") {
-                checkBox.checked = true;
-                break;
-            }
-        }
-        checkBox.enabled = namedParams.enabled;
-        checkBoxes[name] = checkBox;
         return ok;
     }
 
@@ -164,8 +171,28 @@ export class OvaleCompileClass {
             node.rawNamedParams,
         ];
         if (item) {
-            let list = lists[name];
-            if (!(list && list.items && list.items[item])) {
+            let defaultValue = false;
+            for (const [, v] of ipairs(positionalParams)) {
+                if (v.type === "string" && v.value == "default") {
+                    defaultValue = true;
+                    break;
+                }
+            }
+
+            let description =
+                (node.description.type === "string" &&
+                    node.description.value) ||
+                item;
+
+            if (
+                this.controls.addListItem(
+                    name,
+                    item,
+                    description,
+                    defaultValue,
+                    namedParams.enabled
+                )
+            ) {
                 this.self_serial = this.self_serial + 1;
                 this.tracer.Debug(
                     "New list '%s': advance age to %d.",
@@ -173,20 +200,6 @@ export class OvaleCompileClass {
                     this.self_serial
                 );
             }
-            list = list || {
-                items: {},
-                default: undefined,
-            };
-            if (node.description.type === "string")
-                list.items[item] = node.description.value;
-            for (const [, v] of ipairs(positionalParams)) {
-                if (v.type === "string" && v.value == "default") {
-                    list.default = item;
-                    break;
-                }
-            }
-            list.enabled = namedParams.enabled;
-            lists[name] = list;
         }
         return ok;
     }
@@ -531,9 +544,9 @@ export class OvaleCompileClass {
         } else {
             let control;
             if (event == "Ovale_CheckBoxValueChanged") {
-                control = checkBoxes[name];
+                control = this.controls.checkBoxesByName[name];
             } else if (event == "Ovale_ListValueChanged") {
-                control = checkBoxes[name];
+                control = this.controls.listsByName[name];
             }
             if (control && control.triggerEvaluation) {
                 this.EventHandler(event);
@@ -563,7 +576,7 @@ export class OvaleCompileClass {
         } else {
             this.tracer.Debug("No conditions. No need to compile.");
         }
-        ResetControls();
+        this.controls.reset();
         return this.ast;
     }
     EvaluateScript(ast?: AstScriptNode, forceEvaluation?: boolean) {

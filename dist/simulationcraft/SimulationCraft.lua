@@ -5,8 +5,6 @@ local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
 local AceConfigDialog = LibStub:GetLibrary("AceConfigDialog-3.0", true)
 local __uiLocalization = LibStub:GetLibrary("ovale/ui/Localization")
 local L = __uiLocalization.L
-local __enginecontrols = LibStub:GetLibrary("ovale/engine/controls")
-local ResetControls = __enginecontrols.ResetControls
 local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
@@ -44,7 +42,7 @@ local self_lastSimC = ""
 local self_lastScript = ""
 local name = "OvaleSimulationCraft"
 __exports.OvaleSimulationCraftClass = __class(nil, {
-    constructor = function(self, ovaleOptions, ovaleData, emiter, ovaleAst, parser, unparser, ovaleDebug, ovaleCompile, splitter, generator, ovale)
+    constructor = function(self, ovaleOptions, ovaleData, emiter, ovaleAst, parser, unparser, ovaleDebug, ovaleCompile, splitter, generator, ovale, controls)
         self.ovaleOptions = ovaleOptions
         self.ovaleData = ovaleData
         self.emiter = emiter
@@ -56,6 +54,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
         self.splitter = splitter
         self.generator = generator
         self.ovale = ovale
+        self.controls = controls
         self.OnInitialize = function()
             self.emiter:InitializeDisambiguation()
             self:CreateOptions()
@@ -293,7 +292,7 @@ __exports.OvaleSimulationCraftClass = __class(nil, {
                 annotation.dictionary = dictionaryAnnotation.definition
                 self.ovaleAst:PropagateConstants(dictionaryAST)
                 self.ovaleAst:PropagateStrings(dictionaryAST)
-                ResetControls()
+                self.controls:reset()
                 self.ovaleCompile:EvaluateScript(dictionaryAST, true)
             end
             for _, node in ipairs(profile.actionList) do

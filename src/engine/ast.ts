@@ -1457,7 +1457,7 @@ export class OvaleASTClass {
                 let first = true;
                 for (const [k, v] of ipairs(infos.parameters)) {
                     const value = node.rawPositionalParams[k];
-                    if (value) {
+                    if (value && value.type !== "undefined") {
                         if (
                             v.name === "filter" ||
                             v.name === "target" ||

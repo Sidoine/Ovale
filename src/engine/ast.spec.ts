@@ -1,4 +1,4 @@
-import { test, expect, beforeAll } from "@jest/globals";
+import { test, expect } from "@jest/globals";
 import { Mock, It } from "typemoq";
 import { OvaleASTClass } from "./ast";
 import { OvaleConditionClass } from "./condition";
@@ -9,16 +9,15 @@ import { OvaleSpellBookClass } from "../states/SpellBook";
 import { format } from "@wowts/string";
 import { assertDefined, assertIs } from "../tests/helpers";
 
-const context = {
-    ovaleConditionMock: Mock.ofType<OvaleConditionClass>(),
-    ovaleDebugMock: Mock.ofType<OvaleDebugClass>(),
-    ovaleProfilerMock: Mock.ofType<OvaleProfilerClass>(),
-    ovaleScriptsMock: Mock.ofType<OvaleScriptsClass>(),
-    ovaleSpellbookMock: Mock.ofType<OvaleSpellBookClass>(),
-    tracerMock: Mock.ofType<Tracer>(),
-};
-
-beforeAll(() => {
+function makeContext() {
+    const context = {
+        ovaleConditionMock: Mock.ofType<OvaleConditionClass>(),
+        ovaleDebugMock: Mock.ofType<OvaleDebugClass>(),
+        ovaleProfilerMock: Mock.ofType<OvaleProfilerClass>(),
+        ovaleScriptsMock: Mock.ofType<OvaleScriptsClass>(),
+        ovaleSpellbookMock: Mock.ofType<OvaleSpellBookClass>(),
+        tracerMock: Mock.ofType<Tracer>(),
+    };
     const tracer = context.tracerMock;
     tracer
         .setup((x) => x.Warning(It.isAnyString()))
@@ -44,9 +43,11 @@ beforeAll(() => {
     context.ovaleProfilerMock
         .setup((x) => x.create(It.isAny()))
         .returns(() => Mock.ofType<Profiler>().object);
-});
+    return context;
+}
 
 function makeAst() {
+    const context = makeContext();
     return {
         ast: new OvaleASTClass(
             context.ovaleConditionMock.object,
@@ -56,6 +57,7 @@ function makeAst() {
             context.ovaleSpellbookMock.object
         ),
         astAnnotation: { definition: {}, nodeList: {} },
+        context,
     };
 }
 
@@ -223,6 +225,7 @@ test("if in {}", () => {
 
 test("typed condition with only position parameters", () => {
     // Arrange
+    const { ast, astAnnotation, context } = makeAst();
     context.ovaleConditionMock
         .setup((x) => x.getInfos("test"))
         .returns(() => ({
@@ -234,7 +237,6 @@ test("typed condition with only position parameters", () => {
             },
             returnValue: { name: "return", type: "string" },
         }));
-    const { ast, astAnnotation } = makeAst();
 
     // Act
     const [astNode] = ast.ParseCode(
@@ -258,6 +260,7 @@ test("typed condition with only position parameters", () => {
 
 test("typed condition with only named parameters", () => {
     // Arrange
+    const { ast, astAnnotation, context } = makeAst();
     context.ovaleConditionMock
         .setup((x) => x.getInfos("test"))
         .returns(() => ({
@@ -269,7 +272,6 @@ test("typed condition with only named parameters", () => {
             },
             returnValue: { name: "return", type: "string" },
         }));
-    const { ast, astAnnotation } = makeAst();
 
     // Act
     const [astNode] = ast.ParseCode(
@@ -294,6 +296,7 @@ test("typed condition with only named parameters", () => {
 
 test("typed condition with parameters with default values", () => {
     // Arrange
+    const { ast, astAnnotation, context } = makeAst();
     context.ovaleConditionMock
         .setup((x) => x.getInfos("test"))
         .returns(() => ({
@@ -326,7 +329,6 @@ test("typed condition with parameters with default values", () => {
             },
             returnValue: { name: "return", type: "string" },
         }));
-    const { ast, astAnnotation } = makeAst();
 
     // Act
     const [astNode] = ast.ParseCode("expression", `test()`, {}, astAnnotation);
@@ -377,6 +379,7 @@ test("boolean node", () => {
 
 test("unparse typed function with optional parameters", () => {
     // Arrange
+    const { ast, astAnnotation, context } = makeAst();
     context.ovaleConditionMock
         .setup((x) => x.getInfos("test"))
         .returns(() => ({
@@ -404,7 +407,6 @@ test("unparse typed function with optional parameters", () => {
             },
             returnValue: { name: "return", type: "string" },
         }));
-    const { ast, astAnnotation } = makeAst();
 
     // Act
     const [astNode] = ast.ParseCode(
