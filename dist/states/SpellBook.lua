@@ -242,7 +242,6 @@ __exports.OvaleSpellBookClass = __class(nil, {
                         end
                     end
                 end
-            elseif skillType == "FUTURESPELL" then
             elseif  not skillType then
                 break
             end

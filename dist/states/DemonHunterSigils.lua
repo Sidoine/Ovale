@@ -20,7 +20,7 @@ local sigil_start = {
     },
     [189110] = {
         type = "flame",
-        talent = 7
+        talent = 1
     },
     [202137] = {
         type = "silence"

@@ -328,7 +328,6 @@ export class OvaleSpellBookClass {
                         }
                     }
                 }
-            } else if (skillType == "FUTURESPELL") {
             } else if (!skillType) {
                 break;
             }

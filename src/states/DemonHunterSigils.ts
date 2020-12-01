@@ -3,7 +3,11 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import {
+    GetTime,
+    CombatLogGetCurrentEventInfo,
+    TalentIndex,
+} from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { StateModule } from "../engine/state";
@@ -27,7 +31,7 @@ const sigil_start: LuaArray<Sigil> = {
     },
     [189110]: {
         type: "flame",
-        talent: 7,
+        talent: TalentIndex.abyssal_strike_talent,
     },
     [202137]: {
         type: "silence",

@@ -103,7 +103,8 @@ export class LastSpell {
             if (sc.success) {
                 if (
                     spellcast === undefined ||
-                    spellcast.success! < sc.success
+                    spellcast.success === undefined ||
+                    spellcast.success < sc.success
                 ) {
                     spellcast = sc;
                 }

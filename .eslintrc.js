@@ -16,6 +16,7 @@ module.exports = {
         "@typescript-eslint/no-empty-function": "off",
         "no-constant-condition": "off",
         "@typescript-eslint/no-this-alias": "off",
+        "no-empty-pattern": "off",
 
         // TODO enable these
         "prefer-const": "off",
