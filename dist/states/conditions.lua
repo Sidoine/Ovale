@@ -63,10 +63,6 @@ end
 local AMPLIFICATION = 146051
 local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
 local IMBUED_BUFF_ID = 214336
-local NECROTIC_PLAGUE_TALENT = 19
-local NECROTIC_PLAGUE_DEBUFF = 155159
-local BLOOD_PLAGUE_DEBUFF = 55078
-local FROST_FEVER_DEBUFF = 55095
 local STEADY_FOCUS = 177668
 local checkTargets = {
     cycle = true,
@@ -99,8 +95,8 @@ __exports.OvaleConditions = __class(nil, {
     end,
     GetDiseases = function(self, target, atTime)
         local bpAura, ffAura
-        bpAura = self.OvaleAura:GetAura(target, BLOOD_PLAGUE_DEBUFF, atTime, "HARMFUL", true)
-        ffAura = self.OvaleAura:GetAura(target, FROST_FEVER_DEBUFF, atTime, "HARMFUL", true)
+        bpAura = self.OvaleAura:GetAura(target, 55078, atTime, "HARMFUL", true)
+        ffAura = self.OvaleAura:GetAura(target, 55095, atTime, "HARMFUL", true)
         return bpAura, ffAura
     end,
     MaxPower = function(self, powerType, positionalParams, namedParams, atTime)

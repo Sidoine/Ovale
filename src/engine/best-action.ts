@@ -375,6 +375,7 @@ export class OvaleBestActionClass {
                 actionTexture = `Interface\\Icons\\${texture}`;
             }
         }
+        result.actionTexture = actionTexture;
         result.actionInRange = false;
         result.actionCooldownStart = 0;
         result.actionCooldownDuration = 0;
