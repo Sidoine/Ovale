@@ -562,13 +562,7 @@ Define(perforated_veins_conduit 248)
   SpellDamageBuff(garrote subterfuge set=1.8 enabled=(specialization(assassination) and hastalent(subterfuge_talent)))
   SpellDamageBuff(garrote 11327 set=1.8 enabled=(specialization(assassination) and hastalent(subterfuge_talent)))
 
-# Fix broken spell definitions inherited from Simulationcraft.
-Define(rupture_debuff 1943)
-Define(sepsis 328305)
   SpellInfo(sepsis cd=90 energy=25 combopoints=-1)
-Define(shiv_debuff 319504)
-  SpellInfo(shiv_debuff duration=9)
-  SpellAddTargetDebuff(shiv shiv_debuff add=1 enabled=(specialization(assassination) and level()>=58))
 
   SpellRequire(slice_and_dice unusable set=1 enabled=(buffremains(slice_and_dice)>(combopoints()+1)*6))
 
