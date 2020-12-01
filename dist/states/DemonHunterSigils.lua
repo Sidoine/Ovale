@@ -20,7 +20,7 @@ local sigil_start = {
     },
     [189110] = {
         type = "flame",
-        talent = 1
+        talent = 22502
     },
     [202137] = {
         type = "silence"
@@ -46,7 +46,6 @@ local sigil_end = {
         type = "chains"
     }
 }
-local QUICKENED_SIGILS_TALENT = 14
 __exports.OvaleSigilClass = __class(nil, {
     constructor = function(self, ovalePaperDoll, ovale, ovaleSpellBook)
         self.ovalePaperDoll = ovalePaperDoll
@@ -107,7 +106,7 @@ __exports.OvaleSigilClass = __class(nil, {
         local charging = false
         for _, v in ipairs(activated_sigils[type]) do
             local activation_time = SIGIL_ACTIVATION_TIME + UPDATE_DELAY
-            if self.ovaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0 then
+            if self.ovaleSpellBook:GetTalentPoints(22510) > 0 then
                 activation_time = activation_time - 1
             end
             charging = charging or atTime < v + activation_time

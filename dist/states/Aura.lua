@@ -872,7 +872,6 @@ __exports.OvaleAuraClass = __class(States, {
                 if aura and ( not auraFound or auraFound.ending < aura.ending) then
                     self.debug:Log("Aura %s matching '%s' found on %s with (%s, %s)", id, auraId, guid, aura.start, aura.ending)
                     auraFound = aura
-                else
                 end
             end
             if  not auraFound then

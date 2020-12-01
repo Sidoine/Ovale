@@ -98,15 +98,10 @@ __exports.OvaleConditions = __class(nil, {
         return seconds / multiplier
     end,
     GetDiseases = function(self, target, atTime)
-        local npAura, bpAura, ffAura
-        local talented = self.OvaleSpellBook:GetTalentPoints(NECROTIC_PLAGUE_TALENT) > 0
-        if talented then
-            npAura = self.OvaleAura:GetAura(target, NECROTIC_PLAGUE_DEBUFF, atTime, "HARMFUL", true)
-        else
-            bpAura = self.OvaleAura:GetAura(target, BLOOD_PLAGUE_DEBUFF, atTime, "HARMFUL", true)
-            ffAura = self.OvaleAura:GetAura(target, FROST_FEVER_DEBUFF, atTime, "HARMFUL", true)
-        end
-        return talented, npAura, bpAura, ffAura
+        local bpAura, ffAura
+        bpAura = self.OvaleAura:GetAura(target, BLOOD_PLAGUE_DEBUFF, atTime, "HARMFUL", true)
+        ffAura = self.OvaleAura:GetAura(target, FROST_FEVER_DEBUFF, atTime, "HARMFUL", true)
+        return bpAura, ffAura
     end,
     MaxPower = function(self, powerType, positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
@@ -740,11 +735,9 @@ __exports.OvaleConditions = __class(nil, {
         self.DiseasesRemaining = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local target, _ = self:ParseCondition(positionalParams, namedParams)
-            local talented, npAura, bpAura, ffAura = self:GetDiseases(target, atTime)
+            local bpAura, ffAura = self:GetDiseases(target, atTime)
             local aura
-            if talented and npAura and self.OvaleAura:IsActiveAura(npAura, atTime) then
-                aura = npAura
-            elseif  not talented and bpAura and self.OvaleAura:IsActiveAura(bpAura, atTime) and ffAura and self.OvaleAura:IsActiveAura(ffAura, atTime) then
+            if bpAura and self.OvaleAura:IsActiveAura(bpAura, atTime) and ffAura and self.OvaleAura:IsActiveAura(ffAura, atTime) then
                 aura = (bpAura.ending < ffAura.ending and bpAura) or ffAura
             end
             if aura then
@@ -755,11 +748,9 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.DiseasesTicking = function(positionalParams, namedParams, atTime)
             local target, _ = self:ParseCondition(positionalParams, namedParams)
-            local talented, npAura, bpAura, ffAura = self:GetDiseases(target, atTime)
+            local bpAura, ffAura = self:GetDiseases(target, atTime)
             local gain, ending
-            if talented and npAura then
-                gain, ending = npAura.gain, npAura.start, npAura.ending
-            elseif  not talented and bpAura and ffAura then
+            if bpAura and ffAura then
                 gain = (bpAura.gain > ffAura.gain and bpAura.gain) or ffAura.gain
                 ending = (bpAura.ending < ffAura.ending and bpAura.ending) or ffAura.ending
             end
@@ -770,11 +761,9 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.DiseasesAnyTicking = function(positionalParams, namedParams, atTime)
             local target, _ = self:ParseCondition(positionalParams, namedParams)
-            local talented, npAura, bpAura, ffAura = self:GetDiseases(target, atTime)
+            local bpAura, ffAura = self:GetDiseases(target, atTime)
             local aura
-            if talented and npAura then
-                aura = npAura
-            elseif  not talented and (bpAura or ffAura) then
+            if bpAura or ffAura then
                 aura = bpAura or ffAura
                 if bpAura and ffAura then
                     aura = (bpAura.ending > ffAura.ending and bpAura) or ffAura

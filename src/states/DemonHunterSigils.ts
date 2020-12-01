@@ -6,7 +6,7 @@ import { insert, remove } from "@wowts/table";
 import {
     GetTime,
     CombatLogGetCurrentEventInfo,
-    TalentIndex,
+    TalentId,
 } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
@@ -31,7 +31,7 @@ const sigil_start: LuaArray<Sigil> = {
     },
     [189110]: {
         type: "flame",
-        talent: TalentIndex.abyssal_strike_talent,
+        talent: TalentId.abyssal_strike_talent,
     },
     [202137]: {
         type: "silence",
@@ -57,7 +57,7 @@ const sigil_end: LuaArray<Sigil> = {
         type: "chains",
     },
 };
-const QUICKENED_SIGILS_TALENT = 14;
+
 export class OvaleSigilClass implements StateModule {
     private module: AceModule & AceEvent;
 
@@ -162,7 +162,9 @@ export class OvaleSigilClass implements StateModule {
         for (const [, v] of ipairs(activated_sigils[type])) {
             let activation_time = SIGIL_ACTIVATION_TIME + UPDATE_DELAY;
             if (
-                this.ovaleSpellBook.GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0
+                this.ovaleSpellBook.GetTalentPoints(
+                    TalentId.quickened_sigils_talent
+                ) > 0
             ) {
                 activation_time = activation_time - 1;
             }
