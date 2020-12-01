@@ -28,6 +28,7 @@ import {
     GetUnitSpeed,
     HasFullControl,
     IsStealthed,
+    SpellId,
     UnitCastingInfo,
     UnitChannelInfo,
     UnitClass,
@@ -88,10 +89,6 @@ function Capitalize(word: string): string {
 const AMPLIFICATION = 146051;
 const INCREASED_CRIT_EFFECT_3_PERCENT = 44797;
 const IMBUED_BUFF_ID = 214336;
-const NECROTIC_PLAGUE_TALENT = 19;
-const NECROTIC_PLAGUE_DEBUFF = 155159;
-const BLOOD_PLAGUE_DEBUFF = 55078;
-const FROST_FEVER_DEBUFF = 55095;
 const STEADY_FOCUS = 177668;
 
 type Target =
@@ -1768,35 +1765,24 @@ export class OvaleConditions {
     GetDiseases(
         target: string,
         atTime: number
-    ): [boolean, Aura | undefined, Aura | undefined, Aura | undefined] {
-        let npAura, bpAura, ffAura;
-        const talented =
-            this.OvaleSpellBook.GetTalentPoints(NECROTIC_PLAGUE_TALENT) > 0;
-        if (talented) {
-            npAura = this.OvaleAura.GetAura(
-                target,
-                NECROTIC_PLAGUE_DEBUFF,
-                atTime,
-                "HARMFUL",
-                true
-            );
-        } else {
-            bpAura = this.OvaleAura.GetAura(
-                target,
-                BLOOD_PLAGUE_DEBUFF,
-                atTime,
-                "HARMFUL",
-                true
-            );
-            ffAura = this.OvaleAura.GetAura(
-                target,
-                FROST_FEVER_DEBUFF,
-                atTime,
-                "HARMFUL",
-                true
-            );
-        }
-        return [talented, npAura, bpAura, ffAura];
+    ): [Aura | undefined, Aura | undefined] {
+        let bpAura, ffAura;
+
+        bpAura = this.OvaleAura.GetAura(
+            target,
+            SpellId.blood_plague,
+            atTime,
+            "HARMFUL",
+            true
+        );
+        ffAura = this.OvaleAura.GetAura(
+            target,
+            SpellId.frost_fever_debuff,
+            atTime,
+            "HARMFUL",
+            true
+        );
+        return [bpAura, ffAura];
     }
 
     /** Get the remaining time in seconds before any diseases applied by the death knight will expire.
@@ -1821,15 +1807,9 @@ export class OvaleConditions {
             positionalParams[3],
         ];
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [talented, npAura, bpAura, ffAura] = this.GetDiseases(
-            target,
-            atTime
-        );
+        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
         let aura;
-        if (talented && npAura && this.OvaleAura.IsActiveAura(npAura, atTime)) {
-            aura = npAura;
-        } else if (
-            !talented &&
+        if (
             bpAura &&
             this.OvaleAura.IsActiveAura(bpAura, atTime) &&
             ffAura &&
@@ -1858,14 +1838,9 @@ export class OvaleConditions {
         atTime: number
     ): ConditionResult => {
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [talented, npAura, bpAura, ffAura] = this.GetDiseases(
-            target,
-            atTime
-        );
+        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
         let gain, ending;
-        if (talented && npAura) {
-            [gain, ending] = [npAura.gain, npAura.start, npAura.ending];
-        } else if (!talented && bpAura && ffAura) {
+        if (bpAura && ffAura) {
             gain = (bpAura.gain > ffAura.gain && bpAura.gain) || ffAura.gain;
             //start = (bpAura.start > ffAura.start) && bpAura.start || ffAura.start;
             ending =
@@ -1892,14 +1867,9 @@ export class OvaleConditions {
         atTime: number
     ): ConditionResult => {
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [talented, npAura, bpAura, ffAura] = this.GetDiseases(
-            target,
-            atTime
-        );
+        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
         let aura;
-        if (talented && npAura) {
-            aura = npAura;
-        } else if (!talented && (bpAura || ffAura)) {
+        if (bpAura || ffAura) {
             aura = bpAura || ffAura;
             if (bpAura && ffAura) {
                 aura = (bpAura.ending > ffAura.ending && bpAura) || ffAura;

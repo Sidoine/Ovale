@@ -44,13 +44,13 @@ export class Splitter {
     ) {
         const node = this.ovaleAst.newNodeWithChildren("logical", annotation);
         node.operator = operator;
-        if (operator == "not") {
+        if (!rhsNode) {
             node.expressionType = "unary";
             node.child[1] = lhsNode;
         } else {
             node.expressionType = "binary";
             node.child[1] = lhsNode;
-            node.child[2] = rhsNode!;
+            node.child[2] = rhsNode;
         }
         return node;
     }

@@ -277,7 +277,7 @@ __exports.Splitter = __class(nil, {
     NewLogicalNode = function(self, operator, lhsNode, rhsNode, annotation)
         local node = self.ovaleAst:newNodeWithChildren("logical", annotation)
         node.operator = operator
-        if operator == "not" then
+        if  not rhsNode then
             node.expressionType = "unary"
             node.child[1] = lhsNode
         else

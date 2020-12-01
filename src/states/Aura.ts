@@ -828,7 +828,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
             aura.value1 == value1 &&
             aura.value2 == value2 &&
             aura.value3 == value3;
-        aura.serial = this.current.serial[guid]!;
+        aura.serial = this.current.serial[guid];
         if (!auraIsActive || !auraIsUnchanged) {
             this.debug.Debug(
                 "    Adding %s %s (%s) to %s at %f, aura.serial=%d, duration=%f, expirationTime=%f, auraIsActive=%s, auraIsUnchanged=%s",
@@ -1469,7 +1469,6 @@ export class OvaleAuraClass extends States<AuraInterface> {
                         aura.ending
                     );
                     auraFound = aura;
-                } else {
                 }
             }
             if (!auraFound) {

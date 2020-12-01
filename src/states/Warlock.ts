@@ -1,6 +1,11 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
-import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import {
+    GetTime,
+    CombatLogGetCurrentEventInfo,
+    TalentId,
+    SpellId,
+} from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 import { pow } from "@wowts/math";
 import { AceModule } from "@wowts/tsaddon";
@@ -13,16 +18,16 @@ import { Compare, OvaleConditionClass } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 
-interface customAura {
+interface CustomAura {
     customId: number;
     duration: number;
     stacks: number;
     auraName: string;
 }
 
-const CUSTOM_AURAS: LuaArray<customAura> = {
-    [80240]: {
-        customId: -80240,
+const CUSTOM_AURAS: LuaArray<CustomAura> = {
+    [SpellId.havoc]: {
+        customId: -SpellId.havoc,
         duration: 10,
         stacks: 1,
         auraName: "active_havoc",
@@ -40,13 +45,6 @@ const enum DemonId {
     GrimoireFelguard = 17252,
     Vilefiend = 135816,
 }
-
-const enum Spells {
-    Implosion = 196277,
-    HandOfGuldan = 105174,
-}
-
-const INNER_DEMONS_TALENT = 17;
 
 const demonData: LuaArray<{ duration: number }> = {
     [DemonId.WildImp]: {
@@ -177,7 +175,7 @@ export class OvaleWarlockClass implements StateModule {
             this.ovale.needRefresh();
         } else if (cleuEvent == "SPELL_CAST_SUCCESS") {
             // Implosion removes all the wild imps
-            if (spellId == Spells.Implosion) {
+            if (spellId == SpellId.implosion) {
                 for (const [k, d] of pairs(this.demonsCount)) {
                     if (
                         d.id == DemonId.WildImp ||
@@ -218,7 +216,7 @@ export class OvaleWarlockClass implements StateModule {
         const delay = (ms || 0) / 1000;
         let impsSpawned = 0;
         // check for hand of guldan
-        if (this.future.next.currentCast.spellId == Spells.HandOfGuldan) {
+        if (this.future.next.currentCast.spellId == SpellId.hand_of_guldan) {
             let soulshards = this.power.current.power["soulshards"] || 0;
             if (soulshards >= 3) {
                 soulshards = 3;
@@ -228,7 +226,8 @@ export class OvaleWarlockClass implements StateModule {
 
         // inner demons talent
         const talented =
-            this.ovaleSpellBook.GetTalentPoints(INNER_DEMONS_TALENT) > 0;
+            this.ovaleSpellBook.GetTalentPoints(TalentId.inner_demons_talent) >
+            0;
         if (talented) {
             const value = this.getRemainingDemonDuration(
                 DemonId.InnerDemonsWildImp,
@@ -321,7 +320,6 @@ export class OvaleWarlockClass implements StateModule {
      */
     private getTimeToShard(now: number) {
         let value = 3600;
-        const creepingDeathTalent = 20;
         const tickTime =
             2 /
             this.ovalePaperDoll.GetHasteMultiplier(
@@ -329,7 +327,7 @@ export class OvaleWarlockClass implements StateModule {
                 this.ovalePaperDoll.next
             );
         const [activeAgonies] = this.ovaleAura.AuraCount(
-            980,
+            SpellId.agony,
             "HARMFUL",
             true,
             undefined,
@@ -340,7 +338,11 @@ export class OvaleWarlockClass implements StateModule {
             value =
                 ((1 / (0.184 * pow(activeAgonies, -2 / 3))) * tickTime) /
                 activeAgonies;
-            if (this.ovaleSpellBook.IsKnownTalent(creepingDeathTalent)) {
+            if (
+                this.ovaleSpellBook.IsKnownTalent(
+                    TalentId.creeping_death_talent
+                )
+            ) {
                 value = value * 0.85;
             }
         }

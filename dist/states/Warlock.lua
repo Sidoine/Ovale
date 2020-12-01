@@ -18,7 +18,6 @@ local CUSTOM_AURAS = {
         auraName = "active_havoc"
     }
 }
-local INNER_DEMONS_TALENT = 17
 local demonData = {
     [55659] = {
         duration = 15
@@ -121,7 +120,7 @@ __exports.OvaleWarlockClass = __class(nil, {
                 end
                 impsSpawned = impsSpawned + soulshards
             end
-            local talented = self.ovaleSpellBook:GetTalentPoints(INNER_DEMONS_TALENT) > 0
+            local talented = self.ovaleSpellBook:GetTalentPoints(23146) > 0
             if talented then
                 local value = self:getRemainingDemonDuration(143622, atTime + delay)
                 if value <= 0 then
@@ -183,12 +182,11 @@ __exports.OvaleWarlockClass = __class(nil, {
     end,
     getTimeToShard = function(self, now)
         local value = 3600
-        local creepingDeathTalent = 20
         local tickTime = 2 / self.ovalePaperDoll:GetHasteMultiplier("spell", self.ovalePaperDoll.next)
         local activeAgonies = self.ovaleAura:AuraCount(980, "HARMFUL", true, nil, now, nil)
         if activeAgonies > 0 then
             value = ((1 / (0.184 * pow(activeAgonies, -2 / 3))) * tickTime) / activeAgonies
-            if self.ovaleSpellBook:IsKnownTalent(creepingDeathTalent) then
+            if self.ovaleSpellBook:IsKnownTalent(19281) then
                 value = value * 0.85
             end
         end

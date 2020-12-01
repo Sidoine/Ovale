@@ -129,6 +129,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                     actionTexture = "Interface\\Icons\\" .. texture
                 end
             end
+            result.actionTexture = actionTexture
             result.actionInRange = false
             result.actionCooldownStart = 0
             result.actionCooldownDuration = 0
