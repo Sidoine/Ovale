@@ -45,10 +45,6 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2)
   SpellRequire(barrage unusable set=1 enabled=(not hastalent(barrage_talent_marksmanship)))
-  SpellAddBuff(barrage barrage_unused_0 add=1)
-Define(barrage_unused_0 120361)
-# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
-  SpellInfo(barrage_unused_0 gcd=0 offgcd=1)
 Define(beast_cleave_buff 118455)
 # After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
   SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
@@ -103,14 +99,6 @@ Define(chakrams 259391)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
   SpellInfo(chakrams focus=15 cd=20)
   SpellRequire(chakrams unusable set=1 enabled=(not hastalent(chakrams_talent)))
-  SpellAddBuff(chakrams chakrams_unused_2 add=1)
-  SpellAddTargetDebuff(chakrams chakrams_unused_1 add=1)
-Define(chakrams_unused_1 259398)
-# @spelldesc259381
-  SpellInfo(chakrams_unused_1 gcd=0 offgcd=1)
-Define(chakrams_unused_2 267605)
-# Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for 259396s1 Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
-  SpellInfo(chakrams_unused_2 cd=20 duration=5)
 Define(chimaera_shot 53209)
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
   SpellInfo(chimaera_shot cd=15)
@@ -174,11 +162,6 @@ Define(flanking_strike 269751)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(frenzy_buff 138895)
 # Haste increased by s1 for 10 seconds.
   SpellInfo(frenzy_buff duration=10 max_stacks=5 gcd=0 offgcd=1)
@@ -205,10 +188,6 @@ Define(in_the_rhythm 272733)
   SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(in_the_rhythm in_the_rhythm add=1)
-  SpellAddTargetDebuff(in_the_rhythm in_the_rhythm_unused_0 add=1)
-Define(in_the_rhythm_unused_0 264198)
-# When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
-  SpellInfo(in_the_rhythm_unused_0 gcd=0 offgcd=1)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
   SpellInfo(kill_command focus=30 cd=7.5)
@@ -228,10 +207,6 @@ Define(latent_poison 273286)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
-Define(lights_judgment_unused_0 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -266,12 +241,8 @@ Define(pheromone_bomb 270332)
 Define(potion_of_unbridled_fury 300714)
 # Fill yourself with unbridled energy, giving your offensive spells and attacks a chance to do an additional 300717s1 Fire damage to your target. Lasts 60 seconds.
   SpellInfo(potion_of_unbridled_fury duration=60 gcd=0 offgcd=1)
-  SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury_unused_0 add=1)
   # Chance to deal an extra 300717s1 Fire damage to your current target.
   SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury add=1)
-Define(potion_of_unbridled_fury_unused_0 300717)
-# Deal s1 Fire damage to your current target.
-  SpellInfo(potion_of_unbridled_fury_unused_0 gcd=0 offgcd=1)
 Define(precise_shots 260240)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
   SpellInfo(precise_shots gcd=0 offgcd=1)
@@ -340,10 +311,6 @@ Define(steel_trap 162488)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
   SpellInfo(steel_trap cd=30)
   SpellRequire(steel_trap unusable set=1 enabled=(not hastalent(steel_trap_talent)))
-  SpellAddTargetDebuff(steel_trap steel_trap_unused_1 add=1)
-Define(steel_trap_unused_1 162496)
-# Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
-  SpellInfo(steel_trap_unused_1 duration=60 gcd=0 offgcd=1)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
@@ -369,10 +336,6 @@ Define(vipers_venom_buff 268552)
 Define(volatile_bomb 271045)
 # Hurl a bomb at the target, exploding for 271048s1 Fire damage in a cone and coating enemies in volatile wildfire, scorching them for 271049o1 Fire damage over 6 seconds.rnrnVolatile Bomb causes an extra explosion for 260231s1 Fire damage against targets affected by Serpent Sting, and refreshes your Serpent Stings when it explodes.
   SpellInfo(volatile_bomb cd=18)
-  SpellAddTargetDebuff(volatile_bomb volatile_bomb_unused_0 add=1)
-Define(volatile_bomb_unused_0 271047)
-# Hurl a bomb at the target, exploding for 271048s1 Fire damage in a cone and coating enemies in volatile wildfire, scorching them for 271049o1 Fire damage over 6 seconds.rnrnVolatile Bomb causes an extra explosion for 260231s1 Fire damage against targets affected by Serpent Sting, and refreshes your Serpent Stings when it explodes.
-  SpellInfo(volatile_bomb_unused_0 duration=0.5 gcd=0 offgcd=1)
 Define(volley 260243)
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
   SpellInfo(volley cd=45 duration=6 tick=0.5)
@@ -387,15 +350,11 @@ Define(war_stomp 20549)
 Define(wildfire_bomb 259495)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
   SpellInfo(wildfire_bomb cd=18)
-  SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_unused_1 add=1)
 Define(wildfire_bomb_debuff 269747)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
   SpellInfo(wildfire_bomb_debuff duration=6 gcd=0 offgcd=1 tick=1)
   # Suffering w1 Fire damage every t1 sec.
   SpellAddTargetDebuff(wildfire_bomb_debuff wildfire_bomb_debuff add=1)
-Define(wildfire_bomb_unused_1 265163)
-# Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
-  SpellInfo(wildfire_bomb_unused_1 duration=0.5 gcd=0 offgcd=1)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)

@@ -114,14 +114,6 @@ Define(fist_of_the_white_tiger 261947)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1)
   SpellRequire(fist_of_the_white_tiger unusable set=1 enabled=(not hastalent(fist_of_the_white_tiger_talent)))
-  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_unused_0 add=1)
-  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_unused_1 add=1)
-Define(fist_of_the_white_tiger_unused_0 261977)
-# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-  SpellInfo(fist_of_the_white_tiger_unused_0 gcd=0 offgcd=1)
-Define(fist_of_the_white_tiger_unused_1 261978)
-# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-  SpellInfo(fist_of_the_white_tiger_unused_1 gcd=0 offgcd=1 chi=-3)
 Define(fists_of_fury 113656)
 # Pummels all targets in front of you, dealing 5*s5 damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
@@ -131,11 +123,6 @@ Define(flying_serpent_kick 101545)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(fortifying_brew 243435)
 # Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
   SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
@@ -173,10 +160,6 @@ Define(leg_sweep 119381)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
-Define(lights_judgment_unused_0 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -210,20 +193,12 @@ Define(ripple_in_space 299306)
 Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
   SpellInfo(rising_sun_kick chi=2 cd=10)
-  SpellAddTargetDebuff(rising_sun_kick rising_sun_kick_unused_0 add=1)
-Define(rising_sun_kick_unused_0 185099)
-# Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
-  SpellInfo(rising_sun_kick_unused_0 gcd=0 offgcd=1)
 Define(rushing_jade_wind 116847)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75)
   SpellRequire(rushing_jade_wind unusable set=1 enabled=(not hastalent(rushing_jade_wind_talent_windwalker)))
-  SpellAddBuff(rushing_jade_wind rushing_jade_wind_unused_0 add=1)
   # Dealing physical damage to nearby enemies every 116847t1 sec.
   SpellAddBuff(rushing_jade_wind rushing_jade_wind add=1)
-Define(rushing_jade_wind_unused_0 148187)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-  SpellInfo(rushing_jade_wind_unused_0 gcd=0 offgcd=1)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
   SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)

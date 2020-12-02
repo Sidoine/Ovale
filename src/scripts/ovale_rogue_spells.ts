@@ -133,12 +133,8 @@ Define(dreadblades 343142)
 # Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
   SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1)
   SpellRequire(dreadblades unusable set=1 enabled=(not hastalent(dreadblades_talent)))
-  SpellAddBuff(dreadblades dreadblades_unused_0 add=1)
   # Sinister Strike, ?s196937[Ghostly Strike, ][]Ambush, and Pistol Shot will refill all of your combo points when used.
   SpellAddBuff(dreadblades dreadblades add=1)
-Define(dreadblades_unused_0 343143)
-# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
-  SpellInfo(dreadblades_unused_0 gcd=0 offgcd=1 combopoints=-10)
 Define(echoing_reprimand 323547)
 # Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand energy=0 cd=45 gcd=1 combopoints=-2)
@@ -181,11 +177,6 @@ Define(flagellation 323654)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over 18 seconds.?a231719[ Silences the target for 3 seconds when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(garrote energy=45 cd=6 duration=18 gcd=1 combopoints=-1 tick=2)
@@ -254,10 +245,6 @@ Define(latent_arcana_buff 296962)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
-Define(lights_judgment_unused_0 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(marked_for_death 137619)
 # Marks the target, instantly generating s1 combo points. Cooldown reset if the target dies within 60 seconds.
   SpellInfo(marked_for_death cd=60 duration=60 gcd=0 offgcd=1 combopoints=-5)
@@ -280,14 +267,6 @@ Define(memory_of_lucid_dreams_buff 298357)
 Define(mutilate 1329)
 # Attack with both weapons, dealing a total of <dmg> Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(mutilate energy=50 gcd=1 combopoints=-2)
-  SpellAddTargetDebuff(mutilate mutilate_unused_0 add=1)
-  SpellAddTargetDebuff(mutilate mutilate_unused_1 add=1)
-Define(mutilate_unused_0 5374)
-# Instantly attacks for s2 Physical damage.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
-  SpellInfo(mutilate_unused_0 gcd=0 offgcd=1)
-Define(mutilate_unused_1 27576)
-# Instantly attacks for s2 Physical damage.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
-  SpellInfo(mutilate_unused_1 gcd=0 offgcd=1)
 Define(opportunity 195627)
 # Viciously strike an enemy, causing s1*<mult> Physical damage.?s279876[rnrnHas a s3 chance to hit an additional time, making your next Pistol Shot half cost and double damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points; each time it strikes.|r
   SpellInfo(opportunity duration=10 gcd=0 offgcd=1)

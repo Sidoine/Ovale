@@ -24,12 +24,8 @@ Define(berserking 59621)
 Define(bladestorm 227847)
 # Become an unstoppable storm of destructive force, striking up to s1 nearby targets for (1+6 seconds)*50622s1 Physical damage over 6 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
   SpellInfo(bladestorm cd=90 duration=6 tick=1)
-  SpellAddBuff(bladestorm bladestorm_unused_2 add=1)
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
   SpellAddBuff(bladestorm bladestorm add=1)
-Define(bladestorm_unused_2 50622)
-# You become a whirling storm of destructive force, striking all nearby targets with your main hand weapon for s1 Physical damage.
-  SpellInfo(bladestorm_unused_2 gcd=0 offgcd=1)
 Define(blood_fury 20572)
 # Increases your attack power by s1 for 15 seconds.
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
@@ -78,14 +74,6 @@ Define(crushing_assault_buff 278826)
 Define(crushing_blow 335097)
 # Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(crushing_blow cd=8 rage=-12)
-  SpellAddTargetDebuff(crushing_blow crushing_blow_unused_0 add=1)
-  SpellAddTargetDebuff(crushing_blow crushing_blow_unused_1 add=1)
-Define(crushing_blow_unused_0 335098)
-# Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-  SpellInfo(crushing_blow_unused_0 gcd=0 offgcd=1)
-Define(crushing_blow_unused_1 335100)
-# Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-  SpellInfo(crushing_blow_unused_1 gcd=0 offgcd=1)
 Define(deadly_calm 262228)
 # Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.
   SpellInfo(deadly_calm cd=60 duration=20 gcd=0 offgcd=1)
@@ -102,25 +90,12 @@ Define(dragon_roar 118000)
 Define(execute 5308)
 # Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
   SpellInfo(execute rage=0 cd=6)
-  SpellAddTargetDebuff(execute execute_unused_5 add=1)
-  SpellAddTargetDebuff(execute execute_offhand add=1)
-Define(execute_offhand 163558)
-# Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
-  SpellInfo(execute_offhand)
-Define(execute_unused_5 280849)
-# Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
-  SpellInfo(execute_unused_5 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -140,10 +115,6 @@ Define(intimidating_shout 5246)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
-Define(lights_judgment_unused_0 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(meat_cleaver 280392)
 # Whirlwind deals s1 more damage and now affects your next s2+s3 single-target melee attacks, instead of the next s3 attacks.
   SpellInfo(meat_cleaver gcd=0 offgcd=1)
@@ -189,33 +160,9 @@ Define(quaking_palm 107079)
 Define(raging_blow 85288)
 # A mighty blow with both weapons that deals a total of <damage> Physical damage.?s316452[rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(raging_blow cd=8 rage=-12)
-  SpellAddTargetDebuff(raging_blow raging_blow_unused_1 add=1)
-  SpellAddTargetDebuff(raging_blow raging_blow_unused_0 add=1)
-Define(raging_blow_unused_0 85384)
-# A mighty blow with both weapons that deals a total of <damage> Physical damage.?s316452[rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-  SpellInfo(raging_blow_unused_0 gcd=0 offgcd=1)
-Define(raging_blow_unused_1 96103)
-# A mighty blow with both weapons that deals a total of <damage> Physical damage.?s316452[rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-  SpellInfo(raging_blow_unused_1 gcd=0 offgcd=1)
 Define(rampage 184367)
 # ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
   SpellInfo(rampage rage=80)
-  SpellAddTargetDebuff(rampage rampage_unused_0 add=1)
-  SpellAddTargetDebuff(rampage rampage_unused_1 add=1)
-  SpellAddTargetDebuff(rampage rampage_unused_3 add=1)
-  SpellAddTargetDebuff(rampage rampage_unused_2 add=1)
-Define(rampage_unused_0 184707)
-# ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
-  SpellInfo(rampage_unused_0 gcd=0 offgcd=1)
-Define(rampage_unused_1 184709)
-# ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
-  SpellInfo(rampage_unused_1 gcd=0 offgcd=1)
-Define(rampage_unused_2 201363)
-# ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
-  SpellInfo(rampage_unused_2 gcd=0 offgcd=1)
-Define(rampage_unused_3 201364)
-# ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
-  SpellInfo(rampage_unused_3 gcd=0 offgcd=1)
 Define(ravager 152277)
 # Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
   SpellInfo(ravager cd=45 duration=12 tick=2)
@@ -307,22 +254,6 @@ Define(warbreaker 262161)
 Define(whirlwind 190411)
 # Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
   SpellInfo(whirlwind rage=30)
-  SpellAddBuff(whirlwind whirlwind_unused_4 add=1)
-  SpellAddBuff(whirlwind whirlwind_offhand_unused_0 add=1)
-  SpellAddBuff(whirlwind whirlwind_unused_6 add=1)
-  SpellAddBuff(whirlwind whirlwind_offhand add=1)
-Define(whirlwind_offhand 199851)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
-  SpellInfo(whirlwind_offhand gcd=0 offgcd=1)
-Define(whirlwind_offhand_unused_0 44949)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
-  SpellInfo(whirlwind_offhand_unused_0 gcd=0 offgcd=1)
-Define(whirlwind_unused_4 199667)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
-  SpellInfo(whirlwind_unused_4 gcd=0 offgcd=1)
-Define(whirlwind_unused_6 199852)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
-  SpellInfo(whirlwind_unused_6 gcd=0 offgcd=1)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)

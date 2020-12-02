@@ -21,11 +21,6 @@ Define(ascendance_enhancement 114051)
   SpellRequire(ascendance_enhancement unusable set=1 enabled=(not hastalent(ascendance_talent_enhancement)))
   # Transformed into a powerful Air ascendant. Auto attacks have a 114089r yard range. Stormstrike is empowered and has a 114089r yard range.
   SpellAddBuff(ascendance_enhancement ascendance_enhancement add=1)
-  SpellAddBuff(ascendance_enhancement windlash add=1)
-  SpellAddBuff(ascendance_enhancement ascendance_unused_1 add=1)
-Define(ascendance_unused_1 344548)
-# Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
-  SpellInfo(ascendance_unused_1 gcd=0 offgcd=1)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -101,10 +96,6 @@ Define(feral_lunge 196884)
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
   SpellInfo(feral_lunge cd=30 gcd=0.5)
   SpellRequire(feral_lunge unusable set=1 enabled=(not hastalent(feral_lunge_talent)))
-  SpellAddTargetDebuff(feral_lunge feral_lunge_unused_0 add=1)
-Define(feral_lunge_unused_0 196881)
-# Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
-  SpellInfo(feral_lunge_unused_0 gcd=0 offgcd=1)
 Define(feral_spirit 51533)
 # Summons two Spirit ?s147783[Raptors][Wolves] that aid you in battle for 15 seconds. They are immune to movement-impairing effects.rnrnFeral Spirit generates one stack of Maelstrom Weapon immediately, and one stack every 333957t1 sec for 15 seconds.
   SpellInfo(feral_spirit cd=120)
@@ -161,10 +152,6 @@ Define(icefury 210714)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing (108 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s3 Maelstrom.|r][]
   SpellInfo(lava_burst cd=8 maelstrom=0)
-  SpellAddTargetDebuff(lava_burst lava_burst_unused_1 add=1)
-Define(lava_burst_unused_1 285452)
-# Hurls molten lava at the target, dealing (108 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s3 Maelstrom.|r][]
-  SpellInfo(lava_burst_unused_1 gcd=0 offgcd=1)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.rnrnDamage is increased by s2 if your offhand weapon is imbued with Flametongue Weapon.
   SpellInfo(lava_lash cd=18)
@@ -180,12 +167,8 @@ Define(lightning_lasso 305483)
 Define(lightning_shield 192106)
 # Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (3.5999999999999996 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
   SpellInfo(lightning_shield duration=1800)
-  SpellAddBuff(lightning_shield lightning_shield_unused_1 add=1)
   # Chance to deal 192109s1 Nature damage when you take melee damage.
   SpellAddBuff(lightning_shield lightning_shield add=1)
-Define(lightning_shield_unused_1 192109)
-# Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (3.5999999999999996 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
-  SpellInfo(lightning_shield_unused_1 gcd=0 offgcd=1)
 Define(liquid_magma_totem 192222)
 # Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
   SpellInfo(liquid_magma_totem cd=60 duration=15 gcd=1)
@@ -258,9 +241,6 @@ Define(windfury_totem 8512)
 Define(windfury_weapon 33757)
 # Imbue your main-hand weapon with the element of Wind for 3600 seconds. Each main-hand attack has a 319773h chance to trigger two extra attacks, dealing 25504sw1 Physical damage each.
   SpellInfo(windfury_weapon)
-Define(windlash 114089)
-# A massive gust of air that deals s1 Physical damage.
-  SpellInfo(windlash gcd=0 offgcd=1)
 Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike cd=9)

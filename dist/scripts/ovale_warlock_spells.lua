@@ -128,21 +128,12 @@ Define(explosive_potential 275398)
   SpellInfo(explosive_potential duration=15 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(explosive_potential explosive_potential add=1)
-  SpellAddTargetDebuff(explosive_potential explosive_potential_unused_0 add=1)
-Define(explosive_potential_unused_0 275395)
-# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
-  SpellInfo(explosive_potential_unused_0 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(grimoire_felguard 111898)
 # Summons a Felguard who attacks the target for 17 seconds that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
   SpellInfo(grimoire_felguard soulshards=1 cd=120 duration=17)
@@ -286,10 +277,6 @@ Define(summon_infernal 1122)
   SpellInfo(summon_infernal cd=180 duration=0.25)
   # Stunned.
   SpellAddTargetDebuff(summon_infernal infernal_awakening add=1)
-  SpellAddTargetDebuff(summon_infernal summon_infernal_unused_0 add=1)
-Define(summon_infernal_unused_0 111685)
-# Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
-  SpellInfo(summon_infernal_unused_0 duration=30 gcd=0 offgcd=1)
 Define(summon_vilefiend 264119)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15)

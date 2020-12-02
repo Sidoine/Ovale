@@ -8,27 +8,11 @@ export function registerDemonHunterSpells(OvaleScripts: OvaleScriptsClass) {
     let code = `Define(annihilation 201427)
 # Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(annihilation fury=40)
-  SpellAddBuff(annihilation annihilation_unused_1 add=1)
-  SpellAddBuff(annihilation annihilation_unused_0 add=1)
-Define(annihilation_unused_0 201428)
-# Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(annihilation_unused_0 gcd=0 offgcd=1)
-Define(annihilation_unused_1 227518)
-# Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(annihilation_unused_1 gcd=0 offgcd=1)
 Define(blade_dance 188499)
 # Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
   SpellInfo(blade_dance fury=35 cd=15 duration=1)
-  SpellAddBuff(blade_dance blade_dance_unused_0 add=1)
-  SpellAddBuff(blade_dance blade_dance_unused_1 add=1)
   # Dodge chance increased by s2.
   SpellAddBuff(blade_dance blade_dance add=1)
-Define(blade_dance_unused_0 199552)
-# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
-  SpellInfo(blade_dance_unused_0 gcd=0 offgcd=1)
-Define(blade_dance_unused_1 200685)
-# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
-  SpellInfo(blade_dance_unused_1 gcd=0 offgcd=1)
 Define(blood_of_the_enemy 297969)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy)
@@ -47,14 +31,6 @@ Define(chaos_nova 179057)
 Define(chaos_strike 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike fury=40)
-  SpellAddTargetDebuff(chaos_strike chaos_strike_unused_3 add=1)
-  SpellAddTargetDebuff(chaos_strike chaos_strike_unused_2 add=1)
-Define(chaos_strike_unused_2 199547)
-# Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(chaos_strike_unused_2 gcd=0 offgcd=1)
-Define(chaos_strike_unused_3 222031)
-# Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(chaos_strike_unused_3 gcd=0 offgcd=1)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
@@ -74,16 +50,8 @@ Define(consume_magic 278326)
 Define(death_sweep 210152)
 # Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
   SpellInfo(death_sweep fury=35 cd=9)
-  SpellAddBuff(death_sweep death_sweep_unused_0 add=1)
-  SpellAddBuff(death_sweep death_sweep_unused_1 add=1)
   # Dodge chance increased by s3.
   SpellAddBuff(death_sweep death_sweep add=1)
-Define(death_sweep_unused_0 210153)
-# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
-  SpellInfo(death_sweep_unused_0 gcd=0 offgcd=1)
-Define(death_sweep_unused_1 210155)
-# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
-  SpellInfo(death_sweep_unused_1 gcd=0 offgcd=1)
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100?s321028[, and your Parry chance by 203819s1, for 6 seconds][].
   SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
@@ -114,12 +82,8 @@ Define(fel_barrage 258925)
 # Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
   SpellInfo(fel_barrage cd=60 duration=3 channel=3 tick=0.25)
   SpellRequire(fel_barrage unusable set=1 enabled=(not hastalent(fel_barrage_talent)))
-  SpellAddBuff(fel_barrage fel_barrage_unused_1 add=1)
   # Unleashing Fel.
   SpellAddBuff(fel_barrage fel_barrage add=1)
-Define(fel_barrage_unused_1 258926)
-# Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
-  SpellInfo(fel_barrage_unused_1 gcd=0 offgcd=1)
 Define(fel_bombardment 337849)
 # Immolation Aura damage has a chance to grant you a stack of Fel Bombardment, increasing the damage that your next Throw Glaive deals to your primary target by 337849s1 and launching an additional glaive at a nearby target. This effect stacks up to 337849u times.
   SpellInfo(fel_bombardment duration=30 max_stacks=5 gcd=0 offgcd=1)
@@ -146,11 +110,6 @@ Define(fiery_brand 204021)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(fodder_to_the_flame 329554)
 # Commission a duel to the death against a Condemned Demon from the Theater of Pain. Vanquishing your foe releases its demon soul and creates a pool of demon blood that lasts for 30 seconds. Fighting within the pool increases your Haste by 330910s1 and reduces the damage that enemies deal to you by 330874s1.rnrnFleshcraft treats the Condemned Demon as a powerful enemy.
   SpellInfo(fodder_to_the_flame cd=120)
@@ -158,14 +117,6 @@ Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
   SpellInfo(fracture cd=4.5 fury=-25)
   SpellRequire(fracture unusable set=1 enabled=(not hastalent(fracture_talent)))
-  SpellAddTargetDebuff(fracture fracture_unused_1 add=1)
-  SpellAddTargetDebuff(fracture fracture_unused_0 add=1)
-Define(fracture_unused_0 225921)
-# @spelldesc209795
-  SpellInfo(fracture_unused_0 gcd=0 offgcd=1)
-Define(fracture_unused_1 225919)
-# @spelldesc209795
-  SpellInfo(fracture_unused_1 gcd=0 offgcd=1)
 Define(glaive_tempest 342817)
 # Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
   SpellInfo(glaive_tempest fury=30 cd=20 duration=3)
@@ -176,12 +127,8 @@ Define(guardian_of_azeroth 295840)
 Define(immolation_aura 258920)
 # Engulf yourself in flames, ?a320364 [instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and ][]radiating 258922s1*6 seconds Fire damage over 6 seconds.?s320374[rnrn|cFFFFFFFFGenerates <havocTalentFury> Fury over 6 seconds.|r][]?(s212612 & !s320374)[rnrn|cFFFFFFFFGenerates <havocFury> Fury.|r][]?s212613[rnrn|cFFFFFFFFGenerates <vengeFury> Fury over 6 seconds.|r][]
   SpellInfo(immolation_aura cd=30 duration=6 fury=-8 tick=1)
-  SpellAddBuff(immolation_aura immolation_aura_unused_1 add=1)
   # Burning nearby enemies for 258922s1 Fire damage every t1 sec.?a207548[rnrnMovement speed increased by w4.][]?a320331[rnrnArmor increased by w5. Attackers suffer Fire damage.][]
   SpellAddBuff(immolation_aura immolation_aura add=1)
-Define(immolation_aura_unused_1 258922)
-# Engulf yourself in flames, ?a320364 [instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and ][]radiating 258922s1*6 seconds Fire damage over 6 seconds.?s320374[rnrn|cFFFFFFFFGenerates <havocTalentFury> Fury over 6 seconds.|r][]?(s212612 & !s320374)[rnrn|cFFFFFFFFGenerates <havocFury> Fury.|r][]?s212613[rnrn|cFFFFFFFFGenerates <vengeFury> Fury over 6 seconds.|r][]
-  SpellInfo(immolation_aura_unused_1 gcd=0 offgcd=1 fury=-2)
 Define(imprison 217832)
 # Imprisons a demon, beast, or humanoid, incapacitating them for 60 seconds. Damage will cancel the effect. Limit 1.
   SpellInfo(imprison cd=45 duration=60)
@@ -267,10 +214,6 @@ Define(sinful_brand 317009)
 Define(soul_cleave 228477)
 # Viciously strike 228478s2 enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds?s321021[ and heals you for an additional s5 for each Soul Fragment consumed][].
   SpellInfo(soul_cleave fury=30)
-  SpellAddBuff(soul_cleave soul_cleave_unused_0 add=1)
-Define(soul_cleave_unused_0 228478)
-# Viciously strike 228478s2 enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds?s321021[ and heals you for an additional s5 for each Soul Fragment consumed][].
-  SpellInfo(soul_cleave_unused_0 gcd=0 offgcd=1)
 Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
   SpellInfo(spirit_bomb fury=30 duration=1.5)
@@ -289,10 +232,6 @@ Define(the_unbound_force 299321)
 Define(throw_glaive 204157)
 # Throw a demonic glaive at the target, dealing 346665s1 Physical damage. The glaive can ricochet to ?s320386[346665x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
   SpellInfo(throw_glaive cd=9)
-  SpellAddTargetDebuff(throw_glaive throw_glaive_unused_4 add=1)
-Define(throw_glaive_unused_4 346665)
-# Throw a demonic glaive at the target, dealing s2 Physical damage. The glaive can ricochet to ?s320386[x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
-  SpellInfo(throw_glaive_unused_4 gcd=0 offgcd=1)
 Define(unbound_chaos_buff 347462)
   SpellInfo(unbound_chaos_buff duration=20 max_stacks=1 gcd=0 offgcd=1)
   # Damage of your next Fel Rush increased by s1.

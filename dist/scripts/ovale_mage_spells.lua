@@ -40,11 +40,6 @@ Define(arcane_intellect 1459)
 Define(arcane_missiles 5143)
 # Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(40.5 of Spell Power) Arcane damage.
   SpellInfo(arcane_missiles duration=2.5 channel=2.5 tick=0.625)
-  SpellAddBuff(arcane_missiles arcane_missiles_unused_0 add=1)
-  SpellAddTargetDebuff(arcane_missiles arcane_missiles_unused_0 add=1)
-Define(arcane_missiles_unused_0 7268)
-# Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(40.5 of Spell Power) Arcane damage.
-  SpellInfo(arcane_missiles_unused_0 gcd=0 offgcd=1)
 Define(arcane_orb 153626)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
   SpellInfo(arcane_orb cd=20 duration=2.5 arcanecharges=-1)
@@ -188,11 +183,6 @@ Define(flurry_debuff 228354)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(focused_resolve 298614)
   SpellInfo(focused_resolve duration=25 max_stacks=20 gcd=0 offgcd=1)
 Define(freezing_rain_buff 270232)
@@ -213,10 +203,6 @@ Define(frost_nova 122)
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)
-  SpellAddTargetDebuff(frostbolt frostbolt_unused_0 add=1)
-Define(frostbolt_unused_0 228597)
-# Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
-  SpellInfo(frostbolt_unused_0 gcd=0 offgcd=1)
 Define(frozen 174955)
 # Deals m2 Frost damage, and Stuns targets for 30 seconds (8 sec PvP).
   SpellInfo(frozen duration=30 gcd=0 offgcd=1)
@@ -285,10 +271,6 @@ Define(infernal_cascade 336832)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
-Define(lights_judgment_unused_0 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(living_bomb 44457)
 # The target becomes a Living Bomb, taking 217694o1 Fire damage over 4 seconds, and then exploding to deal an additional (14.000000000000002 of Spell Power) Fire damage to the target and reduced damage to all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
   SpellInfo(living_bomb cd=12)
@@ -321,10 +303,6 @@ Define(nether_tempest 114923)
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (90 of Spell Power) Fire damage to the target and reduced damage to other nearby enemies.
   SpellInfo(phoenix_flames cd=25)
-  SpellAddTargetDebuff(phoenix_flames phoenix_flames_unused_0 add=1)
-Define(phoenix_flames_unused_0 257542)
-# Hurls a Phoenix that deals (90 of Spell Power) Fire damage to the target and reduced damage to other nearby enemies.
-  SpellInfo(phoenix_flames_unused_0 gcd=0 offgcd=1)
 Define(presence_of_mind 205025)
 # Causes your next n Arcane Blasts to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
@@ -396,14 +374,10 @@ Define(scorch 2948)
 Define(shifting_power 314791)
 # Draw power from the ground beneath, dealing (47.36 of Spell Power)*4 seconds/t Nature damage over 4 seconds to enemies within 325130A1 yds. rnrnWhile channeling, your Mage ability cooldowns are reduced by -s2/1000*4 seconds/t sec over 4 seconds.
   SpellInfo(shifting_power cd=45 duration=4 channel=4 tick=1)
-  SpellAddBuff(shifting_power shifting_power_unused_0 add=1)
   # Every t1 sec, deal 325130s1 Nature damage to enemies within 325130A1 yds and reduce the remaining cooldown of your abilities by -s2/1000 sec.
   SpellAddBuff(shifting_power shifting_power add=1)
   # Rooted in place.
   SpellAddBuff(shifting_power fae_tendrils_unused_0 add=1)
-Define(shifting_power_unused_0 325130)
-# Draw power from the ground beneath, dealing (47.36 of Spell Power)*4 seconds/t Nature damage over 4 seconds to enemies within 325130A1 yds. rnrnWhile channeling, your Mage ability cooldowns are reduced by -s2/1000*4 seconds/t sec over 4 seconds.
-  SpellInfo(shifting_power_unused_0 gcd=0 offgcd=1)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)

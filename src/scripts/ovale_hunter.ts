@@ -157,7 +157,7 @@ AddFunction beast_masteryprecombatshortcdactions
  unless spell(worldvein_resonance) or spell(memory_of_lucid_dreams)
  {
   #focused_azerite_beam,if=!raid_event.invulnerable.exists
-  if not never(raid_event_invulnerable_exists) and buffexpires(focused_azerite_beam_unused_0) spell(focused_azerite_beam)
+  if not never(raid_event_invulnerable_exists) spell(focused_azerite_beam)
   #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
   if hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } spell(bestial_wrath)
  }
@@ -184,7 +184,7 @@ AddFunction beast_masteryprecombatcdactions
    #use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists&(trinket.1.has_cooldown+trinket.2.has_cooldown<2|equipped.variable_intensity_gigavolt_oscillating_reactor)
    if not never(raid_event_invulnerable_exists) and { { itemcooldown(trinket0slot) and itemcooldown(trinket1slot) } + { itemcooldown(trinket0slot) and itemcooldown(trinket1slot) } < 2 or hasequippeditem(variable_intensity_gigavolt_oscillating_reactor_item) } beast_masteryuseitemactions()
 
-   unless not never(raid_event_invulnerable_exists) and buffexpires(focused_azerite_beam_unused_0) and spell(focused_azerite_beam)
+   unless not never(raid_event_invulnerable_exists) and spell(focused_azerite_beam)
    {
     #aspect_of_the_wild,precast_time=1.3,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
     if not hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } spell(aspect_of_the_wild)
@@ -201,7 +201,7 @@ AddFunction beast_masteryprecombatcdactions
 
 AddFunction beast_masteryprecombatcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not never(raid_event_invulnerable_exists) and buffexpires(focused_azerite_beam_unused_0) and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
+ spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or not never(raid_event_invulnerable_exists) and spell(focused_azerite_beam) or hasazeritetrait(primal_instincts_trait) and not azeriteessenceismajor(essence_of_the_focusing_iris_essence_id) and { hasequippeditem(azsharas_font_of_power_item) or not hasequippeditem(cyclotronic_blast_item) } and spell(bestial_wrath)
 }
 
 ### actions.cleave

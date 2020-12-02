@@ -210,7 +210,10 @@ export function convertFromSpellData(
                     effect.trigger_spell_id
                 );
                 if (!triggeredSpell) continue;
-                if (hasAttribute(triggeredSpell, SpellAttributes.SX_HIDDEN))
+                if (
+                    hasAttribute(triggeredSpell, SpellAttributes.SX_HIDDEN) ||
+                    !triggeredSpell.tooltip
+                )
                     continue;
 
                 if (isFriendlyTarget(effect.targeting_1)) {

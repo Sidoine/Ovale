@@ -45,12 +45,8 @@ Define(berserk_bear 50334)
 Define(berserk_cat 106951)
 # Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellInfo(berserk_cat cd=180 duration=20 gcd=0 offgcd=1)
-  SpellAddBuff(berserk_cat berserk_unused_2 add=1)
   # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellAddBuff(berserk_cat berserk_cat add=1)
-Define(berserk_unused_2 343216)
-# Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
-  SpellInfo(berserk_unused_2 gcd=0 offgcd=1 combopoints=-1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -136,21 +132,12 @@ Define(ferocious_bite 22568)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20)
   SpellRequire(force_of_nature unusable set=1 enabled=(not hastalent(force_of_nature_talent)))
   # Granting s5/10*d Astral Power over d.
   SpellAddBuff(force_of_nature force_of_nature add=1)
-  SpellAddTargetDebuff(force_of_nature force_of_nature_unused_1 add=1)
-Define(force_of_nature_unused_1 248280)
-# Summons a stand of s2 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.
-  SpellInfo(force_of_nature_unused_1 duration=10 gcd=0 offgcd=1)
 Define(full_moon 202771)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(full_moon cd=15 lunarpower=-40)
@@ -199,7 +186,6 @@ Define(incarnation_king_of_the_jungle 102543)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
   SpellInfo(incarnation_king_of_the_jungle cd=180 duration=30 gcd=0 offgcd=1)
   SpellRequire(incarnation_king_of_the_jungle unusable set=1 enabled=(not hastalent(incarnation_king_of_the_jungle_talent)))
-  SpellAddBuff(incarnation_king_of_the_jungle berserk_unused_2 add=1)
   # Rake and Shred deal damage as though you were stealthed.rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.rnrnEnergy costs reduced by w2.
   SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle add=1)
   # Allows the use of Prowl even while in combat.
@@ -209,10 +195,6 @@ Define(iron_jaws 276026)
   SpellInfo(iron_jaws duration=30 gcd=0 offgcd=1)
   # Your next Maim will deal an additional w1 damage per combo point.
   SpellAddBuff(iron_jaws iron_jaws add=1)
-  SpellAddTargetDebuff(iron_jaws iron_jaws_unused_0 add=1)
-Define(iron_jaws_unused_0 276021)
-# Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
-  SpellInfo(iron_jaws_unused_0 gcd=0 offgcd=1)
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
