@@ -238,6 +238,7 @@ __exports.OvaleAuraClass = __class(States, {
                 end
             end
             if CLEU_AURA_EVENTS[cleuEvent] then
+                self.ovaleData:registerAuraSeen(spellId)
                 local unitId = self.ovaleGuid:GUIDUnit(destGUID)
                 self.debug:DebugTimestamp("UnitId: ", unitId)
                 if unitId then
@@ -273,6 +274,7 @@ __exports.OvaleAuraClass = __class(States, {
                     end
                 end
             elseif mine and CLEU_TICK_EVENTS[cleuEvent] and self_playerGUID then
+                self.ovaleData:registerAuraSeen(spellId)
                 self.debug:DebugTimestamp("%s: %s", cleuEvent, destGUID)
                 local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
                 local now = GetTime()
@@ -891,6 +893,9 @@ __exports.OvaleAuraClass = __class(States, {
         local guid = self.ovaleGuid:UnitGUID(unitId)
         if  not guid then
             return 
+        end
+        if isNumber(auraId) then
+            self.ovaleData:registerAuraAsked(auraId)
         end
         return self:GetAuraByGUID(guid, auraId, filter, mine, atTime)
     end,

@@ -8,6 +8,9 @@ local wipe = wipe
 local find = string.find
 local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isNumber = __toolstools.isNumber
+local GetSpellInfo = GetSpellInfo
+local concat = table.concat
+local insert = table.insert
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
     ["DEMONHUNTER"] = true,
@@ -77,7 +80,7 @@ local STAT_USE_NAMES = {
     [5] = "trinket_stack_proc"
 }
 __exports.OvaleDataClass = __class(nil, {
-    constructor = function(self, runner)
+    constructor = function(self, runner, ovaleDebug)
         self.runner = runner
         self.STAT_NAMES = STAT_NAMES
         self.STAT_SHORTNAME = STAT_SHORTNAME
@@ -88,6 +91,54 @@ __exports.OvaleDataClass = __class(nil, {
         self.itemInfo = {}
         self.itemList = {}
         self.spellInfo = {}
+        self.spellDebug = {}
+        self.debugOptions = {
+            data = {
+                name = "Data",
+                type = "group",
+                args = {
+                    spells = {
+                        name = "Spell data",
+                        type = "input",
+                        multiline = 25,
+                        width = "full",
+                        get = function(info)
+                            local array = {}
+                            local properties = {}
+                            for spellName, spellNameDebug in pairs(self.spellDebug) do
+                                local display = false
+                                for _, spellDebug in pairs(spellNameDebug) do
+                                    if spellDebug.auraAsked or spellDebug.spellAsked then
+                                        display = true
+                                        break
+                                    end
+                                end
+                                if display then
+                                    insert(array, spellName .. ":")
+                                    for spellId, spellDebug in pairs(spellNameDebug) do
+                                        wipe(properties)
+                                        if spellDebug.auraAsked then
+                                            insert(properties, "aura asked")
+                                        end
+                                        if spellDebug.auraSeen then
+                                            insert(properties, "aura seen")
+                                        end
+                                        if spellDebug.spellAsked then
+                                            insert(properties, "spell asked")
+                                        end
+                                        if spellDebug.spellCast then
+                                            insert(properties, "spell cast")
+                                        end
+                                        insert(array, "  " .. spellId .. ": " .. concat(properties, ", "))
+                                    end
+                                end
+                            end
+                            return concat(array, "\n")
+                        end
+                    }
+                }
+            }
+        }
         self.buffSpellList = {
             attack_power_multiplier_buff = {
                 [6673] = true,
@@ -257,6 +308,38 @@ __exports.OvaleDataClass = __class(nil, {
                 self.DEFAULT_SPELL_LIST[name] = true
             end
         end
+        for k, v in pairs(self.debugOptions) do
+            ovaleDebug.defaultOptions.args[k] = v
+        end
+    end,
+    getSpellDebug = function(self, spellId)
+        local spellName = GetSpellInfo(spellId)
+        if  not spellName then
+            spellName = "unknown"
+        end
+        local spellDebugName = self.spellDebug[spellName]
+        if  not spellDebugName then
+            spellDebugName = {}
+            self.spellDebug[spellName] = spellDebugName
+        end
+        local spellDebug = spellDebugName[spellId]
+        if  not spellDebug then
+            spellDebug = {}
+            spellDebugName[spellId] = spellDebug
+        end
+        return spellDebug
+    end,
+    registerSpellCast = function(self, spellId)
+        self:getSpellDebug(spellId).spellCast = true
+    end,
+    registerAuraSeen = function(self, spellId)
+        self:getSpellDebug(spellId).auraSeen = true
+    end,
+    registerAuraAsked = function(self, spellId)
+        self:getSpellDebug(spellId).auraAsked = true
+    end,
+    registerSpellAsked = function(self, spellId)
+        self:getSpellDebug(spellId).spellAsked = true
     end,
     Reset = function(self)
         wipe(self.itemInfo)

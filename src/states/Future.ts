@@ -884,6 +884,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         spellId: number
     ) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+            this.ovaleData.registerSpellCast(spellId);
             const spellName = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
             this.tracer.DebugTimestamp(
@@ -964,6 +965,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         spellId: number
     ) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+            this.ovaleData.registerSpellCast(spellId);
             const spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_SUCCEEDED"

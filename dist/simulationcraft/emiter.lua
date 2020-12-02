@@ -358,6 +358,7 @@ __exports.Emiter = __class(nil, {
                     isSpellAction = false
                 elseif className == "DEMONHUNTER" and action == "pick_up_fragment" then
                     bodyCode = "texture(spell_shadow_soulgem text=pickup)"
+                    conditionCode = "soulfragments() > 0"
                     isSpellAction = false
                 elseif className == "DRUID" and action == "pulverize" then
                     local debuffName = "thrash_bear_debuff"

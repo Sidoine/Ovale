@@ -555,6 +555,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
             }
         }
         if (CLEU_AURA_EVENTS[cleuEvent]) {
+            this.ovaleData.registerAuraSeen(spellId);
             const [unitId] = this.ovaleGuid.GUIDUnit(destGUID);
             this.debug.DebugTimestamp("UnitId: ", unitId);
             if (unitId) {
@@ -634,6 +635,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 }
             }
         } else if (mine && CLEU_TICK_EVENTS[cleuEvent] && self_playerGUID) {
+            this.ovaleData.registerAuraSeen(spellId);
             this.debug.DebugTimestamp("%s: %s", cleuEvent, destGUID);
             const aura = GetAura(
                 this.current.aura,
@@ -1516,6 +1518,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
     ) {
         const guid = this.ovaleGuid.UnitGUID(unitId);
         if (!guid) return;
+        if (isNumber(auraId)) this.ovaleData.registerAuraAsked(auraId);
         return this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
     }
 

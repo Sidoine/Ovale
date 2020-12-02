@@ -458,9 +458,9 @@ AddFunction havoc_defaultmainactions
  unless not gcdremaining() > 0 and havoccooldownmainpostconditions()
  {
   #pick_up_fragment,if=demon_soul_fragments>0
-  if soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
+  if soulfragments() > 0 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
   #pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
-  if furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } texture(spell_shadow_soulgem text=pickup)
+  if furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
   #throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
   if buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } spell(throw_glaive)
   #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
@@ -492,7 +492,7 @@ AddFunction havoc_defaultshortcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldownshortcdactions()
 
- unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
   if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakshortcdactions()
@@ -513,7 +513,7 @@ AddFunction havoc_defaultshortcdactions
 
 AddFunction havoc_defaultshortcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions() or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
+ not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions() or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
 }
 
 AddFunction havoc_defaultcdactions
@@ -529,7 +529,7 @@ AddFunction havoc_defaultcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldowncdactions()
 
- unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
   if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakcdactions()
@@ -550,7 +550,7 @@ AddFunction havoc_defaultcdactions
 
 AddFunction havoc_defaultcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions() or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
+ not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and { not hasazeritetrait(eyes_of_rage_trait) or spellcooldown(eye_beam) > 1.4 } and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions() or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
 }
 
 ### Havoc icons.

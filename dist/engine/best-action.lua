@@ -157,6 +157,7 @@ __exports.OvaleBestActionClass = __class(nil, {
     getSpellActionInfo = function(self, spellId, element, atTime, target)
         local targetGUID = self.OvaleGUID:UnitGUID(target)
         local result = element.result
+        self.ovaleData:registerSpellAsked(spellId)
         local si = self.ovaleData.spellInfo[spellId]
         local replacedSpellId = nil
         if si then

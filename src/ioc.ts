@@ -130,7 +130,7 @@ export class IoC {
             this.baseState,
             this.condition
         );
-        this.data = new OvaleDataClass(runner);
+        this.data = new OvaleDataClass(runner, this.debug);
         this.equipment = new OvaleEquipmentClass(
             this.ovale,
             this.debug,

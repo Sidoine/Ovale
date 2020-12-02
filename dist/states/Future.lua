@@ -389,6 +389,7 @@ __exports.OvaleFutureClass = __class(States, {
         end
         self.UNIT_SPELLCAST_START = function(event, unitId, lineId, spellId)
             if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
+                self.ovaleData:registerSpellCast(spellId)
                 local spellName = self.ovaleSpellBook:GetSpellName(spellId)
                 self.profiler:StartProfiling("OvaleFuture_UNIT_SPELLCAST_START")
                 self.tracer:DebugTimestamp(event, unitId, spellName, lineId, spellId)
@@ -427,6 +428,7 @@ __exports.OvaleFutureClass = __class(States, {
         end
         self.UNIT_SPELLCAST_SUCCEEDED = function(event, unitId, lineId, spellId)
             if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
+                self.ovaleData:registerSpellCast(spellId)
                 local spell = self.ovaleSpellBook:GetSpellName(spellId)
                 self.profiler:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
                 self.tracer:DebugTimestamp(event, unitId, spell, lineId, spellId)

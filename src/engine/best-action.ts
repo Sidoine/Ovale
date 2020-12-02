@@ -196,6 +196,7 @@ export class OvaleBestActionClass {
     ): NodeActionResult | NodeNoResult {
         const targetGUID = this.OvaleGUID.UnitGUID(target);
         const result = element.result;
+        this.ovaleData.registerSpellAsked(spellId);
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
         if (si) {

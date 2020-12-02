@@ -1223,6 +1223,7 @@ export class Emiter {
                 action === "pick_up_fragment"
             ) {
                 bodyCode = "texture(spell_shadow_soulgem text=pickup)";
+                conditionCode = "soulfragments() > 0";
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "pulverize") {
                 const debuffName = "thrash_bear_debuff";

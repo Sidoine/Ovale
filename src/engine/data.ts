@@ -11,13 +11,16 @@ import { find } from "@wowts/string";
 import { isNumber } from "../tools/tools";
 import { HasteType } from "../states/PaperDoll";
 import { Powers } from "../states/Power";
-import { SpellId } from "@wowts/wow-mock";
+import { GetSpellInfo, SpellId } from "@wowts/wow-mock";
 import {
     AstItemRequireNode,
     AstSpellAuraListNode,
     AstSpellRequireNode,
 } from "./ast";
 import { Runner } from "./runner";
+import { OptionUiAll } from "../ui/acegui-helpers";
+import { concat, insert } from "@wowts/table";
+import { OvaleDebugClass } from "./debug";
 
 const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
@@ -199,6 +202,13 @@ export interface SpellInfo extends SpellInfoValues {
     aura?: SpellAddAuras;
 }
 
+interface SpellDebug {
+    auraSeen?: boolean;
+    spellCast?: boolean;
+    auraAsked?: boolean;
+    spellAsked?: boolean;
+}
+
 export class OvaleDataClass {
     STAT_NAMES = STAT_NAMES;
     STAT_SHORTNAME = STAT_SHORTNAME;
@@ -209,6 +219,68 @@ export class OvaleDataClass {
     itemInfo: LuaArray<SpellInfo> = {};
     itemList: LuaObj<LuaArray<number>> = {};
     spellInfo: LuaObj<SpellInfo> = {};
+    private spellDebug: LuaObj<Record<number, SpellDebug>> = {};
+
+    private debugOptions: LuaObj<OptionUiAll> = {
+        data: {
+            name: "Data",
+            type: "group",
+            args: {
+                spells: {
+                    name: "Spell data",
+                    type: "input",
+                    multiline: 25,
+                    width: "full",
+                    get: (info: LuaArray<string>) => {
+                        const array: LuaArray<string> = {};
+                        const properties: LuaArray<string> = {};
+                        for (const [spellName, spellNameDebug] of pairs(
+                            this.spellDebug
+                        )) {
+                            let display = false;
+                            for (const [, spellDebug] of pairs(
+                                spellNameDebug
+                            )) {
+                                if (
+                                    spellDebug.auraAsked ||
+                                    spellDebug.spellAsked
+                                ) {
+                                    display = true;
+                                    break;
+                                }
+                            }
+                            if (display) {
+                                insert(array, `${spellName}:`);
+
+                                for (const [spellId, spellDebug] of pairs(
+                                    spellNameDebug
+                                )) {
+                                    wipe(properties);
+                                    if (spellDebug.auraAsked)
+                                        insert(properties, "aura asked");
+                                    if (spellDebug.auraSeen)
+                                        insert(properties, "aura seen");
+                                    if (spellDebug.spellAsked)
+                                        insert(properties, "spell asked");
+                                    if (spellDebug.spellCast)
+                                        insert(properties, "spell cast");
+                                    insert(
+                                        array,
+                                        `  ${spellId}: ${concat(
+                                            properties,
+                                            ", "
+                                        )}`
+                                    );
+                                }
+                            }
+                        }
+                        return concat(array, "\n");
+                    },
+                },
+            },
+        },
+    };
+
     buffSpellList: LuaObj<LuaArray<boolean>> = {
         attack_power_multiplier_buff: {
             [6673]: true,
@@ -358,7 +430,7 @@ export class OvaleDataClass {
             [SpellId.true_bearing]: true,
         },
     };
-    constructor(private runner: Runner) {
+    constructor(private runner: Runner, ovaleDebug: OvaleDebugClass) {
         for (const [, useName] of pairs(STAT_USE_NAMES)) {
             let name;
             for (const [, statName] of pairs(STAT_NAMES)) {
@@ -379,6 +451,43 @@ export class OvaleDataClass {
                 this.DEFAULT_SPELL_LIST[name] = true;
             }
         }
+
+        for (const [k, v] of pairs(this.debugOptions)) {
+            ovaleDebug.defaultOptions.args[k] = v;
+        }
+    }
+
+    private getSpellDebug(spellId: number) {
+        let [spellName] = GetSpellInfo(spellId);
+        if (!spellName) spellName = "unknown";
+
+        let spellDebugName = this.spellDebug[spellName];
+        if (!spellDebugName) {
+            spellDebugName = {};
+            this.spellDebug[spellName] = spellDebugName;
+        }
+        let spellDebug = spellDebugName[spellId];
+        if (!spellDebug) {
+            spellDebug = {};
+            spellDebugName[spellId] = spellDebug;
+        }
+        return spellDebug;
+    }
+
+    registerSpellCast(spellId: number) {
+        this.getSpellDebug(spellId).spellCast = true;
+    }
+
+    registerAuraSeen(spellId: number) {
+        this.getSpellDebug(spellId).auraSeen = true;
+    }
+
+    registerAuraAsked(spellId: number) {
+        this.getSpellDebug(spellId).auraAsked = true;
+    }
+
+    registerSpellAsked(spellId: number) {
+        this.getSpellDebug(spellId).spellAsked = true;
     }
 
     DEFAULT_SPELL_LIST: LuaObj<boolean> = {};
