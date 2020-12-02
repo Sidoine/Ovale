@@ -108,7 +108,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     );
     addSpellList("berserk", "berserk_cat", "berserk_bear");
 
-    fixIdentifier("rupture_debuff", 1943);
     fixIdentifier("sepsis", 328305);
     fixIdentifier("shiv_debuff", 319504);
 

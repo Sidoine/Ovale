@@ -227,7 +227,7 @@ export class Emiter {
         this.AddDisambiguation("none", "none");
         this.AddDisambiguation(
             "inevitable_demise_az_buff",
-            "inevitable_demise_debuff",
+            "inevitable_demise_buff",
             "WARLOCK"
         );
         this.AddDisambiguation(
@@ -286,7 +286,7 @@ export class Emiter {
         this.AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE");
         this.AddDisambiguation(
             "unbridled_fury_buff",
-            "potion_of_unbridled_fury_buff"
+            "potion_of_unbridled_fury"
         );
         this.AddDisambiguation("swipe_bear", "swipe", "DRUID");
         this.AddDisambiguation(

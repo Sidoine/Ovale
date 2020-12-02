@@ -206,6 +206,13 @@ export function convertFromSpellData(
     if (spell.spellEffects && !spell.triggered_by) {
         for (const effect of spell.spellEffects) {
             if (effect.trigger_spell_id) {
+                const triggeredSpell = spellDataById.get(
+                    effect.trigger_spell_id
+                );
+                if (!triggeredSpell) continue;
+                if (hasAttribute(triggeredSpell, SpellAttributes.SX_HIDDEN))
+                    continue;
+
                 if (isFriendlyTarget(effect.targeting_1)) {
                     if (
                         playerAuras.every(

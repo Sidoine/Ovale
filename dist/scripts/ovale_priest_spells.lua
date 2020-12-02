@@ -15,10 +15,10 @@ Define(ascended_blast 325283)
 Define(ascended_nova 325020)
 # Release a powerful burst of anima, dealing up to (74 of Spell Power) Arcane damage, based on the number of enemies, and (24 of Spell Power) healing to up to 325041s2 allies within A1 yds.rnrnGrants s3 lstack:stacks; of Boon of the Ascended for each target damaged.
   SpellInfo(ascended_nova gcd=1)
-  SpellAddBuff(ascended_nova ascended_nova_buff add=1)
-Define(ascended_nova_buff 325041)
+  SpellAddBuff(ascended_nova ascended_nova_unused_0 add=1)
+Define(ascended_nova_unused_0 325041)
 # Release a powerful burst of anima, dealing up to (74 of Spell Power) Arcane damage, based on the number of enemies, and (24 of Spell Power) healing to up to 325041s2 allies within A1 yds.rnrnGrants s3 lstack:stacks; of Boon of the Ascended for each target damaged.
-  SpellInfo(ascended_nova_buff gcd=0 offgcd=1)
+  SpellInfo(ascended_nova_unused_0 gcd=0 offgcd=1)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -88,10 +88,10 @@ Define(holy_fire 14914)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
-Define(lights_judgment_debuff 256893)
+  SpellAddTargetDebuff(lights_judgment lights_judgment_unused_0 add=1)
+Define(lights_judgment_unused_0 256893)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_debuff cd=150)
+  SpellInfo(lights_judgment_unused_0 cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -126,7 +126,6 @@ Define(mindbender 200174)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
   SpellInfo(mindbender cd=60 duration=15)
   SpellRequire(mindbender unusable set=1 enabled=(not hastalent(mindbender_talent)))
-# Unknown spell id 41967
 Define(penance 47540)
 # Launches a volley of holy light at the target, causing ?s193134[(40 of Spell Power)*4][(40 of Spell Power)*3] Holy damage to an enemy or ?s193134[(125 of Spell Power)*4][(125 of Spell Power)*3] healing to an ally over 2 seconds. Castable while moving.
   SpellInfo(penance cd=9 channel=0)
@@ -201,7 +200,6 @@ Define(shadow_word_pain 589)
 Define(shadowfiend 34433)
 # Summons a shadowy fiend to attack the target for 15 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
   SpellInfo(shadowfiend cd=180 duration=15)
-# Unknown spell id 41967
   # 343726
   SpellAddBuff(shadowfiend shadowfiend add=1)
 Define(shadowform 232698)
@@ -209,7 +207,6 @@ Define(shadowform 232698)
   SpellInfo(shadowform)
   # Spell damage dealt increased by s1.
   SpellAddBuff(shadowform shadowform add=1)
-# Unknown spell id 210195
 Define(silence 15487)
 # Silences the target, preventing them from casting spells for 4 seconds. Against non-players, also interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(silence cd=45 duration=4 gcd=0 offgcd=1)
@@ -226,16 +223,10 @@ Define(surrender_to_madness 319952)
   SpellAddBuff(surrender_to_madness surrender_to_madness add=1)
   # Mind Blast has an additional charge.rn?s193225[Spell damage dealt increased by w16.][Spell damage dealt increased by w1.]rn?s341240[Critical strike chance increased by w4.][]?s193225[ Losing w3/500 Insanity every sec.][]
   SpellAddBuff(surrender_to_madness voidform_unused_0 add=1)
-  SpellAddBuff(surrender_to_madness surrender_to_madness_buff add=1)
-  SpellAddBuff(surrender_to_madness surrender_to_madness_buff_unused_0 add=1)
   SpellAddTargetDebuff(surrender_to_madness void_eruption_unused_0 add=1)
   SpellAddTargetDebuff(surrender_to_madness void_eruption_unused_1 add=1)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddTargetDebuff(surrender_to_madness surrender_to_madness add=1)
-Define(surrender_to_madness_buff 342839)
-  SpellInfo(surrender_to_madness_buff duration=15 gcd=0 offgcd=1)
-Define(surrender_to_madness_buff_unused_0 342840)
-  SpellInfo(surrender_to_madness_buff_unused_0 duration=10 gcd=0 offgcd=1)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
@@ -291,43 +282,43 @@ Define(wrathful_faerie_debuff 342132)
   SpellInfo(wrathful_faerie_debuff duration=20 gcd=0 offgcd=1)
   # Direct damage on this target restores 327703s1/100.1 Mana or 327703s2/100 Insanity to @auracaster.rnrnFollows your Shadow Word: Pain.
   SpellAddTargetDebuff(wrathful_faerie_debuff wrathful_faerie_debuff add=1)
-Define(damnation_talent 16) #21718
+Define(damnation_talent 21718)
 # Instantly afflicts the target with Shadow Word: Pain, Vampiric Touch and Devouring Plague.
-Define(divine_star_talent 17) #19760
+Define(divine_star_talent 19760)
 # Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
-Define(hungering_void_talent 20) #21978
+Define(hungering_void_talent 21978)
 # Void Bolt causes the target to become vulnerable to the void, increasing their damage taken from you by 345219m2 for 6 seconds. This effect may only be active on one target at a time.rnrnCasting Void Bolt on an enemy that is already vulnerable extends the duration of your Voidform by m3 sec, or m4 sec if Void Bolt critically strikes.
-Define(mind_bomb_talent 11) #23375
+Define(mind_bomb_talent 23375)
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 6 seconds.
-Define(mindbender_talent 17) #21719
+Define(mindbender_talent 21719)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
-Define(mindbender_talent 17) #21719
+Define(mindbender_talent 21719)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
-Define(misery_talent 8) #23126
+Define(misery_talent 23126)
 # Vampiric Touch also applies Shadow Word: Pain to the target.
-Define(power_word_solace_talent 9) #19755
+Define(power_word_solace_talent 19755)
 # Strikes an enemy with heavenly power, dealing (80 of Spell Power) Holy damage and restoring <mana> of your maximum mana.
-Define(psychic_link_talent 14) #22311
+Define(psychic_link_talent 22311)
 # ?s205351[Shadow Word: Void][Mind Blast] deals s1 of its damage to all other targets afflicted by your Vampiric Touch within 199486A2 yards.
-Define(purge_the_wicked_talent 16) #22161
+Define(purge_the_wicked_talent 22161)
 # Cleanses the target with fire, causing (24.8 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
-Define(purge_the_wicked_talent 16) #22161
+Define(purge_the_wicked_talent 22161)
 # Cleanses the target with fire, causing (24.8 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
-Define(schism_talent 3) #22329
+Define(schism_talent 22329)
 # Attack the enemy's soul with a surge of Shadow energy, dealing (150 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
-Define(searing_nightmare_talent 9) #23127
+Define(searing_nightmare_talent 23127)
 # Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
-Define(searing_nightmare_talent 9) #23127
+Define(searing_nightmare_talent 23127)
 # Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
-Define(shadow_covenant_talent 15) #19766
+Define(shadow_covenant_talent 19766)
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
-Define(shadow_crash_talent 15) #21755
+Define(shadow_crash_talent 21755)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
-Define(surrender_to_madness_talent 21) #21979
+Define(surrender_to_madness_talent 21979)
 # Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
-Define(twist_of_fate_talent_shadow 7) #23125
+Define(twist_of_fate_talent_shadow 23125)
 # After damaging a target below s1 health, you gain 123254s2 increased damage and healing for 8 seconds.
-Define(void_torrent_talent 18) #21720
+Define(void_torrent_talent 21720)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
 Define(unbridled_fury_item 139327)
 Define(painbreaker_psalm_runeforge 6981)

@@ -36,9 +36,9 @@ Define(blood_of_the_enemy 297969)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
-Define(cascading_calamity 275378)
+Define(cascading_calamity 275376)
 # Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
-  SpellInfo(cascading_calamity duration=15 gcd=0 offgcd=1)
+  SpellInfo(cascading_calamity gcd=0 offgcd=1)
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
   SpellInfo(cataclysm cd=30)
@@ -128,10 +128,10 @@ Define(explosive_potential 275398)
   SpellInfo(explosive_potential duration=15 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(explosive_potential explosive_potential add=1)
-  SpellAddTargetDebuff(explosive_potential explosive_potential_debuff add=1)
-Define(explosive_potential_debuff 275395)
+  SpellAddTargetDebuff(explosive_potential explosive_potential_unused_0 add=1)
+Define(explosive_potential_unused_0 275395)
 # When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
-  SpellInfo(explosive_potential_debuff gcd=0 offgcd=1)
+  SpellInfo(explosive_potential_unused_0 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -187,12 +187,13 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-Define(inevitable_demise_buff 273522)
+Define(inevitable_demise_buff 334320)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
-  SpellInfo(inevitable_demise_buff gcd=0 offgcd=1)
-Define(inevitable_demise_debuff 273521)
-# Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
-  SpellInfo(inevitable_demise_debuff gcd=0 offgcd=1)
+  SpellInfo(inevitable_demise_buff duration=20 max_stacks=50 gcd=0 offgcd=1 tick=1)
+  # Drain Life deals w1 additional damage and costs w3 less mana.
+  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff add=1)
+  # Drain Life deals w1 additional damage and costs w3 less mana.
+  SpellAddTargetDebuff(inevitable_demise_buff inevitable_demise_buff add=1)
 Define(infernal_awakening 22703)
 # An infernal falls from the sky, dealing (60 of Spell Power) Fire damage to all targets, stunning them for 2 seconds.
   SpellInfo(infernal_awakening duration=2 gcd=0 offgcd=1)
@@ -285,10 +286,10 @@ Define(summon_infernal 1122)
   SpellInfo(summon_infernal cd=180 duration=0.25)
   # Stunned.
   SpellAddTargetDebuff(summon_infernal infernal_awakening add=1)
-  SpellAddTargetDebuff(summon_infernal summon_infernal_debuff add=1)
-Define(summon_infernal_debuff 111685)
+  SpellAddTargetDebuff(summon_infernal summon_infernal_unused_0 add=1)
+Define(summon_infernal_unused_0 111685)
 # Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
-  SpellInfo(summon_infernal_debuff duration=30 gcd=0 offgcd=1)
+  SpellInfo(summon_infernal_unused_0 duration=30 gcd=0 offgcd=1)
 Define(summon_vilefiend 264119)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15)
@@ -315,79 +316,79 @@ Define(vile_taint 278350)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
-Define(bilescourge_bombers_talent 2) #22048
+Define(bilescourge_bombers_talent 22048)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
-Define(cataclysm_talent 12) #23143
+Define(cataclysm_talent 23143)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
-Define(cataclysm_talent 12) #23143
+Define(cataclysm_talent 23143)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
-Define(channel_demonfire_talent 20) #23144
+Define(channel_demonfire_talent 23144)
 # Launches s1 bolts of felfire over 3 seconds at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals (19.36 of Spell Power) Fire damage to the target and (7.7 of Spell Power) Fire damage to nearby enemies.
-Define(dark_soul_instability_talent 21) #23092
+Define(dark_soul_instability_talent 23092)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
-Define(dark_soul_instability_talent 21) #23092
+Define(dark_soul_instability_talent 23092)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
-Define(dark_soul_misery_talent 21) #19293
+Define(dark_soul_misery_talent 19293)
 # Infuses your soul with the misery of fallen foes, increasing haste by (25 of Spell Power) for 20 seconds.
-Define(demonic_consumption_talent 20) #22479
+Define(demonic_consumption_talent 22479)
 # Your Demon Commander now drains 267971s2 of the life from your demon servants to empower himself.
-Define(demonic_strength_talent 3) #23138
+Define(demonic_strength_talent 23138)
 # Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
-Define(doom_talent 6) #23158
+Define(doom_talent 23158)
 # Inflicts impending doom upon the target, causing o1 Shadow damage after 20 seconds.rnrn|cFFFFFFFFDoom damage generates 1 Soul Shard.|r
-Define(drain_soul_talent 3) #23141
+Define(drain_soul_talent 23141)
 # Drains the target's soul, causing o1 Shadow damage over 5 seconds.rnrnDamage is increased by s2 against enemies below s3 health.rnrn|cFFFFFFFFGenerates 1 Soul Shard if the target dies during this effect.|r
-Define(eradication_talent 2) #22090
+Define(eradication_talent 22090)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
-Define(eradication_talent 2) #22090
+Define(eradication_talent 22090)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
-Define(fire_and_brimstone_talent 11) #22043
+Define(fire_and_brimstone_talent 22043)
 # Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard LFragment:Fragments; for each additional enemy hit.
-Define(flashover_talent 1) #22038
+Define(flashover_talent 22038)
 # Conflagrate deals s3 increased damage and grants an additional charge of Backdraft.
-Define(grimoire_of_sacrifice_talent 18) #19295
+Define(grimoire_of_sacrifice_talent 19295)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (43.75 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
-Define(grimoire_of_sacrifice_talent 18) #19295
+Define(grimoire_of_sacrifice_talent 19295)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (43.75 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
-Define(grimoire_felguard_talent 18) #21717
+Define(grimoire_felguard_talent 21717)
 # Summons a Felguard who attacks the target for 17 seconds that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
-Define(haunt_talent 17) #23159
+Define(haunt_talent 23159)
 # A ghostly soul haunts the target, dealing (68.75 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 18 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
-Define(haunt_talent 17) #23159
+Define(haunt_talent 23159)
 # A ghostly soul haunts the target, dealing (68.75 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 18 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
-Define(inferno_talent 10) #22480
+Define(inferno_talent 22480)
 # Rain of Fire damage is increased by s2 and has a s1 chance to generate a Soul Shard Fragment.
-Define(inner_demons_talent 17) #23146
+Define(inner_demons_talent 23146)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
-Define(inner_demons_talent 17) #23146
+Define(inner_demons_talent 23146)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
-Define(internal_combustion_talent 5) #21695
+Define(internal_combustion_talent 21695)
 # Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
-Define(nether_portal_talent 21) #23091
+Define(nether_portal_talent 23091)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
-Define(phantom_singularity_talent 11) #19292
+Define(phantom_singularity_talent 19292)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(22.5 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
-Define(phantom_singularity_talent 11) #19292
+Define(phantom_singularity_talent 19292)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(22.5 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
-Define(power_siphon_talent 5) #21694
+Define(power_siphon_talent 21694)
 # Instantly sacrifice up to s1 Wild Imps, generating s1 charges of Demonic Core that cause Demonbolt to deal 334581s1 additional damage.
-Define(shadowburn_talent 6) #23157
+Define(shadowburn_talent 23157)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
-Define(siphon_life_talent 6) #22089
+Define(siphon_life_talent 22089)
 # Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
-Define(soul_fire_talent 3) #22040
+Define(soul_fire_talent 22040)
 # Burns the enemy's soul, dealing (420 of Spell Power) Fire damage and applying Immolate.rnrn|cFFFFFFFFGenerates 281490s1/10 Soul Shard.|r
-Define(soul_fire_talent 3) #22040
+Define(soul_fire_talent 22040)
 # Burns the enemy's soul, dealing (420 of Spell Power) Fire damage and applying Immolate.rnrn|cFFFFFFFFGenerates 281490s1/10 Soul Shard.|r
-Define(soul_strike_talent 11) #22042
+Define(soul_strike_talent 22042)
 # Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
-Define(sow_the_seeds_talent 10) #19279
+Define(sow_the_seeds_talent 19279)
 # Seed of Corruption now @switch<s2>[][consumes a Soul Shard, if available, to ]embeds demon seeds into s1 additional nearby enemies.
-Define(summon_vilefiend_talent 12) #23160
+Define(summon_vilefiend_talent 23160)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
-Define(summon_vilefiend_talent 12) #23160
+Define(summon_vilefiend_talent 23160)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
-Define(vile_taint_talent 12) #22046
+Define(vile_taint_talent 22046)
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
 Define(vilefiend 135816)
 Define(wild_imp 55659)

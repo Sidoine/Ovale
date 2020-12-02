@@ -184,7 +184,7 @@ AddFunction armsexecutemainactions
  #execute,if=buff.memory_of_lucid_dreams.up|buff.deadly_calm.up|debuff.colossus_smash.up|buff.test_of_might.up
  if buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might) spell(execute)
  #slam,if=buff.crushing_assault.up&buff.memory_of_lucid_dreams.down
- if buffpresent(crushing_assault) and buffexpires(memory_of_lucid_dreams_buff) spell(slam)
+ if buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) spell(slam)
  #overpower
  spell(overpower)
  #execute
@@ -222,7 +222,7 @@ AddFunction armsexecuteshortcdactions
 
 AddFunction armsexecuteshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might) } and spell(execute) or buffpresent(crushing_assault) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
+ target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
 }
 
 AddFunction armsexecutecdactions
@@ -231,7 +231,7 @@ AddFunction armsexecutecdactions
 
 AddFunction armsexecutecdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(colossus_smash) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or not buffpresent(memory_of_lucid_dreams_buff) and buffpresent(test_of_might) and rage() < 30 and not buffpresent(deadly_calm) and spell(bladestorm) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might) } and spell(execute) or buffpresent(crushing_assault) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
+ target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or spell(deadly_calm) or { rage() < 52 and buffexpires(memory_of_lucid_dreams_buff) or rage() < 20 } and spell(skullsplitter) or { spellcooldown(colossus_smash) < 2 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 2 } and spell(ravager) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(colossus_smash) or { not azeriteessenceismajor(memory_of_lucid_dreams_essence_id) or buffpresent(memory_of_lucid_dreams_buff) or spellcooldown(memory_of_lucid_dreams) > 10 } and spell(warbreaker) or target.debuffremaining(deep_wounds_debuff) <= baseduration(mortal_strike_debuff) * 0.3 and { enemies() == 1 or not enemies() > 1 and not hastalent(cleave_talent) } and spell(mortal_strike) or { enemies() > 2 and target.debuffremaining(deep_wounds_debuff) <= baseduration(cleave) * 0.3 or enemies() > 3 } and spell(cleave) or not buffpresent(memory_of_lucid_dreams_buff) and buffpresent(test_of_might) and rage() < 30 and not buffpresent(deadly_calm) and spell(bladestorm) or { buffpresent(memory_of_lucid_dreams_buff) or buffpresent(deadly_calm) or target.debuffpresent(colossus_smash_debuff) or buffpresent(test_of_might) } and spell(execute) or buffpresent(crushing_assault_buff) and buffexpires(memory_of_lucid_dreams_buff) and spell(slam) or spell(overpower) or spell(execute)
 }
 
 ### actions.default
@@ -431,7 +431,7 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 # concentrated_flame_burn_debuff
 # condensed_lifeforce_essence_id
 # conductive_ink
-# crushing_assault
+# crushing_assault_buff
 # deadly_calm
 # deadly_calm_talent
 # deep_wounds_debuff
