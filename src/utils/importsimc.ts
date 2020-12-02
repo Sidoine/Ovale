@@ -80,7 +80,7 @@ if (existsSync("../wow-mock")) {
         encoding: "utf8",
     });
 
-    let talentInfos = `export const enum TalentId {
+    const talentInfos = `export const enum TalentId {
 ${Array.from(spellData.talentsById.values())
     .map((x) => ` 	${x.identifier} = ${x.id},`)
     .join("\n")}

@@ -13,7 +13,7 @@ export type ConditionResult = [
     /** If defined, the value is defined only before this time in seconds */
     end?: number,
     /** The value */
-    value?: number | string,
+    value?: number | string | boolean,
     /** If defined, the time at which the value is defined, otherwise, the value is a constant */
     origin?: number,
     /** If defined, the rate at which each second the value change, otherwise, the value is a constant */

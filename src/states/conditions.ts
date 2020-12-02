@@ -13,6 +13,7 @@ import {
     ParseCondition,
     ReturnValueBetween,
     ParameterInfo,
+    ReturnBoolean,
 } from "../engine/condition";
 import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
@@ -1516,22 +1517,12 @@ export class OvaleConditions {
 	 if target.CreatureFamily(Dragonkin)
 	     Spell(hibernate)
      */
-    private CreatureFamily = (
-        positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
-        atTime: number
-    ) => {
-        let [name, yesno] = [
-            <string>positionalParams[1],
-            <"yes" | "no">positionalParams[2],
-        ];
+    private CreatureFamily = (_: number, name: string, target: string) => {
         name = Capitalize(name);
-        const [target] = this.ParseCondition(positionalParams, namedParams);
         const family = UnitCreatureFamily(target);
         const lookupTable =
             LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
-        const boolean = lookupTable && family == lookupTable[name];
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(lookupTable && family == lookupTable[name]);
     };
 
     /**  Test if the target is any of the listed creature types.
@@ -1715,14 +1706,14 @@ export class OvaleConditions {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [interval, comparator, limit] = [
+        const [interval, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
         let value = 0;
         if (interval > 0) {
-            let [, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+            const [, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
                 interval
             );
             value = totalMagic;
@@ -1747,14 +1738,14 @@ export class OvaleConditions {
         namedParams: LuaObj<any>,
         atTime: number
     ) => {
-        let [interval, comparator, limit] = [
+        const [interval, comparator, limit] = [
             positionalParams[1],
             positionalParams[2],
             positionalParams[3],
         ];
         let value = 0;
         if (interval > 0) {
-            let [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+            const [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
                 interval
             );
             value = total - totalMagic;
@@ -1766,16 +1757,14 @@ export class OvaleConditions {
         target: string,
         atTime: number
     ): [Aura | undefined, Aura | undefined] {
-        let bpAura, ffAura;
-
-        bpAura = this.OvaleAura.GetAura(
+        const bpAura = this.OvaleAura.GetAura(
             target,
             SpellId.blood_plague,
             atTime,
             "HARMFUL",
             true
         );
-        ffAura = this.OvaleAura.GetAura(
+        const ffAura = this.OvaleAura.GetAura(
             target,
             SpellId.frost_fever_debuff,
             atTime,
@@ -2984,20 +2973,10 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    private Name = (
-        positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
-        atTime: number
-    ) => {
-        let [name, yesno] = [positionalParams[1], positionalParams[2]];
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        if (type(name) == "number") {
-            name = this.OvaleSpellBook.GetSpellName(name);
-        }
-        const targetName = UnitName(target);
-        const boolean = name == targetName;
-        return TestBoolean(boolean, yesno);
+    private Name = (atTime: number, target: string) => {
+        return ReturnConstant(UnitName(target));
     };
+
     /** Test if the game is on a PTR server
 	 @name PTR
 	 @paramsig number
@@ -3226,15 +3205,14 @@ export class OvaleConditions {
             if (powerMax > 0) {
                 const conversion = 100 / powerMax;
                 const power = this.OvalePower.next.power[powerType] || 0;
-                let [value, origin, rate] = [
-                    power * conversion,
-                    atTime,
+                const value = power * conversion;
+                const origin = atTime;
+                let rate =
                     this.OvalePower.getPowerRateAt(
                         this.OvalePower.next,
                         powerType,
                         atTime
-                    ) * conversion,
-                ];
+                    ) * conversion;
                 if ((rate > 0 && value >= 100) || (rate < 0 && value == 0)) {
                     rate = 0;
                 }
@@ -5097,17 +5075,12 @@ l    */
             positionalParams[2],
             positionalParams[3],
         ];
-        let [
+        const [
             charges,
             maxCharges,
             start,
             duration,
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
-        if (!charges) {
-            return [];
-        }
-        charges = charges || 0;
-        maxCharges = maxCharges || 1;
         if (namedParams.count == 0 && charges < maxCharges) {
             return TestValue(
                 atTime,
@@ -6232,7 +6205,8 @@ l    */
         namedParams: LuaObj<any>,
         atTime: number
     ): ConditionResult => {
-        let [id, seconds] = [positionalParams[1], positionalParams[2]];
+        const id = positionalParams[1];
+        let seconds = positionalParams[2];
         seconds = seconds || 0;
         const [count, , ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
         if (count !== undefined && ending !== undefined && count > 0) {
@@ -6926,10 +6900,12 @@ l    */
             this.Classification
         );
         ovaleCondition.RegisterCondition("counter", false, this.Counter);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.register(
             "creaturefamily",
-            false,
-            this.CreatureFamily
+            this.CreatureFamily,
+            { type: "boolean" },
+            { name: "name", type: "string", optional: false },
+            targetParameter
         );
         ovaleCondition.RegisterCondition(
             "creaturetype",
@@ -7112,7 +7088,12 @@ l    */
         );
         ovaleCondition.RegisterCondition("level", false, this.Level);
         ovaleCondition.RegisterCondition("list", false, this.List);
-        ovaleCondition.RegisterCondition("name", false, this.Name);
+        ovaleCondition.register(
+            "name",
+            this.Name,
+            { type: "string" },
+            targetParameter
+        );
         ovaleCondition.RegisterCondition("ptr", false, this.PTR);
         ovaleCondition.RegisterCondition(
             "persistentmultiplier",

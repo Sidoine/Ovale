@@ -12,6 +12,7 @@ local ReturnValue = __enginecondition.ReturnValue
 local ReturnConstant = __enginecondition.ReturnConstant
 local ParseCondition = __enginecondition.ParseCondition
 local ReturnValueBetween = __enginecondition.ReturnValueBetween
+local ReturnBoolean = __enginecondition.ReturnBoolean
 local ipairs = ipairs
 local pairs = pairs
 local type = type
@@ -94,9 +95,8 @@ __exports.OvaleConditions = __class(nil, {
         return seconds / multiplier
     end,
     GetDiseases = function(self, target, atTime)
-        local bpAura, ffAura
-        bpAura = self.OvaleAura:GetAura(target, 55078, atTime, "HARMFUL", true)
-        ffAura = self.OvaleAura:GetAura(target, 55095, atTime, "HARMFUL", true)
+        local bpAura = self.OvaleAura:GetAura(target, 55078, atTime, "HARMFUL", true)
+        local ffAura = self.OvaleAura:GetAura(target, 55095, atTime, "HARMFUL", true)
         return bpAura, ffAura
     end,
     MaxPower = function(self, powerType, positionalParams, namedParams, atTime)
@@ -154,7 +154,9 @@ __exports.OvaleConditions = __class(nil, {
             if powerMax > 0 then
                 local conversion = 100 / powerMax
                 local power = self.OvalePower.next.power[powerType] or 0
-                local value, origin, rate = power * conversion, atTime, self.OvalePower:getPowerRateAt(self.OvalePower.next, powerType, atTime) * conversion
+                local value = power * conversion
+                local origin = atTime
+                local rate = self.OvalePower:getPowerRateAt(self.OvalePower.next, powerType, atTime) * conversion
                 if (rate > 0 and value >= 100) or (rate < 0 and value == 0) then
                     rate = 0
                 end
@@ -644,14 +646,11 @@ __exports.OvaleConditions = __class(nil, {
             local value = self.OvaleFuture:GetCounter(counter, atTime)
             return Compare(value, comparator, limit)
         end
-        self.CreatureFamily = function(positionalParams, namedParams, atTime)
-            local name, yesno = positionalParams[1], positionalParams[2]
+        self.CreatureFamily = function(_, name, target)
             name = Capitalize(name)
-            local target = self:ParseCondition(positionalParams, namedParams)
             local family = UnitCreatureFamily(target)
             local lookupTable = LibBabbleCreatureType and LibBabbleCreatureType:GetLookupTable()
-            local boolean = lookupTable and family == lookupTable[name]
-            return TestBoolean(boolean, yesno)
+            return ReturnBoolean(lookupTable and family == lookupTable[name])
         end
         self.CreatureType = function(positionalParams, namedParams, atTime)
             local target = self:ParseCondition(positionalParams, namedParams)
@@ -1081,15 +1080,8 @@ __exports.OvaleConditions = __class(nil, {
             end
             return 
         end
-        self.Name = function(positionalParams, namedParams, atTime)
-            local name, yesno = positionalParams[1], positionalParams[2]
-            local target = self:ParseCondition(positionalParams, namedParams)
-            if type(name) == "number" then
-                name = self.OvaleSpellBook:GetSpellName(name)
-            end
-            local targetName = UnitName(target)
-            local boolean = name == targetName
-            return TestBoolean(boolean, yesno)
+        self.Name = function(atTime, target)
+            return ReturnConstant(UnitName(target))
         end
         self.PTR = function(positionalParams, namedParams, atTime)
             local comparator, limit = positionalParams[1], positionalParams[2]
@@ -1442,11 +1434,6 @@ __exports.OvaleConditions = __class(nil, {
         self.SpellCharges = function(positionalParams, namedParams, atTime)
             local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
             local charges, maxCharges, start, duration = self.OvaleCooldown:GetSpellCharges(spellId, atTime)
-            if  not charges then
-                return 
-            end
-            charges = charges or 0
-            maxCharges = maxCharges or 1
             if namedParams.count == 0 and charges < maxCharges then
                 return TestValue(atTime, INFINITY, charges + 1, start + duration, 1 / duration, comparator, limit)
             end
@@ -1729,7 +1716,8 @@ __exports.OvaleConditions = __class(nil, {
             return Compare(value, comparator, limit)
         end
         self.TotemExpires = function(positionalParams, namedParams, atTime)
-            local id, seconds = positionalParams[1], positionalParams[2]
+            local id = positionalParams[1]
+            local seconds = positionalParams[2]
             seconds = seconds or 0
             local count, _, ending = self.OvaleTotem:GetTotemInfo(id, atTime)
             if count ~= nil and ending ~= nil and count > 0 then
@@ -1988,7 +1976,13 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("class", false, self.Class)
         ovaleCondition:RegisterCondition("classification", false, self.Classification)
         ovaleCondition:RegisterCondition("counter", false, self.Counter)
-        ovaleCondition:RegisterCondition("creaturefamily", false, self.CreatureFamily)
+        ovaleCondition:register("creaturefamily", self.CreatureFamily, {
+            type = "boolean"
+        }, {
+            name = "name",
+            type = "string",
+            optional = false
+        }, targetParameter)
         ovaleCondition:RegisterCondition("creaturetype", false, self.CreatureType)
         ovaleCondition:RegisterCondition("critdamage", false, self.CritDamage)
         ovaleCondition:RegisterCondition("damage", false, self.Damage)
@@ -2046,7 +2040,9 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("lastspelldamage", false, self.LastDamage)
         ovaleCondition:RegisterCondition("level", false, self.Level)
         ovaleCondition:RegisterCondition("list", false, self.List)
-        ovaleCondition:RegisterCondition("name", false, self.Name)
+        ovaleCondition:register("name", self.Name, {
+            type = "string"
+        }, targetParameter)
         ovaleCondition:RegisterCondition("ptr", false, self.PTR)
         ovaleCondition:RegisterCondition("persistentmultiplier", false, self.PersistentMultiplier)
         ovaleCondition:RegisterCondition("petpresent", false, self.PetPresent)

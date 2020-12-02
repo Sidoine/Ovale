@@ -179,7 +179,7 @@ export class OvaleCompileClass {
                 }
             }
 
-            let description =
+            const description =
                 (node.description.type === "string" &&
                     node.description.value) ||
                 item;

@@ -279,7 +279,10 @@ __exports.OvaleCooldownClass = __class(States, {
             end
         end
         if cd.charges then
-            local charges, maxCharges, chargeStart, chargeDuration = cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+            local charges = cd.charges
+            local maxCharges = cd.maxCharges
+            local chargeStart = cd.chargeStart
+            local chargeDuration = cd.chargeDuration
             while chargeStart + chargeDuration <= now and charges < maxCharges do
                 chargeStart = chargeStart + chargeDuration
                 charges = charges + 1
@@ -317,7 +320,10 @@ __exports.OvaleCooldownClass = __class(States, {
     end,
     GetSpellCharges = function(self, spellId, atTime)
         local cd = self:GetCD(spellId, atTime)
-        local charges, maxCharges, chargeStart, chargeDuration = cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+        local charges = cd.charges
+        local maxCharges = cd.maxCharges
+        local chargeStart = cd.chargeStart
+        local chargeDuration = cd.chargeDuration
         if charges then
             while chargeStart + chargeDuration <= atTime and charges < maxCharges do
                 chargeStart = chargeStart + chargeDuration
