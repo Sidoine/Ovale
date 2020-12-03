@@ -215,7 +215,7 @@ AddFunction affliction_defaultmainactions
    #drain_life,if=buff.inevitable_demise.stack>30
    if buffstacks(inevitable_demise_buff) > 30 spell(drain_life)
    #drain_life,if=buff.inevitable_demise_az.stack>30
-   if debuffstacks(inevitable_demise_debuff) > 30 spell(drain_life)
+   if buffstacks(inevitable_demise_buff) > 30 spell(drain_life)
    #drain_soul
    spell(drain_soul)
    #shadow_bolt
@@ -249,7 +249,7 @@ AddFunction affliction_defaultshortcdactions
 
 AddFunction affliction_defaultshortcdpostconditions
 {
- soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or debuffstacks(inevitable_demise_debuff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 AddFunction affliction_defaultcdactions
@@ -277,7 +277,7 @@ AddFunction affliction_defaultcdactions
 
 AddFunction affliction_defaultcdpostconditions
 {
- spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or debuffstacks(inevitable_demise_debuff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or buffstacks(inevitable_demise_buff) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### Affliction icons.
@@ -342,7 +342,6 @@ AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affli
 # haunt
 # haunt_talent
 # inevitable_demise_buff
-# inevitable_demise_debuff
 # malefic_rapture
 # memory_of_lucid_dreams
 # phantom_singularity

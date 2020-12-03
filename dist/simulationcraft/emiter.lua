@@ -2354,7 +2354,7 @@ __exports.Emiter = __class(nil, {
     end,
     InitializeDisambiguation = function(self)
         self:AddDisambiguation("none", "none")
-        self:AddDisambiguation("inevitable_demise_az_buff", "inevitable_demise_debuff", "WARLOCK")
+        self:AddDisambiguation("inevitable_demise_az_buff", "inevitable_demise_buff", "WARLOCK")
         self:AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
         self:AddDisambiguation("flagellation_cleanse", "flagellation", "ROGUE")
         self:AddDisambiguation("ashvanes_razor_coral", "razor_coral")
@@ -2368,7 +2368,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("disciplinary_command_frost_buff", "disciplinary_command__frost_aura_dnt", "MAGE")
         self:AddDisambiguation("hyperthread_wristwraps_300142", "hyperthread_wristwraps", "MAGE", "fire")
         self:AddDisambiguation("use_mana_gem", "replenish_mana", "MAGE")
-        self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury_buff")
+        self:AddDisambiguation("unbridled_fury_buff", "potion_of_unbridled_fury")
         self:AddDisambiguation("swipe_bear", "swipe", "DRUID")
         self:AddDisambiguation("wound_spender", "scourge_strike", "DEATHKNIGHT")
         self:AddDisambiguation("any_dnd", "death_and_decay", "DEATHKNIGHT")

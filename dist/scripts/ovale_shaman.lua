@@ -536,7 +536,7 @@ AddFunction enhancementprecombatmainactions
  #flametongue_weapon
  if buffexpires(flametongue_weapon) spell(flametongue_weapon)
  #lightning_shield
- if buffexpires(lightning_shield_buff) spell(lightning_shield)
+ if buffexpires(lightning_shield) spell(lightning_shield)
  #windfury_totem
  spell(windfury_totem)
 }
@@ -547,7 +547,7 @@ AddFunction enhancementprecombatmainpostconditions
 
 AddFunction enhancementprecombatshortcdactions
 {
- unless spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield_buff) and spell(lightning_shield)
+ unless spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield) and spell(lightning_shield)
  {
   #stormkeeper,if=talent.stormkeeper.enabled
   if hastalent(stormkeeper_talent_enhancement) spell(stormkeeper_enhancement)
@@ -556,7 +556,7 @@ AddFunction enhancementprecombatshortcdactions
 
 AddFunction enhancementprecombatshortcdpostconditions
 {
- spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield_buff) and spell(lightning_shield) or spell(windfury_totem)
+ spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield) and spell(lightning_shield) or spell(windfury_totem)
 }
 
 AddFunction enhancementprecombatcdactions
@@ -565,7 +565,7 @@ AddFunction enhancementprecombatcdactions
 
 AddFunction enhancementprecombatcdpostconditions
 {
- spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield_buff) and spell(lightning_shield) or hastalent(stormkeeper_talent_enhancement) and spell(stormkeeper_enhancement) or spell(windfury_totem)
+ spell(windfury_weapon) or buffexpires(flametongue_weapon) and spell(flametongue_weapon) or buffexpires(lightning_shield) and spell(lightning_shield) or hastalent(stormkeeper_talent_enhancement) and spell(stormkeeper_enhancement) or spell(windfury_totem)
 }
 
 ### actions.aoe

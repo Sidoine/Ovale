@@ -353,12 +353,10 @@ export class OvaleCooldownClass
             }
         }
         if (cd.charges) {
-            let [charges, maxCharges, chargeStart, chargeDuration] = [
-                cd.charges,
-                cd.maxCharges,
-                cd.chargeStart,
-                cd.chargeDuration,
-            ];
+            let charges = cd.charges;
+            const maxCharges = cd.maxCharges;
+            let chargeStart = cd.chargeStart;
+            const chargeDuration = cd.chargeDuration;
             while (
                 chargeStart + chargeDuration <= now &&
                 charges < maxCharges
@@ -434,12 +432,10 @@ export class OvaleCooldownClass
         atTime: number
     ): [number, number, number, number] {
         const cd = this.GetCD(spellId, atTime);
-        let [charges, maxCharges, chargeStart, chargeDuration] = [
-            cd.charges,
-            cd.maxCharges,
-            cd.chargeStart,
-            cd.chargeDuration,
-        ];
+        let charges = cd.charges;
+        const maxCharges = cd.maxCharges;
+        let chargeStart = cd.chargeStart;
+        const chargeDuration = cd.chargeDuration;
         if (charges) {
             while (
                 chargeStart + chargeDuration <= atTime &&

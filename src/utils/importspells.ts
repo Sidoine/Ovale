@@ -1700,7 +1700,8 @@ export function getSpellData(directory: string) {
                     spell.identifier += "_trigger";
                 } else if (
                     !triggeredSpell.identifier.endsWith("_buff") &&
-                    !triggeredSpell.identifier.endsWith("_debuff")
+                    !triggeredSpell.identifier.endsWith("_debuff") &&
+                    triggeredSpell.tooltip
                 ) {
                     if (isFriendlyTarget(spellEffect.targeting_1)) {
                         triggeredSpell.identifier += "_buff";

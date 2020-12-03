@@ -3,7 +3,7 @@ import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "../ui/Localization";
 import { OvaleClass } from "../Ovale";
 import { AstNode, AstAnnotation, OvaleASTClass } from "../engine/ast";
-import { ResetControls } from "../engine/controls";
+import { Controls } from "../engine/controls";
 import { format, gmatch, gsub, lower, match, sub } from "@wowts/string";
 import {
     ipairs,
@@ -68,7 +68,8 @@ export class OvaleSimulationCraftClass {
         private ovaleCompile: OvaleCompileClass,
         private splitter: Splitter,
         private generator: Generator,
-        private ovale: OvaleClass
+        private ovale: OvaleClass,
+        private controls: Controls
     ) {
         this.registerOptions();
         this.module = ovale.createModule(
@@ -367,7 +368,7 @@ export class OvaleSimulationCraftClass {
                 this.ovaleAst.PropagateConstants(dictionaryAST);
                 this.ovaleAst.PropagateStrings(dictionaryAST);
                 // this.ovaleAst.FlattenParameters(dictionaryAST);
-                ResetControls();
+                this.controls.reset();
                 this.ovaleCompile.EvaluateScript(dictionaryAST, true);
             }
 

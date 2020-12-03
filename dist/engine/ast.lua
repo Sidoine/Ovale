@@ -587,7 +587,7 @@ __exports.OvaleASTClass = __class(nil, {
                     local first = true
                     for k, v in ipairs(infos.parameters) do
                         local value = node.rawPositionalParams[k]
-                        if value then
+                        if value and value.type ~= "undefined" then
                             if v.name == "filter" or v.name == "target" or (v.defaultValue ~= nil and ((v.type == "boolean" and value.type == "boolean" and value.value == v.defaultValue) or (v.type == "number" and value.type == "value" and value.value == v.defaultValue) or (v.type == "string" and value.type == "string" and value.value == v.defaultValue))) then
                                 nameParameters = true
                             else

@@ -40,11 +40,6 @@ Define(arcane_intellect 1459)
 Define(arcane_missiles 5143)
 # Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(40.5 of Spell Power) Arcane damage.
   SpellInfo(arcane_missiles duration=2.5 channel=2.5 tick=0.625)
-  SpellAddBuff(arcane_missiles arcane_missiles_buff add=1)
-  SpellAddTargetDebuff(arcane_missiles arcane_missiles_buff add=1)
-Define(arcane_missiles_buff 7268)
-# Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(40.5 of Spell Power) Arcane damage.
-  SpellInfo(arcane_missiles_buff gcd=0 offgcd=1)
 Define(arcane_orb 153626)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
   SpellInfo(arcane_orb cd=20 duration=2.5 arcanecharges=-1)
@@ -60,9 +55,9 @@ Define(bag_of_tricks 312411)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(blaster_master 274598)
-# Fire Blast increases your Mastery by s1 for 3 sec. This effect stacks.
-  SpellInfo(blaster_master duration=3 max_stacks=3 gcd=0 offgcd=1)
+Define(blaster_master 274597)
+# Scorch increases the damage the target takes from your Fire Blast by s1 for 30 seconds.
+  SpellInfo(blaster_master gcd=0 offgcd=1)
 Define(blink 1953)
 # Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
   SpellInfo(blink cd=0.5 charge_cd=15 duration=0.3)
@@ -188,11 +183,6 @@ Define(flurry_debuff 228354)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(focused_resolve 298614)
   SpellInfo(focused_resolve duration=25 max_stacks=20 gcd=0 offgcd=1)
 Define(freezing_rain_buff 270232)
@@ -213,10 +203,6 @@ Define(frost_nova 122)
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)
-  SpellAddTargetDebuff(frostbolt frostbolt_debuff_unused_4 add=1)
-Define(frostbolt_debuff_unused_4 228597)
-# Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
-  SpellInfo(frostbolt_debuff_unused_4 gcd=0 offgcd=1)
 Define(frozen 174955)
 # Deals m2 Frost damage, and Stuns targets for 30 seconds (8 sec PvP).
   SpellInfo(frozen duration=30 gcd=0 offgcd=1)
@@ -285,10 +271,6 @@ Define(infernal_cascade 336832)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
-Define(lights_judgment_debuff 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_debuff cd=150)
 Define(living_bomb 44457)
 # The target becomes a Living Bomb, taking 217694o1 Fire damage over 4 seconds, and then exploding to deal an additional (14.000000000000002 of Spell Power) Fire damage to the target and reduced damage to all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
   SpellInfo(living_bomb cd=12)
@@ -321,10 +303,6 @@ Define(nether_tempest 114923)
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (90 of Spell Power) Fire damage to the target and reduced damage to other nearby enemies.
   SpellInfo(phoenix_flames cd=25)
-  SpellAddTargetDebuff(phoenix_flames phoenix_flames_debuff add=1)
-Define(phoenix_flames_debuff 257542)
-# Hurls a Phoenix that deals (90 of Spell Power) Fire damage to the target and reduced damage to other nearby enemies.
-  SpellInfo(phoenix_flames_debuff gcd=0 offgcd=1)
 Define(presence_of_mind 205025)
 # Causes your next n Arcane Blasts to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
@@ -396,14 +374,10 @@ Define(scorch 2948)
 Define(shifting_power 314791)
 # Draw power from the ground beneath, dealing (47.36 of Spell Power)*4 seconds/t Nature damage over 4 seconds to enemies within 325130A1 yds. rnrnWhile channeling, your Mage ability cooldowns are reduced by -s2/1000*4 seconds/t sec over 4 seconds.
   SpellInfo(shifting_power cd=45 duration=4 channel=4 tick=1)
-  SpellAddBuff(shifting_power shifting_power_buff add=1)
   # Every t1 sec, deal 325130s1 Nature damage to enemies within 325130A1 yds and reduce the remaining cooldown of your abilities by -s2/1000 sec.
   SpellAddBuff(shifting_power shifting_power add=1)
   # Rooted in place.
   SpellAddBuff(shifting_power fae_tendrils_unused_0 add=1)
-Define(shifting_power_buff 325130)
-# Draw power from the ground beneath, dealing (47.36 of Spell Power)*4 seconds/t Nature damage over 4 seconds to enemies within 325130A1 yds. rnrnWhile channeling, your Mage ability cooldowns are reduced by -s2/1000*4 seconds/t sec over 4 seconds.
-  SpellInfo(shifting_power_buff gcd=0 offgcd=1)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
@@ -441,61 +415,61 @@ Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
 SpellList(clearcasting_arcane clearcasting_arcane_0 clearcasting_arcane_1)
-Define(alexstraszas_fury_talent 11) #22465
+Define(alexstraszas_fury_talent 22465)
 # Dragon's Breath always critically strikes for s2 increased critical strike damage and contributes to Hot Streak. rnrnAdditionally, damage done by your next Pyroblast or Flamestrike is increased by 334277s1.
-Define(amplification_talent 1) #22458
+Define(amplification_talent 22458)
 # When Clearcast, Arcane Missiles fires s2 additional lmissile:missiles;.
-Define(arcane_echo_talent 11) #22467
+Define(arcane_echo_talent 22467)
 # Direct damage you deal to enemies affected by Touch of the Magi, causes an explosion that deals (10.92 of Spell Power) Arcane damage to s1 nearby enemies.
-Define(arcane_familiar_talent 3) #22464
+Define(arcane_familiar_talent 22464)
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for 3600 seconds.
-Define(arcane_orb_talent 17) #22449
+Define(arcane_orb_talent 22449)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
-Define(arcane_orb_talent 17) #22449
+Define(arcane_orb_talent 22449)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
-Define(comet_storm_talent 18) #22473
+Define(comet_storm_talent 22473)
 # Calls down a series of 7 icy comets on and around the target, that deals up to 7*(40 of Spell Power) Frost damage to all enemies within 228601A1 yds of its impacts.
-Define(ebonbolt_talent 12) #22469
+Define(ebonbolt_talent 22469)
 # Launch a bolt of ice at the enemy, dealing (200 of Spell Power) Frost damage and granting you Brain Freeze.
-Define(enlightened_talent 21) #21145
+Define(enlightened_talent 21145)
 # Arcane damage dealt while above s1 mana is increased by 321388s1, Mana Regen while below s1 is increased by 321390s1.
-Define(firestarter_talent 1) #22456
+Define(firestarter_talent 22456)
 # Your Fireball and Pyroblast spells always deal a critical strike when the target is above s1 health.
-Define(flame_on_talent 10) #22450
+Define(flame_on_talent 22450)
 # Reduces the cooldown of Fire Blast by s3 seconds and increases the maximum number of charges by s1.
-Define(flame_patch_talent 16) #22451
+Define(flame_patch_talent 22451)
 # Flamestrike leaves behind a patch of flames which burns enemies within it for 8*(6 of Spell Power) Fire damage over 8 seconds. 
-Define(from_the_ashes_talent 12) #22468
+Define(from_the_ashes_talent 22468)
 # Increases Mastery by s3 for each charge of Phoenix Flames off cooldown and your direct-damage critical strikes reduce its cooldown by s2/-1000 sec.
-Define(glacial_spike_talent 21) #21634
+Define(glacial_spike_talent 21634)
 # Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (297 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
-Define(ice_floes_talent 6) #23073
+Define(ice_floes_talent 23073)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
-Define(ice_nova_talent 3) #22463
+Define(ice_nova_talent 22463)
 # Causes a whirl of icy wind around the enemy, dealing (180 of Spell Power) Frost damage to the target and reduced damage to all other enemies within a2 yards, and freezing them in place for 2 seconds.
-Define(kindling_talent 19) #21631
+Define(kindling_talent 21631)
 # Your Fireball, Pyroblast, Fire Blast, and Phoenix Flames critical strikes reduce the remaining cooldown on Combustion by <cdr> sec.
-Define(living_bomb_talent 18) #22472
+Define(living_bomb_talent 22472)
 # The target becomes a Living Bomb, taking 217694o1 Fire damage over 4 seconds, and then exploding to deal an additional (14.000000000000002 of Spell Power) Fire damage to the target and reduced damage to all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
-Define(meteor_talent 21) #21633
+Define(meteor_talent 21633)
 # Calls down a meteor which lands at the target location after 3 seconds, dealing (260 of Spell Power) Fire damage, split evenly between all targets within 8 yards, and burns the ground, dealing 8*(8.25 of Spell Power) Fire damage over 8.5 seconds to all enemies in the area. 
-Define(nether_tempest_talent 12) #22470
+Define(nether_tempest_talent 22470)
 # Places a Nether Tempest on the target which deals 114923o1 Arcane damage over 12 seconds to the target and nearby enemies within 10 yards. Limit 1 target. Deals reduced damage to secondary targets.rnrnDamage increased by 36032s1 per Arcane Charge.
-Define(pyroclasm_talent 20) #22220
+Define(pyroclasm_talent 22220)
 # Consuming Hot Streak has a s1 chance to make your next non-instant Pyroblast cast within 15 seconds deal 269651s1 additional damage.rnrnMaximum 269651u stacks.
-Define(ray_of_frost_talent 20) #22309
+Define(ray_of_frost_talent 22309)
 # Channel an icy beam at the enemy for 5 seconds, dealing (120 of Spell Power) Frost damage every t2 sec and slowing movement by s4. Each time Ray of Frost deals damage, its damage and snare increases by 208141s1.rnrnGenerates s3 charges of Fingers of Frost over its duration.
-Define(resonance_talent 10) #22453
+Define(resonance_talent 22453)
 # Arcane Barrage deals s1 increased damage per target it hits.
-Define(rune_of_power_talent 9) #22447
+Define(rune_of_power_talent 22447)
 # Places a Rune of Power on the ground for 15 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
-Define(rune_of_power_talent 9) #22447
+Define(rune_of_power_talent 22447)
 # Places a Rune of Power on the ground for 15 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
-Define(searing_touch_talent 3) #22462
+Define(searing_touch_talent 22462)
 # Scorch deals s2 increased damage and is a guaranteed Critical Strike when the target is below s1 health.
-Define(splitting_ice_talent 17) #23176
+Define(splitting_ice_talent 23176)
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
-Define(supernova_talent 18) #22474
+Define(supernova_talent 22474)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
 Define(ancient_knot_of_wisdom_item 166793)
 Define(azsharas_font_of_power_item 169314)

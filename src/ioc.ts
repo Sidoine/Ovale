@@ -56,6 +56,7 @@ import { Covenant } from "./states/covenant";
 import { Runeforge } from "./states/runeforge";
 import { Conduit } from "./states/conduit";
 import { Runner } from "./engine/runner";
+import { Controls } from "./engine/controls";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -122,6 +123,7 @@ export class IoC {
         this.lastSpell = new LastSpell();
         this.baseState = new BaseState();
         this.condition = new OvaleConditionClass(this.baseState);
+        const controls = new Controls();
         const runner = new Runner(
             this.profiler,
             this.debug,
@@ -261,7 +263,8 @@ export class IoC {
             this.options,
             this.ovale,
             this.score,
-            this.spellBook
+            this.spellBook,
+            controls
         );
         this.power = new OvalePowerClass(
             this.debug,
@@ -377,7 +380,8 @@ export class IoC {
             this.spellBook,
             this.bestAction,
             combat,
-            runner
+            runner,
+            controls
         );
         this.dataBroker = new OvaleDataBrokerClass(
             this.paperDoll,
@@ -420,7 +424,8 @@ export class IoC {
             this.compile,
             this.splitter,
             this.generator,
-            this.ovale
+            this.ovale,
+            controls
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
         const covenant = new Covenant(this.ovale, this.debug);

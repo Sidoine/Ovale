@@ -42,13 +42,9 @@ Define(berserk_bear 50334)
   SpellInfo(berserk_bear cd=180 duration=15 gcd=0 offgcd=1)
   # Cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration are reduced by w1. Ironfur cost reduced by w3.
   SpellAddBuff(berserk_bear berserk_bear add=1)
-Define(berserk_buff 343216)
-# Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
-  SpellInfo(berserk_buff gcd=0 offgcd=1 combopoints=-1)
 Define(berserk_cat 106951)
 # Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellInfo(berserk_cat cd=180 duration=20 gcd=0 offgcd=1)
-  SpellAddBuff(berserk_cat berserk_buff add=1)
   # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellAddBuff(berserk_cat berserk_cat add=1)
 Define(berserking 59621)
@@ -98,18 +94,18 @@ Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink gcd=0 offgcd=1)
   # Falling below 296964M~1 health will cause Conductive Ink to inflict 296963s1*(1+@versadmg) Nature damage.
-  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger add=1)
-Define(conductive_ink_buff_trigger 302565)
+  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger_buff add=1)
+Define(conductive_ink_buff_trigger_buff 302565)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_buff_trigger duration=120 max_stacks=999 gcd=0 offgcd=1)
+  SpellInfo(conductive_ink_buff_trigger_buff duration=120 max_stacks=999 gcd=0 offgcd=1)
 Define(convoke_the_spirits 323764)
 # Call upon the Night Fae for an eruption of energy, channeling a rapid flurry of s2 Druid spells and abilities over 4 seconds.rnrnYou will cast ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake and Thrash on appropriate nearby targets, favoring your current shapeshift form.
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.333)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits add=1)
-Define(dawning_sun 276154)
+Define(dawning_sun 276153)
 # Starfire increases the damage of your Wrath by s1 for 8 seconds.
-  SpellInfo(dawning_sun duration=8 gcd=0 offgcd=1)
+  SpellInfo(dawning_sun gcd=0 offgcd=1)
 Define(dazed 50259)
 # Leap behind an enemy, dazing them for 3 seconds.
   SpellInfo(dazed duration=3 gcd=0 offgcd=1)
@@ -136,21 +132,12 @@ Define(ferocious_bite 22568)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20)
   SpellRequire(force_of_nature unusable set=1 enabled=(not hastalent(force_of_nature_talent)))
   # Granting s5/10*d Astral Power over d.
   SpellAddBuff(force_of_nature force_of_nature add=1)
-  SpellAddTargetDebuff(force_of_nature force_of_nature_debuff add=1)
-Define(force_of_nature_debuff 248280)
-# Summons a stand of s2 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.
-  SpellInfo(force_of_nature_debuff duration=10 gcd=0 offgcd=1)
 Define(full_moon 202771)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(full_moon cd=15 lunarpower=-40)
@@ -199,7 +186,6 @@ Define(incarnation_king_of_the_jungle 102543)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
   SpellInfo(incarnation_king_of_the_jungle cd=180 duration=30 gcd=0 offgcd=1)
   SpellRequire(incarnation_king_of_the_jungle unusable set=1 enabled=(not hastalent(incarnation_king_of_the_jungle_talent)))
-  SpellAddBuff(incarnation_king_of_the_jungle berserk_buff add=1)
   # Rake and Shred deal damage as though you were stealthed.rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.rnrnEnergy costs reduced by w2.
   SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle add=1)
   # Allows the use of Prowl even while in combat.
@@ -209,10 +195,6 @@ Define(iron_jaws 276026)
   SpellInfo(iron_jaws duration=30 gcd=0 offgcd=1)
   # Your next Maim will deal an additional w1 damage per combo point.
   SpellAddBuff(iron_jaws iron_jaws add=1)
-  SpellAddTargetDebuff(iron_jaws iron_jaws_debuff add=1)
-Define(iron_jaws_debuff 276021)
-# Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
-  SpellInfo(iron_jaws_debuff gcd=0 offgcd=1)
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
@@ -497,59 +479,59 @@ SpellList(berserk berserk_cat berserk_bear)
 SpellList(bs_inc_buff incarnation_king_of_the_jungle incarnation_guardian_of_ursoc berserk_bear berserk_cat)
 SpellList(bt_buffs bt_swipe_buff bt_thrash_buff bt_shred_buff bt_brutal_slash_buff bt_moonfire_buff bt_rake_buff)
 SpellList(wild_charge wild_charge_bear wild_charge_cat)
-Define(balance_affinity_talent 7) #22163
+Define(balance_affinity_talent 22163)
 # You gain:rnrn@spellicon197524 @spellname197524rnIncreases the range of all of your abilities by s1 yards.rnrnYou also learn:rnrn@spellicon197625 @spellname197625rn@spellicon197626 @spellname197626rn@spellicon197628 @spellname197628rn@spellicon197630 @spellname197630rn@spellicon132469@spellname132469
-Define(bloodtalons_talent 20) #21649
+Define(bloodtalons_talent 21649)
 # When you use s2 different combo point-generating abilities within s1 sec, the damage of your next 145152n Rips or Ferocious Bites is increased by 145152s1.
-Define(brambles_talent 1) #22419
+Define(brambles_talent 22419)
 # Sharp brambles protect you, absorbing and reflecting up to <shield> damage from each attack.rnrnWhile Barkskin is active, the brambles also deal 213709s1 Nature damage to all nearby enemies every 22812t3 sec.
-Define(brutal_slash_talent 17) #21711
+Define(brutal_slash_talent 21711)
 # Strikes up to s3 nearby enemies with a massive slash, inflicting s2 Physical damage.rnrn|cFFFFFFFFAwards s1 combo lpoint:points;.|r
-Define(feral_affinity_talent_guardian 8) #22156
+Define(feral_affinity_talent_guardian 22156)
 # You gain:rnrn@spellicon131768 @spellname131768rnIncreases your movement speed by (25 of Spell Power).rnrnYou also learn:rnrn@spellicon1822 @spellname1822rn@spellicon1079 @spellname1079rn@spellicon22570 @spellname22570rnrnYour energy regeneration is increased by s2.
-Define(feral_frenzy_talent 21) #21653
+Define(feral_frenzy_talent 21653)
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
-Define(force_of_nature_talent 3) #22387
+Define(force_of_nature_talent 22387)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
-Define(fury_of_elune_talent 20) #21193
+Define(fury_of_elune_talent 21193)
 # Calls down a beam of pure celestial energy that follows the enemy, dealing up to <dmg> Astral damage over 8 seconds within its area. Damage reduced on secondary targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
-Define(heart_of_the_wild_talent 12) #18577
+Define(heart_of_the_wild_talent 18577)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-Define(incarnation_chosen_of_elune_talent 15) #21702
+Define(incarnation_chosen_of_elune_talent 21702)
 # An improved Moonkin Form that grants the benefits of Celestial Alignment, and s2 critical strike chance.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
-Define(incarnation_guardian_of_ursoc_talent 15) #22388
+Define(incarnation_guardian_of_ursoc_talent 22388)
 # An improved Bear Form that grants the benefits of Berserk, causes Mangle to hit up to (25 of Spell Power) targets, and increases maximum health by s5.rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
-Define(incarnation_king_of_the_jungle_talent 15) #21704
+Define(incarnation_king_of_the_jungle_talent 21704)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
-Define(lunar_inspiration_talent 3) #22365
+Define(lunar_inspiration_talent 22365)
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
-Define(mighty_bash_talent 10) #21778
+Define(mighty_bash_talent 21778)
 # Invokes the spirit of Ursoc to stun the target for 4 seconds. Usable in all shapeshift forms.
-Define(new_moon_talent 21) #21655
+Define(new_moon_talent 21655)
 # Deals m1 Astral damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-Define(primal_wrath_talent 18) #22370
+Define(primal_wrath_talent 22370)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
-Define(primal_wrath_talent 18) #22370
+Define(primal_wrath_talent 22370)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
-Define(pulverize_talent 21) #22425
+Define(pulverize_talent 22425)
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage and reduce the damage they deal to you by s2 for 10 seconds.
-Define(sabertooth_talent 2) #22364
+Define(sabertooth_talent 22364)
 # Ferocious Bite deals s1 increased damage and increases the duration of Rip on your target by s2 sec per combo point spent.
-Define(savage_roar_talent 14) #18579
+Define(savage_roar_talent 18579)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
-Define(soul_of_the_forest_talent 13) #18580
+Define(soul_of_the_forest_talent 18580)
 # Eclipse increases Wrath's Astral power generation s1, and increases Starfire's area effect damage by s2.
-Define(starlord_talent 14) #21706
+Define(starlord_talent 21706)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
-Define(starlord_talent 14) #21706
+Define(starlord_talent 21706)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
-Define(stellar_drift_talent 16) #22389
+Define(stellar_drift_talent 22389)
 # Increases Starfall's duration by s1/1000 sec, its damage by s2, and allows you to cast while moving while it is active.
-Define(stellar_flare_talent 18) #22165
+Define(stellar_flare_talent 22165)
 # Burns the target for (12.5 of Spell Power) Astral damage, and then an additional o2 damage over 24 seconds.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-Define(twin_moons_talent 17) #21712
+Define(twin_moons_talent 21712)
 # Moonfire deals s2 increased damage and also hits another nearby enemy within s1 yds of the target.
-Define(warrior_of_elune_talent 2) #22386
+Define(warrior_of_elune_talent 22386)
 # Your next n Starfires are instant cast and generate s2 increased Astral Power.
 Define(lunar_empowerment 292664)
 Define(solar_empowerment 292663)

@@ -74,10 +74,10 @@ Define(conductive_ink 302491)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
   SpellInfo(conductive_ink gcd=0 offgcd=1)
   # Falling below 296964M~1 health will cause Conductive Ink to inflict 296963s1*(1+@versadmg) Nature damage.
-  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger add=1)
-Define(conductive_ink_buff_trigger 302565)
+  SpellAddTargetDebuff(conductive_ink conductive_ink_buff_trigger_buff add=1)
+Define(conductive_ink_buff_trigger_buff 302565)
 # Your damaging abilities against enemies above M3 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
-  SpellInfo(conductive_ink_buff_trigger duration=120 max_stacks=999 gcd=0 offgcd=1)
+  SpellInfo(conductive_ink_buff_trigger_buff duration=120 max_stacks=999 gcd=0 offgcd=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1)
@@ -112,14 +112,6 @@ Define(fist_of_the_white_tiger 261947)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1)
   SpellRequire(fist_of_the_white_tiger unusable set=1 enabled=(not hastalent(fist_of_the_white_tiger_talent)))
-  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_buff add=1)
-  SpellAddBuff(fist_of_the_white_tiger fist_of_the_white_tiger_buff_unused_0 add=1)
-Define(fist_of_the_white_tiger_buff 261977)
-# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-  SpellInfo(fist_of_the_white_tiger_buff gcd=0 offgcd=1)
-Define(fist_of_the_white_tiger_buff_unused_0 261978)
-# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-  SpellInfo(fist_of_the_white_tiger_buff_unused_0 gcd=0 offgcd=1 chi=-3)
 Define(fists_of_fury 113656)
 # Pummels all targets in front of you, dealing 5*s5 damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
@@ -129,11 +121,6 @@ Define(flying_serpent_kick 101545)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam add=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam_unused_0 add=1)
-Define(focused_azerite_beam_unused_0 295261)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
-  SpellInfo(focused_azerite_beam_unused_0 cd=90)
 Define(fortifying_brew 243435)
 # Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
   SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
@@ -171,10 +158,6 @@ Define(leg_sweep 119381)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-  SpellAddTargetDebuff(lights_judgment lights_judgment_debuff add=1)
-Define(lights_judgment_debuff 256893)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards.
-  SpellInfo(lights_judgment_debuff cd=150)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -208,20 +191,12 @@ Define(ripple_in_space 299306)
 Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
   SpellInfo(rising_sun_kick chi=2 cd=10)
-  SpellAddTargetDebuff(rising_sun_kick rising_sun_kick_debuff add=1)
-Define(rising_sun_kick_debuff 185099)
-# Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
-  SpellInfo(rising_sun_kick_debuff gcd=0 offgcd=1)
 Define(rushing_jade_wind 116847)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75)
   SpellRequire(rushing_jade_wind unusable set=1 enabled=(not hastalent(rushing_jade_wind_talent_windwalker)))
-  SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff add=1)
   # Dealing physical damage to nearby enemies every 116847t1 sec.
   SpellAddBuff(rushing_jade_wind rushing_jade_wind add=1)
-Define(rushing_jade_wind_buff 148187)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-  SpellInfo(rushing_jade_wind_buff gcd=0 offgcd=1)
 Define(seething_rage 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
   SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
@@ -279,43 +254,43 @@ Define(whirling_dragon_punch 152175)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
-Define(black_ox_brew_talent 9) #19992
+Define(black_ox_brew_talent 19992)
 # Chug some Black Ox Brew, which instantly refills your Energy, Purifying Brew charges, and resets the cooldown of Celestial Brew.
-Define(blackout_combo_talent 21) #22108
+Define(blackout_combo_talent 22108)
 # Blackout Kick also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnCelestial Brew: Pauses Stagger damage for s4 sec.
-Define(chi_burst_talent 3) #20185
+Define(chi_burst_talent 20185)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
-Define(chi_burst_talent 3) #20185
+Define(chi_burst_talent 20185)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
-Define(chi_wave_talent 2) #19820
+Define(chi_wave_talent 19820)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
-Define(dampen_harm_talent 15) #20175
+Define(dampen_harm_talent 20175)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
-Define(diffuse_magic_talent 14) #20173
+Define(diffuse_magic_talent 20173)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
-Define(energizing_elixir_talent 9) #22096
+Define(energizing_elixir_talent 22096)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
-Define(energizing_elixir_talent 9) #22096
+Define(energizing_elixir_talent 22096)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
-Define(fist_of_the_white_tiger_talent 8) #19771
+Define(fist_of_the_white_tiger_talent 19771)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-Define(fist_of_the_white_tiger_talent 8) #19771
+Define(fist_of_the_white_tiger_talent 19771)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-Define(hit_combo_talent 16) #22093
+Define(hit_combo_talent 22093)
 # Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
-Define(rushing_jade_wind_talent_windwalker 17) #23122
+Define(rushing_jade_wind_talent_windwalker 23122)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-Define(rushing_jade_wind_talent 17) #20184
+Define(rushing_jade_wind_talent 20184)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-Define(serenity_talent 21) #21191
+Define(serenity_talent 21191)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
-Define(serenity_talent 21) #21191
+Define(serenity_talent 21191)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
-Define(special_delivery_talent 16) #19819
+Define(special_delivery_talent 19819)
 # Drinking from your Brews has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
-Define(whirling_dragon_punch_talent 20) #22105
+Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
-Define(whirling_dragon_punch_talent 20) #22105
+Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(unbridled_fury_item 139327)
 Define(the_crucible_of_flame_essence_id 12)

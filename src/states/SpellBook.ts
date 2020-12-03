@@ -37,8 +37,6 @@ import { OvaleDataClass } from "../engine/data";
 import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
-const MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
-
 const ParseHyperlink = function (hyperlink: string) {
     const [color, linkType, linkData, text] = match(
         hyperlink,
@@ -177,21 +175,18 @@ export class OvaleSpellBookClass {
                 ] = GetTalentInfo(i, j, activeTalentGroup);
                 if (talentId) {
                     const combinedSelected = selected || selectedByLegendary;
-                    const index = 3 * (i - 1) + j;
-                    if (index <= MAX_NUM_TALENTS) {
-                        this.talent[index] = name;
-                        if (combinedSelected) {
-                            this.talentPoints[index] = 1;
-                        } else {
-                            this.talentPoints[index] = 0;
-                        }
-                        this.tracer.Debug(
-                            "    Talent %s (%d) is %s.",
-                            name,
-                            index,
-                            (combinedSelected && "enabled") || "disabled"
-                        );
+                    this.talent[talentId] = name;
+                    if (combinedSelected) {
+                        this.talentPoints[talentId] = 1;
+                    } else {
+                        this.talentPoints[talentId] = 0;
                     }
+                    this.tracer.Debug(
+                        "    Talent %s (%d) is %s.",
+                        name,
+                        talentId,
+                        (combinedSelected && "enabled") || "disabled"
+                    );
                 }
             }
         }
@@ -328,7 +323,6 @@ export class OvaleSpellBookClass {
                         }
                     }
                 }
-            } else if (skillType == "FUTURESPELL") {
             } else if (!skillType) {
                 break;
             }

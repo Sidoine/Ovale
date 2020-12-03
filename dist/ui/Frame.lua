@@ -5,9 +5,6 @@ local AceGUI = LibStub:GetLibrary("AceGUI-3.0", true)
 local Masque = LibStub:GetLibrary("Masque", true)
 local __Icon = LibStub:GetLibrary("ovale/ui/Icon")
 local OvaleIcon = __Icon.OvaleIcon
-local __enginecontrols = LibStub:GetLibrary("ovale/engine/controls")
-local lists = __enginecontrols.lists
-local checkBoxes = __enginecontrols.checkBoxes
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local next = next
@@ -31,6 +28,7 @@ local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isNumber = __toolstools.isNumber
 local OneTimeMessage = __toolstools.OneTimeMessage
 local PrintOneTimeMessages = __toolstools.PrintOneTimeMessages
+local insert = table.insert
 local strmatch = match
 local INFINITY = huge
 local BARRE = 8
@@ -330,13 +328,15 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     UpdateControls = function(self)
         local profile = self.ovaleOptions.db.profile
         wipe(self.checkBoxWidget)
-        for name, checkBox in pairs(checkBoxes) do
-            if checkBox.text then
+        local atTime = self.ovaleFuture.next.nextCast
+        for _, checkBox in ipairs(self.controls.checkBoxes) do
+            if checkBox.text and ( not checkBox.enabled or self.runner:computeAsBoolean(checkBox.enabled, atTime)) then
+                local name = checkBox.name
                 local widget = AceGUI:Create("CheckBox")
                 local text = self:FinalizeString(checkBox.text)
                 widget:SetLabel(text)
                 if profile.check[name] == nil then
-                    profile.check[name] = checkBox.checked
+                    profile.check[name] = checkBox.defaultValue
                 end
                 if profile.check[name] then
                     widget:SetValue(profile.check[name])
@@ -345,17 +345,24 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 widget:SetCallback("OnValueChanged", self.OnCheckBoxValueChanged)
                 self:AddChild(widget)
                 self.checkBoxWidget[name] = widget
-            else
-                OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
             end
         end
         wipe(self.listWidget)
-        for name, list in pairs(lists) do
+        for _, list in ipairs(self.controls.lists) do
             if next(list.items) then
                 local widget = AceGUI:Create("Dropdown")
-                widget:SetList(list.items)
+                local items = {}
+                local order = {}
+                for _, v in ipairs(list.items) do
+                    if  not v.enabled or self.runner:computeAsBoolean(v.enabled, atTime) then
+                        items[v.name] = v.text
+                        insert(order, v.name)
+                    end
+                end
+                widget:SetList(items, order)
+                local name = list.name
                 if  not profile.list[name] then
-                    profile.list[name] = list.default
+                    profile.list[name] = list.defaultValue
                 end
                 if profile.list[name] then
                     widget:SetValue(profile.list[name])
@@ -494,7 +501,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             self.content:SetPoint("TOPLEFT", self.frame, "TOPLEFT", maxWidth + profile.apparence.iconShiftX, profile.apparence.iconShiftY)
         end
     end,
-    constructor = function(self, ovaleState, ovaleFrameModule, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat, runner)
+    constructor = function(self, ovaleState, ovaleFrameModule, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat, runner, controls)
         self.ovaleState = ovaleState
         self.ovaleFrameModule = ovaleFrameModule
         self.ovaleCompile = ovaleCompile
@@ -509,6 +516,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self.ovaleBestAction = ovaleBestAction
         self.combat = combat
         self.runner = runner
+        self.controls = controls
         self.checkBoxWidget = {}
         self.listWidget = {}
         self.visible = true
@@ -587,7 +595,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     end,
 })
 __exports.OvaleFrameModuleClass = __class(nil, {
-    constructor = function(self, ovaleState, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat, runner)
+    constructor = function(self, ovaleState, ovaleCompile, ovaleFuture, baseState, ovaleEnemies, ovale, ovaleOptions, ovaleDebug, ovaleSpellFlash, ovaleSpellBook, ovaleBestAction, combat, runner, controls)
         self.ovaleState = ovaleState
         self.ovaleCompile = ovaleCompile
         self.ovaleFuture = ovaleFuture
@@ -632,6 +640,6 @@ __exports.OvaleFrameModuleClass = __class(nil, {
             self.frame:UpdateVisibility()
         end
         self.module = ovale:createModule("OvaleFrame", self.OnInitialize, self.handleDisable, aceEvent)
-        self.frame = OvaleFrame(self.ovaleState, self, self.ovaleCompile, self.ovaleFuture, self.baseState, self.ovaleEnemies, self.ovale, self.ovaleOptions, self.ovaleDebug, self.ovaleSpellFlash, self.ovaleSpellBook, self.ovaleBestAction, combat, runner)
+        self.frame = OvaleFrame(self.ovaleState, self, self.ovaleCompile, self.ovaleFuture, self.baseState, self.ovaleEnemies, self.ovale, self.ovaleOptions, self.ovaleDebug, self.ovaleSpellFlash, self.ovaleSpellBook, self.ovaleBestAction, combat, runner, controls)
     end,
 })

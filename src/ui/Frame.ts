@@ -9,7 +9,7 @@ import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleStateClass } from "../engine/state";
 import { OvaleIcon } from "./Icon";
 import { OvaleEnemiesClass } from "../states/Enemies";
-import { lists, checkBoxes } from "../engine/controls";
+import { Controls } from "../engine/controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, ipairs, next, pairs, wipe, type, LuaObj } from "@wowts/lua";
 import { match } from "@wowts/string";
@@ -39,6 +39,7 @@ import { OvaleSpellBookClass } from "../states/SpellBook";
 import { OvaleCombatClass } from "../states/combat";
 import { isNumber, OneTimeMessage, PrintOneTimeMessages } from "../tools/tools";
 import { Runner } from "../engine/runner";
+import { insert } from "@wowts/table";
 
 const strmatch = match;
 const INFINITY = huge;
@@ -586,13 +587,19 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     UpdateControls() {
         const profile = this.ovaleOptions.db.profile;
         wipe(this.checkBoxWidget);
-        for (const [name, checkBox] of pairs(checkBoxes)) {
-            if (checkBox.text) {
+        const atTime = this.ovaleFuture.next.nextCast;
+        for (const [, checkBox] of ipairs(this.controls.checkBoxes)) {
+            if (
+                checkBox.text &&
+                (!checkBox.enabled ||
+                    this.runner.computeAsBoolean(checkBox.enabled, atTime))
+            ) {
+                const name = checkBox.name;
                 const widget = AceGUI.Create("CheckBox");
                 const text = this.FinalizeString(checkBox.text);
                 widget.SetLabel(text);
                 if (profile.check[name] == undefined) {
-                    profile.check[name] = checkBox.checked;
+                    profile.check[name] = checkBox.defaultValue;
                 }
                 if (profile.check[name]) {
                     widget.SetValue(profile.check[name]);
@@ -604,20 +611,32 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 );
                 this.AddChild(widget);
                 this.checkBoxWidget[name] = widget;
-            } else {
-                OneTimeMessage(
-                    "Warning: checkbox '%s' is used but not defined.",
-                    name
-                );
+                // } else {
+                //     OneTimeMessage(
+                //         "Warning: checkbox '%s' is used but not defined.",
+                //         name
+                //     );
             }
         }
         wipe(this.listWidget);
-        for (const [name, list] of pairs(lists)) {
+        for (const [, list] of ipairs(this.controls.lists)) {
             if (next(list.items)) {
                 const widget = AceGUI.Create("Dropdown");
-                widget.SetList(list.items);
+                const items: LuaObj<string> = {};
+                const order: LuaArray<string> = {};
+                for (const [, v] of ipairs(list.items)) {
+                    if (
+                        !v.enabled ||
+                        this.runner.computeAsBoolean(v.enabled, atTime)
+                    ) {
+                        items[v.name] = v.text;
+                        insert(order, v.name);
+                    }
+                }
+                widget.SetList(items, order);
+                const name = list.name;
                 if (!profile.list[name]) {
-                    profile.list[name] = list.default;
+                    profile.list[name] = list.defaultValue;
                 }
                 if (profile.list[name]) {
                     widget.SetValue(profile.list[name]);
@@ -835,7 +854,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
         private combat: OvaleCombatClass,
-        private runner: Runner
+        private runner: Runner,
+        private controls: Controls
     ) {
         super();
         const hider = CreateFrame(
@@ -974,7 +994,8 @@ export class OvaleFrameModuleClass {
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
         combat: OvaleCombatClass,
-        runner: Runner
+        runner: Runner,
+        controls: Controls
     ) {
         this.module = ovale.createModule(
             "OvaleFrame",
@@ -996,7 +1017,8 @@ export class OvaleFrameModuleClass {
             this.ovaleSpellBook,
             this.ovaleBestAction,
             combat,
-            runner
+            runner,
+            controls
         );
     }
 }

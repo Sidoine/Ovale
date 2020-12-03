@@ -33,7 +33,6 @@ local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 local __toolstools = LibStub:GetLibrary("ovale/tools/tools")
 local isNumber = __toolstools.isNumber
 local OneTimeMessage = __toolstools.OneTimeMessage
-local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 local ParseHyperlink = function(hyperlink)
     local color, linkType, linkData, text = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d*):?%d?|?h?%[?([^%[%]]*)%]?|?h?|?r?")
     return color, linkType, linkData, text
@@ -102,16 +101,13 @@ __exports.OvaleSpellBookClass = __class(nil, {
                     local talentId, name, _, selected, _, _, _, _, _, _, selectedByLegendary = GetTalentInfo(i, j, activeTalentGroup)
                     if talentId then
                         local combinedSelected = selected or selectedByLegendary
-                        local index = 3 * (i - 1) + j
-                        if index <= MAX_NUM_TALENTS then
-                            self.talent[index] = name
-                            if combinedSelected then
-                                self.talentPoints[index] = 1
-                            else
-                                self.talentPoints[index] = 0
-                            end
-                            self.tracer:Debug("    Talent %s (%d) is %s.", name, index, (combinedSelected and "enabled") or "disabled")
+                        self.talent[talentId] = name
+                        if combinedSelected then
+                            self.talentPoints[talentId] = 1
+                        else
+                            self.talentPoints[talentId] = 0
                         end
+                        self.tracer:Debug("    Talent %s (%d) is %s.", name, talentId, (combinedSelected and "enabled") or "disabled")
                     end
                 end
             end
@@ -242,7 +238,6 @@ __exports.OvaleSpellBookClass = __class(nil, {
                         end
                     end
                 end
-            elseif skillType == "FUTURESPELL" then
             elseif  not skillType then
                 break
             end
