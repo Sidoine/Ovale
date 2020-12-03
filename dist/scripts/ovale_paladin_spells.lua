@@ -259,16 +259,13 @@ Define(lay_on_hands 633)
     SpellAddBuff(shield_of_the_righteous divine_purpose set=0)
 Define(shield_of_the_righteous_buff 132403)
     SpellInfo(shield_of_the_righteous_buff duration=4.5)
-Define(unbreakable_spirit_talent 10)
-
-    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
-    SpellAddBuff(word_of_glory divine_purpose set=0)
+Define(unbreakable_spirit_talent 22433)
 #word_of_glory
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(shining_light_free_buff)))
     SpellAddBuff(word_of_glory divine_purpose set=0)
     SpellAddBuff(word_of_glory shining_light_free_buff set=0)
-Define(shining_light_free_buff 327510)
+#shining_light_free_buff
     SpellInfo(shining_light_free_buff duration=30)
     ]]
     OvaleScripts:RegisterScript("PALADIN", nil, name, desc, code, "include")
