@@ -250,7 +250,8 @@ __exports.OvaleDataClass = __class(nil, {
                 [102543] = true,
                 [115192] = true,
                 [115193] = true,
-                [185313] = true
+                [185313] = true,
+                [185422] = true
             },
             rogue_stealthed_buff = {
                 [1784] = true,
@@ -258,6 +259,7 @@ __exports.OvaleDataClass = __class(nil, {
                 [1856] = true,
                 [11327] = true,
                 [185313] = true,
+                [185422] = true,
                 [115192] = true
             },
             mantle_stealthed_buff = {
