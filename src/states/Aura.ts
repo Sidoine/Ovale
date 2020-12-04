@@ -1662,6 +1662,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                     for (const [petGUID] of pairs(self_petGUID)) {
                         aura = auraTable[auraId][petGUID];
                         if (
+                            aura &&
                             this.IsActiveAura(aura, atTime) &&
                             aura.filter == filter &&
                             aura.stacks >= minStacks &&
@@ -1673,6 +1674,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 } else {
                     for (const [, aura] of pairs(auraTable[auraId])) {
                         if (
+                            aura &&
                             this.IsActiveAura(aura, atTime) &&
                             aura.filter == filter &&
                             aura.stacks >= minStacks

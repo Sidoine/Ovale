@@ -978,13 +978,13 @@ __exports.OvaleAuraClass = __class(States, {
                     end
                     for petGUID in pairs(self_petGUID) do
                         aura = auraTable[auraId][petGUID]
-                        if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
+                        if aura and self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
                             self:CountMatchingActiveAura(aura)
                         end
                     end
                 else
                     for _, aura in pairs(auraTable[auraId]) do
-                        if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
+                        if aura and self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
                             self:CountMatchingActiveAura(aura)
                         end
                     end
