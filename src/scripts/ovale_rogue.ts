@@ -176,6 +176,7 @@ AddFunction assassinationprecombatmainpostconditions
 AddFunction assassinationprecombatshortcdactions
 {
  #apply_poison
+ if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
  #flask
  #augmentation
  #food
@@ -883,6 +884,7 @@ AddFunction outlawprecombatmainpostconditions
 AddFunction outlawprecombatshortcdactions
 {
  #apply_poison
+ if BuffRemaining(lethal_poison_buff) < 1200 Spell(instant_poison)
  #flask
  #augmentation
  #food
@@ -1650,6 +1652,7 @@ AddFunction subtletystealth_cdscdpostconditions
 AddFunction subtletyprecombatmainactions
 {
  #apply_poison
+ if BuffRemaining(lethal_poison_buff) < 1200 Spell(instant_poison)
  #flask
  #augmentation
  #food
