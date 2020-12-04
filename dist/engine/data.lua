@@ -286,6 +286,11 @@ __exports.OvaleDataClass = __class(nil, {
                 [193357] = true,
                 [199603] = true,
                 [193359] = true
+            },
+            lethal_poison_buff = {
+                [2823] = true,
+                [8679] = true,
+                [315584] = true
             }
         }
         self.DEFAULT_SPELL_LIST = {}

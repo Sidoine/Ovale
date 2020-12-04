@@ -520,6 +520,13 @@ Define(deeper_daggers_conduit 245)
 Define(perforated_veins_conduit 248)
     ]]
     code = code .. [[
+Define(instant_poison 315584)
+  SpellInfo(instant_poison duration=3600 gcd=0 offgcd=1)
+  SpellAddBuff(instant_poison instant_poison add=1)
+Define(wound_poison 8679)
+  SpellInfo(wound_poison duration=3600 gcd=0 offgcd=1)
+  SpellAddBuff(wound_poison wound_poison add=1)
+
   SpellInfo(garrote_exsanguinated duration=18)
   SpellInfo(rupture_exsanguinated duration=8) # TODO should be the same duration of the current rupture debuff
 

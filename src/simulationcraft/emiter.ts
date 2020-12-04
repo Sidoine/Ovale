@@ -1362,18 +1362,21 @@ export class Emiter {
             } else if (className == "ROGUE" && action == "adrenaline_rush") {
                 conditionCode = "EnergyDeficit() > 1";
             } else if (className == "ROGUE" && action == "apply_poison") {
+                let lethal: string | undefined = undefined;
                 if (modifiers.lethal) {
-                    const name = this.unparser.Unparse(modifiers.lethal);
-                    action = `${name}_poison`;
-                    const buffName = "lethal_poison_buff";
-                    this.AddSymbol(annotation, buffName);
-                    conditionCode = format(
-                        "BuffRemaining(%s) < 1200",
-                        buffName
-                    );
+                    lethal = this.unparser.Unparse(modifiers.lethal);
+                } else if (specialization == "assassination") {
+                    lethal = "deadly";
                 } else {
-                    isSpellAction = false;
+                    lethal = "instant";
                 }
+                action = `${lethal}_poison`;
+                const buffName = "lethal_poison_buff";
+                this.AddSymbol(annotation, buffName);
+                conditionCode = format(
+                    "BuffRemaining(%s) < 1200",
+                    buffName
+                );
             } else if (className == "ROGUE" && action == "cancel_autoattack") {
                 isSpellAction = false;
             } else if (className == "ROGUE" && action == "premeditation") {

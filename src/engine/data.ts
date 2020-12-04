@@ -429,6 +429,11 @@ export class OvaleDataClass {
             [SpellId.skull_and_crossbones]: true,
             [SpellId.true_bearing]: true,
         },
+        lethal_poison_buff: {
+            [SpellId.deadly_poison]: true,
+            [8679]: true,
+            [315584]: true,
+        },
     };
     constructor(private runner: Runner, ovaleDebug: OvaleDebugClass) {
         for (const [, useName] of pairs(STAT_USE_NAMES)) {

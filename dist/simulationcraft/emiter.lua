@@ -441,15 +441,18 @@ __exports.Emiter = __class(nil, {
                 elseif className == "ROGUE" and action == "adrenaline_rush" then
                     conditionCode = "EnergyDeficit() > 1"
                 elseif className == "ROGUE" and action == "apply_poison" then
+                    local lethal = nil
                     if modifiers.lethal then
-                        local name = self.unparser:Unparse(modifiers.lethal)
-                        action = name .. "_poison"
-                        local buffName = "lethal_poison_buff"
-                        self:AddSymbol(annotation, buffName)
-                        conditionCode = format("BuffRemaining(%s) < 1200", buffName)
+                        lethal = self.unparser:Unparse(modifiers.lethal)
+                    elseif specialization == "assassination" then
+                        lethal = "deadly"
                     else
-                        isSpellAction = false
+                        lethal = "instant"
                     end
+                    action = lethal .. "_poison"
+                    local buffName = "lethal_poison_buff"
+                    self:AddSymbol(annotation, buffName)
+                    conditionCode = format("BuffRemaining(%s) < 1200", buffName)
                 elseif className == "ROGUE" and action == "cancel_autoattack" then
                     isSpellAction = false
                 elseif className == "ROGUE" and action == "premeditation" then
