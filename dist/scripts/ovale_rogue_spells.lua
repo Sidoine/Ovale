@@ -530,8 +530,6 @@ Define(perforated_veins_conduit 248)
   SpellDamageBuff(garrote subterfuge set=1.8 enabled=(specialization(assassination) and hastalent(subterfuge_talent)))
   SpellDamageBuff(garrote 11327 set=1.8 enabled=(specialization(assassination) and hastalent(subterfuge_talent)))
 
-  SpellInfo(sepsis cd=90 energy=25 combopoints=-1)
-
   SpellRequire(slice_and_dice unusable set=1 enabled=(buffremains(slice_and_dice)>(combopoints()+1)*6))
 
   SpellRequire(stealth unusable set=1 enabled=(stealthed()))
