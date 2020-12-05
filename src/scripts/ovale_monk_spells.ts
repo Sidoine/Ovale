@@ -305,11 +305,14 @@ Define(detox 218164)
     SpellInfo(detox cd=8)
 Define(healing_elixir 122281)
     SpellInfo(healing_elixir charge_cd=30 gcd=0 offgcd=1)
-
+#rising_sun_kick
     SpellRequire(rising_sun_kick chi set=0 enabled=(not specialization(windwalker)))
     SpellRequire(rushing_jade_wind chi set=0 enabled=(not specialization(windwalker)))
-    
+#storm_earth_and_fire
     SpellRequire(storm_earth_and_fire unusable set=1 enabled=(buffpresent(storm_earth_and_fire)))
+#touch_of_death
+    SpellInfo(touch_of_death unusable=1)
+    SpellRequire(touch_of_death unusable set=0 enabled=(target.Health() < player.Health() or (Level() >= 44 and target.HealthPercent() < 15)))
 
 ## Stagger
 Define(stagger 115069)
