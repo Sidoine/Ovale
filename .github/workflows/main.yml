@@ -7,11 +7,11 @@ name: CI
 on:
     push:
         branches: [master]
-    pull_request:
+        tags:
+            - "**"
+   pull_request:
         branches: [master]
-    tags:
-        - "**"
-
+ 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
     # This workflow contains a single job called "build"
