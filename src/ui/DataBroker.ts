@@ -72,7 +72,7 @@ export class OvaleDataBrokerClass {
             minimap: {
                 order: 25,
                 type: "toggle",
-                name: L["Show minimap icon"],
+                name: L["show_minimap_icon"],
                 get: () => {
                     return !this.ovaleOptions.db.profile.apparence.minimap.hide;
                 },
@@ -96,17 +96,17 @@ export class OvaleDataBrokerClass {
             this.tooltipTitle ||
             `${this.ovale.GetName()} ${this.ovaleVersion.version}`;
         tooltip.SetText(this.tooltipTitle, 1, 1, 1);
-        tooltip.AddLine(L["Click to select the script."]);
-        tooltip.AddLine(L["Middle-Click to toggle the script options panel."]);
-        tooltip.AddLine(L["Right-Click for options."]);
-        tooltip.AddLine(L["Shift-Right-Click for the current trace log."]);
+        tooltip.AddLine(L["script_tooltip"]);
+        tooltip.AddLine(L["middle_click_help"]);
+        tooltip.AddLine(L["right_click_help"]);
+        tooltip.AddLine(L["shift_right_click_help"]);
     };
 
     private OnClick = (fr: UIFrame, button: "LeftButton") => {
         if (button == "LeftButton") {
             const menu: LuaArray<MenuItem> = {
                 1: {
-                    text: L["Script"],
+                    text: L["script"],
                     isTitle: true,
                 },
             };

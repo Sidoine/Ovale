@@ -130,11 +130,11 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.profiler = ovaleProfiler.create(this.module.GetName());
         const debugOptions: LuaObj<OptionUiAll> = {
             power: {
-                name: L["Power"],
+                name: L["power"],
                 type: "group",
                 args: {
                     power: {
-                        name: L["Power"],
+                        name: L["power"],
                         type: "input",
                         multiline: 25,
                         width: "full",

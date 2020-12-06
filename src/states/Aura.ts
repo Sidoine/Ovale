@@ -401,11 +401,11 @@ export class OvaleAuraClass extends States<AuraInterface> {
         const output: LuaArray<string> = {};
         const debugOptions: LuaObj<OptionUiAll> = {
             playerAura: {
-                name: L["Auras (player)"],
+                name: L["auras_player"],
                 type: "group",
                 args: {
                     buff: {
-                        name: L["Auras on the player"],
+                        name: L["auras_on_player"],
                         type: "input",
                         multiline: 25,
                         width: "full",
@@ -436,11 +436,11 @@ export class OvaleAuraClass extends States<AuraInterface> {
                 },
             },
             targetAura: {
-                name: L["Auras (target)"],
+                name: L["auras_target"],
                 type: "group",
                 args: {
                     targetbuff: {
-                        name: L["Auras on the target"],
+                        name: L["auras_on_target"],
                         type: "input",
                         multiline: 25,
                         width: "full",

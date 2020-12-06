@@ -704,17 +704,17 @@ export class OvaleSimulationCraftClass {
             args: {
                 input: {
                     order: 10,
-                    name: L["Input"],
+                    name: L["input"],
                     type: "group",
                     args: {
                         description: {
                             order: 10,
-                            name: `${L["The contents of a SimulationCraft profile."]}\nhttps://code.google.com/p/simulationcraft/source/browse/profiles`,
+                            name: `${L["simulationcraft_profile_content"]}\nhttps://code.google.com/p/simulationcraft/source/browse/profiles`,
                             type: "description",
                         },
                         input: {
                             order: 20,
-                            name: L["SimulationCraft Profile"],
+                            name: L["simulationcraft_profile"],
                             type: "input",
                             multiline: 25,
                             width: "full",
@@ -737,17 +737,17 @@ export class OvaleSimulationCraftClass {
                 },
                 overrides: {
                     order: 20,
-                    name: L["Overrides"],
+                    name: L["overrides"],
                     type: "group",
                     args: {
                         description: {
                             order: 10,
-                            name: L["SIMULATIONCRAFT_OVERRIDES_DESCRIPTION"],
+                            name: L["simulationcraft_overrides_description"],
                             type: "description",
                         },
                         overrides: {
                             order: 20,
-                            name: L["Overrides"],
+                            name: L["overrides"],
                             type: "input",
                             multiline: 25,
                             width: "full",
@@ -773,20 +773,17 @@ export class OvaleSimulationCraftClass {
                 },
                 output: {
                     order: 30,
-                    name: L["Output"],
+                    name: L["output"],
                     type: "group",
                     args: {
                         description: {
                             order: 10,
-                            name:
-                                L[
-                                    "The script translated from the SimulationCraft profile."
-                                ],
+                            name: L["simulationcraft_profile_translated"],
                             type: "description",
                         },
                         output: {
                             order: 20,
-                            name: L["Script"],
+                            name: L["script"],
                             type: "input",
                             multiline: 25,
                             width: "full",

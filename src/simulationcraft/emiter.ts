@@ -2883,6 +2883,12 @@ export class Emiter {
                 } else if (property === "stack") {
                     code = `demons(${buffName})`;
                 }
+            } else if (name === "arcane_charge") {
+                if (property === "stack") {
+                    code = "arcanecharges()";
+                } else if (property === "max_stack") {
+                    code = "maxarcanecharges()";
+                }
             } else {
                 // buffname
                 [name] = this.Disambiguate(

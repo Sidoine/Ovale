@@ -20,6 +20,7 @@ import { OvaleSpellBookClass } from "../states/SpellBook";
 import { ActionType } from "../engine/best-action";
 import { isNumber, isString } from "../tools/tools";
 import { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
+import { LocalizationStrings } from "./localization/definition";
 const INFINITY = huge;
 const COOLDOWN_THRESHOLD = 0.1;
 
@@ -43,7 +44,7 @@ export class OvaleIcon {
     lastSound: string | undefined;
     fontScale: undefined | number;
     value: number | undefined;
-    help: string | undefined;
+    help: keyof Required<LocalizationStrings> | undefined;
     shouldClick = false;
     cdShown = false;
     focusText: UIFontString;
@@ -121,7 +122,7 @@ export class OvaleIcon {
         this.focusText.SetFontObject("GameFontNormalSmall");
         this.focusText.SetAllPoints(this.frame);
         this.focusText.SetTextColor(1, 1, 1);
-        this.focusText.SetText(L["Focus"]);
+        this.focusText.SetText(L["focus"]);
         this.frame.RegisterForClicks("AnyUp");
         if (profile.apparence.clickThru) {
             this.frame.EnableMouse(false);
@@ -332,7 +333,7 @@ export class OvaleIcon {
         return [startTime, element];
     }
     SetHelp(help: string | undefined) {
-        this.help = help;
+        this.help = help as keyof Required<LocalizationStrings>;
     }
     SetParams(
         positionalParams: AstIconNode["rawPositionalParams"],
@@ -433,12 +434,7 @@ export class OvaleIcon {
                 GameTooltip.AddLine(actionHelp, 0.5, 1, 0.75);
             }
             if (this.HasScriptControls()) {
-                GameTooltip.AddLine(
-                    L["Cliquer pour afficher/cacher les options"],
-                    1,
-                    1,
-                    1
-                );
+                GameTooltip.AddLine(L["options_tooltip"], 1, 1, 1);
             }
             GameTooltip.Show();
         }

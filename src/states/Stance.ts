@@ -95,11 +95,11 @@ export class OvaleStanceClass
         this.profiler = ovaleProfiler.create(this.module.GetName());
         const debugOptions: LuaObj<OptionUiAll> = {
             stance: {
-                name: L["Stances"],
+                name: L["stances"],
                 type: "group",
                 args: {
                     stance: {
-                        name: L["Stances"],
+                        name: L["stances"],
                         type: "input",
                         multiline: 25,
                         width: "full",

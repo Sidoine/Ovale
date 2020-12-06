@@ -1,15 +1,6 @@
-.idea
 /node_modules
-/dist/**/*.js
-/libs
-dist/**/*.js.map
+/dist
 /yarn-error.log
 *.orig
-/package-lock.json
-/sample.json
-/src/utils/override
-*.bat
 /items-data.txt
 /spells-data.txt
-/.nyc_output
-/coverage

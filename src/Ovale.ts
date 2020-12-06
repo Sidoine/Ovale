@@ -26,7 +26,7 @@ export class OvaleClass extends OvaleBase {
     constructor() {
         super();
         _G["BINDING_HEADER_OVALE"] = "Ovale";
-        const toggleCheckBox = L["Inverser la boîte à cocher "];
+        const toggleCheckBox = L["check_box_tooltip"];
         _G["BINDING_NAME_OVALE_CHECKBOX0"] = `${toggleCheckBox}(1)`;
         _G["BINDING_NAME_OVALE_CHECKBOX1"] = `${toggleCheckBox}(2)`;
         _G["BINDING_NAME_OVALE_CHECKBOX2"] = `${toggleCheckBox}(3)`;
@@ -127,7 +127,13 @@ export class OvaleClass extends OvaleBase {
         dep3?: Library<V>,
         dep4?: Library<W>
     ): AceModule & T & U & V & W {
-        const ret = new (this.NewModule(name, dep1, dep2, dep3, dep4))();
+        const ret = new (this.NewModule(
+            name,
+            dep1,
+            dep2,
+            dep3,
+            dep4
+        ))() as AceModule & T & U & V & W;
         ret.OnInitialize = onInitialize;
         // TODO use onRelease
         return ret;

@@ -33,11 +33,11 @@ import { OptionUiAll } from "../ui/acegui-helpers";
 export class OvaleActionBarClass {
     private debugOptions: LuaObj<OptionUiAll> = {
         actionbar: {
-            name: L["Action bar"],
+            name: L["action_bar"],
             type: "group",
             args: {
                 spellbook: {
-                    name: L["Action bar"],
+                    name: L["action_bar"],
                     type: "input",
                     multiline: 25,
                     width: "full",

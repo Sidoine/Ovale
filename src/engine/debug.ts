@@ -23,10 +23,7 @@ export class Tracer {
         const toggles = debug.defaultOptions.args.toggles as OptionUiGroup;
         toggles.args[name] = {
             name: name,
-            desc: format(
-                L["Enable debugging messages for the %s module."],
-                name
-            ),
+            desc: format(L["enable_debug_messages"], name),
             type: "toggle",
         };
     }
@@ -96,11 +93,11 @@ export class OvaleDebugClass {
     self_traced = false;
 
     defaultOptions: OptionUiGroup = {
-        name: `Ovale ${L["Debug"]}`,
+        name: `Ovale ${L["debug"]}`,
         type: "group",
         args: {
             toggles: {
-                name: L["Options"],
+                name: L["options"],
                 type: "group",
                 order: 10,
                 args: {},
@@ -123,15 +120,15 @@ export class OvaleDebugClass {
                 },
             },
             trace: {
-                name: L["Trace"],
+                name: L["trace"],
                 type: "group",
                 order: 20,
                 args: {
                     trace: {
                         order: 10,
                         type: "execute",
-                        name: L["Trace"],
-                        desc: L["Trace the next frame update."],
+                        name: L["trace"],
+                        desc: L["trace_next_frame"],
                         func: () => {
                             this.DoTrace(true);
                         },
@@ -139,7 +136,7 @@ export class OvaleDebugClass {
                     traceLog: {
                         order: 20,
                         type: "execute",
-                        name: L["Show Trace Log"],
+                        name: L["show_trace_log"],
                         func: () => {
                             this.DisplayTraceLog();
                         },
@@ -163,14 +160,14 @@ export class OvaleDebugClass {
             aceTimer
         );
         this.traceLog = LibTextDump.New(
-            `${this.ovale.GetName()} - ${L["Trace Log"]}`,
+            `${this.ovale.GetName()} - ${L["trace_log"]}`,
             750,
             500
         );
 
         const actions: LuaObj<OptionUiExecute> = {
             debug: {
-                name: L["Debug"],
+                name: L["debug"],
                 type: "execute",
                 func: () => {
                     const appName = this.module.GetName();
@@ -197,7 +194,7 @@ export class OvaleDebugClass {
         AceConfig.RegisterOptionsTable(appName, this.defaultOptions);
         AceConfigDialog.AddToBlizOptions(
             appName,
-            L["Debug"],
+            L["debug"],
             this.ovale.GetName()
         );
     };

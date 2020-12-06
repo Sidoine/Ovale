@@ -159,17 +159,14 @@ export class OvaleSpellFlashClass {
                 enabled: {
                     order: 10,
                     type: "toggle",
-                    name: L["Enabled"],
-                    desc:
-                        L[
-                            "Flash spells on action bars when they are ready to be cast. Requires SpellFlashCore."
-                        ],
+                    name: L["enabled"],
+                    desc: L["flash_spells_help"],
                     width: "full",
                 },
                 inCombat: {
                     order: 10,
                     type: "toggle",
-                    name: L["En combat uniquement"],
+                    name: L["combat_only"],
                     disabled: () => {
                         return (
                             !this.isEnabled() ||
@@ -181,7 +178,7 @@ export class OvaleSpellFlashClass {
                 hasTarget: {
                     order: 20,
                     type: "toggle",
-                    name: L["Si cible uniquement"],
+                    name: L["if_target"],
                     disabled: () => {
                         return (
                             !this.isEnabled() ||
@@ -193,7 +190,7 @@ export class OvaleSpellFlashClass {
                 hasHostileTarget: {
                     order: 30,
                     type: "toggle",
-                    name: L["Cacher si cible amicale ou morte"],
+                    name: L["hide_if_dead_or_friendly_target"],
                     disabled: () => {
                         return (
                             !this.isEnabled() ||
@@ -205,7 +202,7 @@ export class OvaleSpellFlashClass {
                 hideInVehicle: {
                     order: 40,
                     type: "toggle",
-                    name: L["Cacher dans les véhicules"],
+                    name: L["hide_in_vehicles"],
                     disabled: () => {
                         return (
                             !this.isEnabled() ||
@@ -217,7 +214,7 @@ export class OvaleSpellFlashClass {
                 brightness: {
                     order: 50,
                     type: "range",
-                    name: L["Flash brightness"],
+                    name: L["flash_brightness"],
                     min: 0,
                     max: 1,
                     bigStep: 0.01,
@@ -233,7 +230,7 @@ export class OvaleSpellFlashClass {
                 size: {
                     order: 60,
                     type: "range",
-                    name: L["Flash size"],
+                    name: L["flash_size"],
                     min: 0,
                     max: 3,
                     bigStep: 0.01,
@@ -249,11 +246,8 @@ export class OvaleSpellFlashClass {
                 threshold: {
                     order: 70,
                     type: "range",
-                    name: L["Flash threshold"],
-                    desc:
-                        L[
-                            "Time (in milliseconds) to begin flashing the spell to use before it is ready."
-                        ],
+                    name: L["flash_threshold"],
+                    desc: L["flash_time"],
                     min: 0,
                     max: 1000,
                     step: 1,
@@ -269,7 +263,7 @@ export class OvaleSpellFlashClass {
                 colors: {
                     order: 80,
                     type: "group",
-                    name: L["Colors"],
+                    name: L["colors"],
                     inline: true,
                     disabled: () => {
                         return (
@@ -312,25 +306,25 @@ export class OvaleSpellFlashClass {
                         colorMain: {
                             order: 10,
                             type: "color",
-                            name: L["Main attack"],
+                            name: L["main_attack"],
                             hasAlpha: false,
                         },
                         colorCd: {
                             order: 20,
                             type: "color",
-                            name: L["Long cooldown abilities"],
+                            name: L["long_cd"],
                             hasAlpha: false,
                         },
                         colorShortCd: {
                             order: 30,
                             type: "color",
-                            name: L["Short cooldown abilities"],
+                            name: L["short_cd"],
                             hasAlpha: false,
                         },
                         colorInterrupt: {
                             order: 40,
                             type: "color",
-                            name: L["Interrupts"],
+                            name: L["interrupts"],
                             hasAlpha: false,
                         },
                     },

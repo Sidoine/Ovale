@@ -15,11 +15,11 @@ import { OvaleDebugClass, Tracer } from "./debug";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
 export const DEFAULT_NAME = "Ovale";
-const DEFAULT_DESCRIPTION = L["Script défaut"];
+const DEFAULT_DESCRIPTION = L["default_script"];
 const CUSTOM_NAME = "custom";
-const CUSTOM_DESCRIPTION = L["Script personnalisé"];
+const CUSTOM_DESCRIPTION = L["custom_script"];
 const DISABLED_NAME = "Disabled";
-const DISABLED_DESCRIPTION = L["Disabled"];
+const DISABLED_DESCRIPTION = L["disabled"];
 
 export type ScriptType = "script" | "include";
 
@@ -58,7 +58,7 @@ export class OvaleScriptsClass {
         };
         const actions: LuaObj<OptionUiAll> = {
             code: {
-                name: L["Code"],
+                name: L["code"],
                 type: "execute",
                 func: () => {
                     const appName = this.module.GetName();
@@ -231,13 +231,13 @@ export class OvaleScriptsClass {
 
     CreateOptions() {
         const options = {
-            name: `${this.ovale.GetName()} ${L["Script"]}`,
+            name: `${this.ovale.GetName()} ${L["script"]}`,
             type: "group",
             args: {
                 source: {
                     order: 10,
                     type: "select",
-                    name: L["Script"],
+                    name: L["script"],
                     width: "double",
                     values: (info: any) => {
                         const scriptType =
@@ -257,7 +257,7 @@ export class OvaleScriptsClass {
                     order: 20,
                     type: "input",
                     multiline: 25,
-                    name: L["Script"],
+                    name: L["script"],
                     width: "full",
                     disabled: () => {
                         return this.getCurrentSpecScriptName() !== CUSTOM_NAME;
@@ -284,12 +284,12 @@ export class OvaleScriptsClass {
                 copy: {
                     order: 30,
                     type: "execute",
-                    name: L["Copier sur Script personnalisé"],
+                    name: L["copy_to_custom_script"],
                     disabled: () => {
                         return this.getCurrentSpecScriptName() === CUSTOM_NAME;
                     },
                     confirm: () => {
-                        return L["Ecraser le Script personnalisé préexistant?"];
+                        return L["overwrite_existing_script"];
                     },
                     func: () => {
                         const code = this.GetScript(
@@ -312,7 +312,7 @@ export class OvaleScriptsClass {
                 showHiddenScripts: {
                     order: 40,
                     type: "toggle",
-                    name: L["Show hidden"],
+                    name: L["show_hidden"],
                     get: (info: any) => {
                         return this.ovaleOptions.db.profile.showHiddenScripts;
                     },
@@ -326,7 +326,7 @@ export class OvaleScriptsClass {
         AceConfig.RegisterOptionsTable(appName, options);
         AceConfigDialog.AddToBlizOptions(
             appName,
-            L["Script"],
+            L["script"],
             this.ovale.GetName()
         );
     }

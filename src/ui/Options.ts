@@ -199,7 +199,7 @@ export class OvaleOptionsClass {
         args: {
             show: {
                 type: "execute",
-                name: L["Afficher la fenêtre"],
+                name: L["show_frame"],
                 guiHidden: true,
                 func: () => {
                     this.db.profile.apparence.enableIcons = true;
@@ -211,7 +211,7 @@ export class OvaleOptionsClass {
             },
             hide: {
                 type: "execute",
-                name: L["Cacher la fenêtre"],
+                name: L["hide_frame"],
                 guiHidden: true,
                 func: () => {
                     this.db.profile.apparence.enableIcons = false;
@@ -229,7 +229,7 @@ export class OvaleOptionsClass {
                 },
             },
             refresh: {
-                name: L["Display refresh statistics"],
+                name: L["display_refresh_statistics"],
                 type: "execute",
                 func: () => {
                     let [
@@ -276,11 +276,8 @@ export class OvaleOptionsClass {
         args: {
             standaloneOptions: {
                 order: 30,
-                name: L["Standalone options"],
-                desc:
-                    L[
-                        "Open configuration panel in a separate, movable window."
-                    ],
+                name: L["standalone_options"],
+                desc: L["movable_configuration_pannel"],
                 type: "toggle",
                 get: () => {
                     return this.db.profile.standaloneOptions;
@@ -292,12 +289,12 @@ export class OvaleOptionsClass {
             iconGroupAppearance: {
                 order: 40,
                 type: "group",
-                name: L["Groupe d'icônes"],
+                name: L["icon_group"],
                 args: {
                     enableIcons: {
                         order: 10,
                         type: "toggle",
-                        name: L["Enabled"],
+                        name: L["enabled"],
                         width: "full",
                         set: (info: LuaArray<string>, value: boolean) => {
                             this.db.profile.apparence.enableIcons = value;
@@ -310,7 +307,7 @@ export class OvaleOptionsClass {
                     verrouille: {
                         order: 10,
                         type: "toggle",
-                        name: L["Verrouiller position"],
+                        name: L["lock_position"],
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
                         },
@@ -318,7 +315,7 @@ export class OvaleOptionsClass {
                     clickThru: {
                         order: 20,
                         type: "toggle",
-                        name: L["Ignorer les clics souris"],
+                        name: L["ignore_mouse_clicks"],
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
                         },
@@ -326,7 +323,7 @@ export class OvaleOptionsClass {
                     visibility: {
                         order: 20,
                         type: "group",
-                        name: L["Visibilité"],
+                        name: L["visibility"],
                         inline: true,
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
@@ -335,34 +332,34 @@ export class OvaleOptionsClass {
                             enCombat: {
                                 order: 10,
                                 type: "toggle",
-                                name: L["En combat uniquement"],
+                                name: L["combat_only"],
                             },
                             avecCible: {
                                 order: 20,
                                 type: "toggle",
-                                name: L["Si cible uniquement"],
+                                name: L["if_target"],
                             },
                             targetHostileOnly: {
                                 order: 30,
                                 type: "toggle",
-                                name: L["Cacher si cible amicale ou morte"],
+                                name: L["hide_if_dead_or_friendly_target"],
                             },
                             hideVehicule: {
                                 order: 40,
                                 type: "toggle",
-                                name: L["Cacher dans les véhicules"],
+                                name: L["hide_in_vehicles"],
                             },
                             hideEmpty: {
                                 order: 50,
                                 type: "toggle",
-                                name: L["Cacher bouton vide"],
+                                name: L["hide_empty_buttons"],
                             },
                         },
                     },
                     layout: {
                         order: 30,
                         type: "group",
-                        name: L["Layout"],
+                        name: L["layout"],
                         inline: true,
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
@@ -371,22 +368,19 @@ export class OvaleOptionsClass {
                             moving: {
                                 order: 10,
                                 type: "toggle",
-                                name: L["Défilement"],
-                                desc: L["Les icônes se déplacent"],
+                                name: L["scrolling"],
+                                desc: L["scrolling_help"],
                             },
                             vertical: {
                                 order: 20,
                                 type: "toggle",
-                                name: L["Vertical"],
+                                name: L["vertical"],
                             },
                             offsetX: {
                                 order: 30,
                                 type: "range",
-                                name: L["Horizontal offset"],
-                                desc:
-                                    L[
-                                        "Horizontal offset from the center of the screen."
-                                    ],
+                                name: L["horizontal_offset"],
+                                desc: L["horizontal_offset_help"],
                                 min: -1000,
                                 max: 1000,
                                 softMin: -500,
@@ -396,11 +390,8 @@ export class OvaleOptionsClass {
                             offsetY: {
                                 order: 40,
                                 type: "range",
-                                name: L["Vertical offset"],
-                                desc:
-                                    L[
-                                        "Vertical offset from the center of the screen."
-                                    ],
+                                name: L["vertical_offset"],
+                                desc: L["vertical_offset_help"],
                                 min: -1000,
                                 max: 1000,
                                 softMin: -500,
@@ -410,7 +401,7 @@ export class OvaleOptionsClass {
                             margin: {
                                 order: 50,
                                 type: "range",
-                                name: L["Marge entre deux icônes"],
+                                name: L["margin_between_icons"],
                                 min: -16,
                                 max: 64,
                                 step: 1,
@@ -422,13 +413,13 @@ export class OvaleOptionsClass {
             iconAppearance: {
                 order: 50,
                 type: "group",
-                name: L["Icône"],
+                name: L["icon"],
                 args: {
                     iconScale: {
                         order: 10,
                         type: "range",
-                        name: L["Taille des icônes"],
-                        desc: L["La taille des icônes"],
+                        name: L["icon_scale"],
+                        desc: L["icon_scale"],
                         min: 0.5,
                         max: 3,
                         bigStep: 0.01,
@@ -437,8 +428,8 @@ export class OvaleOptionsClass {
                     smallIconScale: {
                         order: 20,
                         type: "range",
-                        name: L["Taille des petites icônes"],
-                        desc: L["La taille des petites icônes"],
+                        name: L["small_icon_scale"],
+                        desc: L["small_icon_scale_help"],
                         min: 0.5,
                         max: 3,
                         bigStep: 0.01,
@@ -468,8 +459,8 @@ export class OvaleOptionsClass {
                     fontScale: {
                         order: 30,
                         type: "range",
-                        name: L["Taille des polices"],
-                        desc: L["La taille des polices"],
+                        name: L["font_scale"],
+                        desc: L["font_scale_help"],
                         min: 0.2,
                         max: 2,
                         bigStep: 0.01,
@@ -478,7 +469,7 @@ export class OvaleOptionsClass {
                     alpha: {
                         order: 40,
                         type: "range",
-                        name: L["Opacité des icônes"],
+                        name: L["icon_opacity"],
                         min: 0,
                         max: 1,
                         bigStep: 0.01,
@@ -487,58 +478,43 @@ export class OvaleOptionsClass {
                     raccourcis: {
                         order: 50,
                         type: "toggle",
-                        name: L["Raccourcis clavier"],
-                        desc:
-                            L[
-                                "Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"
-                            ],
+                        name: L["keyboard_shortcuts"],
+                        desc: L["show_keyboard_shortcuts"],
                     },
                     numeric: {
                         order: 60,
                         type: "toggle",
-                        name: L["Affichage numérique"],
-                        desc:
-                            L[
-                                "Affiche le temps de recharge sous forme numérique"
-                            ],
+                        name: L["show_cooldown"],
+                        desc: L["show_cooldown_help"],
                     },
                     highlightIcon: {
                         order: 70,
                         type: "toggle",
-                        name: L["Illuminer l'icône"],
-                        desc:
-                            L[
-                                "Illuminer l'icône quand la technique doit être spammée"
-                            ],
+                        name: L["highlight_icon"],
+                        desc: L["highlight_icon_help"],
                     },
                     flashIcon: {
                         order: 80,
                         type: "toggle",
-                        name:
-                            L[
-                                "Illuminer l'icône quand le temps de recharge est écoulé"
-                            ],
+                        name: L["highlight_icon_on_cd"],
                     },
                     targetText: {
                         order: 90,
                         type: "input",
-                        name: L["Caractère de portée"],
-                        desc:
-                            L[
-                                "Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"
-                            ],
+                        name: L["range_indicator"],
+                        desc: L["range_indicator_help"],
                     },
                 },
             },
             optionsAppearance: {
                 order: 60,
                 type: "group",
-                name: L["Options"],
+                name: L["options"],
                 args: {
                     iconShiftX: {
                         order: 10,
                         type: "range",
-                        name: L["Décalage horizontal des options"],
+                        name: L["options_horizontal_shift"],
                         min: -256,
                         max: 256,
                         step: 1,
@@ -546,7 +522,7 @@ export class OvaleOptionsClass {
                     iconShiftY: {
                         order: 20,
                         type: "range",
-                        name: L["Décalage vertical des options"],
+                        name: L["options_vertical_shift"],
                         min: -256,
                         max: 256,
                         step: 1,
@@ -554,7 +530,7 @@ export class OvaleOptionsClass {
                     optionsAlpha: {
                         order: 30,
                         type: "range",
-                        name: L["Opacité des options"],
+                        name: L["option_opacity"],
                         min: 0,
                         max: 1,
                         bigStep: 0.01,
@@ -565,21 +541,18 @@ export class OvaleOptionsClass {
             predictiveIcon: {
                 order: 70,
                 type: "group",
-                name: L["Prédictif"],
+                name: L["two_abilities"],
                 args: {
                     predictif: {
                         order: 10,
                         type: "toggle",
-                        name: L["Prédictif"],
-                        desc:
-                            L[
-                                "Affiche les deux prochains sorts et pas uniquement le suivant"
-                            ],
+                        name: L["two_abilities"],
+                        desc: L["two_icons"],
                     },
                     secondIconScale: {
                         order: 20,
                         type: "range",
-                        name: L["Taille du second icône"],
+                        name: L["second_icon_scale"],
                         min: 0.2,
                         max: 1,
                         bigStep: 0.01,
@@ -595,20 +568,14 @@ export class OvaleOptionsClass {
                     taggedEnemies: {
                         order: 10,
                         type: "toggle",
-                        name: L["Only count tagged enemies"],
-                        desc:
-                            L[
-                                "Only count a mob as an enemy if it is directly affected by a player's spells."
-                            ],
+                        name: L["only_tagged"],
+                        desc: L["only_tagged_help"],
                     },
                     auraLag: {
                         order: 20,
                         type: "range",
-                        name: L["Aura lag"],
-                        desc:
-                            L[
-                                "Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed"
-                            ],
+                        name: L["aura_lag"],
+                        desc: L["lag_threshold"],
                         min: 100,
                         max: 700,
                         step: 10,

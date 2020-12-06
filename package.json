@@ -1,7 +1,7 @@
 {
     "name": "ovale",
-    "version": "9.0.0",
-    "description": "",
+    "version": "9.0.21",
+    "description": "Show the icon of the next spell to cast",
     "main": "dist/index.js",
     "scripts": {
         "test": "jest",
@@ -13,9 +13,13 @@
         "watch-tools": "tsc -w",
         "coverage": "nyc --reporter=lcovonly ava",
         "lint": "eslint src --ext .ts",
-        "prettier": "prettier --write src"
+        "prettier": "prettier --write src",
+        "localize": "node dist/src/utils/translation.js"
     },
-    "author": "",
+    "author": "Sidoine De Wispelaere",
+    "contributors": [
+        "Johnny C. Lam"
+    ],
     "license": "ISC",
     "dependencies": {
         "@types/node": "^12.6.2",
@@ -31,6 +35,7 @@
         "@wowts/ace_serializer-3.0": "^1.1.0",
         "@wowts/ace_timer-3.0": "^2.2.0",
         "@wowts/bit": "^1.0.0",
+        "@wowts/callback_handler-1.0": "^1.0.0",
         "@wowts/coroutine": "^1.1.0",
         "@wowts/lib_artifact_data-1.0": "^1.0.0",
         "@wowts/lib_babble-creature_type-3.0": "^1.1.1",
@@ -39,19 +44,20 @@
         "@wowts/lib_dual_spec-1.0": "^1.0.0",
         "@wowts/lib_range_check-2.0": "^1.0.0",
         "@wowts/lib_text_dump-1.0": "^1.0.1",
-        "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
         "@wowts/lua": "^1.5.0",
-        "@wowts/masque": "^1.0.1",
         "@wowts/math": "^1.1.0",
-        "@wowts/recount": "^1.1.0",
         "@wowts/string": "^1.1.1",
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.1.0",
         "@wowts/wow-mock": "^1.26.0"
     },
+    "optionalDependencies": {
+        "@wowts/recount": "^1.1.0",
+        "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
+        "@wowts/masque": "^1.0.1"
+    },
     "devDependencies": {
-        "@types/csv-parse": "^1.2.2",
         "@typescript-eslint/eslint-plugin": "^4.8.2",
         "@typescript-eslint/parser": "^4.8.2",
         "@wowts/tstolua": "^1.11.4",
@@ -65,5 +71,11 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/Sidoine/Ovale.git"
+    },
+    "lua": {
+        "name": "Ovale",
+        "title": "Ovale Spell Priority",
+        "interface": "90002",
+        "savedVariables": "OvaleDB"
     }
 }

@@ -22,11 +22,29 @@ jobs:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
 
-            - name: Install
-              run: yarn install
+            - name: Install packages
+              run: yarn install --ignore-scripts
+
+            # Only needed for the localize tool, need to move it outside Ovale
+            - name: Compile tools
+              run: yarn prepare-tools
+
+            - name: Localize
+              run: yarn localize
 
             - name: Lint
               run: yarn lint
 
             - name: Test
               run: yarn test
+
+            - name: Create lua
+              run: yarn prepare -i
+
+            - name: Archive production artifacts
+                uses: actions/upload-artifact@v2
+                with:
+                  name: ovale
+                  path: |
+                    dist
+                    !dist/src

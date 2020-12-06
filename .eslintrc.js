@@ -19,6 +19,9 @@ module.exports = {
         "no-empty-pattern": "off",
         "prefer-const": "off",
 
+        // Stylistics
+        "quote-props": ["error", "as-needed"],
+
         // TODO enable these
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-explicit-any": "off",

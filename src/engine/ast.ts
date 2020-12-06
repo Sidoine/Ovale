@@ -39,6 +39,7 @@ import {
 } from "../tools/TimeSpan";
 import { ActionType } from "./best-action";
 import { PowerType } from "../states/Power";
+import { LocalizationStrings } from "../ui/localization/definition";
 
 const KEYWORD: LuaObj<boolean> = {
     ["and"]: true,
@@ -4083,7 +4084,7 @@ export class OvaleASTClass {
                 const nodeAsString = <AstStringNode>node;
                 if (node.type === "string") {
                     const key = node.value;
-                    const value = L[key];
+                    const value = L[key as keyof LocalizationStrings];
                     if (key != value) {
                         nodeAsString.value = value;
                         nodeAsString.name = key;
@@ -4121,7 +4122,7 @@ export class OvaleASTClass {
                             [value] = GetItemInfo(stringKey);
                             if (!value) value = "item:" + stringKey;
                         } else if (name == "l") {
-                            value = L[stringKey];
+                            value = L[stringKey as keyof LocalizationStrings];
                         } else if (name == "spellname") {
                             value =
                                 this.ovaleSpellBook.GetSpellName(

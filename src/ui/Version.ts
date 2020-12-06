@@ -47,14 +47,14 @@ export class OvaleVersionClass {
         this.tracer = ovaleDebug.create(this.module.GetName());
         const actions: LuaObj<OptionUiAll> = {
             ping: {
-                name: L["Ping for Ovale users in group"],
+                name: L["ping_users"],
                 type: "execute",
                 func: () => {
                     this.VersionCheck();
                 },
             },
             version: {
-                name: L["Show version number"],
+                name: L["show_version_number"],
                 type: "execute",
                 func: () => {
                     this.tracer.Print(this.version);

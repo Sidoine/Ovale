@@ -19,9 +19,6 @@ Define(arcane_barrage 44425)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing (45.7 of Spell Power) Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
   SpellInfo(arcane_blast arcanecharges=-1)
-Define(arcane_charge_buff 36032)
-# @spelldesc114664
-  SpellInfo(arcane_charge_buff max_stacks=4 gcd=0 offgcd=1)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing (54.6 of Spell Power) Arcane damage to all enemies within A2 yards.?a137021[rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r][]
   SpellInfo(arcane_explosion arcanecharges=-1)

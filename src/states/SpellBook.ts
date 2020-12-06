@@ -82,11 +82,11 @@ export class OvaleSpellBookClass {
     ) {
         const debugOptions: LuaObj<OptionUiAll> = {
             spellbook: {
-                name: L["Spellbook"],
+                name: L["spellbook"],
                 type: "group",
                 args: {
                     spellbook: {
-                        name: L["Spellbook"],
+                        name: L["spellbook"],
                         type: "input",
                         multiline: 25,
                         width: "full",
@@ -97,11 +97,11 @@ export class OvaleSpellBookClass {
                 },
             },
             talent: {
-                name: L["Talents"],
+                name: L["talents"],
                 type: "group",
                 args: {
                     talent: {
-                        name: L["Talents"],
+                        name: L["talents"],
                         type: "input",
                         multiline: 25,
                         width: "full",

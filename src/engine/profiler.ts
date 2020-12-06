@@ -18,7 +18,7 @@ export class Profiler {
         const args = profiler.moduleOptions;
         args[name] = {
             name: name,
-            desc: format(L["Enable profiling for the %s module."], name),
+            desc: format(L["enable_profiling"], name),
             type: "toggle",
         };
         profiler.profiles[name] = this;
@@ -74,7 +74,7 @@ export class OvaleProfilerClass {
 
     actions: LuaObj<OptionUiAll> = {
         profiling: {
-            name: L["Profiling"],
+            name: L["profiling"],
             type: "execute",
             func: () => {
                 const appName = this.ovale.GetName();
@@ -87,15 +87,15 @@ export class OvaleProfilerClass {
     moduleOptions: LuaObj<OptionUiAll> = {};
 
     options: OptionUiGroup = {
-        name: `${this.ovale.GetName()} ${L["Profiling"]}`,
+        name: `${this.ovale.GetName()} ${L["profiling"]}`,
         type: "group",
         args: {
             profiling: {
-                name: L["Profiling"],
+                name: L["profiling"],
                 type: "group",
                 args: {
                     modules: {
-                        name: L["Modules"],
+                        name: L["modules"],
                         type: "group",
                         inline: true,
                         order: 10,
@@ -118,8 +118,8 @@ export class OvaleProfilerClass {
                         },
                     },
                     reset: {
-                        name: L["Reset"],
-                        desc: L["Reset the profiling statistics."],
+                        name: L["reset"],
+                        desc: L["reset_profiling"],
                         type: "execute",
                         order: 20,
                         func: () => {
@@ -127,8 +127,8 @@ export class OvaleProfilerClass {
                         },
                     },
                     show: {
-                        name: L["Show"],
-                        desc: L["Show the profiling statistics."],
+                        name: L["show"],
+                        desc: L["show_profiling_statistics"],
                         type: "execute",
                         order: 30,
                         func: () => {
@@ -163,7 +163,7 @@ export class OvaleProfilerClass {
             this.OnDisable
         );
         this.profilingOutput = LibTextDump.New(
-            `${this.ovale.GetName()} - ${L["Profiling"]}`,
+            `${this.ovale.GetName()} - ${L["profiling"]}`,
             750,
             500
         );
@@ -174,7 +174,7 @@ export class OvaleProfilerClass {
         AceConfig.RegisterOptionsTable(appName, this.options);
         AceConfigDialog.AddToBlizOptions(
             appName,
-            L["Profiling"],
+            L["profiling"],
             this.ovale.GetName()
         );
     };

@@ -590,6 +590,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
     ["active_bt_triggers"]: { name: "buffcount", extraSymbol: "bt_buffs" },
     ["animacharged_cp"]: { name: "maxcombopoints" },
+    ["arcane_charges"]: { name: "arcanecharges", modifiers: powerModifiers },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
     ["ca_active"]: {
         code: "talent(careful_aim_talent) and target.healthpercent() > 70",
