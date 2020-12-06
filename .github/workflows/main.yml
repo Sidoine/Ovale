@@ -42,9 +42,9 @@ jobs:
               run: yarn prepare -i
 
             - name: Archive production artifacts
-                uses: actions/upload-artifact@v2
-                with:
+              uses: actions/upload-artifact@v2
+              with:
                   name: ovale
                   path: |
-                    dist
-                    !dist/src
+                      dist
+                      !dist/src
