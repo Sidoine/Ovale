@@ -4,10 +4,9 @@ on:
     push:
         tags:
             - "**"
-    needs: CI
-
 jobs:
     release:
+        needs: build
         runs-on: ubuntu-latest
 
         env:
