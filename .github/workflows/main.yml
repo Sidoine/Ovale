@@ -9,6 +9,8 @@ on:
         branches: [master]
     pull_request:
         branches: [master]
+    tags:
+        - "**"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -48,3 +50,25 @@ jobs:
                   path: |
                       dist
                       !dist/src
+
+    release:
+        needs: build
+        runs-on: ubuntu-latest
+        if: startsWith(github.ref, 'refs/tags') == true
+
+        env:
+            CF_API_KEY: ${{ secrets.CF_API_KEY }}
+            WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+            GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+        steps:
+            - name: Download artifact
+              uses: action/download-artifact@v2
+              with:
+                  name: ovale
+                  path: .release
+
+            - name: Package and release
+              uses: BigWigsMods/packager@master
+              with:
+                  args: -c -e -l -w 22949 -c ovale
