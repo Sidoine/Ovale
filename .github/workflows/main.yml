@@ -68,6 +68,9 @@ jobs:
                   name: ovale
                   path: .release
 
+            - name: Create a .git directory for the packager
+              run: mkdir .git
+
             - name: Package and release
               uses: BigWigsMods/packager@master
               with:
