@@ -69,6 +69,8 @@ jobs:
             - name: Get changelog
               id: changelog_reader
               uses: mindsers/changelog-reader-action@v2
+              with:
+                  path: ovale/CHANGELOG.md
 
             - name: Publish
               uses: wowts/publisher@main
