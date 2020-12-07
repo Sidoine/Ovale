@@ -71,7 +71,7 @@ jobs:
               uses: mindsers/changelog-reader-action@v2
 
             - name: Publish
-              uses: wowts/publisher@master
+              uses: wowts/publisher@main
               with:
                   name: Ovale
                   path: ovale
