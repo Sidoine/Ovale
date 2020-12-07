@@ -393,6 +393,8 @@ export class OvaleDataClass {
             [SpellId.subterfuge]: true,
             [115193]: true,
             [SpellId.shadow_dance]: true,
+            [185422]: true,
+            [347037]: true,
         },
         rogue_stealthed_buff: {
             [SpellId.stealth]: true,
@@ -400,7 +402,9 @@ export class OvaleDataClass {
             [SpellId.vanish]: true,
             [11327]: true,
             [SpellId.shadow_dance]: true,
+            [185422]: true,
             [SpellId.subterfuge]: true,
+            [347037]: true,
         },
         mantle_stealthed_buff: {
             [SpellId.stealth]: true,
