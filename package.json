@@ -53,16 +53,20 @@
         "@wowts/wow-mock": "^1.26.0"
     },
     "optionalDependencies": {
-        "@wowts/recount": "^1.1.0",
         "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
-        "@wowts/masque": "^1.0.1"
+        "@wowts/masque": "^1.0.1",
+        "@wowts/recount": "^1.1.0"
     },
     "devDependencies": {
+        "@commitlint/cli": "^11.0.0",
+        "@commitlint/config-conventional": "^11.0.0",
         "@typescript-eslint/eslint-plugin": "^4.8.2",
         "@typescript-eslint/parser": "^4.8.2",
         "@wowts/tstolua": "^1.11.4",
+        "commitlint": "^11.0.0",
         "csv-parse": "^4.12.0",
         "eslint": "^7.14.0",
+        "husky": "^4.3.5",
         "jest": "^26.6.3",
         "prettier": "^2.2.0",
         "ts-jest": "^26.4.4",
@@ -77,5 +81,13 @@
         "title": "Ovale Spell Priority",
         "interface": "90002",
         "savedVariables": "OvaleDB"
+    },
+    "husky": {
+        "hooks": {
+            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+        }
+    },
+    "commitlint": {
+        "extends": ["@commitlint/config-conventional"]
     }
 }
