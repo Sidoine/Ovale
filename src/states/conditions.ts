@@ -101,16 +101,6 @@ type Target =
     | "pettarget"
     | "targettarget";
 
-const checkTargets: KeyCheck<Target> = {
-    cycle: true,
-    focus: true,
-    pet: true,
-    pettarget: true,
-    player: true,
-    target: true,
-    targettarget: true,
-};
-
 const checkHaste: KeyCheck<HasteType> = {
     base: true,
     melee: true,
@@ -6762,7 +6752,6 @@ l    */
             optional: true,
             defaultValue: "player",
             type: "string",
-            checkTokens: checkTargets,
         };
 
         const filterParameter: ParameterInfo<Filter> = {
