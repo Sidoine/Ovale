@@ -44,7 +44,7 @@ jobs:
               run: yarn prepare -i
 
             - name: Copy README.md
-              run: cp README.md dist
+              run: cp *.md dist
 
             - name: Archive production artifacts
               uses: actions/upload-artifact@v2
@@ -66,6 +66,10 @@ jobs:
                   name: ovale
                   path: ovale
 
+            - name: Get changelog
+              id: changelog_reader
+              uses: mindsers/changelog-reader-action@v2
+
             - name: Publish
               uses: wowts/publisher@master
               with:
@@ -76,4 +80,4 @@ jobs:
                   cf-id: 7749
                   wowi-api-token: ${{ secrets.WOWI_API_TOKEN }}
                   wowi-id: 22949
-                  changelog: TODO
+                  changelog: ${{ step.changelog_reader.outputs.changes }}

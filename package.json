@@ -14,7 +14,8 @@
         "coverage": "nyc --reporter=lcovonly ava",
         "lint": "eslint src --ext .ts",
         "prettier": "prettier --write src",
-        "localize": "node dist/src/utils/translation.js"
+        "localize": "node dist/src/utils/translation.js",
+        "release": "standard-version -s"
     },
     "author": "Sidoine De Wispelaere",
     "contributors": [
@@ -69,6 +70,7 @@
         "husky": "^4.3.5",
         "jest": "^26.6.3",
         "prettier": "^2.2.0",
+        "standard-version": "^9.0.0",
         "ts-jest": "^26.4.4",
         "typemoq": "^2.1.0"
     },
@@ -88,6 +90,8 @@
         }
     },
     "commitlint": {
-        "extends": ["@commitlint/config-conventional"]
+        "extends": [
+            "@commitlint/config-conventional"
+        ]
     }
 }
