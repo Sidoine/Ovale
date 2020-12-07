@@ -66,11 +66,11 @@ jobs:
                   name: ovale
                   path: ovale
 
-            - name: Get changelog
-              id: changelog_reader
-              uses: mindsers/changelog-reader-action@v2
-              with:
-                  path: ovale/CHANGELOG.md
+            # - name: Get changelog
+            #   id: changelog_reader
+            #   uses: mindsers/changelog-reader-action@v2
+            #   with:
+            #       path: ovale/CHANGELOG.md
 
             - name: Publish
               uses: wowts/publisher@main
@@ -82,4 +82,4 @@ jobs:
                   cf-id: 7749
                   wowi-api-token: ${{ secrets.WOWI_API_TOKEN }}
                   wowi-id: 22949
-                  changelog: ${{ steps.changelog_reader.outputs.changes }}
+                  changelog: TODO
