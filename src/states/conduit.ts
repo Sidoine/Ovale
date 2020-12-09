@@ -27,7 +27,7 @@ export class Conduit {
     };
 
     constructor(debug: OvaleDebugClass) {
-        debug.defaultOptions.args["covenant"] = this.debugOptions;
+        debug.defaultOptions.args["conduit"] = this.debugOptions;
     }
 
     registerConditions(condition: OvaleConditionClass) {
