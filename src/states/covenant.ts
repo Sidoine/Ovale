@@ -54,7 +54,7 @@ export class Covenant {
         const ids = C_Covenants.GetCovenantIDs();
         for (const [, v] of ipairs(ids)) {
             const covenant = C_Covenants.GetCovenantData(v);
-            if (covenant and covenant.name and covenant.ID) {
+            if (covenant && covenant.name && covenant.ID) {
                 const [name] = gsub(lower(covenant.name), " ", "_");
                 COVENANT_ID_BY_NAME[name] = covenant.ID;
             }
