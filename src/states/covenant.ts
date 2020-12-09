@@ -8,7 +8,7 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
 } from "../engine/condition";
-import { pairs, ipairs, type, tostring, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { pairs, ipairs, tostring, LuaArray, LuaObj, unpack } from "@wowts/lua";
 import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
