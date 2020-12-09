@@ -2,13 +2,13 @@ import { OvaleClass } from "../Ovale";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { AceModule } from "@wowts/tsaddon";
 import { CovenantChosenEvent, C_Covenants } from "@wowts/wow-mock";
-import { isNumber, isString, tostring, AceEventHandler } from "../tools/tools";
+import { isNumber, isString, AceEventHandler } from "../tools/tools";
 import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
 } from "../engine/condition";
-import { pairs, ipairs, type, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { pairs, ipairs, type, tostring, LuaArray, LuaObj, unpack } from "@wowts/lua";
 import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
