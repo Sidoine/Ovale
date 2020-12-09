@@ -8,7 +8,7 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
 } from "../engine/condition";
-import { ipairs, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { pairs, ipairs, type, LuaArray, LuaObj, unpack } from "@wowts/lua";
 import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
@@ -85,8 +85,10 @@ export class Covenant {
         const [covenant] = unpack(positionalParameters);
         if (type(covenant) == "number") {
             return ReturnBoolean(this.covenantId === covenant);
-        } else {
+        } else if (type(covenant) == "string") {
             return ReturnBoolean(this.covenantId === COVENANT_ID_BY_NAME[covenant]);
+        } else {
+            return ReturnBoolean(false);
         }
     };
 }
