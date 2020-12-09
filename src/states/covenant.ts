@@ -83,7 +83,7 @@ export class Covenant {
 
     private isCovenant: ConditionFunction = (positionalParameters) => {
         const [covenant] = unpack(positionalParameters);
-        if type(covenant) == "number" {
+        if (type(covenant) == "number") {
             return ReturnBoolean(this.covenantId === covenant);
         } else {
             return ReturnBoolean(this.covenantId === COVENANT_ID_BY_NAME[covenant]);
