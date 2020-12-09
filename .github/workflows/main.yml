@@ -82,4 +82,3 @@ jobs:
                   cf-id: 7749
                   wowi-api-token: ${{ secrets.WOWI_API_TOKEN }}
                   wowi-id: 22949
-                  changelog: TODO
