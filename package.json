@@ -15,7 +15,7 @@
         "lint": "eslint src --ext .ts",
         "prettier": "prettier --write src",
         "localize": "node dist/src/utils/translation.js",
-        "release": "standard-version -s"
+        "release": "standard-version -t '' -s"
     },
     "author": "Sidoine De Wispelaere",
     "contributors": [
