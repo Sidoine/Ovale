@@ -618,8 +618,11 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         name: "iscovenant",
         modifiers: {
             enabled: { type: MiscOperandModifierType.Remove },
+            kyrian: { type: MiscOperandModifierType.Parameter },
+            necrolord: { type: MiscOperandModifierType.Parameter },
+            night_fae: { type: MiscOperandModifierType.Parameter },
+            venthyr: { type: MiscOperandModifierType.Parameter },
         },
-        symbol: "",
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },
     ["death_knight"]: {

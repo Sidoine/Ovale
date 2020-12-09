@@ -38,7 +38,7 @@ Define(blood_of_the_enemy 297969)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
-Define(cascading_calamity 275376)
+Define(cascading_calamity 275372)
 # Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
   SpellInfo(cascading_calamity gcd=0 offgcd=1)
 Define(cataclysm 152108)

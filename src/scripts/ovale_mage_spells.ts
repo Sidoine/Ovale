@@ -54,8 +54,8 @@ Define(bag_of_tricks 312411)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(blaster_master 274597)
-# Scorch increases the damage the target takes from your Fire Blast by s1 for 30 seconds.
+Define(blaster_master 274596)
+# Fire Blast increases your Mastery by s1 for 3 sec. This effect stacks.
   SpellInfo(blaster_master gcd=0 offgcd=1)
 Define(blink 1953)
 # Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
@@ -353,10 +353,10 @@ Define(replenish_mana 5405)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
-Define(rule_of_threes_buff 187292)
-# Arcane Missiles now fires m2 additional Missiles. 
-  SpellInfo(rule_of_threes_buff duration=10 gcd=0 offgcd=1)
-  # Arcane Missiles now fires m2 additional Missiles.
+Define(rule_of_threes_buff 264774)
+# When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
+  SpellInfo(rule_of_threes_buff duration=15 gcd=0 offgcd=1)
+  # The cost of your next Arcane Blast or Arcane Missiles is reduced by s1.
   SpellAddBuff(rule_of_threes_buff rule_of_threes_buff add=1)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 15 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.

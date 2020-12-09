@@ -244,9 +244,9 @@ Define(void_torrent 263165)
 Define(void_torrent_buff 289577)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
   SpellInfo(void_torrent_buff duration=3.9 gcd=0 offgcd=1 tick=0.975)
-Define(voidform_shadow 228264)
+Define(voidform 228264)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
-  SpellInfo(voidform_shadow gcd=0 offgcd=1)
+  SpellInfo(voidform gcd=0 offgcd=1)
 Define(voidform_unused_0 194249)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
   SpellInfo(voidform_unused_0 duration=15 gcd=0 offgcd=1 tick=1)

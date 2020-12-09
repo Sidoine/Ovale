@@ -175,10 +175,10 @@ Define(liquid_magma_totem 192222)
 # Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
   SpellInfo(liquid_magma_totem cd=60 duration=15 gcd=1)
   SpellRequire(liquid_magma_totem unusable set=1 enabled=(not hastalent(liquid_magma_totem_talent)))
-Define(maelstrom_weapon_buff 187881)
+Define(maelstrom_weapon_buff 344179)
 # When you deal damage with a melee weapon, you have a chance to gain Maelstrom Weapon, stacking up to 344179u times. Each stack of Maelstrom Weapon reduces the cast time of your next damage or healing spell by 187881s1 and increase the damage or healing of your next spell by 187881s3. A maximum of s2 stacks of Maelstrom Weapon can be consumed at a time.
-  SpellInfo(maelstrom_weapon_buff duration=30 max_stacks=5 gcd=0 offgcd=1)
-  # Your next damage or healing spell has its cast time reduced by s1 and damage or healing increased by s2.
+  SpellInfo(maelstrom_weapon_buff duration=30 max_stacks=10 gcd=0 offgcd=1)
+  # Your next damage or healing spell has its cast time reduced by max(187881s1, -100)*-1 and damage or healing increased by min(187881s2, 5*s~2).
   SpellAddBuff(maelstrom_weapon_buff maelstrom_weapon_buff add=1)
 Define(primordial_wave 326059)
 # Blast your target with a Primordial Wave, dealing (65 of Spell Power) Shadow damage and apply Flame Shock to an enemy, or ?a137039[heal an ally for (65 of Spell Power) and apply Riptide to them][heal an ally for (65 of Spell Power)].rnrnYour next ?a137040[Lava Burst]?a137041[Lightning Bolt][Healing Wave] will also hit all targets affected by your ?a137040|a137041[Flame Shock][Riptide] for ?a137039[s2]?a137040[s3][s4] of normal ?a137039[healing][damage].

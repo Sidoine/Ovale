@@ -163,6 +163,8 @@ AddFunction assassinationstealthedcdpostconditions
 
 AddFunction assassinationprecombatmainactions
 {
+ #apply_poison
+ if buffremaining(lethal_poison_buff) < 1200 spell(deadly_poison)
  #stealth
  spell(stealth)
  #slice_and_dice,precombat_seconds=1
@@ -175,24 +177,25 @@ AddFunction assassinationprecombatmainpostconditions
 
 AddFunction assassinationprecombatshortcdactions
 {
- #apply_poison
- if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
- #flask
- #augmentation
- #food
- #snapshot_stats
- #marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
- if 600 > 15 spell(marked_for_death)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(deadly_poison)
+ {
+  #flask
+  #augmentation
+  #food
+  #snapshot_stats
+  #marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
+  if 600 > 15 spell(marked_for_death)
+ }
 }
 
 AddFunction assassinationprecombatshortcdpostconditions
 {
- spell(stealth) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(deadly_poison) or spell(stealth) or spell(slice_and_dice)
 }
 
 AddFunction assassinationprecombatcdactions
 {
- unless 600 > 15 and spell(marked_for_death) or spell(stealth) or spell(slice_and_dice)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(deadly_poison) or 600 > 15 and spell(marked_for_death) or spell(stealth) or spell(slice_and_dice)
  {
   #use_item,name=azsharas_font_of_power
   assassinationuseitemactions()
@@ -203,7 +206,7 @@ AddFunction assassinationprecombatcdactions
 
 AddFunction assassinationprecombatcdpostconditions
 {
- 600 > 15 and spell(marked_for_death) or spell(stealth) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(deadly_poison) or 600 > 15 and spell(marked_for_death) or spell(stealth) or spell(slice_and_dice)
 }
 
 ### actions.essences
@@ -871,6 +874,8 @@ AddFunction outlawstealthcdpostconditions
 
 AddFunction outlawprecombatmainactions
 {
+ #apply_poison
+ if buffremaining(lethal_poison_buff) < 1200 spell(instant_poison)
  #stealth,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
  if not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) spell(stealth)
  #slice_and_dice,precombat_seconds=2
@@ -883,30 +888,31 @@ AddFunction outlawprecombatmainpostconditions
 
 AddFunction outlawprecombatshortcdactions
 {
- #apply_poison
- if BuffRemaining(lethal_poison_buff) < 1200 Spell(instant_poison)
- #flask
- #augmentation
- #food
- #snapshot_stats
- #marked_for_death,precombat_seconds=5,if=raid_event.adds.in>40
- if 600 > 40 spell(marked_for_death)
-
- unless { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison)
  {
-  #roll_the_bones,precombat_seconds=1
-  spell(roll_the_bones)
+  #flask
+  #augmentation
+  #food
+  #snapshot_stats
+  #marked_for_death,precombat_seconds=5,if=raid_event.adds.in>40
+  if 600 > 40 spell(marked_for_death)
+
+  unless { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth)
+  {
+   #roll_the_bones,precombat_seconds=1
+   spell(roll_the_bones)
+  }
  }
 }
 
 AddFunction outlawprecombatshortcdpostconditions
 {
- { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(slice_and_dice)
 }
 
 AddFunction outlawprecombatcdactions
 {
- unless 600 > 40 and spell(marked_for_death) or { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(roll_the_bones) or spell(slice_and_dice)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or 600 > 40 and spell(marked_for_death) or { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(roll_the_bones) or spell(slice_and_dice)
  {
   #use_item,name=azsharas_font_of_power
   outlawuseitemactions()
@@ -917,7 +923,7 @@ AddFunction outlawprecombatcdactions
 
 AddFunction outlawprecombatcdpostconditions
 {
- 600 > 40 and spell(marked_for_death) or { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(roll_the_bones) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or 600 > 40 and spell(marked_for_death) or { not hasequippeditem(pocketsized_computation_device_item) or not spellcooldownduration(cyclotronic_blast) or never(raid_event_invulnerable_exists) } and spell(stealth) or spell(roll_the_bones) or spell(slice_and_dice)
 }
 
 ### actions.finish
@@ -1371,6 +1377,7 @@ AddIcon enabled=(checkboxon(opt_rogue_outlaw_aoe) and specialization(outlaw)) he
 # gouge
 # greenskins_wickers
 # guardian_of_azeroth
+# instant_poison
 # keep_your_wits_about_you_buff
 # kick
 # killing_spree
@@ -1652,7 +1659,7 @@ AddFunction subtletystealth_cdscdpostconditions
 AddFunction subtletyprecombatmainactions
 {
  #apply_poison
- if BuffRemaining(lethal_poison_buff) < 1200 Spell(instant_poison)
+ if buffremaining(lethal_poison_buff) < 1200 spell(instant_poison)
  #flask
  #augmentation
  #food
@@ -1669,7 +1676,7 @@ AddFunction subtletyprecombatmainpostconditions
 
 AddFunction subtletyprecombatshortcdactions
 {
- unless spell(stealth)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or spell(stealth)
  {
   #marked_for_death,precombat_seconds=15
   spell(marked_for_death)
@@ -1678,12 +1685,12 @@ AddFunction subtletyprecombatshortcdactions
 
 AddFunction subtletyprecombatshortcdpostconditions
 {
- spell(stealth) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or spell(stealth) or spell(slice_and_dice)
 }
 
 AddFunction subtletyprecombatcdactions
 {
- unless spell(stealth) or spell(marked_for_death) or spell(slice_and_dice)
+ unless buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or spell(stealth) or spell(marked_for_death) or spell(slice_and_dice)
  {
   #shadow_blades,if=runeforge.mark_of_the_master_assassin.equipped
   if equippedruneforge(mark_of_the_master_assassin_runeforge) spell(shadow_blades)
@@ -1694,7 +1701,7 @@ AddFunction subtletyprecombatcdactions
 
 AddFunction subtletyprecombatcdpostconditions
 {
- spell(stealth) or spell(marked_for_death) or spell(slice_and_dice)
+ buffremaining(lethal_poison_buff) < 1200 and spell(instant_poison) or spell(stealth) or spell(marked_for_death) or spell(slice_and_dice)
 }
 
 ### actions.finish
@@ -2258,6 +2265,7 @@ AddIcon enabled=(checkboxon(opt_rogue_subtlety_aoe) and specialization(subtlety)
 # gloomblade_talent
 # guardian_of_azeroth
 # inevitability_trait
+# instant_poison
 # kick
 # kidney_shot
 # lights_judgment

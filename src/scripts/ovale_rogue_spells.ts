@@ -120,8 +120,8 @@ Define(deadly_poison 2823)
 Define(deadly_poison_buff 2818)
 # Coats your weapons with a Lethal Poison that lasts for 3600 seconds. Each strike has a h chance to poison the enemy for 2818m1*12 seconds/2818t1 Nature damage over 12 seconds. Subsequent poison applications will instantly deal 113780s1 Nature damage.
   SpellInfo(deadly_poison_buff duration=12 gcd=0 offgcd=1 tick=2)
-Define(deadshot 272936)
-# Mutilate has a s1 chance to apply additional Deadly Poison, and does s2*2 additional damage.rnrn|C000FFF00Assassination|R
+Define(deadshot 272935)
+# Between the Eyes increases the damage of your next Pistol Shot by s1.
   SpellInfo(deadshot gcd=0 offgcd=1)
 Define(deathly_shadows_buff 341202)
 # Vanish grants 341202s3 combo points and increases all damage dealt by 341202s1 for 12 seconds.
@@ -210,6 +210,17 @@ Define(hidden_blades_buff 270070)
   SpellInfo(hidden_blades_buff max_stacks=20 gcd=0 offgcd=1)
   # Your next Fan of Knives deals s1 increased damage.
   SpellAddBuff(hidden_blades_buff hidden_blades_buff add=1)
+Define(instant_poison 315584)
+# Coats your weapons with a Lethal Poison that lasts for 3600 seconds. Each strike has a h chance of poisoning the enemy which instantly inflicts 315585s1 Nature damage.
+  SpellInfo(instant_poison duration=3600 gcd=0 offgcd=1)
+  SpellRequire(instant_poison replaced_by set=deadly_poison enabled=(specialization(assassination)))
+  # Suffering w1 Nature damage every t1 seconds.
+  SpellAddBuff(instant_poison instant_poison_buff add=1)
+  # Each strike has a chance of poisoning the enemy, inflicting 315585s1 Nature damage.
+  SpellAddBuff(instant_poison instant_poison add=1)
+Define(instant_poison_buff 315585)
+# Coats your weapons with a Lethal Poison that lasts for 3600 seconds. Each strike has a h chance of poisoning the enemy which instantly inflicts 315585s1 Nature damage.
+  SpellInfo(instant_poison_buff gcd=0 offgcd=1)
 Define(internal_bleeding_debuff 154953)
 # Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 6 seconds, based on combo points spent.
   SpellInfo(internal_bleeding_debuff duration=6 gcd=0 offgcd=1 tick=1)
@@ -524,9 +535,9 @@ Define(perforated_veins_conduit 248)
 // END
 
     code += `
-Define(instant_poison 315584)
-  SpellInfo(instant_poison duration=3600 gcd=0 offgcd=1)
-  SpellAddBuff(instant_poison instant_poison add=1)
+
+  
+  
 Define(wound_poison 8679)
   SpellInfo(wound_poison duration=3600 gcd=0 offgcd=1)
   SpellAddBuff(wound_poison wound_poison add=1)

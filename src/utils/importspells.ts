@@ -1554,6 +1554,8 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Passive") spell.identifierScore--;
         if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)
             spell.identifierScore--;
+        if (spell.spellAttributes.indexOf(SpellAttribute.Hidden) >= 0)
+            spell.identifierScore--;
     }
 
     console.log("Import active spells...");
@@ -1807,7 +1809,25 @@ export function getSpellData(directory: string) {
                 } else {
                     identifier += "_debuff";
                 }
-                if (!identifiers[identifier]) return identifier;
+
+                const existingBuffId = identifiers[identifier];
+                if (existingBuffId) {
+                    const existingBuff = spellDataById.get(existingBuffId);
+                    if (
+                        existingBuff &&
+                        existingBuff.identifierScore < spell.identifierScore
+                    ) {
+                        let i = 0;
+                        while (identifiers[`${identifier}_unused_${i}`]) {
+                            i++;
+                        }
+                        existingBuff.identifier = `${identifier}_unused_${i}`;
+                        identifiers[existingBuff.identifier] = existingBuffId;
+                        return identifier;
+                    }
+                } else {
+                    return identifier;
+                }
             }
         }
         let i = 0;

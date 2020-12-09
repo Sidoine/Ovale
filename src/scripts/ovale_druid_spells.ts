@@ -103,7 +103,7 @@ Define(convoke_the_spirits 323764)
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.333)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits add=1)
-Define(dawning_sun 276153)
+Define(dawning_sun 276152)
 # Starfire increases the damage of your Wrath by s1 for 8 seconds.
   SpellInfo(dawning_sun gcd=0 offgcd=1)
 Define(dazed 50259)
