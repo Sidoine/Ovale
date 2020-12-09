@@ -168,7 +168,6 @@ export interface SpellInfoValues extends Powers {
     interrupt?: number;
     add_duration?: number;
     add_cd?: number;
-    // nocd?:number;
     // flash?:boolean;
     // target?:string;
     // soundtime?:number;

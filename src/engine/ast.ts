@@ -452,7 +452,6 @@ export interface NodeActionResult extends BaseNodeValue {
         nored?: FlattenParameterValue;
         help?: FlattenParameterValue;
         pool_resource?: FlattenParameterValue;
-        nocd?: FlattenParameterValue;
         flash?: FlattenParameterValue;
     };
 }

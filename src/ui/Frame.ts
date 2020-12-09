@@ -367,16 +367,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             ) {
                 start = this.ovaleFuture.next.nextCast;
             }
-            if (
-                start &&
-                element.options &&
-                isNumber(element.options.nocd) &&
-                now < start - element.options.nocd
-            ) {
-                icons[1].Update(element, undefined);
-            } else {
-                icons[1].Update(element, start);
-            }
+            icons[1].Update(element, start);
             if (element.actionType == "spell") {
                 action.spellId = element.actionId;
             } else {
@@ -420,7 +411,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             // if (
             //     node.namedParams.size != "small" &&
-            //     !node.namedParams.nocd &&
             //     profile.apparence.predictif
             // ) {
             //     if (start) {
