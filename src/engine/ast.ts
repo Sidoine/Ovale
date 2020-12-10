@@ -776,6 +776,7 @@ export interface AstFunctionNode
         | "unlimited"
         | "usable"
         | "any"
+        | "value"
     > {
     name: string;
 }
@@ -793,6 +794,7 @@ const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
     unlimited: true,
     usable: true,
     any: true,
+    value: true,
 };
 
 export interface AstActionNode
@@ -1379,10 +1381,9 @@ export class OvaleASTClass {
     };
 
     private unparseAction: UnparserFunction<AstActionNode> = (node) => {
-        let name;
         return format(
             "%s(%s)",
-            name,
+            node.name,
             this.UnparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams,

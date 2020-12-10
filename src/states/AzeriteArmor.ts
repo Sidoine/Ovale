@@ -24,6 +24,7 @@ import { OvaleDebugClass } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import { Compare, OvaleConditionClass, TestBoolean } from "../engine/condition";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const azeriteSlots: LuaArray<boolean> = {
     [1]: true,
@@ -192,7 +193,7 @@ export class OvaleAzeriteArmor {
 
     private AzeriteTraitRank = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -205,7 +206,7 @@ export class OvaleAzeriteArmor {
     };
     private HasAzeriteTrait = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];

@@ -9,7 +9,11 @@ import {
     OvaleConditionClass,
 } from "../engine/condition";
 import { huge } from "@wowts/math";
-import { setResultType } from "../engine/ast";
+import {
+    AstFunctionNode,
+    NamedParametersOf,
+    setResultType,
+} from "../engine/ast";
 
 export class Variables implements StateModule {
     isState = true;
@@ -123,7 +127,7 @@ export class Variables implements StateModule {
      */
     private getState = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [name, comparator, limit] = [
@@ -146,7 +150,7 @@ export class Variables implements StateModule {
      */
     private getStateDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [name, comparator, limit] = [

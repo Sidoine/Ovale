@@ -17,6 +17,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { Compare, OvaleConditionClass } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 interface CustomAura {
     customId: number;
@@ -205,7 +206,7 @@ export class OvaleWarlockClass implements StateModule {
 
     private impsSpawnedDuring = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [ms, comparator, limit] = [
@@ -242,7 +243,7 @@ export class OvaleWarlockClass implements StateModule {
 
     private getDemonsCount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [creatureId, comparator, limit] = [
@@ -261,7 +262,7 @@ export class OvaleWarlockClass implements StateModule {
 
     private demonDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [creatureId, comparator, limit] = [
@@ -351,7 +352,7 @@ export class OvaleWarlockClass implements StateModule {
 
     private timeToShard = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];

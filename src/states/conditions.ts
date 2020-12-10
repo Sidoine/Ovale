@@ -19,7 +19,7 @@ import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
 import { HasteType, PaperDollData, OvalePaperDollClass } from "./PaperDoll";
 import { Aura, OvaleAuraClass } from "./Aura";
-import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
+import { ipairs, pairs, type, LuaArray, lualength } from "@wowts/lua";
 import {
     GetBuildInfo,
     GetItemCount,
@@ -180,7 +180,7 @@ export class OvaleConditions {
 	if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements) */
     private ArmorSetBonus = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
@@ -205,7 +205,7 @@ export class OvaleConditions {
 	    Spell(ferocious_bite) */
     private ArmorSetParts = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [, comparator, limit] = [
@@ -220,7 +220,7 @@ export class OvaleConditions {
 
     private AzeriteEssenceIsMajor = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -229,7 +229,7 @@ export class OvaleConditions {
     };
     private AzeriteEssenceIsMinor = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -238,7 +238,7 @@ export class OvaleConditions {
     };
     private AzeriteEssenceIsEnabled = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -249,7 +249,7 @@ export class OvaleConditions {
     };
     private AzeriteEssenceRank = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [essenceId, comparator, limit] = [
@@ -276,7 +276,7 @@ export class OvaleConditions {
 
     private BaseDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -328,7 +328,7 @@ export class OvaleConditions {
 	 if DebuffAmount(stagger more 10000) Spell(purifying_brew) */
     private BuffAmount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -380,7 +380,7 @@ export class OvaleConditions {
 	 if target.DebuffComboPoints(rip) <5 Spell(rip) */
     private BuffComboPoints = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -458,7 +458,7 @@ export class OvaleConditions {
 	 */
     private BuffCount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -502,7 +502,7 @@ export class OvaleConditions {
      */
     private BuffCooldownDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -549,7 +549,7 @@ export class OvaleConditions {
      */
     private BuffCountOnAny = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -577,7 +577,7 @@ export class OvaleConditions {
             auraId,
             filter,
             mine,
-            namedParams.stacks,
+            namedParams.stacks as number | undefined,
             atTime,
             excludeUnitId
         );
@@ -618,7 +618,7 @@ export class OvaleConditions {
      */
     private BuffDirection = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -672,7 +672,7 @@ export class OvaleConditions {
      */
     private BuffDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -825,7 +825,7 @@ export class OvaleConditions {
 	 @see DebuffGain */
     private BuffGain = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -853,7 +853,7 @@ export class OvaleConditions {
 
     private BuffImproved = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [, comparator, limit] = [
@@ -884,7 +884,7 @@ export class OvaleConditions {
      */
     private BuffPersistentMultiplier = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -932,7 +932,7 @@ export class OvaleConditions {
      */
     private BuffRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -979,7 +979,7 @@ export class OvaleConditions {
      */
     private BuffRemainingOnAny = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -999,7 +999,7 @@ export class OvaleConditions {
             auraId,
             filter,
             mine,
-            namedParams.stacks,
+            namedParams.stacks as number | undefined,
             atTime,
             excludeUnitId
         );
@@ -1033,7 +1033,7 @@ export class OvaleConditions {
      */
     private BuffStacks = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -1093,7 +1093,7 @@ export class OvaleConditions {
      */
     private BuffStacksOnAny = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -1151,7 +1151,7 @@ export class OvaleConditions {
      */
     private BuffStealable = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
@@ -1171,7 +1171,7 @@ export class OvaleConditions {
      */
     private CanCast = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = positionalParams[1];
@@ -1197,7 +1197,7 @@ export class OvaleConditions {
      */
     private CastTime = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -1224,7 +1224,7 @@ export class OvaleConditions {
      */
     private ExecuteTime = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -1256,7 +1256,7 @@ export class OvaleConditions {
      */
     private Casting = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = positionalParams[1];
@@ -1337,7 +1337,7 @@ export class OvaleConditions {
 	 */
     private CheckBoxOff = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
@@ -1364,7 +1364,7 @@ export class OvaleConditions {
      */
     private CheckBoxOn = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
@@ -1395,7 +1395,7 @@ export class OvaleConditions {
      */
     private Class = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [className, yesno] = [positionalParams[1], positionalParams[2]];
@@ -1428,7 +1428,7 @@ export class OvaleConditions {
      */
     private Classification = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [classification, yesno] = [
@@ -1478,7 +1478,7 @@ export class OvaleConditions {
      */
     private Counter = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [counter, comparator, limit] = [
@@ -1535,7 +1535,7 @@ export class OvaleConditions {
      */
     private CreatureType = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
@@ -1568,7 +1568,7 @@ export class OvaleConditions {
      */
     private CritDamage = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -1632,7 +1632,7 @@ export class OvaleConditions {
      */
     private Damage = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -1667,7 +1667,7 @@ export class OvaleConditions {
      */
     private DamageTaken = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [interval, comparator, limit] = [
@@ -1697,7 +1697,7 @@ export class OvaleConditions {
      */
     private MagicDamageTaken = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [interval, comparator, limit] = [
@@ -1729,7 +1729,7 @@ export class OvaleConditions {
      */
     private PhysicalDamageTaken = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [interval, comparator, limit] = [
@@ -1781,7 +1781,7 @@ export class OvaleConditions {
      */
     private DiseasesRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [
@@ -1817,7 +1817,7 @@ export class OvaleConditions {
      */
     private DiseasesTicking = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
@@ -1846,7 +1846,7 @@ export class OvaleConditions {
      */
     private DiseasesAnyTicking = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
@@ -1885,7 +1885,7 @@ export class OvaleConditions {
      */
     private Distance = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -1911,7 +1911,7 @@ export class OvaleConditions {
      */
     private Enemies = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -1946,7 +1946,7 @@ export class OvaleConditions {
      */
     private EnergyRegenRate = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -1974,7 +1974,7 @@ export class OvaleConditions {
      */
     private EnrageRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2009,7 +2009,7 @@ export class OvaleConditions {
      */
     private Exists = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2025,7 +2025,7 @@ export class OvaleConditions {
      */
     False: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return [];
@@ -2044,7 +2044,7 @@ export class OvaleConditions {
      */
     private FocusRegenRate = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2067,7 +2067,7 @@ export class OvaleConditions {
      */
     private FocusCastingRegen = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -2117,7 +2117,7 @@ export class OvaleConditions {
      */
     private GCD = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2140,7 +2140,7 @@ export class OvaleConditions {
      */
     private GCDRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2175,7 +2175,7 @@ export class OvaleConditions {
 
     private Glyph = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [, yesno] = [positionalParams[1], positionalParams[2]];
@@ -2194,7 +2194,7 @@ export class OvaleConditions {
      */
     private HasFullControlCondition = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2219,7 +2219,7 @@ export class OvaleConditions {
      */
     private Health = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2264,7 +2264,7 @@ export class OvaleConditions {
      */
     private EffectiveHealth = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2298,7 +2298,7 @@ export class OvaleConditions {
      */
     private HealthMissing = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2341,7 +2341,7 @@ export class OvaleConditions {
      */
     private HealthPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2387,7 +2387,7 @@ export class OvaleConditions {
      */
     private EffectiveHealthPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2426,7 +2426,7 @@ export class OvaleConditions {
      */
     private MaxHealth = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2451,7 +2451,7 @@ export class OvaleConditions {
      */
     private TimeToDie = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2488,7 +2488,7 @@ export class OvaleConditions {
      */
     private TimeToHealthPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [percent, comparator, limit] = [
@@ -2536,7 +2536,7 @@ export class OvaleConditions {
      */
     private InFlightToTarget = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -2560,7 +2560,7 @@ export class OvaleConditions {
      */
     private InRange = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -2586,7 +2586,7 @@ export class OvaleConditions {
      */
     private IsAggroed = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2610,7 +2610,7 @@ export class OvaleConditions {
      */
     private IsDead = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2634,7 +2634,7 @@ export class OvaleConditions {
      */
     private IsEnraged = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
@@ -2664,7 +2664,7 @@ export class OvaleConditions {
      */
     private IsFeared = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2689,7 +2689,7 @@ export class OvaleConditions {
      */
     private IsFriend = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2710,7 +2710,7 @@ export class OvaleConditions {
      */
     private IsIncapacitated = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2735,7 +2735,7 @@ export class OvaleConditions {
      */
     private IsInterruptible = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2763,7 +2763,7 @@ export class OvaleConditions {
      */
     private IsPVP = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2783,7 +2783,7 @@ export class OvaleConditions {
      */
     private IsRooted = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2806,7 +2806,7 @@ export class OvaleConditions {
      */
     private IsStunned = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -2830,7 +2830,7 @@ export class OvaleConditions {
      */
     private ItemCharges = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [itemId, comparator, limit] = [
@@ -2856,7 +2856,7 @@ export class OvaleConditions {
      */
     private ItemCount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [itemId, comparator, limit] = [
@@ -2884,7 +2884,7 @@ export class OvaleConditions {
      */
     private LastDamage = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [spellId, comparator, limit] = [
@@ -2915,7 +2915,7 @@ export class OvaleConditions {
      */
     private Level = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -2941,7 +2941,7 @@ export class OvaleConditions {
      */
     private List = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [name, value] = [positionalParams[1], positionalParams[2]];
@@ -2982,7 +2982,7 @@ export class OvaleConditions {
      */
     private PTR = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -3009,7 +3009,7 @@ export class OvaleConditions {
      */
     private PersistentMultiplier: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -3050,7 +3050,7 @@ export class OvaleConditions {
      */
     private PetPresent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -3250,7 +3250,7 @@ export class OvaleConditions {
      */
     private AlternatePower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("alternate", positionalParams, namedParams, atTime);
@@ -3268,7 +3268,7 @@ export class OvaleConditions {
      */
     private AstralPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("lunarpower", positionalParams, namedParams, atTime);
@@ -3341,7 +3341,7 @@ export class OvaleConditions {
      */
     private Focus = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("focus", positionalParams, namedParams, atTime);
@@ -3356,7 +3356,7 @@ export class OvaleConditions {
      */
     private Fury = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("fury", positionalParams, namedParams, atTime);
@@ -3375,7 +3375,7 @@ export class OvaleConditions {
      */
     private HolyPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("holypower", positionalParams, namedParams, atTime);
@@ -3390,7 +3390,7 @@ export class OvaleConditions {
      */
     private Insanity = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("insanity", positionalParams, namedParams, atTime);
@@ -3411,7 +3411,7 @@ export class OvaleConditions {
         */
     private Mana = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("mana", positionalParams, namedParams, atTime);
@@ -3426,7 +3426,7 @@ export class OvaleConditions {
      */
     private Maelstrom = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("maelstrom", positionalParams, namedParams, atTime);
@@ -3441,7 +3441,7 @@ export class OvaleConditions {
      */
     private Pain = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("pain", positionalParams, namedParams, atTime);
@@ -3460,7 +3460,7 @@ export class OvaleConditions {
      */
     private Rage = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("rage", positionalParams, namedParams, atTime);
@@ -3479,7 +3479,7 @@ export class OvaleConditions {
      */
     private RunicPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("runicpower", positionalParams, namedParams, atTime);
@@ -3498,14 +3498,14 @@ export class OvaleConditions {
      */
     private SoulShards = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("soulshards", positionalParams, namedParams, atTime);
     };
     private ArcaneCharges = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power(
@@ -3529,7 +3529,7 @@ export class OvaleConditions {
      */
     private AlternatePowerDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3553,7 +3553,7 @@ export class OvaleConditions {
      */
     private AstralPowerDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3580,7 +3580,7 @@ export class OvaleConditions {
      */
     private ChiDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit("chi", positionalParams, namedParams, atTime);
@@ -3594,7 +3594,7 @@ export class OvaleConditions {
      */
     private ComboPointsDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3621,7 +3621,7 @@ export class OvaleConditions {
      */
     private EnergyDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3645,7 +3645,7 @@ export class OvaleConditions {
      */
     private FocusDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3657,7 +3657,7 @@ export class OvaleConditions {
     };
     private FuryDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit("fury", positionalParams, namedParams, atTime);
@@ -3676,7 +3676,7 @@ export class OvaleConditions {
      */
     private HolyPowerDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3703,14 +3703,14 @@ export class OvaleConditions {
      */
     private ManaDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit("mana", positionalParams, namedParams, atTime);
     };
     private PainDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit("pain", positionalParams, namedParams, atTime);
@@ -3729,7 +3729,7 @@ export class OvaleConditions {
      */
     private RageDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit("rage", positionalParams, namedParams, atTime);
@@ -3748,7 +3748,7 @@ export class OvaleConditions {
      */
     private RunicPowerDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3772,7 +3772,7 @@ export class OvaleConditions {
      */
     private SoulShardsDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerDeficit(
@@ -3799,7 +3799,7 @@ export class OvaleConditions {
      */
     private ManaPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerPercent("mana", positionalParams, namedParams, atTime);
@@ -3819,7 +3819,7 @@ export class OvaleConditions {
      */
     private MaxAlternatePower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -3831,7 +3831,7 @@ export class OvaleConditions {
     };
     private MaxChi = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("chi", positionalParams, namedParams, atTime);
@@ -3851,7 +3851,7 @@ export class OvaleConditions {
 l    */
     private MaxComboPoints = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -3875,7 +3875,7 @@ l    */
      */
     private MaxEnergy = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("energy", positionalParams, namedParams, atTime);
@@ -3894,14 +3894,14 @@ l    */
      */
     private MaxFocus = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("focus", positionalParams, namedParams, atTime);
     };
     private MaxFury = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("fury", positionalParams, namedParams, atTime);
@@ -3920,7 +3920,7 @@ l    */
      */
     private MaxHolyPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -3946,14 +3946,14 @@ l    */
      */
     private MaxMana = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("mana", positionalParams, namedParams, atTime);
     };
     private MaxPain = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("pain", positionalParams, namedParams, atTime);
@@ -3972,7 +3972,7 @@ l    */
      */
     private MaxRage = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower("rage", positionalParams, namedParams, atTime);
@@ -3991,7 +3991,7 @@ l    */
      */
     private MaxRunicPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -4015,7 +4015,7 @@ l    */
      */
     private MaxSoulShards = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -4039,7 +4039,7 @@ l    */
      */
     private MaxArcaneCharges = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.MaxPower(
@@ -4099,7 +4099,7 @@ l    */
      */
     private EnergyCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost("energy", positionalParams, namedParams, atTime);
@@ -4122,7 +4122,7 @@ l    */
      */
     private FocusCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost("focus", positionalParams, namedParams, atTime);
@@ -4146,7 +4146,7 @@ l    */
      */
     private ManaCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost("mana", positionalParams, namedParams, atTime);
@@ -4169,7 +4169,7 @@ l    */
      */
     private RageCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost("rage", positionalParams, namedParams, atTime);
@@ -4192,7 +4192,7 @@ l    */
      */
     private RunicPowerCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost(
@@ -4212,7 +4212,7 @@ l    */
      */
     private AstralPowerCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost(
@@ -4232,7 +4232,7 @@ l    */
      */
     private MainPowerCost = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.PowerCost(
@@ -4259,7 +4259,7 @@ l    */
      */
     private Present = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -4279,12 +4279,12 @@ l    */
      */
     private PreviousGCDSpell = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spell, yesno] = [positionalParams[1], positionalParams[2]];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
-        const count = namedParams.count;
+        const count = namedParams.count as number | undefined;
         let boolean;
         if (count && count > 1) {
             boolean =
@@ -4309,7 +4309,7 @@ l    */
      */
     private PreviousOffGCDSpell = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spell, yesno] = [positionalParams[1], positionalParams[2]];
@@ -4330,7 +4330,7 @@ l    */
      */
     private PreviousSpell = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spell, yesno] = [positionalParams[1], positionalParams[2]];
@@ -4357,7 +4357,7 @@ l    */
      */
     private RelativeLevel = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -4378,7 +4378,7 @@ l    */
 
     private Refreshable = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const auraId = positionalParams[1];
@@ -4421,7 +4421,7 @@ l    */
      */
     private RemainingCastTime: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -4456,7 +4456,7 @@ l    */
      */
     private Rune = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -4482,7 +4482,7 @@ l    */
 
     private RuneDeficit = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -4523,7 +4523,7 @@ l    */
      */
     private RuneCount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -4550,7 +4550,7 @@ l    */
      */
     private TimeToRunes = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [runes, comparator, limit] = [
@@ -4614,7 +4614,7 @@ l    */
      */
     private Agility = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4636,7 +4636,7 @@ l    */
      */
     private AttackPower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4658,7 +4658,7 @@ l    */
      */
     private CritRating = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4680,7 +4680,7 @@ l    */
      */
     private HasteRating = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4702,7 +4702,7 @@ l    */
      */
     private Intellect = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4726,7 +4726,7 @@ l    */
      */
     private MasteryEffect = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4748,7 +4748,7 @@ l    */
      */
     private MasteryRating = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4773,7 +4773,7 @@ l    */
      */
     private MeleeCritChance = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.SnapshotCritChance(
@@ -4795,7 +4795,7 @@ l    */
      */
     private MeleeAttackSpeedPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4820,7 +4820,7 @@ l    */
      */
     private RangedCritChance = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.SnapshotCritChance(
@@ -4845,7 +4845,7 @@ l    */
      */
     private SpellCritChance = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.SnapshotCritChance(
@@ -4867,7 +4867,7 @@ l    */
      */
     private SpellCastSpeedPercent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4889,7 +4889,7 @@ l    */
      */
     private Spellpower = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4911,7 +4911,7 @@ l    */
      */
     private Stamina = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4933,7 +4933,7 @@ l    */
      */
     private Strength = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4947,7 +4947,7 @@ l    */
 
     private Versatility = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4961,7 +4961,7 @@ l    */
 
     private VersatilityRating = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Snapshot(
@@ -4991,7 +4991,7 @@ l    */
      */
     private Speed = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -5015,7 +5015,7 @@ l    */
      */
     private SpellChargeCooldown = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5061,7 +5061,7 @@ l    */
      */
     private SpellCharges: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5100,7 +5100,7 @@ l    */
      *     Spell(dire_frenzy) */
     private SpellFullRecharge = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
@@ -5144,7 +5144,7 @@ l    */
      */
     private SpellCooldown: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         let comparator: string | undefined, limit: number | undefined;
@@ -5200,7 +5200,7 @@ l    */
      */
     private SpellCooldownDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5235,7 +5235,7 @@ l    */
      */
     private SpellRechargeDuration = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5345,7 +5345,7 @@ l    */
      */
     private SpellCount = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5371,7 +5371,7 @@ l    */
      */
     private SpellKnown = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -5397,7 +5397,7 @@ l    */
      */
     private SpellMaxCharges: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -5430,7 +5430,7 @@ l    */
      */
     private SpellUsable: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -5464,7 +5464,7 @@ l    */
      */
     private Stealthed = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -5492,7 +5492,7 @@ l    */
      */
     private LastSwing = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const swing = positionalParams[1];
@@ -5523,7 +5523,7 @@ l    */
      */
     private NextSwing = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const swing = positionalParams[1];
@@ -5553,7 +5553,7 @@ l    */
      */
     private Talent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [talentId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -5574,7 +5574,7 @@ l    */
      */
     private TalentPoints = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [talent, comparator, limit] = [
@@ -5601,7 +5601,7 @@ l    */
      */
     private TargetIsPlayer = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -5627,7 +5627,7 @@ l    */
      */
     private Threat = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -5743,7 +5743,7 @@ l    */
      */
     private TicksRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -5787,7 +5787,7 @@ l    */
     /** Gets the remaining time until the next tick */
     private TickTimeRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -5832,7 +5832,7 @@ l    */
      */
     private TimeSincePreviousSpell: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spell, comparator, limit] = [
@@ -5857,7 +5857,7 @@ l    */
      */
     private TimeToBloodlust = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [
@@ -5871,7 +5871,7 @@ l    */
 
     private TimeToEclipse = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [, comparator, limit] = [
@@ -5930,7 +5930,7 @@ l    */
      */
     private TimeToEnergy = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [level, comparator, limit] = [
@@ -5954,7 +5954,7 @@ l    */
      */
     private TimeToMaxEnergy = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType = "energy";
@@ -5977,7 +5977,7 @@ l    */
      */
     private TimeToFocus = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [level, comparator, limit] = [
@@ -6001,7 +6001,7 @@ l    */
      */
     private TimeToMaxFocus = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType: PowerType = "focus";
@@ -6012,7 +6012,7 @@ l    */
 
     private TimeToMaxMana = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType: PowerType = "mana";
@@ -6081,7 +6081,7 @@ l    */
      */
     private TimeToEnergyFor: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.TimeToPowerFor(
@@ -6104,7 +6104,7 @@ l    */
      */
     private TimeToFocusFor = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.TimeToPowerFor(
@@ -6129,7 +6129,7 @@ l    */
      */
     private TimeToSpell = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [, comparator, limit] = [
@@ -6169,7 +6169,7 @@ l    */
      */
     private TimeWithHaste = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [seconds, comparator, limit] = [
@@ -6177,7 +6177,7 @@ l    */
             positionalParams[2],
             positionalParams[3],
         ];
-        const haste = namedParams.haste || "spell";
+        const haste = (namedParams.haste as HasteType) || "spell";
         const value = this.GetHastedTime(seconds, haste);
         return Compare(value, comparator, limit);
     };
@@ -6196,7 +6196,7 @@ l    */
      */
     private TotemExpires = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const id = positionalParams[1];
@@ -6221,7 +6221,7 @@ l    */
      */
     private TotemPresent = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const id = positionalParams[1];
@@ -6251,7 +6251,7 @@ l    */
      */
     private TotemRemaining = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [id, comparator, limit] = [
@@ -6277,7 +6277,7 @@ l    */
      */
     private Tracking = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -6311,7 +6311,7 @@ l    */
      */
     private TravelTime = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, comparator, limit] = [
@@ -6341,7 +6341,7 @@ l    */
      */
     private True = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         return [0, INFINITY];
@@ -6364,7 +6364,7 @@ l    */
      */
     private WeaponDPS = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const hand = positionalParams[1];
@@ -6393,7 +6393,7 @@ l    */
         */
     private SigilCharging = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         let charging = false;
@@ -6412,7 +6412,7 @@ l    */
      */
     private IsBossFight = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const bossEngaged = this.OvaleBossMod.IsBossEngaged(atTime);
@@ -6430,11 +6430,11 @@ l    */
      */
     private Race = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         let isRace = false;
-        const target = namedParams.target || "player";
+        const target = (namedParams.target as string | undefined) || "player";
         const [, targetRaceId] = UnitRace(target);
         for (const [, v] of ipairs(positionalParams)) {
             isRace = isRace || v == targetRaceId;
@@ -6452,10 +6452,10 @@ l    */
      */
     private UnitInPartyCond = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const target = namedParams.target || "player";
+        const target = (namedParams.target as string | undefined) || "player";
         const isTrue = UnitInParty(target);
         return TestBoolean(isTrue, "yes");
     };
@@ -6470,10 +6470,10 @@ l    */
      */
     private UnitInRaidCond = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const target = namedParams.target || "player";
+        const target = (namedParams.target as string | undefined) || "player";
         const raidIndex = UnitInRaid(target);
         return TestBoolean(raidIndex != undefined, "yes");
     };
@@ -6484,7 +6484,7 @@ l    */
 	 */
     private SoulFragments = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
@@ -6507,7 +6507,7 @@ l    */
      */
     private HasDebuffType = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const [target] = this.ParseCondition(positionalParams, namedParams);

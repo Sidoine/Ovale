@@ -39,6 +39,7 @@ import {
 } from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
 import { huge } from "@wowts/math";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const OVALE_SLOTID_BY_SLOTNAME = {
     ammoslot: 0,
@@ -453,7 +454,7 @@ export class OvaleEquipmentClass {
      */
     private hasEquippedItem = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [itemId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -488,7 +489,7 @@ export class OvaleEquipmentClass {
      */
     private hasShield = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -511,7 +512,7 @@ export class OvaleEquipmentClass {
      */
     private hasTrinket = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
@@ -545,7 +546,7 @@ export class OvaleEquipmentClass {
      */
     private ItemCooldown = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         let [itemId, comparator, limit] = [

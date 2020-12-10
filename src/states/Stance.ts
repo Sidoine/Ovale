@@ -17,6 +17,7 @@ import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import { OvaleConditionClass, TestBoolean } from "../engine/condition";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const [druidCatForm] = GetSpellInfo(768);
 const [druidTravelForm] = GetSpellInfo(783);
@@ -132,7 +133,7 @@ export class OvaleStanceClass
      */
     private Stance = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [stance, yesno] = [positionalParams[1], positionalParams[2]];

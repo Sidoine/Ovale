@@ -1,6 +1,6 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { CombatLogGetCurrentEventInfo, UnitStagger } from "@wowts/wow-mock";
-import { LuaArray, lualength, LuaObj, pairs } from "@wowts/lua";
+import { LuaArray, lualength, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
@@ -18,6 +18,7 @@ import { OvaleAuraClass } from "./Aura";
 import { OvaleHealthClass } from "./Health";
 import { isNumber } from "../tools/tools";
 import { BaseState } from "./BaseState";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const LIGHT_STAGGER = 124275;
 const MODERATE_STAGGER = 124274;
@@ -152,7 +153,7 @@ export class OvaleStaggerClass implements StateModule {
      */
     private StaggerRemaining: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [target] = ParseCondition(namedParams, this.baseState);
@@ -239,7 +240,7 @@ export class OvaleStaggerClass implements StateModule {
      */
     private StaggerTick: ConditionFunction = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [count, comparator, limit] = [

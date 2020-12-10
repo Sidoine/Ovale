@@ -5,7 +5,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { GetTime } from "@wowts/wow-mock";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { LuaObj, LuaArray } from "@wowts/lua";
+import { LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
     TestBoolean,
@@ -15,6 +15,7 @@ import {
     ReturnConstant,
 } from "../engine/condition";
 import { huge } from "@wowts/math";
+import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 export class CombatState {
     inCombat = false;
@@ -131,7 +132,7 @@ export class OvaleCombatClass
      */
     private InCombat = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const yesno = positionalParams[1];
@@ -151,7 +152,7 @@ export class OvaleCombatClass
      */
     private TimeInCombat = (
         positionalParams: LuaArray<any>,
-        namedParams: LuaObj<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
