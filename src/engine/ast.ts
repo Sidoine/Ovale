@@ -29,7 +29,6 @@ import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
 import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
 import { SpellInfoProperty, SpellInfoValues } from "./data";
-import { HasteType } from "../states/PaperDoll";
 import { Result } from "../simulationcraft/definitions";
 import {
     EMPTY_SET,
@@ -161,11 +160,6 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     proc: true,
 };
 
-// const STANCE_KEYWORD = {
-//     ["if_stance"]: true,
-//     ["stance"]: true,
-//     ["to_stance"]: true,
-// };
 {
     for (const [keyword, value] of pairs(SPELL_AURA_KEYWORD)) {
         DECLARATION_KEYWORD[keyword] = value;
@@ -175,12 +169,22 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     }
 }
 
-const ACTION_PARAMETER_COUNT: LuaObj<number> = {
+const checkActionType: KeyCheck<ActionType> = {
+    item: true,
+    macro: true,
+    setstate: true,
+    spell: true,
+    texture: true,
+    value: true,
+};
+
+const ACTION_PARAMETER_COUNT: Record<ActionType, number> = {
     ["item"]: 1,
     ["macro"]: 1,
     ["spell"]: 1,
     ["texture"]: 1,
     ["setstate"]: 2,
+    value: 1,
 };
 const STATE_ACTION: LuaObj<boolean> = {
     ["setstate"]: true,
@@ -324,8 +328,8 @@ export interface AstAnnotation {
     listList?: LuaArray<ListParameters>;
     positionalParametersList?: LuaArray<PositionalParameters>;
     rawPositionalParametersList?: LuaArray<RawPositionalParameters>;
-    flattenParametersList?: LuaArray<NamedParameters>;
-    rawNamedParametersList?: LuaArray<RawNamedParameters>;
+    flattenParametersList?: LuaArray<NamedParameters<string>>;
+    rawNamedParametersList?: LuaArray<RawNamedParameters<string>>;
     nodeList: LuaArray<AstNode>;
     parametersReference?: LuaArray<AstNode>;
     postOrderReference?: LuaArray<AstGroupNode>;
@@ -339,12 +343,12 @@ export interface AstAnnotation {
     verify?: boolean;
     functionHash?: LuaObj<AstNode>;
     expressionHash?: LuaObj<AstNode>;
-    parametersList?: LuaArray<NamedParameters>;
+    parametersList?: LuaArray<NamedParameters<string>>;
     sync?: LuaObj<AstNode>;
 }
 
 export interface NodeTypes {
-    action: AstFunctionNode;
+    action: AstActionNode;
     action_list: AstActionListNode;
     add_function: AstAddFunctionNode;
     arithmetic: AstExpressionNode;
@@ -444,16 +448,7 @@ export interface NodeActionResult extends BaseNodeValue {
     actionCharges?: number;
     castTime?: number;
     offgcd?: boolean;
-    options?: {
-        wait?: FlattenParameterValue;
-        text?: FlattenParameterValue;
-        sound?: FlattenParameterValue;
-        soundtime?: FlattenParameterValue;
-        nored?: FlattenParameterValue;
-        help?: FlattenParameterValue;
-        pool_resource?: FlattenParameterValue;
-        flash?: FlattenParameterValue;
-    };
+    options?: NamedParametersOf<AstActionNode>;
 }
 
 interface AstNodeTypes {
@@ -512,10 +507,8 @@ export function isAstNodeWithChildren(
     return (node as any).child !== undefined;
 }
 
-export interface AstNodeWithParameters<
-    T extends NodeType,
-    P extends string = DefaultNamedParameters
-> extends AstBaseNodeWithChildren<T> {
+export interface AstNodeWithParameters<T extends NodeType, P extends string>
+    extends AstBaseNodeWithChildren<T> {
     rawPositionalParams: RawPositionalParameters;
     rawNamedParams: RawNamedParameters<P>;
 
@@ -531,6 +524,7 @@ export interface AstNodeWithParameters<
 }
 
 export type AstNode =
+    | AstActionNode
     | AstActionListNode
     | AstAddFunctionNode
     | AstBangValueNode
@@ -769,44 +763,78 @@ function isExpressionNode(node: AstNode): node is AstExpressionNode {
 
 export interface AstFunctionNode
     extends AstNodeWithParameters<
-        "state" | "action" | "function" | "custom_function",
+        "state" | "function" | "custom_function",
         | "target"
         | "filter"
-        | "text"
-        | "pool_resource"
-        | "usable"
-        | "offgcd"
-        | "texture"
-        | "extra_amount"
-        | "help"
-        | "count"
-        | "any"
-        | "max"
+        | "excludeTarget"
+        | "stacks"
+        | "haste"
         | "tagged"
+        | "name"
+        | "max"
+        | "count"
+        | "unlimited"
+        | "usable"
+        | "any"
     > {
-    name: string;
-}
-
-export interface AstTypedFunctionNode
-    extends AstNodeWithParameters<"typed_function", string> {
     name: string;
 }
 
 const checkFunctionParameters: NamedParametersCheck<AstFunctionNode> = {
     filter: true,
     target: true,
-    text: true,
+    count: true,
+    excludeTarget: true,
+    haste: true,
+    max: true,
+    name: true,
+    stacks: true,
+    tagged: true,
+    unlimited: true,
+    usable: true,
+    any: true,
+};
+
+export interface AstActionNode
+    extends AstNodeWithParameters<
+        "action",
+        | "wait"
+        | "text"
+        | "sound"
+        | "soundtime"
+        | "nored"
+        | "help"
+        | "pool_resource"
+        | "flash"
+        | "usable"
+        | "target"
+        | "offgcd"
+        | "extra_amount"
+        | "texture"
+    > {
+    name: ActionType;
+}
+
+const checkActionParameters: NamedParametersCheck<AstActionNode> = {
+    flash: true,
+    help: true,
+    nored: true,
     pool_resource: true,
+    sound: true,
+    soundtime: true,
+    text: true,
+    wait: true,
+    target: true,
     usable: true,
     offgcd: true,
-    texture: true,
     extra_amount: true,
-    help: true,
-    count: true,
-    any: true,
-    max: true,
-    tagged: true,
+    texture: true,
 };
+
+export interface AstTypedFunctionNode
+    extends AstNodeWithParameters<"typed_function", string> {
+    name: string;
+}
 
 export interface AstStringNode extends AstBaseNode<"string"> {
     value: string;
@@ -1009,65 +1037,18 @@ class SelfPool extends OvalePool<AstNode> {
 type CheckboxParameters = LuaArray<AstNode>;
 type ListParameters = LuaObj<AstNode>;
 
-export interface ValuedNamedParameters {
-    pertrait?: number;
-    nocd?: number;
-    cd?: number;
-    flash?: string;
-    help?: string;
-    soundtime?: number;
-    enemies?: number;
-    texture?: string;
-    itemset?: string;
-    itemcount?: number;
-    proc?: string;
-    buff?: string;
-    add_duration?: number;
-    add_cd?: number;
-    addlist?: string;
-    dummy_replace?: string;
-    learn?: number;
-    shared_cd?: number;
-    stance?: number;
-    to_stance?: number;
-    nored?: number;
-    sound?: string;
-    text?: string;
-    mine?: number;
-    offgcd?: number;
-    casttime?: number;
-    pool_resource?: number;
-    size?: "small";
-    unlimited?: number;
-    wait?: number;
-    max?: number;
-    extra_amount?: number;
-    type?: string;
-    any?: number;
-    usable?: number;
-    haste?: HasteType;
-    rage?: number;
-}
-
-export type NamedParameters<K extends string = DefaultNamedParameters> = {
+export type NamedParameters<K extends string> = {
     [key in K]?: FlattenParameterValue;
 };
+
+export type NamedParametersOf<
+    K extends AstNodeWithParameters<NodeType, string>
+> = K["cachedParams"]["named"];
 
 type FlattenParameterValue = string | number | boolean | undefined;
 export type PositionalParameters = LuaArray<FlattenParameterValue>;
 
-type DefaultNamedParameters =
-    | keyof ValuedNamedParameters
-    | "filter"
-    | "target"
-    | "listitem"
-    | "checkbox"
-    | "if"
-    | "add"
-    | "set"
-    | "percent";
-
-export type RawNamedParameters<K extends string = DefaultNamedParameters> = {
+export type RawNamedParameters<K extends string> = {
     [key in K]?: AstNode;
 };
 
@@ -1094,13 +1075,13 @@ export class OvaleASTClass {
     private positionalParametersPool = new OvalePool<PositionalParameters>(
         "OvaleAST_FlattenParameterValues"
     );
-    private rawNamedParametersPool = new OvalePool<RawNamedParameters>(
+    private rawNamedParametersPool = new OvalePool<RawNamedParameters<string>>(
         "OvaleAST_rawNamedParametersPool"
     );
     private rawPositionalParametersPool = new OvalePool<RawPositionalParameters>(
         "OVALEAST_rawPositionParametersPool"
     );
-    private namedParametersPool = new OvalePool<NamedParameters>(
+    private namedParametersPool = new OvalePool<NamedParameters<string>>(
         "OvaleAST_FlattenParametersPool"
     );
     public childrenPool = new OvalePool<LuaArray<AstNode>>(
@@ -1396,6 +1377,20 @@ export class OvaleASTClass {
         }
         return expression;
     };
+
+    private unparseAction: UnparserFunction<AstActionNode> = (node) => {
+        let name;
+        return format(
+            "%s(%s)",
+            name,
+            this.UnparseParameters(
+                node.rawPositionalParams,
+                node.rawNamedParams,
+                true
+            )
+        );
+    };
+
     private UnparseFunction: UnparserFunction<AstFunctionNode> = (node) => {
         let s;
         if (this.HasParameters(node)) {
@@ -1732,7 +1727,7 @@ export class OvaleASTClass {
     private UNPARSE_VISITOR: {
         [key in keyof NodeTypes]?: UnparserFunction<NodeTypes[key]>;
     } = {
-        ["action"]: this.UnparseFunction,
+        ["action"]: this.unparseAction,
         ["add_function"]: this.UnparseAddFunction,
         ["arithmetic"]: this.UnparseExpression,
         ["bang_value"]: this.UnparseBangValue,
@@ -2416,8 +2411,59 @@ export class OvaleASTClass {
         return node;
     }
 
+    private parseAction(
+        tokenStream: OvaleLexer,
+        annotation: AstAnnotation,
+        name: ActionType
+    ) {
+        if (!this.parseToken(tokenStream, "ACTION", "(")) return undefined;
+        const count = ACTION_PARAMETER_COUNT[name];
+        const [positionalParams, namedParams] = this.ParseParameters(
+            tokenStream,
+            "function",
+            annotation,
+            count,
+            checkActionParameters
+        );
+        if (!positionalParams || !namedParams) return undefined;
+        if (!this.parseToken(tokenStream, "ACTION", ")")) return undefined;
+
+        const node = this.newNodeWithParameters(
+            "action",
+            annotation,
+            positionalParams,
+            namedParams
+        );
+
+        node.name = name;
+        if (STRING_LOOKUP_FUNCTION[name]) {
+            annotation.stringReference = annotation.stringReference || {};
+            annotation.stringReference[
+                lualength(annotation.stringReference) + 1
+            ] = node;
+        }
+        node.asString = this.unparseAction(node);
+
+        if (name === "spell") {
+            const parameter = positionalParams[1];
+            if (!parameter) {
+                this.SyntaxError(
+                    tokenStream,
+                    "Type error: %s function expect a spell id parameter",
+                    name
+                );
+            }
+            annotation.spellNode = annotation.spellNode || {};
+            annotation.spellNode[
+                lualength(annotation.spellNode) + 1
+            ] = parameter;
+        }
+
+        return node;
+    }
+
     private ParseFunction: ParserFunction<
-        AstFunctionNode | AstTypedFunctionNode
+        AstFunctionNode | AstTypedFunctionNode | AstActionNode
     > = (tokenStream, annotation) => {
         let name;
         {
@@ -2432,6 +2478,10 @@ export class OvaleASTClass {
                 );
                 return undefined;
             }
+        }
+
+        if (checkToken(checkActionType, name)) {
+            return this.parseAction(tokenStream, annotation, name);
         }
 
         let target;
@@ -2501,21 +2551,9 @@ export class OvaleASTClass {
             namedParams.filter = this.newString(annotation, filter);
         }
 
-        let nodeType: "state" | "action" | "function" | "custom_function";
+        let nodeType: "state" | "function" | "custom_function";
         if (STATE_ACTION[name]) {
             nodeType = "state";
-        } else if (ACTION_PARAMETER_COUNT[name]) {
-            const count = ACTION_PARAMETER_COUNT[name];
-            if (count > lualength(positionalParams)) {
-                this.SyntaxError(
-                    tokenStream,
-                    "Syntax error: action '%s' requires at least %d fixed parameter(s).",
-                    name,
-                    count
-                );
-                return undefined;
-            }
-            nodeType = "action";
         } else if (STRING_LOOKUP_FUNCTION[name]) {
             nodeType = "function";
         } else if (this.ovaleCondition.IsCondition(name)) {
@@ -2929,7 +2967,7 @@ export class OvaleASTClass {
         const node = this.GetNumberNode(value, annotation);
         return node;
     };
-    private ParseParameters<T extends string = DefaultNamedParameters>(
+    private ParseParameters<T extends string>(
         tokenStream: OvaleLexer,
         methodName: string,
         annotation: AstAnnotation,
@@ -3631,7 +3669,7 @@ export class OvaleASTClass {
         return node;
     };
     private ParseString: ParserFunction<
-        AstStringNode | AstFunctionNode | AstTypedFunctionNode
+        AstStringNode | AstFunctionNode | AstActionNode | AstTypedFunctionNode
     > = (tokenStream, annotation) => {
         let value;
         const [tokenType, token] = tokenStream.Peek();
@@ -4284,7 +4322,7 @@ export class OvaleASTClass {
                 for (const [name] of pairs(functionCall)) {
                     if (
                         !(
-                            ACTION_PARAMETER_COUNT[name] ||
+                            checkToken(checkActionType, name) ||
                             STRING_LOOKUP_FUNCTION[name] ||
                             this.ovaleCondition.IsCondition(name) ||
                             (customFunction && customFunction[name])

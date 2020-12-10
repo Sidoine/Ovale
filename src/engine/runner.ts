@@ -9,6 +9,7 @@ import {
 } from "@wowts/lua";
 import { abs, huge, min } from "@wowts/math";
 import {
+    AstActionNode,
     AstBooleanNode,
     AstExpressionNode,
     AstFunctionNode,
@@ -25,6 +26,7 @@ import {
     AstVariableNode,
     isAstNodeWithChildren,
     NamedParameters,
+    NamedParametersOf,
     NodeActionResult,
     NodeNoResult,
     NodeType,
@@ -64,7 +66,7 @@ export type ActionInfo = [
 ];
 
 export type ActionInfoHandler = (
-    element: AstFunctionNode,
+    element: AstActionNode,
     atTime: number,
     target: string
 ) => NodeActionResult | NodeNoResult;
@@ -269,33 +271,30 @@ export class Runner {
     }
 
     public GetActionInfo(
-        element: AstFunctionNode,
+        element: AstActionNode,
         atTime: number,
-        namedParameters: NamedParameters
+        namedParameters: NamedParametersOf<AstActionNode>
     ) {
-        if (element.type == "action") {
-            if (
-                element.result.serial &&
-                element.result.serial >= this.self_serial
-            ) {
-                this.tracer.Log(
-                    "[%d]    using cached result (age = %d/%d)",
-                    element.nodeId,
-                    element.result.serial,
-                    this.self_serial
-                );
-            } else {
-                const target =
-                    (isString(namedParameters.target) &&
-                        namedParameters.target) ||
-                    this.baseState.next.defaultTarget;
-                const result = this.actionHandlers[element.name](
-                    element,
-                    atTime,
-                    target
-                );
-                if (result.type === "action") result.options = namedParameters;
-            }
+        if (
+            element.result.serial &&
+            element.result.serial >= this.self_serial
+        ) {
+            this.tracer.Log(
+                "[%d]    using cached result (age = %d/%d)",
+                element.nodeId,
+                element.result.serial,
+                this.self_serial
+            );
+        } else {
+            const target =
+                (isString(namedParameters.target) && namedParameters.target) ||
+                this.baseState.next.defaultTarget;
+            const result = this.actionHandlers[element.name](
+                element,
+                atTime,
+                target
+            );
+            if (result.type === "action") result.options = namedParameters;
         }
         return element.result;
     }
@@ -306,7 +305,7 @@ export class Runner {
         return node.result;
     };
 
-    private ComputeAction: ComputerFunction<AstFunctionNode> = (
+    private ComputeAction: ComputerFunction<AstActionNode> = (
         node,
         atTime: number
     ) => {

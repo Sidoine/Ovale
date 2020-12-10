@@ -1,7 +1,13 @@
 import { next, LuaObj, LuaArray, ipairs, unpack, pack } from "@wowts/lua";
 import { huge } from "@wowts/math";
 import { BaseState } from "../states/BaseState";
-import { PositionalParameters, NamedParameters, AstNodeSnapshot } from "./ast";
+import {
+    PositionalParameters,
+    AstNodeSnapshot,
+    AstActionNode,
+    AstFunctionNode,
+    NamedParametersOf,
+} from "./ast";
 import { AuraType } from "./data";
 import { isString, KeyCheck } from "../tools/tools";
 import { insert } from "@wowts/table";
@@ -21,13 +27,13 @@ export type ConditionResult = [
 ];
 export type ConditionFunction = (
     positionalParams: PositionalParameters,
-    namedParams: NamedParameters,
+    namedParams: NamedParametersOf<AstFunctionNode>,
     atTime: number
 ) => ConditionResult;
 
 export type ConditionAction = (
     positionalParams: PositionalParameters,
-    namedParams: NamedParameters,
+    namedParams: NamedParametersOf<AstActionNode>,
     atTime: number,
     result: AstNodeSnapshot
 ) => void;
@@ -237,7 +243,7 @@ export class OvaleConditionClass {
     EvaluateCondition(
         name: string,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         return this.conditions[name](positionalParams, namedParams, atTime);
@@ -248,7 +254,7 @@ export class OvaleConditionClass {
 }
 
 export function ParseCondition(
-    namedParams: NamedParameters,
+    namedParams: NamedParametersOf<AstFunctionNode>,
     baseState: BaseState,
     defaultTarget?: string
 ): [target: string, filter: AuraType | undefined, mine: boolean] {

@@ -51,7 +51,11 @@ import {
     UnitRace,
 } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
-import { PositionalParameters, NamedParameters } from "../engine/ast";
+import {
+    PositionalParameters,
+    NamedParametersOf,
+    AstFunctionNode,
+} from "../engine/ast";
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
@@ -1058,7 +1062,7 @@ export class OvaleConditions {
 
     private maxStacks = (
         positionalParams: PositionalParameters,
-        namedParameters: NamedParameters,
+        namedParameters: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -3064,7 +3068,7 @@ export class OvaleConditions {
     private MaxPower(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -3089,7 +3093,7 @@ export class OvaleConditions {
     private Power(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -3128,7 +3132,7 @@ export class OvaleConditions {
     private PowerDeficit(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -3182,7 +3186,7 @@ export class OvaleConditions {
     private PowerPercent(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -3283,7 +3287,7 @@ export class OvaleConditions {
      */
     private Chi = (
         positionalParams: LuaArray<any>,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("chi", positionalParams, namedParams, atTime);
@@ -3300,7 +3304,7 @@ export class OvaleConditions {
      */
     private ComboPoints = (
         positionalParams: LuaArray<any>,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("combopoints", positionalParams, namedParams, atTime);
@@ -3318,7 +3322,7 @@ export class OvaleConditions {
      */
     private Energy = (
         positionalParams: LuaArray<any>,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         return this.Power("energy", positionalParams, namedParams, atTime);
@@ -4051,7 +4055,7 @@ l    */
     private PowerCost(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [spell, comparator, limit] = [
@@ -4567,7 +4571,7 @@ l    */
         statName: keyof PaperDollData,
         defaultValue: number,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -4585,7 +4589,7 @@ l    */
         statName: keyof PaperDollData,
         defaultValue: number,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const [comparator, limit] = [
@@ -5271,7 +5275,7 @@ l    */
      */
     private SpellData: ConditionFunction = (
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, key, comparator, limit] = [
@@ -5306,7 +5310,7 @@ l    */
      */
     private SpellInfoProperty: ConditionFunction = (
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [spellId, key, comparator, limit] = [
@@ -5654,7 +5658,7 @@ l    */
      */
     private TickTime = (
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -5690,7 +5694,7 @@ l    */
 
     private CurrentTickTime = (
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [auraId, comparator, limit] = [
@@ -6020,7 +6024,7 @@ l    */
     private TimeToPowerFor(
         powerType: PowerType,
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult {
         const [spellId, comparator, limit] = [
@@ -6525,7 +6529,7 @@ l    */
 
     private stackTimeTo = (
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = <number>positionalParams[1];
@@ -6582,7 +6586,7 @@ l    */
 
     private ParseCondition(
         positionalParams: PositionalParameters,
-        namedParams: NamedParameters,
+        namedParams: NamedParametersOf<AstFunctionNode>,
         defaultTarget?: string
     ) {
         return ParseCondition(namedParams, this.baseState, defaultTarget);

@@ -18,7 +18,7 @@ import {
     IsUsableItem,
 } from "@wowts/wow-mock";
 import {
-    AstFunctionNode,
+    AstActionNode,
     AstIconNode,
     AstNodeSnapshot,
     NodeActionResult,
@@ -40,7 +40,13 @@ import { OvaleDebugClass, Tracer } from "./debug";
 import { Variables } from "../states/Variables";
 import { ActionInfoHandler, Runner } from "./runner";
 
-export type ActionType = "item" | "spell" | "texture" | "macro" | "value";
+export type ActionType =
+    | "item"
+    | "spell"
+    | "texture"
+    | "macro"
+    | "value"
+    | "setstate";
 
 export class OvaleBestActionClass {
     private module: AceModule & AceEvent;
@@ -190,7 +196,7 @@ export class OvaleBestActionClass {
 
     private getSpellActionInfo(
         spellId: number,
-        element: AstFunctionNode,
+        element: AstActionNode,
         atTime: number,
         target: string
     ): NodeActionResult | NodeNoResult {
@@ -358,7 +364,7 @@ export class OvaleBestActionClass {
     }
 
     private GetActionTextureInfo: ActionInfoHandler = (
-        element: AstFunctionNode,
+        element: AstActionNode,
         atTime: number,
         target: string
     ) => {
