@@ -484,6 +484,7 @@ export class Runner {
                 // if (start < newStart) {
                 //     start = newStart;
                 // }
+                start = atTime;
             }
             this.tracer.Log(
                 "[%d]    Action %s can start at %f.",
@@ -1234,11 +1235,6 @@ export class Runner {
                 node.cachedParams.positional[k] = this.computeAsValue(
                     v,
                     atTime
-                );
-                this.tracer.Log(
-                    "Parameter %d is %s",
-                    k,
-                    tostring(node.cachedParams.positional[k])
                 );
             }
         }

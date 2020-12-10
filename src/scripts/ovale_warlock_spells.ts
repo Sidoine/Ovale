@@ -180,13 +180,11 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-Define(inevitable_demise_buff 334320)
+Define(inevitable_demise_buff 273525)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
-  SpellInfo(inevitable_demise_buff duration=20 max_stacks=50 gcd=0 offgcd=1 tick=1)
-  # Drain Life deals w1 additional damage and costs w3 less mana.
+  SpellInfo(inevitable_demise_buff duration=20 max_stacks=50 gcd=0 offgcd=1)
+  # Each time your Drain Life deals damage, it deals w1 additional damage and heals for an additional w1.
   SpellAddBuff(inevitable_demise_buff inevitable_demise_buff add=1)
-  # Drain Life deals w1 additional damage and costs w3 less mana.
-  SpellAddTargetDebuff(inevitable_demise_buff inevitable_demise_buff add=1)
 Define(infernal_awakening 22703)
 # An infernal falls from the sky, dealing (60 of Spell Power) Fire damage to all targets, stunning them for 2 seconds.
   SpellInfo(infernal_awakening duration=2 gcd=0 offgcd=1)

@@ -148,12 +148,9 @@ Define(expanded_potential_buff 327495)
 Define(fae_tendrils_unused_0 342373)
 # Shifting Power entangles enemies it hits, rooting them in place for 5 seconds.
   SpellInfo(fae_tendrils_unused_0 duration=5 max_stacks=1 gcd=0 offgcd=1)
-Define(fingers_of_frost 112965)
+Define(fingers_of_frost_buff 44544)
 # Frostbolt has a s1 chance and Frozen Orb damage has a s2 to grant a charge of Fingers of Frost.rnrnFingers of Frost causes your next Ice Lance to deal damage as if the target were frozen.rnrnMaximum 44544s1 charges.
-  SpellInfo(fingers_of_frost gcd=0 offgcd=1)
-Define(fingers_of_frost_unused_0 44544)
-# Frostbolt has a s1 chance and Frozen Orb damage has a s2 to grant a charge of Fingers of Frost.rnrnFingers of Frost causes your next Ice Lance to deal damage as if the target were frozen.rnrnMaximum 44544s1 charges.
-  SpellInfo(fingers_of_frost_unused_0 duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(fingers_of_frost_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
 Define(fire_blast 108853)
 # Blasts the enemy for (79.2 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
   SpellInfo(fire_blast cd=0.5 charge_cd=12 gcd=0 offgcd=1)
@@ -191,7 +188,7 @@ Define(freezing_winds 327478)
 # While Frozen Orb is active, you gain Fingers of Frost every 327478t1 sec.
   SpellInfo(freezing_winds duration=30 gcd=0 offgcd=1 tick=2)
   # Your next Ice Lance deals damage as if the target were frozen.
-  SpellAddBuff(freezing_winds fingers_of_frost_unused_0 add=1)
+  SpellAddBuff(freezing_winds fingers_of_frost_buff add=1)
   # Gaining Fingers of Frost every t1 sec.
   SpellAddBuff(freezing_winds freezing_winds add=1)
 Define(frost_nova 122)

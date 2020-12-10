@@ -243,9 +243,11 @@ Define(potion_of_unbridled_fury 300714)
   SpellInfo(potion_of_unbridled_fury duration=60 gcd=0 offgcd=1)
   # Chance to deal an extra 300717s1 Fire damage to your current target.
   SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury add=1)
-Define(precise_shots 260240)
+Define(precise_shots_buff 260242)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
-  SpellInfo(precise_shots gcd=0 offgcd=1)
+  SpellInfo(precise_shots_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
+  # Damage of ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot increased by s1.
+  SpellAddBuff(precise_shots_buff precise_shots_buff add=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)

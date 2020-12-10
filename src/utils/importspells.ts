@@ -1797,8 +1797,8 @@ export function getSpellData(directory: string) {
             if (
                 spell.spellEffects &&
                 !identifier.endsWith("_buff") &&
-                !identifier.endsWith("_debuff") &&
-                !spell.spellEffects.some((x) => x.trigger_spell_id)
+                !identifier.endsWith("_debuff") // &&
+                //!spell.spellEffects.some((x) => x.trigger_spell_id)
             ) {
                 if (
                     spell.spellEffects.some((x) =>

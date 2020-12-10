@@ -137,9 +137,11 @@ Define(imprison 217832)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
   SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
-Define(lifeblood_buff 305694)
+Define(lifeblood_buff 295137)
 # Every s4-s1 sec, a Lifeblood Shard erupts from the nearby ground for 12 seconds.?!s295186&a295078[rnrn@spellicon295078@spellname295114rnGrants you and any other ally using Worldvein Resonance 295078s5 primary stat while within m2*(1+(295160m1/100)) yds of the Lifeblood Shard. You can benefit from a maximum of 295137u Lifeblood Shards at a time.][]
-  SpellInfo(lifeblood_buff duration=3 gcd=0 offgcd=1)
+  SpellInfo(lifeblood_buff duration=20 max_stacks=4 gcd=0 offgcd=1 tick=2)
+  # ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] increased by w1+w2+w3.
+  SpellAddTargetDebuff(lifeblood_buff lifeblood_buff add=1)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
