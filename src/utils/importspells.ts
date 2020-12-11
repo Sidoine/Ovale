@@ -1574,7 +1574,8 @@ export function getSpellData(directory: string) {
         };
         const spell = spellDataById.get(activeSpell.spell_id);
         if (spell) {
-            spell.identifierScore += 10;
+            if (!spell.spellAttributes.includes(SpellAttribute.Passive))
+                spell.identifierScore += 10;
             spell.className = classNames[activeSpell.class_id];
         }
     }
@@ -1589,7 +1590,8 @@ export function getSpellData(directory: string) {
         const specIndex = getNumber(specSpell[1]);
         const spell = spellDataById.get(getNumber(specSpell[2]));
         if (spell) {
-            spell.identifierScore += 10;
+            if (!spell.spellAttributes.includes(SpellAttribute.Passive))
+                spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
             if (specSpell[3]) {
@@ -1785,7 +1787,8 @@ export function getSpellData(directory: string) {
                 if (spec) {
                     if (spell.specializationName.indexOf(spec) < 0)
                         spell.specializationName.push(spec);
-                    spell.identifierScore += 10;
+                    if (!spell.spellAttributes.includes(SpellAttribute.Passive))
+                        spell.identifierScore += 10;
                 }
             }
         }

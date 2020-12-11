@@ -224,7 +224,6 @@ export class Emiter {
     }
 
     public InitializeDisambiguation() {
-        this.AddDisambiguation("none", "none");
         this.AddDisambiguation(
             "inevitable_demise_az_buff",
             "inevitable_demise_buff",
@@ -1373,10 +1372,7 @@ export class Emiter {
                 action = `${lethal}_poison`;
                 const buffName = "lethal_poison_buff";
                 this.AddSymbol(annotation, buffName);
-                conditionCode = format(
-                    "BuffRemaining(%s) < 1200",
-                    buffName
-                );
+                conditionCode = format("BuffRemaining(%s) < 1200", buffName);
             } else if (className == "ROGUE" && action == "cancel_autoattack") {
                 isSpellAction = false;
             } else if (className == "ROGUE" && action == "premeditation") {

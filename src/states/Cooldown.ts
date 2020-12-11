@@ -1,5 +1,4 @@
 import { OvaleDataClass } from "../engine/data";
-import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -109,8 +108,7 @@ export class OvaleCooldownClass
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
-        ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        ovaleProfiler: OvaleProfilerClass
     ) {
         super(CooldownData);
         this.module = ovale.createModule(
@@ -222,17 +220,7 @@ export class OvaleCooldownClass
                 }
             }
         } else {
-            let start, duration, enable;
-            const [index, bookType] = this.ovaleSpellBook.GetSpellBookIndex(
-                spellId
-            );
-
-            // TODO Cache this
-            if (index && bookType) {
-                [start, duration, enable] = GetSpellCooldown(index, bookType);
-            } else {
-                [start, duration, enable] = GetSpellCooldown(spellId);
-            }
+            let [start, duration, enable] = GetSpellCooldown(spellId);
             this.tracer.Log(
                 "Call GetSpellCooldown which returned %f, %f, %d",
                 start,

@@ -662,7 +662,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 atTime,
                 powerType
             );
-            this.tracer.Log("Spell has cost of %s for %s", cost, powerType);
+            this.tracer.Log("Spell has cost of %d for %s", cost, powerType);
             if (
                 cost !== undefined &&
                 cost > this.getPowerAt(this.GetState(atTime), powerType, atTime)

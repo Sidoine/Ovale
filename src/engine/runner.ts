@@ -40,7 +40,6 @@ import { OvaleConditionClass } from "./condition";
 import { OvaleDebugClass, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
 import {
-    EMPTY_SET,
     newTimeSpan,
     OvaleTimeSpan,
     releaseTimeSpans,
@@ -255,15 +254,16 @@ export class Runner {
 
     private ComputeBool(element: AstNode, atTime: number) {
         const newElement = this.Compute(element, atTime);
-        if (
-            newElement.type === "value" &&
-            (newElement.value == 0 || newElement.value === false) &&
-            (newElement.rate == 0 || newElement.rate === undefined)
-        ) {
-            return EMPTY_SET;
-        } else {
-            return newElement.timeSpan;
-        }
+        // if (
+        //     newElement.type === "value" &&
+        //     newElement.value == 0 &&
+        //     (newElement.rate == 0 || newElement.rate === undefined)
+        // ) {
+        //     // Force a value of 0 to be falsy
+        //     return EMPTY_SET;
+        // } else {
+        return newElement.timeSpan;
+        // }
     }
 
     public registerActionInfoHandler(name: string, handler: ActionInfoHandler) {
@@ -300,8 +300,11 @@ export class Runner {
     }
 
     private computeBoolean: ComputerFunction<AstBooleanNode> = (node) => {
-        this.GetTimeSpan(node, UNIVERSE);
-        this.SetValue(node, node.value);
+        if (node.value) {
+            this.GetTimeSpan(node, UNIVERSE);
+        } else {
+            this.GetTimeSpan(node);
+        }
         return node.result;
     };
 
@@ -322,12 +325,15 @@ export class Runner {
         if (!result.actionTexture) {
             this.tracer.Log("[%d]    Action %s not found.", nodeId, action);
             wipe(timeSpan);
+            setResultType(result, "none");
         } else if (!result.actionEnable) {
             this.tracer.Log("[%d]    Action %s not enabled.", nodeId, action);
             wipe(timeSpan);
+            setResultType(result, "none");
         } else if (namedParameters.usable == 1 && !result.actionUsable) {
             this.tracer.Log("[%d]    Action %s not usable.", nodeId, action);
             wipe(timeSpan);
+            setResultType(result, "none");
         } else {
             if (!result.castTime) {
                 result.castTime = 0;
@@ -484,7 +490,7 @@ export class Runner {
                 // if (start < newStart) {
                 //     start = newStart;
                 // }
-                start = atTime;
+                // start = atTime;
             }
             this.tracer.Log(
                 "[%d]    Action %s can start at %f.",
@@ -870,7 +876,7 @@ export class Runner {
         this.profiler.StartProfiling("OvaleBestAction_ComputeGroup");
         let bestTimeSpan, bestElement;
         const best = newTimeSpan();
-        const current = newTimeSpan();
+        const currentTimeSpanAfterTime = newTimeSpan();
         for (const [, child] of ipairs(group.child)) {
             const nodeString = child.asString || `[${child.type}]`;
             this.tracer.Log(
@@ -880,16 +886,20 @@ export class Runner {
                 nodeString
             );
             const currentElement = this.Compute(child, atTime);
-            const currentTimeSpan = currentElement.timeSpan;
-            currentTimeSpan.IntersectInterval(atTime, huge, current);
+            const currentElementTimeSpan = currentElement.timeSpan;
+            currentElementTimeSpan.IntersectInterval(
+                atTime,
+                huge,
+                currentTimeSpanAfterTime
+            );
             this.tracer.Log(
                 "[%d]    group checking child [%d-%s] result: %s",
                 group.nodeId,
                 child.nodeId,
                 nodeString,
-                current
+                currentTimeSpanAfterTime
             );
-            if (current.Measure() > 0) {
+            if (currentTimeSpanAfterTime.Measure() > 0) {
                 let currentIsBetter = false;
                 if (best.Measure() == 0 || !bestElement) {
                     this.tracer.Log(
@@ -897,7 +907,7 @@ export class Runner {
                         group.nodeId,
                         child.nodeId,
                         nodeString,
-                        current
+                        currentTimeSpanAfterTime
                     );
                     currentIsBetter = true;
                 } else {
@@ -906,7 +916,7 @@ export class Runner {
                             bestElement.options &&
                             bestElement.options.wait) ||
                         0;
-                    const difference = best[1] - current[1];
+                    const difference = best[1] - currentTimeSpanAfterTime[1];
                     if (
                         difference > threshold ||
                         (difference === threshold &&
@@ -920,19 +930,32 @@ export class Runner {
                             group.nodeId,
                             child.nodeId,
                             nodeString,
-                            currentTimeSpan
+                            currentElementTimeSpan
                         );
                         currentIsBetter = true;
+                    } else {
+                        this.tracer.Log(
+                            "[%d] group best is still %s: %s",
+                            group.nodeId,
+                            this.resultToString(group.result),
+                            best
+                        );
                     }
                 }
                 if (currentIsBetter) {
-                    best.copyFromArray(current);
-                    bestTimeSpan = currentTimeSpan;
+                    best.copyFromArray(currentTimeSpanAfterTime);
+                    bestTimeSpan = currentElementTimeSpan;
                     bestElement = currentElement;
                 }
+            } else {
+                this.tracer.Log(
+                    "[%d]   child [%d] measure is 0, skipping",
+                    group.nodeId,
+                    child.nodeId
+                );
             }
         }
-        releaseTimeSpans(best, current);
+        releaseTimeSpans(best, currentTimeSpanAfterTime);
         const timeSpan = this.GetTimeSpan(group, bestTimeSpan);
         if (bestElement) {
             this.copyResult(group.result, bestElement);
@@ -1115,7 +1138,7 @@ export class Runner {
 
     private SetValue(
         node: AstNode,
-        value?: number | string | boolean,
+        value?: number | string,
         origin?: number,
         rate?: number
     ): void {
@@ -1168,7 +1191,7 @@ export class Runner {
 
     public computeAsBoolean(element: AstNode, atTime: number) {
         const result = this.RecursiveCompute(element, atTime);
-        return result.timeSpan.HasTime(atTime) || false;
+        return result.timeSpan.HasTime(atTime);
     }
 
     public computeAsNumber(element: AstNode, atTime: number) {

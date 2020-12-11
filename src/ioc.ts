@@ -156,8 +156,7 @@ export class IoC {
             this.lastSpell,
             this.ovale,
             this.debug,
-            this.profiler,
-            this.spellBook
+            this.profiler
         );
         this.demonHunterSigils = new OvaleSigilClass(
             this.paperDoll,

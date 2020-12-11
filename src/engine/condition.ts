@@ -19,7 +19,7 @@ export type ConditionResult = [
     /** If defined, the value is defined only before this time in seconds */
     end?: number,
     /** The value */
-    value?: number | string | boolean,
+    value?: number | string,
     /** If defined, the time at which the value is defined, otherwise, the value is a constant */
     origin?: number,
     /** If defined, the rate at which each second the value change, otherwise, the value is a constant */
@@ -120,10 +120,14 @@ type ParametersInfo<T extends readonly unknown[]> = {
     [Index in keyof T]: ParameterInfo<T[Index]>;
 };
 
+interface ReturnInfo {
+    type: "number" | "string" | "none";
+}
+
 export interface FunctionInfos {
     parameters: LuaArray<ParameterInfos>;
     namedParameters: LuaObj<number>;
-    returnValue: Pick<ParameterInfos, "type">;
+    returnValue: ReturnInfo;
     replacements?: LuaArray<{ index: number; mapValues: LuaObj<string> }>;
     func: (atTime: number, ...args: unknown[]) => ConditionResult;
     // TODO should be better
@@ -170,7 +174,7 @@ export class OvaleConditionClass {
     register<P extends any[], R extends ConditionResult>(
         name: string,
         func: (atTime: number, ...args: P) => R,
-        returnParameters: Pick<DefinedParameterInfo<R[2]>, "type">,
+        returnParameters: ReturnInfo,
         ...parameters: ParametersInfo<P>
     ) {
         const infos: FunctionInfos = {

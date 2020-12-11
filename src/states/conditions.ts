@@ -6896,7 +6896,7 @@ l    */
         ovaleCondition.register(
             "creaturefamily",
             this.CreatureFamily,
-            { type: "boolean" },
+            { type: "none" },
             { name: "name", type: "string", optional: false },
             targetParameter
         );

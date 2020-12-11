@@ -426,7 +426,7 @@ export interface NodeStateResult extends BaseNodeValue {
 
 export interface NodeValueResult extends BaseNodeValue {
     type: "value";
-    value?: number | string | boolean;
+    value?: number | string;
     origin?: number;
     rate?: number;
 }
@@ -3821,10 +3821,13 @@ export class OvaleASTClass {
         const node = this.NewNode("boolean", annotation);
         node.value = value;
         node.result.constant = true;
-        const result = node.result as NodeValueResult;
-        result.timeSpan.copyFromArray(UNIVERSE);
-        result.type = "value";
-        result.value = value;
+        const result = node.result;
+        if (value) {
+            result.timeSpan.copyFromArray(UNIVERSE);
+        } else {
+            wipe(result.timeSpan);
+        }
+        result.type = "none";
         return node;
     }
 

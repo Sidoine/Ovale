@@ -99,7 +99,8 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         for (let i = 1; i <= count; i += 1) {
             this[i] = A[i];
         }
-        for (let i = count + 1; i <= lualength(this); i += 1) {
+        const length = lualength(this);
+        for (let i = count + 1; i <= length; i += 1) {
             delete this[i];
         }
         return this;
@@ -110,7 +111,8 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         for (let i = 1; i <= count; i += 1) {
             this[i] = select(i, __args);
         }
-        for (let i = count + 1; i <= lualength(this); i += 1) {
+        const length = lualength(this);
+        for (let i = count + 1; i <= length; i += 1) {
             delete this[i];
         }
         return this;
