@@ -135,5 +135,14 @@
     "vertical": "垂直圖示",
     "vertical_offset": "垂直位置",
     "vertical_offset_help": "距離畫面正中央的垂直方向移動距離。",
-    "visibility": "顯示"
+    "visibility": "顯示",
+    "frequent_health_updates": "Frequent health updates",
+    "frequent_health_updates_help": "Updates health of units more frquently; enabling this may reduce FPS.",
+    "max_refresh": "Max refresh",
+    "min_refresh": "Min Refresh",
+    "min_refresh_help": "Minimum time (in milliseconds) between updates; lower values may reduce FPS.",
+    "scan_all_auras_help": "Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive",
+    "scan_all_auras": "Full buffs/debuffs scan",
+    "remaining_time_font_color": "Remaining time font color",
+    "icon_snapshot": "Icon nodes snapshot"
 }
