@@ -135,5 +135,14 @@
     "vertical": "Verticale",
     "vertical_offset": "Vertical offset",
     "vertical_offset_help": "Vertical offset from the center of the screen.",
-    "visibility": "Visibilità"
+    "visibility": "Visibilità",
+    "frequent_health_updates": "Frequent health updates",
+    "frequent_health_updates_help": "Updates health of units more frquently; enabling this may reduce FPS.",
+    "max_refresh": "Max refresh",
+    "min_refresh": "Min Refresh",
+    "min_refresh_help": "Minimum time (in milliseconds) between updates; lower values may reduce FPS.",
+    "scan_all_auras_help": "Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive",
+    "scan_all_auras": "Full buffs/debuffs scan",
+    "remaining_time_font_color": "Remaining time font color",
+    "icon_snapshot": "Icon nodes snapshot"
 }
