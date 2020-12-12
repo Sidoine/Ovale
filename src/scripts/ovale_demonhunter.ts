@@ -19,7 +19,7 @@ Include(ovale_demonhunter_spells)
 
 AddFunction waiting_for_momentum
 {
- hastalent(momentum_talent) and not buffpresent(momentum_buff)
+ hastalent(momentum_talent) and not buffpresent(momentum)
 }
 
 AddFunction waiting_for_essence_break
@@ -636,7 +636,7 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # memory_of_lucid_dreams_buff
 # metamorphosis
 # metamorphosis_buff
-# momentum_buff
+# momentum
 # momentum_talent
 # potion_of_unbridled_fury_item
 # prepared_buff

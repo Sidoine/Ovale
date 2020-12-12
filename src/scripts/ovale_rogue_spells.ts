@@ -40,7 +40,7 @@ Define(berserking 59621)
   SpellInfo(berserking gcd=0 offgcd=1)
 Define(between_the_eyes 315341)
 # Finishing move that deals damage with your pistol, increasing your critical strike chance against the target by s2.?a235484[ Critical strikes with this ability deal four times normal damage.][]rn   1 point : <damage>*1 damage, 3 secrn   2 points: <damage>*2 damage, 6 secrn   3 points: <damage>*3 damage, 9 secrn   4 points: <damage>*4 damage, 12 secrn   5 points: <damage>*5 damage, 15 sec?s193531[rn   6 points: <damage>*6 damage, 18 sec][]
-  SpellInfo(between_the_eyes energy=25 combopoints=1 cd=45 gcd=1)
+  SpellInfo(between_the_eyes energy=25 combopoints=1 max_combopoints=4 cd=45 gcd=1)
   # Critical strike chance taken from the Rogue increased by s2.
   SpellAddTargetDebuff(between_the_eyes between_the_eyes add=1)
 Define(blade_flurry 13877)
@@ -101,7 +101,7 @@ Define(conductive_ink_buff_trigger_buff 302565)
   SpellInfo(conductive_ink_buff_trigger_buff duration=120 max_stacks=999 gcd=0 offgcd=1)
 Define(crimson_tempest 121411)
 # Finishing move that slashes at up to s3 enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
-  SpellInfo(crimson_tempest energy=35 combopoints=1 duration=2 gcd=1 tick=2)
+  SpellInfo(crimson_tempest energy=35 combopoints=1 max_combopoints=4 duration=2 gcd=1 tick=2)
   SpellRequire(crimson_tempest unusable set=1 enabled=(not hastalent(crimson_tempest_talent)))
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(crimson_tempest crimson_tempest add=1)
@@ -128,7 +128,7 @@ Define(deathly_shadows_buff 341202)
   SpellInfo(deathly_shadows_buff duration=12 gcd=0 offgcd=1 combopoints=-5)
 Define(dispatch 2098)
 # Finishing move that dispatches the enemy, dealing damage per combo point:rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
-  SpellInfo(dispatch energy=35 combopoints=1 gcd=1)
+  SpellInfo(dispatch energy=35 combopoints=1 max_combopoints=4 gcd=1)
 Define(dreadblades 343142)
 # Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s323654[ Slaughter,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
   SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1)
@@ -140,12 +140,12 @@ Define(echoing_reprimand 323547)
   SpellInfo(echoing_reprimand energy=0 cd=45 gcd=1 combopoints=-2)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
-  SpellInfo(envenom energy=35 combopoints=1 duration=1 gcd=1)
+  SpellInfo(envenom energy=35 combopoints=1 max_combopoints=4 duration=1 gcd=1)
   # Poison application chance increased by s2.?s340081[rnPoison critical strikes generate 340426s1 Energy.][]
   SpellAddBuff(envenom envenom add=1)
 Define(eviscerate 196819)
 # Finishing move that disembowels the target, causing damage per combo point.?s231716[ Targets with Find Weakness suffer an additional 231716s1 damage as Shadow.][]rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
-  SpellInfo(eviscerate energy=35 combopoints=1 gcd=1)
+  SpellInfo(eviscerate energy=35 combopoints=1 max_combopoints=4 gcd=1)
   SpellRequire(eviscerate replaced_by set=envenom enabled=(specialization(assassination)))
   SpellRequire(eviscerate replaced_by set=dispatch enabled=(specialization(outlaw)))
 Define(exsanguinate 200806)
@@ -155,14 +155,9 @@ Define(exsanguinate 200806)
 Define(fan_of_knives 51723)
 # Sprays knives at up to s3 targets within A1 yards, dealing s1 Physical damage and applying your active poisons at their normal rate.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(fan_of_knives energy=35 gcd=1)
-Define(find_weakness 316219)
-# Cheap Shot and Shadowstrike reveal a flaw in your target's defenses, causing all of your attacks to bypass 316220s1 of that enemy's armor for 18 seconds.
-  SpellInfo(find_weakness gcd=0 offgcd=1)
-  # w1 of armor is ignored by the attacking Rogue.
-  SpellAddBuff(find_weakness find_weakness_buff_unused_1 add=1)
-Define(find_weakness_buff_unused_1 316220)
-# Your Shadowstrike and Cheap Shot reveal a flaw in your target's defenses, causing all your attacks to bypass 91021s1 of that enemy's armor for 10 seconds.
-  SpellInfo(find_weakness_buff_unused_1 duration=18 gcd=0 offgcd=1)
+Define(find_weakness 107988)
+# Increases critical strike by (100 of Spell Power) for 20 seconds.
+  SpellInfo(find_weakness duration=20 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -205,11 +200,11 @@ Define(greenskins_wickers 340573)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
-Define(hidden_blades_buff 270070)
+Define(hidden_blades 270070)
 # Every t1 sec, gain 270070s1 increased damage for your next Fan of Knives, stacking up to 270070u times.
-  SpellInfo(hidden_blades_buff max_stacks=20 gcd=0 offgcd=1)
+  SpellInfo(hidden_blades max_stacks=20 gcd=0 offgcd=1)
   # Your next Fan of Knives deals s1 increased damage.
-  SpellAddBuff(hidden_blades_buff hidden_blades_buff add=1)
+  SpellAddBuff(hidden_blades hidden_blades add=1)
 Define(instant_poison 315584)
 # Coats your weapons with a Lethal Poison that lasts for 3600 seconds. Each strike has a h chance of poisoning the enemy which instantly inflicts 315585s1 Nature damage.
   SpellInfo(instant_poison duration=3600 gcd=0 offgcd=1)
@@ -221,11 +216,11 @@ Define(instant_poison 315584)
 Define(instant_poison_buff 315585)
 # Coats your weapons with a Lethal Poison that lasts for 3600 seconds. Each strike has a h chance of poisoning the enemy which instantly inflicts 315585s1 Nature damage.
   SpellInfo(instant_poison_buff gcd=0 offgcd=1)
-Define(internal_bleeding_debuff 154953)
+Define(internal_bleeding 154953)
 # Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 6 seconds, based on combo points spent.
-  SpellInfo(internal_bleeding_debuff duration=6 gcd=0 offgcd=1 tick=1)
+  SpellInfo(internal_bleeding duration=6 gcd=0 offgcd=1 tick=1)
   # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(internal_bleeding_debuff internal_bleeding_debuff add=1)
+  SpellAddTargetDebuff(internal_bleeding internal_bleeding add=1)
 Define(keep_your_wits_about_you_buff 288988)
 # When an attack Blade Flurries, increase the chance for Sinister Strike to strike again by s1. Additional strikes of Sinister Strike deal s2 more damage.
   SpellInfo(keep_your_wits_about_you_buff duration=15 max_stacks=33 gcd=0 offgcd=1)
@@ -234,7 +229,7 @@ Define(kick 1766)
   SpellInfo(kick cd=15 duration=5 gcd=0 offgcd=1 interrupt=1)
 Define(kidney_shot 408)
 # Finishing move that stuns the target. Lasts longer per combo point:rn   1 point  : 2 secondsrn   2 points: 3 secondsrn   3 points: 4 secondsrn   4 points: 5 secondsrn   5 points: 6 seconds?s193531[rn   6 points: 7 seconds][]
-  SpellInfo(kidney_shot energy=25 combopoints=1 cd=20 duration=1 gcd=1)
+  SpellInfo(kidney_shot energy=25 combopoints=1 max_combopoints=4 cd=20 duration=1 gcd=1)
   # Stunned.
   SpellAddTargetDebuff(kidney_shot kidney_shot add=1)
 Define(killing_spree 51690)
@@ -262,11 +257,11 @@ Define(marked_for_death 137619)
   SpellRequire(marked_for_death unusable set=1 enabled=(not hastalent(marked_for_death_talent)))
   # Marked for Death will reset upon death.
   SpellAddTargetDebuff(marked_for_death marked_for_death add=1)
-Define(master_assassin_buff 256735)
+Define(master_assassin 256735)
 # While Stealth is active and for s1 sec after breaking Stealth, your critical strike chance is increased by 256735s1.
-  SpellInfo(master_assassin_buff gcd=0 offgcd=1)
+  SpellInfo(master_assassin gcd=0 offgcd=1)
   # Critical strike chance increased by w1.
-  SpellAddBuff(master_assassin_buff master_assassin_buff add=1)
+  SpellAddBuff(master_assassin master_assassin add=1)
 Define(memory_of_lucid_dreams 299300)
 # Infuse your Heart of Azeroth with Memory of Lucid Dreams.
   SpellInfo(memory_of_lucid_dreams)
@@ -291,11 +286,11 @@ Define(pistol_shot 185763)
   SpellInfo(pistol_shot energy=40 duration=6 gcd=1 combopoints=-1)
   # Movement speed reduced by s3.
   SpellAddTargetDebuff(pistol_shot pistol_shot add=1)
-Define(premeditation_buff 343173)
+Define(premeditation 343173)
 # After entering Stealth, your next Shadowstrike grants up to s1 sec of Slice and Dice, and generates s2 additional combo points if Slice and Dice is active.
-  SpellInfo(premeditation_buff gcd=0 offgcd=1)
+  SpellInfo(premeditation gcd=0 offgcd=1)
   # Shadowstrike grants up to 343160s1 sec. of Slice and Dice, and generate 343160s2 additional combo points if Slice and Dice is active.
-  SpellAddBuff(premeditation_buff premeditation_buff add=1)
+  SpellAddBuff(premeditation premeditation add=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
@@ -330,12 +325,12 @@ Define(roll_the_bones 315508)
   SpellAddBuff(roll_the_bones roll_the_bones add=1)
 Define(rupture 1943)
 # Finishing move that tears open the target, dealing Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 8 secrn   2 points: o1*3 over 12 secrn   3 points: o1*4 over 16 secrn   4 points: o1*5 over 20 secrn   5 points: o1*6 over 24 sec?s193531[rn   6 points: o1*7 over 28 sec][]
-  SpellInfo(rupture energy=25 combopoints=1 duration=4 gcd=1 tick=2)
+  SpellInfo(rupture energy=25 combopoints=1 max_combopoints=4 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rupture rupture add=1)
 Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
-  SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1)
+  SpellInfo(secret_technique energy=30 combopoints=1 max_combopoints=4 cd=45 gcd=1)
   SpellRequire(secret_technique unusable set=1 enabled=(not hastalent(secret_technique_talent)))
 Define(sepsis 328305)
 # Infect the target's blood, dealing o1 Nature damage over 10 seconds. If the target survives its full duration, they suffer an additional 328306s1 damage and you gain s6 use of any Stealth ability for 5 seconds.rnrnCooldown reduced by s3 sec if Sepsis does not last its full duration.rnrn|cFFFFFFFFAwards s7 combo lpoint:points;.|r
@@ -404,7 +399,7 @@ Define(skull_and_crossbones 199603)
   SpellAddBuff(skull_and_crossbones skull_and_crossbones add=1)
 Define(slice_and_dice 315496)
 # Finishing move that consumes combo points to increase attack speed by s1?s344362[ and Energy regeneration by s3][]. Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
-  SpellInfo(slice_and_dice energy=25 combopoints=1 duration=6 gcd=1 tick=2)
+  SpellInfo(slice_and_dice energy=25 combopoints=1 max_combopoints=4 duration=6 gcd=1 tick=2)
   # Attack speed increased by w1.rn?w3>0[Energy regeneration increased by w3.][]
   SpellAddBuff(slice_and_dice slice_and_dice add=1)
 Define(stealth 1784)

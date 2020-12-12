@@ -126,11 +126,11 @@ Define(frost_shock 196840)
   SpellInfo(frost_shock duration=6)
   # Movement speed reduced by s2.
   SpellAddTargetDebuff(frost_shock frost_shock add=1)
-Define(hailstorm_buff 334196)
+Define(hailstorm 334196)
 # Each stack of Maelstrom Weapon consumed increases the damage of your next Frost Shock by 334196s1, and causes your next Frost Shock to hit 334196m2 additional target per Maelstrom Weapon stack consumed.
-  SpellInfo(hailstorm_buff duration=20 max_stacks=5 gcd=0 offgcd=1)
+  SpellInfo(hailstorm duration=20 max_stacks=5 gcd=0 offgcd=1)
   # Your next Frost Shock will deal s1 additional damage, and hit m2 additional Ltarget:targets;.
-  SpellAddBuff(hailstorm_buff hailstorm_buff add=1)
+  SpellAddBuff(hailstorm hailstorm add=1)
 Define(heroism 32182)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Exhausted and unable to benefit from Heroism or Time Warp again for 600 seconds.
   SpellInfo(heroism cd=300 duration=40 gcd=0 offgcd=1)
@@ -157,9 +157,9 @@ Define(lava_burst 51505)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.rnrnDamage is increased by s2 if your offhand weapon is imbued with Flametongue Weapon.
   SpellInfo(lava_lash cd=18)
-Define(lava_surge_buff 77762)
+Define(lava_surge 77762)
 # The Shaman's next Lava Burst casts instantly.
-  SpellInfo(lava_surge_buff duration=10 gcd=0 offgcd=1)
+  SpellInfo(lava_surge duration=10 gcd=0 offgcd=1)
 Define(lightning_bolt 188196)
 # Hurls a bolt of lightning at the target, dealing (95 of Spell Power) Nature damage.?a343725[rnrn|cFFFFFFFFGenerates 343725s1 Maelstrom.|r][]
   SpellInfo(lightning_bolt)

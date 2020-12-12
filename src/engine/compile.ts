@@ -18,7 +18,6 @@ import {
 import { OvaleConditionClass } from "./condition";
 import { OvaleCooldownClass } from "../states/Cooldown";
 import { AuraType, OvaleDataClass, SpellAddAuras, SpellInfo } from "./data";
-import { OvalePaperDollClass } from "../states/PaperDoll";
 import { POWER_TYPES, PowerType } from "../states/Power";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { Controls } from "./controls";
@@ -41,10 +40,10 @@ import { GetSpellInfo } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
 import { OvaleDebugClass, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
-import { OvaleOptionsClass } from "../ui/Options";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleScoreClass } from "../ui/Score";
+import { OvaleScriptsClass } from "./scripts";
 
 const NUMBER_PATTERN = "^%-?%d+%.?%d*$";
 
@@ -101,15 +100,14 @@ export class OvaleCompileClass {
         private ovaleAst: OvaleASTClass,
         private ovaleCondition: OvaleConditionClass,
         private ovaleCooldown: OvaleCooldownClass,
-        private ovalePaperDoll: OvalePaperDollClass,
         private ovaleData: OvaleDataClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleDebug: OvaleDebugClass,
-        private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass,
         private ovaleSpellBook: OvaleSpellBookClass,
-        private controls: Controls
+        private controls: Controls,
+        private script: OvaleScriptsClass
     ) {
         this.tracer = ovaleDebug.create("OvaleCompile");
         this.profiler = ovaleProfiler.create("OvaleCompile");
@@ -528,13 +526,7 @@ export class OvaleCompileClass {
         this.module.UnregisterMessage("Ovale_SpecializationChanged");
     };
     private Ovale_ScriptChanged = (event: string) => {
-        this.CompileScript(
-            this.ovaleOptions.db.profile.source[
-                `${
-                    this.ovale.playerClass
-                }_${this.ovalePaperDoll.GetSpecialization()}`
-            ]
-        );
+        this.CompileScript(this.script.getCurrentSpecScriptName());
         this.EventHandler(event);
     };
 

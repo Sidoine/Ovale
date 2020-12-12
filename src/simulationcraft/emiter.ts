@@ -226,7 +226,7 @@ export class Emiter {
     public InitializeDisambiguation() {
         this.AddDisambiguation(
             "inevitable_demise_az_buff",
-            "inevitable_demise_buff",
+            "inevitable_demise",
             "WARLOCK"
         );
         this.AddDisambiguation(
@@ -4048,11 +4048,11 @@ export class Emiter {
             code = "0";
         } else if (className == "ROGUE" && operand == "poisoned_bleeds") {
             code =
-                "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)";
+                "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding)";
             this.AddSymbol(annotation, "rupture");
             this.AddSymbol(annotation, "garrote");
             this.AddSymbol(annotation, "internal_bleeding_talent");
-            this.AddSymbol(annotation, "internal_bleeding_debuff");
+            this.AddSymbol(annotation, "internal_bleeding");
         } else if (className == "ROGUE" && operand == "exsanguinated") {
             code = "target.DebuffPresent(exsanguinated)";
             this.AddSymbol(annotation, "exsanguinated");
@@ -4072,8 +4072,8 @@ export class Emiter {
             className == "ROGUE" &&
             operand == "master_assassin_remains"
         ) {
-            code = "BuffRemaining(master_assassin_buff)";
-            this.AddSymbol(annotation, "master_assassin_buff");
+            code = "BuffRemaining(master_assassin)";
+            this.AddSymbol(annotation, "master_assassin");
         } else if (
             className == "ROGUE" &&
             operand == "buff.roll_the_bones.remains"

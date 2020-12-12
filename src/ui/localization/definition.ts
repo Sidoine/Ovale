@@ -38,8 +38,8 @@ export interface LocalizationStrings {
     ["flash_threshold"]?: string;
     ["focus"]?: string;
     ["font_scale_help"]?: string;
-    ["Frequent health updates"]?: string;
-    ["Full buffs/debuffs scan"]?: string;
+    ["frequent_health_updates"]?: string;
+    ["scan_all_auras"]?: string;
     ["hide_empty_buttons"]?: string;
     ["hide_frame"]?: string;
     ["hide_if_dead_or_friendly_target"]?: string;
@@ -68,10 +68,10 @@ export interface LocalizationStrings {
     ["main"]?: string;
     ["mana"]?: string;
     ["margin_between_icons"]?: string;
-    ["Max Refresh"]?: string;
+    ["max_refresh"]?: string;
     ["middle_click_help"]?: string;
-    ["Min Refresh"]?: string;
-    ["Minimum time (in milliseconds) between updates; lower values may reduce FPS."]?: string;
+    ["min_refresh"]?: string;
+    ["min_refresh_help"]?: string;
     ["modules"]?: string;
     ["movable_configuration_pannel"]?: string;
     ["moving"]?: string;
@@ -95,11 +95,11 @@ export interface LocalizationStrings {
     ["profiling"]?: string;
     ["range_indicator_help"]?: string;
     ["range_indicator"]?: string;
-    ["Remaining time font color"]?: string;
+    ["remaining_time_font_color"]?: string;
     ["reset_profiling"]?: string;
     ["reset"]?: string;
     ["right_click_help"]?: string;
-    ["Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive"]?: string;
+    scan_all_auras_help?: string;
     ["script_tooltip"]?: string;
     ["script"]?: string;
     ["scrolling_help"]?: string;
@@ -138,10 +138,11 @@ export interface LocalizationStrings {
     ["trace"]?: string;
     ["two_abilities"]?: string;
     ["two_icons"]?: string;
-    ["Updates health of units more frquently; enabling this may reduce FPS."]?: string;
+    ["frequent_health_updates_help"]?: string;
     ["lock_position"]?: string;
     ["vertical_offset_help"]?: string;
     ["vertical_offset"]?: string;
     ["vertical"]?: string;
     ["visibility"]?: string;
+    icon_snapshot?: string;
 }

@@ -113,6 +113,7 @@ export class IoC {
     public variables: Variables;
     public version: OvaleVersionClass;
     public warlock: OvaleWarlockClass;
+    public runner: Runner;
 
     constructor() {
         // TODO créer configuration avec la partie GUI et rajouter une méthode register à appeler ici comme pour les states
@@ -255,15 +256,14 @@ export class IoC {
             this.ast,
             this.condition,
             this.cooldown,
-            this.paperDoll,
             this.data,
             this.profiler,
             this.debug,
-            this.options,
             this.ovale,
             this.score,
             this.spellBook,
-            controls
+            controls,
+            this.scripts
         );
         this.power = new OvalePowerClass(
             this.debug,
@@ -380,7 +380,8 @@ export class IoC {
             this.bestAction,
             combat,
             runner,
-            controls
+            controls,
+            this.scripts
         );
         this.dataBroker = new OvaleDataBrokerClass(
             this.paperDoll,
@@ -457,6 +458,8 @@ export class IoC {
             this.bossMod,
             this.spells
         );
+
+        this.runner = runner;
 
         // States
         this.state.RegisterState(this.cooldown);

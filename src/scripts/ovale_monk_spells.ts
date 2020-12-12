@@ -89,6 +89,12 @@ Define(dampen_harm 122278)
 Define(dance_of_chiji_buff 325202)
 # Spending Chi has a chance to make your next Spinning Crane Kick free and deal s1 additional damage.
   SpellInfo(dance_of_chiji_buff duration=15 gcd=0 offgcd=1)
+Define(dance_of_chiji_windwalker 325201)
+# Spending Chi has a chance to make your next Spinning Crane Kick free and deal an additional s1 damage.
+  SpellInfo(dance_of_chiji_windwalker gcd=0 offgcd=1)
+  SpellRequire(dance_of_chiji_windwalker unusable set=1 enabled=(not hastalent(dance_of_chiji_talent)))
+  # Your next Spinning Crane Kick is free and deals w1 additional damage.
+  SpellAddBuff(dance_of_chiji_windwalker dance_of_chiji_buff add=1)
 Define(diffuse_magic 122783)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
   SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1)
@@ -133,9 +139,9 @@ Define(fortifying_brew_buff 120954)
   SpellInfo(fortifying_brew_buff duration=15 gcd=0 offgcd=1)
   # Health increased by <health>, damage taken reduced by <damage>, and effectiveness of Stagger increased by 115203s1.
   SpellAddBuff(fortifying_brew_buff fortifying_brew_buff add=1)
-Define(gift_of_the_ox 124502)
+Define(gift_of_the_ox 124503)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
-  SpellInfo(gift_of_the_ox gcd=0 offgcd=1)
+  SpellInfo(gift_of_the_ox duration=30 gcd=0 offgcd=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -268,6 +274,8 @@ Define(chi_wave_talent 19820)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 20175)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
+Define(dance_of_chiji_talent 22102)
+# Spending Chi has a chance to make your next Spinning Crane Kick free and deal an additional s1 damage.
 Define(diffuse_magic_talent 20173)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 22096)

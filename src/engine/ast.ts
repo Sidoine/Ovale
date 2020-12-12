@@ -158,6 +158,54 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     learn: true,
     pertrait: true,
     proc: true,
+    max_alternate: true,
+    max_arcanecharges: true,
+    max_chi: true,
+    max_combopoints: true,
+    max_energy: true,
+    max_focus: true,
+    max_fury: true,
+    max_holypower: true,
+    max_insanity: true,
+    max_lunarpower: true,
+    max_maelstrom: true,
+    max_mana: true,
+    max_pain: true,
+    max_rage: true,
+    max_runicpower: true,
+    max_soulshards: true,
+    refund_alternate: true,
+    refund_arcanecharges: true,
+    refund_chi: true,
+    refund_combopoints: true,
+    refund_energy: true,
+    refund_focus: true,
+    refund_fury: true,
+    refund_holypower: true,
+    refund_insanity: true,
+    refund_lunarpower: true,
+    refund_maelstrom: true,
+    refund_mana: true,
+    refund_pain: true,
+    refund_rage: true,
+    refund_runicpower: true,
+    refund_soulshards: true,
+    set_alternate: true,
+    set_arcanecharges: true,
+    set_chi: true,
+    set_combopoints: true,
+    set_energy: true,
+    set_focus: true,
+    set_fury: true,
+    set_holypower: true,
+    set_insanity: true,
+    set_lunarpower: true,
+    set_maelstrom: true,
+    set_mana: true,
+    set_pain: true,
+    set_rage: true,
+    set_runicpower: true,
+    set_soulshards: true,
 };
 
 {
@@ -406,7 +454,8 @@ type NodeWithBodyType = {
 interface BaseNodeValue {
     /**
      * The serial is used to know if the value has already
-     * been computed this frame
+     * been computed this frame. It is a positive value
+     * or -1 if it's currently computed, or 0 it it was never computed
      */
     serial: number;
     constant?: boolean;
@@ -701,7 +750,6 @@ export interface AstIfNode extends AstBaseNodeWithChildren<"if"> {
 export interface AstIconNode
     extends AstNodeWithParameters<
         "icon",
-        | "secure"
         | "target"
         | "enemies"
         | "size"
@@ -715,7 +763,6 @@ export interface AstIconNode
 }
 
 const iconParametersCheck: NamedParametersCheck<AstIconNode> = {
-    secure: true,
     enemies: true,
     target: true,
     size: true,
@@ -4126,7 +4173,7 @@ export class OvaleASTClass {
                 if (node.type === "string") {
                     const key = node.value;
                     const value = L[key as keyof LocalizationStrings];
-                    if (key != value) {
+                    if (value) {
                         nodeAsString.value = value;
                         nodeAsString.name = key;
                     }
@@ -4163,7 +4210,9 @@ export class OvaleASTClass {
                             [value] = GetItemInfo(stringKey);
                             if (!value) value = "item:" + stringKey;
                         } else if (name == "l") {
-                            value = L[stringKey as keyof LocalizationStrings];
+                            value =
+                                L[stringKey as keyof LocalizationStrings] ||
+                                stringKey;
                         } else if (name == "spellname") {
                             value =
                                 this.ovaleSpellBook.GetSpellName(
@@ -4182,141 +4231,7 @@ export class OvaleASTClass {
         }
         this.profiler.StopProfiling("OvaleAST_PropagateStrings");
     }
-    // public FlattenParameters(ast: AstNode) {
-    //     this.profiler.StartProfiling("OvaleAST_FlattenParameters");
-    //     let annotation = ast.annotation;
-    //     if (annotation && annotation.parametersReference) {
-    //         let dictionary = annotation.definition;
-    //         for (const [, node] of ipairs<AstNode>(
-    //             annotation.parametersReference
-    //         )) {
-    //             if (node.rawPositionalParams) {
-    //                 let parameters = this.flattenParameterValuesPool.Get();
-    //                 for (const [key, value] of ipairs(
-    //                     node.rawPositionalParams
-    //                 )) {
-    //                     parameters[key] = this.FlattenParameterValue(
-    //                         value,
-    //                         annotation
-    //                     );
-    //                 }
-    //                 node.positionalParams = parameters;
-    //                 annotation.positionalParametersList =
-    //                     annotation.positionalParametersList || {};
-    //                 annotation.positionalParametersList[
-    //                     lualength(annotation.positionalParametersList) + 1
-    //                 ] = parameters;
-    //             }
-    //             if (node.rawNamedParams) {
-    //                 const parameters: NamedParameters = this.objectPool.Get();
-    //                 for (const [key] of kpairs(node.rawNamedParams)) {
-    //                     if (key === "listitem") {
-    //                         const control: LuaObj<string | number> =
-    //                             parameters[key] || this.objectPool.Get();
-    //                         const listItems = node.rawNamedParams[key];
-    //                         for (const [list, item] of pairs(listItems)) {
-    //                             control[
-    //                                 list
-    //                             ] = this.FlattenParameterValueNotCsv(
-    //                                 item,
-    //                                 annotation
-    //                             );
-    //                         }
-    //                         if (!parameters[key]) {
-    //                             parameters[key] = control;
-    //                             annotation.objects = annotation.objects || {};
-    //                             annotation.objects[
-    //                                 lualength(annotation.objects) + 1
-    //                             ] = control;
-    //                         }
-    //                     } else if (key === "checkbox") {
-    //                         let control: LuaObj<number | string> =
-    //                             parameters[key] || this.objectPool.Get();
-    //                         const checkBoxItems = node.rawNamedParams[key];
-    //                         for (const [i, name] of ipairs(checkBoxItems)) {
-    //                             control[i] = this.FlattenParameterValueNotCsv(
-    //                                 name,
-    //                                 annotation
-    //                             );
-    //                         }
-    //                         if (!parameters[key]) {
-    //                             parameters[key] = control;
-    //                             annotation.objects = annotation.objects || {};
-    //                             annotation.objects[
-    //                                 lualength(annotation.objects) + 1
-    //                             ] = control;
-    //                         }
-    //                     } else {
-    //                         const value = node.rawNamedParams[key]!; //TODO
-    //                         const flattenValue = this.FlattenParameterValue(
-    //                             value,
-    //                             annotation
-    //                         );
-    //                         if (
-    //                             type(key) != "number" &&
-    //                             dictionary &&
-    //                             dictionary[key]
-    //                         ) {
-    //                             parameters[
-    //                                 dictionary[key] as keyof typeof parameters
-    //                             ] = flattenValue as any;
-    //                         } else {
-    //                             // TODO delete named parameters that are not single values
-    //                             (<any>parameters[key]) = flattenValue;
-    //                         }
-    //                     }
-    //                 }
-    //                 node.namedParams = parameters;
-    //                 annotation.parametersList = annotation.parametersList || {};
-    //                 annotation.parametersList[
-    //                     lualength(annotation.parametersList) + 1
-    //                 ] = parameters;
-    //             }
-    //             let output = this.outputPool.Get();
-    //             for (const [k, v] of kpairs(node.namedParams)) {
-    //                 if (isCheckBoxFlattenParameters(k, v)) {
-    //                     for (const [, name] of ipairs(v)) {
-    //                         output[lualength(output) + 1] = format(
-    //                             "checkbox=%s",
-    //                             name
-    //                         );
-    //                     }
-    //                 } else if (isListItemFlattenParameters(k, v)) {
-    //                     for (const [list, item] of ipairs(v)) {
-    //                         output[lualength(output) + 1] = format(
-    //                             "listitem=%s:%s",
-    //                             list,
-    //                             item
-    //                         );
-    //                     }
-    //                 } else if (isLuaArray<SimpleValue>(v)) {
-    //                     output[lualength(output) + 1] = format(
-    //                         "%s=%s",
-    //                         k,
-    //                         concat(v, ",")
-    //                     );
-    //                 } else {
-    //                     output[lualength(output) + 1] = format("%s=%s", k, v);
-    //                 }
-    //             }
-    //             sort(output);
-    //             for (
-    //                 let k = lualength(node.positionalParams);
-    //                 k >= 1;
-    //                 k += -1
-    //             ) {
-    //                 insert(output, 1, node.positionalParams[k] as string); // TODO
-    //             }
-    //             if (lualength(output) > 0) {
-    //                 node.paramsAsString = concat(output, " ");
-    //             } else {
-    //                 node.paramsAsString = "";
-    //             }
-    //             this.outputPool.Release(output);
-    //         }
-    //     }
-    //     this.profiler.StopProfiling("OvaleAST_FlattenParameters");
-    // }
+
     private VerifyFunctionCalls(ast: AstNode) {
         this.profiler.StartProfiling("OvaleAST_VerifyFunctionCalls");
         if (ast.annotation && ast.annotation.verify) {

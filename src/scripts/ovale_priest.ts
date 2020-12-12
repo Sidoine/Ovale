@@ -5,6 +5,241 @@ export function registerPriest(OvaleScripts: OvaleScriptsClass) {
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
+	const name = "sc_t25_priest_discipline"
+	const desc = "[9.0] Simulationcraft: T25_Priest_Discipline"
+	const code = `
+# Based on SimulationCraft profile "T25_Priest_Discipline".
+#	class=priest
+#	spec=discipline
+#	talents=3020110
+
+Include(ovale_common)
+Include(ovale_priest_spells)
+
+AddFunction disciplineuseitemactions
+{
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
+}
+
+### actions.precombat
+
+AddFunction disciplineprecombatmainactions
+{
+}
+
+AddFunction disciplineprecombatmainpostconditions
+{
+}
+
+AddFunction disciplineprecombatshortcdactions
+{
+}
+
+AddFunction disciplineprecombatshortcdpostconditions
+{
+}
+
+AddFunction disciplineprecombatcdactions
+{
+}
+
+AddFunction disciplineprecombatcdpostconditions
+{
+}
+
+### actions.boon
+
+AddFunction disciplineboonmainactions
+{
+ #ascended_blast
+ spell(ascended_blast)
+ #ascended_nova
+ spell(ascended_nova)
+}
+
+AddFunction disciplineboonmainpostconditions
+{
+}
+
+AddFunction disciplineboonshortcdactions
+{
+}
+
+AddFunction disciplineboonshortcdpostconditions
+{
+ spell(ascended_blast) or spell(ascended_nova)
+}
+
+AddFunction disciplinebooncdactions
+{
+}
+
+AddFunction disciplinebooncdpostconditions
+{
+ spell(ascended_blast) or spell(ascended_nova)
+}
+
+### actions.default
+
+AddFunction discipline_defaultmainactions
+{
+ #berserking
+ spell(berserking)
+ #purge_the_wicked,if=!ticking
+ if not target.debuffpresent(purge_the_wicked_debuff) spell(purge_the_wicked)
+ #shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
+ if not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
+ #schism
+ spell(schism)
+ #mind_blast
+ spell(mind_blast)
+ #penance
+ spell(penance)
+ #purge_the_wicked,if=remains<(duration*0.3)
+ if target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 spell(purge_the_wicked)
+ #shadow_word_pain,if=remains<(duration*0.3)&!talent.purge_the_wicked.enabled
+ if target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) spell(shadow_word_pain)
+ #power_word_solace
+ spell(power_word_solace)
+ #divine_star,if=mana.pct>80
+ if manapercent() > 80 spell(divine_star)
+ #smite
+ spell(smite)
+ #shadow_word_pain
+ spell(shadow_word_pain)
+}
+
+AddFunction discipline_defaultmainpostconditions
+{
+}
+
+AddFunction discipline_defaultshortcdactions
+{
+ #mindbender,if=talent.mindbender.enabled
+ if hastalent(mindbender_talent) spell(mindbender)
+
+ unless spell(berserking)
+ {
+  #bag_of_tricks
+  spell(bag_of_tricks)
+  #shadow_covenant
+  spell(shadow_covenant)
+
+  unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
+  {
+   #shadow_word_death
+   spell(shadow_word_death)
+  }
+ }
+}
+
+AddFunction discipline_defaultshortcdpostconditions
+{
+ spell(berserking) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+}
+
+AddFunction discipline_defaultcdactions
+{
+ #use_item,slot=trinket2
+ disciplineuseitemactions()
+
+ unless hastalent(mindbender_talent) and spell(mindbender)
+ {
+  #shadowfiend,if=!talent.mindbender.enabled
+  if not hastalent(mindbender_talent) spell(shadowfiend)
+  #blood_fury
+  spell(blood_fury)
+
+  unless spell(berserking)
+  {
+   #arcane_torrent
+   spell(arcane_torrent)
+   #lights_judgment
+   spell(lights_judgment)
+   #fireblood
+   spell(fireblood)
+   #ancestral_call
+   spell(ancestral_call)
+  }
+ }
+}
+
+AddFunction discipline_defaultcdpostconditions
+{
+ hastalent(mindbender_talent) and spell(mindbender) or spell(berserking) or spell(bag_of_tricks) or spell(shadow_covenant) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(schism) or spell(mind_blast) or spell(penance) or target.debuffremaining(purge_the_wicked_debuff) < baseduration(purge_the_wicked_debuff) * 0.3 and spell(purge_the_wicked) or target.debuffremaining(shadow_word_pain) < baseduration(shadow_word_pain) * 0.3 and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(power_word_solace) or manapercent() > 80 and spell(divine_star) or spell(smite) or spell(shadow_word_pain)
+}
+
+### Discipline icons.
+
+AddCheckBox(opt_priest_discipline_aoe l(aoe) default enabled=(specialization(discipline)))
+
+AddIcon enabled=(not checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) enemies=1 help=shortcd
+{
+ if not incombat() disciplineprecombatshortcdactions()
+ discipline_defaultshortcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=shortcd
+{
+ if not incombat() disciplineprecombatshortcdactions()
+ discipline_defaultshortcdactions()
+}
+
+AddIcon enabled=(specialization(discipline)) enemies=1 help=main
+{
+ if not incombat() disciplineprecombatmainactions()
+ discipline_defaultmainactions()
+}
+
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=aoe
+{
+ if not incombat() disciplineprecombatmainactions()
+ discipline_defaultmainactions()
+}
+
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and not specialization(discipline)) enemies=1 help=cd
+{
+ if not incombat() disciplineprecombatcdactions()
+ discipline_defaultcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) help=cd
+{
+ if not incombat() disciplineprecombatcdactions()
+ discipline_defaultcdactions()
+}
+
+### Required symbols
+# ancestral_call
+# arcane_torrent
+# ascended_blast
+# ascended_nova
+# bag_of_tricks
+# berserking
+# blood_fury
+# divine_star
+# fireblood
+# lights_judgment
+# mind_blast
+# mindbender
+# mindbender_talent
+# penance
+# power_word_solace
+# purge_the_wicked
+# purge_the_wicked_debuff
+# purge_the_wicked_talent
+# schism
+# shadow_covenant
+# shadow_word_death
+# shadow_word_pain
+# shadowfiend
+# smite
+`
+	OvaleScripts.RegisterScript("PRIEST", "discipline", name, desc, code, "script")
+}
+
+{
 	const name = "sc_t25_priest_shadow"
 	const desc = "[9.0] Simulationcraft: T25_Priest_Shadow"
 	const code = `

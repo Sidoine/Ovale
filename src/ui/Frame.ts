@@ -7,7 +7,7 @@ import { OvaleBestActionClass } from "../engine/best-action";
 import { OvaleCompileClass } from "../engine/compile";
 import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleStateClass } from "../engine/state";
-import { OvaleIcon } from "./Icon";
+import { IconParent, OvaleIcon } from "./Icon";
 import { OvaleEnemiesClass } from "../states/Enemies";
 import { Controls } from "../engine/controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -30,25 +30,31 @@ import { huge } from "@wowts/math";
 import { AceGUIRegisterAsContainer } from "./acegui-helpers";
 import { OvaleFutureClass } from "../states/Future";
 import { BaseState } from "../states/BaseState";
-import { AstNodeSnapshot } from "../engine/ast";
+import { AstIconNode, AstNodeSnapshot } from "../engine/ast";
 import { OvaleClass } from "../Ovale";
 import { OvaleOptionsClass } from "./Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { OvaleCombatClass } from "../states/combat";
-import { isNumber, OneTimeMessage, PrintOneTimeMessages } from "../tools/tools";
+import {
+    isNumber,
+    OneTimeMessage,
+    PrintOneTimeMessages,
+    stringify,
+} from "../tools/tools";
 import { Runner } from "../engine/runner";
 import { insert } from "@wowts/table";
+import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
+import { L } from "./Localization";
+import { OvaleScriptsClass } from "../engine/scripts";
 
 const strmatch = match;
 const INFINITY = huge;
 const BARRE = 8;
 
 interface Action {
-    secure?: boolean;
-    secureIcons: LuaArray<OvaleIcon>;
-    icons: LuaArray<OvaleIcon>;
+    icons: OvaleIcon;
     spellId?: number | string;
     waitStart?: number;
     left: number;
@@ -58,10 +64,11 @@ interface Action {
     dy: number;
 }
 
-class OvaleFrame extends AceGUI.WidgetContainerBase {
+class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox> = {};
     listWidget: LuaObj<AceGUIWidgetDropDown> = {};
     visible = true;
+    private traceLog: TextDump;
 
     ToggleOptions() {
         if (this.content.IsShown()) {
@@ -221,52 +228,14 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             const maxHeight = 0;
 
             for (const [k, node] of ipairs(iconNodes)) {
-                const action = this.actions[k];
-                if (
-                    node.rawNamedParams.target &&
-                    node.rawNamedParams.target.type === "string"
-                ) {
-                    this.tracer.Debug(
-                        `Default target is ${node.rawNamedParams.target.value}`
-                    );
-                    this.baseState.current.defaultTarget =
-                        node.rawNamedParams.target.value;
-                } else {
-                    this.baseState.current.defaultTarget = "target";
-                }
-                if (
-                    node.rawNamedParams.enemies &&
-                    node.rawNamedParams.enemies.type === "value"
-                ) {
-                    this.ovaleEnemies.next.enemies =
-                        node.rawNamedParams.enemies.value;
-                } else {
-                    this.ovaleEnemies.next.enemies = undefined;
-                }
+                const icon = this.actions[k];
+
                 this.tracer.Log("+++ Icon %d", k);
-                this.ovaleBestAction.StartNewAction();
-                let atTime = this.ovaleFuture.next.nextCast;
-                if (
-                    this.ovaleFuture.next.currentCast.spellId == undefined ||
-                    this.ovaleFuture.next.currentCast.spellId !=
-                        this.ovaleFuture.next.lastGCDSpellId
-                ) {
-                    atTime = this.baseState.next.currentTime;
-                }
-                const [, namedParameters] = this.runner.computeParameters(
-                    node,
-                    atTime
-                );
-                if (
-                    namedParameters.enabled === undefined ||
-                    namedParameters.enabled
-                ) {
-                    [left, top] = this.goNextIcon(action, left, top);
-                    action.icons[1].Show();
-                    const element = this.ovaleBestAction.GetAction(
-                        node,
-                        atTime
-                    );
+                const [element, atTime] = this.getIconAction(node);
+
+                if (element && atTime) {
+                    [left, top] = this.goNextIcon(icon, left, top);
+                    icon.icons.Show();
                     let start;
                     if (element.type === "action" && element.offgcd) {
                         start = element.timeSpan.NextTime(
@@ -276,7 +245,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                         start = element.timeSpan.NextTime(atTime);
                     }
                     if (profile.apparence.enableIcons) {
-                        this.UpdateActionIcon(action, element, start || 0);
+                        this.UpdateActionIcon(icon, element, start || 0);
                     }
                     if (profile.apparence.spellFlash.enabled) {
                         this.ovaleSpellFlash.Flash(
@@ -287,7 +256,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                         );
                     }
                 } else {
-                    action.icons[1].Hide();
+                    icon.icons.Hide();
                 }
             }
             this.updateBarSize(left, maxHeight);
@@ -305,7 +274,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         now?: number
     ) {
         const profile = this.ovaleOptions.db.profile;
-        const icons = (action.secure && action.secureIcons) || action.icons;
+        const icons = action.icons;
         now = now || GetTime();
         if (element.type == "value") {
             let value;
@@ -317,12 +286,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             // if (node.texture) {
             //     actionTexture = node.namedParams.texture;
             // }
-            icons[1].SetValue(value, undefined);
+            icons.SetValue(value, undefined);
             // if (lualength(icons) > 1) {
             //     icons[2].Update(element, undefined);
             // }
         } else if (element.type === "none") {
-            icons[1].SetValue(undefined, undefined);
+            icons.SetValue(undefined, undefined);
         } else if (element.type === "action") {
             if (
                 element.actionResourceExtend &&
@@ -367,7 +336,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             ) {
                 start = this.ovaleFuture.next.nextCast;
             }
-            icons[1].Update(element, start);
+            icons.Update(element, start);
             if (element.actionType == "spell") {
                 action.spellId = element.actionId;
             } else {
@@ -380,34 +349,25 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             if (
                 profile.apparence.moving &&
-                icons[1].cooldownStart &&
-                icons[1].cooldownEnd
+                icons.cooldownStart &&
+                icons.cooldownEnd
             ) {
                 let top =
                     1 -
-                    (now - icons[1].cooldownStart) /
-                        (icons[1].cooldownEnd - icons[1].cooldownStart);
+                    (now - icons.cooldownStart) /
+                        (icons.cooldownEnd - icons.cooldownStart);
                 if (top < 0) {
                     top = 0;
                 } else if (top > 1) {
                     top = 1;
                 }
-                icons[1].SetPoint(
+                icons.SetPoint(
                     "TOPLEFT",
                     this.frame,
                     "TOPLEFT",
                     (action.left + top * action.dx) / action.scale,
                     (action.top - top * action.dy) / action.scale
                 );
-                if (icons[2]) {
-                    icons[2].SetPoint(
-                        "TOPLEFT",
-                        this.frame,
-                        "TOPLEFT",
-                        (action.left + (top + 1) * action.dx) / action.scale,
-                        (action.top - (top + 1) * action.dy) / action.scale
-                    );
-                }
             }
             // if (
             //     node.namedParams.size != "small" &&
@@ -477,7 +437,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         }
 
         if (!profile.apparence.moving) {
-            icons[1].SetPoint(
+            icons.SetPoint(
                 "TOPLEFT",
                 this.frame,
                 "TOPLEFT",
@@ -649,12 +609,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
 
     UpdateIcons() {
         for (const [, action] of pairs(this.actions)) {
-            for (const [, icon] of pairs(action.icons)) {
-                icon.Hide();
-            }
-            for (const [, icon] of pairs(action.secureIcons)) {
-                icon.Hide();
-            }
+            action.icons.Hide();
+            action.icons.Hide();
         }
         const profile = this.ovaleOptions.db.profile;
         this.frame.EnableMouse(!profile.apparence.clickThru);
@@ -667,8 +623,14 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         for (const [k, node] of ipairs(iconNodes)) {
             if (!this.actions[k]) {
                 this.actions[k] = {
-                    icons: {},
-                    secureIcons: {},
+                    icons: new OvaleIcon(
+                        k,
+                        `Icon${k}`,
+                        this,
+                        false,
+                        this.ovaleOptions,
+                        this.ovaleSpellBook
+                    ),
                     dx: 0,
                     dy: 0,
                     left: 0,
@@ -678,7 +640,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             const action = this.actions[k];
             let width, height, newScale;
-            let nbIcons;
             if (
                 node.rawNamedParams.size != undefined &&
                 node.rawNamedParams.size.type === "string" &&
@@ -687,21 +648,10 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 newScale = profile.apparence.smallIconScale;
                 width = newScale * 36 + margin;
                 height = newScale * 36 + margin;
-                nbIcons = 1;
             } else {
                 newScale = profile.apparence.iconScale;
                 width = newScale * 36 + margin;
                 height = newScale * 36 + margin;
-                if (
-                    profile.apparence.predictif &&
-                    node.rawNamedParams.type !== undefined &&
-                    node.rawNamedParams.type.type === "string" &&
-                    node.rawNamedParams.type.value !== "value"
-                ) {
-                    nbIcons = 2;
-                } else {
-                    nbIcons = 1;
-                }
             }
             if (top + height > profile.apparence.iconScale * 36 + margin) {
                 top = 0;
@@ -719,59 +669,27 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 action.dx = 0;
                 action.dy = height;
             }
-            action.secure =
-                node.rawNamedParams.secure &&
-                node.rawNamedParams.secure.type === "value";
-            for (let l = 1; l <= nbIcons; l += 1) {
-                let icon: OvaleIcon;
-                if (!action.secure) {
-                    if (!action.icons[l]) {
-                        action.icons[l] = new OvaleIcon(
-                            `Icon${k}n${l}`,
-                            this,
-                            false,
-                            this.ovaleOptions,
-                            this.ovaleSpellBook
-                        );
-                    }
-                    icon = action.icons[l];
-                } else {
-                    if (!action.secureIcons[l]) {
-                        action.secureIcons[l] = new OvaleIcon(
-                            `SecureIcon${k}n${l}`,
-                            this,
-                            true,
-                            this.ovaleOptions,
-                            this.ovaleSpellBook
-                        );
-                    }
-                    icon = action.secureIcons[l];
-                }
-                let scale = action.scale;
-                if (l > 1) {
-                    scale = scale * profile.apparence.secondIconScale;
-                }
-                icon.SetScale(scale);
-                icon.SetRemainsFont(profile.apparence.remainsFontColor);
-                icon.SetFontScale(profile.apparence.fontScale);
-                icon.SetParams(node.rawPositionalParams, node.rawNamedParams);
-                icon.SetHelp(
-                    (node.rawNamedParams.help != undefined &&
-                        node.rawNamedParams.help.type === "string" &&
-                        node.rawNamedParams.help.value) ||
-                        undefined
-                );
-                icon.SetRangeIndicator(profile.apparence.targetText);
-                icon.EnableMouse(!profile.apparence.clickThru);
-                icon.frame.SetAlpha(profile.apparence.alpha);
-                icon.cdShown = l == 1;
-                if (this.skinGroup) {
-                    this.skinGroup.AddButton(icon.frame);
-                }
-                if (l == 1) {
-                    icon.Show();
-                }
+            let icon: OvaleIcon;
+            icon = action.icons;
+            let scale = action.scale;
+            icon.SetScale(scale);
+            icon.SetRemainsFont(profile.apparence.remainsFontColor);
+            icon.SetFontScale(profile.apparence.fontScale);
+            icon.SetParams(node.rawPositionalParams, node.rawNamedParams);
+            icon.SetHelp(
+                (node.rawNamedParams.help != undefined &&
+                    node.rawNamedParams.help.type === "string" &&
+                    node.rawNamedParams.help.value) ||
+                    undefined
+            );
+            icon.SetRangeIndicator(profile.apparence.targetText);
+            icon.EnableMouse(!profile.apparence.clickThru);
+            icon.frame.SetAlpha(profile.apparence.alpha);
+            icon.cdShown = true;
+            if (this.skinGroup) {
+                this.skinGroup.AddButton(icon.frame);
             }
+            icon.Show();
             top = top + height;
             if (top > maxHeight) {
                 maxHeight = top;
@@ -845,9 +763,13 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         private ovaleBestAction: OvaleBestActionClass,
         private combat: OvaleCombatClass,
         private runner: Runner,
-        private controls: Controls
+        private controls: Controls,
+        private scripts: OvaleScriptsClass
     ) {
         super();
+
+        this.traceLog = LibTextDump.New(`Ovale - ${L.icon_snapshot}`, 750, 500);
+
         const hider = CreateFrame(
             "Frame",
             `${ovale.GetName()}PetBattleFrameHider`,
@@ -914,6 +836,85 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         content.SetHeight(100);
         content.Hide();
         AceGUIRegisterAsContainer(this);
+    }
+
+    debugIcon(index: number): void {
+        const iconNodes = this.ovaleCompile.GetIconNodes();
+        this.tracer.Print("%d", index);
+        const [result, atTime] = this.getIconAction(iconNodes[index]);
+        if (result && atTime) {
+            const traceLog = this.traceLog;
+            traceLog.Clear();
+            const serial = result.serial;
+            traceLog.AddLine(
+                `{ "atTime": ${atTime}, "serial": ${serial}, "index": ${index}, "script": "${this.scripts.GetScriptName(
+                    this.scripts.getCurrentSpecScriptName()
+                )}", "nodes": {`
+            );
+            let first = true;
+            for (const [, node] of ipairs(
+                iconNodes[index].annotation.nodeList
+            )) {
+                if (!node.result.constant) {
+                    const nodeResult = node.result;
+                    if (nodeResult.serial === serial) {
+                        let serialized;
+                        if (first) {
+                            first = false;
+                            serialized = "";
+                        } else {
+                            serialized = ",";
+                        }
+                        serialized += `"${node.nodeId}": `;
+                        serialized += stringify(node.result);
+                        traceLog.AddLine(serialized);
+                    }
+                }
+            }
+            traceLog.AddLine(`}, "result": ${stringify(result)} }`);
+            traceLog.Display();
+        }
+    }
+
+    public getIconAction(node: AstIconNode): [] | [AstNodeSnapshot, number] {
+        if (
+            node.rawNamedParams.target &&
+            node.rawNamedParams.target.type === "string"
+        ) {
+            this.tracer.Debug(
+                `Default target is ${node.rawNamedParams.target.value}`
+            );
+            this.baseState.current.defaultTarget =
+                node.rawNamedParams.target.value;
+        } else {
+            this.baseState.current.defaultTarget = "target";
+        }
+        if (
+            node.rawNamedParams.enemies &&
+            node.rawNamedParams.enemies.type === "value"
+        ) {
+            this.ovaleEnemies.next.enemies = node.rawNamedParams.enemies.value;
+        } else {
+            this.ovaleEnemies.next.enemies = undefined;
+        }
+
+        // This needs to be done here for each icon because
+        // some node values depends on the defaultTarget and enemies values
+        this.ovaleBestAction.StartNewAction();
+        let atTime = this.ovaleFuture.next.nextCast;
+        if (
+            this.ovaleFuture.next.currentCast.spellId == undefined ||
+            this.ovaleFuture.next.currentCast.spellId !==
+                this.ovaleFuture.next.lastGCDSpellId
+        ) {
+            atTime = this.baseState.next.currentTime;
+        }
+        const [, namedParameters] = this.runner.computeParameters(node, atTime);
+
+        if (namedParameters.enabled === undefined || namedParameters.enabled) {
+            return [this.ovaleBestAction.GetAction(node, atTime), atTime];
+        }
+        return [];
     }
 }
 
@@ -985,7 +986,8 @@ export class OvaleFrameModuleClass {
         private ovaleBestAction: OvaleBestActionClass,
         combat: OvaleCombatClass,
         runner: Runner,
-        controls: Controls
+        controls: Controls,
+        scripts: OvaleScriptsClass
     ) {
         this.module = ovale.createModule(
             "OvaleFrame",
@@ -1008,7 +1010,8 @@ export class OvaleFrameModuleClass {
             this.ovaleBestAction,
             combat,
             runner,
-            controls
+            controls,
+            scripts
         );
     }
 }

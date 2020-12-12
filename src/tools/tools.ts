@@ -9,6 +9,8 @@ import {
     truthy,
     wipe,
     select,
+    kpairs,
+    ipairs,
 } from "@wowts/lua";
 import { len, find, format } from "@wowts/string";
 import { DEFAULT_CHAT_FRAME, UIFrame } from "@wowts/wow-mock";
@@ -90,3 +92,38 @@ export type AceEventHandler<E> = E extends (
 ) => infer R
     ? (...args: P) => R
     : never;
+
+export function stringify(obj: any) {
+    if (isString(obj)) {
+        return `"${obj}"`;
+    }
+    if (isNumber(obj)) {
+        return tostring(obj);
+    }
+    if (isBoolean(obj)) {
+        return (obj && "true") || "false";
+    }
+    if (obj[1]) {
+        let firstItem = true;
+        let serialized = "[";
+        for (const [, item] of ipairs(obj)) {
+            if (firstItem) firstItem = false;
+            else serialized += ",";
+            serialized += stringify(item);
+        }
+        serialized += "]";
+        return serialized;
+    }
+    let serialized = "{";
+    let firstProp = true;
+    for (const [k, v] of kpairs(obj)) {
+        if (v !== undefined) {
+            if (firstProp) firstProp = false;
+            else serialized += ",";
+            serialized += `"${k as string}": `;
+            serialized += stringify(v);
+        }
+    }
+    serialized += "}";
+    return serialized;
+}

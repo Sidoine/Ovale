@@ -67,7 +67,6 @@ export interface ApparenceOptions {
     iconShiftX: number;
     iconShiftY: number;
     optionsAlpha: number;
-    predictif: boolean;
     secondIconScale: number;
     taggedEnemies: boolean;
     minFrameRefresh: number;
@@ -141,7 +140,6 @@ export class OvaleOptionsClass {
                 iconShiftX: 0,
                 iconShiftY: 0,
                 optionsAlpha: 1,
-                predictif: false,
                 secondIconScale: 1,
                 taggedEnemies: false,
                 minFrameRefresh: 50,
@@ -438,7 +436,7 @@ export class OvaleOptionsClass {
                     remainsFontColor: {
                         type: "color",
                         order: 25,
-                        name: L["Remaining time font color"],
+                        name: L["remaining_time_font_color"],
                         get: () => {
                             const t = this.db.profile.apparence
                                 .remainsFontColor;
@@ -583,11 +581,8 @@ export class OvaleOptionsClass {
                     minFrameRefresh: {
                         order: 30,
                         type: "range",
-                        name: L["Min Refresh"],
-                        desc:
-                            L[
-                                "Minimum time (in milliseconds) between updates; lower values may reduce FPS."
-                            ],
+                        name: L["min_refresh"],
+                        desc: L["min_refresh_help"],
                         min: 50,
                         max: 100,
                         step: 5,
@@ -595,11 +590,8 @@ export class OvaleOptionsClass {
                     maxFrameRefresh: {
                         order: 40,
                         type: "range",
-                        name: L["Max Refresh"],
-                        desc:
-                            L[
-                                "Minimum time (in milliseconds) between updates; lower values may reduce FPS."
-                            ],
+                        name: L["max_refresh"],
+                        desc: L["min_refresh_help"],
                         min: 100,
                         max: 400,
                         step: 10,
@@ -608,21 +600,15 @@ export class OvaleOptionsClass {
                         order: 50,
                         width: "full",
                         type: "toggle",
-                        name: L["Full buffs/debuffs scan"],
-                        desc:
-                            L[
-                                "Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive"
-                            ],
+                        name: L["scan_all_auras"],
+                        desc: L.scan_all_auras_help,
                     },
                     frequentHealthUpdates: {
                         order: 60,
                         width: "full",
                         type: "toggle",
-                        name: L["Frequent health updates"],
-                        desc:
-                            L[
-                                "Updates health of units more frquently; enabling this may reduce FPS."
-                            ],
+                        name: L["frequent_health_updates"],
+                        desc: L["frequent_health_updates_help"],
                     },
                 },
             },

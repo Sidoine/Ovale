@@ -154,7 +154,7 @@ export class OvaleScriptsClass {
     SetScript(name: string) {
         const oldSource = this.getCurrentSpecScriptName();
         if (oldSource !== name) {
-            this.setCurrentSpecScriptName(name);
+            this.setCurrentSpecScript(name);
             this.module.SendMessage("Ovale_ScriptChanged");
         }
     }
@@ -211,7 +211,7 @@ export class OvaleScriptsClass {
         );
     }
 
-    private getCurrentSpecIdentifier() {
+    getCurrentSpecScriptId() {
         return `${
             this.ovale.playerClass
         }_${this.ovalePaperDoll.GetSpecialization()}`;
@@ -219,14 +219,14 @@ export class OvaleScriptsClass {
 
     getCurrentSpecScriptName() {
         return this.ovaleOptions.db.profile.source[
-            this.getCurrentSpecIdentifier()
+            this.getCurrentSpecScriptId()
         ];
     }
 
-    setCurrentSpecScriptName(source: string) {
+    setCurrentSpecScript(scriptName: string) {
         this.ovaleOptions.db.profile.source[
-            this.getCurrentSpecIdentifier()
-        ] = source;
+            this.getCurrentSpecScriptId()
+        ] = scriptName;
     }
 
     CreateOptions() {
@@ -303,7 +303,7 @@ export class OvaleScriptsClass {
                             code,
                             "script"
                         );
-                        this.setCurrentSpecScriptName(CUSTOM_NAME);
+                        this.setCurrentSpecScript(CUSTOM_NAME);
                         const script = this.GetScript(CUSTOM_NAME);
                         if (script) this.ovaleOptions.db.profile.code = script;
                         this.module.SendMessage("Ovale_ScriptChanged");

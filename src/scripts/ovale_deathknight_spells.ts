@@ -69,7 +69,7 @@ Define(bone_shield 195181)
   SpellAddBuff(bone_shield bone_shield add=1)
 Define(bonestorm 194844)
 # A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
-  SpellInfo(bonestorm runicpower=10 cd=60 duration=1 tick=1)
+  SpellInfo(bonestorm runicpower=10 max_runicpower=90 cd=60 duration=1 tick=1)
   SpellRequire(bonestorm unusable set=1 enabled=(not hastalent(bonestorm_talent)))
   # Dealing 196528s1 Shadow damage to nearby enemies every t3 sec, and healing for 196545s1 of maximum health for each target hit (up to s1*s4).
   SpellAddBuff(bonestorm bonestorm add=1)
@@ -84,11 +84,9 @@ Define(chains_of_ice 45524)
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
   # Movement slowed s1 by frozen chains.
   SpellAddTargetDebuff(chains_of_ice chains_of_ice add=1)
-Define(cold_heart_buff 235599)
-# Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 248397s1 Shadowfrost damage. Stacks up to 235599u times.rnrnIf Chains of Ice is used when you have 235599u stacks of Cold Heart, the target will also be stunned in a block of ice for 4 seconds.
+Define(cold_heart_buff 281209)
+# Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
-  # Your next Chains of Ice will deal 248397s1 Shadowfrost damage.
-  SpellAddBuff(cold_heart_buff cold_heart_buff add=1)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
@@ -122,9 +120,9 @@ Define(death_and_decay 43265)
 Define(death_coil 47541)
 # Fires a blast of unholy energy at the target, causing 47632s1 Shadow damage to an enemy or healing an Undead ally for 47633s1 health.?s316941[rnrnReduces the cooldown of Dark Transformation by s2/1000 sec.][]
   SpellInfo(death_coil runicpower=40)
-Define(death_strike 278223)
-# Death Strike's cost is reduced by s3/-10, and its healing is increased by s1.
-  SpellInfo(death_strike gcd=0 offgcd=1)
+Define(death_strike 49998)
+# Focuses dark power into a strike?s137006[ with both weapons, that deals a total of s1+66188s1][ that deals s1] Physical damage and heals you for s2 of all damage taken in the last s4 sec, minimum s3.1 of maximum health.
+  SpellInfo(death_strike runicpower=45)
 Define(defile 152280)
 # Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
   SpellInfo(defile runes=1 runicpower=-10 cd=20 duration=10 tick=1)
@@ -145,19 +143,19 @@ Define(eradicating_blow 337936)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
   SpellInfo(festering_strike runes=2 runicpower=-20)
-Define(festering_wound_debuff 194310)
+Define(festering_wound 194310)
 # A pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
-  SpellInfo(festering_wound_debuff duration=30 max_stacks=6 gcd=0 offgcd=1)
+  SpellInfo(festering_wound duration=30 max_stacks=6 gcd=0 offgcd=1)
   # Suffering from a wound that will deal 194311s1/s1 Shadow damage when damaged by Scourge Strike.
-  SpellAddTargetDebuff(festering_wound_debuff festering_wound_debuff add=1)
+  SpellAddTargetDebuff(festering_wound festering_wound add=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(frost_fever_debuff 55095)
+Define(frost_fever 55095)
 # A disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
-  SpellInfo(frost_fever_debuff duration=24 gcd=0 offgcd=1 tick=3)
+  SpellInfo(frost_fever duration=24 gcd=0 offgcd=1 tick=3)
   # Suffering w1 Frost damage every t1 sec.
-  SpellAddTargetDebuff(frost_fever_debuff frost_fever_debuff add=1)
+  SpellAddTargetDebuff(frost_fever frost_fever add=1)
 Define(frost_strike 49143)
 # Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
   SpellInfo(frost_strike runicpower=25)

@@ -20,12 +20,7 @@ import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleFutureClass } from "./Future";
 import { BaseState } from "./BaseState";
-import {
-    OvaleDataClass,
-    SpellInfo,
-    SpellInfoNumberProperty,
-    SpellInfoProperty,
-} from "../engine/data";
+import { OvaleDataClass, SpellInfo } from "../engine/data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
@@ -695,6 +690,17 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         let spellRefund = 0;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si[powerType]) {
+            const setPowerValue = this.ovaleData.GetSpellInfoProperty(
+                spellId,
+                atTime,
+                `set_${powerType}` as `set_${PowerType}`,
+                targetGUID
+            );
+            if (setPowerValue !== undefined) {
+                const power = this.getPowerAt(state, powerType, atTime);
+                return [power - setPowerValue, 0];
+            }
+
             let [cost, ratio] = this.ovaleData.GetSpellInfoPropertyNumber(
                 spellId,
                 atTime,
@@ -747,8 +753,8 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 //     }
                 // }
 
-                const maxCostParam = `max_${powerType}`;
-                const maxCost = si[maxCostParam as SpellInfoNumberProperty];
+                const maxCostParam = `max_${powerType}` as `max_${PowerType}`;
+                const maxCost = si[maxCostParam];
                 if (maxCost) {
                     const power = this.getPowerAt(state, powerType, atTime);
                     if (power > maxCost || maximumCost) {
@@ -761,7 +767,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 spellCost =
                     (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
 
-                const parameter = `refund_${powerType}` as SpellInfoProperty;
+                const parameter = `refund_${powerType}` as `refund_${PowerType}`;
                 const refund = this.ovaleData.getSpellInfoProperty(
                     si,
                     atTime,

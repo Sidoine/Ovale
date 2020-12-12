@@ -24,11 +24,12 @@ import { LocalizationStrings } from "./localization/definition";
 const INFINITY = huge;
 const COOLDOWN_THRESHOLD = 0.1;
 
-interface IconParent {
+export interface IconParent {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox>;
     listWidget: LuaObj<AceGUIWidgetDropDown>;
     frame: UIFrame;
     ToggleOptions(): void;
+    debugIcon(index: number): void;
 }
 
 export class OvaleIcon {
@@ -67,6 +68,7 @@ export class OvaleIcon {
     }
 
     constructor(
+        private index: number,
         name: string,
         private parent: IconParent,
         secure: boolean,
@@ -116,7 +118,7 @@ export class OvaleIcon {
         this.actionType = undefined;
         this.actionId = undefined;
         this.actionHelp = undefined;
-        this.frame.SetScript("OnMouseUp", () => this.OvaleIcon_OnMouseUp());
+        this.frame.SetScript("OnMouseUp", this.OvaleIcon_OnMouseUp);
         this.frame.SetScript("OnEnter", () => this.OvaleIcon_OnEnter());
         this.frame.SetScript("OnLeave", () => this.OvaleIcon_OnLeave());
         this.focusText.SetFontObject("GameFontNormalSmall");
@@ -395,12 +397,23 @@ export class OvaleIcon {
     SetRangeIndicator(text: string) {
         this.rangeIndicator.SetText(text);
     }
-    OvaleIcon_OnMouseUp() {
+    OvaleIcon_OnMouseUp = (
+        _: unknown,
+        button:
+            | "LeftButton"
+            | "RightButton"
+            | "MiddleButton"
+            | "Button4"
+            | "Button5"
+    ) => {
         if (!this.actionButton) {
-            this.parent.ToggleOptions();
+            if (button === "LeftButton") this.parent.ToggleOptions();
+            else if (button === "MiddleButton") {
+                this.parent.debugIcon(this.index);
+            }
         }
         this.frame.SetChecked(true);
-    }
+    };
     OvaleIcon_OnEnter() {
         if (this.help || this.actionType || this.HasScriptControls()) {
             GameTooltip.SetOwner(this.frame, "ANCHOR_BOTTOMLEFT");

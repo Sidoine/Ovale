@@ -10,11 +10,11 @@ export function registerWarlockSpells(OvaleScripts: OvaleScriptsClass) {
   SpellInfo(agony duration=18 max_stacks=6 tick=2)
   # Suffering w1 Shadow damage every t1 sec. Damage increases over time.
   SpellAddTargetDebuff(agony agony add=1)
-Define(backdraft_buff 117828)
+Define(backdraft 117828)
 # Conflagrate reduces the cast time of your next Incinerate or Chaos Bolt by 117828s1. Maximum ?s267115[s2][s1] charges.
-  SpellInfo(backdraft_buff duration=10 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(backdraft duration=10 max_stacks=2 gcd=0 offgcd=1)
   # Incinerate and Chaos Bolt cast times reduced by s1.
-  SpellAddBuff(backdraft_buff backdraft_buff add=1)
+  SpellAddBuff(backdraft backdraft add=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -88,11 +88,11 @@ Define(dark_soul_misery 113860)
 Define(demonbolt 264178)
 # Send the fiery soul of a fallen demon at the enemy, causing (73.4 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
-Define(demonic_core_buff 264173)
+Define(demonic_core 264173)
 # When your Wild Imps expend all of their energy or are imploded, you have a s1 chance to absorb their life essence, granting you a stack of Demonic Core. rnrnWhen your summoned Dreadstalkers fade away, you have a s2 chance to absorb their life essence, granting you a stack of Demonic Core.rnrnDemonic Core reduces the cast time of Demonbolt by 264173s1. Maximum 264173u stacks.
-  SpellInfo(demonic_core_buff duration=20 max_stacks=4 gcd=0 offgcd=1)
+  SpellInfo(demonic_core duration=20 max_stacks=4 gcd=0 offgcd=1)
   # The cast time of Demonbolt is reduced by s1. ?a334581[Demonbolt damage is increased by 334581s1.][]
-  SpellAddBuff(demonic_core_buff demonic_core_buff add=1)
+  SpellAddBuff(demonic_core demonic_core add=1)
 Define(demonic_strength 267171)
 # Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
   SpellInfo(demonic_strength cd=60 duration=20)
@@ -154,7 +154,7 @@ Define(guardian_of_azeroth 295840)
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
 Define(hand_of_guldan 105174)
 # Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
-  SpellInfo(hand_of_guldan soulshards=1)
+  SpellInfo(hand_of_guldan soulshards=1 max_soulshards=2)
 Define(haunt 48181)
 # A ghostly soul haunts the target, dealing (68.75 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 18 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
   SpellInfo(haunt cd=15 duration=18)
@@ -180,18 +180,18 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-Define(inevitable_demise_buff 273525)
+Define(inevitable_demise 273525)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
-  SpellInfo(inevitable_demise_buff duration=20 max_stacks=50 gcd=0 offgcd=1)
+  SpellInfo(inevitable_demise duration=20 max_stacks=50 gcd=0 offgcd=1)
   # Each time your Drain Life deals damage, it deals w1 additional damage and heals for an additional w1.
-  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff add=1)
+  SpellAddBuff(inevitable_demise inevitable_demise add=1)
 Define(infernal_awakening 22703)
 # An infernal falls from the sky, dealing (60 of Spell Power) Fire damage to all targets, stunning them for 2 seconds.
   SpellInfo(infernal_awakening duration=2 gcd=0 offgcd=1)
-Define(inner_demons 267216)
+Define(inner_demons_demonology 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
-  SpellInfo(inner_demons gcd=0 offgcd=1 tick=12)
-  SpellRequire(inner_demons unusable set=1 enabled=(not hastalent(inner_demons_talent)))
+  SpellInfo(inner_demons_demonology gcd=0 offgcd=1 tick=12)
+  SpellRequire(inner_demons_demonology unusable set=1 enabled=(not hastalent(inner_demons_talent)))
 Define(malefic_rapture 324536)
 # Your damaging periodic effects erupt on all targets, causing <damage> Shadow damage per effect.
   SpellInfo(malefic_rapture soulshards=1)

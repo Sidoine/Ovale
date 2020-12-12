@@ -82,16 +82,16 @@ Define(deadly_calm 262228)
   SpellRequire(deadly_calm unusable set=1 enabled=(not hastalent(deadly_calm_talent)))
   # Your abilities cost s1 less Rage.
   SpellAddBuff(deadly_calm deadly_calm add=1)
-Define(deep_wounds_debuff 262115)
+Define(deep_wounds 262115)
 # Mortal Strike, ?s262161[Warbreaker][Colossus Smash], ?s845[Cleave, ][]and ?s152277[Ravager][Bladestorm] inflict Deep Wounds, dealing 262115o1 Bleed damage over 12 seconds and increasing the damage the enemy takes from you by (110.00000000000001 of Spell Power).1.
-  SpellInfo(deep_wounds_debuff duration=12 gcd=0 offgcd=1 tick=3)
+  SpellInfo(deep_wounds duration=12 gcd=0 offgcd=1 tick=3)
 Define(dragon_roar 118000)
 # Roar explosively, dealing s1 Physical damage to all enemies within A1 yds. Dragon Roar critically strikes for 3 times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(dragon_roar cd=30 rage=-10)
   SpellRequire(dragon_roar unusable set=1 enabled=(not hastalent(dragon_roar_talent_protection)))
 Define(execute 5308)
 # Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
-  SpellInfo(execute rage=0 cd=6)
+  SpellInfo(execute rage=0 max_rage=20 cd=6)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)

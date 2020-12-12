@@ -162,9 +162,9 @@ Define(flanking_strike 269751)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
-Define(frenzy_buff 138895)
+Define(frenzy 138895)
 # Haste increased by s1 for 10 seconds.
-  SpellInfo(frenzy_buff duration=10 max_stacks=5 gcd=0 offgcd=1)
+  SpellInfo(frenzy duration=10 max_stacks=5 gcd=0 offgcd=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -195,7 +195,7 @@ Define(kill_command_survival 259489)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
   SpellInfo(kill_command_survival cd=6 focus=-15)
   # Your next ?s259387[Mongoose Bite][Raptor Strike] deals s1 increased damage.
-  SpellAddBuff(kill_command_survival tip_of_the_spear_buff add=1)
+  SpellAddBuff(kill_command_survival tip_of_the_spear add=1)
 Define(kill_shot 320976)
 # You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
   SpellInfo(kill_shot focus=10 cd=10)
@@ -243,11 +243,11 @@ Define(potion_of_unbridled_fury 300714)
   SpellInfo(potion_of_unbridled_fury duration=60 gcd=0 offgcd=1)
   # Chance to deal an extra 300717s1 Fire damage to your current target.
   SpellAddBuff(potion_of_unbridled_fury potion_of_unbridled_fury add=1)
-Define(precise_shots_buff 260242)
+Define(precise_shots 260242)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
-  SpellInfo(precise_shots_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(precise_shots duration=15 max_stacks=2 gcd=0 offgcd=1)
   # Damage of ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot increased by s1.
-  SpellAddBuff(precise_shots_buff precise_shots_buff add=1)
+  SpellAddBuff(precise_shots precise_shots add=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
@@ -316,9 +316,9 @@ Define(steel_trap 162488)
 Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
-Define(tip_of_the_spear_buff 260286)
+Define(tip_of_the_spear 260286)
 # Kill Command increases the damage of your next ?s259387[Mongoose Bite][Raptor Strike] by 260286s1, stacking up to 260286u times.
-  SpellInfo(tip_of_the_spear_buff duration=10 max_stacks=3 gcd=0 offgcd=1)
+  SpellInfo(tip_of_the_spear duration=10 max_stacks=3 gcd=0 offgcd=1)
 Define(trick_shots_buff 257622)
 # When Multi-Shot hits s2 or more targets, your next Aimed Shot or Rapid Fire will ricochet and hit up to s1 additional targets for s4 of normal damage.
   SpellInfo(trick_shots_buff duration=20 gcd=0 offgcd=1)

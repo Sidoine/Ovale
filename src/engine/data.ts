@@ -10,7 +10,7 @@ import {
 import { find } from "@wowts/string";
 import { isNumber } from "../tools/tools";
 import { HasteType } from "../states/PaperDoll";
-import { Powers } from "../states/Power";
+import { PowerType } from "../states/Power";
 import { GetSpellInfo, SpellId } from "@wowts/wow-mock";
 import {
     AstItemRequireNode,
@@ -116,7 +116,27 @@ export interface SpellAddAuras {
 
 export type SpellInfoProperty = keyof SpellInfoValues;
 
-export interface SpellInfoValues extends Powers {
+type SpellInfoPowerValues = {
+    [K in PowerType]?: number;
+};
+
+type SpellInfoPowerSetValues = {
+    [K in PowerType as `set_${K}`]?: number;
+};
+
+type SpellInfoPowerMaxValues = {
+    [K in PowerType as `max_${K}`]?: number;
+};
+
+type SpellInfoPowerRefundValues = {
+    [K in PowerType as `refund_${K}`]?: number | "cost";
+};
+
+export interface SpellInfoValues
+    extends SpellInfoPowerValues,
+        SpellInfoPowerSetValues,
+        SpellInfoPowerMaxValues,
+        SpellInfoPowerRefundValues {
     duration?: number;
     add_duration_combopoints?: number;
     tick?: number;

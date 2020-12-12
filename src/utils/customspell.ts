@@ -88,8 +88,11 @@ function getPowerName(power: PowerType): OvalePowerType | "runes" | "health" {
     }
 }
 
-function getPowerDataValue(powerData: SpellPowerData) {
-    return getPowerValue(powerData.power_type, powerData.cost);
+function getPowerDataValue(
+    powerData: SpellPowerData,
+    property: keyof SpellPowerData
+) {
+    return getPowerValue(powerData.power_type, powerData[property]);
 }
 
 function getPowerValue(powerType: PowerType, cost: number) {
@@ -127,7 +130,12 @@ export function convertFromSpellData(
         for (const power of spell.spellPowers) {
             const powerName = getPowerName(power.power_type);
             if (power.cost) {
-                spellInfo[powerName] = getPowerDataValue(power);
+                spellInfo[powerName] = getPowerDataValue(power, "cost");
+            }
+            if (power.cost_max) {
+                spellInfo[
+                    `max_${powerName}` as `max_${OvalePowerType}`
+                ] = getPowerDataValue(power, "cost_max");
             }
         }
     }

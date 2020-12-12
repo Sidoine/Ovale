@@ -63,11 +63,11 @@ Define(bloodlust 2825)
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(bloodlust bloodlust add=1)
-Define(bloodtalons_buff 145152)
+Define(bloodtalons 145152)
 # @spelldesc155672
-  SpellInfo(bloodtalons_buff duration=30 gcd=0 offgcd=1)
+  SpellInfo(bloodtalons duration=30 gcd=0 offgcd=1)
   # Your next Rip or Ferocious Bite deals s1 increased damage.
-  SpellAddBuff(bloodtalons_buff bloodtalons_buff add=1)
+  SpellAddBuff(bloodtalons bloodtalons add=1)
 Define(brutal_slash 202028)
 # Strikes up to s3 nearby enemies with a massive slash, inflicting s2 Physical damage.rnrn|cFFFFFFFFAwards s1 combo lpoint:points;.|r
   SpellInfo(brutal_slash energy=25 cd=8 gcd=1 combopoints=-1)
@@ -82,9 +82,9 @@ Define(celestial_alignment 194223)
   SpellInfo(celestial_alignment cd=180 duration=20 gcd=0 offgcd=1)
   # Both Eclipses active. Haste increased by w1.
   SpellAddBuff(celestial_alignment celestial_alignment add=1)
-Define(clearcasting_buff 16870)
+Define(clearcasting 16870)
 # Your healing over time from Lifebloom has a (25 of Spell Power) chance to cause a Clearcasting state, making your next ?a155577[155577m1+1 Regrowths][Regrowth] cost no mana.
-  SpellInfo(clearcasting_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
+  SpellInfo(clearcasting duration=15 max_stacks=1 gcd=0 offgcd=1)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
   SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
@@ -128,7 +128,7 @@ Define(feral_frenzy 274837)
   SpellRequire(feral_frenzy unusable set=1 enabled=(not hastalent(feral_frenzy_talent)))
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a102543[s2*(1+(25 of Spell Power)/100)][s2] additional Energy to increase damage by up to 100.rnrn?s202031[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
-  SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
+  SpellInfo(ferocious_bite energy=25 combopoints=1 max_combopoints=4 gcd=1)
 Define(focused_azerite_beam 295258)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
@@ -147,11 +147,11 @@ Define(fury_of_elune 202770)
   SpellRequire(fury_of_elune unusable set=1 enabled=(not hastalent(fury_of_elune_talent)))
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune add=1)
-Define(galactic_guardian_buff 213708)
+Define(galactic_guardian 213708)
 # Your damage has a h chance to trigger a free automatic Moonfire on that target. rnrnWhen this occurs, the next Moonfire you cast generates 213708m1/10 Rage, and deals 213708s3 increased direct damage.
-  SpellInfo(galactic_guardian_buff duration=15 gcd=0 offgcd=1)
+  SpellInfo(galactic_guardian duration=15 gcd=0 offgcd=1)
   # Your next Moonfire generates m1/10 Rage, and deals s3 increased direct damage.
-  SpellAddBuff(galactic_guardian_buff galactic_guardian_buff add=1)
+  SpellAddBuff(galactic_guardian galactic_guardian add=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -208,9 +208,11 @@ Define(kindred_empowerment_energize 327139)
   SpellInfo(kindred_empowerment_energize duration=10 gcd=0 offgcd=1 tick=0.5)
   # Energizing @auracaster, granting them s1 of all damage you deal as Kindred Empowerment.
   SpellAddBuff(kindred_empowerment_energize kindred_empowerment_energize add=1)
-Define(kindred_spirits 56315)
-# Increases your maximum Focus and your pet's maximum Focus by (25 of Spell Power).
-  SpellInfo(kindred_spirits gcd=0 offgcd=1)
+Define(kindred_spirits 326434)
+# Form a bond with an ally. Every 60 seconds, you may empower the bond for 10 seconds, granting you an effect based on your partner's role, and granting them an effect based on your role.rnrn?c3[|cFFFFFFFFTank|rrn@spellicon327037 @spellname327037rnProtect your bonded partner, redirecting s1 of damage they take to you, unless you fall below s3 health.]?c4[|cFFFFFFFFHealer|rrn@spellicon327071 @spellname327071rnFocus on your bonded partner, replicating 327148s1 of all healing you deal onto them.][|cFFFFFFFFDamager|rrn@spellicon327022 @spellname327022rnEnergize your bonded partner, granting them 327139s1 of your damage as additional Arcane damage, healing, or absorption.]
+  SpellInfo(kindred_spirits duration=3600)
+  # Bonded with @auracaster. Every 327097d, they may empower the bond, granting bonuses based on your respective roles.
+  SpellAddBuff(kindred_spirits kindred_spirits add=1)
 Define(lunar_inspiration 155580)
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
   SpellInfo(lunar_inspiration gcd=0 offgcd=1)
@@ -222,7 +224,7 @@ Define(lycaras_fleeting_glimpse 340060)
   SpellAddBuff(lycaras_fleeting_glimpse lycaras_fleeting_glimpse add=1)
 Define(maim 22570)
 # Finishing move that causes Physical damage and stuns the target. Damage and duration increased per combo point:rnrn   1 point  : s2*1 damage, 1 secrn   2 points: s2*2 damage, 2 secrn   3 points: s2*3 damage, 3 secrn   4 points: s2*4 damage, 4 secrn   5 points: s2*5 damage, 5 sec
-  SpellInfo(maim energy=30 combopoints=1 cd=20 gcd=1)
+  SpellInfo(maim energy=30 combopoints=1 max_combopoints=4 cd=20 gcd=1)
   # Stunned.
   SpellAddBuff(maim maim add=1)
 Define(mangle 33917)
@@ -279,7 +281,7 @@ Define(oneths_perception 339800)
   SpellAddBuff(oneths_perception oneths_perception add=1)
 Define(primal_wrath 285381)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
-  SpellInfo(primal_wrath energy=20 combopoints=1 gcd=1)
+  SpellInfo(primal_wrath energy=20 combopoints=1 max_combopoints=4 gcd=1)
   SpellRequire(primal_wrath unusable set=1 enabled=(not hastalent(primal_wrath_talent)))
 Define(primordial_arcanic_pulsar 338825)
 # Every s1 Astral Power spent grants Celestial Alignment for s2 sec.
@@ -330,7 +332,7 @@ Define(reckless_force_buff 298409)
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 4 seconds*2 secrn   2 points: o1*3 over 4 seconds*3 secrn   3 points: o1*4 over 4 seconds*4 secrn   4 points: o1*5 over 4 seconds*5 secrn   5 points: o1*6 over 4 seconds*6 sec
-  SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
+  SpellInfo(rip energy=20 combopoints=1 max_combopoints=4 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip add=1)
 Define(ripple_in_space 299306)
@@ -341,7 +343,7 @@ Define(savage_combatant_buff 340613)
   SpellInfo(savage_combatant_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
-  SpellInfo(savage_roar energy=25 combopoints=1 duration=6 gcd=1 tick=2)
+  SpellInfo(savage_roar energy=25 combopoints=1 max_combopoints=4 duration=6 gcd=1 tick=2)
   SpellRequire(savage_roar unusable set=1 enabled=(not hastalent(savage_roar_talent)))
   # Damage increased 62071s1 while in Cat Form.rnEnergy regeneration increased by 62071s3.
   SpellAddBuff(savage_roar savage_roar add=1)
@@ -377,15 +379,11 @@ Define(starfall 191034)
 Define(starfire 194153)
 # Call down a burst of energy, causing (76.5 of Spell Power) Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(starfire lunarpower=-8)
-Define(starlord 202345)
+Define(starlord 279709)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
-  SpellInfo(starlord gcd=0 offgcd=1)
-  SpellRequire(starlord unusable set=1 enabled=(not hastalent(starlord_talent)))
-Define(starlord_buff 279709)
-# Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
-  SpellInfo(starlord_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
+  SpellInfo(starlord duration=15 max_stacks=3 gcd=0 offgcd=1)
   # Haste increased by s1.
-  SpellAddBuff(starlord_buff starlord_buff add=1)
+  SpellAddBuff(starlord starlord add=1)
 Define(starsurge 78674)
 # Launch a surge of stellar energies at the target, dealing (206.99999999999997 of Spell Power) Astral damage, and empowering the damage bonus of any active Eclipse for its duration.
   SpellInfo(starsurge lunarpower=30)
@@ -521,8 +519,6 @@ Define(savage_roar_talent 18579)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
 Define(soul_of_the_forest_talent 18580)
 # Eclipse increases Wrath's Astral power generation s1, and increases Starfire's area effect damage by s2.
-Define(starlord_talent 21706)
-# Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
 Define(starlord_talent 21706)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
 Define(stellar_drift_talent 22389)

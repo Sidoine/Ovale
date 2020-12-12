@@ -9,6 +9,7 @@ module.exports = {
     parserOptions: {
         ecmaVersion: 12,
         sourceType: "module",
+        project: "tsconfig.json",
     },
     plugins: ["@typescript-eslint"],
     rules: {
@@ -18,6 +19,11 @@ module.exports = {
         "@typescript-eslint/no-this-alias": "off",
         "no-empty-pattern": "off",
         "prefer-const": "off",
+
+        // "@typescript-eslint/strict-boolean-expressions": [
+        //     2,
+        //     { allowNullableObject: true, allowNullableBoolean: true },
+        // ],
 
         // Stylistics
         "quote-props": ["error", "as-needed"],

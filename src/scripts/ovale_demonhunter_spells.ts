@@ -160,11 +160,11 @@ Define(metamorphosis 187827)
 Define(metamorphosis_buff 162264)
 # Leap into the air and land with explosive force, dealing 200166s2 Chaos damage to enemies within 8 yds, and stunning them for 3 seconds. Players are Dazed for 3 seconds instead.rnrnUpon landing, you are transformed into a hellish demon for 30 seconds, ?s320645[immediately resetting the cooldown of your Eye Beam and Blade Dance abilities, ][]greatly empowering your Chaos Strike and Blade Dance abilities?s320422[ and gaining 320422s1 Haste][]?s204909[ and 162264s3 Leech][].
   SpellInfo(metamorphosis_buff duration=30 gcd=0 offgcd=1 tick=1)
-Define(momentum_buff 208628)
+Define(momentum 208628)
 # Increases all damage done by s1.
-  SpellInfo(momentum_buff duration=6 gcd=0 offgcd=1)
+  SpellInfo(momentum duration=6 gcd=0 offgcd=1)
   # Damage done increased by s1.
-  SpellAddBuff(momentum_buff momentum_buff add=1)
+  SpellAddBuff(momentum momentum add=1)
 Define(prepared_buff 203650)
 # Reduces the cooldown of Vengeful Retreat by 10 sec, and generates (203650s1/5)*10 seconds Fury over 10 seconds if you damage at least one enemy with Vengeful Retreat.
   SpellInfo(prepared_buff duration=10 gcd=0 offgcd=1)

@@ -43,9 +43,10 @@ Define(crusade 231895)
   SpellRequire(crusade unusable set=1 enabled=(not hastalent(crusade_talent)))
   # ?a206338[Damage done increased by w1.rnHaste increased by w3.][Damage done and haste increased by <damage>.]
   SpellAddBuff(crusade crusade add=1)
-Define(crusader_strike 231667)
-# Crusader Strike now has s1+1 charges.
-  SpellInfo(crusader_strike gcd=0 offgcd=1)
+Define(crusader_strike 35395)
+# Strike the target for s1 Physical damage.rnrn|cFFFFFFFFGenerates s2 Holy Power.
+  SpellInfo(crusader_strike cd=6 holypower=-1)
+  SpellRequire(crusader_strike replaced_by set=hammer_of_the_righteous enabled=(specialization(protection)))
 Define(divine_purpose 223819)
 # Holy Power abilities have a s1 chance to make your next Holy Power ability free and deal 223819s2 increased damage and healing.
   SpellInfo(divine_purpose duration=12 gcd=0 offgcd=1)

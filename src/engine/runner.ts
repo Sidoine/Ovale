@@ -78,7 +78,7 @@ type ComputerFunction<T extends AstNode> = (
 export class Runner {
     private profiler: Profiler;
     private tracer: Tracer;
-    private self_serial = 0;
+    public self_serial = 0;
     private actionHandlers: LuaObj<ActionInfoHandler> = {};
 
     constructor(
@@ -99,13 +99,7 @@ export class Runner {
         this.profiler.StartProfiling("OvaleBestAction_PostOrderCompute");
         let result: AstNodeSnapshot | undefined;
         const postOrder = element.postOrder;
-        if (
-            postOrder &&
-            !(
-                element.result.serial &&
-                element.result.serial >= this.self_serial
-            )
-        ) {
+        if (postOrder && element.result.serial !== this.self_serial) {
             let index = 1;
             const N = lualength(postOrder);
             while (index < N) {
@@ -115,70 +109,69 @@ export class Runner {
                 ];
                 index = index + 2;
                 result = this.PostOrderCompute(childNode, atTime);
-                if (parentNode && result.timeSpan) {
-                    let shortCircuit = false;
+
+                let shortCircuit = false;
+                if (
+                    isAstNodeWithChildren(parentNode) &&
+                    parentNode.child[1] == childNode
+                ) {
                     if (
-                        isAstNodeWithChildren(parentNode) &&
-                        parentNode.child[1] == childNode
+                        parentNode.type == "if" &&
+                        result.timeSpan.Measure() == 0
                     ) {
-                        if (
-                            parentNode.type == "if" &&
-                            result.timeSpan.Measure() == 0
-                        ) {
-                            this.tracer.Log(
-                                "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.",
-                                element.nodeId,
-                                childNode.type,
-                                parentNode.nodeId
-                            );
-                            shortCircuit = true;
-                        } else if (
-                            parentNode.type == "unless" &&
-                            result.timeSpan.IsUniverse()
-                        ) {
-                            this.tracer.Log(
-                                "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
-                                element.nodeId,
-                                childNode.type,
-                                parentNode.nodeId
-                            );
-                            shortCircuit = true;
-                        } else if (
-                            parentNode.type == "logical" &&
-                            parentNode.operator == "and" &&
-                            result.timeSpan.Measure() == 0
-                        ) {
-                            this.tracer.Log(
-                                "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.",
-                                element.nodeId,
-                                childNode.type,
-                                parentNode.nodeId
-                            );
-                            shortCircuit = true;
-                        } else if (
-                            parentNode.type == "logical" &&
-                            parentNode.operator == "or" &&
-                            result.timeSpan.IsUniverse()
-                        ) {
-                            this.tracer.Log(
-                                "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
-                                element.nodeId,
-                                childNode.type,
-                                parentNode.nodeId
-                            );
-                            shortCircuit = true;
-                        }
+                        this.tracer.Log(
+                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.",
+                            element.nodeId,
+                            childNode.type,
+                            parentNode.nodeId
+                        );
+                        shortCircuit = true;
+                    } else if (
+                        parentNode.type == "unless" &&
+                        result.timeSpan.IsUniverse()
+                    ) {
+                        this.tracer.Log(
+                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
+                            element.nodeId,
+                            childNode.type,
+                            parentNode.nodeId
+                        );
+                        shortCircuit = true;
+                    } else if (
+                        parentNode.type == "logical" &&
+                        parentNode.operator == "and" &&
+                        result.timeSpan.Measure() == 0
+                    ) {
+                        this.tracer.Log(
+                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.",
+                            element.nodeId,
+                            childNode.type,
+                            parentNode.nodeId
+                        );
+                        shortCircuit = true;
+                    } else if (
+                        parentNode.type == "logical" &&
+                        parentNode.operator == "or" &&
+                        result.timeSpan.IsUniverse()
+                    ) {
+                        this.tracer.Log(
+                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
+                            element.nodeId,
+                            childNode.type,
+                            parentNode.nodeId
+                        );
+                        shortCircuit = true;
                     }
-                    if (shortCircuit) {
-                        while (parentNode != postOrder[index] && index <= N) {
-                            index = index + 2;
-                        }
-                        if (index > N) {
-                            this.tracer.Error(
-                                "Ran off end of postOrder node list for node %d.",
-                                element.nodeId
-                            );
-                        }
+                }
+                if (shortCircuit) {
+                    while (parentNode != postOrder[index] && index <= N) {
+                        index = index + 2;
+                    }
+                    if (index > N) {
+                        this.tracer.Error(
+                            "Ran off end of postOrder node list for node %d.",
+                            element.nodeId
+                        );
                     }
                 }
             }
@@ -201,10 +194,7 @@ export class Runner {
                 element.asString || element.type
             );
             return element.result;
-        } else if (
-            element.result.serial &&
-            element.result.serial >= this.self_serial
-        ) {
+        } else if (element.result.serial === this.self_serial) {
             this.tracer.Log(
                 "[%d] >>> Returning for '%s' cached value %s at %s",
                 element.nodeId,
@@ -275,10 +265,7 @@ export class Runner {
         atTime: number,
         namedParameters: NamedParametersOf<AstActionNode>
     ) {
-        if (
-            element.result.serial &&
-            element.result.serial >= this.self_serial
-        ) {
+        if (element.result.serial === this.self_serial) {
             this.tracer.Log(
                 "[%d]    using cached result (age = %d/%d)",
                 element.nodeId,
@@ -322,7 +309,7 @@ export class Runner {
 
         const action = node.name;
         // element.positionalParams[1];
-        if (!result.actionTexture) {
+        if (result.actionTexture === undefined) {
             this.tracer.Log("[%d]    Action %s not found.", nodeId, action);
             wipe(timeSpan);
             setResultType(result, "none");
@@ -335,12 +322,12 @@ export class Runner {
             wipe(timeSpan);
             setResultType(result, "none");
         } else {
-            if (!result.castTime) {
+            if (result.castTime === undefined) {
                 result.castTime = 0;
             }
             let start: number;
             if (
-                result.actionCooldownStart &&
+                result.actionCooldownStart !== undefined &&
                 result.actionCooldownStart > 0 &&
                 (result.actionCharges == undefined || result.actionCharges == 0)
             ) {
@@ -351,7 +338,7 @@ export class Runner {
                     result.actionCharges || "(nil)"
                 );
                 if (
-                    result.actionCooldownDuration &&
+                    result.actionCooldownDuration !== undefined &&
                     result.actionCooldownDuration > 0
                 ) {
                     this.tracer.Log(
@@ -382,7 +369,7 @@ export class Runner {
                     );
                     start = atTime;
                 } else if (
-                    result.actionCooldownDuration &&
+                    result.actionCooldownDuration !== undefined &&
                     result.actionCooldownDuration > 0
                 ) {
                     this.tracer.Log(
@@ -404,11 +391,11 @@ export class Runner {
                 }
             }
             if (
-                result.actionResourceExtend &&
+                result.actionResourceExtend !== undefined &&
                 result.actionResourceExtend > 0
             ) {
                 if (
-                    namedParameters.pool_resource &&
+                    namedParameters.pool_resource !== undefined &&
                     namedParameters.pool_resource == 1
                 ) {
                     this.tracer.Log(
@@ -782,12 +769,19 @@ export class Runner {
 
     private copyResult(target: AstNodeSnapshot, source: AstNodeSnapshot) {
         for (const [k] of kpairs(target)) {
-            if (k !== "timeSpan" && k !== "type" && k !== "serial")
+            if (
+                k !== "timeSpan" &&
+                k !== "type" &&
+                k !== "serial" &&
+                source[k] === undefined
+            )
                 delete target[k];
         }
         for (const [k, v] of kpairs(source)) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (k !== "timeSpan") (target[k] as any) = v;
+            if (k !== "timeSpan" && k !== "serial" && target[k] !== v) {
+                (target[k] as any) = v;
+            }
         }
     }
 
@@ -1103,7 +1097,7 @@ export class Runner {
         this.profiler.StartProfiling("OvaleBestAction_ComputeLua");
         const value = loadstring(element.lua)();
         this.tracer.Log("[%d]    lua returns %s", element.nodeId, value);
-        if (value) {
+        if (value !== undefined) {
             this.SetValue(element, value);
         }
         this.GetTimeSpan(element, UNIVERSE);
@@ -1143,10 +1137,21 @@ export class Runner {
         rate?: number
     ): void {
         const result = node.result;
-        setResultType(result, "value");
-        result.value = value || 0;
-        result.origin = origin || 0;
-        result.rate = rate || 0;
+        if (result.type !== "value") {
+            setResultType(result, "value");
+        }
+        value = value || 0;
+        origin = origin || 0;
+        rate = rate || 0;
+        if (
+            value !== result.value ||
+            result.origin !== origin ||
+            result.rate !== rate
+        ) {
+            result.value = value;
+            result.origin = origin;
+            result.rate = rate;
+        }
     }
 
     private AsValue(
@@ -1167,7 +1172,7 @@ export class Runner {
             origin = node.origin || 0;
             rate = node.rate || 0;
             timeSpan = node.timeSpan || UNIVERSE;
-        } else if (node.timeSpan && node.timeSpan.HasTime(atTime)) {
+        } else if (node.timeSpan.HasTime(atTime)) {
             [value, origin, rate, timeSpan] = [1, 0, 0, UNIVERSE];
         } else {
             [value, origin, rate, timeSpan] = [0, 0, 0, UNIVERSE];
