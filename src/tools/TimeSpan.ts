@@ -94,6 +94,10 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
     }
 
+    toString() {
+        return this.__tostring();
+    }
+
     copyFromArray(A: OvaleTimeSpan) {
         const count = lualength(A);
         for (let i = 1; i <= count; i += 1) {
@@ -203,7 +207,7 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         const A = this;
         const countA = lualength(A);
         result = result || newTimeSpan();
-        if (countA > 0 && startB && endB) {
+        if (countA > 0) {
             let countResult = 0;
             let [i, k] = [1, 1];
             while (true) {

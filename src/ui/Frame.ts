@@ -865,14 +865,23 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                         } else {
                             serialized = ",";
                         }
-                        serialized += `"${node.nodeId}": `;
-                        serialized += stringify(node.result);
+                        serialized += `"${node.nodeId}": {"result": ${stringify(
+                            node.result
+                        )}, "type": "${node.type}", "asString": ${stringify(
+                            node.asString
+                        )} }`;
                         traceLog.AddLine(serialized);
                     }
                 }
             }
             traceLog.AddLine(`}, "result": ${stringify(result)} }`);
             traceLog.Display();
+
+            this.ovaleDebug.trace = true;
+            this.ovaleDebug.traceLog.Clear();
+            this.getIconAction(iconNodes[index]);
+            this.ovaleDebug.trace = false;
+            this.ovaleDebug.DisplayTraceLog();
         }
     }
 

@@ -12,7 +12,7 @@ import {
     kpairs,
     ipairs,
 } from "@wowts/lua";
-import { len, find, format } from "@wowts/string";
+import { len, find, format, gsub } from "@wowts/string";
 import { DEFAULT_CHAT_FRAME, UIFrame } from "@wowts/wow-mock";
 
 export function isString(s: unknown): s is string {
@@ -94,8 +94,10 @@ export type AceEventHandler<E> = E extends (
     : never;
 
 export function stringify(obj: any) {
+    if (obj === undefined) return "null";
+
     if (isString(obj)) {
-        return `"${obj}"`;
+        return `"${gsub(obj, '"', '\\"')}"`;
     }
     if (isNumber(obj)) {
         return tostring(obj);

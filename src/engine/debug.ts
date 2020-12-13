@@ -210,6 +210,7 @@ export class OvaleDebugClass {
             }, 0.5);
         }
     }
+
     ResetTrace() {
         this.bug = undefined;
         this.trace = false;

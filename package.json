@@ -45,7 +45,7 @@
         "@wowts/lib_dual_spec-1.0": "^1.0.0",
         "@wowts/lib_range_check-2.0": "^1.0.0",
         "@wowts/lib_text_dump-1.0": "^1.0.1",
-        "@wowts/lua": "^1.5.0",
+        "@wowts/lua": "^1.5.1",
         "@wowts/math": "^1.1.0",
         "@wowts/string": "^1.1.1",
         "@wowts/table": "^1.0.1",

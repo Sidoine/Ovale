@@ -3166,7 +3166,7 @@ export class Emiter {
             } else if (property == "duration") {
                 code = format("%sCooldownDuration(%s)", prefix, name);
             } else if (property == "ready") {
-                code = format("%sCooldown(%s) == 0", prefix, name);
+                code = format("%sCooldown(%s) <= 0", prefix, name);
             } else if (
                 property == "remains" ||
                 property == "remains_guess" ||
@@ -3861,14 +3861,14 @@ export class Emiter {
             operand == "cooldown.chaos_blades.ready"
         ) {
             code =
-                "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0";
+                "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) <= 0";
             this.AddSymbol(annotation, "chaos_blades_talent");
             this.AddSymbol(annotation, "chaos_blades");
         } else if (
             className == "DEMONHUNTER" &&
             operand == "cooldown.nemesis.ready"
         ) {
-            code = "Talent(nemesis_talent) and SpellCooldown(nemesis) == 0";
+            code = "Talent(nemesis_talent) and SpellCooldown(nemesis) <= 0";
             this.AddSymbol(annotation, "nemesis_talent");
             this.AddSymbol(annotation, "nemesis");
         } else if (
@@ -3877,7 +3877,7 @@ export class Emiter {
             specialization == "havoc"
         ) {
             code =
-                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) == 0";
+                "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) <= 0";
             this.AddSymbol(annotation, "metamorphosis");
         } else if (
             className == "DRUID" &&

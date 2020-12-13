@@ -633,6 +633,7 @@ export class Runner {
         const elementB = this.Compute(element.child[2], atTime);
         const [x, y, z, timeSpanB] = this.AsValue(atTime, elementB);
         timeSpanA.Intersect(timeSpanB, timeSpan);
+
         if (timeSpan.Measure() == 0) {
             this.tracer.Log(
                 "[%d]    compare '%s' returns %s with zero measure",
@@ -743,15 +744,16 @@ export class Runner {
                     element.name
                 );
             const elementA = this.Compute(node.child[1], atTime);
+            timeSpan.copyFromArray(elementA.timeSpan);
             if (this.tracer.debug.trace)
                 this.tracer.Log(
-                    "[%d]: [%d] %s is returning %s",
+                    "[%d]: [%d] %s is returning %s with timespan = %s",
                     element.nodeId,
                     node.child[1].nodeId,
                     element.name,
-                    this.resultToString(elementA)
+                    this.resultToString(elementA),
+                    timeSpan
                 );
-            timeSpan.copyFromArray(elementA.timeSpan);
             this.copyResult(result, elementA);
         } else {
             this.tracer.Error(`Unable to find ${element.name}`);
@@ -881,6 +883,7 @@ export class Runner {
             );
             const currentElement = this.Compute(child, atTime);
             const currentElementTimeSpan = currentElement.timeSpan;
+            wipe(currentTimeSpanAfterTime);
             currentElementTimeSpan.IntersectInterval(
                 atTime,
                 huge,
@@ -895,7 +898,7 @@ export class Runner {
             );
             if (currentTimeSpanAfterTime.Measure() > 0) {
                 let currentIsBetter = false;
-                if (best.Measure() == 0 || !bestElement) {
+                if (best.Measure() == 0 || bestElement === undefined) {
                     this.tracer.Log(
                         "[%d]    group first best is [%d-%s]: %s",
                         group.nodeId,

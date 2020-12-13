@@ -1,7 +1,7 @@
 import { AceDatabase } from "@wowts/ace_db-3.0";
 import { LuaArray } from "@wowts/lua";
 import { huge } from "@wowts/math";
-import { AstNode, AstNodeSnapshot } from "../engine/ast";
+import { AstNode, AstNodeSnapshot, NodeType } from "../engine/ast";
 import { IoC } from "../ioc";
 import { registerScripts } from "../scripts";
 import { assertDefined } from "../tests/helpers";
@@ -13,7 +13,10 @@ interface IconDump {
     serial: number;
     index: number;
     script: string;
-    nodes: Record<string, AstNodeSnapshot>;
+    nodes: Record<
+        string,
+        { result: AstNodeSnapshot; asString: null | string; type: NodeType }
+    >;
     result: AstNodeSnapshot;
 }
 
@@ -27,7 +30,7 @@ function fixSnapshot(snapshot: AstNodeSnapshot) {
 
 export function executeDump(
     json: string
-): [AstNodeSnapshot | undefined, IconDump, LuaArray<AstNode>] {
+): [AstNodeSnapshot | undefined, IconDump, LuaArray<AstNode>, string] {
     json = json.replace(/\binf\b/g, huge.toString());
     const iconDump = JSON.parse(json) as IconDump;
     const ioc = new IoC();
@@ -36,6 +39,7 @@ export function executeDump(
         OvaleDb;
     const script = ioc.compile.CompileScript(iconDump.script);
     ioc.baseState.ResetState = () => {};
+    ioc.debug.DoTrace(false);
     assertDefined(script);
     ioc.compile.EvaluateScript();
     const iconNodes = ioc.compile.GetIconNodes();
@@ -44,11 +48,12 @@ export function executeDump(
     ioc.baseState.next.currentTime = iconDump.atTime;
     const nodeList = script.annotation.nodeList;
     for (const [k, v] of Object.entries(iconDump.nodes)) {
-        fixSnapshot(v);
+        const result = v.result;
+        fixSnapshot(result);
         const nodeId = parseInt(k);
         const node = nodeList[nodeId];
         const nodeResult = nodeList[nodeId].result;
-        Object.assign(nodeResult, v);
+        Object.assign(nodeResult, result);
 
         if (
             node.type !== "action" &&
@@ -61,5 +66,8 @@ export function executeDump(
     ioc.runner.self_serial = iconDump.serial - 1;
     const [result] = ioc.frame.frame.getIconAction(iconNode);
     fixSnapshot(iconDump.result);
-    return [result, iconDump, nodeList];
+    const log = (ioc.debug.traceLog as any).lines
+        .join("\n")
+        .replace(/1\.7976931348623157e\+308/g, "inf");
+    return [result, iconDump, nodeList, log];
 }

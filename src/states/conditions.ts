@@ -5181,7 +5181,7 @@ l    */
         if (earliest == INFINITY) {
             return Compare(0, comparator, limit);
         } else if (earliest > 0) {
-            return TestValue(0, earliest, 0, earliest, -1, comparator, limit);
+            return TestValue(0, huge, 0, earliest, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
     };
