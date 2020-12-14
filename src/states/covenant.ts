@@ -8,7 +8,7 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
 } from "../engine/condition";
-import { pairs, ipairs, tostring, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { pairs, ipairs, LuaArray, LuaObj, unpack } from "@wowts/lua";
 import { OvaleDebugClass } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
@@ -86,7 +86,7 @@ export class Covenant {
         if (isNumber(covenant)) {
             return ReturnBoolean(this.covenantId === covenant);
         } else if (isString(covenant)) {
-            const name = tostring(covenant);
+            const name = covenant as string;
             return ReturnBoolean(this.covenantId === COVENANT_ID_BY_NAME[name]);
         } else {
             return ReturnBoolean(false);
