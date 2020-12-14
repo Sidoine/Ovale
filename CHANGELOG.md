@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.24](https://github.com/Sidoine/Ovale/compare/9.0.23...9.0.24) (2020-12-14)
+
+
+### Bug Fixes
+
+* **priest:** fix various bugs with shadow priest script ([523377a](https://github.com/Sidoine/Ovale/commit/523377aabcabe87668488142c1881fd15abacbb2)), closes [#732](https://github.com/Sidoine/Ovale/issues/732)
+
 ### [9.0.23](https://github.com/Sidoine/Ovale/compare/9.0.22...9.0.23) (2020-12-13)
 
 
