@@ -83,7 +83,7 @@ function integrationTest(name: string) {
     for (const [, icon] of ipairs(icons)) {
         const result = ioc.bestAction.GetAction(
             icon,
-            ioc.baseState.current.currentTime
+            ioc.baseState.currentTime
         );
         assertDefined(result);
         // TODO need filled spellbook     assertIs(result.type, "action");

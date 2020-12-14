@@ -219,9 +219,7 @@ export class OvaleConditionClass {
             (positionalParams[infos.targetIndex] === "target" ||
                 positionalParams[infos.targetIndex] === "cycle")
         ) {
-            positionalParams[
-                infos.targetIndex
-            ] = this.baseState.next.defaultTarget;
+            positionalParams[infos.targetIndex] = this.baseState.defaultTarget;
         }
         return infos.func(atTime, ...unpack(positionalParams));
     }
@@ -269,7 +267,7 @@ export function ParseCondition(
     namedParams.target = namedParams.target || target;
 
     if (target === "cycle" || target === "target") {
-        target = baseState.next.defaultTarget;
+        target = baseState.defaultTarget;
     }
     let filter: AuraType | undefined;
     if (namedParams.filter) {

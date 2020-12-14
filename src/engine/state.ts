@@ -12,8 +12,24 @@ export type SpellCastEventHandler = (
 
 export interface StateModule {
     CleanState(): void;
+
+    /** Called each time the script is executed.
+     * Should clear the values that computes the engine state
+     * TODO: I don't see the point of this method, it should be removed
+     * and its code should be in ResetState
+     */
     InitializeState(): void;
+
+    /** Called after InitializeState and after any script
+     * recompilation. Anything that depends on the script should
+     * be done instead of InitializeState
+     */
     ResetState(): void;
+
+    /**
+     * These three methods are called after ResetState for each spell cast that
+     * is in flight or that currently cast
+     */
     ApplySpellStartCast?: SpellCastEventHandler;
     ApplySpellAfterCast?: SpellCastEventHandler;
     ApplySpellOnHit?: SpellCastEventHandler;

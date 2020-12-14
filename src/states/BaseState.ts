@@ -1,24 +1,18 @@
-import { StateModule, States } from "../engine/state";
+import { StateModule } from "../engine/state";
 import { GetTime } from "@wowts/wow-mock";
 
-class BaseStateData {
-    currentTime = 0;
+export class BaseState implements StateModule {
+    /** The default target for the current icon. */
     defaultTarget = "target";
-}
 
-export class BaseState extends States<BaseStateData> implements StateModule {
-    constructor() {
-        super(BaseStateData);
-    }
+    /** Cached value of GetTime(), the real current time */
+    currentTime = 0;
 
-    InitializeState() {
-        this.next.defaultTarget = "target";
-    }
+    InitializeState() {}
 
     ResetState() {
-        const now = GetTime();
-        this.next.currentTime = now;
-        this.next.defaultTarget = this.current.defaultTarget;
+        this.currentTime = GetTime();
+        this.defaultTarget = "target";
     }
 
     CleanState() {}

@@ -18,7 +18,6 @@ import {
 } from "@wowts/wow-mock";
 import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
-import { OvaleFutureClass } from "./Future";
 import { BaseState } from "./BaseState";
 import { OvaleDataClass, SpellInfo } from "../engine/data";
 import { OvaleClass } from "../Ovale";
@@ -107,9 +106,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
-        private ovaleFuture: OvaleFutureClass,
         private baseState: BaseState,
-        // private ovaleAura: OvaleAuraClass,
         private ovalePaperDoll: OvalePaperDollClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private combat: OvaleCombatClass
@@ -565,32 +562,21 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         if (si) {
             for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
-                const [cost, refund] = this.getPowerCostAt(
+                let [cost, refund] = this.getPowerCostAt(
                     this.next,
                     spellId,
                     powerInfo.type,
                     atTime,
                     targetGUID
                 );
-                let power = this.next.power[powerType] || 0;
-                if (cost) {
-                    power = power - cost;
-                }
-                if (refund) {
-                    power = power + refund;
-                }
-                const seconds = this.ovaleFuture.next.nextCast - atTime;
-                if (seconds > 0) {
-                    const powerRate =
-                        this.getPowerRateAt(this.next, powerType, atTime) || 0;
-                    power = power + powerRate * seconds;
-                }
+                let power = this.getPowerAt(this.next, powerType, atTime);
                 const mini = powerInfo.mini || 0;
-                if (mini && power < mini) {
-                    power = mini;
+                if (power - cost < mini) {
+                    cost = power;
                 }
+                power = (this.next.power[powerType] || 0) + refund - cost;
                 const maxi = this.current.maxPower[powerType];
-                if (maxi && power > maxi) {
+                if (maxi !== undefined && power > maxi) {
                     power = maxi;
                 }
                 this.next.power[powerType] = power;
@@ -638,15 +624,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         atTime: number
     ): number {
         let power = state.power[powerType] || 0;
-        if (atTime) {
-            const now = this.baseState.next.currentTime;
-            const seconds = atTime - now;
-            if (seconds > 0) {
-                const powerRate =
-                    this.getPowerRateAt(state, powerType, atTime) || 0;
-                power = power + powerRate * seconds;
-            }
-        }
+        const now = this.baseState.currentTime;
+        const seconds = atTime - now;
+        const powerRate = this.getPowerRateAt(state, powerType, atTime) || 0;
+        power = power + powerRate * seconds;
         return power;
     }
 
@@ -709,50 +690,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 true
             );
             if (ratio && ratio != 0) {
-                // let addRequirements =
-                //     si &&
-                //     si.require &&
-                //     si.require[
-                //         `add_${powerType}_from_aura` as SpellInfoProperty
-                //     ];
-                // if (addRequirements) {
-                //     for (const [v, rArray] of pairs(addRequirements)) {
-                //         // if (isLuaArray(rArray)) {
-                //         //     for (const [, requirement] of ipairs(rArray)) {
-                //         //         let [
-                //         //             verified,
-                //         //         ] = this.requirement.CheckRequirements(
-                //         //             spellId,
-                //         //             atTime,
-                //         //             requirement,
-                //         //             1,
-                //         //             targetGUID
-                //         //         );
-                //         //         if (verified) {
-                //         //             let aura = this.ovaleAura.GetAura(
-                //         //                 "player",
-                //         //                 requirement[2],
-                //         //                 atTime,
-                //         //                 undefined,
-                //         //                 true
-                //         //             );
-                //         //             if (
-                //         //                 aura &&
-                //         //                 this.ovaleAura.IsActiveAura(
-                //         //                     aura,
-                //         //                     atTime
-                //         //                 )
-                //         //             ) {
-                //         //                 cost =
-                //         //                     cost +
-                //         //                     (tonumber(v) || 0) * aura.stacks;
-                //         //             }
-                //         //         }
-                //         //     }
-                //         // }
-                //     }
-                // }
-
                 const maxCostParam = `max_${powerType}` as `max_${PowerType}`;
                 const maxCost = si[maxCostParam];
                 if (maxCost) {

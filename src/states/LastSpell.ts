@@ -6,7 +6,7 @@ import { Powers } from "./Power";
 export interface SpellCast extends PaperDollSnapshot {
     stop: number;
     start: number;
-    lineId?: number;
+    lineId?: string;
     spellId: number;
     spellName: string;
     targetName: string;

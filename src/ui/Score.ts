@@ -197,7 +197,7 @@ export class OvaleScoreClass {
     UNIT_SPELLCAST_SUCCEEDED = (
         event: string,
         unitId: string,
-        lineId: number,
+        lineId: string,
         spellId: number
     ) => {
         if (unitId == "player" || unitId == "pet") {

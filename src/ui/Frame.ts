@@ -125,7 +125,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 if (!action.waitStart) {
                     return 1;
                 } else {
-                    const now = this.baseState.current.currentTime;
+                    const now = this.baseState.currentTime;
                     const lag = now - action.waitStart;
                     if (lag > 5) {
                         return undefined;
@@ -221,6 +221,9 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
             if (this.ovaleCompile.EvaluateScript()) {
                 this.UpdateFrame();
             }
+            this.ovaleState.ResetState();
+            this.ovaleFuture.ApplyInFlightSpells();
+
             const profile = this.ovaleOptions.db.profile;
             const iconNodes = this.ovaleCompile.GetIconNodes();
             let left = 0;
@@ -239,7 +242,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                     let start;
                     if (element.type === "action" && element.offgcd) {
                         start = element.timeSpan.NextTime(
-                            this.baseState.next.currentTime
+                            this.baseState.currentTime
                         );
                     } else {
                         start = element.timeSpan.NextTime(atTime);
@@ -282,14 +285,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 value = element.value + (now - element.origin) * element.rate;
             }
             this.tracer.Log("GetAction: start=%s, value=%f", start, value);
-            // let actionTexture;
-            // if (node.texture) {
-            //     actionTexture = node.namedParams.texture;
-            // }
             icons.SetValue(value, undefined);
-            // if (lualength(icons) > 1) {
-            //     icons[2].Update(element, undefined);
-            // }
         } else if (element.type === "none") {
             icons.SetValue(undefined, undefined);
         } else if (element.type === "action") {
@@ -369,71 +365,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                     (action.top - top * action.dy) / action.scale
                 );
             }
-            // if (
-            //     node.namedParams.size != "small" &&
-            //     profile.apparence.predictif
-            // ) {
-            //     if (start) {
-            //         this.tracer.Log("****Second icon %s", start);
-            //         const target = this.ovaleGuid.UnitGUID(
-            //             actionTarget || "target"
-            //         );
-            //         if (target)
-            //             this.ovaleFuture.ApplySpell(
-            //                 <number>actionId,
-            //                 target,
-            //                 start
-            //             );
-            //         let atTime = this.ovaleFuture.next.nextCast;
-            //         if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
-            //             atTime = this.baseState.next.currentTime;
-            //         }
-            //         let [
-            //             timeSpan,
-            //             nextElement,
-            //         ] = this.ovaleBestAction.GetAction(node, atTime);
-            //         if (nextElement && nextElement.offgcd) {
-            //             start =
-            //                 timeSpan.NextTime(
-            //                     this.baseState.next.currentTime
-            //                 ) || huge;
-            //         } else {
-            //             start = timeSpan.NextTime(atTime) || huge;
-            //         }
-            //         const [
-            //             actionTexture2,
-            //             actionInRange2,
-            //             actionCooldownStart2,
-            //             actionCooldownDuration2,
-            //             actionUsable2,
-            //             actionShortcut2,
-            //             actionIsCurrent2,
-            //             actionEnable2,
-            //             actionType2,
-            //             actionId2,
-            //             actionTarget2,
-            //             actionResourceExtend2,
-            //         ] = this.ovaleBestAction.GetActionInfo(nextElement, start);
-            //         icons[2].Update(
-            //             nextElement,
-            //             start,
-            //             actionTexture2,
-            //             actionInRange2,
-            //             actionCooldownStart2,
-            //             actionCooldownDuration2,
-            //             actionUsable2,
-            //             actionShortcut2,
-            //             actionIsCurrent2,
-            //             actionEnable2,
-            //             actionType2,
-            //             actionId2,
-            //             actionTarget2,
-            //             actionResourceExtend2
-            //         );
-            //     } else {
-            //         icons[2].Update(element, undefined);
-            //     }
-            // }
         }
 
         if (!profile.apparence.moving) {
@@ -561,11 +492,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 );
                 this.AddChild(widget);
                 this.checkBoxWidget[name] = widget;
-                // } else {
-                //     OneTimeMessage(
-                //         "Warning: checkbox '%s' is used but not defined.",
-                //         name
-                //     );
             }
         }
         wipe(this.listWidget);
@@ -601,7 +527,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
             } else {
                 OneTimeMessage(
                     "Warning: list '%s' is used but has no items.",
-                    name
+                    list.name
                 );
             }
         }
@@ -879,6 +805,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
 
             this.ovaleDebug.trace = true;
             this.ovaleDebug.traceLog.Clear();
+            this.ovaleState.ResetState();
+            this.ovaleFuture.ApplyInFlightSpells();
             this.getIconAction(iconNodes[index]);
             this.ovaleDebug.trace = false;
             this.ovaleDebug.DisplayTraceLog();
@@ -893,10 +821,9 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
             this.tracer.Debug(
                 `Default target is ${node.rawNamedParams.target.value}`
             );
-            this.baseState.current.defaultTarget =
-                node.rawNamedParams.target.value;
+            this.baseState.defaultTarget = node.rawNamedParams.target.value;
         } else {
-            this.baseState.current.defaultTarget = "target";
+            this.baseState.defaultTarget = "target";
         }
         if (
             node.rawNamedParams.enemies &&
@@ -914,10 +841,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
         if (
             this.ovaleFuture.next.currentCast.spellId == undefined ||
             this.ovaleFuture.next.currentCast.spellId !==
-                this.ovaleFuture.next.lastGCDSpellId
+                this.ovaleFuture.next.lastGCDSpellId ||
+            this.ovaleFuture.IsChanneling(this.baseState.currentTime)
         ) {
-            atTime = this.baseState.next.currentTime;
+            atTime = this.baseState.currentTime;
         }
+
         const [, namedParameters] = this.runner.computeParameters(node, atTime);
 
         if (namedParameters.enabled === undefined || namedParameters.enabled) {

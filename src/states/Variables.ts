@@ -75,12 +75,12 @@ export class Variables implements StateModule {
     GetState(name: string) {
         return this.futureVariable[name] || this.variable[name] || 0;
     }
-    GetStateDuration(name: string) {
+    GetStateDuration(name: string, atTime: number) {
         const lastEnable =
             this.futureLastEnable[name] ||
             this.lastEnable[name] ||
-            this.baseState.next.currentTime;
-        return this.baseState.next.currentTime - lastEnable;
+            this.baseState.currentTime;
+        return atTime - lastEnable;
     }
     PutState(name: string, value: number, isFuture: boolean, atTime: number) {
         if (isFuture) {
@@ -158,7 +158,7 @@ export class Variables implements StateModule {
             positionalParams[2],
             positionalParams[3],
         ];
-        const value = this.GetStateDuration(name);
+        const value = this.GetStateDuration(name, atTime);
         return Compare(value, comparator, limit);
     };
 

@@ -52,7 +52,7 @@ Define(dark_thought 341207)
   SpellAddBuff(dark_thought dark_thought add=1)
 Define(devouring_plague 335467)
 # Afflicts the target with a disease that instantly causes (65 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
-  SpellInfo(devouring_plague insanity=5000 duration=6 tick=3)
+  SpellInfo(devouring_plague insanity=50 duration=6 tick=3)
   # Suffering s2 damage every t2 sec.
   SpellAddTargetDebuff(devouring_plague devouring_plague add=1)
 Define(divine_star 110744)
@@ -158,7 +158,7 @@ Define(schism 214621)
   SpellAddTargetDebuff(schism schism add=1)
 Define(searing_nightmare 341385)
 # Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
-  SpellInfo(searing_nightmare insanity=3000)
+  SpellInfo(searing_nightmare insanity=30)
   SpellRequire(searing_nightmare unusable set=1 enabled=(not hastalent(searing_nightmare_talent)))
 Define(shadow_covenant 314867)
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
@@ -171,7 +171,7 @@ Define(shadow_covenant_buff 322105)
   SpellInfo(shadow_covenant_buff duration=9 gcd=0 offgcd=1)
 Define(shadow_crash 342834)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (85 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrnIf Shadow Crash hits a lone target, they suffer 342835m2 increased damage from your next Shadow Crash within 15 seconds. Stacks up to 342835u.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
-  SpellInfo(shadow_crash cd=45 insanity=-800)
+  SpellInfo(shadow_crash cd=45 insanity=-8)
   SpellRequire(shadow_crash unusable set=1 enabled=(not hastalent(shadow_crash_talent)))
   # Damage taken from the Priests' Shadow Crash increased by w2.
   SpellAddTargetDebuff(shadow_crash shadow_crash_debuff add=1)
@@ -183,7 +183,7 @@ Define(shadow_word_death 32379)
   SpellInfo(shadow_word_death cd=30)
 Define(shadow_word_pain 589)
 # A word of darkness that causes (12.920000000000002 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 12 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
-  SpellInfo(shadow_word_pain duration=12 insanity=-400 tick=2)
+  SpellInfo(shadow_word_pain duration=12 insanity=-4 tick=2)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain add=1)
 Define(shadowfiend 34433)
@@ -223,12 +223,12 @@ Define(unfurling_darkness 341291)
   SpellInfo(unfurling_darkness duration=15 gcd=0 offgcd=1)
 Define(vampiric_touch 34914)
 # A touch of darkness that causes 34914o2 Shadow damage over 21 seconds, and heals you for e2*100 of damage dealt.rn?s322116[rnIf Vampiric Touch is dispelled, the dispeller flees in Horror for 3 seconds.rn][]rn|cFFFFFFFFGenerates m3/100 Insanity.|r
-  SpellInfo(vampiric_touch duration=21 insanity=-500 tick=3)
+  SpellInfo(vampiric_touch duration=21 insanity=-5 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(vampiric_touch vampiric_touch add=1)
 Define(void_bolt 205448)
 # Sends a bolt of pure void energy at the enemy, causing (81.6 of Spell Power) Shadow damage?s193225[, refreshing the duration of Devouring Plague on the target][]?a231688[ and extending the duration of Shadow Word: Pain and Vampiric Touch on all nearby targets by <ext> sec][]. rnrnRequires Voidform.rnrn|cFFFFFFFFGenerates /100;s3 Insanity.|r
-  SpellInfo(void_bolt cd=4.5 insanity=-1200)
+  SpellInfo(void_bolt cd=4.5 insanity=-12)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing (64.60000000000001 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.
   SpellInfo(void_eruption cd=90)

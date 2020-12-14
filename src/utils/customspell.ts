@@ -109,6 +109,9 @@ function getPowerValue(powerType: PowerType, cost: number) {
         case PowerType.POWER_SOUL_SHARDS:
             divisor = 10;
             break;
+        case PowerType.POWER_INSANITY:
+            divisor = 100;
+            break;
         //case PowerType.POWER_DEMONIC_FURY:
         // return percentage ? 0.1 : 1.0;
     }

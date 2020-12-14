@@ -275,7 +275,7 @@ export class Runner {
         } else {
             const target =
                 (isString(namedParameters.target) && namedParameters.target) ||
-                this.baseState.next.defaultTarget;
+                this.baseState.defaultTarget;
             const result = this.actionHandlers[element.name](
                 element,
                 atTime,
@@ -432,52 +432,7 @@ export class Runner {
                     nodeId,
                     action
                 );
-
-                // TODO
-                // let newStart = atTime;
-                // if (this.OvaleFuture.IsChanneling(atTime)) {
-                //     let spell = this.OvaleFuture.GetCurrentCast(atTime);
-                //     if (spell) {
-                //         let si =
-                //             spell.spellId &&
-                //             this.ovaleData.spellInfo[spell.spellId];
-                //         if (si) {
-                //             let channel = si.channel || si.canStopChannelling;
-                //             if (channel) {
-                //                 let hasteMultiplier = this.ovalePaperDoll.GetHasteMultiplier(
-                //                     si.haste,
-                //                     this.ovalePaperDoll.next
-                //                 );
-                //                 let numTicks = floor(
-                //                     channel * hasteMultiplier + 0.5
-                //                 );
-                //                 let tick =
-                //                     (spell.stop - spell.start) / numTicks;
-                //                 let tickTime = spell.start;
-                //                 for (let i = 1; i <= numTicks; i += 1) {
-                //                     tickTime = tickTime + tick;
-                //                     if (newStart <= tickTime) {
-                //                         break;
-                //                     }
-                //                 }
-                //                 newStart = tickTime;
-                //                 this.tracer.Log(
-                //                     "[%d]    %s start=%f, numTicks=%d, tick=%f, tickTime=%f",
-                //                     nodeId,
-                //                     spell.spellId,
-                //                     newStart,
-                //                     numTicks,
-                //                     tick,
-                //                     tickTime
-                //                 );
-                //             }
-                //         }
-                //     }
-                // }
-                // if (start < newStart) {
-                //     start = newStart;
-                // }
-                // start = atTime;
+                start = atTime;
             }
             this.tracer.Log(
                 "[%d]    Action %s can start at %f.",

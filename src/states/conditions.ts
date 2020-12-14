@@ -24,7 +24,6 @@ import {
     GetBuildInfo,
     GetItemCount,
     GetNumTrackingTypes,
-    GetTime,
     GetTrackingInfo,
     GetUnitSpeed,
     HasFullControl,
@@ -562,8 +561,7 @@ export class OvaleConditions {
             namedParams
         );
         const excludeUnitId =
-            (namedParams.excludeTarget == 1 &&
-                this.baseState.next.defaultTarget) ||
+            (namedParams.excludeTarget == 1 && this.baseState.defaultTarget) ||
             undefined;
         const fractional = (namedParams.count == 0 && true) || false;
         const [
@@ -992,8 +990,7 @@ export class OvaleConditions {
             namedParams
         );
         const excludeUnitId =
-            (namedParams.excludeTarget == 1 &&
-                this.baseState.next.defaultTarget) ||
+            (namedParams.excludeTarget == 1 && this.baseState.defaultTarget) ||
             undefined;
         const [count, , , , startFirst, endingLast] = this.OvaleAura.AuraCount(
             auraId,
@@ -1106,8 +1103,7 @@ export class OvaleConditions {
             namedParams
         );
         const excludeUnitId =
-            (namedParams.excludeTarget == 1 &&
-                this.baseState.next.defaultTarget) ||
+            (namedParams.excludeTarget == 1 && this.baseState.defaultTarget) ||
             undefined;
         const [
             count,
@@ -1233,7 +1229,7 @@ export class OvaleConditions {
             positionalParams[3],
         ];
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        const gcd = this.OvaleFuture.GetGCD();
+        const gcd = this.OvaleFuture.GetGCD(atTime);
         const t = (castTime > gcd && castTime) || gcd;
         return Compare(t, comparator, limit);
     };
@@ -1310,7 +1306,7 @@ export class OvaleConditions {
                     castSpellId,
                     castSpellName,
                     spellId,
-                    this.baseState.next.currentTime
+                    this.baseState.currentTime
                 );
                 return [start, ending];
             } else if (
@@ -2082,7 +2078,7 @@ export class OvaleConditions {
         );
         let power = 0;
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        const gcd = this.OvaleFuture.GetGCD();
+        const gcd = this.OvaleFuture.GetGCD(atTime);
         const castSeconds = (castTime > gcd && castTime) || gcd;
         power = power + regenRate * castSeconds;
         const aura = this.OvaleAura.GetAura(
@@ -2121,7 +2117,7 @@ export class OvaleConditions {
         atTime: number
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        const value = this.OvaleFuture.GetGCD();
+        const value = this.OvaleFuture.GetGCD(atTime);
         return Compare(value, comparator, limit);
     };
 
@@ -2226,7 +2222,7 @@ export class OvaleConditions {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
-            const now = GetTime();
+            const now = this.baseState.currentTime;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
             const [value, origin, rate] = [
                 health,
@@ -2274,7 +2270,7 @@ export class OvaleConditions {
                 this.OvaleHealth.UnitAbsorb(target) -
                 this.OvaleHealth.UnitHealAbsorb(target) || 0;
 
-        const now = GetTime();
+        const now = this.baseState.currentTime;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
         const [value, origin, rate] = [health, now, (-1 * health) / timeToDie];
         const [start, ending] = [now, INFINITY];
@@ -2306,7 +2302,7 @@ export class OvaleConditions {
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
         if (health > 0) {
-            const now = GetTime();
+            const now = this.baseState.currentTime;
             const missing = maxHealth - health;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
             const [value, origin, rate] = [missing, now, health / timeToDie];
@@ -2348,7 +2344,7 @@ export class OvaleConditions {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
-            const now = GetTime();
+            const now = this.baseState.currentTime;
             const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
             const healthPercent = (health / maxHealth) * 100;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
@@ -2397,7 +2393,7 @@ export class OvaleConditions {
                 this.OvaleHealth.UnitAbsorb(target) -
                 this.OvaleHealth.UnitHealAbsorb(target) || 0;
 
-        const now = GetTime();
+        const now = this.baseState.currentTime;
         const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
         const healthPercent = (health / maxHealth) * 100;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
@@ -2456,7 +2452,7 @@ export class OvaleConditions {
     ) => {
         const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
-        const now = GetTime();
+        const now = this.baseState.currentTime;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
         const [value, origin, rate] = [timeToDie, now, -1];
         const [start] = [now, now + timeToDie];
@@ -2502,7 +2498,7 @@ export class OvaleConditions {
             const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
             const healthPercent = (health / maxHealth) * 100;
             if (healthPercent >= percent) {
-                const now = GetTime();
+                const now = this.baseState.currentTime;
                 const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
                 const t =
                     (timeToDie * (healthPercent - percent)) / healthPercent;

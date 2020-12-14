@@ -4,7 +4,7 @@ import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { next, pairs, LuaObj, kpairs } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
-import { States } from "../engine/state";
+import { StateModule, States } from "../engine/state";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
@@ -90,7 +90,7 @@ export class CooldownData {
 
 export class OvaleCooldownClass
     extends States<CooldownData>
-    implements SpellCastModule {
+    implements SpellCastModule, StateModule {
     serial = 0;
     sharedCooldown: LuaObj<LuaArray<boolean>> = {};
     gcd = {
@@ -227,7 +227,7 @@ export class OvaleCooldownClass
                 duration,
                 enable
             );
-            if (start && start > 0) {
+            if (start !== undefined && start > 0) {
                 const [gcdStart, gcdDuration] = this.GetGlobalCooldown();
                 this.tracer.Log(
                     "GlobalCooldown is %d, %d",
@@ -385,7 +385,7 @@ export class OvaleCooldownClass
                 "cd",
                 targetGUID
             );
-            if (duration) {
+            if (duration !== undefined) {
                 if (duration < 0) {
                     duration = 0;
                 }

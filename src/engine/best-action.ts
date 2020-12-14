@@ -1,7 +1,6 @@
 import { OvaleActionBarClass } from "./action-bar";
 import { OvaleDataClass } from "./data";
 import { OvaleEquipmentClass, SlotName } from "../states/Equipment";
-import { OvaleStateClass } from "./state";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, tonumber } from "@wowts/lua";
 import {
@@ -58,7 +57,6 @@ export class OvaleBestActionClass {
         private ovaleActionBar: OvaleActionBarClass,
         private ovaleData: OvaleDataClass,
         private ovaleCooldown: OvaleCooldownClass,
-        private ovaleState: OvaleStateClass,
         Ovale: OvaleClass,
         private OvaleGUID: OvaleGUIDClass,
         private OvalePower: OvalePowerClass,
@@ -127,7 +125,7 @@ export class OvaleBestActionClass {
         result.actionType = "item";
         result.actionId = itemId;
         result.actionTarget = target;
-        result.castTime = this.OvaleFuture.GetGCD(undefined, atTime);
+        result.castTime = this.OvaleFuture.GetGCD(atTime);
         this.profiler.StopProfiling("OvaleBestAction_GetActionItemInfo");
         return result;
     };
@@ -161,7 +159,7 @@ export class OvaleBestActionClass {
         result.actionIsCurrent = IsCurrentAction(action);
         result.actionType = "macro";
         result.actionId = macro;
-        result.castTime = this.OvaleFuture.GetGCD(undefined, atTime);
+        result.castTime = this.OvaleFuture.GetGCD(atTime);
         this.profiler.StopProfiling("OvaleBestAction_GetActionMacroInfo");
         return result;
     };
@@ -392,7 +390,7 @@ export class OvaleBestActionClass {
         result.actionIsCurrent = false;
         result.actionType = "texture";
         result.actionId = actionTexture;
-        result.castTime = this.OvaleFuture.GetGCD(undefined, atTime);
+        result.castTime = this.OvaleFuture.GetGCD(atTime);
 
         this.profiler.StopProfiling("OvaleBestAction_GetActionTextureInfo");
         return result;
@@ -403,8 +401,6 @@ export class OvaleBestActionClass {
     };
 
     public StartNewAction() {
-        this.ovaleState.ResetState();
-        this.OvaleFuture.ApplyInFlightSpells();
         this.runner.refresh();
     }
 

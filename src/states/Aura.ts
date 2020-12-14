@@ -10,7 +10,7 @@ import {
 } from "../engine/data";
 import { OvaleGUIDClass } from "../engine/guid";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleStateClass, States } from "../engine/state";
+import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -325,7 +325,9 @@ let stacks: number;
 let startChangeCount, endingChangeCount: number;
 let startFirst: number, endingLast: number;
 
-export class OvaleAuraClass extends States<AuraInterface> {
+export class OvaleAuraClass
+    extends States<AuraInterface>
+    implements StateModule {
     private debug: Tracer;
     private module: AceModule & AceEvent;
     private profiler: Profiler;
@@ -754,7 +756,6 @@ export class OvaleAuraClass extends States<AuraInterface> {
 
     IsActiveAura(aura: Aura, atTime: number): aura is Aura {
         let boolean = false;
-        atTime = atTime || this.baseState.next.currentTime;
         if (aura.state) {
             if (
                 aura.serial == this.next.auraSerial &&

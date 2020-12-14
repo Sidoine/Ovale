@@ -45,7 +45,7 @@ export function executeDump(
     const iconNodes = ioc.compile.GetIconNodes();
     const iconNode = iconNodes[iconDump.index];
     assertDefined(iconNode);
-    ioc.baseState.next.currentTime = iconDump.atTime;
+    ioc.baseState.currentTime = iconDump.atTime;
     const nodeList = script.annotation.nodeList;
     for (const [k, v] of Object.entries(iconDump.nodes)) {
         const result = v.result;
