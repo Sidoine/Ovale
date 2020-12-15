@@ -44,7 +44,9 @@ jobs:
               run: yarn prepare -i
 
             - name: Copy README.md
-              run: cp *.md dist
+              run: |
+                  cp *.md dist
+                  cp Bindings.xml dist
 
             - name: Archive production artifacts
               uses: actions/upload-artifact@v2
