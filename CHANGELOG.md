@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.25](https://github.com/Sidoine/Ovale/compare/9.0.24...9.0.25) (2020-12-15)
+
+
+### Bug Fixes
+
+* copy Bindings.xml to output ([926420b](https://github.com/Sidoine/Ovale/commit/926420baf98d8dcdf3c63d0dfe5e2a63ed692201)), closes [#738](https://github.com/Sidoine/Ovale/issues/738)
+* replace SpellFlash by LibButtonGlow-1.0 ([31b45e6](https://github.com/Sidoine/Ovale/commit/31b45e6e0447355ca3b836ded662b585736c3345)), closes [#700](https://github.com/Sidoine/Ovale/issues/700)
+* was always showing development version ([5a45f05](https://github.com/Sidoine/Ovale/commit/5a45f05a87ebed174fd524f6ca4ffe02e919fc35)), closes [#733](https://github.com/Sidoine/Ovale/issues/733)
+
 ### [9.0.24](https://github.com/Sidoine/Ovale/compare/9.0.23...9.0.24) (2020-12-14)
 
 
