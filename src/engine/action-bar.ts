@@ -24,6 +24,7 @@ import {
     GetBonusBarIndex,
     GetMacroItem,
     GetMacroSpell,
+    UIFrame,
 } from "@wowts/wow-mock";
 import ElvUI from "@wowts/libactionbutton-1.0-elvui";
 import { AceModule } from "@wowts/tsaddon";
@@ -308,17 +309,20 @@ export class OvaleActionBarClass {
         }
         this.profiler.StopProfiling("OvaleActionBar_UpdateKeyBindings");
     }
-    GetForSpell(spellId: number) {
+    getSpellActionSlot(spellId: number) {
         return this.spell[spellId];
     }
-    GetForMacro(macroName: string) {
+    getMacroActionSlot(macroName: string) {
         return this.macro[macroName];
     }
-    GetForItem(itemId: number) {
+    getItemActionSlot(itemId: number) {
         return this.item[itemId];
     }
-    GetBinding(slot: number) {
+    getBindings(slot: number) {
         return this.keybind[slot];
+    }
+    getFrame(slot: number): UIFrame {
+        return _G["ActionButton" + slot];
     }
 
     output: LuaArray<string> = {};

@@ -40,6 +40,7 @@
         "@wowts/coroutine": "^1.1.0",
         "@wowts/lib_artifact_data-1.0": "^1.0.0",
         "@wowts/lib_babble-creature_type-3.0": "^1.1.1",
+        "@wowts/lib_button_glow-1.0": "^1.0.0",
         "@wowts/lib_d_b_icon-1.0": "^1.0.0",
         "@wowts/lib_data_broker-1.1": "^1.0.0",
         "@wowts/lib_dual_spec-1.0": "^1.0.0",

@@ -282,13 +282,17 @@ export class IoC {
             this.aura,
             this.health
         );
+        this.actionBar = new OvaleActionBarClass(
+            this.debug,
+            this.ovale,
+            this.profiler,
+            this.spellBook
+        );
         this.spellFlash = new OvaleSpellFlashClass(
             this.options,
             this.ovale,
             combat,
-            this.data,
-            this.spellBook,
-            this.stance
+            this.actionBar
         );
         this.totem = new OvaleTotemClass(
             this.ovale,
@@ -333,12 +337,6 @@ export class IoC {
             this.power,
             this.paperDoll
         );
-        this.actionBar = new OvaleActionBarClass(
-            this.debug,
-            this.ovale,
-            this.profiler,
-            this.spellBook
-        );
         this.spells = new OvaleSpellsClass(
             this.spellBook,
             this.ovale,
@@ -379,7 +377,8 @@ export class IoC {
             combat,
             runner,
             controls,
-            this.scripts
+            this.scripts,
+            this.actionBar
         );
         this.dataBroker = new OvaleDataBrokerClass(
             this.paperDoll,

@@ -487,8 +487,7 @@ export interface NodeActionResult extends BaseNodeValue {
     actionCooldownDuration?: number;
     actionCooldownStart?: number;
     actionUsable?: boolean;
-    actionShortcut?: string;
-    actionIsCurrent?: boolean;
+    actionSlot?: number;
     actionEnable?: boolean;
     actionType?: ActionType;
     actionId?: string | number;

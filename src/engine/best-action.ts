@@ -11,7 +11,6 @@ import {
     GetItemSpell,
     GetSpellTexture,
     IsActionInRange,
-    IsCurrentAction,
     IsItemInRange,
     IsUsableAction,
     IsUsableItem,
@@ -101,7 +100,7 @@ export class OvaleBestActionClass {
             itemId = itemIdFromSlot;
         }
         this.tracer.Log("Item ID '%s'", itemId);
-        const action = this.ovaleActionBar.GetForItem(itemId);
+        const actionSlot = this.ovaleActionBar.getItemActionSlot(itemId);
         const [spellName] = GetItemSpell(itemId);
         if (node.cachedParams.named.texture) {
             result.actionTexture = `Interface\\Icons\\${node.cachedParams.named.texture}`;
@@ -118,10 +117,7 @@ export class OvaleBestActionClass {
                 IsUsableItem(itemId) &&
                 this.OvaleSpells.IsUsableItem(itemId, atTime)) ||
             false;
-        if (action) {
-            result.actionShortcut = this.ovaleActionBar.GetBinding(action);
-            result.actionIsCurrent = IsCurrentAction(action);
-        }
+        result.actionSlot = actionSlot;
         result.actionType = "item";
         result.actionId = itemId;
         result.actionTarget = target;
@@ -138,25 +134,25 @@ export class OvaleBestActionClass {
         this.profiler.StartProfiling("OvaleBestAction_GetActionMacroInfo");
         const result = element.result;
         const macro = <string>element.cachedParams.positional[1];
-        const action = this.ovaleActionBar.GetForMacro(macro);
+        const actionSlot = this.ovaleActionBar.getMacroActionSlot(macro);
         setResultType(result, "action");
-        if (!action) {
+        if (!actionSlot) {
             this.tracer.Log("Unknown macro '%s'.", macro);
             return result;
         }
         if (element.cachedParams.named.texture) {
             result.actionTexture = `Interface\\Icons\\${element.cachedParams.named.texture}`;
         }
-        result.actionTexture = result.actionTexture || GetActionTexture(action);
-        result.actionInRange = IsActionInRange(action, target);
+        result.actionTexture =
+            result.actionTexture || GetActionTexture(actionSlot);
+        result.actionInRange = IsActionInRange(actionSlot, target);
         [
             result.actionCooldownStart,
             result.actionCooldownDuration,
             result.actionEnable,
-        ] = GetActionCooldown(action);
-        result.actionUsable = IsUsableAction(action);
-        result.actionShortcut = this.ovaleActionBar.GetBinding(action);
-        result.actionIsCurrent = IsCurrentAction(action);
+        ] = GetActionCooldown(actionSlot);
+        result.actionUsable = IsUsableAction(actionSlot);
+        result.actionSlot = actionSlot;
         result.actionType = "macro";
         result.actionId = macro;
         result.castTime = this.OvaleFuture.GetGCD(atTime);
@@ -221,15 +217,17 @@ export class OvaleBestActionClass {
                 );
             }
         }
-        let action = this.ovaleActionBar.GetForSpell(spellId);
-        if (!action && replacedSpellId) {
+        let actionSlot = this.ovaleActionBar.getSpellActionSlot(spellId);
+        if (!actionSlot && replacedSpellId) {
             this.tracer.Log(
                 "Action not found for spell ID '%s'; checking for replaced spell ID '%s'.",
                 spellId,
                 replacedSpellId
             );
-            action = this.ovaleActionBar.GetForSpell(replacedSpellId);
-            if (action) spellId = replacedSpellId;
+            actionSlot = this.ovaleActionBar.getSpellActionSlot(
+                replacedSpellId
+            );
+            if (actionSlot) spellId = replacedSpellId;
         }
         let isKnownSpell = this.OvaleSpellBook.IsKnownSpell(spellId);
         if (!isKnownSpell && replacedSpellId) {
@@ -241,7 +239,7 @@ export class OvaleBestActionClass {
             isKnownSpell = this.OvaleSpellBook.IsKnownSpell(replacedSpellId);
             if (isKnownSpell) spellId = replacedSpellId;
         }
-        if (!isKnownSpell && !action) {
+        if (!isKnownSpell && !actionSlot) {
             setResultType(result, "none");
             this.tracer.Log("Unknown spell ID '%s'.", spellId);
             return result;
@@ -286,10 +284,7 @@ export class OvaleBestActionClass {
         );
         result.actionResourceExtend = 0;
         result.actionUsable = isUsable;
-        if (action) {
-            result.actionShortcut = this.ovaleActionBar.GetBinding(action);
-            result.actionIsCurrent = IsCurrentAction(action);
-        }
+        result.actionSlot = actionSlot;
         result.actionType = "spell";
         result.actionId = spellId;
         if (si) {
@@ -386,8 +381,7 @@ export class OvaleBestActionClass {
         result.actionCooldownDuration = 0;
         result.actionEnable = true;
         result.actionUsable = true;
-        result.actionShortcut = undefined;
-        result.actionIsCurrent = false;
+        result.actionSlot = undefined;
         result.actionType = "texture";
         result.actionId = actionTexture;
         result.castTime = this.OvaleFuture.GetGCD(atTime);

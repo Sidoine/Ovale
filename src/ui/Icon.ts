@@ -21,6 +21,7 @@ import { ActionType } from "../engine/best-action";
 import { isNumber, isString } from "../tools/tools";
 import { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
 import { LocalizationStrings } from "./localization/definition";
+import { OvaleActionBarClass } from "../engine/action-bar";
 const INFINITY = huge;
 const COOLDOWN_THRESHOLD = 0.1;
 
@@ -73,7 +74,8 @@ export class OvaleIcon {
         private parent: IconParent,
         secure: boolean,
         private ovaleOptions: OvaleOptionsClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private actionBar: OvaleActionBarClass
     ) {
         if (!secure) {
             this.frame = CreateFrame(
@@ -290,7 +292,11 @@ export class OvaleIcon {
             }
             if (profile.apparence.raccourcis) {
                 this.shortcut.Show();
-                this.shortcut.SetText(element.actionShortcut);
+                this.shortcut.SetText(
+                    (element.actionSlot !== undefined &&
+                        this.actionBar.getBindings(element.actionSlot)) ||
+                        undefined
+                );
             } else {
                 this.shortcut.Hide();
             }

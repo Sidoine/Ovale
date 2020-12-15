@@ -984,6 +984,15 @@
     "@wowts/tsaddon" "^1.1.2"
     "@wowts/tslib" "^1.1.0"
 
+"@wowts/lib_button_glow-1.0@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wowts/lib_button_glow-1.0/-/lib_button_glow-1.0-1.0.0.tgz#0ac276aa12a5aa019d8087baf9d177141079dfc3"
+  integrity sha512-cPS8anaRnT/l7VB8YnHpeWmeKJxW0scFMZsDaD5lBJUMvWi/wVRlyYnkIkwYSjGPZPTH1EFaEUqnfybSOoVPoQ==
+  dependencies:
+    "@wowts/lua" "^1.0.3"
+    "@wowts/tslib" "^1.0.0"
+    "@wowts/wow-mock" "^1.26.0"
+
 "@wowts/lib_d_b_icon-1.0@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@wowts/lib_d_b_icon-1.0/-/lib_d_b_icon-1.0-1.1.0.tgz#04db9afd684cfc9bf4f36a27d635f4d3befe4683"

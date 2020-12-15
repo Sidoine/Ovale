@@ -48,6 +48,7 @@ import { insert } from "@wowts/table";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
 import { L } from "./Localization";
 import { OvaleScriptsClass } from "../engine/scripts";
+import { OvaleActionBarClass } from "../engine/action-bar";
 
 const strmatch = match;
 const INFINITY = huge;
@@ -255,10 +256,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                             node.cachedParams.named.flash as string | undefined,
                             node.cachedParams.named.help as string | undefined,
                             element,
-                            start || 0
+                            start || 0,
+                            k
                         );
                     }
                 } else {
+                    this.ovaleSpellFlash.hideFlash(k);
                     icon.icons.Hide();
                 }
             }
@@ -555,7 +558,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                         this,
                         false,
                         this.ovaleOptions,
-                        this.ovaleSpellBook
+                        this.ovaleSpellBook,
+                        this.actionBar
                     ),
                     dx: 0,
                     dy: 0,
@@ -690,7 +694,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
         private combat: OvaleCombatClass,
         private runner: Runner,
         private controls: Controls,
-        private scripts: OvaleScriptsClass
+        private scripts: OvaleScriptsClass,
+        private actionBar: OvaleActionBarClass
     ) {
         super();
 
@@ -925,7 +930,8 @@ export class OvaleFrameModuleClass {
         combat: OvaleCombatClass,
         runner: Runner,
         controls: Controls,
-        scripts: OvaleScriptsClass
+        scripts: OvaleScriptsClass,
+        actionBar: OvaleActionBarClass
     ) {
         this.module = ovale.createModule(
             "OvaleFrame",
@@ -949,7 +955,8 @@ export class OvaleFrameModuleClass {
             combat,
             runner,
             controls,
-            scripts
+            scripts,
+            actionBar
         );
     }
 }
