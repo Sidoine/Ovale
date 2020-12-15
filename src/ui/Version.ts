@@ -106,7 +106,7 @@ export class OvaleVersionClass {
             if (channel) {
                 this.module.SendCommMessage(MSG_PREFIX, message, channel);
             }
-            self_timer = this.module.ScheduleTimer("PrintVersionCheck", 3);
+            self_timer = this.module.ScheduleTimer(this.PrintVersionCheck, 3, this);
         }
     }
     PrintVersionCheck() {
