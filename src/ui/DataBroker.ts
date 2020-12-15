@@ -3,10 +3,9 @@ import LibDataBroker from "@wowts/lib_data_broker-1.1";
 import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
 import { OvaleOptionsClass } from "./Options";
 import { DEFAULT_NAME, OvaleScriptsClass } from "../engine/scripts";
-import { OvaleVersionClass } from "./Version";
 import { OvaleFrameModuleClass } from "./Frame";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { pairs, LuaArray, LuaObj, kpairs } from "@wowts/lua";
+import { pairs, LuaArray, LuaObj, kpairs, version } from "@wowts/lua";
 import { insert } from "@wowts/table";
 import {
     CreateFrame,
@@ -59,8 +58,7 @@ export class OvaleDataBrokerClass {
         private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
         private ovaleDebug: OvaleDebugClass,
-        private ovaleScripts: OvaleScriptsClass,
-        private ovaleVersion: OvaleVersionClass
+        private ovaleScripts: OvaleScriptsClass
     ) {
         this.module = ovale.createModule(
             "OvaleDataBroker",
@@ -93,8 +91,7 @@ export class OvaleDataBrokerClass {
 
     private OnTooltipShow = (tooltip: UIGameTooltip) => {
         this.tooltipTitle =
-            this.tooltipTitle ||
-            `${this.ovale.GetName()} ${this.ovaleVersion.version}`;
+            this.tooltipTitle || `${this.ovale.GetName()} ${version}`;
         tooltip.SetText(this.tooltipTitle, 1, 1, 1);
         tooltip.AddLine(L["script_tooltip"]);
         tooltip.AddLine(L["middle_click_help"]);

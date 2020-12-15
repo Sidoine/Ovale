@@ -6,7 +6,7 @@ import aceComm, { AceComm } from "@wowts/ace_comm-3.0";
 import aceSerializer, { AceSerializer } from "@wowts/ace_serializer-3.0";
 import aceTimer, { Timer, AceTimer } from "@wowts/ace_timer-3.0";
 import { format } from "@wowts/string";
-import { ipairs, next, pairs, wipe, LuaObj } from "@wowts/lua";
+import { ipairs, next, pairs, wipe, LuaObj, version } from "@wowts/lua";
 import { insert, sort } from "@wowts/table";
 import {
     IsInGroup,
@@ -20,13 +20,8 @@ import { OptionUiAll } from "./acegui-helpers";
 const self_printTable: LuaObj<string> = {};
 const self_userVersion: LuaObj<string> = {};
 let self_timer: Timer | undefined;
-const OVALE_VERSION = "@project-version@";
-const REPOSITORY_KEYWORD = `@${"project-version"}@`;
 
 export class OvaleVersionClass {
-    version =
-        (OVALE_VERSION == REPOSITORY_KEYWORD && "development version") ||
-        OVALE_VERSION;
     warned = false;
     private module: AceModule & AceComm & AceTimer & AceSerializer;
     private tracer: Tracer;
@@ -57,7 +52,7 @@ export class OvaleVersionClass {
                 name: L["show_version_number"],
                 type: "execute",
                 func: () => {
-                    this.tracer.Print(this.version);
+                    this.tracer.Print(version);
                 },
             },
         };
@@ -80,14 +75,16 @@ export class OvaleVersionClass {
         sender: string
     ) => {
         if (prefix == MSG_PREFIX) {
-            const [ok, msgType, version] = this.module.Deserialize(message);
+            const [ok, msgType, senderVersion] = this.module.Deserialize(
+                message
+            );
             if (ok) {
-                this.tracer.Debug(msgType, version, channel, sender);
+                this.tracer.Debug(msgType, senderVersion, channel, sender);
                 if (msgType == "V") {
-                    const msg = this.module.Serialize("VR", this.version);
+                    const msg = this.module.Serialize("VR", version);
                     this.module.SendCommMessage(MSG_PREFIX, msg, channel);
                 } else if (msgType == "VR") {
-                    self_userVersion[sender] = version;
+                    self_userVersion[sender] = senderVersion;
                 }
             }
         }
@@ -95,7 +92,7 @@ export class OvaleVersionClass {
     VersionCheck() {
         if (!self_timer) {
             wipe(self_userVersion);
-            const message = this.module.Serialize("V", this.version);
+            const message = this.module.Serialize("V", version);
             let channel;
             if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE)) {
                 channel = "INSTANCE_CHAT";
@@ -115,10 +112,10 @@ export class OvaleVersionClass {
     PrintVersionCheck() {
         if (next(self_userVersion)) {
             wipe(self_printTable);
-            for (const [sender, version] of pairs(self_userVersion)) {
+            for (const [sender, userVersion] of pairs(self_userVersion)) {
                 insert(
                     self_printTable,
-                    format(">>> %s is using Ovale %s", sender, version)
+                    format(">>> %s is using Ovale %s", sender, userVersion)
                 );
             }
             sort(self_printTable);

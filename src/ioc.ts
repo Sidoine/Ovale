@@ -387,8 +387,7 @@ export class IoC {
             this.options,
             this.ovale,
             this.debug,
-            this.scripts,
-            this.version
+            this.scripts
         );
         this.unparser = new Unparser(this.debug);
         this.emiter = new Emiter(
