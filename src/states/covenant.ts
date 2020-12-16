@@ -2,7 +2,7 @@ import { OvaleClass } from "../Ovale";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { AceModule } from "@wowts/tsaddon";
 import { CovenantChosenEvent, C_Covenants } from "@wowts/wow-mock";
-import { isNumber, isString, AceEventHandler } from "../tools/tools";
+import { isNumber, AceEventHandler } from "../tools/tools";
 import {
     ConditionFunction,
     OvaleConditionClass,
@@ -83,13 +83,13 @@ export class Covenant {
 
     private isCovenant: ConditionFunction = (positionalParameters) => {
         const [covenant] = unpack(positionalParameters);
+        if (!covenant) return [];
+        let id: number | undefined;
         if (isNumber(covenant)) {
-            return ReturnBoolean(this.covenantId === covenant);
-        } else if (isString(covenant)) {
-            const name = covenant as string;
-            return ReturnBoolean(this.covenantId === COVENANT_ID_BY_NAME[name]);
+            id = covenant;
         } else {
-            return ReturnBoolean(false);
+            id = COVENANT_ID_BY_NAME[covenant as string]
         }
+        return ReturnBoolean(this.covenantId === id);
     };
 }
