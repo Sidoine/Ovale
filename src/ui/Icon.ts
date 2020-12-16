@@ -222,10 +222,10 @@ export class OvaleIcon {
                     cd.SetDrawEdge(false);
                     cd.SetSwipeColor(0, 0, 0, 0.8);
                     cd.SetCooldown(start, duration);
-                    cd.Show();
                 }
+                cd.Show();
             } else {
-                this.cd.Hide();
+                cd.Hide();
             }
             this.icone.Show();
             this.icone.SetTexture(element.actionTexture);
