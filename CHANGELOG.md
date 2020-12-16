@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.26](https://github.com/Sidoine/Ovale/compare/9.0.25...9.0.26) (2020-12-16)
+
+
+### Bug Fixes
+
+* remove unnecessary use of "tostring" in isCovenant. ([#734](https://github.com/Sidoine/Ovale/issues/734)) ([b07880b](https://github.com/Sidoine/Ovale/commit/b07880bce0ac478117d42fc57ffb3c53b0c5613d))
+* show cooldown frame if a cooldown is active ([#743](https://github.com/Sidoine/Ovale/issues/743)) ([bead88d](https://github.com/Sidoine/Ovale/commit/bead88d403df49c26bb17d84daff9f56e0a52c35)), closes [#739](https://github.com/Sidoine/Ovale/issues/739)
+* update tstolua ([56fcf58](https://github.com/Sidoine/Ovale/commit/56fcf581f68357d8b0808edde610788791c23855)), closes [#745](https://github.com/Sidoine/Ovale/issues/745)
+
 ### [9.0.25](https://github.com/Sidoine/Ovale/compare/9.0.24...9.0.25) (2020-12-15)
 
 
