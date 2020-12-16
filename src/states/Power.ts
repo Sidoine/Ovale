@@ -24,7 +24,6 @@ import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
-import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleCombatClass } from "./combat";
 import { OptionUiAll } from "../ui/acegui-helpers";
@@ -107,7 +106,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private baseState: BaseState,
-        private ovalePaperDoll: OvalePaperDollClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private combat: OvaleCombatClass
     ) {
@@ -755,33 +753,41 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         targetGUID: string | undefined,
         powerType: PowerType | undefined,
         extraPower?: number
-    ) {
-        let seconds = 0;
-        powerType = powerType || POOLED_RESOURCE[this.ovalePaperDoll.class];
-        if (powerType) {
-            let [cost] = this.getPowerCostAt(
-                state,
-                spellId,
-                powerType,
-                atTime,
-                targetGUID
-            );
-            if (cost > 0) {
-                const power = this.getPowerAt(state, powerType, atTime);
-                if (extraPower) {
-                    cost = cost + extraPower;
-                }
-                if (power < cost) {
-                    const powerRate =
-                        this.getPowerRateAt(state, powerType, atTime);
-                    if (powerRate > 0) {
-                        seconds = (cost - power) / powerRate;
-                    } else {
-                        seconds = INFINITY;
+    ): number {
+        let timeToPower = 0;
+        const si = this.ovaleData.spellInfo[spellId];
+        if (si) {
+            for (const [, powerInfo] of kpairs(this.POWER_INFO)) {
+                const pType = powerInfo.type;
+                if (powerType === undefined || powerType == pType) {
+                    let [cost] = this.getPowerCostAt(
+                        state,
+                        spellId,
+                        pType,
+                        atTime,
+                        targetGUID
+                    );
+                    if (cost > 0) {
+                        if (powerType == pType && extraPower) {
+                            cost = cost + extraPower;
+                        }
+                        const power = this.getPowerAt(state, pType, atTime);
+                        if (power < cost) {
+                            const powerRate =
+                                this.getPowerRateAt(state, pType, atTime);
+                            if (powerRate > 0) {
+                                const seconds = (cost - power) / powerRate;
+                                if (timeToPower < seconds) {
+                                    timeToPower = seconds;
+                                }
+                            } else {
+                                return INFINITY;
+                            }
+                        }
                     }
                 }
             }
         }
-        return seconds;
+        return timeToPower;
     }
 }
