@@ -622,6 +622,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             necrolord: { type: MiscOperandModifierType.Parameter },
             night_fae: { type: MiscOperandModifierType.Parameter },
             venthyr: { type: MiscOperandModifierType.Parameter },
+            none: { type: MiscOperandModifierType.Parameter },
         },
     },
     ["cp_max_spend"]: { name: "maxcombopoints" },

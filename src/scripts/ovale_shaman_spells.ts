@@ -23,6 +23,12 @@ Define(ascendance_enhancement 114051)
   SpellRequire(ascendance_enhancement unusable set=1 enabled=(not hastalent(ascendance_talent_enhancement)))
   # Transformed into a powerful Air ascendant. Auto attacks have a 114089r yard range. Stormstrike is empowered and has a 114089r yard range.
   SpellAddBuff(ascendance_enhancement ascendance_enhancement add=1)
+Define(ascendance_restoration 114052)
+# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
+  SpellInfo(ascendance_restoration cd=180 duration=15 tick=1)
+  SpellRequire(ascendance_restoration unusable set=1 enabled=(not hastalent(ascendance_talent_restoration)))
+  # Transformed into a powerful Water Ascendant. Healing you deal is duplicated and distributed evenly among nearby allies.
+  SpellAddBuff(ascendance_restoration ascendance_restoration add=1)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -48,16 +54,16 @@ Define(chain_harvest 320674)
 Define(chain_lightning 188443)
 # Hurls a lightning bolt at the enemy, dealing (47 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.?s187874[rnrnIf Chain Lightning hits more than 1 target, each target hit by your Chain Lightning increases the damage of your next Crash Lightning by 333964s1.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s5 Maelstrom per target hit.|r][]
   SpellInfo(chain_lightning)
-Define(concentrated_flame 295368)
-# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame add=1)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 10 seconds, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
   SpellInfo(crash_lightning cd=9)
   # Stormstrike and Lava Lash deal an additional 195592s1 damage to all targets in front of you.
   SpellAddBuff(crash_lightning crash_lightning add=1)
+Define(doom_winds 204945)
+# Unleashes the inner power of the |cFFFFCC99Doomhammer|r, causing all auto attacks to trigger Windfury, and increasing damage dealt by Windfury by s2 for 6 seconds.
+  SpellInfo(doom_winds cd=60 duration=6 gcd=0 offgcd=1)
+  # Chance to proc Windfury weapon on auto attacks increased by 100.rnWindfury damage increased by s2.
+  SpellAddBuff(doom_winds doom_winds add=1)
 Define(earth_elemental 198103)
 # Calls forth a Greater Earth Elemental to protect you and your allies for 60 seconds.
   SpellInfo(earth_elemental cd=300)
@@ -75,7 +81,7 @@ Define(earthquake 61882)
   SpellInfo(earthquake maelstrom=60 duration=6 tick=1)
 Define(echoes_of_great_sundering_buff 336217)
 # When you cast Earth Shock, your next Earthquake will deal 336217s2 additional damage.
-  SpellInfo(echoes_of_great_sundering_buff duration=15 gcd=0 offgcd=1)
+  SpellInfo(echoes_of_great_sundering_buff duration=25 gcd=0 offgcd=1)
 Define(echoing_shock 320125)
 # Shock the target for (65 of Spell Power) Elemental damage and create an ancestral echo, causing your next damage or healing spell to be cast a second time s2/1000.1 sec later for free.
   SpellInfo(echoing_shock cd=30 duration=8)
@@ -86,6 +92,11 @@ Define(elemental_blast 117014)
 # Harnesses the raw power of the elements, dealing (140 of Spell Power) Elemental damage and increasing your Critical Strike or Haste by 118522s1 or Mastery by 173184s1*168534bc1 for 10 seconds.?a343725[rnrn|cFFFFFFFFGenerates 343725s10 Maelstrom.|r][]
   SpellInfo(elemental_blast cd=12)
   SpellRequire(elemental_blast unusable set=1 enabled=(not hastalent(elemental_blast_talent_elemental)))
+Define(elemental_equilibrium_buff 336731)
+# Dealing direct Fire, Frost, and Nature damage within 10 seconds will increase all damage dealt by 347348s1 for 10 seconds. This can only occur once every 30 seconds.
+  SpellInfo(elemental_equilibrium_buff duration=10 gcd=0 offgcd=1)
+  # Damage of your next Frost spell increased by w1.
+  SpellAddBuff(elemental_equilibrium_buff elemental_equilibrium_buff add=1)
 Define(fae_transfusion 328923)
 # Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
   SpellInfo(fae_transfusion cd=120 duration=3 channel=3 tick=0.5)
@@ -151,6 +162,9 @@ Define(icefury 210714)
   SpellRequire(icefury unusable set=1 enabled=(not hastalent(icefury_talent)))
   # Frost Shock damage increased by s2.
   SpellAddBuff(icefury icefury add=1)
+Define(lava_beam 114074)
+# Unleashes a blast of superheated flame at the enemy, dealing (47 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates 343725s6 Maelstrom per target hit.|r 
+  SpellInfo(lava_beam)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing (108 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s3 Maelstrom.|r][]
   SpellInfo(lava_burst cd=8 maelstrom=0)
@@ -163,9 +177,6 @@ Define(lava_surge 77762)
 Define(lightning_bolt 188196)
 # Hurls a bolt of lightning at the target, dealing (95 of Spell Power) Nature damage.?a343725[rnrn|cFFFFFFFFGenerates 343725s1 Maelstrom.|r][]
   SpellInfo(lightning_bolt)
-Define(lightning_lasso 305483)
-# Grips the target in lightning, stunning and dealing 305485o1 Nature damage over 5 seconds while the target is lassoed. Can move while channeling.
-  SpellInfo(lightning_lasso cd=30)
 Define(lightning_shield 192106)
 # Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (3.5999999999999996 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
   SpellInfo(lightning_shield duration=1800)
@@ -180,6 +191,12 @@ Define(maelstrom_weapon_buff 344179)
   SpellInfo(maelstrom_weapon_buff duration=30 max_stacks=10 gcd=0 offgcd=1)
   # Your next damage or healing spell has its cast time reduced by max(187881s1, -100)*-1 and damage or healing increased by min(187881s2, 5*s~2).
   SpellAddBuff(maelstrom_weapon_buff maelstrom_weapon_buff add=1)
+Define(master_of_the_elements_buff 260734)
+# Casting Lava Burst increases the damage of your next Nature, Physical, or Frost spell by 260734s1.
+  SpellInfo(master_of_the_elements_buff duration=15 gcd=0 offgcd=1)
+Define(primal_lava_actuators_buff 335896)
+# Each time Flame Shock deals Periodic damage, increase the damage of your next Lava Lash by 335896s1 and reduce the cooldown of Lava Lash by m1/10.1 sec.
+  SpellInfo(primal_lava_actuators_buff duration=15 max_stacks=8 gcd=0 offgcd=1)
 Define(primordial_wave 326059)
 # Blast your target with a Primordial Wave, dealing (65 of Spell Power) Shadow damage and apply Flame Shock to an enemy, or ?a137039[heal an ally for (65 of Spell Power) and apply Riptide to them][heal an ally for (65 of Spell Power)].rnrnYour next ?a137040[Lava Burst]?a137041[Lightning Bolt][Healing Wave] will also hit all targets affected by your ?a137040|a137041[Flame Shock][Riptide] for ?a137039[s2]?a137040[s3][s4] of normal ?a137039[healing][damage].
   SpellInfo(primordial_wave cd=45)
@@ -193,14 +210,17 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm add=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(spiritwalkers_grace 79206)
 # Calls upon the guidance of the spirits for 15 seconds, permitting movement while casting Shaman spells. Castable while casting.?a192088[ Increases movement speed by 192088s2.][]
   SpellInfo(spiritwalkers_grace cd=120 duration=15 gcd=0 offgcd=1)
   # Able to move while casting all Shaman spells.
   SpellAddBuff(spiritwalkers_grace spiritwalkers_grace add=1)
+Define(static_discharge 342243)
+# Discharge excess energy from your Lightning Shield, dealing (23 of Spell Power) Nature damage to an enemy within 342244A1 yds every t1 sec for 3 seconds.rnrnTargets with your Flame Shock on them are preferred.
+  SpellInfo(static_discharge cd=30 duration=3 tick=0.5)
+  SpellRequire(static_discharge unusable set=1 enabled=(not hastalent(static_discharge_talent)))
+  # Discharging excess Lightning Shield energy at your enemies.
+  SpellAddBuff(static_discharge static_discharge add=1)
 Define(storm_elemental 192249)
 # Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
   SpellInfo(storm_elemental cd=150)
@@ -234,6 +254,9 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp add=1)
+Define(wind_gust_buff 263806)
+# Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
+  SpellInfo(wind_gust_buff duration=30 max_stacks=20 gcd=0 offgcd=1)
 Define(wind_shear 57994)
 # Disrupts the target's concentration with a burst of wind, interrupting spellcasting and preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(wind_shear cd=12 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -246,19 +269,24 @@ Define(windfury_weapon 33757)
 Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike cd=9)
-Define(worldvein_resonance 298606)
-# Infuse your Heart of Azeroth with Worldvein Resonance.
-  SpellInfo(worldvein_resonance)
+Define(ascendance_talent_restoration 22359)
+# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
 Define(ascendance_talent_enhancement 21972)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(ascendance_talent 21675)
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.rnrnWhen you transform into the Flame Ascendant, instantly cast a Lava Burst at all enemies affected by your Flame Shock, and refresh your Flame Shock durations to 18 seconds.
+Define(ascendance_talent_restoration 22359)
+# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
 Define(ascendance_talent_enhancement 21972)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(ascendance_talent 21675)
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.rnrnWhen you transform into the Flame Ascendant, instantly cast a Lava Burst at all enemies affected by your Flame Shock, and refresh your Flame Shock durations to 18 seconds.
+Define(crashing_storm_talent 21973)
+# Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 6 seconds. 
 Define(earthen_spike_talent 22977)
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for 10 seconds.
+Define(echo_of_the_elements_talent_elemental 22357)
+# ?c1[Lava Burst now has s2+1][Riptide, Healing Stream Totem, and Lava Burst now have s2+1] charges. Effects that reset ?c1[its][their] remaining cooldown will instead grant 1 charge.
 Define(echoing_shock_talent 23460)
 # Shock the target for (65 of Spell Power) Elemental damage and create an ancestral echo, causing your next damage or healing spell to be cast a second time s2/1000.1 sec later for free.
 Define(echoing_shock_talent 23460)
@@ -279,12 +307,22 @@ Define(icefury_talent 23111)
 # Hurls frigid ice at the target, dealing (82.5 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s2 increased damage and generate 343725s7 Maelstrom.rnrn|cFFFFFFFFGenerates 343725s8 Maelstrom.|r
 Define(icefury_talent 23111)
 # Hurls frigid ice at the target, dealing (82.5 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s2 increased damage and generate 343725s7 Maelstrom.rnrn|cFFFFFFFFGenerates 343725s8 Maelstrom.|r
+Define(lashing_flames_talent 22354)
+# Lava Lash now increases the damage of Flame Shock on its target by 334168s1 for 20 seconds.
 Define(liquid_magma_totem_talent 19273)
 # Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
 Define(liquid_magma_totem_talent 19273)
 # Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
 Define(master_of_the_elements_talent 19271)
 # Casting Lava Burst increases the damage of your next Nature, Physical, or Frost spell by 260734s1.
+Define(primal_elementalist_talent 19266)
+# Your Earth, Fire, and Storm Elementals are drawn from primal elementals s1 more powerful than regular elementals, with additional abilities, and you gain direct control over them.
+Define(static_discharge_talent 22358)
+# Discharge excess energy from your Lightning Shield, dealing (23 of Spell Power) Nature damage to an enemy within 342244A1 yds every t1 sec for 3 seconds.rnrnTargets with your Flame Shock on them are preferred.
+Define(static_discharge_talent 22358)
+# Discharge excess energy from your Lightning Shield, dealing (23 of Spell Power) Nature damage to an enemy within 342244A1 yds every t1 sec for 3 seconds.rnrnTargets with your Flame Shock on them are preferred.
+Define(storm_elemental_talent 19272)
+# Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
 Define(storm_elemental_talent 19272)
 # Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
 Define(stormkeeper_talent_enhancement 22352)
@@ -298,7 +336,16 @@ Define(stormkeeper_talent 22153)
 Define(sundering_talent 22351)
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
 Define(hex 51514)
+Define(potion_of_spectral_intellect_item 171273)
+Define(potion_of_spectral_agility_item 171270)
+Define(deeptremor_stone_runeforge 6986)
 Define(echoes_of_great_sundering_runeforge 6991)
+Define(elemental_equilibrium_runeforge 6990)
+Define(skybreakers_fiery_demise_runeforge 6989)
+Define(doom_winds_runeforge 6993)
+Define(primal_lava_actuators_runeforge 6996)
+Define(field_of_blossoms_soulbind 319191)
+Define(grove_invigoration_soulbind 322721)
     `;
 // END
     OvaleScripts.RegisterScript(

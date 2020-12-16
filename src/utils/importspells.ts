@@ -1136,6 +1136,7 @@ export interface ConduitRank {
 export interface SoulbindAbility {
     spell_id: number;
     covenant_id: number;
+    soulbind_id: number;
     name: string;
 
     identifier: string;
@@ -1376,22 +1377,25 @@ function isRankSpell(spell: SpellData) {
     return spell.rank_str && spell.rank_str.indexOf("Rank") === 0;
 }
 
-function getString(o: unknown): string {
+function getString(cell: CellValue[], index: number): string {
+    const o = cell[index];
     if (o === 0) return "";
     if (typeof o === "string") return o;
-    throw Error(`typeof ${o} is not a string`);
+    throw Error(`typeof ${o}in ${JSON.stringify(cell)} is not a string`);
 }
 
-function getNumber(o: unknown): number {
+function getNumber(cell: CellValue[], index: number): number {
+    const o = cell[index];
     if (o === undefined) return 0;
     if (typeof o === "number") return o;
-    throw Error(`typeof ${o} is not a number`);
+    throw Error(`typeof ${o} in ${JSON.stringify(cell)} is not a number`);
 }
 
-function getArrayOfNumbers(o: unknown): number[] {
+function getArrayOfNumbers(cell: CellValue[], index: number): number[] {
+    const o = cell[index];
     if (o === 0) return [];
     if (typeof o === "string") return []; // TODO reference to a variable
-    if (o instanceof Array) return o;
+    if (o instanceof Array) return o as number[];
     throw Error(`typeof ${o} is not a number[]`);
 }
 
@@ -1447,45 +1451,45 @@ export function getSpellData(directory: string) {
     for (const row of output.spell_data_t) {
         let i = 0;
         const spell: SpellData = {
-            name: getString(row[i++]),
-            id: getNumber(row[i++]),
-            school: getNumber(row[i++]),
-            prj_speed: getNumber(row[i++]),
-            race_mask: getNumber(row[i++]),
-            class_mask: getNumber(row[i++]),
-            scaling_type: getNumber(row[i++]),
-            max_scaling_level: getNumber(row[i++]),
-            spell_level: getNumber(row[i++]),
-            max_level: getNumber(row[i++]),
-            req_max_level: getNumber(row[i++]),
-            min_range: getNumber(row[i++]),
-            max_range: getNumber(row[i++]),
-            cooldown: getNumber(row[i++]),
-            gcd: getNumber(row[i++]),
-            category_cooldown: getNumber(row[i++]),
-            charges: getNumber(row[i++]),
-            charge_cooldown: getNumber(row[i++]),
-            category: getNumber(row[i++]),
-            dmg_class: getNumber(row[i++]),
-            max_targets: getNumber(row[i++]),
-            duration: getNumber(row[i++]),
-            max_stack: getNumber(row[i++]),
-            proc_chance: getNumber(row[i++]),
-            proc_charges: getNumber(row[i++]),
-            proc_flags: getNumber(row[i++]),
-            internal_cooldown: getNumber(row[i++]),
-            rppm: getNumber(row[i++]),
-            equipped_class: getNumber(row[i++]),
-            equipped_invtype_mask: getNumber(row[i++]),
-            equipped_subclass_mask: getNumber(row[i++]),
-            cast_time: getNumber(row[i++]),
-            attributes: getArrayOfNumbers(row[i++]),
-            class_flags: getArrayOfNumbers(row[i++]),
-            class_flags_family: getNumber(row[i++]),
-            stance_mask: getNumber(row[i++]),
-            mechanic: getNumber(row[i++]),
-            power_id: getNumber(row[i++]),
-            essence_id: getNumber(row[i++]),
+            name: getString(row, i++),
+            id: getNumber(row, i++),
+            school: getNumber(row, i++),
+            prj_speed: getNumber(row, i++),
+            race_mask: getNumber(row, i++),
+            class_mask: getNumber(row, i++),
+            scaling_type: getNumber(row, i++),
+            max_scaling_level: getNumber(row, i++),
+            spell_level: getNumber(row, i++),
+            max_level: getNumber(row, i++),
+            req_max_level: getNumber(row, i++),
+            min_range: getNumber(row, i++),
+            max_range: getNumber(row, i++),
+            cooldown: getNumber(row, i++),
+            gcd: getNumber(row, i++),
+            category_cooldown: getNumber(row, i++),
+            charges: getNumber(row, i++),
+            charge_cooldown: getNumber(row, i++),
+            category: getNumber(row, i++),
+            dmg_class: getNumber(row, i++),
+            max_targets: getNumber(row, i++),
+            duration: getNumber(row, i++),
+            max_stack: getNumber(row, i++),
+            proc_chance: getNumber(row, i++),
+            proc_charges: getNumber(row, i++),
+            proc_flags: getNumber(row, i++),
+            internal_cooldown: getNumber(row, i++),
+            rppm: getNumber(row, i++),
+            equipped_class: getNumber(row, i++),
+            equipped_invtype_mask: getNumber(row, i++),
+            equipped_subclass_mask: getNumber(row, i++),
+            cast_time: getNumber(row, i++),
+            attributes: getArrayOfNumbers(row, i++),
+            class_flags: getArrayOfNumbers(row, i++),
+            class_flags_family: getNumber(row, i++),
+            stance_mask: getNumber(row, i++),
+            mechanic: getNumber(row, i++),
+            power_id: getNumber(row, i++),
+            essence_id: getNumber(row, i++),
 
             // cast_min: row[29],
             // cast_max: row[30],
@@ -1566,11 +1570,11 @@ export function getSpellData(directory: string) {
     for (const row of output.active_class_spell_t) {
         let i = 0;
         const activeSpell: ActiveClassSpell = {
-            class_id: getNumber(row[i++]),
-            spec_id: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            override_spell_id: getNumber(row[i++]),
-            name: getString(row[i++]),
+            class_id: getNumber(row, i++),
+            spec_id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            override_spell_id: getNumber(row, i++),
+            name: getString(row, i++),
         };
         const spell = spellDataById.get(activeSpell.spell_id);
         if (spell) {
@@ -1586,16 +1590,17 @@ export function getSpellData(directory: string) {
     }
 
     for (const specSpell of output.specialization_spell_entry_t) {
-        const classIndex = getNumber(specSpell[0]);
-        const specIndex = getNumber(specSpell[1]);
-        const spell = spellDataById.get(getNumber(specSpell[2]));
+        let i = 0;
+        const classIndex = getNumber(specSpell, i++);
+        const specIndex = getNumber(specSpell, i++);
+        const spell = spellDataById.get(getNumber(specSpell, i++));
         if (spell) {
             if (!spell.spellAttributes.includes(SpellAttribute.Passive))
                 spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
             if (specSpell[3]) {
-                spell.replace_spell_id = getNumber(specSpell[3]);
+                spell.replace_spell_id = getNumber(specSpell, i++);
                 const replaced = spellDataById.get(spell.replace_spell_id);
                 if (replaced) {
                     if (!replaced.replaced_by) replaced.replaced_by = [];
@@ -1619,12 +1624,13 @@ export function getSpellData(directory: string) {
     if (!output.spelltext_data_t) throw Error("No spelltext_data_t");
 
     for (const spellText of output.spelltext_data_t) {
-        const spellId = getNumber(spellText[0]);
+        let i = 0;
+        const spellId = getNumber(spellText, i++);
         const spell = spellDataById.get(spellId);
         if (spell) {
-            spell.desc = getString(spellText[1]);
-            spell.tooltip = getString(spellText[2]);
-            spell.rank_str = getString(spellText[3]);
+            spell.desc = getString(spellText, i++);
+            spell.tooltip = getString(spellText, i++);
+            spell.rank_str = getString(spellText, i++);
         }
     }
 
@@ -1634,34 +1640,34 @@ export function getSpellData(directory: string) {
     for (const row of output.spelleffect_data_t) {
         let i = 0;
         const spellEffect: SpellEffectData = {
-            id: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            index: getNumber(row[i++]),
-            type: getNumber(row[i++]),
-            subtype: getNumber(row[i++]),
+            id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            index: getNumber(row, i++),
+            type: getNumber(row, i++),
+            subtype: getNumber(row, i++),
 
-            m_coeff: getNumber(row[i++]),
-            m_delta: getNumber(row[i++]),
-            m_unk: getNumber(row[i++]),
-            sp_coeff: getNumber(row[i++]),
-            ap_coeff: getNumber(row[i++]),
-            amplitude: getNumber(row[i++]),
-            radius: getNumber(row[i++]),
-            radius_max: getNumber(row[i++]),
-            base_value: getNumber(row[i++]),
-            misc_value: getNumber(row[i++]),
-            misc_value_2: getNumber(row[i++]),
-            class_flags: getArrayOfNumbers(row[i++]),
-            trigger_spell_id: getNumber(row[i++]),
-            m_chain: getNumber(row[i++]),
-            pp_combo_points: getNumber(row[i++]),
-            real_ppl: getNumber(row[i++]),
-            mechanic: getNumber(row[i++]),
-            chain_target: getNumber(row[i++]),
-            targeting_1: getNumber(row[i++]),
-            targeting_2: getNumber(row[i++]),
-            m_value: getNumber(row[i++]),
-            pvp_coeff: getNumber(row[i++]),
+            m_coeff: getNumber(row, i++),
+            m_delta: getNumber(row, i++),
+            m_unk: getNumber(row, i++),
+            sp_coeff: getNumber(row, i++),
+            ap_coeff: getNumber(row, i++),
+            amplitude: getNumber(row, i++),
+            radius: getNumber(row, i++),
+            radius_max: getNumber(row, i++),
+            base_value: getNumber(row, i++),
+            misc_value: getNumber(row, i++),
+            misc_value_2: getNumber(row, i++),
+            class_flags: getArrayOfNumbers(row, i++),
+            trigger_spell_id: getNumber(row, i++),
+            m_chain: getNumber(row, i++),
+            pp_combo_points: getNumber(row, i++),
+            real_ppl: getNumber(row, i++),
+            mechanic: getNumber(row, i++),
+            chain_target: getNumber(row, i++),
+            targeting_1: getNumber(row, i++),
+            targeting_2: getNumber(row, i++),
+            m_value: getNumber(row, i++),
+            pvp_coeff: getNumber(row, i++),
         };
 
         // TODO There seems to be a bug in Simulationcraft
@@ -1727,16 +1733,16 @@ export function getSpellData(directory: string) {
     for (const row of output.spellpower_data_t) {
         let i = 0;
         const spellPower: SpellPowerData = {
-            id: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            aura_id: getNumber(row[i++]),
-            power_type: getNumber(row[i++]),
-            cost: getNumber(row[i++]),
-            cost_max: getNumber(row[i++]),
-            cost_per_tick: getNumber(row[i++]),
-            pct_cost: getNumber(row[i++]),
-            pct_cost_max: getNumber(row[i++]),
-            pct_cost_per_tick: getNumber(row[i++]),
+            id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            aura_id: getNumber(row, i++),
+            power_type: getNumber(row, i++),
+            cost: getNumber(row, i++),
+            cost_max: getNumber(row, i++),
+            cost_per_tick: getNumber(row, i++),
+            pct_cost: getNumber(row, i++),
+            pct_cost_max: getNumber(row, i++),
+            pct_cost_per_tick: getNumber(row, i++),
         };
         const spell = spellDataById.get(spellPower.spell_id);
         if (spell) {
@@ -1750,15 +1756,15 @@ export function getSpellData(directory: string) {
     for (const row of output.talent_data_t) {
         let i = 0;
         const talent: TalentData = {
-            name: getString(row[i++]),
-            id: getNumber(row[i++]),
-            flags: getNumber(row[i++]),
-            m_class: getNumber(row[i++]),
-            spec: getNumber(row[i++]),
-            col: getNumber(row[i++]),
-            row: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            replace_id: getNumber(row[i++]),
+            name: getString(row, i++),
+            id: getNumber(row, i++),
+            flags: getNumber(row, i++),
+            m_class: getNumber(row, i++),
+            spec: getNumber(row, i++),
+            col: getNumber(row, i++),
+            row: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            replace_id: getNumber(row, i++),
             identifier: "",
             talentId: 0,
         };
@@ -1916,10 +1922,10 @@ export function getSpellData(directory: string) {
     for (const row of output.azerite_power_entry_t) {
         let i = 0;
         const talent: AzeriteTrait = {
-            id: getNumber(row[i++]),
-            spellId: getNumber(row[i++]),
-            bonusId: getNumber(row[i++]),
-            name: getString(row[i++]),
+            id: getNumber(row, i++),
+            spellId: getNumber(row, i++),
+            bonusId: getNumber(row, i++),
+            name: getString(row, i++),
             identifier: "",
         };
         talent.identifier = getIdentifier(talent.name) + "_trait";
@@ -1941,9 +1947,9 @@ export function getSpellData(directory: string) {
     for (const row of output.azerite_essence_entry_t) {
         let i = 0;
         const essence: AzeriteEssenceEntry = {
-            id: getNumber(row[i++]),
-            category: getNumber(row[i++]),
-            name: getString(row[i++]),
+            id: getNumber(row, i++),
+            category: getNumber(row, i++),
+            name: getString(row, i++),
             identifier: "",
         };
         essence.identifier = getIdentifier(essence.name + "_essence_id");
@@ -1954,17 +1960,18 @@ export function getSpellData(directory: string) {
         essenceById.set(essence.id, essence);
     }
 
+    console.log("Import runeforges...");
     if (!output.runeforge_legendary_entry_t)
         throw Error("No runeforge_legendary_entry_t");
     const runeforgeById = new Map<number, Runeforge>();
     for (const row of output.runeforge_legendary_entry_t) {
         let i = 0;
         const runeforge: Runeforge = {
-            bonus_id: getNumber(row[i++]),
-            specialization_id: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            mask_inv_type: getNumber(row[i++]),
-            name: getString(row[i++]),
+            bonus_id: getNumber(row, i++),
+            specialization_id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            mask_inv_type: getNumber(row, i++),
+            name: getString(row, i++),
             identifier: "",
         };
         runeforge.identifier = getIdentifier(runeforge.name + "_runeforge");
@@ -1980,14 +1987,15 @@ export function getSpellData(directory: string) {
         runeforgeById.set(runeforge.bonus_id, runeforge);
     }
 
+    console.log("Import conduits...");
     if (!output.conduit_entry_t) throw Error("No conduit_entry_t");
     const conduitById = new Map<number, Conduit>();
     for (const row of output.conduit_entry_t) {
         let i = 0;
         const conduit: Conduit = {
-            id: getNumber(row[i++]),
-            spell_id: getNumber(row[i++]),
-            name: getString(row[i++]),
+            id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            name: getString(row, i++),
             identifier: "",
         };
         conduit.identifier = getIdentifier(conduit.name + "_conduit");
@@ -1995,15 +2003,17 @@ export function getSpellData(directory: string) {
         conduitById.set(conduit.id, conduit);
     }
 
+    console.log("Import souldbind abilities...");
     if (!output.soulbind_ability_entry_t)
         throw Error("No soulbind_ability_entry_t");
     const soulbindAbilityById = new Map<number, SoulbindAbility>();
     for (const row of output.soulbind_ability_entry_t) {
         let i = 0;
         const soulbindAbility: SoulbindAbility = {
-            spell_id: getNumber(row[i++]),
-            covenant_id: getNumber(row[i++]),
-            name: getString(row[i++]),
+            spell_id: getNumber(row, i++),
+            covenant_id: getNumber(row, i++),
+            soulbind_id: getNumber(row, i++),
+            name: getString(row, i++),
             identifier: "",
         };
         soulbindAbility.identifier = getIdentifier(
@@ -2020,33 +2030,33 @@ export function getSpellData(directory: string) {
     for (const row of output.dbc_item_data_t) {
         let i = 0;
         const item: ItemData = {
-            name: getString(row[i++]),
-            id: getNumber(row[i++]),
-            flags_1: getNumber(row[i++]),
-            flags_2: getNumber(row[i++]),
-            type_flags: getNumber(row[i++]),
-            level: getNumber(row[i++]),
-            req_level: getNumber(row[i++]),
-            req_skill: getNumber(row[i++]),
-            req_skill_level: getNumber(row[i++]),
-            quality: getNumber(row[i++]),
-            inventory_type: getNumber(row[i++]),
-            item_class: getNumber(row[i++]),
-            item_subclass: getNumber(row[i++]),
-            bind_type: getNumber(row[i++]),
-            delay: getNumber(row[i++]),
-            dmg_range: getNumber(row[i++]),
-            item_modifier: getNumber(row[i++]),
-            dbc_stats: getArrayOfNumbers(row[i++]),
-            dbc_stats_count: getNumber(row[i++]),
-            class_mask: getNumber(row[i++]),
-            race_mask: getNumber(row[i++]),
-            socket_color: getArrayOfNumbers(row[i++]),
-            gem_properties: getNumber(row[i++]),
-            id_socket_bonus: getNumber(row[i++]),
-            id_set: getNumber(row[i++]),
-            id_curve: getNumber(row[i++]),
-            id_artifact: getNumber(row[i++]),
+            name: getString(row, i++),
+            id: getNumber(row, i++),
+            flags_1: getNumber(row, i++),
+            flags_2: getNumber(row, i++),
+            type_flags: getNumber(row, i++),
+            level: getNumber(row, i++),
+            req_level: getNumber(row, i++),
+            req_skill: getNumber(row, i++),
+            req_skill_level: getNumber(row, i++),
+            quality: getNumber(row, i++),
+            inventory_type: getNumber(row, i++),
+            item_class: getNumber(row, i++),
+            item_subclass: getNumber(row, i++),
+            bind_type: getNumber(row, i++),
+            delay: getNumber(row, i++),
+            dmg_range: getNumber(row, i++),
+            item_modifier: getNumber(row, i++),
+            dbc_stats: getArrayOfNumbers(row, i++),
+            dbc_stats_count: getNumber(row, i++),
+            class_mask: getNumber(row, i++),
+            race_mask: getNumber(row, i++),
+            socket_color: getArrayOfNumbers(row, i++),
+            gem_properties: getNumber(row, i++),
+            id_socket_bonus: getNumber(row, i++),
+            id_set: getNumber(row, i++),
+            id_curve: getNumber(row, i++),
+            id_artifact: getNumber(row, i++),
 
             identifier: "",
         };

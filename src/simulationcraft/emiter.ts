@@ -324,6 +324,10 @@ export class Emiter {
             "adaptive_swarm",
             "DRUID"
         );
+        this.AddDisambiguation(
+            "spectral_intellect_item",
+            "potion_of_spectral_intellect_item"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -2843,7 +2847,9 @@ export class Emiter {
     };
 
     private isDaemon(name: string) {
-        return name === "vilefiend" || name === "wild_imps";
+        return (
+            name === "vilefiend" || name === "wild_imps" || name === "tyrant"
+        );
     }
 
     private EmitOperandBuff: EmitOperandVisitor = (
@@ -2876,11 +2882,14 @@ export class Emiter {
                     code = "not target.inrange()";
                 }
             } else if (this.isDaemon(name)) {
-                buffName = name;
+                if (name === "tyrant") buffName = "demonic_tyrant";
+                else buffName = name;
                 if (property === "remains") {
                     code = `demonduration(${buffName})`;
                 } else if (property === "stack") {
                     code = `demons(${buffName})`;
+                } else if (property === "down") {
+                    code = `demonduration(${buffName}) <= 0`;
                 }
             } else if (name === "arcane_charge") {
                 if (property === "stack") {

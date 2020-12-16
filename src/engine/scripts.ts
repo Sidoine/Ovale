@@ -172,7 +172,7 @@ export class OvaleScriptsClass {
         }
 
         if (specialization) {
-            name = format("sc_t25_%s_%s", scClassName, specialization);
+            name = format("sc_t26_%s_%s", scClassName, specialization);
             if (!this.script[name]) {
                 this.tracer.Log(`Script ${name} not found`);
                 name = DISABLED_NAME;

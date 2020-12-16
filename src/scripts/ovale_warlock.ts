@@ -5,10 +5,10 @@ export function registerWarlock(OvaleScripts: OvaleScriptsClass) {
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_t25_warlock_affliction"
-	const desc = "[9.0] Simulationcraft: T25_Warlock_Affliction"
+	const name = "sc_t26_warlock_affliction"
+	const desc = "[9.0] Simulationcraft: T26_Warlock_Affliction"
 	const code = `
-# Based on SimulationCraft profile "T25_Warlock_Affliction".
+# Based on SimulationCraft profile "T26_Warlock_Affliction".
 #	class=warlock
 #	spec=affliction
 #	talents=3302023
@@ -23,6 +23,40 @@ AddFunction afflictionuseitemactions
 {
  item(trinket0slot text=13 usable=1)
  item(trinket1slot text=14 usable=1)
+}
+
+### actions.se
+
+AddFunction afflictionsemainactions
+{
+ #haunt
+ spell(haunt)
+ #drain_soul,interrupt_global=1,interrupt_if=debuff.shadow_embrace.stack>=3
+ spell(drain_soul)
+ #shadow_bolt
+ spell(shadow_bolt)
+}
+
+AddFunction afflictionsemainpostconditions
+{
+}
+
+AddFunction afflictionseshortcdactions
+{
+}
+
+AddFunction afflictionseshortcdpostconditions
+{
+ spell(haunt) or spell(drain_soul) or spell(shadow_bolt)
+}
+
+AddFunction afflictionsecdactions
+{
+}
+
+AddFunction afflictionsecdpostconditions
+{
+ spell(haunt) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### actions.precombat
@@ -75,37 +109,73 @@ AddFunction afflictionprecombatcdpostconditions
  not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
 }
 
+### actions.item
+
+AddFunction afflictionitemmainactions
+{
+}
+
+AddFunction afflictionitemmainpostconditions
+{
+}
+
+AddFunction afflictionitemshortcdactions
+{
+}
+
+AddFunction afflictionitemshortcdpostconditions
+{
+}
+
+AddFunction afflictionitemcdactions
+{
+ #use_items
+ afflictionuseitemactions()
+}
+
+AddFunction afflictionitemcdpostconditions
+{
+}
+
 ### actions.darkglare_prep
 
 AddFunction afflictiondarkglare_prepmainactions
 {
- #vile_taint
- spell(vile_taint)
+ #vile_taint,if=cooldown.summon_darkglare.remains<2
+ if spellcooldown(summon_darkglare) < 2 spell(vile_taint)
  #berserking
  spell(berserking)
+ #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
+ if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantmainactions()
 }
 
 AddFunction afflictiondarkglare_prepmainpostconditions
 {
+ not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantmainpostconditions()
 }
 
 AddFunction afflictiondarkglare_prepshortcdactions
 {
+ unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking)
+ {
+  #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
+  if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantshortcdactions()
+ }
 }
 
 AddFunction afflictiondarkglare_prepshortcdpostconditions
 {
- spell(vile_taint) or spell(berserking)
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantshortcdpostconditions()
 }
 
 AddFunction afflictiondarkglare_prepcdactions
 {
- unless spell(vile_taint)
+ unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint)
  {
   #dark_soul
   spell(dark_soul_misery)
   #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(unbridled_fury_item usable=1)
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_intellect_item usable=1)
   #fireblood
   spell(fireblood)
   #blood_fury
@@ -113,163 +183,609 @@ AddFunction afflictiondarkglare_prepcdactions
 
   unless spell(berserking)
   {
-   #summon_darkglare
-   spell(summon_darkglare)
+   #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
+   if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantcdactions()
+
+   unless not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
+   {
+    #summon_darkglare
+    spell(summon_darkglare)
+   }
   }
  }
 }
 
 AddFunction afflictiondarkglare_prepcdpostconditions
 {
- spell(vile_taint) or spell(berserking)
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
 }
 
-### actions.cooldowns
+### actions.covenant
 
-AddFunction afflictioncooldownsmainactions
-{
- #worldvein_resonance
- spell(worldvein_resonance)
- #memory_of_lucid_dreams
- spell(memory_of_lucid_dreams)
- #blood_of_the_enemy
- spell(blood_of_the_enemy)
- #ripple_in_space
- spell(ripple_in_space)
- #concentrated_flame
- spell(concentrated_flame)
- #the_unbound_force,if=buff.reckless_force.remains
- if buffpresent(reckless_force_buff) spell(the_unbound_force)
-}
-
-AddFunction afflictioncooldownsmainpostconditions
+AddFunction afflictioncovenantmainactions
 {
 }
 
-AddFunction afflictioncooldownsshortcdactions
+AddFunction afflictioncovenantmainpostconditions
 {
- unless spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space)
+}
+
+AddFunction afflictioncovenantshortcdactions
+{
+ #impending_catastrophe,if=cooldown.summon_darkglare.remains<10|cooldown.summon_darkglare.remains>50
+ if spellcooldown(summon_darkglare) < 10 or spellcooldown(summon_darkglare) > 50 spell(impending_catastrophe)
+ #decimating_bolt,if=cooldown.summon_darkglare.remains>5&(debuff.haunt.remains>4|!talent.haunt.enabled)
+ if spellcooldown(summon_darkglare) > 5 and { target.debuffremaining(haunt) > 4 or not hastalent(haunt_talent) } spell(decimating_bolt)
+ #soul_rot,if=cooldown.summon_darkglare.remains<5|cooldown.summon_darkglare.remains>50|cooldown.summon_darkglare.remains>25&conduit.corrupting_leer.enabled
+ if spellcooldown(summon_darkglare) < 5 or spellcooldown(summon_darkglare) > 50 or spellcooldown(summon_darkglare) > 25 and conduit(corrupting_leer_conduit) spell(soul_rot)
+ #scouring_tithe
+ spell(scouring_tithe)
+}
+
+AddFunction afflictioncovenantshortcdpostconditions
+{
+}
+
+AddFunction afflictioncovenantcdactions
+{
+}
+
+AddFunction afflictioncovenantcdpostconditions
+{
+ { spellcooldown(summon_darkglare) < 10 or spellcooldown(summon_darkglare) > 50 } and spell(impending_catastrophe) or spellcooldown(summon_darkglare) > 5 and { target.debuffremaining(haunt) > 4 or not hastalent(haunt_talent) } and spell(decimating_bolt) or { spellcooldown(summon_darkglare) < 5 or spellcooldown(summon_darkglare) > 50 or spellcooldown(summon_darkglare) > 25 and conduit(corrupting_leer_conduit) } and spell(soul_rot) or spell(scouring_tithe)
+}
+
+### actions.aoe
+
+AddFunction afflictionaoemainactions
+{
+ #haunt
+ spell(haunt)
+ #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+ if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+ unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
  {
-  #focused_azerite_beam
-  spell(focused_azerite_beam)
-  #purifying_blast
-  spell(purifying_blast)
-  #reaping_flames
-  spell(reaping_flames)
+  #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+  unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+  {
+   #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+   if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepmainactions()
+
+   unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepmainpostconditions()
+   {
+    #seed_of_corruption,if=talent.sow_the_seeds.enabled&can_seed
+    if hastalent(sow_the_seeds_talent) and message("can_seed is not implemented") spell(seed_of_corruption)
+    #seed_of_corruption,if=!talent.sow_the_seeds.enabled&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
+    if not hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffrefreshable(corruption_debuff) spell(seed_of_corruption)
+    #agony,cycle_targets=1,if=active_dot.agony<4,target_if=!dot.agony.ticking
+    if debuffcountonany(agony) < 4 and not target.debuffpresent(agony) spell(agony)
+    #agony,cycle_targets=1,if=active_dot.agony>=4,target_if=refreshable&dot.agony.ticking
+    if debuffcountonany(agony) >= 4 and { target.refreshable(agony) and target.debuffpresent(agony) } spell(agony)
+    #unstable_affliction,if=dot.unstable_affliction.refreshable
+    if target.debuffrefreshable(unstable_affliction_debuff) spell(unstable_affliction)
+    #vile_taint,if=soul_shard>1
+    if soulshards() > 1 spell(vile_taint)
+    #call_action_list,name=covenant,if=!covenant.necrolord
+    if not iscovenant("necrolord") afflictioncovenantmainactions()
+
+    unless not iscovenant("necrolord") and afflictioncovenantmainpostconditions()
+    {
+     #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+     if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+     unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+      if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+      unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+       if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+       unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+       {
+        #call_action_list,name=item
+        afflictionitemmainactions()
+
+        unless afflictionitemmainpostconditions()
+        {
+         #malefic_rapture,if=dot.vile_taint.ticking
+         if target.debuffpresent(vile_taint) spell(malefic_rapture)
+         #malefic_rapture,if=dot.soul_rot.ticking&!talent.sow_the_seeds.enabled
+         if target.debuffpresent(soul_rot) and not hastalent(sow_the_seeds_talent) spell(malefic_rapture)
+         #malefic_rapture,if=!talent.vile_taint.enabled
+         if not hastalent(vile_taint_talent) spell(malefic_rapture)
+         #malefic_rapture,if=soul_shard>4
+         if soulshards() > 4 spell(malefic_rapture)
+         #siphon_life,cycle_targets=1,if=active_dot.siphon_life<=3,target_if=!dot.siphon_life.ticking
+         if debuffcountonany(siphon_life) <= 3 and not target.debuffpresent(siphon_life) spell(siphon_life)
+         #call_action_list,name=covenant
+         afflictioncovenantmainactions()
+
+         unless afflictioncovenantmainpostconditions()
+         {
+          #drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5|buff.inevitable_demise.stack>=35&dot.soul_rot.ticking
+          if buffstacks(inevitable_demise) >= 50 or buffpresent(inevitable_demise) and target.timetodie() < 5 or buffstacks(inevitable_demise) >= 35 and target.debuffpresent(soul_rot) spell(drain_life)
+          #drain_soul,interrupt=1
+          spell(drain_soul)
+          #shadow_bolt
+          spell(shadow_bolt)
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
  }
 }
 
-AddFunction afflictioncooldownsshortcdpostconditions
+AddFunction afflictionaoemainpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space) or spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+ iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepmainpostconditions() or not iscovenant("necrolord") and afflictioncovenantmainpostconditions() or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or afflictionitemmainpostconditions() or afflictioncovenantmainpostconditions()
 }
 
-AddFunction afflictioncooldownscdactions
+AddFunction afflictionaoeshortcdactions
 {
- unless spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy)
+ #phantom_singularity
+ spell(phantom_singularity)
+
+ unless spell(haunt)
  {
-  #guardian_of_azeroth
-  spell(guardian_of_azeroth)
+  #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+  unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+  {
+   #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+   if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+   unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+   {
+    #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+    if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepshortcdactions()
+
+    unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepshortcdpostconditions() or hastalent(sow_the_seeds_talent) and message("can_seed is not implemented") and spell(seed_of_corruption) or not hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffrefreshable(corruption_debuff) and spell(seed_of_corruption) or debuffcountonany(agony) < 4 and not target.debuffpresent(agony) and spell(agony) or debuffcountonany(agony) >= 4 and { target.refreshable(agony) and target.debuffpresent(agony) } and spell(agony) or target.debuffrefreshable(unstable_affliction_debuff) and spell(unstable_affliction) or soulshards() > 1 and spell(vile_taint)
+    {
+     #call_action_list,name=covenant,if=!covenant.necrolord
+     if not iscovenant("necrolord") afflictioncovenantshortcdactions()
+
+     unless not iscovenant("necrolord") and afflictioncovenantshortcdpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+      if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+      unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+       if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+       unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+       {
+        #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+        if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+        unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+        {
+         #call_action_list,name=item
+         afflictionitemshortcdactions()
+
+         unless afflictionitemshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and not hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or soulshards() > 4 and spell(malefic_rapture) or debuffcountonany(siphon_life) <= 3 and not target.debuffpresent(siphon_life) and spell(siphon_life)
+         {
+          #call_action_list,name=covenant
+          afflictioncovenantshortcdactions()
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
  }
 }
 
-AddFunction afflictioncooldownscdpostconditions
+AddFunction afflictionaoeshortcdpostconditions
 {
- spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space) or spell(focused_azerite_beam) or spell(purifying_blast) or spell(reaping_flames) or spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+ spell(haunt) or iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepshortcdpostconditions() or hastalent(sow_the_seeds_talent) and message("can_seed is not implemented") and spell(seed_of_corruption) or not hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffrefreshable(corruption_debuff) and spell(seed_of_corruption) or debuffcountonany(agony) < 4 and not target.debuffpresent(agony) and spell(agony) or debuffcountonany(agony) >= 4 and { target.refreshable(agony) and target.debuffpresent(agony) } and spell(agony) or target.debuffrefreshable(unstable_affliction_debuff) and spell(unstable_affliction) or soulshards() > 1 and spell(vile_taint) or not iscovenant("necrolord") and afflictioncovenantshortcdpostconditions() or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictionitemshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and not hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or soulshards() > 4 and spell(malefic_rapture) or debuffcountonany(siphon_life) <= 3 and not target.debuffpresent(siphon_life) and spell(siphon_life) or afflictioncovenantshortcdpostconditions() or { buffstacks(inevitable_demise) >= 50 or buffpresent(inevitable_demise) and target.timetodie() < 5 or buffstacks(inevitable_demise) >= 35 and target.debuffpresent(soul_rot) } and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+}
+
+AddFunction afflictionaoecdactions
+{
+ unless spell(phantom_singularity) or spell(haunt)
+ {
+  #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+  unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+  {
+   #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+   if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+   unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+   {
+    #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+    if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepcdactions()
+
+    unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepcdpostconditions() or hastalent(sow_the_seeds_talent) and message("can_seed is not implemented") and spell(seed_of_corruption) or not hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffrefreshable(corruption_debuff) and spell(seed_of_corruption) or debuffcountonany(agony) < 4 and not target.debuffpresent(agony) and spell(agony) or debuffcountonany(agony) >= 4 and { target.refreshable(agony) and target.debuffpresent(agony) } and spell(agony) or target.debuffrefreshable(unstable_affliction_debuff) and spell(unstable_affliction) or soulshards() > 1 and spell(vile_taint)
+    {
+     #call_action_list,name=covenant,if=!covenant.necrolord
+     if not iscovenant("necrolord") afflictioncovenantcdactions()
+
+     unless not iscovenant("necrolord") and afflictioncovenantcdpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+      if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+      unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+       if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+       unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+       {
+        #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+        if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+        unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+        {
+         #dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
+         if spellcooldown(summon_darkglare) > target.timetodie() spell(dark_soul_misery)
+         #call_action_list,name=item
+         afflictionitemcdactions()
+
+         unless afflictionitemcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and not hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or soulshards() > 4 and spell(malefic_rapture) or debuffcountonany(siphon_life) <= 3 and not target.debuffpresent(siphon_life) and spell(siphon_life)
+         {
+          #call_action_list,name=covenant
+          afflictioncovenantcdactions()
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction afflictionaoecdpostconditions
+{
+ spell(phantom_singularity) or spell(haunt) or iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepcdpostconditions() or hastalent(sow_the_seeds_talent) and message("can_seed is not implemented") and spell(seed_of_corruption) or not hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffrefreshable(corruption_debuff) and spell(seed_of_corruption) or debuffcountonany(agony) < 4 and not target.debuffpresent(agony) and spell(agony) or debuffcountonany(agony) >= 4 and { target.refreshable(agony) and target.debuffpresent(agony) } and spell(agony) or target.debuffrefreshable(unstable_affliction_debuff) and spell(unstable_affliction) or soulshards() > 1 and spell(vile_taint) or not iscovenant("necrolord") and afflictioncovenantcdpostconditions() or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictionitemcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and not hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or not hastalent(vile_taint_talent) and spell(malefic_rapture) or soulshards() > 4 and spell(malefic_rapture) or debuffcountonany(siphon_life) <= 3 and not target.debuffpresent(siphon_life) and spell(siphon_life) or afflictioncovenantcdpostconditions() or { buffstacks(inevitable_demise) >= 50 or buffpresent(inevitable_demise) and target.timetodie() < 5 or buffstacks(inevitable_demise) >= 35 and target.debuffpresent(soul_rot) } and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### actions.default
 
 AddFunction affliction_defaultmainactions
 {
- #vile_taint,if=soul_shard>1
- if soulshards() > 1 spell(vile_taint)
- #siphon_life,if=refreshable
- if target.refreshable(siphon_life) spell(siphon_life)
- #agony,if=refreshable
- if target.refreshable(agony) spell(agony)
- #unstable_affliction,if=refreshable
- if target.refreshable(unstable_affliction_debuff) spell(unstable_affliction)
- #unstable_affliction,if=azerite.cascading_calamity.enabled&buff.cascading_calamity.remains<3
- if hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 spell(unstable_affliction)
- #corruption,if=refreshable
- if target.refreshable(corruption_debuff) spell(corruption)
- #haunt
- spell(haunt)
- #call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
- if spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+ #call_action_list,name=aoe,if=active_enemies>3
+ if enemies() > 3 afflictionaoemainactions()
 
- unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+ unless enemies() > 3 and afflictionaoemainpostconditions()
  {
-  #call_action_list,name=cooldowns
-  afflictioncooldownsmainactions()
+  #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
 
-  unless afflictioncooldownsmainpostconditions()
+  unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
   {
-   #malefic_rapture,if=dot.vile_taint.ticking
-   if target.debuffpresent(vile_taint) spell(malefic_rapture)
-   #malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking||cooldown.phantom_singularity.remains>12||soul_shard>3)
-   if hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } spell(malefic_rapture)
-   #malefic_rapture,if=talent.sow_the_seeds.enabled
-   if hastalent(sow_the_seeds_talent) spell(malefic_rapture)
-   #drain_life,if=buff.inevitable_demise.stack>30
-   if buffstacks(inevitable_demise) > 30 spell(drain_life)
-   #drain_life,if=buff.inevitable_demise_az.stack>30
-   if buffstacks(inevitable_demise) > 30 spell(drain_life)
-   #drain_soul
-   spell(drain_soul)
-   #shadow_bolt
-   spell(shadow_bolt)
+   #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+   if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+   unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+   {
+    #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+    if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepmainactions()
+
+    unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepmainpostconditions()
+    {
+     #agony,if=dot.agony.remains<4
+     if target.debuffremaining(agony) < 4 spell(agony)
+     #agony,cycle_targets=1,if=active_enemies>1,target_if=dot.agony.remains<4
+     if enemies() > 1 and target.debuffremaining(agony) < 4 spell(agony)
+     #haunt
+     spell(haunt)
+     #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+     if enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+     unless enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=active_enemies>2&(covenant.necrolord|covenant.kyrian|covenant.none)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+      if enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+      unless enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+       if enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+       unless enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+       {
+        #seed_of_corruption,if=active_enemies>2&talent.sow_the_seeds.enabled&!dot.seed_of_corruption.ticking&!in_flight
+        if enemies() > 2 and hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) spell(seed_of_corruption)
+        #seed_of_corruption,if=active_enemies>2&talent.siphon_life.enabled&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.remains<4
+        if enemies() > 2 and hastalent(siphon_life_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffremaining(corruption_debuff) < 4 spell(seed_of_corruption)
+        #vile_taint,if=(soul_shard>1|active_enemies>2)&cooldown.summon_darkglare.remains>12
+        if { soulshards() > 1 or enemies() > 2 } and spellcooldown(summon_darkglare) > 12 spell(vile_taint)
+        #unstable_affliction,if=dot.unstable_affliction.remains<4
+        if target.debuffremaining(unstable_affliction_debuff) < 4 spell(unstable_affliction)
+        #siphon_life,if=dot.siphon_life.remains<4
+        if target.debuffremaining(siphon_life) < 4 spell(siphon_life)
+        #siphon_life,cycle_targets=1,if=active_enemies>1,target_if=dot.siphon_life.remains<4
+        if enemies() > 1 and target.debuffremaining(siphon_life) < 4 spell(siphon_life)
+        #call_action_list,name=covenant,if=!covenant.necrolord
+        if not iscovenant("necrolord") afflictioncovenantmainactions()
+
+        unless not iscovenant("necrolord") and afflictioncovenantmainpostconditions()
+        {
+         #corruption,if=active_enemies<4-(talent.sow_the_seeds.enabled|talent.siphon_life.enabled)&dot.corruption.remains<2
+         if enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 spell(corruption)
+         #corruption,cycle_targets=1,if=active_enemies<4-(talent.sow_the_seeds.enabled|talent.siphon_life.enabled),target_if=dot.corruption.remains<2
+         if enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 spell(corruption)
+         #malefic_rapture,if=soul_shard>4
+         if soulshards() > 4 spell(malefic_rapture)
+         #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+         if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+         unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+         {
+          #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+          if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+          unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+          {
+           #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+           if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepmainactions()
+
+           unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions()
+           {
+            #call_action_list,name=item
+            afflictionitemmainactions()
+
+            unless afflictionitemmainpostconditions()
+            {
+             #call_action_list,name=se,if=debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3
+             if target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 afflictionsemainactions()
+
+             unless { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionsemainpostconditions()
+             {
+              #malefic_rapture,if=dot.vile_taint.ticking
+              if target.debuffpresent(vile_taint) spell(malefic_rapture)
+              #malefic_rapture,if=dot.impending_catastrophe_dot.ticking
+              if target.debuffpresent(impending_catastrophe_debuff) spell(malefic_rapture)
+              #malefic_rapture,if=dot.soul_rot.ticking
+              if target.debuffpresent(soul_rot) spell(malefic_rapture)
+              #malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking|soul_shard>3|time_to_die<cooldown.phantom_singularity.remains)
+              if hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or soulshards() > 3 or target.timetodie() < spellcooldown(phantom_singularity) } spell(malefic_rapture)
+              #malefic_rapture,if=talent.sow_the_seeds.enabled
+              if hastalent(sow_the_seeds_talent) spell(malefic_rapture)
+              #drain_life,if=buff.inevitable_demise.stack>40|buff.inevitable_demise.up&time_to_die<4
+              if buffstacks(inevitable_demise) > 40 or buffpresent(inevitable_demise) and target.timetodie() < 4 spell(drain_life)
+              #call_action_list,name=covenant
+              afflictioncovenantmainactions()
+
+              unless afflictioncovenantmainpostconditions()
+              {
+               #agony,if=refreshable
+               if target.refreshable(agony) spell(agony)
+               #agony,cycle_targets=1,if=active_enemies>1,target_if=refreshable
+               if enemies() > 1 and target.refreshable(agony) spell(agony)
+               #corruption,if=refreshable&active_enemies<4-(talent.sow_the_seeds.enabled|talent.siphon_life.enabled)
+               if target.refreshable(corruption_debuff) and enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } spell(corruption)
+               #unstable_affliction,if=refreshable
+               if target.refreshable(unstable_affliction_debuff) spell(unstable_affliction)
+               #siphon_life,if=refreshable
+               if target.refreshable(siphon_life) spell(siphon_life)
+               #siphon_life,cycle_targets=1,if=active_enemies>1,target_if=refreshable
+               if enemies() > 1 and target.refreshable(siphon_life) spell(siphon_life)
+               #corruption,cycle_targets=1,if=active_enemies<4-(talent.sow_the_seeds.enabled|talent.siphon_life.enabled),target_if=refreshable
+               if enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.refreshable(corruption_debuff) spell(corruption)
+               #drain_soul,interrupt=1
+               spell(drain_soul)
+               #shadow_bolt
+               spell(shadow_bolt)
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
   }
  }
 }
 
 AddFunction affliction_defaultmainpostconditions
 {
- spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or afflictioncooldownsmainpostconditions()
+ enemies() > 3 and afflictionaoemainpostconditions() or iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepmainpostconditions() or enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or not iscovenant("necrolord") and afflictioncovenantmainpostconditions() or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepmainpostconditions() or afflictionitemmainpostconditions() or { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionsemainpostconditions() or afflictioncovenantmainpostconditions()
 }
 
 AddFunction affliction_defaultshortcdactions
 {
- #phantom_singularity
- spell(phantom_singularity)
+ #call_action_list,name=aoe,if=active_enemies>3
+ if enemies() > 3 afflictionaoeshortcdactions()
 
- unless soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt)
+ unless enemies() > 3 and afflictionaoeshortcdpostconditions()
  {
-  #call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-  if spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+  #phantom_singularity,if=time>30
+  if timeincombat() > 30 spell(phantom_singularity)
+  #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
 
-  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+  unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
   {
-   #call_action_list,name=cooldowns
-   afflictioncooldownsshortcdactions()
+   #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+   if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+   unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+   {
+    #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+    if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepshortcdactions()
+
+    unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepshortcdpostconditions() or target.debuffremaining(agony) < 4 and spell(agony) or enemies() > 1 and target.debuffremaining(agony) < 4 and spell(agony) or spell(haunt)
+    {
+     #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+     if enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+     unless enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=active_enemies>2&(covenant.necrolord|covenant.kyrian|covenant.none)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+      if enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+      unless enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+       if enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+       unless enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or enemies() > 2 and hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or enemies() > 2 and hastalent(siphon_life_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffremaining(corruption_debuff) < 4 and spell(seed_of_corruption) or { soulshards() > 1 or enemies() > 2 } and spellcooldown(summon_darkglare) > 12 and spell(vile_taint) or target.debuffremaining(unstable_affliction_debuff) < 4 and spell(unstable_affliction) or target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or enemies() > 1 and target.debuffremaining(siphon_life) < 4 and spell(siphon_life)
+       {
+        #call_action_list,name=covenant,if=!covenant.necrolord
+        if not iscovenant("necrolord") afflictioncovenantshortcdactions()
+
+        unless not iscovenant("necrolord") and afflictioncovenantshortcdpostconditions() or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption)
+        {
+         #phantom_singularity,if=covenant.necrolord|covenant.night_fae|covenant.kyrian|covenant.none
+         if iscovenant("necrolord") or iscovenant("night_fae") or iscovenant("kyrian") or iscovenant("none") spell(phantom_singularity)
+
+         unless soulshards() > 4 and spell(malefic_rapture)
+         {
+          #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+          if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+          unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+          {
+           #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+           if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+           unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+           {
+            #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+            if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepshortcdactions()
+
+            unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions()
+            {
+             #call_action_list,name=item
+             afflictionitemshortcdactions()
+
+             unless afflictionitemshortcdpostconditions()
+             {
+              #call_action_list,name=se,if=debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3
+              if target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 afflictionseshortcdactions()
+
+              unless { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionseshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(impending_catastrophe_debuff) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or soulshards() > 3 or target.timetodie() < spellcooldown(phantom_singularity) } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or { buffstacks(inevitable_demise) > 40 or buffpresent(inevitable_demise) and target.timetodie() < 4 } and spell(drain_life)
+              {
+               #call_action_list,name=covenant
+               afflictioncovenantshortcdactions()
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
   }
  }
 }
 
 AddFunction affliction_defaultshortcdpostconditions
 {
- soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictioncooldownsshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise) > 30 and spell(drain_life) or buffstacks(inevitable_demise) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ enemies() > 3 and afflictionaoeshortcdpostconditions() or iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepshortcdpostconditions() or target.debuffremaining(agony) < 4 and spell(agony) or enemies() > 1 and target.debuffremaining(agony) < 4 and spell(agony) or spell(haunt) or enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or enemies() > 2 and hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or enemies() > 2 and hastalent(siphon_life_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffremaining(corruption_debuff) < 4 and spell(seed_of_corruption) or { soulshards() > 1 or enemies() > 2 } and spellcooldown(summon_darkglare) > 12 and spell(vile_taint) or target.debuffremaining(unstable_affliction_debuff) < 4 and spell(unstable_affliction) or target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or enemies() > 1 and target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or not iscovenant("necrolord") and afflictioncovenantshortcdpostconditions() or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or soulshards() > 4 and spell(malefic_rapture) or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepshortcdpostconditions() or afflictionitemshortcdpostconditions() or { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionseshortcdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(impending_catastrophe_debuff) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or soulshards() > 3 or target.timetodie() < spellcooldown(phantom_singularity) } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or { buffstacks(inevitable_demise) > 40 or buffpresent(inevitable_demise) and target.timetodie() < 4 } and spell(drain_life) or afflictioncovenantshortcdpostconditions() or target.refreshable(agony) and spell(agony) or enemies() > 1 and target.refreshable(agony) and spell(agony) or target.refreshable(corruption_debuff) and enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and spell(corruption) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or target.refreshable(siphon_life) and spell(siphon_life) or enemies() > 1 and target.refreshable(siphon_life) and spell(siphon_life) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.refreshable(corruption_debuff) and spell(corruption) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 AddFunction affliction_defaultcdactions
 {
- unless spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt)
+ #call_action_list,name=aoe,if=active_enemies>3
+ if enemies() > 3 afflictionaoecdactions()
+
+ unless enemies() > 3 and afflictionaoecdpostconditions() or timeincombat() > 30 and spell(phantom_singularity)
  {
-  #call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-  if spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+  #call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+  if iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
 
-  unless spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+  unless iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
   {
-   #dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
-   if spellcooldown(summon_darkglare) > target.timetodie() spell(dark_soul_misery)
-   #call_action_list,name=cooldowns
-   afflictioncooldownscdactions()
+   #call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+   if iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
 
-   unless afflictioncooldownscdpostconditions()
+   unless iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
    {
-    #use_items
-    afflictionuseitemactions()
+    #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
+    if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 afflictiondarkglare_prepcdactions()
+
+    unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepcdpostconditions() or target.debuffremaining(agony) < 4 and spell(agony) or enemies() > 1 and target.debuffremaining(agony) < 4 and spell(agony) or spell(haunt)
+    {
+     #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+     if enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+     unless enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+     {
+      #call_action_list,name=darkglare_prep,if=active_enemies>2&(covenant.necrolord|covenant.kyrian|covenant.none)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+      if enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+      unless enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+      {
+       #call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
+       if enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+       unless enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or enemies() > 2 and hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or enemies() > 2 and hastalent(siphon_life_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffremaining(corruption_debuff) < 4 and spell(seed_of_corruption) or { soulshards() > 1 or enemies() > 2 } and spellcooldown(summon_darkglare) > 12 and spell(vile_taint) or target.debuffremaining(unstable_affliction_debuff) < 4 and spell(unstable_affliction) or target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or enemies() > 1 and target.debuffremaining(siphon_life) < 4 and spell(siphon_life)
+       {
+        #call_action_list,name=covenant,if=!covenant.necrolord
+        if not iscovenant("necrolord") afflictioncovenantcdactions()
+
+        unless not iscovenant("necrolord") and afflictioncovenantcdpostconditions() or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or { iscovenant("necrolord") or iscovenant("night_fae") or iscovenant("kyrian") or iscovenant("none") } and spell(phantom_singularity) or soulshards() > 4 and spell(malefic_rapture)
+        {
+         #call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+         if iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+         unless iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+         {
+          #call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+          if { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+          unless { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+          {
+           #call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
+           if iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } afflictiondarkglare_prepcdactions()
+
+           unless iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions()
+           {
+            #dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
+            if spellcooldown(summon_darkglare) > target.timetodie() spell(dark_soul_misery)
+            #call_action_list,name=item
+            afflictionitemcdactions()
+
+            unless afflictionitemcdpostconditions()
+            {
+             #call_action_list,name=se,if=debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3
+             if target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 afflictionsecdactions()
+
+             unless { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionsecdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(impending_catastrophe_debuff) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or soulshards() > 3 or target.timetodie() < spellcooldown(phantom_singularity) } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or { buffstacks(inevitable_demise) > 40 or buffpresent(inevitable_demise) and target.timetodie() < 4 } and spell(drain_life)
+             {
+              #call_action_list,name=covenant
+              afflictioncovenantcdactions()
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
    }
   }
  }
@@ -277,7 +793,7 @@ AddFunction affliction_defaultcdactions
 
 AddFunction affliction_defaultcdpostconditions
 {
- spell(phantom_singularity) or soulshards() > 1 and spell(vile_taint) or target.refreshable(siphon_life) and spell(siphon_life) or target.refreshable(agony) and spell(agony) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or hasazeritetrait(cascading_calamity_trait) and buffremaining(cascading_calamity) < 3 and spell(unstable_affliction) or target.refreshable(corruption_debuff) and spell(corruption) or spell(haunt) or spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictioncooldownscdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or spellcooldown(phantom_singularity) > 12 or soulshards() > 3 } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or buffstacks(inevitable_demise) > 30 and spell(drain_life) or buffstacks(inevitable_demise) > 30 and spell(drain_life) or spell(drain_soul) or spell(shadow_bolt)
+ enemies() > 3 and afflictionaoecdpostconditions() or timeincombat() > 30 and spell(phantom_singularity) or iscovenant("venthyr") and target.debuffpresent(impending_catastrophe_debuff) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or iscovenant("night_fae") and target.debuffpresent(soul_rot) and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and target.debuffpresent(phantom_singularity) and target.debuffremaining(phantom_singularity) < 2 and afflictiondarkglare_prepcdpostconditions() or target.debuffremaining(agony) < 4 and spell(agony) or enemies() > 1 and target.debuffremaining(agony) < 4 and spell(agony) or spell(haunt) or enemies() > 2 and iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or enemies() > 2 and { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or enemies() > 2 and iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and { target.debuffpresent(phantom_singularity) or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or enemies() > 2 and hastalent(sow_the_seeds_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and spell(seed_of_corruption) or enemies() > 2 and hastalent(siphon_life_talent) and not target.debuffpresent(seed_of_corruption) and not inflighttotarget(seed_of_corruption) and target.debuffremaining(corruption_debuff) < 4 and spell(seed_of_corruption) or { soulshards() > 1 or enemies() > 2 } and spellcooldown(summon_darkglare) > 12 and spell(vile_taint) or target.debuffremaining(unstable_affliction_debuff) < 4 and spell(unstable_affliction) or target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or enemies() > 1 and target.debuffremaining(siphon_life) < 4 and spell(siphon_life) or not iscovenant("necrolord") and afflictioncovenantcdpostconditions() or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.debuffremaining(corruption_debuff) < 2 and spell(corruption) or { iscovenant("necrolord") or iscovenant("night_fae") or iscovenant("kyrian") or iscovenant("none") } and spell(phantom_singularity) or soulshards() > 4 and spell(malefic_rapture) or iscovenant("venthyr") and { spellcooldown(impending_catastrophe) <= 0 or target.debuffpresent(impending_catastrophe_debuff) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or { iscovenant("necrolord") or iscovenant("kyrian") or iscovenant("none") } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or iscovenant("night_fae") and { spellcooldown(soul_rot) <= 0 or target.debuffpresent(soul_rot) } and spellcooldown(summon_darkglare) < 2 and { target.debuffremaining(phantom_singularity) > 2 or not hastalent(phantom_singularity_talent) } and afflictiondarkglare_prepcdpostconditions() or afflictionitemcdpostconditions() or { target.debuffstacks(shadow_embrace) < 2 - inflighttotarget(shadow_bolt) or target.debuffremaining(shadow_embrace) < 3 } and afflictionsecdpostconditions() or target.debuffpresent(vile_taint) and spell(malefic_rapture) or target.debuffpresent(impending_catastrophe_debuff) and spell(malefic_rapture) or target.debuffpresent(soul_rot) and spell(malefic_rapture) or hastalent(phantom_singularity_talent) and { target.debuffpresent(phantom_singularity) or soulshards() > 3 or target.timetodie() < spellcooldown(phantom_singularity) } and spell(malefic_rapture) or hastalent(sow_the_seeds_talent) and spell(malefic_rapture) or { buffstacks(inevitable_demise) > 40 or buffpresent(inevitable_demise) and target.timetodie() < 4 } and spell(drain_life) or afflictioncovenantcdpostconditions() or target.refreshable(agony) and spell(agony) or enemies() > 1 and target.refreshable(agony) and spell(agony) or target.refreshable(corruption_debuff) and enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and spell(corruption) or target.refreshable(unstable_affliction_debuff) and spell(unstable_affliction) or target.refreshable(siphon_life) and spell(siphon_life) or enemies() > 1 and target.refreshable(siphon_life) and spell(siphon_life) or enemies() < 4 - { hastalent(sow_the_seeds_talent) or hastalent(siphon_life_talent) } and target.refreshable(corruption_debuff) and spell(corruption) or spell(drain_soul) or spell(shadow_bolt)
 }
 
 ### Affliction icons.
@@ -325,55 +841,51 @@ AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affli
 # agony
 # berserking
 # blood_fury
-# blood_of_the_enemy
-# cascading_calamity
-# cascading_calamity_trait
-# concentrated_flame
+# corrupting_leer_conduit
 # corruption
 # corruption_debuff
 # dark_soul_misery
+# decimating_bolt
 # drain_life
 # drain_soul
 # fireblood
-# focused_azerite_beam
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
-# guardian_of_azeroth
 # haunt
 # haunt_talent
+# impending_catastrophe
+# impending_catastrophe_debuff
 # inevitable_demise
 # malefic_rapture
-# memory_of_lucid_dreams
 # phantom_singularity
 # phantom_singularity_talent
-# purifying_blast
-# reaping_flames
-# reckless_force_buff
-# ripple_in_space
+# potion_of_spectral_intellect_item
+# scouring_tithe
 # seed_of_corruption
 # shadow_bolt
+# shadow_embrace
 # siphon_life
+# siphon_life_talent
+# soul_rot
 # sow_the_seeds_talent
 # summon_darkglare
 # summon_imp
-# the_unbound_force
-# unbridled_fury_item
 # unstable_affliction
 # unstable_affliction_debuff
 # vile_taint
-# worldvein_resonance
+# vile_taint_talent
 `
 	OvaleScripts.RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
 }
 
 {
-	const name = "sc_t25_warlock_demonology"
-	const desc = "[9.0] Simulationcraft: T25_Warlock_Demonology"
+	const name = "sc_t26_warlock_demonology"
+	const desc = "[9.0] Simulationcraft: T26_Warlock_Demonology"
 	const code = `
-# Based on SimulationCraft profile "T25_Warlock_Demonology".
+# Based on SimulationCraft profile "T26_Warlock_Demonology".
 #	class=warlock
 #	spec=demonology
-#	talents=3302032
+#	talents=3303032
 #	pet=felguard
 
 Include(ovale_common)
@@ -562,7 +1074,7 @@ AddFunction demonologyoff_gcdcdactions
  unless demonduration(demonic_tyrant) > 0 and spell(berserking)
  {
   #potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
-  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(unbridled_fury_item usable=1)
+  if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
   #blood_fury,if=pet.demonic_tyrant.active
   if demonduration(demonic_tyrant) > 0 spell(blood_fury)
   #fireblood,if=pet.demonic_tyrant.active
@@ -575,58 +1087,41 @@ AddFunction demonologyoff_gcdcdpostconditions
  demonduration(demonic_tyrant) > 0 and spell(berserking)
 }
 
-### actions.essences
+### actions.covenant
 
-AddFunction demonologyessencesmainactions
-{
- #worldvein_resonance,if=cooldown.summon_demonic_tyrant.remains>45
- if spellcooldown(summon_demonic_tyrant) > 45 spell(worldvein_resonance)
- #memory_of_lucid_dreams
- spell(memory_of_lucid_dreams)
- #blood_of_the_enemy
- spell(blood_of_the_enemy)
- #ripple_in_space
- spell(ripple_in_space)
- #concentrated_flame
- spell(concentrated_flame)
- #the_unbound_force,if=buff.reckless_force.remains
- if buffpresent(reckless_force_buff) spell(the_unbound_force)
-}
-
-AddFunction demonologyessencesmainpostconditions
+AddFunction demonologycovenantmainactions
 {
 }
 
-AddFunction demonologyessencesshortcdactions
+AddFunction demonologycovenantmainpostconditions
 {
- unless spellcooldown(summon_demonic_tyrant) > 45 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space)
- {
-  #focused_azerite_beam
-  spell(focused_azerite_beam)
-  #purifying_blast
-  spell(purifying_blast)
-  #reaping_flames
-  spell(reaping_flames)
- }
 }
 
-AddFunction demonologyessencesshortcdpostconditions
+AddFunction demonologycovenantshortcdactions
 {
- spellcooldown(summon_demonic_tyrant) > 45 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space) or spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+ #impending_catastrophe,if=!talent.sacrificed_souls.enabled|active_enemies>1
+ if not hastalent(sacrificed_souls_talent) or enemies() > 1 spell(impending_catastrophe)
+ #scouring_tithe,if=talent.sacrificed_souls.enabled&active_enemies=1
+ if hastalent(sacrificed_souls_talent) and enemies() == 1 spell(scouring_tithe)
+ #scouring_tithe,if=!talent.sacrificed_souls.enabled&active_enemies<4
+ if not hastalent(sacrificed_souls_talent) and enemies() < 4 spell(scouring_tithe)
+ #soul_rot
+ spell(soul_rot)
+ #decimating_bolt
+ spell(decimating_bolt)
 }
 
-AddFunction demonologyessencescdactions
+AddFunction demonologycovenantshortcdpostconditions
 {
- unless spellcooldown(summon_demonic_tyrant) > 45 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy)
- {
-  #guardian_of_azeroth
-  spell(guardian_of_azeroth)
- }
 }
 
-AddFunction demonologyessencescdpostconditions
+AddFunction demonologycovenantcdactions
 {
- spellcooldown(summon_demonic_tyrant) > 45 and spell(worldvein_resonance) or spell(memory_of_lucid_dreams) or spell(blood_of_the_enemy) or spell(ripple_in_space) or spell(focused_azerite_beam) or spell(purifying_blast) or spell(reaping_flames) or spell(concentrated_flame) or buffpresent(reckless_force_buff) and spell(the_unbound_force)
+}
+
+AddFunction demonologycovenantcdpostconditions
+{
+ { not hastalent(sacrificed_souls_talent) or enemies() > 1 } and spell(impending_catastrophe) or hastalent(sacrificed_souls_talent) and enemies() == 1 and spell(scouring_tithe) or not hastalent(sacrificed_souls_talent) and enemies() < 4 and spell(scouring_tithe) or spell(soul_rot) or spell(decimating_bolt)
 }
 
 ### actions.default
@@ -638,37 +1133,45 @@ AddFunction demonology_defaultmainactions
 
  unless demonologyoff_gcdmainpostconditions()
  {
-  #call_action_list,name=essences
-  demonologyessencesmainactions()
+  #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<4&!variable.tyrant_ready
+  if spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() demonologytyrant_prepmainactions()
 
-  unless demonologyessencesmainpostconditions()
+  unless spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepmainpostconditions()
   {
-   #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-   if spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() demonologytyrant_prepmainactions()
+   #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
+   if tyrant_ready() demonologysummon_tyrantmainactions()
 
-   unless spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepmainpostconditions()
+   unless tyrant_ready() and demonologysummon_tyrantmainpostconditions()
    {
-    #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
-    if tyrant_ready() demonologysummon_tyrantmainactions()
+    #call_dreadstalkers
+    spell(call_dreadstalkers)
+    #doom,if=refreshable
+    if target.refreshable(doom) spell(doom)
+    #implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
+    if enemies() > 1 and not hastalent(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
+    #implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
+    if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 spell(implosion)
+    #hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
+    if soulshards() == 5 or buffpresent(nether_portal) spell(hand_of_guldan)
+    #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains>20&(cooldown.summon_vilefiend.remains>5|!talent.summon_vilefiend.enabled)&cooldown.call_dreadstalkers.remains>2
+    if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 spell(hand_of_guldan)
+    #call_action_list,name=covenant,if=(covenant.necrolord|covenant.night_fae)&!talent.nether_portal.enabled
+    if { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) demonologycovenantmainactions()
 
-    unless tyrant_ready() and demonologysummon_tyrantmainpostconditions()
+    unless { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantmainpostconditions()
     {
-     #call_dreadstalkers
-     spell(call_dreadstalkers)
-     #doom,if=refreshable
-     if target.refreshable(doom) spell(doom)
-     #hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
-     if soulshards() == 5 or buffpresent(nether_portal) spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains>20&(cooldown.summon_vilefiend.remains>5|!talent.summon_vilefiend.enabled)&cooldown.call_dreadstalkers.remains>2
-     if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 spell(hand_of_guldan)
      #demonbolt,if=buff.demonic_core.react&soul_shard<4
      if buffpresent(demonic_core) and soulshards() < 4 spell(demonbolt)
-     #implosion,if=azerite.explosive_potential.rank>1&buff.explosive_potential.remains<3&buff.wild_imps.stack>=3
-     if azeritetraitrank(explosive_potential_trait) > 1 and buffremaining(explosive_potential) < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 spell(implosion)
      #soul_strike
      spell(soul_strike)
-     #shadow_bolt
-     spell(shadow_bolt)
+     #call_action_list,name=covenant
+     demonologycovenantmainactions()
+
+     unless demonologycovenantmainpostconditions()
+     {
+      #shadow_bolt
+      spell(shadow_bolt)
+     }
     }
    }
   }
@@ -677,7 +1180,7 @@ AddFunction demonology_defaultmainactions
 
 AddFunction demonology_defaultmainpostconditions
 {
- demonologyoff_gcdmainpostconditions() or demonologyessencesmainpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepmainpostconditions() or tyrant_ready() and demonologysummon_tyrantmainpostconditions()
+ demonologyoff_gcdmainpostconditions() or spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepmainpostconditions() or tyrant_ready() and demonologysummon_tyrantmainpostconditions() or { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantmainpostconditions() or demonologycovenantmainpostconditions()
 }
 
 AddFunction demonology_defaultshortcdactions
@@ -687,35 +1190,41 @@ AddFunction demonology_defaultshortcdactions
 
  unless demonologyoff_gcdshortcdpostconditions()
  {
-  #call_action_list,name=essences
-  demonologyessencesshortcdactions()
+  #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<4&!variable.tyrant_ready
+  if spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() demonologytyrant_prepshortcdactions()
 
-  unless demonologyessencesshortcdpostconditions()
+  unless spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions()
   {
-   #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-   if spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() demonologytyrant_prepshortcdactions()
+   #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
+   if tyrant_ready() demonologysummon_tyrantshortcdactions()
 
-   unless spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions()
+   unless tyrant_ready() and demonologysummon_tyrantshortcdpostconditions()
    {
-    #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
-    if tyrant_ready() demonologysummon_tyrantshortcdactions()
+    #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
+    if spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 spell(summon_vilefiend)
 
-    unless tyrant_ready() and demonologysummon_tyrantshortcdpostconditions()
+    unless spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom)
     {
-     #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
-     if spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 spell(summon_vilefiend)
+     #demonic_strength
+     spell(demonic_strength)
+     #bilescourge_bombers
+     spell(bilescourge_bombers)
 
-     unless spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom)
+     unless enemies() > 1 and not hastalent(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spell(implosion) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan)
      {
-      #demonic_strength
-      spell(demonic_strength)
-      #bilescourge_bombers
-      spell(bilescourge_bombers)
+      #call_action_list,name=covenant,if=(covenant.necrolord|covenant.night_fae)&!talent.nether_portal.enabled
+      if { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) demonologycovenantshortcdactions()
 
-      unless { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
+      unless { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantshortcdpostconditions() or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
       {
        #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
        if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 spell(power_siphon)
+
+       unless spell(soul_strike)
+       {
+        #call_action_list,name=covenant
+        demonologycovenantshortcdactions()
+       }
       }
      }
     }
@@ -726,7 +1235,7 @@ AddFunction demonology_defaultshortcdactions
 
 AddFunction demonology_defaultshortcdpostconditions
 {
- demonologyoff_gcdshortcdpostconditions() or demonologyessencesshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions() or tyrant_ready() and demonologysummon_tyrantshortcdpostconditions() or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or azeritetraitrank(explosive_potential_trait) > 1 and buffremaining(explosive_potential) < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 and spell(implosion) or spell(soul_strike) or spell(shadow_bolt)
+ demonologyoff_gcdshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepshortcdpostconditions() or tyrant_ready() and demonologysummon_tyrantshortcdpostconditions() or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or enemies() > 1 and not hastalent(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spell(implosion) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantshortcdpostconditions() or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or spell(soul_strike) or demonologycovenantshortcdpostconditions() or spell(shadow_bolt)
 }
 
 AddFunction demonology_defaultcdactions
@@ -736,25 +1245,31 @@ AddFunction demonology_defaultcdactions
 
  unless demonologyoff_gcdcdpostconditions()
  {
-  #call_action_list,name=essences
-  demonologyessencescdactions()
+  #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<4&!variable.tyrant_ready
+  if spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() demonologytyrant_prepcdactions()
 
-  unless demonologyessencescdpostconditions()
+  unless spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepcdpostconditions()
   {
-   #run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-   if spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() demonologytyrant_prepcdactions()
+   #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
+   if tyrant_ready() demonologysummon_tyrantcdactions()
 
-   unless spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepcdpostconditions()
+   unless tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or enemies() > 1 and not hastalent(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spell(implosion) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan)
    {
-    #run_action_list,name=summon_tyrant,if=variable.tyrant_ready
-    if tyrant_ready() demonologysummon_tyrantcdactions()
+    #call_action_list,name=covenant,if=(covenant.necrolord|covenant.night_fae)&!talent.nether_portal.enabled
+    if { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) demonologycovenantcdactions()
 
-    unless tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
+    unless { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantcdpostconditions() or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt)
     {
      #grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.summon_demonic_tyrant.remains+15
      if spellcooldown(summon_demonic_tyrant) + spellcooldownduration(summon_demonic_tyrant) > target.timetodie() or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 15 spell(grimoire_felguard)
      #use_items
      demonologyuseitemactions()
+
+     unless demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or spell(soul_strike)
+     {
+      #call_action_list,name=covenant
+      demonologycovenantcdactions()
+     }
     }
    }
   }
@@ -763,7 +1278,7 @@ AddFunction demonology_defaultcdactions
 
 AddFunction demonology_defaultcdpostconditions
 {
- demonologyoff_gcdcdpostconditions() or demonologyessencescdpostconditions() or spellcooldown(summon_demonic_tyrant) < 5 and not tyrant_ready() and demonologytyrant_prepcdpostconditions() or tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or azeritetraitrank(explosive_potential_trait) > 1 and buffremaining(explosive_potential) < 3 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 3 and spell(implosion) or spell(soul_strike) or spell(shadow_bolt)
+ demonologyoff_gcdcdpostconditions() or spellcooldown(summon_demonic_tyrant) < 4 and not tyrant_ready() and demonologytyrant_prepcdpostconditions() or tyrant_ready() and demonologysummon_tyrantcdpostconditions() or { spellcooldown(summon_demonic_tyrant) > 40 or target.timetodie() < spellcooldown(summon_demonic_tyrant) + 25 } and spell(summon_vilefiend) or spell(call_dreadstalkers) or target.refreshable(doom) and spell(doom) or spell(demonic_strength) or spell(bilescourge_bombers) or enemies() > 1 and not hastalent(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 8 and demonduration(demonic_tyrant) <= 0 and spell(implosion) or { soulshards() == 5 or buffpresent(nether_portal) } and spell(hand_of_guldan) or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 20 and { spellcooldown(summon_vilefiend) > 5 or not hastalent(summon_vilefiend_talent) } and spellcooldown(call_dreadstalkers) > 2 and spell(hand_of_guldan) or { iscovenant("necrolord") or iscovenant("night_fae") } and not hastalent(nether_portal_talent) and demonologycovenantcdpostconditions() or buffpresent(demonic_core) and soulshards() < 4 and spell(demonbolt) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core) < 3 and spell(power_siphon) or spell(soul_strike) or demonologycovenantcdpostconditions() or spell(shadow_bolt)
 }
 
 ### Demonology icons.
@@ -811,55 +1326,49 @@ AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and specialization(demon
 # berserking_buff
 # bilescourge_bombers
 # blood_fury
-# blood_of_the_enemy
 # call_dreadstalkers
-# concentrated_flame
+# decimating_bolt
 # demonbolt
 # demonic_consumption_talent
 # demonic_core
 # demonic_strength
+# demonic_tyrant
 # doom
-# explosive_potential
-# explosive_potential_trait
 # fireblood
-# focused_azerite_beam
 # grimoire_felguard
-# guardian_of_azeroth
 # hand_of_guldan
+# impending_catastrophe
 # implosion
 # inner_demons_demonology
 # inner_demons_talent
-# memory_of_lucid_dreams
 # nether_portal
+# nether_portal_talent
+# potion_of_spectral_intellect_item
 # power_siphon
-# purifying_blast
-# reaping_flames
-# reckless_force_buff
-# ripple_in_space
+# sacrificed_souls_talent
+# scouring_tithe
 # shadow_bolt
+# soul_rot
 # soul_strike
 # summon_demonic_tyrant
 # summon_felguard
 # summon_vilefiend
 # summon_vilefiend_talent
-# the_unbound_force
-# unbridled_fury_item
 # vilefiend
 # wild_imp
 # wild_imp_inner_demons
-# worldvein_resonance
 `
 	OvaleScripts.RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
 }
 
 {
-	const name = "sc_t25_warlock_destruction"
-	const desc = "[9.0] Simulationcraft: T25_Warlock_Destruction"
+	const name = "sc_t26_warlock_destruction"
+	const desc = "[9.0] Simulationcraft: T26_Warlock_Destruction"
 	const code = `
-# Based on SimulationCraft profile "T25_Warlock_Destruction".
+# Based on SimulationCraft profile "T26_Warlock_Destruction".
 #	class=warlock
 #	spec=destruction
-#	talents=2103023
+#	talents=3203012
 #	pet=imp
 
 Include(ovale_common)
@@ -946,8 +1455,12 @@ AddFunction destructionhavocshortcdactions
 {
  unless buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate)
  {
-  #soul_fire
-  spell(soul_fire)
+  #soul_fire,if=cast_time<havoc_remains
+  if casttime(soul_fire) < debuffremainingonany(havoc) spell(soul_fire)
+  #decimating_bolt,if=cast_time<havoc_remains&soulbind.lead_by_example.enabled
+  if casttime(decimating_bolt) < debuffremainingonany(havoc) and enabledsoulbind(lead_by_example_soulbind) spell(decimating_bolt)
+  #scouring_tithe,if=cast_time<havoc_remains
+  if casttime(scouring_tithe) < debuffremainingonany(havoc) spell(scouring_tithe)
  }
 }
 
@@ -962,7 +1475,7 @@ AddFunction destructionhavoccdactions
 
 AddFunction destructionhavoccdpostconditions
 {
- buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or spell(soul_fire) or { hastalent(internal_combustion_talent) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
+ buffexpires(backdraft) and soulshards() >= 1 and soulshards() <= 4 and spell(conflagrate) or casttime(soul_fire) < debuffremainingonany(havoc) and spell(soul_fire) or casttime(decimating_bolt) < debuffremainingonany(havoc) and enabledsoulbind(lead_by_example_soulbind) and spell(decimating_bolt) or casttime(scouring_tithe) < debuffremainingonany(havoc) and spell(scouring_tithe) or { hastalent(internal_combustion_talent) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) and target.refreshable(immolate_debuff) } and spell(immolate) or casttime(chaos_bolt) < debuffremainingonany(havoc) and spell(chaos_bolt) or spell(shadowburn) or casttime(incinerate) < debuffremainingonany(havoc) and spell(incinerate)
 }
 
 ### actions.essences
@@ -1047,7 +1560,7 @@ AddFunction destructioncdscdactions
  #dark_soul_instability
  spell(dark_soul_instability)
  #potion,if=pet.infernal.active
- if demonduration(infernal) > 0 and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(unbridled_fury_item usable=1)
+ if demonduration(infernal) > 0 and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
 
  unless demonduration(infernal) > 0 and spell(berserking)
  {
@@ -1106,30 +1619,46 @@ AddFunction destructionaoemainpostconditions
 
 AddFunction destructionaoeshortcdactions
 {
- unless demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
+ unless demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire)
  {
-  #call_action_list,name=cds
-  destructioncdsshortcdactions()
+  #soul_rot
+  spell(soul_rot)
 
-  unless destructioncdsshortcdpostconditions()
+  unless target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
   {
-   #call_action_list,name=essences
-   destructionessencesshortcdactions()
+   #call_action_list,name=cds
+   destructioncdsshortcdactions()
 
-   unless destructionessencesshortcdpostconditions()
+   unless destructioncdsshortcdpostconditions()
    {
-    #havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
-    if not never(target_is_target) and enemies() < 4 and enemies() > 1 spell(havoc)
+    #call_action_list,name=essences
+    destructionessencesshortcdactions()
 
-    unless spell(rain_of_fire)
+    unless destructionessencesshortcdpostconditions()
     {
-     #havoc,cycle_targets=1,if=!(self.target=target)
-     if not player.targetguid() == target.guid() and enemies() > 1 spell(havoc)
+     #havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
+     if not never(target_is_target) and enemies() < 4 and enemies() > 1 spell(havoc)
 
-     unless hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate)
+     unless spell(rain_of_fire)
      {
-      #soul_fire
-      spell(soul_fire)
+      #havoc,cycle_targets=1,if=!(self.target=target)
+      if not player.targetguid() == target.guid() and enemies() > 1 spell(havoc)
+      #decimating_bolt,if=(soulbind.lead_by_example.enabled|!talent.fire_and_brimstone.enabled)
+      if enabledsoulbind(lead_by_example_soulbind) or not hastalent(fire_and_brimstone_talent) spell(decimating_bolt)
+
+      unless hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate)
+      {
+       #soul_fire
+       spell(soul_fire)
+
+       unless buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn)
+       {
+        #scouring_tithe,if=!(talent.fire_and_brimstone.enabled|talent.inferno.enabled)
+        if not { hastalent(fire_and_brimstone_talent) or hastalent(inferno_talent) } spell(scouring_tithe)
+        #impending_catastrophe,if=!(talent.fire_and_brimstone.enabled|talent.inferno.enabled)
+        if not { hastalent(fire_and_brimstone_talent) or hastalent(inferno_talent) } spell(impending_catastrophe)
+       }
+      }
      }
     }
    }
@@ -1144,7 +1673,7 @@ AddFunction destructionaoeshortcdpostconditions
 
 AddFunction destructionaoecdactions
 {
- unless demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
+ unless demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire) or spell(soul_rot) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate)
  {
   #call_action_list,name=cds
   destructioncdscdactions()
@@ -1159,18 +1688,20 @@ AddFunction destructionaoecdactions
 
 AddFunction destructionaoecdpostconditions
 {
- demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not never(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not player.targetguid() == target.guid() and enemies() > 1 and spell(havoc) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or spell(incinerate)
+ demonduration(infernal) > 0 and { not spellcooldown(havoc) <= 0 or enemies() > 3 } and spell(rain_of_fire) or spell(soul_rot) or target.debuffremaining(immolate_debuff) > casttime(channel_demonfire) and spell(channel_demonfire) or target.debuffremaining(immolate_debuff) < 5 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or not never(target_is_target) and enemies() < 4 and enemies() > 1 and spell(havoc) or spell(rain_of_fire) or not player.targetguid() == target.guid() and enemies() > 1 and spell(havoc) or { enabledsoulbind(lead_by_example_soulbind) or not hastalent(fire_and_brimstone_talent) } and spell(decimating_bolt) or hastalent(fire_and_brimstone_talent) and buffpresent(backdraft) and soulshards() < 5 - 0.2 * enemies() and spell(incinerate) or spell(soul_fire) or buffexpires(backdraft) and spell(conflagrate) or target.healthpercent() < 20 and spell(shadowburn) or not { hastalent(fire_and_brimstone_talent) or hastalent(inferno_talent) } and spell(scouring_tithe) or not { hastalent(fire_and_brimstone_talent) or hastalent(inferno_talent) } and spell(impending_catastrophe) or spell(incinerate)
 }
 
 ### actions.default
 
 AddFunction destruction_defaultmainactions
 {
- #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocmainactions()
+ #call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
+ if debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocmainactions()
 
- unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions()
+ unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions()
  {
+  #conflagrate,if=talent.roaring_blaze.enabled&debuff.roaring_blaze.remains<1.5
+  if hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 spell(conflagrate)
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoemainactions()
 
@@ -1217,15 +1748,15 @@ AddFunction destruction_defaultmainactions
 
 AddFunction destruction_defaultmainpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions() or enemies() > 2 and destructionaoemainpostconditions() or destructioncdsmainpostconditions() or destructionessencesmainpostconditions()
+ debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocmainpostconditions() or enemies() > 2 and destructionaoemainpostconditions() or destructioncdsmainpostconditions() or destructionessencesmainpostconditions()
 }
 
 AddFunction destruction_defaultshortcdactions
 {
- #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocshortcdactions()
+ #call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
+ if debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavocshortcdactions()
 
- unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions()
+ unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate)
  {
   #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1
   if not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 spell(cataclysm)
@@ -1249,8 +1780,18 @@ AddFunction destruction_defaultshortcdactions
 
      unless destructionessencesshortcdpostconditions() or spell(channel_demonfire)
      {
+      #scouring_tithe
+      spell(scouring_tithe)
+      #decimating_bolt
+      spell(decimating_bolt)
       #havoc,cycle_targets=1,if=!(target=self.target)&(dot.immolate.remains>dot.immolate.duration*0.5|!talent.internal_combustion.enabled)
       if not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 spell(havoc)
+      #impending_catastrophe
+      spell(impending_catastrophe)
+      #soul_rot
+      spell(soul_rot)
+      #havoc,if=runeforge.odr_shawl_of_the_ymirjar.equipped
+      if equippedruneforge(odr_shawl_of_the_ymirjar_runeforge) and enemies() > 1 spell(havoc)
      }
     }
    }
@@ -1260,15 +1801,15 @@ AddFunction destruction_defaultshortcdactions
 
 AddFunction destruction_defaultshortcdpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(channel_demonfire) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or enemies() > 2 and destructionaoeshortcdpostconditions() or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdsshortcdpostconditions() or destructionessencesshortcdpostconditions() or spell(channel_demonfire) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 AddFunction destruction_defaultcdactions
 {
- #call_action_list,name=havoc,if=havoc_active&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
- if debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavoccdactions()
+ #call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
+ if debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavoccdactions()
 
- unless debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm)
+ unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm)
  {
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoecdactions()
@@ -1289,7 +1830,7 @@ AddFunction destruction_defaultcdactions
 
 AddFunction destruction_defaultcdpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or spell(scouring_tithe) or spell(decimating_bolt) or not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or spell(impending_catastrophe) or spell(soul_rot) or equippedruneforge(odr_shawl_of_the_ymirjar_runeforge) and enemies() > 1 and spell(havoc) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 ### Destruction icons.
@@ -1345,6 +1886,7 @@ AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(dest
 # conflagrate
 # dark_soul_instability
 # dark_soul_instability_talent
+# decimating_bolt
 # eradication
 # eradication_talent
 # fire_and_brimstone_talent
@@ -1357,22 +1899,29 @@ AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(dest
 # havoc
 # immolate
 # immolate_debuff
+# impending_catastrophe
 # incinerate
 # inferno_talent
 # internal_combustion_talent
+# lead_by_example_soulbind
 # memory_of_lucid_dreams
+# odr_shawl_of_the_ymirjar_runeforge
+# potion_of_spectral_intellect_item
 # purifying_blast
 # rain_of_fire
 # reaping_flames
 # reckless_force_buff
 # ripple_in_space
+# roaring_blaze
+# roaring_blaze_talent
+# scouring_tithe
 # shadowburn
 # soul_fire
 # soul_fire_talent
+# soul_rot
 # summon_imp
 # summon_infernal
 # the_unbound_force
-# unbridled_fury_item
 # worldvein_resonance
 `
 	OvaleScripts.RegisterScript("WARLOCK", "destruction", name, desc, code, "script")

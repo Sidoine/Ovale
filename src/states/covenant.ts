@@ -83,6 +83,8 @@ export class Covenant {
 
     private isCovenant: ConditionFunction = (positionalParameters) => {
         const [covenant] = unpack(positionalParameters);
+        if (covenant === "none") {
+            return ReturnBoolean(this.covenantId === undefined);
         if (!covenant) return [];
         let id: number | undefined;
         if (isNumber(covenant)) {

@@ -28,10 +28,18 @@ Define(blessed_hammer 204019)
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
   SpellInfo(blessed_hammer cd=6 duration=5 holypower=-1)
   SpellRequire(blessed_hammer unusable set=1 enabled=(not hastalent(blessed_hammer_talent)))
+Define(blessing_of_the_seasons 328278)
+#  
+  SpellInfo(blessing_of_the_seasons gcd=0 offgcd=1)
 Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6)
   SpellRequire(blinding_light unusable set=1 enabled=(not hastalent(blinding_light_talent)))
+Define(bloodlust 2825)
+# Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(bloodlust bloodlust add=1)
 Define(consecration 26573)
 # Consecrates the land beneath you, causing 81297s1*9 Holy damage over 12 seconds to enemies who enter the area. Limit s2.
   SpellInfo(consecration cd=9 duration=12 tick=1)
@@ -47,6 +55,11 @@ Define(crusader_strike 35395)
 # Strike the target for s1 Physical damage.rnrn|cFFFFFFFFGenerates s2 Holy Power.
   SpellInfo(crusader_strike cd=6 holypower=-1)
   SpellRequire(crusader_strike replaced_by set=hammer_of_the_righteous enabled=(specialization(protection)))
+Define(devotion_aura 465)
+# Party and raid members within a1 yards are bolstered by their devotion, reducing damage taken by s1.
+  SpellInfo(devotion_aura)
+  # Damage taken reduced by w1.
+  SpellAddBuff(devotion_aura devotion_aura add=1)
 Define(divine_purpose 223819)
 # Holy Power abilities have a s1 chance to make your next Holy Power ability free and deal 223819s2 increased damage and healing.
   SpellInfo(divine_purpose duration=12 gcd=0 offgcd=1)
@@ -124,14 +137,12 @@ Define(moment_of_glory 327193)
   SpellRequire(moment_of_glory unusable set=1 enabled=(not hastalent(moment_of_glory_talent)))
   # Your next n Avenger's Shields have no cooldown and deal w2 additional damage.
   SpellAddBuff(moment_of_glory moment_of_glory add=1)
+Define(phantom_fire 321937)
+# Deal s1 Shadow Fire damage to your current target.
+  SpellInfo(phantom_fire gcd=0 offgcd=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
-Define(razor_coral_debuff 303568)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
-  SpellInfo(razor_coral_debuff duration=120 max_stacks=100 gcd=0 offgcd=1)
-  # Withdrawing the Razor Coral will grant w1 Critical Strike.
-  SpellAddTargetDebuff(razor_coral_debuff razor_coral_debuff add=1)
 Define(rebuke 96231)
 # Interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
@@ -159,7 +170,7 @@ Define(shield_of_vengeance 184662)
   SpellAddBuff(shield_of_vengeance shield_of_vengeance add=1)
 Define(shining_light_free_buff 327510)
 # @spelldesc321136
-  SpellInfo(shining_light_free_buff duration=20 gcd=0 offgcd=1)
+  SpellInfo(shining_light_free_buff duration=30 gcd=0 offgcd=1)
   # Your next Word of Glory is free.
   SpellAddBuff(shining_light_free_buff shining_light_free_buff add=1)
 Define(templars_verdict 85256)
@@ -169,18 +180,10 @@ Define(the_unbound_force 299321)
 # Infuse your Heart of Azeroth with The Unbound Force.
   SpellInfo(the_unbound_force)
 Define(vanquishers_hammer 328204)
-# Throws a hammer at your target dealing (170 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].
-  SpellInfo(vanquishers_hammer holypower=1 cd=30 duration=20)
+# Throws a hammer at your target dealing (136 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].
+  SpellInfo(vanquishers_hammer cd=30 duration=20)
   # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous].
   SpellAddBuff(vanquishers_hammer vanquishers_hammer add=1)
-Define(vengeful_shock 340006)
-# Avenger's Shield causes your target to take |cFFFFFFFFs1.1|r increased Holy damage from you for 5 seconds.
-  SpellInfo(vengeful_shock gcd=0 offgcd=1)
-  # Suffering w1 more Holy damage.
-  SpellAddBuff(vengeful_shock vengeful_shock_buff add=1)
-Define(vengeful_shock_buff 340007)
-# Avenger's Shield causes your target to take |cFFFFFFFFs1.1|r increased Holy damage from you for 5 seconds.
-  SpellInfo(vengeful_shock_buff duration=5 max_stacks=1 gcd=0 offgcd=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing s1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds. Damage reduced on secondary targets.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-3)
@@ -227,8 +230,6 @@ Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
-Define(condensed_lifeforce_essence_id 14)
-Define(vengeful_shock_conduit 195)
     `;
 // END
     code += `
@@ -240,7 +241,7 @@ Define(divine_shield 642)
 	SpellRequire(divine_shield unusable set=1 enabled=(debuffpresent(forbearance_debuff)))
 Define(forbearance_debuff 25771)
     SpellInfo(forbearance_debuff duration=30)
-#hammer_of_wrath
+hammer_of_wrath
     SpellRequire(hammer_of_wrath unusable set=1 enabled=(target.healthpercent() > 20 and (level()<58 or not buffpresent(avenging_wrath))))
 Define(lay_on_hands 633)
     SpellInfo(lay_on_hands cd=600)
@@ -255,12 +256,12 @@ Define(lay_on_hands 633)
 Define(shield_of_the_righteous_buff 132403)
     SpellInfo(shield_of_the_righteous_buff duration=4.5)
 Define(unbreakable_spirit_talent 22433)
-#word_of_glory
+word_of_glory
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(shining_light_free_buff)))
     SpellAddBuff(word_of_glory divine_purpose set=0)
     SpellAddBuff(word_of_glory shining_light_free_buff set=0)
-#shining_light_free_buff
+shining_light_free_buff
     SpellInfo(shining_light_free_buff duration=30)
     `;
     OvaleScripts.RegisterScript(

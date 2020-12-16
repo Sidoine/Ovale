@@ -38,9 +38,6 @@ Define(blood_of_the_enemy 297969)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
-Define(cascading_calamity 275372)
-# Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
-  SpellInfo(cascading_calamity gcd=0 offgcd=1)
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
   SpellInfo(cataclysm cd=30)
@@ -50,7 +47,7 @@ Define(channel_demonfire 196447)
   SpellInfo(channel_demonfire cd=25 duration=3 channel=3 tick=0.2)
   SpellRequire(channel_demonfire unusable set=1 enabled=(not hastalent(channel_demonfire_talent)))
 Define(chaos_bolt 116858)
-# Unleashes a devastating blast of chaos, dealing a critical strike for 2*(120 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
+# Unleashes a devastating blast of chaos, dealing a critical strike for 2*(146 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
   SpellInfo(chaos_bolt soulshards=2)
 Define(concentrated_flame 295368)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
@@ -85,6 +82,9 @@ Define(dark_soul_misery 113860)
   SpellRequire(dark_soul_misery unusable set=1 enabled=(not hastalent(dark_soul_misery_talent)))
   # Haste increased by s1.
   SpellAddBuff(dark_soul_misery dark_soul_misery add=1)
+Define(decimating_bolt 325289)
+# Hurl bolts of decimating magic at your target, dealing <damage> Shadow damage and increasing the damage of your next?s198590[][ 325299u] ?s137046[Incinerates]?s198590[Drain Soul]?a137044&?!s137046[Demonbolts]?!a137044[Shadow Bolts][] by 325299s1.?a196408[ This value is reduced while using Fire and Brimstone.][]rnrnDecimating Bolt's damage, and the bonus to ?s137046[Incinerate]?s198590[Drain Soul]?a137044[Demonbolt]?!s137046&!a137044[Shadow Bolt][] both increase as your target's health decreases.
+  SpellInfo(decimating_bolt cd=45)
 Define(demonbolt 264178)
 # Send the fiery soul of a fallen demon at the enemy, causing (73.4 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
@@ -125,11 +125,6 @@ Define(eradication 196412)
 Define(eradication_buff 196414)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
   SpellInfo(eradication_buff duration=7 gcd=0 offgcd=1)
-Define(explosive_potential 275398)
-# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
-  SpellInfo(explosive_potential duration=15 gcd=0 offgcd=1)
-  # Haste increased by w1.
-  SpellAddBuff(explosive_potential explosive_potential add=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -174,6 +169,14 @@ Define(immolate_debuff 118297)
   SpellInfo(immolate_debuff mana=0.95 cd=10 duration=21 gcd=0 offgcd=1 tick=3)
   # Fire damage inflicted every t1 sec.
   SpellAddTargetDebuff(immolate_debuff immolate_debuff add=1)
+Define(impending_catastrophe 321792)
+# Call forth a cloud of chaotic anima that travels to the target enemy, dealing (23 of Spell Power) Shadow damage to enemies in its path. When the anima reaches the target it explodes, inflicting either Curse of Weakness or Curse of Tongues, and dealing 322170o1 Shadow damage over 12 seconds to all nearby enemies.
+  SpellInfo(impending_catastrophe cd=60 duration=12)
+Define(impending_catastrophe_debuff 322170)
+# Call forth a cloud of chaotic anima that travels to the target enemy, dealing (23 of Spell Power) Shadow damage to enemies in its path. When the anima reaches the target it explodes, inflicting either Curse of Weakness or Curse of Tongues, and dealing 322170o1 Shadow damage over 12 seconds to all nearby enemies.
+  SpellInfo(impending_catastrophe_debuff duration=12 gcd=0 offgcd=1 tick=2)
+  # Suffering w1 Shadow damage every t1 sec.
+  SpellAddTargetDebuff(impending_catastrophe_debuff impending_catastrophe_debuff add=1)
 Define(implosion 196277)
 # Demonic forces suck all of your Wild Imps toward the target, and then cause them to violently explode, dealing 196278s2 Shadowflame damage to all enemies within 196278A3 yards.
   SpellInfo(implosion)
@@ -229,15 +232,32 @@ Define(reckless_force_buff 298409)
 Define(ripple_in_space 299306)
 # Infuse your Heart of Azeroth with Ripple in Space.
   SpellInfo(ripple_in_space)
+Define(roaring_blaze 205184)
+# Conflagrate increases your ?s6353[Soul Fire, ][]?s196447[Channel Demonfire, ][]Immolate, Incinerate, and Conflagrate damage to the target by 265931s1 for 8 seconds.
+  SpellInfo(roaring_blaze gcd=0 offgcd=1)
+  SpellRequire(roaring_blaze unusable set=1 enabled=(not hastalent(roaring_blaze_talent)))
+Define(scouring_tithe 312321)
+# Deal (54 of Spell Power) Arcane damage instantly, and o2 over 18 seconds. If the enemy dies while affected by Scouring Tithe, you generate ?a137043[s3/10]?a137044[s4/10][s5/10] Soul LShard:Shards;. If they survive, Scouring Tithe's cooldown is refreshed.
+  SpellInfo(scouring_tithe cd=40 duration=18 tick=3)
+  # Suffering w2 Arcane damage every t2 sec.
+  SpellAddTargetDebuff(scouring_tithe scouring_tithe add=1)
 Define(seed_of_corruption 27243)
 # Embeds a demon seed in the enemy target that will explode after 12 seconds, dealing (40 of Spell Power) Shadow damage to all enemies within 27285A1 yards and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes SPS*s1/100 damage from your spells.
   SpellInfo(seed_of_corruption soulshards=1 duration=12 tick=12)
   # Embeded with a demon seed that will soon explode, dealing Shadow damage to the caster's enemies within 27285A1 yards, and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes w3 damage from your spells.
   SpellAddTargetDebuff(seed_of_corruption seed_of_corruption add=1)
 Define(shadow_bolt 686)
-# Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]?a32388[rnrnApplies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.][] 
+# Sends a shadowy bolt at the enemy, causing (39 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]?a32388[rnrnApplies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.][] 
   SpellInfo(shadow_bolt)
   SpellRequire(shadow_bolt replaced_by set=incinerate enabled=(specialization(destruction)))
+Define(shadow_embrace 32388)
+# ?s198590[Drain Soul][Shadow Bolt] and Haunt apply Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.
+  SpellInfo(shadow_embrace gcd=0 offgcd=1)
+  # Damage taken increased by s1.1.
+  SpellAddBuff(shadow_embrace shadow_embrace_buff add=1)
+Define(shadow_embrace_buff 32390)
+# ?s198590[Drain Soul][Shadow Bolt] and Haunt apply Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.
+  SpellInfo(shadow_embrace_buff duration=12 max_stacks=3 gcd=0 offgcd=1)
 Define(shadowburn 17877)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
   SpellInfo(shadowburn soulshards=1 cd=12 duration=5)
@@ -254,6 +274,11 @@ Define(soul_fire 6353)
 # Burns the enemy's soul, dealing (420 of Spell Power) Fire damage and applying Immolate.rnrn|cFFFFFFFFGenerates 281490s1/10 Soul Shard.|r
   SpellInfo(soul_fire cd=45)
   SpellRequire(soul_fire unusable set=1 enabled=(not hastalent(soul_fire_talent)))
+Define(soul_rot 325640)
+# Wither away all life force of your current target and up to s3 additional targets nearby, causing your primary target to suffer o2*(1+m4/10) Nature damage and secondary targets to suffer o2 Nature damage over 8 seconds.rnrnFor the next 8 seconds, casting Drain Life will cause you to also Drain Life from any enemy affected by your Soul Rot, and Drain Life will not consume any mana.
+  SpellInfo(soul_rot cd=60 duration=8 tick=2)
+  # Suffering s2 Nature damage every t2 sec.
+  SpellAddTargetDebuff(soul_rot soul_rot add=1)
 Define(soul_strike 264057)
 # Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
   SpellInfo(soul_strike cd=10)
@@ -353,14 +378,24 @@ Define(internal_combustion_talent 21695)
 # Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
 Define(nether_portal_talent 23091)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
+Define(nether_portal_talent 23091)
+# Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
 Define(phantom_singularity_talent 19292)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(22.5 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
 Define(phantom_singularity_talent 19292)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(22.5 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
 Define(power_siphon_talent 21694)
 # Instantly sacrifice up to s1 Wild Imps, generating s1 charges of Demonic Core that cause Demonbolt to deal 334581s1 additional damage.
+Define(roaring_blaze_talent 23155)
+# Conflagrate increases your ?s6353[Soul Fire, ][]?s196447[Channel Demonfire, ][]Immolate, Incinerate, and Conflagrate damage to the target by 265931s1 for 8 seconds.
+Define(roaring_blaze_talent 23155)
+# Conflagrate increases your ?s6353[Soul Fire, ][]?s196447[Channel Demonfire, ][]Immolate, Incinerate, and Conflagrate damage to the target by 265931s1 for 8 seconds.
+Define(sacrificed_souls_talent 23161)
+# Shadow Bolt and Demonbolt deal s1 additional damage per demon you have summoned.
 Define(shadowburn_talent 23157)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
+Define(siphon_life_talent 22089)
+# Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
 Define(siphon_life_talent 22089)
 # Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
 Define(soul_fire_talent 22040)
@@ -377,12 +412,16 @@ Define(summon_vilefiend_talent 23160)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
 Define(vile_taint_talent 22046)
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+Define(vile_taint_talent 22046)
+# Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+Define(demonic_tyrant 135002)
 Define(vilefiend 135816)
 Define(wild_imp 55659)
 Define(wild_imp_inner_demons 143622)
-Define(unbridled_fury_item 139327)
-Define(cascading_calamity_trait 275372)
-Define(explosive_potential_trait 275395)
+Define(potion_of_spectral_intellect_item 171273)
+Define(odr_shawl_of_the_ymirjar_runeforge 7037)
+Define(corrupting_leer_conduit 174)
+Define(lead_by_example_soulbind 342156)
     `;
 // END
 

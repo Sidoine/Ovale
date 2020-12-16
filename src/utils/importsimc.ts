@@ -22,7 +22,7 @@ import { getFixes } from "./fixes";
 
 const outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
-const profilesDirectory = simcDirectory + "/profiles/Tier25";
+const profilesDirectory = simcDirectory + "/profiles/Tier26";
 const SIMC_CLASS = [
     "deathknight",
     "demonhunter",
