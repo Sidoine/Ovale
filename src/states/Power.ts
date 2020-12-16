@@ -19,7 +19,7 @@ import {
 import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { BaseState } from "./BaseState";
-import { OvaleDataClass, SpellInfo } from "../engine/data";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
@@ -642,22 +642,19 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return power;
     }
 
-    hasPowerFor(spellInfo: SpellInfo, atTime: number) {
-        for (const [, powerType] of kpairs(this.POWER_TYPE)) {
-            const cost = this.ovaleData.getSpellInfoProperty(
-                spellInfo,
-                atTime,
-                powerType
-            );
-            this.tracer.Log("Spell has cost of %d for %s", cost, powerType);
-            if (
-                cost !== undefined &&
-                cost > this.getPowerAt(this.GetState(atTime), powerType, atTime)
-            ) {
-                return false;
-            }
-        }
-        return true;
+    hasPowerFor(
+        spellId: number,
+        atTime: number,
+        targetGUID?: string
+    ): boolean {
+        const seconds = this.getTimeToPowerStateAt(
+            this.GetState(atTime),
+            spellId,
+            atTime,
+            targetGUID,
+            undefined
+        );
+        return (seconds === 0);
     }
 
     /**
@@ -768,7 +765,17 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                         targetGUID
                     );
                     if (cost > 0) {
+                        this.tracer.Log("    Spell ID '%d' has cost of %d %s",
+                            spellId,
+                            cost,
+                            pType
+                        );
                         if (powerType == pType && extraPower) {
+                            this.tracer.Log(
+                                "        Including extra power %d for %s",
+                                extraPower,
+                                pType
+                            );
                             cost = cost + extraPower;
                         }
                         const power = this.getPowerAt(state, pType, atTime);
@@ -777,17 +784,29 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                                 this.getPowerRateAt(state, pType, atTime);
                             if (powerRate > 0) {
                                 const seconds = (cost - power) / powerRate;
+                                this.tracer.Log(
+                                    "        Requires %f seconds to %d %s",
+                                    seconds,
+                                    cost,
+                                    pType
+                                );
                                 if (timeToPower < seconds) {
                                     timeToPower = seconds;
                                 }
                             } else {
-                                return INFINITY;
+                                timeToPower = INFINITY;
+                                break;
                             }
                         }
                     }
                 }
             }
         }
+        this.tracer.Log(
+            "Spell ID '%d' requires %f seconds for power requirements.",
+            spellId,
+            timeToPower
+        );
         return timeToPower;
     }
 }
