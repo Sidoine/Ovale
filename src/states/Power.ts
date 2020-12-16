@@ -606,12 +606,25 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * Power regeneration rate for the given powerType.
      * @param powerType
      */
-    getPowerRateAt(state: PowerState, powerType: string, atTime: number) {
+    getPowerRateAt(
+        state: PowerState,
+        powerType: string,
+        atTime: number
+    ): number {
+        let rate: number;
         if (this.combat.isInCombat(atTime)) {
-            return state.activeRegen[powerType];
+            rate = state.activeRegen[powerType] || 0;
         } else {
-            return state.inactiveRegen[powerType];
+            rate = state.inactiveRegen[powerType] || 0;
         }
+        const REGEN_RATE_MIN_THRESHOLD = 0.05;
+        if (
+            (rate > 0 && rate < REGEN_RATE_MIN_THRESHOLD) ||
+            (rate < 0 && rate > -1 * REGEN_RATE_MIN_THRESHOLD)
+        ) {
+            rate = 0;
+        }
+        return rate;
     }
     /**
      * Power atTime for the given powerType.
@@ -626,7 +639,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         let power = state.power[powerType] || 0;
         const now = this.baseState.currentTime;
         const seconds = atTime - now;
-        const powerRate = this.getPowerRateAt(state, powerType, atTime) || 0;
+        const powerRate = this.getPowerRateAt(state, powerType, atTime);
         power = power + powerRate * seconds;
         return power;
     }
@@ -760,7 +773,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
                 if (power < cost) {
                     const powerRate =
-                        this.getPowerRateAt(state, powerType, atTime) || 0;
+                        this.getPowerRateAt(state, powerType, atTime);
                     if (powerRate > 0) {
                         seconds = (cost - power) / powerRate;
                     } else {
