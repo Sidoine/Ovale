@@ -106,10 +106,11 @@ export class OvaleVersionClass {
             if (channel) {
                 this.module.SendCommMessage(MSG_PREFIX, message, channel);
             }
-            self_timer = this.module.ScheduleTimer("PrintVersionCheck", 3);
+            self_timer = this.module.ScheduleTimer(this.printVersionCheck, 3);
         }
     }
-    PrintVersionCheck() {
+
+    private printVersionCheck = () => {
         if (next(self_userVersion)) {
             wipe(self_printTable);
             for (const [sender, userVersion] of pairs(self_userVersion)) {
@@ -126,5 +127,5 @@ export class OvaleVersionClass {
             this.tracer.Print(">>> No other Ovale users present.");
         }
         self_timer = undefined;
-    }
+    };
 }
