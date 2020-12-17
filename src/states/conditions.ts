@@ -5888,25 +5888,26 @@ l    */
         atTime: number
     ) {
         level = level || 0;
-        const power = this.OvalePower.next.power[powerType] || 0;
-        const powerRegen =
-            this.OvalePower.getPowerRateAt(
-                this.OvalePower.next,
-                powerType,
-                atTime
-            ) || 1;
-        if (powerRegen == 0) {
-            if (power == level) {
-                return Compare(0, comparator, limit);
-            }
-            return Compare(INFINITY, comparator, limit);
-        } else {
-            const t = (level - power) / powerRegen;
-            if (t > 0) {
-                const ending = atTime + t;
-                return TestValue(0, ending, 0, ending, -1, comparator, limit);
-            }
+        const seconds = this.OvalePower.getTimeToPowerAt(
+            this.OvalePower.next,
+            level,
+            powerType,
+            atTime
+        );
+        if (seconds == 0) {
             return Compare(0, comparator, limit);
+        } else if (seconds < INFINITY) {
+            return TestValue(
+                0,
+                atTime + seconds,
+                seconds,
+                atTime,
+                -1,
+                comparator,
+                limit
+            );
+        } else {
+            return Compare(INFINITY, comparator, limit);
         }
     }
 
