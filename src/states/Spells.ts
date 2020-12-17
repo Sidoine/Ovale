@@ -175,7 +175,7 @@ export class OvaleSpellsClass implements StateModule {
                 isUsable = false;
             }
             if (isUsable) {
-                noMana = !this.power.hasPowerFor(si, atTime);
+                noMana = !this.power.hasPowerFor(spellId, atTime, targetGUID);
                 if (noMana) {
                     isUsable = false;
                     this.tracer.Log(

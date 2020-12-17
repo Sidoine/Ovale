@@ -326,7 +326,7 @@ export class OvaleBestActionClass {
                 if (timeToPower > timeToCd) {
                     result.actionResourceExtend = timeToPower - timeToCd;
                     this.tracer.Log(
-                        "Spell ID '%s' requires an extra %fs for primary resource.",
+                        "Spell ID '%s' requires an extra %f seconds for power requirements.",
                         spellId,
                         result.actionResourceExtend
                     );

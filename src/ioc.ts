@@ -271,7 +271,6 @@ export class IoC {
             this.profiler,
             this.data,
             this.baseState,
-            this.paperDoll,
             this.spellBook,
             combat
         );

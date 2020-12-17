@@ -19,12 +19,11 @@ import {
 import { isNumber, OneTimeMessage } from "../tools/tools";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { BaseState } from "./BaseState";
-import { OvaleDataClass, SpellInfo } from "../engine/data";
+import { OvaleDataClass } from "../engine/data";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
-import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleCombatClass } from "./combat";
 import { OptionUiAll } from "../ui/acegui-helpers";
@@ -107,7 +106,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private baseState: BaseState,
-        private ovalePaperDoll: OvalePaperDollClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private combat: OvaleCombatClass
     ) {
@@ -606,12 +604,25 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
      * Power regeneration rate for the given powerType.
      * @param powerType
      */
-    getPowerRateAt(state: PowerState, powerType: string, atTime: number) {
+    getPowerRateAt(
+        state: PowerState,
+        powerType: string,
+        atTime: number
+    ): number {
+        let rate: number;
         if (this.combat.isInCombat(atTime)) {
-            return state.activeRegen[powerType];
+            rate = state.activeRegen[powerType] || 0;
         } else {
-            return state.inactiveRegen[powerType];
+            rate = state.inactiveRegen[powerType] || 0;
         }
+        const REGEN_RATE_MIN_THRESHOLD = 0.05;
+        if (
+            (rate > 0 && rate < REGEN_RATE_MIN_THRESHOLD) ||
+            (rate < 0 && rate > -1 * REGEN_RATE_MIN_THRESHOLD)
+        ) {
+            rate = 0;
+        }
+        return rate;
     }
     /**
      * Power atTime for the given powerType.
@@ -626,27 +637,24 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         let power = state.power[powerType] || 0;
         const now = this.baseState.currentTime;
         const seconds = atTime - now;
-        const powerRate = this.getPowerRateAt(state, powerType, atTime) || 0;
+        const powerRate = this.getPowerRateAt(state, powerType, atTime);
         power = power + powerRate * seconds;
         return power;
     }
 
-    hasPowerFor(spellInfo: SpellInfo, atTime: number) {
-        for (const [, powerType] of kpairs(this.POWER_TYPE)) {
-            const cost = this.ovaleData.getSpellInfoProperty(
-                spellInfo,
-                atTime,
-                powerType
-            );
-            this.tracer.Log("Spell has cost of %d for %s", cost, powerType);
-            if (
-                cost !== undefined &&
-                cost > this.getPowerAt(this.GetState(atTime), powerType, atTime)
-            ) {
-                return false;
-            }
-        }
-        return true;
+    hasPowerFor(
+        spellId: number,
+        atTime: number,
+        targetGUID?: string
+    ): boolean {
+        const seconds = this.getTimeToPowerStateAt(
+            this.GetState(atTime),
+            spellId,
+            atTime,
+            targetGUID,
+            undefined
+        );
+        return (seconds === 0);
     }
 
     /**
@@ -742,33 +750,63 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         targetGUID: string | undefined,
         powerType: PowerType | undefined,
         extraPower?: number
-    ) {
-        let seconds = 0;
-        powerType = powerType || POOLED_RESOURCE[this.ovalePaperDoll.class];
-        if (powerType) {
-            let [cost] = this.getPowerCostAt(
-                state,
-                spellId,
-                powerType,
-                atTime,
-                targetGUID
-            );
-            if (cost > 0) {
-                const power = this.getPowerAt(state, powerType, atTime);
-                if (extraPower) {
-                    cost = cost + extraPower;
-                }
-                if (power < cost) {
-                    const powerRate =
-                        this.getPowerRateAt(state, powerType, atTime) || 0;
-                    if (powerRate > 0) {
-                        seconds = (cost - power) / powerRate;
-                    } else {
-                        seconds = INFINITY;
+    ): number {
+        let timeToPower = 0;
+        const si = this.ovaleData.spellInfo[spellId];
+        if (si) {
+            for (const [, powerInfo] of kpairs(this.POWER_INFO)) {
+                const pType = powerInfo.type;
+                if (powerType === undefined || powerType == pType) {
+                    let [cost] = this.getPowerCostAt(
+                        state,
+                        spellId,
+                        pType,
+                        atTime,
+                        targetGUID
+                    );
+                    if (cost > 0) {
+                        this.tracer.Log("    Spell ID '%d' has cost of %d %s",
+                            spellId,
+                            cost,
+                            pType
+                        );
+                        if (powerType == pType && extraPower) {
+                            this.tracer.Log(
+                                "        Including extra power %d for %s",
+                                extraPower,
+                                pType
+                            );
+                            cost = cost + extraPower;
+                        }
+                        const power = this.getPowerAt(state, pType, atTime);
+                        if (power < cost) {
+                            const powerRate =
+                                this.getPowerRateAt(state, pType, atTime);
+                            if (powerRate > 0) {
+                                const seconds = (cost - power) / powerRate;
+                                this.tracer.Log(
+                                    "        Requires %f seconds to %d %s",
+                                    seconds,
+                                    cost,
+                                    pType
+                                );
+                                if (timeToPower < seconds) {
+                                    timeToPower = seconds;
+                                }
+                            } else {
+                                timeToPower = INFINITY;
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
-        return seconds;
+        this.tracer.Log(
+            "Spell ID '%d' requires %f seconds for power requirements.",
+            spellId,
+            timeToPower
+        );
+        return timeToPower;
     }
 }
