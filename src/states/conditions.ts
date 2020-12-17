@@ -49,7 +49,7 @@ import {
     UnitPowerMax,
     UnitRace,
 } from "@wowts/wow-mock";
-import { huge, min } from "@wowts/math";
+import { huge as INFINITY, min } from "@wowts/math";
 import {
     PositionalParameters,
     NamedParametersOf,
@@ -77,8 +77,6 @@ import { OvaleSigilClass } from "./DemonHunterSigils";
 import { OvaleRunesClass } from "./Runes";
 import { OvaleBossModClass } from "./BossMod";
 import { isNumber, KeyCheck, OneTimeMessage } from "../tools/tools";
-
-const INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
 function BossArmorDamageReduction(target: string) {
@@ -291,7 +289,7 @@ export class OvaleConditions {
                     id,
                     this.OvalePaperDoll.next
                 );
-                if (value != huge) {
+                if (value != INFINITY) {
                     break;
                 }
             }
@@ -5177,7 +5175,7 @@ l    */
         if (earliest == INFINITY) {
             return Compare(0, comparator, limit);
         } else if (earliest > 0) {
-            return TestValue(0, huge, 0, earliest, -1, comparator, limit);
+            return TestValue(0, INFINITY, 0, earliest, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
     };
