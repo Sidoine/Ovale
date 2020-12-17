@@ -625,6 +625,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         return rate;
     }
+
     /**
      * Power atTime for the given powerType.
      * @param powerType
@@ -641,6 +642,29 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         const powerRate = this.getPowerRateAt(state, powerType, atTime);
         power = power + powerRate * seconds;
         return power;
+    }
+
+    /**
+     * Number of seconds until powrLevel is reached atTime for the powerType.
+     * @param powerLevel
+     * @param powerType
+     * @param atTime
+     */
+    getTimeToPowerAt(
+        state: PowerState,
+        powerLevel: number,
+        powerType: PowerType,
+        atTime: number,
+    ): number {
+        let seconds = INFINITY;
+        const power = this.getPowerAt(state, powerType, atTime)
+        if (power < powerLevel) {
+            const powerRate = this.getPowerRateAt(state, powerType, atTime);
+            if (powerRate > 0) {
+                seconds = (powerLevel - power) / powerRate;
+            }
+        }
+        return seconds;
     }
 
     hasPowerFor(
@@ -787,26 +811,22 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                                 cost = cost + <number>extraAmount;
                             }
                         }
-                        const power = this.getPowerAt(state, pType, atTime);
-                        if (power < cost) {
-                            const powerRate =
-                                this.getPowerRateAt(state, pType, atTime);
-                            if (powerRate > 0) {
-                                const seconds = (cost - power) / powerRate;
-                                this.tracer.Log(
-                                    "        Requires %f seconds to %d %s",
-                                    seconds,
-                                    cost,
-                                    pType
-                                );
-                                if (timeToPower < seconds) {
-                                    timeToPower = seconds;
-                                }
-                            } else {
-                                timeToPower = INFINITY;
-                                break;
-                            }
+                        const seconds = this.getTimeToPowerAt(
+                            state,
+                            cost,
+                            pType,
+                            atTime
+                        );
+                        this.tracer.Log(
+                            "        Requires %f seconds to %d %s",
+                            seconds,
+                            cost,
+                            pType
+                        );
+                        if (timeToPower < seconds) {
+                            timeToPower = seconds;
                         }
+                        if (timeToPower === INFINITY) break;
                     }
                 }
             }
