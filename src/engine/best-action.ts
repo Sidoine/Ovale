@@ -292,8 +292,6 @@ export class OvaleBestActionClass {
                 result.actionTexture = `Interface\\Icons\\${si.texture}`;
             }
             if (result.actionCooldownStart && result.actionCooldownDuration) {
-                const extraPower =
-                    <number>element.cachedParams.named.extra_amount || 0;
                 // let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, targetGUID, extraPower);
                 const timeToCd =
                     (result.actionCooldownDuration > 0 &&
@@ -306,7 +304,7 @@ export class OvaleBestActionClass {
                     atTime,
                     targetGUID,
                     undefined,
-                    extraPower
+                    element.cachedParams.named
                 );
                 const runes = this.ovaleData.GetSpellInfoProperty(
                     spellId,

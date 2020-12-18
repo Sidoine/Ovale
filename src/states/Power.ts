@@ -25,6 +25,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleSpellBookClass } from "./SpellBook";
+import { NamedParametersOf, AstActionNode } from "../engine/ast";
 import { OvaleCombatClass } from "./combat";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
@@ -470,7 +471,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         atTime: number,
         targetGUID: string | undefined,
         powerType: PowerType | undefined,
-        extraPower?: number
+        extraPower?: NamedParametersOf<AstActionNode>
     ) {
         return this.getTimeToPowerStateAt(
             this.GetState(atTime),
@@ -749,7 +750,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         atTime: number,
         targetGUID: string | undefined,
         powerType: PowerType | undefined,
-        extraPower?: number
+        extraPower?: NamedParametersOf<AstActionNode>
     ): number {
         let timeToPower = 0;
         const si = this.ovaleData.spellInfo[spellId];
@@ -770,13 +771,21 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                             cost,
                             pType
                         );
-                        if (powerType == pType && extraPower) {
-                            this.tracer.Log(
-                                "        Including extra power %d for %s",
-                                extraPower,
-                                pType
-                            );
-                            cost = cost + extraPower;
+                        if (extraPower) {
+                            let extraAmount
+                            if (pType == "energy") {
+                                extraAmount = extraPower.extra_energy;
+                            } else if (pType == "focus") {
+                                extraAmount = extraPower.extra_focus;
+                            }
+                            if (isNumber(extraAmount)) {
+                                this.tracer.Log(
+                                    "        Including extra power %d for %s",
+                                    extraAmount,
+                                    pType
+                                );
+                                cost = cost + <number>extraAmount;
+                            }
                         }
                         const power = this.getPowerAt(state, pType, atTime);
                         if (power < cost) {
