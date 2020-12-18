@@ -8,9 +8,9 @@
             "type": "node",
             "request": "launch",
             "name": "SimulationCraft",
-            "program": "${workspaceFolder}/dist/src/utils/importsimc.js",
+            "program": "${workspaceFolder}/dist/src/utils/importsimc/index.js",
             "protocol": "inspector",
-            "args": ["../../simc/", "T25_Mage_Arcane.simc"],
+            "args": ["../../simc/", "T26_Druid_Feral_Owlweave.simc"],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {

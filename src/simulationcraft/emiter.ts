@@ -95,6 +95,17 @@ function IsTotem(name: string) {
     return false;
 }
 
+function emitTrinketCondition(pattern: string, slot?: string) {
+    if (slot) {
+        return format(pattern, slot);
+    } else {
+        return `{${format(pattern, "trinket0slot")} and ${format(
+            pattern,
+            "trinket1slot"
+        )}}`;
+    }
+}
+
 type Disambiguations = LuaObj<LuaObj<LuaObj<{ 1: string; 2: string }>>>;
 
 export class Emiter {
@@ -166,6 +177,7 @@ export class Emiter {
                     return [potionName, _type];
                 }
             }
+
             return [name, _type];
         }
 
@@ -327,6 +339,30 @@ export class Emiter {
         this.AddDisambiguation(
             "spectral_intellect_item",
             "potion_of_spectral_intellect_item"
+        );
+        this.AddDisambiguation(
+            "spectral_strength_item",
+            "potion_of_spectral_strength_item"
+        );
+        this.AddDisambiguation(
+            "spectral_agility_item",
+            "potion_of_spectral_agility_item"
+        );
+        this.AddDisambiguation(
+            "dreadfire_vessel_344732",
+            "dreadfire_vessel",
+            "MAGE"
+        );
+        this.AddDisambiguation("fiend", "shadowfiend", "PRIEST");
+        this.AddDisambiguation(
+            "deeper_strategem_talent",
+            "deeper_stratagem_talent",
+            "ROGUE"
+        );
+        this.AddDisambiguation(
+            "dark_trasnformation",
+            "dark_transformation",
+            "DEATHKNIGHT"
         );
     }
 
@@ -2321,6 +2357,15 @@ export class Emiter {
                     annotation,
                     action
                 );
+            } else if (token === "dbc") {
+                node = this.emitOperandDbc(
+                    operand,
+                    parseNode,
+                    nodeList,
+                    annotation,
+                    action,
+                    target
+                );
             } else if (token == "debuff") {
                 target = target || "target";
                 node = this.EmitOperandBuff(
@@ -2606,6 +2651,12 @@ export class Emiter {
             code = format("ExecuteTime(%s)", name);
         } else if (property == "executing") {
             code = format("ExecuteTime(%s) > 0", name);
+        } else if (
+            property === "full_reduction" ||
+            property === "tick_reduction"
+        ) {
+            // TODO
+            code = "0";
         } else if (property == "gcd") {
             code = "GCD()";
         } else if (property == "hit_damage") {
@@ -2851,6 +2902,36 @@ export class Emiter {
             name === "vilefiend" || name === "wild_imps" || name === "tyrant"
         );
     }
+
+    private emitOperandDbc: EmitOperandVisitor = (
+        operand,
+        parseNode,
+        nodeList,
+        annotation,
+        action,
+        target
+    ) => {
+        if (!annotation.dbc) return undefined;
+
+        const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+        const token = tokenIterator();
+        if (token !== "dbc") return undefined;
+        const dataBaseName = tokenIterator();
+        if (dataBaseName === "effect") {
+            const effectId = tonumber(tokenIterator());
+            const property = tokenIterator();
+            if (property === "base_value") {
+                const effect = annotation.dbc.effect[effectId];
+                if (effect) {
+                    return this.ovaleAst.newValue(
+                        annotation.astAnnotation,
+                        effect.base_value
+                    );
+                }
+            }
+        }
+        return undefined;
+    };
 
     private EmitOperandBuff: EmitOperandVisitor = (
         operand,
@@ -4245,7 +4326,7 @@ export class Emiter {
                     this.AddSymbol(annotation, name);
                 }
             } else if (token == "has_cooldown") {
-                code = format("ItemCooldown(%s) > 0", name);
+                code = format("ItemCooldownDuration(%s) > 0", name);
                 this.AddSymbol(annotation, name);
             } else if (token == "up") {
                 code = format("BuffPresent(%s)", buffName);
@@ -4310,7 +4391,7 @@ export class Emiter {
                 } else {
                     code = format("HasTalent(%s no)", talentName);
                 }
-            } else if (property == "enabled") {
+            } else if (property == "enabled" || property === undefined) {
                 if (parseNode.asType == "boolean") {
                     code = format("HasTalent(%s)", talentName);
                 } else {
@@ -4433,21 +4514,41 @@ export class Emiter {
         const token = tokenIterator();
         if (token == "trinket") {
             let procType = tokenIterator();
+            let slot;
             if (procType === "1" || procType === "2") {
-                procType = tokenIterator(); // TODO use trinket slot?
+                slot = `trinket${tonumber(procType) - 1}slot`;
+                procType = tokenIterator();
             }
             const statName = tokenIterator();
             let code;
-            if (procType === "cooldown") {
+            if (procType === "is" && slot && statName) {
+                let [item] = this.Disambiguate(
+                    annotation,
+                    `${statName}_item`,
+                    annotation.classId,
+                    annotation.specialization
+                );
+                code = `iteminslot("${slot}") == ${item}`;
+                this.AddSymbol(annotation, item);
+            } else if (procType === "cooldown") {
                 if (statName == "remains") {
-                    code =
-                        "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
+                    code = emitTrinketCondition(`ItemCooldown("%s")`, slot);
+                } else if (statName === "duration") {
+                    code = emitTrinketCondition(
+                        `ItemCooldownDuration(slot="%s")`,
+                        slot
+                    );
                 }
+            } else if (procType === "ready_cooldown") {
+                // TODO The item internal cooldown is ready
+                code = "0";
             } else if (procType === "has_cooldown") {
-                code =
-                    "{ ItemCooldown(Trinket0Slot) and ItemCooldown(Trinket1Slot) }";
-            } else if (sub(procType, 1, 4) == "has_") {
-                code = format("always(trinket_%s_%s)", procType, statName);
+                code = emitTrinketCondition(
+                    `ItemCooldownDuration(slot="%s")`,
+                    slot
+                );
+            } else if (procType == "has_proc") {
+                code = emitTrinketCondition(`ItemRppm(slot="%s") > 0`, slot);
             } else {
                 const property = statName;
                 const [buffName] = this.Disambiguate(

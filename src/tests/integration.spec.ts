@@ -142,7 +142,18 @@ test("sc_t26_warrior_arms", () => integrationTest("sc_t26_warrior_arms"));
 test("sc_t26_warrior_fury", () => {
     integrationTest("sc_t26_warrior_fury");
 });
-
+test("sc_t26_demon_hunter_havoc_momentum", () =>
+    integrationTest("sc_t26_demon_hunter_havoc_momentum"));
+test("sc_t26_druid_feral_owlweave", () =>
+    integrationTest("sc_t26_druid_feral_owlweave"));
+test("sc_t26_priest_shadow_necrolord", () =>
+    integrationTest("sc_t26_priest_shadow_necrolord"));
+test("sc_t26_shaman_elemental_nf", () =>
+    integrationTest("sc_t26_shaman_elemental_nf"));
+test("sc_t26_shaman_enhancement_vdw", () =>
+    integrationTest("sc_t26_shaman_enhancement_vdw"));
+test("sc_t26_warrior_protection", () =>
+    integrationTest("sc_t26_warrior_protection"));
 test("All scripts are tested", () => {
     const missingScripts: string[] = [];
     for (const [name, script] of pairs(mainIoC.scripts.script)) {

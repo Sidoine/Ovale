@@ -208,25 +208,25 @@ export class OvaleCompileClass {
         if (itemId) {
             const ii = this.ovaleData.ItemInfo(itemId);
             for (const [k, v] of kpairs(namedParams)) {
-                if (k == "proc") {
-                    const buff = v;
-                    if (buff.type === "value" && isNumber(buff.value)) {
-                        const name = "item_proc_" + namedParams.proc;
-                        const list = this.ovaleData.buffSpellList[name] || {};
-                        list[buff.value] = true;
-                        this.ovaleData.buffSpellList[name] = list;
-                    } else {
-                        ok = false;
-                        break;
-                    }
-                } else {
-                    if (v.type === "value" || v.type === "string")
-                        (ii as any)[k] = v.value;
-                    else {
-                        ok = false;
-                        break;
-                    }
+                // if (k == "proc") {
+                //     const buff = v;
+                //     if (buff.type === "value" && isNumber(buff.value)) {
+                //         const name = "item_proc_" + namedParams.proc;
+                //         const list = this.ovaleData.buffSpellList[name] || {};
+                //         list[buff.value] = true;
+                //         this.ovaleData.buffSpellList[name] = list;
+                //     } else {
+                //         ok = false;
+                //         break;
+                //     }
+                // } else {
+                if (v.type === "value" || v.type === "string")
+                    (ii as any)[k] = v.value;
+                else {
+                    ok = false;
+                    break;
                 }
+                // }
             }
             this.ovaleData.itemInfo[itemId] = ii;
         }
@@ -446,7 +446,7 @@ export class OvaleCompileClass {
                                     spellName
                                 );
                             }
-                        } else {
+                        } else if (spellId > 0) {
                             this.tracer.Error(
                                 "Unknown spell with ID %s.",
                                 spellId

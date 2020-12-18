@@ -561,6 +561,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
     ["deficit"]: { type: MiscOperandModifierType.Suffix },
     ["pct"]: { name: "percent", type: MiscOperandModifierType.Suffix },
     ["regen"]: { name: "regenrate", type: MiscOperandModifierType.Suffix },
+    ["time_to_40"]: {
+        name: "timeto",
+        type: MiscOperandModifierType.Prefix,
+        extraParameter: 40,
+    },
     ["time_to_50"]: {
         name: "timeto",
         type: MiscOperandModifierType.Prefix,
@@ -598,13 +603,17 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             1: "careful_aim_talent",
         },
     },
+    ["can_seed"]: { name: "buffexpires", extraSymbol: "seed_of_corruption" },
     ["chi"]: { name: "chi", modifiers: powerModifiers },
+    ["effective_combo_points"]: { name: "combopoints" },
     ["combo_points"]: { name: "combopoints", modifiers: powerModifiers },
     ["conduit"]: {
         symbol: "conduit",
         modifiers: {
             enabled: { type: MiscOperandModifierType.Remove },
             rank: { type: MiscOperandModifierType.Suffix },
+            value: { name: "value", type: MiscOperandModifierType.Suffix },
+            time_value: { name: "value", type: MiscOperandModifierType.Suffix },
         },
     },
     ["consecration"]: {
@@ -652,6 +661,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 type: MiscOperandModifierType.Replace,
                 name: "buffpresent",
             },
+            remains: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffremains",
+            },
         },
         extraSymbol: "death_and_decay",
     },
@@ -666,6 +679,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
         name: "checkboxon",
         modifiers: {
             catweave_bear: {
+                type: MiscOperandModifierType.Parameter,
+                createOptions: true,
+            },
+            owlweave_cat: {
                 type: MiscOperandModifierType.Parameter,
                 createOptions: true,
             },
@@ -820,6 +837,24 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             mantle: {
                 name: "mantle_stealthed_buff",
                 type: MiscOperandModifierType.Symbol,
+            },
+            sepsis: {
+                name: "sepsis_buff",
+                type: MiscOperandModifierType.Symbol,
+            },
+        },
+    },
+    ["tar_trap"]: {
+        modifiers: {
+            remains: {
+                name: "buffremaining",
+                extraSymbol: "tar_trap",
+                type: MiscOperandModifierType.Replace,
+            },
+            up: {
+                name: "buffpresent",
+                extraSymbol: "tar_trap",
+                type: MiscOperandModifierType.Replace,
             },
         },
     },
@@ -1041,6 +1076,14 @@ export function checkOptionalSkill(
 
 export type InterruptAnnotation = { [key in Interrupts]?: ClassId };
 
+interface DbcSpellEffect {
+    base_value: number;
+}
+
+export interface DbcData {
+    effect: LuaArray<DbcSpellEffect>;
+}
+
 export class Annotation implements InterruptAnnotation {
     mind_freeze?: ClassId;
     pummel?: ClassId;
@@ -1112,6 +1155,7 @@ export class Annotation implements InterruptAnnotation {
     vengeful_retreat?: string;
     shield_of_vengeance?: string;
     symbolList: LuaArray<string> = {};
+    dbc?: DbcData;
 
     constructor(
         private ovaleData: OvaleDataClass,

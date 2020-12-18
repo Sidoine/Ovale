@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
-import { LuaObj } from "@wowts/lua";
+import { LuaArray, LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
-import { SpecializationName } from "../states/PaperDoll";
+import { SpecializationName } from "../../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
 import * as parse from "csv-parse/lib/sync";
 import { SpellShapeshift } from "./types";
@@ -16,6 +16,7 @@ interface AllData {
     azerite_power_entry_t?: CellValue[][];
     azerite_essence_entry_t?: CellValue[][];
     dbc_item_data_t?: CellValue[][];
+    item_effect_t?: CellValue[][];
     spelltext_data_t?: CellValue[][];
     runeforge_legendary_entry_t?: CellValue[][];
     conduit_entry_t?: CellValue[][];
@@ -1048,6 +1049,17 @@ export interface TalentData {
     talentId: number;
 }
 
+export interface ItemEffect {
+    id: number;
+    spell_id: number;
+    item_id: number;
+    index: number;
+    type: number;
+    cooldown_group: number;
+    cooldown_duration: number;
+    cooldown_group_duration: number;
+}
+
 export interface ItemData {
     id: number;
     name: string;
@@ -1092,6 +1104,7 @@ export interface ItemData {
     id_curve: number;
 
     identifier: string;
+    itemEffects: ItemEffect[];
 }
 
 export interface AzeriteTrait {
@@ -1124,6 +1137,7 @@ export interface Conduit {
     spell_id: number;
     name: string;
     identifier: string;
+    ranks: ConduitRank[];
 }
 
 export interface ConduitRank {
@@ -1432,6 +1446,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "sc_spell_data", output);
     readFile(directory, "sc_talent_data", output);
     readFile(directory, "item_data", output);
+    readFile(directory, "item_effect", output);
     readFile(directory, "azerite", output);
     readFile(directory, "specialization_spells", output);
     readFile(directory, "spelltext_data", output);
@@ -1637,6 +1652,7 @@ export function getSpellData(directory: string) {
     console.log("Import spell effects data...");
     if (!output.spelleffect_data_t) throw Error("No spelleffect_data_t");
 
+    const spellEffectById: LuaArray<SpellEffectData> = {};
     for (const row of output.spelleffect_data_t) {
         let i = 0;
         const spellEffect: SpellEffectData = {
@@ -1672,6 +1688,8 @@ export function getSpellData(directory: string) {
 
         // TODO There seems to be a bug in Simulationcraft
         if (spellEffect.id === 0) continue;
+
+        spellEffectById[spellEffect.id] = spellEffect;
 
         const spell = spellDataById.get(spellEffect.spell_id);
         if (!spell)
@@ -1997,10 +2015,26 @@ export function getSpellData(directory: string) {
             spell_id: getNumber(row, i++),
             name: getString(row, i++),
             identifier: "",
+            ranks: [],
         };
         conduit.identifier = getIdentifier(conduit.name + "_conduit");
         identifiers[conduit.identifier] = conduit.id;
         conduitById.set(conduit.id, conduit);
+    }
+
+    if (!output.conduit_rank_entry_t) throw Error("No conduit_rank_entry_t");
+    for (const row of output.conduit_rank_entry_t) {
+        let i = 0;
+        const rank: ConduitRank = {
+            conduit_id: getNumber(row, i++),
+            rank: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            value: getNumber(row, i++),
+        };
+        const conduit = conduitById.get(rank.conduit_id);
+        if (conduit) {
+            conduit.ranks.push(rank);
+        }
     }
 
     console.log("Import souldbind abilities...");
@@ -2059,10 +2093,29 @@ export function getSpellData(directory: string) {
             id_artifact: getNumber(row, i++),
 
             identifier: "",
+            itemEffects: [],
         };
         item.identifier = getIdentifier(item.name) + "_item";
         itemsById.set(item.id, item);
         identifiers[item.identifier] = item.id;
+    }
+
+    if (!output.item_effect_t) throw Error("No item_effect_t");
+    console.log("Import item effect data..");
+    for (const row of output.item_effect_t) {
+        let i = 0;
+        const itemEffect: ItemEffect = {
+            id: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            item_id: getNumber(row, i++),
+            index: getNumber(row, i++),
+            type: getNumber(row, i++),
+            cooldown_group: getNumber(row, i++),
+            cooldown_duration: getNumber(row, i++),
+            cooldown_group_duration: getNumber(row, i++),
+        };
+        const item = itemsById.get(itemEffect.item_id);
+        item?.itemEffects.push(itemEffect);
     }
 
     console.log("Write files...");
@@ -2087,5 +2140,8 @@ export function getSpellData(directory: string) {
         runeforgeById,
         conduitById,
         soulbindAbilityById,
+        spellEffectById,
     };
 }
+
+export type DbcData = ReturnType<typeof getSpellData>;

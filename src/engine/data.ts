@@ -148,6 +148,9 @@ export interface SpellInfoValues
     gcd?: number;
     shared_cd?: string;
     cd?: number;
+    /** Internal cooldown (mainly on items) */
+    icd?: number;
+    rppm?: number;
     charge_cd?: number;
     forcecd?: number;
     buff_cd?: number; // Internal cooldown, rename?

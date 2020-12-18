@@ -5,10 +5,11 @@ import {
     SpellAttributes,
     EffectType,
     isFriendlyTarget,
+    ItemData,
 } from "./importspells";
 import { writeFileSync } from "fs";
-import { SpellInfo } from "../engine/data";
-import { PowerType as OvalePowerType } from "../states/Power";
+import { SpellInfo } from "../../engine/data";
+import { PowerType as OvalePowerType } from "../../states/Power";
 import { debug } from "console";
 
 export interface CustomAura {
@@ -320,6 +321,47 @@ export function convertFromSpellData(
         require,
     };
     return customSpellData;
+}
+
+export interface CustomItemData {
+    id: number;
+    identifier: string;
+    itemInfo: SpellInfo;
+}
+
+export function convertFromItemData(
+    itemData: ItemData,
+    spellDataById: Map<number, SpellData>
+) {
+    const itemInfo: SpellInfo = { require: {} };
+    for (const effect of itemData.itemEffects) {
+        if (effect.cooldown_duration > 0)
+            itemInfo.cd = effect.cooldown_duration / 1000;
+        if (effect.cooldown_group_duration > 0)
+            itemInfo.cd = effect.cooldown_group_duration / 1000;
+        if (effect.spell_id) {
+            const spell = spellDataById.get(effect.spell_id);
+            if (spell) {
+                if (spell.cooldown > 0) {
+                    itemInfo.cd = spell.cooldown / 1000;
+                }
+                if (spell.internal_cooldown > 0) {
+                    itemInfo.icd = spell.internal_cooldown / 1000;
+                }
+                if (spell.rppm > 0) {
+                    itemInfo.rppm = spell.rppm;
+                }
+            }
+            itemInfo.proc = effect.spell_id;
+        }
+    }
+
+    const customItemData: CustomItemData = {
+        id: itemData.id,
+        identifier: itemData.identifier,
+        itemInfo,
+    };
+    return customItemData;
 }
 
 export function writeCustomSpell(

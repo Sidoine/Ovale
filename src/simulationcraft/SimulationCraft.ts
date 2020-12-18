@@ -29,6 +29,7 @@ import {
     OVALE_TAGS,
     classInfos,
     ActionListParseNode,
+    DbcData,
 } from "./definitions";
 import { OvaleDataClass } from "../engine/data";
 import { Emiter } from "./emiter";
@@ -186,7 +187,7 @@ export class OvaleSimulationCraftClass {
         return parsedProfile as Profile;
     }
 
-    ParseProfile(simc: string, dictionary?: LuaObj<number>) {
+    ParseProfile(simc: string, dictionary?: LuaObj<number>, dbc?: DbcData) {
         const profile = this.readProfile(simc);
 
         let classId: ClassId | undefined = undefined;
@@ -210,6 +211,7 @@ export class OvaleSimulationCraftClass {
             classId,
             profile.spec
         );
+        if (dbc) annotation.dbc = dbc;
         if (dictionary) annotation.dictionary = dictionary;
         profile.annotation = annotation;
 
