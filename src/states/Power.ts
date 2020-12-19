@@ -638,15 +638,16 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         powerType: PowerType,
         atTime: number,
     ): number {
-        let seconds = INFINITY;
         const power = this.getPowerAt(state, powerType, atTime)
         if (power < powerLevel) {
+            let seconds = INFINITY;
             const powerRate = this.getPowerRateAt(state, powerType, atTime);
             if (powerRate > 0) {
                 seconds = (powerLevel - power) / powerRate;
             }
+            return seconds;
         }
-        return seconds;
+        return 0;
     }
 
     /**
