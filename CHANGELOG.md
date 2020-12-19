@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.27](https://github.com/Sidoine/Ovale/compare/9.0.26...9.0.27) (2020-12-19)
+
+
+### Bug Fixes
+
+* check for time to Runes when computing Time to Power. ([#752](https://github.com/Sidoine/Ovale/issues/752)) ([3ddb48a](https://github.com/Sidoine/Ovale/commit/3ddb48aeac9be142fe603f911f3b7ef84b82b463))
+* register correct callback to AceTimer:ScheduleTimer() ([#742](https://github.com/Sidoine/Ovale/issues/742)) ([d8df7bd](https://github.com/Sidoine/Ovale/commit/d8df7bd244902f838153ba13587df80afd1af506))
+* spells are usable only if they meet all of their power requirements ([#746](https://github.com/Sidoine/Ovale/issues/746)) ([18d7714](https://github.com/Sidoine/Ovale/commit/18d77148dfd32c04b7b2c9f559b0aca624edb8c2)), closes [#737](https://github.com/Sidoine/Ovale/issues/737)
+* update to T26 SimulationCraft scripts ([bc3a3e1](https://github.com/Sidoine/Ovale/commit/bc3a3e1e564cfecaff1ddd248c3e6297ab42dfc9))
+
 ### [9.0.26](https://github.com/Sidoine/Ovale/compare/9.0.25...9.0.26) (2020-12-16)
 
 
