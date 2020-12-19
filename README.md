@@ -3,7 +3,7 @@
 It displays one or more icons that show the cooldown of an action. The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
 
 Default scripts are based on [SimulationCraft][]. You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
-Tank scripts based on guides from icy-veins.com are maintained by the [Ovale_TankScripts][] addon.
+Tank scripts based on guides from [Icy Veins][] are maintained by the [Ovale_TankScripts][] addon.
 
 **Please use the [Discord Server][ovale-discord] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
@@ -44,9 +44,9 @@ Blizzard does not allow this. Only a predefined sequence of spells can be bound 
 You need to reach level 10 and choose a specialization. However, be aware that the default [Ovale][] scripts are tuned for max-level characters and you may be missing key abilities at low levels that are assumed to exist. If the default script is not working for you, you will need to find or write a script more appropriate for your character's level.
 
 [corruption]: http://www.wowhead.com/spell=172
-[documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
 [dominos]: https://www.curseforge.com/wow/addons/dominos
 [github]: https://github.com/Sidoine/Ovale
+[icy veins]: https://www.icy-veins.com/
 [libbuttonglow-1.0]: https://www.curseforge.com/wow/addons/libbuttonglow-1-0
 [masque]: https://www.curseforge.com/wow/addons/masque
 [ovale]: https://www.curseforge.com/wow/addons/ovale
