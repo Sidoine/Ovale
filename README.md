@@ -12,7 +12,7 @@ See the [video of a survival hunter][ovale-video] using [Ovale][] during _Wrath 
 # Features
 
 -   Tracks DoTs, buffs, debuffs, cooldowns, combo points, runes, mana -- everything that a player would need to decide what to do.
--   Adapts to your talents.
+-   Adapts to your equipment and talents.
 -   100% configurable: everything is in an easy-to-understand script that you can modify and test in real-time without reloading your UI.
 -   Compatible with the action icon skinning library [Masque][].
 -   Uses [LibButtonGlow-1.0][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
