@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.28](https://github.com/Sidoine/Ovale/compare/9.0.27...9.0.28) (2020-12-19)
+
+
+### Bug Fixes
+
+* it does not take INFINITY seconds when we already have more power than required ([#753](https://github.com/Sidoine/Ovale/issues/753)) ([1afa181](https://github.com/Sidoine/Ovale/commit/1afa1814af3c002158f8e4b9eccbbe0966aba2a7))
+* specialization spells ([0695abd](https://github.com/Sidoine/Ovale/commit/0695abdc3b057e9973f207f716b84a8917f073c4))
+* spellFlashCore wasn't working with bartender and more fixes ([5dc77ac](https://github.com/Sidoine/Ovale/commit/5dc77acb3a8a01f78f1402177b58548fd67f62d5))
+
 ### [9.0.27](https://github.com/Sidoine/Ovale/compare/9.0.26...9.0.27) (2020-12-19)
 
 
