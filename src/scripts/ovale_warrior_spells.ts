@@ -228,10 +228,6 @@ Define(storm_bolt 107570)
   SpellRequire(storm_bolt unusable set=1 enabled=(not hastalent(storm_bolt_talent_fury)))
   # Stunned.
   SpellAddBuff(storm_bolt storm_bolt add=1)
-Define(sudden_death 29725)
-# Your attacks have a chance to make your next ?a317320[Condemn][Execute] cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
-  SpellInfo(sudden_death gcd=0 offgcd=1)
-  SpellRequire(sudden_death unusable set=1 enabled=(not hastalent(sudden_death_talent)))
 Define(sweeping_strikes 260708)
 # For 12 seconds your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellInfo(sweeping_strikes cd=45 duration=12 gcd=0.75)
@@ -309,12 +305,11 @@ Define(skullsplitter_talent 22371)
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(storm_bolt_talent_fury 23093)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
-Define(sudden_death_talent 22360)
-# Your attacks have a chance to make your next ?a317320[Condemn][Execute] cost no Rage, be usable on any target regardless of their health, and deal damage as if you spent s1 Rage.
 Define(unstoppable_force_talent 22544)
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 22391)
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+Define(sudden_death_buff 280776)
 Define(potion_of_phantom_fire_item 171349)
     ItemInfo(potion_of_phantom_fire_item cd=300 rppm=6 proc=307495)
 Define(will_of_the_berserker_runeforge 6966)
@@ -324,7 +319,7 @@ Define(vicious_contempt_conduit 64)
 
     code += `
 SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
-SpellRequire(execute_fury unusable set=1 enabled=(target.healthpercent() > 20))
+SpellRequire(execute_fury unusable set=1 enabled=(target.healthpercent() > 20 and buffexpires(sudden_death_buff)))
   `;
 
     OvaleScripts.RegisterScript(

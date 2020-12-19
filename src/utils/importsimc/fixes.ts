@@ -21,6 +21,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     customIdentifiers.set("hex", 51514);
     customIdentifiers.set("lunar_empowerment", 292664);
     customIdentifiers.set("solar_empowerment", 292663);
+    customIdentifiers.set("sudden_death_buff", 280776);
 
     // Invisible auras
     customIdentifiers.set("garrote_exsanguinated", -703);
