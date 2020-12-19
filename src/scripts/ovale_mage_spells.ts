@@ -144,9 +144,13 @@ Define(fae_tendrils_unused_0 342373)
 Define(fingers_of_frost 44544)
 # Frostbolt has a s1 chance and Frozen Orb damage has a s2 to grant a charge of Fingers of Frost.rnrnFingers of Frost causes your next Ice Lance to deal damage as if the target were frozen.rnrnMaximum 44544s1 charges.
   SpellInfo(fingers_of_frost duration=15 max_stacks=2 gcd=0 offgcd=1)
-Define(fire_blast 108853)
+Define(fire_blast 319836)
+# Blasts the enemy for (72 of Spell Power) Fire damage.?a231568[rnrn|cFFFFFFFFFire:|r Always deals a critical strike.][]
+  SpellInfo(fire_blast cd=0.5 charge_cd=12)
+  SpellRequire(fire_blast replaced_by set=fire_blast_fire enabled=(specialization(fire)))
+Define(fire_blast_fire 108853)
 # Blasts the enemy for (79.2 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
-  SpellInfo(fire_blast cd=0.5 charge_cd=12 gcd=0 offgcd=1)
+  SpellInfo(fire_blast_fire cd=0.5 charge_cd=12 gcd=0 offgcd=1)
 Define(fireball 133)
 # Throws a fiery ball that causes (65 of Spell Power) Fire damage.?a157642[rnrnEach time your Fireball fails to critically strike a target, it gains a stacking 157644s1 increased critical strike chance. Effect ends when Fireball critically strikes.][]
   SpellInfo(fireball)

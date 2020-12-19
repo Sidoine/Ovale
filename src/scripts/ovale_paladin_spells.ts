@@ -111,14 +111,22 @@ Define(holy_avenger 105809)
   SpellRequire(holy_avenger unusable set=1 enabled=(not hastalent(holy_avenger_talent)))
   # Your Holy Power generation is tripled.
   SpellAddBuff(holy_avenger holy_avenger add=1)
-Define(judgment 275779)
-# Judges the target, dealing (112.5 of Spell Power) Holy damage?s231663[, and causing them to take 197277s1 increased damage from your next Holy Power ability][].?a315867[rnrn|cFFFFFFFFGenerates 220637s1 Holy Power.][]rn
+Define(judgment 20271)
+# Judges the target, dealing (63.4 of Spell Power) Holy damage?s231663[, and causing them to take 197277s1 increased damage from your next Holy Power ability.][]?s315867[rnrn|cFFFFFFFFGenerates 220637s1 Holy Power.][]
   SpellInfo(judgment cd=12)
+  SpellRequire(judgment replaced_by set=judgment_holy enabled=(specialization(holy)))
+  SpellRequire(judgment replaced_by set=judgment_protection enabled=(specialization(protection)))
 Define(judgment_debuff 197277)
 # Judges the target, dealing (63.4 of Spell Power) Holy damage?s231663[, and causing them to take 197277s1 increased damage from your next Holy Power ability.][]?s315867[rnrn|cFFFFFFFFGenerates 220637s1 Holy Power.][]
   SpellInfo(judgment_debuff duration=15 gcd=0 offgcd=1)
   # Taking w1 increased damage from @auracaster's next Holy Power ability.
   SpellAddTargetDebuff(judgment_debuff judgment_debuff add=1)
+Define(judgment_holy 275773)
+# Judges the target, dealing (112.5 of Spell Power) Holy damage?s231644[, and causing the target to take 214222s2 increased damage from your next Crusader Strike or Holy Shock][].
+  SpellInfo(judgment_holy cd=12)
+Define(judgment_protection 275779)
+# Judges the target, dealing (112.5 of Spell Power) Holy damage?s231663[, and causing them to take 197277s1 increased damage from your next Holy Power ability][].?a315867[rnrn|cFFFFFFFFGenerates 220637s1 Holy Power.][]rn
+  SpellInfo(judgment_protection cd=12)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)

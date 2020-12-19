@@ -1614,14 +1614,6 @@ export function getSpellData(directory: string) {
                 spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
-            if (specSpell[3]) {
-                spell.replace_spell_id = getNumber(specSpell, i++);
-                const replaced = spellDataById.get(spell.replace_spell_id);
-                if (replaced) {
-                    if (!replaced.replaced_by) replaced.replaced_by = [];
-                    replaced.replaced_by.push(spell.id);
-                }
-            }
             if (className !== "PET") {
                 const specName = specIdToSpecName.get(specIndex);
                 if (specName) {
@@ -1630,6 +1622,21 @@ export function getSpellData(directory: string) {
                     throw Error(
                         `Unknown spec ${specIndex} for class ${classIndex}`
                     );
+                }
+            }
+
+            if (specSpell[3]) {
+                spell.replace_spell_id = getNumber(specSpell, i++);
+                const replaced = spellDataById.get(spell.replace_spell_id);
+                if (replaced) {
+                    if (!replaced.replaced_by) replaced.replaced_by = [];
+                    replaced.replaced_by.push(spell.id);
+                    if (
+                        replaced.identifier === spell.identifier &&
+                        spell.specializationName.length === 1
+                    ) {
+                        spell.identifier += `_${spell.specializationName[0]}`;
+                    }
                 }
             }
         }

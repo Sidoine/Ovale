@@ -901,7 +901,7 @@ AddFunction outlawbuildmainactions
  #pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
  if buffpresent(opportunity) and { buffpresent(greenskins_wickers) or buffpresent(concealed_blunderbuss) } spell(pistol_shot)
  #sinister_strike
- spell(sinister_strike)
+ spell(sinister_strike_outlaw)
  #gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1+buff.broadside.up
  if hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside) spell(gouge)
 }
@@ -921,7 +921,7 @@ AddFunction outlawbuildshortcdactions
 
 AddFunction outlawbuildshortcdpostconditions
 {
- runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike_debuff) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity) and { buffpresent(greenskins_wickers) or buffpresent(concealed_blunderbuss) } and spell(pistol_shot) or spell(sinister_strike) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside) and spell(gouge)
+ runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike_debuff) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity) and { buffpresent(greenskins_wickers) or buffpresent(concealed_blunderbuss) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside) and spell(gouge)
 }
 
 AddFunction outlawbuildcdactions
@@ -930,7 +930,7 @@ AddFunction outlawbuildcdactions
 
 AddFunction outlawbuildcdpostconditions
 {
- runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or spell(echoing_reprimand) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike_debuff) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity) and { buffpresent(greenskins_wickers) or buffpresent(concealed_blunderbuss) } and spell(pistol_shot) or spell(sinister_strike) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside) and spell(gouge)
+ runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or spell(echoing_reprimand) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike_debuff) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity) and { buffpresent(greenskins_wickers) or buffpresent(concealed_blunderbuss) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside) and spell(gouge)
 }
 
 ### actions.default
@@ -1146,7 +1146,7 @@ AddIcon enabled=(checkboxon(opt_rogue_outlaw_aoe) and specialization(outlaw)) he
 # shadowmeld
 # shadowstep
 # shiv
-# sinister_strike
+# sinister_strike_outlaw
 # slice_and_dice
 # stealth
 # tiny_toxic_blade_runeforge

@@ -185,9 +185,13 @@ Define(kill_command_survival 259489)
   SpellInfo(kill_command_survival cd=6 focus=-15)
   # Your next ?s259387[Mongoose Bite][Raptor Strike] deals s1 increased damage.
   SpellAddBuff(kill_command_survival tip_of_the_spear add=1)
-Define(kill_shot 320976)
+Define(kill_shot 53351)
 # You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
   SpellInfo(kill_shot focus=10 cd=10)
+  SpellRequire(kill_shot replaced_by set=kill_shot_survival enabled=(specialization(survival)))
+Define(kill_shot_survival 320976)
+# You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
+  SpellInfo(kill_shot_survival focus=10 cd=10)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)

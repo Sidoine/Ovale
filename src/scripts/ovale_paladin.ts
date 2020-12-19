@@ -49,11 +49,11 @@ AddFunction protectiongetinmeleerange
 AddFunction protectionstandardmainactions
 {
  #shield_of_the_righteous,if=debuff.judgment.up
- if target.debuffpresent(judgment_debuff) spell(shield_of_the_righteous)
+ if target.debuffpresent(judgment_protection) spell(shield_of_the_righteous)
  #shield_of_the_righteous,if=holy_power=5|buff.holy_avenger.up|holy_power=4&talent.sanctified_wrath.enabled&buff.avenging_wrath.up
  if holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) spell(shield_of_the_righteous)
  #judgment,target_if=min:debuff.judgment.remains,if=charges=2|!talent.crusaders_judgment.enabled
- if charges(judgment) == 2 or not hastalent(crusaders_judgment_talent) spell(judgment)
+ if charges(judgment_protection) == 2 or not hastalent(crusaders_judgment_talent) spell(judgment_protection)
  #hammer_of_wrath
  spell(hammer_of_wrath)
  #blessing_of_the_seasons
@@ -61,7 +61,7 @@ AddFunction protectionstandardmainactions
  #avengers_shield
  spell(avengers_shield)
  #judgment,target_if=min:debuff.judgment.remains
- spell(judgment)
+ spell(judgment_protection)
  #consecration,if=!consecration.up
  if not buffpresent(consecration) spell(consecration)
  #blessed_hammer,strikes=2.4,if=charges=3
@@ -86,7 +86,7 @@ AddFunction protectionstandardmainpostconditions
 
 AddFunction protectionstandardshortcdactions
 {
- unless target.debuffpresent(judgment_debuff) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment)
+ unless target.debuffpresent(judgment_protection) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment_protection) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment_protection) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment_protection)
  {
   #vanquishers_hammer
   spell(vanquishers_hammer)
@@ -101,12 +101,12 @@ AddFunction protectionstandardshortcdactions
 
 AddFunction protectionstandardshortcdpostconditions
 {
- target.debuffpresent(judgment_debuff) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment) or not buffpresent(consecration) and spell(consecration) or charges(blessed_hammer) == 3 and spell(blessed_hammer) or charges(hammer_of_the_righteous) == 2 and spell(hammer_of_the_righteous) or buffpresent(vanquishers_hammer) and spell(word_of_glory) or spell(blessed_hammer) or spell(hammer_of_the_righteous) or spell(consecration) or buffpresent(shining_light_free_buff) and not iscovenant("necrolord") and spell(word_of_glory)
+ target.debuffpresent(judgment_protection) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment_protection) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment_protection) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment_protection) or not buffpresent(consecration) and spell(consecration) or charges(blessed_hammer) == 3 and spell(blessed_hammer) or charges(hammer_of_the_righteous) == 2 and spell(hammer_of_the_righteous) or buffpresent(vanquishers_hammer) and spell(word_of_glory) or spell(blessed_hammer) or spell(hammer_of_the_righteous) or spell(consecration) or buffpresent(shining_light_free_buff) and not iscovenant("necrolord") and spell(word_of_glory)
 }
 
 AddFunction protectionstandardcdactions
 {
- unless target.debuffpresent(judgment_debuff) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment) or spell(vanquishers_hammer) or not buffpresent(consecration) and spell(consecration) or spell(divine_toll) or charges(blessed_hammer) == 3 and spell(blessed_hammer)
+ unless target.debuffpresent(judgment_protection) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment_protection) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment_protection) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment_protection) or spell(vanquishers_hammer) or not buffpresent(consecration) and spell(consecration) or spell(divine_toll) or charges(blessed_hammer) == 3 and spell(blessed_hammer)
  {
   #ashen_hallow
   spell(ashen_hallow)
@@ -123,7 +123,7 @@ AddFunction protectionstandardcdactions
 
 AddFunction protectionstandardcdpostconditions
 {
- target.debuffpresent(judgment_debuff) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment) or spell(vanquishers_hammer) or not buffpresent(consecration) and spell(consecration) or spell(divine_toll) or charges(blessed_hammer) == 3 and spell(blessed_hammer) or charges(hammer_of_the_righteous) == 2 and spell(hammer_of_the_righteous) or buffpresent(vanquishers_hammer) and spell(word_of_glory) or spell(blessed_hammer) or spell(hammer_of_the_righteous) or spell(consecration) or buffpresent(shining_light_free_buff) and not iscovenant("necrolord") and spell(word_of_glory)
+ target.debuffpresent(judgment_protection) and spell(shield_of_the_righteous) or { holypower() == 5 or buffpresent(holy_avenger) or holypower() == 4 and hastalent(sanctified_wrath_talent_protection) and buffpresent(avenging_wrath) } and spell(shield_of_the_righteous) or { charges(judgment_protection) == 2 or not hastalent(crusaders_judgment_talent) } and spell(judgment_protection) or spell(hammer_of_wrath) or spell(blessing_of_the_seasons) or spell(avengers_shield) or spell(judgment_protection) or spell(vanquishers_hammer) or not buffpresent(consecration) and spell(consecration) or spell(divine_toll) or charges(blessed_hammer) == 3 and spell(blessed_hammer) or charges(hammer_of_the_righteous) == 2 and spell(hammer_of_the_righteous) or buffpresent(vanquishers_hammer) and spell(word_of_glory) or spell(blessed_hammer) or spell(hammer_of_the_righteous) or spell(consecration) or buffpresent(shining_light_free_buff) and not iscovenant("necrolord") and spell(word_of_glory)
 }
 
 ### actions.precombat
@@ -334,8 +334,7 @@ AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and specialization(prote
 # hammer_of_the_righteous
 # hammer_of_wrath
 # holy_avenger
-# judgment
-# judgment_debuff
+# judgment_protection
 # lights_judgment
 # moment_of_glory
 # phantom_fire

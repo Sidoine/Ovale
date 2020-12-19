@@ -552,7 +552,7 @@ AddFunction furysingle_targetmainactions
  #condemn
  spell(condemn)
  #execute
- spell(execute)
+ spell(execute_fury)
  #bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
  if not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) spell(bloodthirst)
  #bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
@@ -572,7 +572,7 @@ AddFunction furysingle_targetmainactions
  #crushing_blow
  spell(crushing_blow)
  #whirlwind
- spell(whirlwind)
+ spell(whirlwind_fury)
 }
 
 AddFunction furysingle_targetmainpostconditions
@@ -586,7 +586,7 @@ AddFunction furysingle_targetshortcdactions
   #siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
   if enemies() > 1 or 600 > 15 spell(siegebreaker)
 
-  unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute)
+  unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury)
   {
    #bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
    if isenraged() and { enemies() > 1 or 600 > 45 } spell(bladestorm)
@@ -602,7 +602,7 @@ AddFunction furysingle_targetshortcdactions
 
 AddFunction furysingle_targetshortcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 AddFunction furysingle_targetcdactions
@@ -611,7 +611,7 @@ AddFunction furysingle_targetcdactions
 
 AddFunction furysingle_targetcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { enemies() > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute) or isenraged() and { enemies() > 1 or 600 > 45 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies() > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { enemies() > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury) or isenraged() and { enemies() > 1 or 600 > 45 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies() > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -686,7 +686,7 @@ AddFunction fury_defaultmainactions
   #rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
-  if enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) spell(whirlwind)
+  if enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) spell(whirlwind_fury)
   #berserking,if=buff.recklessness.up
   if buffpresent(recklessness) spell(berserking)
   #run_action_list,name=single_target
@@ -714,7 +714,7 @@ AddFunction fury_defaultshortcdactions
    #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
    if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } spell(recklessness)
 
-   unless { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind) or buffpresent(recklessness) and spell(berserking)
+   unless { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking)
    {
     #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
     if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
@@ -727,7 +727,7 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
@@ -744,7 +744,7 @@ AddFunction fury_defaultcdactions
    #potion
    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
 
-   unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind)
+   unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury)
    {
     #use_item,name=dreadfire_vessel
     furyuseitemactions()
@@ -773,7 +773,7 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
@@ -831,7 +831,7 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
 # cruelty_talent
 # crushing_blow
 # dragon_roar
-# execute
+# execute_fury
 # fireblood
 # frenzy
 # heroic_leap
@@ -853,7 +853,7 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
 # storm_bolt
 # vicious_contempt_conduit
 # war_stomp
-# whirlwind
+# whirlwind_fury
 # will_of_the_berserker
 # will_of_the_berserker_runeforge
 `

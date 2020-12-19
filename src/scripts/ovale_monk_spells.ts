@@ -23,12 +23,16 @@ Define(black_ox_brew 115399)
 Define(blackout_combo_buff 228563)
 # Blackout Kick also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnCelestial Brew: Pauses Stagger damage for s4 sec.
   SpellInfo(blackout_combo_buff duration=15 gcd=0 offgcd=1)
-Define(blackout_kick 205523)
-# Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and granting Shuffle for s2 sec][].
-  SpellInfo(blackout_kick cd=4)
+Define(blackout_kick 100784)
+# Kick with a blast of Chi energy, dealing ?s137025[s1*<CAP>/AP][s1] Physical damage.?s261917[rnrnReduces the cooldown of Rising Sun Kick and Fists of Fury by m3/1000.1 sec when used.][]
+  SpellInfo(blackout_kick chi=3 cd=3)
+  SpellRequire(blackout_kick replaced_by set=blackout_kick_brewmaster enabled=(specialization(brewmaster)))
 Define(blackout_kick_aura 116768)
 # You have a m1 chance when you Tiger Palm to cause your next Blackout Kick to cost no Chi within 15 seconds.
   SpellInfo(blackout_kick_aura duration=15 gcd=0 offgcd=1)
+Define(blackout_kick_brewmaster 205523)
+# Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and granting Shuffle for s2 sec][].
+  SpellInfo(blackout_kick_brewmaster cd=4)
 Define(blood_fury 20572)
 # Increases your attack power by s1 for 15 seconds.
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
@@ -132,16 +136,21 @@ Define(fists_of_fury 113656)
 Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
-Define(fortifying_brew 243435)
-# Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
-  SpellInfo(fortifying_brew cd=420 duration=15 gcd=0 offgcd=1)
-  # Maximum health increased by w1.rnDamage taken reduced by w2.?w4>1[rnAbsorbs w4 damage.][]
-  SpellAddBuff(fortifying_brew fortifying_brew add=1)
+Define(fortifying_brew 115203)
+# Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>?s322960[, increasing the effectiveness of Stagger by s1,][] and reducing all damage you take by <damage>.
+  SpellInfo(fortifying_brew cd=360 gcd=0 offgcd=1)
+  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_mistweaver enabled=(specialization(mistweaver windwalker)))
+  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_mistweaver enabled=(specialization(mistweaver windwalker)))
 Define(fortifying_brew_buff 120954)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>?s322960[, increasing the effectiveness of Stagger by s1,][] and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew_buff duration=15 gcd=0 offgcd=1)
   # Health increased by <health>, damage taken reduced by <damage>, and effectiveness of Stagger increased by 115203s1.
   SpellAddBuff(fortifying_brew_buff fortifying_brew_buff add=1)
+Define(fortifying_brew_mistweaver 243435)
+# Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
+  SpellInfo(fortifying_brew_mistweaver cd=420 duration=15 gcd=0 offgcd=1)
+  # Maximum health increased by w1.rnDamage taken reduced by w2.?w4>1[rnAbsorbs w4 damage.][]
+  SpellAddBuff(fortifying_brew_mistweaver fortifying_brew_mistweaver add=1)
 Define(gift_of_the_ox 124503)
 # When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
   SpellInfo(gift_of_the_ox duration=30 gcd=0 offgcd=1)
@@ -200,13 +209,17 @@ Define(serenity 152173)
 Define(spear_hand_strike 116705)
 # Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
   SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
-Define(spinning_crane_kick 322729)
+Define(spinning_crane_kick 101546)
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+  SpellInfo(spinning_crane_kick chi=2 energy=40 duration=1.5 channel=1.5 tick=0.5)
+  SpellRequire(spinning_crane_kick replaced_by set=spinning_crane_kick_brewmaster enabled=(specialization(brewmaster)))
+Define(spinning_crane_kick_brewmaster 322729)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
-  SpellInfo(spinning_crane_kick energy=25 duration=1.5 channel=1.5 tick=0.5)
+  SpellInfo(spinning_crane_kick_brewmaster energy=25 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.rnrnMovement speed reduced by s2.
-  SpellAddBuff(spinning_crane_kick spinning_crane_kick_buff add=1)
+  SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_buff add=1)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
-  SpellAddBuff(spinning_crane_kick spinning_crane_kick add=1)
+  SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster add=1)
 Define(spinning_crane_kick_buff 107270)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
   SpellInfo(spinning_crane_kick_buff gcd=0 offgcd=1)

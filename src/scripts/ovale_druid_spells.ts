@@ -403,9 +403,13 @@ Define(wild_charge_cat 49376)
   SpellAddBuff(wild_charge_cat wild_charge_cat add=1)
   # Dazed.
   SpellAddTargetDebuff(wild_charge_cat dazed add=1)
-Define(wrath 190984)
+Define(wrath 5176)
+# Hurl a ball of energy at the target, dealing (57.75 of Spell Power) Nature damage.
+  SpellInfo(wrath)
+  SpellRequire(wrath replaced_by set=wrath_balance enabled=(specialization(balance)))
+Define(wrath_balance 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
-  SpellInfo(wrath lunarpower=0)
+  SpellInfo(wrath_balance lunarpower=0)
 SpellList(adaptive_swarm adaptive_swarm_damage adaptive_swarm_heal)
 SpellList(eclipse_any eclipse_lunar eclipse_solar)
 SpellList(berserk berserk_cat berserk_bear)

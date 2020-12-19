@@ -104,7 +104,7 @@ AddFunction brewmaster_defaultmainactions
  #breath_of_fire,if=buff.charred_passions.down&runeforge.charred_passions.equipped
  if buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) spell(breath_of_fire)
  #blackout_kick
- spell(blackout_kick)
+ spell(blackout_kick_brewmaster)
  #keg_smash
  spell(keg_smash)
  #faeline_stomp
@@ -114,13 +114,13 @@ AddFunction brewmaster_defaultmainactions
  #rushing_jade_wind,if=buff.rushing_jade_wind.down
  if buffexpires(rushing_jade_wind) spell(rushing_jade_wind)
  #spinning_crane_kick,if=buff.charred_passions.up
- if buffpresent(charred_passions_buff) spell(spinning_crane_kick)
+ if buffpresent(charred_passions_buff) spell(spinning_crane_kick_brewmaster)
  #breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&dot.breath_of_fire_dot.refreshable))
  if buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } spell(breath_of_fire)
  #chi_wave
  spell(chi_wave)
  #spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65&(!talent.spitfire.enabled|!runeforge.charred_passions.equipped)
- if enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } spell(spinning_crane_kick)
+ if enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } spell(spinning_crane_kick_brewmaster)
  #tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
  if not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 spell(tiger_palm)
  #rushing_jade_wind
@@ -151,7 +151,7 @@ AddFunction brewmaster_defaultshortcdactions
     #celestial_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2
     if buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 spell(celestial_brew)
 
-    unless hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire)
+    unless hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire)
     {
      #chi_burst
      if checkboxon(opt_chi_burst) spell(chi_burst)
@@ -163,7 +163,7 @@ AddFunction brewmaster_defaultshortcdactions
 
 AddFunction brewmaster_defaultshortcdpostconditions
 {
- spell(berserking) or spell(weapons_of_order) or spell(purifying_brew) or enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ spell(berserking) or spell(weapons_of_order) or spell(purifying_brew) or enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 AddFunction brewmaster_defaultcdactions
@@ -210,12 +210,12 @@ AddFunction brewmaster_defaultcdactions
      #black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
      if energy() + energyregenrate() * spellcooldown(keg_smash) < 40 and buffexpires(blackout_combo_buff) and not spellcooldown(keg_smash) > 0 spell(black_ox_brew)
 
-     unless enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm)
+     unless enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm)
      {
       #touch_of_death
       spell(touch_of_death)
 
-      unless buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm)
+      unless buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm)
       {
        #arcane_torrent,if=energy<31
        if energy() < 31 spell(arcane_torrent)
@@ -229,7 +229,7 @@ AddFunction brewmaster_defaultcdactions
 
 AddFunction brewmaster_defaultcdpostconditions
 {
- spell(berserking) or spell(bag_of_tricks) or spell(weapons_of_order) or spell(bonedust_brew) or spell(purifying_brew) or enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ spell(berserking) or spell(bag_of_tricks) or spell(weapons_of_order) or spell(bonedust_brew) or spell(purifying_brew) or enemies() >= 2 and spell(keg_smash) or enemies() >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 ### Brewmaster icons.
@@ -280,7 +280,7 @@ AddIcon enabled=(checkboxon(opt_monk_brewmaster_aoe) and specialization(brewmast
 # black_ox_brew
 # blackout_combo_buff
 # blackout_combo_talent
-# blackout_kick
+# blackout_kick_brewmaster
 # blood_fury
 # bloodlust
 # bonedust_brew
@@ -312,7 +312,7 @@ AddIcon enabled=(checkboxon(opt_monk_brewmaster_aoe) and specialization(brewmast
 # rushing_jade_wind
 # rushing_jade_wind_talent
 # spear_hand_strike
-# spinning_crane_kick
+# spinning_crane_kick_brewmaster
 # spitfire_talent
 # tiger_palm
 # touch_of_death

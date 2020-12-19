@@ -254,11 +254,15 @@ Define(pillar_of_frost 51271)
   SpellInfo(pillar_of_frost cd=60 duration=12 gcd=0 offgcd=1)
   # Strength increased by w1.
   SpellAddBuff(pillar_of_frost pillar_of_frost add=1)
-Define(raise_dead 46584)
+Define(raise_dead 46585)
+# Raises a ?s58640[geist][ghoul] to fight by your side.  You can have a maximum of one ?s58640[geist][ghoul] at a time.  Lasts 60 seconds.
+  SpellInfo(raise_dead cd=120 duration=60 gcd=0 offgcd=1)
+  SpellRequire(raise_dead replaced_by set=raise_dead_unholy enabled=(specialization(unholy)))
+Define(raise_dead_unholy 46584)
 # Raises ?s207313[an abomination]?s58640[a geist][a ghoul] to fight by your side. You can have a maximum of one ?s207313[abomination]?s58640[geist][ghoul] at a time.
-  SpellInfo(raise_dead cd=30)
+  SpellInfo(raise_dead_unholy cd=30)
   # A Risen Ally is in your service.
-  SpellAddBuff(raise_dead raise_dead add=1)
+  SpellAddBuff(raise_dead_unholy raise_dead_unholy add=1)
 Define(razorice 51714)
 # Engrave your weapon with a rune that causes 50401s1 extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 51714s1, stacking up to 51714u times. ?a332944[][rnrnModifying your rune requires a Runeforge in Ebon Hold.]
   SpellInfo(razorice duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)

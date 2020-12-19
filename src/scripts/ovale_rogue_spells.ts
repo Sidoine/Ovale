@@ -341,9 +341,9 @@ Define(shuriken_tornado 277925)
   SpellRequire(shuriken_tornado unusable set=1 enabled=(not hastalent(shuriken_tornado_talent)))
   # Releasing a Shuriken Storm every sec.
   SpellAddBuff(shuriken_tornado shuriken_tornado add=1)
-Define(sinister_strike 193315)
+Define(sinister_strike_outlaw 193315)
 # Viciously strike an enemy, causing s1*<mult> Physical damage.?s279876[rnrnHas a s3 chance to hit an additional time, making your next Pistol Shot half cost and double damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points; each time it strikes.|r
-  SpellInfo(sinister_strike energy=45 gcd=1 combopoints=-1)
+  SpellInfo(sinister_strike_outlaw energy=45 gcd=1 combopoints=-1)
 Define(slice_and_dice 315496)
 # Finishing move that consumes combo points to increase attack speed by s1?s344362[ and Energy regeneration by s3][]. Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(slice_and_dice energy=25 combopoints=1 max_combopoints=4 duration=6 gcd=1 tick=2)

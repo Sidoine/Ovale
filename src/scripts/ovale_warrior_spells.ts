@@ -93,9 +93,13 @@ Define(dragon_roar 118000)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(dragon_roar cd=30 rage=-10)
   SpellRequire(dragon_roar unusable set=1 enabled=(not hastalent(dragon_roar_talent_protection)))
-Define(execute 5308)
+Define(execute 163201)
+# Attempts to finish off a foe, causing up to <damage> Physical damage based on Rage spent. Only usable on enemies that have less than 20 health.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
+  SpellInfo(execute rage=20 max_rage=20 cd=6)
+  SpellRequire(execute replaced_by set=execute_fury enabled=(specialization(fury)))
+Define(execute_fury 5308)
 # Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
-  SpellInfo(execute rage=0 max_rage=20 cd=6)
+  SpellInfo(execute_fury rage=0 max_rage=20 cd=6)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -247,9 +251,13 @@ Define(warbreaker 262161)
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(warbreaker cd=45)
   SpellRequire(warbreaker unusable set=1 enabled=(not hastalent(warbreaker_talent)))
-Define(whirlwind 190411)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
+Define(whirlwind 1680)
+# Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking up to s1 nearby targets for <baseDmg> Physical damage.
   SpellInfo(whirlwind rage=30)
+  SpellRequire(whirlwind replaced_by set=whirlwind_fury enabled=(specialization(fury)))
+Define(whirlwind_fury 190411)
+# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
+  SpellInfo(whirlwind_fury rage=30)
 Define(will_of_the_berserker 335597)
 # When Recklessness expires, your Critical Strike is increased by 335597s1 for 8 seconds. Your Raging Blow will refresh the duration of this effect.
   SpellInfo(will_of_the_berserker duration=8 gcd=0 offgcd=1)

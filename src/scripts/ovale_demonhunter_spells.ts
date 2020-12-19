@@ -19,14 +19,26 @@ Define(bulk_extraction 320341)
 Define(burning_wound_debuff 346278)
 # Demon's Bite leaves an open wound on your enemy dealing 346278s1 Chaos damage over 15 seconds and increasing damage taken from your Immolation Aura by 346278s2.
   SpellInfo(burning_wound_debuff duration=15 gcd=0 offgcd=1 tick=3)
-Define(chaos_nova 179057)
+Define(chaos_nova 344867)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
-  SpellInfo(chaos_nova fury=30 cd=60 duration=2)
+  SpellInfo(chaos_nova fury=30 cd=60)
+  SpellRequire(chaos_nova replaced_by set=chaos_nova_havoc enabled=(specialization(havoc)))
+  SpellRequire(chaos_nova replaced_by set=fiery_brand enabled=(specialization(vengeance)))
+  # @spellaura179057
+  SpellAddBuff(chaos_nova chaos_nova add=1)
+Define(chaos_nova_havoc 179057)
+# Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.?s320412[rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.][]
+  SpellInfo(chaos_nova_havoc fury=30 cd=60 duration=2)
   # Stunned.
-  SpellAddTargetDebuff(chaos_nova chaos_nova add=1)
-Define(chaos_strike 162794)
+  SpellAddTargetDebuff(chaos_nova_havoc chaos_nova_havoc add=1)
+Define(chaos_strike 344862)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike fury=40)
+  SpellRequire(chaos_strike replaced_by set=chaos_strike_havoc enabled=(specialization(havoc)))
+  SpellRequire(chaos_strike replaced_by set=soul_cleave enabled=(specialization(vengeance)))
+Define(chaos_strike_havoc 162794)
+# Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
+  SpellInfo(chaos_strike_havoc fury=40)
 Define(chaos_theory 248072)
 # Blade Dance has a s1 chance to grant you Chaos Blades for s2 sec.
   SpellInfo(chaos_theory gcd=0 offgcd=1)
@@ -41,9 +53,9 @@ Define(death_sweep 210152)
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100?s321028[, and your Parry chance by 203819s1, for 6 seconds][].
   SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
-Define(demons_bite 162243)
+Define(demons_bite_havoc 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
-  SpellInfo(demons_bite fury=-25)
+  SpellInfo(demons_bite_havoc fury=-25)
 Define(disrupt 183752)
 # Interrupts the enemy's spellcasting and locks them from that school of magic for 3 seconds.|cFFFFFFFF?s183782[rnrnGenerates 218903s1 Fury on a successful interrupt.][]|r
   SpellInfo(disrupt cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -84,9 +96,9 @@ Define(fel_eruption 211881)
   SpellRequire(fel_eruption unusable set=1 enabled=(not hastalent(fel_eruption_talent)))
   # Stunned.
   SpellAddTargetDebuff(fel_eruption fel_eruption add=1)
-Define(fel_rush 195072)
+Define(fel_rush_havoc 195072)
 # Rush forward, incinerating anything in your path for 192611s1 Chaos damage.
-  SpellInfo(fel_rush cd=1 charge_cd=10 gcd=0.25)
+  SpellInfo(fel_rush_havoc cd=1 charge_cd=10 gcd=0.25)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]
   SpellInfo(felblade cd=15)
@@ -127,16 +139,22 @@ Define(imprison 217832)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
   SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
-Define(metamorphosis 187827)
-# Transform to demon form for 15 seconds, increasing current and maximum health by s2 and Armor by s7.?s321067[ While transformed, Shear and Fracture generate one additional Lesser Soul Fragment][]?s321068[ and s4 additional Fury][].
-  SpellInfo(metamorphosis cd=300 duration=15 gcd=0 offgcd=1 tick=2)
-  # Maximum health increased by w2.rnArmor increased by w7.rn?s263642[Fracture][Shear] generates w4 additional Fury and one additional Lesser Soul Fragment.
-  SpellAddBuff(metamorphosis metamorphosis add=1)
-  # Maximum health increased by w2.rnArmor increased by w7.rn?s263642[Fracture][Shear] generates w4 additional Fury and one additional Lesser Soul Fragment.
-  SpellAddTargetDebuff(metamorphosis metamorphosis add=1)
+Define(metamorphosis 191427)
+# Leap into the air and land with explosive force, dealing 200166s2 Chaos damage to enemies within 8 yds, and stunning them for 3 seconds. Players are Dazed for 3 seconds instead.rnrnUpon landing, you are transformed into a hellish demon for 30 seconds, ?s320645[immediately resetting the cooldown of your Eye Beam and Blade Dance abilities, ][]greatly empowering your Chaos Strike and Blade Dance abilities?s320422[ and gaining 320422s1 Haste][]?s204909[ and 162264s3 Leech][].
+  SpellInfo(metamorphosis cd=300)
+  SpellRequire(metamorphosis replaced_by set=metamorphosis_vengeance enabled=(specialization(vengeance)))
+  # Chaos Strike and Blade Dance upgraded to @spellname201427 and @spellname210152.rnHaste increased by 320422s1.?s204909[rnLeech increased by w3.][]
+  SpellAddBuff(metamorphosis metamorphosis_buff add=1)
 Define(metamorphosis_buff 162264)
 # Leap into the air and land with explosive force, dealing 200166s2 Chaos damage to enemies within 8 yds, and stunning them for 3 seconds. Players are Dazed for 3 seconds instead.rnrnUpon landing, you are transformed into a hellish demon for 30 seconds, ?s320645[immediately resetting the cooldown of your Eye Beam and Blade Dance abilities, ][]greatly empowering your Chaos Strike and Blade Dance abilities?s320422[ and gaining 320422s1 Haste][]?s204909[ and 162264s3 Leech][].
   SpellInfo(metamorphosis_buff duration=30 gcd=0 offgcd=1 tick=1)
+Define(metamorphosis_vengeance 187827)
+# Transform to demon form for 15 seconds, increasing current and maximum health by s2 and Armor by s7.?s321067[ While transformed, Shear and Fracture generate one additional Lesser Soul Fragment][]?s321068[ and s4 additional Fury][].
+  SpellInfo(metamorphosis_vengeance cd=300 duration=15 gcd=0 offgcd=1 tick=2)
+  # Maximum health increased by w2.rnArmor increased by w7.rn?s263642[Fracture][Shear] generates w4 additional Fury and one additional Lesser Soul Fragment.
+  SpellAddBuff(metamorphosis_vengeance metamorphosis_vengeance add=1)
+  # Maximum health increased by w2.rnArmor increased by w7.rn?s263642[Fracture][Shear] generates w4 additional Fury and one additional Lesser Soul Fragment.
+  SpellAddTargetDebuff(metamorphosis_vengeance metamorphosis_vengeance add=1)
 Define(momentum 208628)
 # Increases all damage done by s1.
   SpellInfo(momentum duration=6 gcd=0 offgcd=1)
@@ -191,16 +209,20 @@ Define(the_hunt_debuff_trigger 323802)
 Define(the_hunt_debuff_unused_2 345335)
 # Charge to your target, striking them for 323802s1 Nature damage, rooting them in place for 1.5 seconds and inflicting 345335o1 Nature damage over 6 seconds to up to 345396s2 enemies in your path. rnrnThe pursuit invigorates your soul, healing you for ?c1[345422s1][345422s2] of the damage you deal to your Hunt target for 30 seconds.
   SpellInfo(the_hunt_debuff_unused_2 duration=6 gcd=0 offgcd=1 tick=2)
-Define(throw_glaive 204157)
-# Throw a demonic glaive at the target, dealing 346665s1 Physical damage. The glaive can ricochet to ?s320386[346665x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
+Define(throw_glaive 185123)
+# Throw a demonic glaive at the target, dealing 337819s1 Physical damage. The glaive can ricochet to ?s320386[337819x1-1 additional enemies][an additional enemy] within 10 yards. 
   SpellInfo(throw_glaive cd=9)
+  SpellRequire(throw_glaive replaced_by set=throw_glaive_vengeance enabled=(specialization(vengeance)))
+Define(throw_glaive_vengeance 204157)
+# Throw a demonic glaive at the target, dealing 346665s1 Physical damage. The glaive can ricochet to ?s320386[346665x1-1 additional enemies][an additional enemy] within 10 yards. Generates high threat.
+  SpellInfo(throw_glaive_vengeance cd=9)
 Define(unbound_chaos_buff 347462)
   SpellInfo(unbound_chaos_buff duration=20 max_stacks=1 gcd=0 offgcd=1)
   # Damage of your next Fel Rush increased by s1.
   SpellAddBuff(unbound_chaos_buff unbound_chaos_buff add=1)
-Define(vengeful_retreat 198793)
+Define(vengeful_retreat_havoc 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage?s320635[ and have their movement speed reduced by 198813s1 for 3 seconds][].?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
-  SpellInfo(vengeful_retreat cd=25 duration=1 gcd=0 offgcd=1)
+  SpellInfo(vengeful_retreat_havoc cd=25 duration=1 gcd=0 offgcd=1)
 Define(agonizing_flames_talent 22503)
 # Immolation Aura increases your movement speed by s1 and its duration is increased by s2.
 Define(blind_fury_talent 21854)
