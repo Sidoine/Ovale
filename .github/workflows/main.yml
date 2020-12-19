@@ -43,8 +43,9 @@ jobs:
             - name: Create lua
               run: yarn prepare -i
 
-            - name: Copy README.md
+            - name: Copy extra files for distribution
               run: |
+                  cp LICENSE.txt dist
                   cp *.md dist
                   cp Bindings.xml dist
 
