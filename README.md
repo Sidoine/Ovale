@@ -15,7 +15,7 @@ See the [video of a survival hunter][ovale-video] using [Ovale][] during _Wrath 
 -   Adapts to your talents.
 -   100% configurable: everything is in an easy-to-understand script that you can modify and test in real-time without reloading your UI.
 -   Compatible with the action icon skinning library [Masque][].
--   Use [SpellFlashCore][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
+-   Uses [LibButtonGlow-1.0][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
 
 # FAQ
 
@@ -25,15 +25,15 @@ The [SimulationCraft][] APL language and the [Ovale][] script language are funct
 
 ### Why is the key binding displayed for an action wrong?
 
-You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
+You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.  The currently supported action bars are the default UI and [Dominos][].
+
+### Why don't my abilities flash on my action bars?
+
+You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.  The currently supported action bars are the default UI and [Dominos][].
 
 ### Why is the icon sometimes red?
 
 The cooldown that is displayed in an icon is not always the true action cooldown. If this cooldown is longer than the action cooldown, then the icon is red. In most cases, it means that if you use this action too soon, then you will overwrite or clip a DoT, which may not be what you want.
-
-### How do I make the spells flash on the action bar?
-
-Simply install [SpellFlashCore][] (included if you install [SpellFlash][]) and [Ovale][] will use it to flash the spell to cast on the action bar in addition to displaying the spell in the Ovale icon bar.
 
 ### Why can't I click on the icon to cast the spell?
 
@@ -52,10 +52,10 @@ You need to reach level 10 and choose a specialization. However, be aware that t
 [shadow bolt]: http://www.wowhead.com/spell=686
 [simulationcraft]: http://code.google.com/p/simulationcraft/
 [skada]: https://www.curseforge.com/wow/addons/skada
-[spellflashcore]: https://www.curseforge.com/wow/addons/spellflashcore
-[spellflash]: https://www.curseforge.com/wow/addons/spellflash
 [ovale-discord]: https://discord.gg/PYPpCdc
 [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
 [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
 [github]: https://github.com/Sidoine/Ovale
 [translation]: https://crwd.in/ovale
+[libbuttonglow-1.0]: https://www.curseforge.com/wow/addons/libbuttonglow-1-0
+[dominos]: https://www.curseforge.com/wow/addons/dominos
