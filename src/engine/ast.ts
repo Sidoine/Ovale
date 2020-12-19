@@ -859,7 +859,8 @@ export interface AstActionNode
         | "usable"
         | "target"
         | "offgcd"
-        | "extra_amount"
+        | "extra_energy"
+        | "extra_focus"
         | "texture"
     > {
     name: ActionType;
@@ -877,7 +878,8 @@ const checkActionParameters: NamedParametersCheck<AstActionNode> = {
     target: true,
     usable: true,
     offgcd: true,
-    extra_amount: true,
+    extra_energy: true,
+    extra_focus: true,
     texture: true,
 };
 

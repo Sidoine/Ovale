@@ -49,7 +49,7 @@ import {
     UnitPowerMax,
     UnitRace,
 } from "@wowts/wow-mock";
-import { huge, min } from "@wowts/math";
+import { huge as INFINITY, min } from "@wowts/math";
 import {
     PositionalParameters,
     NamedParametersOf,
@@ -77,8 +77,6 @@ import { OvaleSigilClass } from "./DemonHunterSigils";
 import { OvaleRunesClass } from "./Runes";
 import { OvaleBossModClass } from "./BossMod";
 import { isNumber, KeyCheck, OneTimeMessage } from "../tools/tools";
-
-const INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
 function BossArmorDamageReduction(target: string) {
@@ -291,7 +289,7 @@ export class OvaleConditions {
                     id,
                     this.OvalePaperDoll.next
                 );
-                if (value != huge) {
+                if (value != INFINITY) {
                     break;
                 }
             }
@@ -5177,7 +5175,7 @@ l    */
         if (earliest == INFINITY) {
             return Compare(0, comparator, limit);
         } else if (earliest > 0) {
-            return TestValue(0, huge, 0, earliest, -1, comparator, limit);
+            return TestValue(0, INFINITY, 0, earliest, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
     };
@@ -5890,25 +5888,26 @@ l    */
         atTime: number
     ) {
         level = level || 0;
-        const power = this.OvalePower.next.power[powerType] || 0;
-        const powerRegen =
-            this.OvalePower.getPowerRateAt(
-                this.OvalePower.next,
-                powerType,
-                atTime
-            ) || 1;
-        if (powerRegen == 0) {
-            if (power == level) {
-                return Compare(0, comparator, limit);
-            }
-            return Compare(INFINITY, comparator, limit);
-        } else {
-            const t = (level - power) / powerRegen;
-            if (t > 0) {
-                const ending = atTime + t;
-                return TestValue(0, ending, 0, ending, -1, comparator, limit);
-            }
+        const seconds = this.OvalePower.getTimeToPowerAt(
+            this.OvalePower.next,
+            level,
+            powerType,
+            atTime
+        );
+        if (seconds == 0) {
             return Compare(0, comparator, limit);
+        } else if (seconds < INFINITY) {
+            return TestValue(
+                0,
+                atTime + seconds,
+                seconds,
+                atTime,
+                -1,
+                comparator,
+                limit
+            );
+        } else {
+            return Compare(INFINITY, comparator, limit);
         }
     }
 
@@ -6033,14 +6032,9 @@ l    */
             namedParams,
             "target"
         );
-        if (!powerType) {
-            const [, pt] = this.OvalePower.GetSpellCost(spellId);
-            if (!pt) return [];
-            powerType = pt;
-        }
         const targetGuid = this.OvaleGUID.UnitGUID(target);
         if (!targetGuid) return [];
-        const seconds = this.OvalePower.TimeToPower(
+        const seconds = this.OvaleSpells.TimeToPowerForSpell(
             spellId,
             atTime,
             targetGuid,

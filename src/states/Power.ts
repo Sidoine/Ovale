@@ -465,23 +465,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     };
 
-    TimeToPower(
-        spellId: number,
-        atTime: number,
-        targetGUID: string | undefined,
-        powerType: PowerType | undefined,
-        extraPower?: number
-    ) {
-        return this.getTimeToPowerStateAt(
-            this.GetState(atTime),
-            spellId,
-            atTime,
-            targetGUID,
-            powerType,
-            extraPower
-        );
-    }
-
     InitializeState() {
         for (const [powerType] of kpairs(this.POWER_INFO)) {
             this.next.power[powerType] = 0;
@@ -587,7 +570,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         spellId: number,
         powerType: PowerType,
         atTime: number,
-        targetGUID: string,
+        targetGUID: string | undefined,
         maximumCost?: boolean
     ) {
         return this.getPowerCostAt(
@@ -624,6 +607,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         return rate;
     }
+
     /**
      * Power atTime for the given powerType.
      * @param powerType
@@ -642,19 +626,27 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return power;
     }
 
-    hasPowerFor(
-        spellId: number,
+    /**
+     * Number of seconds until powrLevel is reached atTime for the powerType.
+     * @param powerLevel
+     * @param powerType
+     * @param atTime
+     */
+    getTimeToPowerAt(
+        state: PowerState,
+        powerLevel: number,
+        powerType: PowerType,
         atTime: number,
-        targetGUID?: string
-    ): boolean {
-        const seconds = this.getTimeToPowerStateAt(
-            this.GetState(atTime),
-            spellId,
-            atTime,
-            targetGUID,
-            undefined
-        );
-        return (seconds === 0);
+    ): number {
+        let seconds = INFINITY;
+        const power = this.getPowerAt(state, powerType, atTime)
+        if (power < powerLevel) {
+            const powerRate = this.getPowerRateAt(state, powerType, atTime);
+            if (powerRate > 0) {
+                seconds = (powerLevel - power) / powerRate;
+            }
+        }
+        return seconds;
     }
 
     /**
@@ -733,80 +725,5 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         this.profiler.StopProfiling("OvalePower_PowerCost");
         return [spellCost, spellRefund];
-    }
-
-    /**
-     * How many seconds until there is enough power to use the ability.
-     * @param spellId
-     * @param atTime
-     * @param targetGUID
-     * @param powerType
-     * @param extraPower If true, will add this to the cost
-     */
-    private getTimeToPowerStateAt(
-        state: PowerState,
-        spellId: number,
-        atTime: number,
-        targetGUID: string | undefined,
-        powerType: PowerType | undefined,
-        extraPower?: number
-    ): number {
-        let timeToPower = 0;
-        const si = this.ovaleData.spellInfo[spellId];
-        if (si) {
-            for (const [, powerInfo] of kpairs(this.POWER_INFO)) {
-                const pType = powerInfo.type;
-                if (powerType === undefined || powerType == pType) {
-                    let [cost] = this.getPowerCostAt(
-                        state,
-                        spellId,
-                        pType,
-                        atTime,
-                        targetGUID
-                    );
-                    if (cost > 0) {
-                        this.tracer.Log("    Spell ID '%d' has cost of %d %s",
-                            spellId,
-                            cost,
-                            pType
-                        );
-                        if (powerType == pType && extraPower) {
-                            this.tracer.Log(
-                                "        Including extra power %d for %s",
-                                extraPower,
-                                pType
-                            );
-                            cost = cost + extraPower;
-                        }
-                        const power = this.getPowerAt(state, pType, atTime);
-                        if (power < cost) {
-                            const powerRate =
-                                this.getPowerRateAt(state, pType, atTime);
-                            if (powerRate > 0) {
-                                const seconds = (cost - power) / powerRate;
-                                this.tracer.Log(
-                                    "        Requires %f seconds to %d %s",
-                                    seconds,
-                                    cost,
-                                    pType
-                                );
-                                if (timeToPower < seconds) {
-                                    timeToPower = seconds;
-                                }
-                            } else {
-                                timeToPower = INFINITY;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        this.tracer.Log(
-            "Spell ID '%d' requires %f seconds for power requirements.",
-            spellId,
-            timeToPower
-        );
-        return timeToPower;
     }
 }

@@ -24,13 +24,11 @@ import {
     setResultType,
 } from "./ast";
 import { OvaleCooldownClass } from "../states/Cooldown";
-import { OvaleRunesClass } from "../states/Runes";
 import { OvaleSpellsClass } from "../states/Spells";
 import { isNumber, isString } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./guid";
-import { OvalePowerClass } from "../states/Power";
 import { OvaleFutureClass } from "../states/Future";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { Profiler, OvaleProfilerClass } from "./profiler";
@@ -58,13 +56,11 @@ export class OvaleBestActionClass {
         private ovaleCooldown: OvaleCooldownClass,
         Ovale: OvaleClass,
         private OvaleGUID: OvaleGUIDClass,
-        private OvalePower: OvalePowerClass,
         private OvaleFuture: OvaleFutureClass,
         private OvaleSpellBook: OvaleSpellBookClass,
         ovaleProfiler: OvaleProfilerClass,
         ovaleDebug: OvaleDebugClass,
         private variables: Variables,
-        private ovaleRunes: OvaleRunesClass,
         private OvaleSpells: OvaleSpellsClass,
         private runner: Runner
     ) {
@@ -292,8 +288,6 @@ export class OvaleBestActionClass {
                 result.actionTexture = `Interface\\Icons\\${si.texture}`;
             }
             if (result.actionCooldownStart && result.actionCooldownDuration) {
-                const extraPower =
-                    <number>element.cachedParams.named.extra_amount || 0;
                 // let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, targetGUID, extraPower);
                 const timeToCd =
                     (result.actionCooldownDuration > 0 &&
@@ -301,28 +295,13 @@ export class OvaleBestActionClass {
                             result.actionCooldownDuration -
                             atTime) ||
                     0;
-                let timeToPower = this.OvalePower.TimeToPower(
+                const timeToPower = this.OvaleSpells.TimeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,
                     undefined,
-                    extraPower
+                    element.cachedParams.named
                 );
-                const runes = this.ovaleData.GetSpellInfoProperty(
-                    spellId,
-                    atTime,
-                    "runes",
-                    targetGUID
-                );
-                if (runes) {
-                    const timeToRunes = this.ovaleRunes.GetRunesCooldown(
-                        atTime,
-                        <number>runes
-                    );
-                    if (timeToPower < timeToRunes) {
-                        timeToPower = timeToRunes;
-                    }
-                }
                 if (timeToPower > timeToCd) {
                     result.actionResourceExtend = timeToPower - timeToCd;
                     this.tracer.Log(

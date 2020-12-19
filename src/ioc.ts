@@ -342,7 +342,8 @@ export class IoC {
             this.debug,
             this.profiler,
             this.data,
-            this.power
+            this.power,
+            this.runes,
         );
         this.bestAction = new OvaleBestActionClass(
             this.equipment,
@@ -351,13 +352,11 @@ export class IoC {
             this.cooldown,
             this.ovale,
             this.guid,
-            this.power,
             this.future,
             this.spellBook,
             this.profiler,
             this.debug,
             this.variables,
-            this.runes,
             this.spells,
             runner
         );
