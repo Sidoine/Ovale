@@ -90,6 +90,8 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("adaptive_swarm_damage", 325733);
     fixIdentifier("adaptive_swarm_heal", 325748);
     fixIdentifier("kindred_empowerment_energize", 327139);
+    fixIdentifier("symbols_of_death_autocrit", 227151);
+    fixIdentifier("weapons_of_order_ww", 311054);
 
     // TODO add _cat/_bear using required stance
     fixIdentifier("wild_charge_bear", 16979);
@@ -108,7 +110,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     );
     addSpellList("berserk", "berserk_cat", "berserk_bear");
 
-    fixIdentifier("sepsis", 328305);
     fixIdentifier("shiv_debuff", 319504);
 
     const customIdentifierById = new Map<

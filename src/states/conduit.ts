@@ -3,11 +3,13 @@ import { C_Soulbinds } from "@wowts/wow-mock";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import {
     ConditionFunction,
+    ConditionResult,
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
 } from "../engine/condition";
 import { OvaleDebugClass } from "../engine/debug";
+import { conduits } from "../engine/dbc";
 
 export class Conduit {
     private debugOptions: OptionUiGroup = {
@@ -38,6 +40,13 @@ export class Conduit {
             false,
             this.enabledSoulbind
         );
+        condition.RegisterCondition("soulbind", false, this.enabledSoulbind);
+        condition.register(
+            "conduitvalue",
+            this.conduitValue,
+            { type: "number" },
+            { name: "conduit", type: "number", optional: false }
+        );
     }
 
     private conduit: ConditionFunction = (positionalParameters) => {
@@ -61,5 +70,14 @@ export class Conduit {
     private enabledSoulbind: ConditionFunction = (positionalParameters) => {
         const [soulbindId] = unpack(positionalParameters);
         return ReturnBoolean(C_Soulbinds.GetActiveSoulbindID() === soulbindId);
+    };
+
+    private conduitValue = (
+        atTime: number,
+        conduitId: number
+    ): ConditionResult => {
+        const data = C_Soulbinds.GetConduitCollectionData(conduitId);
+        if (!data) return [];
+        return ReturnConstant(conduits[conduitId].ranks[data.conduitRank]);
     };
 }

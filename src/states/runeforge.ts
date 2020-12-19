@@ -49,6 +49,7 @@ export class Runeforge {
             false,
             this.equippedRuneforge
         );
+        condition.RegisterCondition("runeforge", false, this.equippedRuneforge);
     }
 
     private equippedRuneforge: ConditionFunction = (positionalParameters) => {

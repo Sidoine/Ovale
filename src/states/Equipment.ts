@@ -23,7 +23,7 @@ import {
     GetTime,
 } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
-import { isNumber } from "../tools/tools";
+import { isNumber, KeyCheck } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleDebugClass } from "../engine/debug";
@@ -34,6 +34,7 @@ import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
+    ReturnConstant,
     TestBoolean,
     TestValue,
 } from "../engine/condition";
@@ -64,6 +65,28 @@ const OVALE_SLOTID_BY_SLOTNAME = {
 };
 export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
 const OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
+
+const checkSlotName: KeyCheck<SlotName> = {
+    ammoslot: true,
+    backslot: true,
+    chestslot: true,
+    feetslot: true,
+    finger0slot: true,
+    finger1slot: true,
+    handsslot: true,
+    headslot: true,
+    legsslot: true,
+    mainhandslot: true,
+    neckslot: true,
+    secondaryhandslot: true,
+    shirtslot: true,
+    shoulderslot: true,
+    tabardslot: true,
+    trinket0slot: true,
+    trinket1slot: true,
+    waistslot: true,
+    wristslot: true,
+};
 
 type WeaponType =
     | "INVTYPE_WEAPON"
@@ -157,6 +180,30 @@ export class OvaleEquipmentClass {
             false,
             this.ItemCooldown
         );
+        ovaleCondition.register(
+            "itemrppm",
+            this.itemRppm,
+            { type: "number" },
+            { type: "number", name: "item", optional: true },
+            {
+                type: "string",
+                name: "slot",
+                checkTokens: checkSlotName,
+                optional: true,
+            }
+        );
+        ovaleCondition.register(
+            "itemcooldownduration",
+            this.itemCooldownDuration,
+            { type: "number" },
+            { type: "number", name: "item", isItem: true, optional: true },
+            {
+                type: "string",
+                name: "slot",
+                checkTokens: checkSlotName,
+                optional: true,
+            }
+        );
         ovaleCondition.RegisterCondition(
             "weaponenchantexpires",
             false,
@@ -166,6 +213,17 @@ export class OvaleEquipmentClass {
             "weaponenchantpresent",
             false,
             this.weaponEnchantPresent
+        );
+        ovaleCondition.register(
+            "iteminslot",
+            this.itemInSlot,
+            { type: "number" },
+            {
+                type: "string",
+                optional: false,
+                name: "slot",
+                checkTokens: checkSlotName,
+            }
         );
     }
 
@@ -574,6 +632,32 @@ export class OvaleEquipmentClass {
         return Compare(0, comparator, limit);
     };
 
+    private itemCooldownDuration = (
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined
+    ) => {
+        if (slot !== undefined) {
+            itemId = this.GetEquippedItemBySlotName(slot);
+        }
+        if (!itemId) return ReturnConstant(0);
+
+        let [, duration] = GetItemCooldown(itemId);
+        if (duration <= 0) {
+            duration =
+                (this.OvaleData.GetItemInfoProperty(
+                    itemId,
+                    atTime,
+                    "cd"
+                ) as number) || 0;
+        }
+        return ReturnConstant(duration);
+    };
+
+    private itemInSlot = (atTime: number, slot: SlotName) => {
+        return ReturnConstant(this.GetEquippedItemBySlotName(slot));
+    };
+
     /** Get the number of seconds since the enchantment has expired
      */
     private WeaponEnchantExpires: ConditionFunction = (
@@ -629,6 +713,20 @@ export class OvaleEquipmentClass {
         }
         return [];
     };
+
+    private itemRppm = (
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined
+    ): ConditionResult => {
+        if (slot) itemId = this.GetEquippedItemBySlotName(slot);
+        if (itemId)
+            return ReturnConstant(
+                this.OvaleData.GetItemInfoProperty(itemId, atTime, "rppm")
+            );
+        return [];
+    };
+
     /* Removed for simplicity as I don't think anyone uses this.  If it does need to be added back then GET_ITEM_INFO_RECEIVED will need to be as well.
 const GetItemLevel = function(slotId) {
     OvaleEquipment.StartProfiling("OvaleEquipment_GetItemLevel");

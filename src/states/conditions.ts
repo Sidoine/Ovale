@@ -1756,7 +1756,7 @@ export class OvaleConditions {
         );
         const ffAura = this.OvaleAura.GetAura(
             target,
-            SpellId.frost_fever_debuff,
+            SpellId.frost_fever,
             atTime,
             "HARMFUL",
             true
@@ -6774,11 +6774,16 @@ l    */
             "buffpresent",
             this.BuffPresent,
             { type: "number" },
-            { name: "auraId", type: "number", isSpell: true, optional: false },
+            { name: "aura", type: "number", isSpell: true, optional: false },
             targetParameter,
             filterParameter,
             mineParameter,
-            { name: "seconds", type: "number", defaultValue: 0 },
+            {
+                name: "seconds",
+                type: "number",
+                defaultValue: 0,
+                optional: true,
+            },
             {
                 name: "haste",
                 type: "string",

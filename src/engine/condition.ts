@@ -55,8 +55,9 @@ export function isComparator(token: string): token is ComparatorId {
 interface NumberParameterInfo<Optional = boolean> {
     type: "number";
     name: string;
-    optional?: Optional;
+    optional: Optional;
     isSpell?: boolean;
+    isItem?: boolean;
     defaultValue?: number;
 }
 
