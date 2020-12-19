@@ -1,3 +1,5 @@
+import { huge as INFINITY } from "@wowts/math";
+import { kpairs } from "@wowts/lua";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     GetSpellCount,
@@ -6,6 +8,7 @@ import {
     IsUsableSpell,
     UnitIsFriend,
 } from "@wowts/wow-mock";
+import { isNumber } from "../tools/tools";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
@@ -13,7 +16,8 @@ import { Tracer, OvaleDebugClass } from "../engine/debug";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { StateModule } from "../engine/state";
-import { OvalePowerClass } from "./Power";
+import { NamedParametersOf, AstActionNode } from "../engine/ast";
+import { OvalePowerClass, PowerType } from "./Power";
 
 const WARRIOR_INCERCEPT_SPELLID = 198304;
 const WARRIOR_HEROICTHROW_SPELLID = 57755;
@@ -175,7 +179,13 @@ export class OvaleSpellsClass implements StateModule {
                 isUsable = false;
             }
             if (isUsable) {
-                noMana = !this.power.hasPowerFor(spellId, atTime, targetGUID);
+                const seconds = this.TimeToPowerForSpell(
+                    spellId,
+                    atTime,
+                    targetGUID,
+                    undefined
+                );
+                noMana = (seconds > 0);
                 if (noMana) {
                     isUsable = false;
                     this.tracer.Log(
@@ -193,6 +203,81 @@ export class OvaleSpellsClass implements StateModule {
         this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
     }
+
+    TimeToPowerForSpell(
+        spellId: number,
+        atTime: number,
+        targetGUID: string | undefined,
+        powerType: PowerType | undefined,
+        extraPower?: NamedParametersOf<AstActionNode>
+    ): number {
+        let timeToPower = 0;
+        const si = this.ovaleData.spellInfo[spellId];
+        if (si) {
+            for (const [, powerInfo] of kpairs(this.power.POWER_INFO)) {
+                const pType = powerInfo.type;
+                if (powerType == undefined || powerType == pType) {
+                    let [cost] = this.power.PowerCost(
+                        spellId,
+                        pType,
+                        atTime,
+                        targetGUID
+                    );
+                    if (cost > 0) {
+                        if (extraPower) {
+                            let extraAmount;
+                            if (pType == "energy") {
+                                extraAmount = extraPower.extra_energy;
+                            } else if (pType == "focus") {
+                                extraAmount = extraPower.extra_focus;
+                            }
+                            if (isNumber(extraAmount)) {
+                                this.tracer.Log(
+                                    "    Spell ID '%d' has cost of %d (+%d) %s",
+                                    spellId,
+                                    cost,
+                                    extraAmount,
+                                    pType
+                                );
+                                cost = cost + <number>extraAmount;
+                            }
+                        } else {
+                            this.tracer.Log(
+                                "    Spell ID '%d' has cost of %d %s",
+                                spellId,
+                                cost,
+                                pType
+                            );
+                        }
+                        const seconds = this.power.getTimeToPowerAt(
+                            this.power.next,
+                            cost,
+                            pType,
+                            atTime
+                        );
+                        this.tracer.Log(
+                            "    Spell ID '%d' requires %f seconds to %d %s",
+                            spellId,
+                            seconds,
+                            cost,
+                            pType
+                        );
+                        if (timeToPower < seconds) {
+                            timeToPower = seconds;
+                        }
+                        if (timeToPower === INFINITY) break;
+                    }
+                }
+            }
+        }
+        this.tracer.Log(
+            "Spell ID '%d' requires %f seconds for power requirements.",
+            spellId,
+            timeToPower
+        );
+        return timeToPower;
+    }
+
     /*
     GetTimeToSpell(spellId: number, atTime: number, targetGUID: string, extraPower?: number) {
         if (type(atTime) == "string" && !targetGUID) {

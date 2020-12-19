@@ -351,7 +351,6 @@ export class IoC {
             this.cooldown,
             this.ovale,
             this.guid,
-            this.power,
             this.future,
             this.spellBook,
             this.profiler,

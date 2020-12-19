@@ -6032,14 +6032,9 @@ l    */
             namedParams,
             "target"
         );
-        if (!powerType) {
-            const [, pt] = this.OvalePower.GetSpellCost(spellId);
-            if (!pt) return [];
-            powerType = pt;
-        }
         const targetGuid = this.OvaleGUID.UnitGUID(target);
         if (!targetGuid) return [];
-        const seconds = this.OvalePower.TimeToPower(
+        const seconds = this.OvaleSpells.TimeToPowerForSpell(
             spellId,
             atTime,
             targetGuid,

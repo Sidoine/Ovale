@@ -30,7 +30,6 @@ import { isNumber, isString } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./guid";
-import { OvalePowerClass } from "../states/Power";
 import { OvaleFutureClass } from "../states/Future";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { Profiler, OvaleProfilerClass } from "./profiler";
@@ -58,7 +57,6 @@ export class OvaleBestActionClass {
         private ovaleCooldown: OvaleCooldownClass,
         Ovale: OvaleClass,
         private OvaleGUID: OvaleGUIDClass,
-        private OvalePower: OvalePowerClass,
         private OvaleFuture: OvaleFutureClass,
         private OvaleSpellBook: OvaleSpellBookClass,
         ovaleProfiler: OvaleProfilerClass,
@@ -299,7 +297,7 @@ export class OvaleBestActionClass {
                             result.actionCooldownDuration -
                             atTime) ||
                     0;
-                let timeToPower = this.OvalePower.TimeToPower(
+                let timeToPower = this.OvaleSpells.TimeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,

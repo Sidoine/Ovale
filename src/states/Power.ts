@@ -25,7 +25,6 @@ import { AceModule } from "@wowts/tsaddon";
 import { States, StateModule } from "../engine/state";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { NamedParametersOf, AstActionNode } from "../engine/ast";
 import { OvaleCombatClass } from "./combat";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
@@ -466,23 +465,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     };
 
-    TimeToPower(
-        spellId: number,
-        atTime: number,
-        targetGUID: string | undefined,
-        powerType: PowerType | undefined,
-        extraPower?: NamedParametersOf<AstActionNode>
-    ) {
-        return this.getTimeToPowerStateAt(
-            this.GetState(atTime),
-            spellId,
-            atTime,
-            targetGUID,
-            powerType,
-            extraPower
-        );
-    }
-
     InitializeState() {
         for (const [powerType] of kpairs(this.POWER_INFO)) {
             this.next.power[powerType] = 0;
@@ -588,7 +570,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         spellId: number,
         powerType: PowerType,
         atTime: number,
-        targetGUID: string,
+        targetGUID: string | undefined,
         maximumCost?: boolean
     ) {
         return this.getPowerCostAt(
@@ -667,21 +649,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         return seconds;
     }
 
-    hasPowerFor(
-        spellId: number,
-        atTime: number,
-        targetGUID?: string
-    ): boolean {
-        const seconds = this.getTimeToPowerStateAt(
-            this.GetState(atTime),
-            spellId,
-            atTime,
-            targetGUID,
-            undefined
-        );
-        return (seconds === 0);
-    }
-
     /**
      * Returns the power cost of a spell atTime for the given powerType
      * @param spellId
@@ -758,84 +725,5 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         this.profiler.StopProfiling("OvalePower_PowerCost");
         return [spellCost, spellRefund];
-    }
-
-    /**
-     * How many seconds until there is enough power to use the ability.
-     * @param spellId
-     * @param atTime
-     * @param targetGUID
-     * @param powerType
-     * @param extraPower If true, will add this to the cost
-     */
-    private getTimeToPowerStateAt(
-        state: PowerState,
-        spellId: number,
-        atTime: number,
-        targetGUID: string | undefined,
-        powerType: PowerType | undefined,
-        extraPower?: NamedParametersOf<AstActionNode>
-    ): number {
-        let timeToPower = 0;
-        const si = this.ovaleData.spellInfo[spellId];
-        if (si) {
-            for (const [, powerInfo] of kpairs(this.POWER_INFO)) {
-                const pType = powerInfo.type;
-                if (powerType === undefined || powerType == pType) {
-                    let [cost] = this.getPowerCostAt(
-                        state,
-                        spellId,
-                        pType,
-                        atTime,
-                        targetGUID
-                    );
-                    if (cost > 0) {
-                        this.tracer.Log("    Spell ID '%d' has cost of %d %s",
-                            spellId,
-                            cost,
-                            pType
-                        );
-                        if (extraPower) {
-                            let extraAmount
-                            if (pType == "energy") {
-                                extraAmount = extraPower.extra_energy;
-                            } else if (pType == "focus") {
-                                extraAmount = extraPower.extra_focus;
-                            }
-                            if (isNumber(extraAmount)) {
-                                this.tracer.Log(
-                                    "        Including extra power %d for %s",
-                                    extraAmount,
-                                    pType
-                                );
-                                cost = cost + <number>extraAmount;
-                            }
-                        }
-                        const seconds = this.getTimeToPowerAt(
-                            state,
-                            cost,
-                            pType,
-                            atTime
-                        );
-                        this.tracer.Log(
-                            "        Requires %f seconds to %d %s",
-                            seconds,
-                            cost,
-                            pType
-                        );
-                        if (timeToPower < seconds) {
-                            timeToPower = seconds;
-                        }
-                        if (timeToPower === INFINITY) break;
-                    }
-                }
-            }
-        }
-        this.tracer.Log(
-            "Spell ID '%d' requires %f seconds for power requirements.",
-            spellId,
-            timeToPower
-        );
-        return timeToPower;
     }
 }
