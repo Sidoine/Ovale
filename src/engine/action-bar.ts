@@ -31,6 +31,14 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
+const ActionBars: LuaArray<string> = {
+    1: "ActionButton",
+    2: "MultiBarRightButton",
+    3: "MultiBarLeftButton",
+    4: "MultiBarBottomRightButton",
+    5: "MultiBarBottomLeftButton",
+};
+
 export class OvaleActionBarClass {
     private debugOptions: LuaObj<OptionUiAll> = {
         actionbar: {
@@ -322,7 +330,18 @@ export class OvaleActionBarClass {
         return this.keybind[slot];
     }
     getFrame(slot: number): UIFrame {
-        return _G["ActionButton" + slot];
+        let name;
+        if (_G["Bartender4"]) {
+            name = `BT4Button${slot}`;
+        } else {
+            if (slot <= 24 || slot > 72) {
+                name = `ActionButton${((slot - 1) % 12) + 1}`;
+            } else {
+                const actionBar = (slot - (slot % 12)) / 12;
+                name = `${ActionBars[actionBar]}${slot % 12}`;
+            }
+        }
+        return _G[name];
     }
 
     output: LuaArray<string> = {};

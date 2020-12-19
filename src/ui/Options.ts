@@ -536,28 +536,28 @@ export class OvaleOptionsClass {
                     },
                 },
             },
-            predictiveIcon: {
-                order: 70,
-                type: "group",
-                name: L["two_abilities"],
-                args: {
-                    predictif: {
-                        order: 10,
-                        type: "toggle",
-                        name: L["two_abilities"],
-                        desc: L["two_icons"],
-                    },
-                    secondIconScale: {
-                        order: 20,
-                        type: "range",
-                        name: L["second_icon_scale"],
-                        min: 0.2,
-                        max: 1,
-                        bigStep: 0.01,
-                        isPercent: true,
-                    },
-                },
-            },
+            // predictiveIcon: {
+            //     order: 70,
+            //     type: "group",
+            //     name: L["two_abilities"],
+            //     args: {
+            //         predictif: {
+            //             order: 10,
+            //             type: "toggle",
+            //             name: L["two_abilities"],
+            //             desc: L["two_icons"],
+            //         },
+            //         secondIconScale: {
+            //             order: 20,
+            //             type: "range",
+            //             name: L["second_icon_scale"],
+            //             min: 0.2,
+            //             max: 1,
+            //             bigStep: 0.01,
+            //             isPercent: true,
+            //         },
+            //     },
+            // },
             advanced: {
                 order: 80,
                 type: "group",
