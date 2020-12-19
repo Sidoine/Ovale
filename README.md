@@ -45,17 +45,17 @@ You need to reach level 10 and choose a specialization. However, be aware that t
 
 [corruption]: http://www.wowhead.com/spell=172
 [documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
+[dominos]: https://www.curseforge.com/wow/addons/dominos
+[github]: https://github.com/Sidoine/Ovale
+[libbuttonglow-1.0]: https://www.curseforge.com/wow/addons/libbuttonglow-1-0
 [masque]: https://www.curseforge.com/wow/addons/masque
 [ovale]: https://www.curseforge.com/wow/addons/ovale
 [ovale_tankscripts]: https://www.curseforge.com/wow/addons/ovale_tankscripts
+[ovale-discord]: https://discord.gg/PYPpCdc
+[ovale-tickets]: https://github.com/Sidoine/Ovale/issues
+[ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
 [recount]: http://www.curse.com/addons/wow/recount
 [shadow bolt]: http://www.wowhead.com/spell=686
 [simulationcraft]: http://code.google.com/p/simulationcraft/
 [skada]: https://www.curseforge.com/wow/addons/skada
-[ovale-discord]: https://discord.gg/PYPpCdc
-[ovale-tickets]: https://github.com/Sidoine/Ovale/issues
-[ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
-[github]: https://github.com/Sidoine/Ovale
 [translation]: https://crwd.in/ovale
-[libbuttonglow-1.0]: https://www.curseforge.com/wow/addons/libbuttonglow-1-0
-[dominos]: https://www.curseforge.com/wow/addons/dominos
