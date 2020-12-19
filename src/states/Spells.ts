@@ -18,6 +18,7 @@ import { OvaleDataClass } from "../engine/data";
 import { StateModule } from "../engine/state";
 import { NamedParametersOf, AstActionNode } from "../engine/ast";
 import { OvalePowerClass, PowerType } from "./Power";
+import { OvaleRunesClass } from "./Runes";
 
 const WARRIOR_INCERCEPT_SPELLID = 198304;
 const WARRIOR_HEROICTHROW_SPELLID = 57755;
@@ -33,7 +34,8 @@ export class OvaleSpellsClass implements StateModule {
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
-        private power: OvalePowerClass
+        private power: OvalePowerClass,
+        private runes: OvaleRunesClass
     ) {
         this.module = ovale.createModule(
             "OvaleSpells",
@@ -243,7 +245,7 @@ export class OvaleSpellsClass implements StateModule {
                             }
                         } else {
                             this.tracer.Log(
-                                "    Spell ID '%d' has cost of %d %s",
+                                "    spell ID '%d' has cost of %d %s",
                                 spellId,
                                 cost,
                                 pType
@@ -256,7 +258,7 @@ export class OvaleSpellsClass implements StateModule {
                             atTime
                         );
                         this.tracer.Log(
-                            "    Spell ID '%d' requires %f seconds to %d %s",
+                            "    spell ID '%d' requires %f seconds for %d %s",
                             spellId,
                             seconds,
                             cost,
@@ -265,7 +267,36 @@ export class OvaleSpellsClass implements StateModule {
                         if (timeToPower < seconds) {
                             timeToPower = seconds;
                         }
-                        if (timeToPower === INFINITY) break;
+                        if (timeToPower == INFINITY) {
+                            this.tracer.Log(
+                                "    short-circuiting checks for other power requirements"
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+            if (timeToPower != INFINITY) {
+                // Check runes, implemented as a separate module.
+                const runes = this.ovaleData.GetSpellInfoProperty(
+                    spellId,
+                    atTime,
+                    "runes",
+                    targetGUID
+                );
+                if (runes) {
+                    const seconds = this.runes.GetRunesCooldown(
+                        atTime,
+                        <number>runes
+                    );
+                    this.tracer.Log(
+                        "    spell ID '%d' requires %f seconds for %d runes",
+                        spellId,
+                        seconds,
+                        runes
+                    );
+                    if (timeToPower < seconds) {
+                        timeToPower = seconds;
                     }
                 }
             }

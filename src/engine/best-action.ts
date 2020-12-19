@@ -24,7 +24,6 @@ import {
     setResultType,
 } from "./ast";
 import { OvaleCooldownClass } from "../states/Cooldown";
-import { OvaleRunesClass } from "../states/Runes";
 import { OvaleSpellsClass } from "../states/Spells";
 import { isNumber, isString } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
@@ -62,7 +61,6 @@ export class OvaleBestActionClass {
         ovaleProfiler: OvaleProfilerClass,
         ovaleDebug: OvaleDebugClass,
         private variables: Variables,
-        private ovaleRunes: OvaleRunesClass,
         private OvaleSpells: OvaleSpellsClass,
         private runner: Runner
     ) {
@@ -297,28 +295,13 @@ export class OvaleBestActionClass {
                             result.actionCooldownDuration -
                             atTime) ||
                     0;
-                let timeToPower = this.OvaleSpells.TimeToPowerForSpell(
+                const timeToPower = this.OvaleSpells.TimeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,
                     undefined,
                     element.cachedParams.named
                 );
-                const runes = this.ovaleData.GetSpellInfoProperty(
-                    spellId,
-                    atTime,
-                    "runes",
-                    targetGUID
-                );
-                if (runes) {
-                    const timeToRunes = this.ovaleRunes.GetRunesCooldown(
-                        atTime,
-                        <number>runes
-                    );
-                    if (timeToPower < timeToRunes) {
-                        timeToPower = timeToRunes;
-                    }
-                }
                 if (timeToPower > timeToCd) {
                     result.actionResourceExtend = timeToPower - timeToCd;
                     this.tracer.Log(
