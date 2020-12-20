@@ -553,6 +553,7 @@ interface MiscOperandModifier {
     extraSymbol?: string;
     createOptions?: boolean;
     code?: string;
+    value?: number;
     symbolsInCode?: LuaArray<string>;
 }
 
@@ -775,7 +776,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["maelstrom"]: { name: "maelstrom", modifiers: powerModifiers },
     ["mana"]: { name: "mana", modifiers: powerModifiers },
     ["next_wi_bomb"]: {
-        name: "buffpresent",
+        name: "spellusable",
         symbol: "bomb",
     },
     ["pain"]: { name: "pain", modifiers: powerModifiers },

@@ -218,11 +218,9 @@ Define(nesingwarys_trapping_apparatus 336744)
   SpellInfo(nesingwarys_trapping_apparatus duration=5 gcd=0 offgcd=1 focus=-45)
   # Focus Generation increased by s2.
   SpellAddBuff(nesingwarys_trapping_apparatus nesingwarys_trapping_apparatus add=1)
-Define(pheromone_bomb 270332)
+Define(pheromone_bomb 270323)
 # Hurl a bomb at the target, exploding for 270329s1 Fire damage in a cone and coating enemies in pheromones, causing them to suffer 270332o1 Fire damage over 6 seconds.rnrnKill Command has a s2 chance to reset against targets coated with Pheromone Bomb.
-  SpellInfo(pheromone_bomb duration=6 gcd=0 offgcd=1 tick=1)
-  # Suffering w1 Fire damage every t1 sec.
-  SpellAddTargetDebuff(pheromone_bomb pheromone_bomb add=1)
+  SpellInfo(pheromone_bomb cd=18)
 Define(precise_shots 260242)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
   SpellInfo(precise_shots duration=15 max_stacks=2 gcd=0 offgcd=1)
@@ -252,11 +250,9 @@ Define(serpent_sting 259491)
   SpellInfo(serpent_sting focus=20 duration=12 tick=3)
   # Suffering w2 Nature damage every t2 sec.?a265428[ The Hunter's pet deals w3 increased damage to you.][]
   SpellAddTargetDebuff(serpent_sting serpent_sting add=1)
-Define(shrapnel_bomb 270339)
+Define(shrapnel_bomb 270335)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
-  SpellInfo(shrapnel_bomb duration=6 gcd=0 offgcd=1 tick=1)
-  # Suffering w1 Fire damage every t1 sec.rn?s259387[Mongoose Bite][Raptor Strike] and Butchery apply a stack of Internal Bleeding.
-  SpellAddTargetDebuff(shrapnel_bomb shrapnel_bomb add=1)
+  SpellInfo(shrapnel_bomb cd=18)
 Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=120 duration=12)
@@ -394,6 +390,7 @@ Define(niyas_tools_poison_soulbind 320660)
     // END
     code += `
 SpellRequire(kill_shot unusable set=1 enabled=(target.healthpercent() > 20))
+SpellRequire(kill_shot_survival unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(harpoon unusable set=1 enabled=(target.distance() < 8))
   `;
 

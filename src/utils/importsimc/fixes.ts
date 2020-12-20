@@ -94,6 +94,11 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("symbols_of_death_autocrit", 227151);
     fixIdentifier("weapons_of_order_ww", 311054);
 
+    // Bombs
+    fixIdentifier("pheromone_bomb", 270323);
+    fixIdentifier("shrapnel_bomb", 270335);
+    fixIdentifier("volatile_bomb", 271045);
+
     // TODO add _cat/_bear using required stance
     fixIdentifier("wild_charge_bear", 16979);
     fixIdentifier("wild_charge_cat", 49376);
