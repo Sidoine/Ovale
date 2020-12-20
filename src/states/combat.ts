@@ -8,11 +8,11 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
-    TestValue,
     Compare,
     ConditionFunction,
     ReturnBoolean,
     ReturnConstant,
+    ReturnValueBetween,
 } from "../engine/condition";
 import { huge as INFINITY } from "@wowts/math";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
@@ -155,7 +155,7 @@ export class OvaleCombatClass
         if (this.isInCombat(atTime)) {
             const state = this.GetState(atTime);
             const start = state.combatStartTime;
-            return TestValue(start, INFINITY, 0, start, 1);
+            return ReturnValueBetween(start, INFINITY, 0, start, 1);
         }
         return Compare(0);
     };

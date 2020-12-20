@@ -36,7 +36,7 @@ import {
     OvaleConditionClass,
     ReturnBoolean,
     ReturnConstant,
-    TestValue,
+    ReturnValueBetween,
 } from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
 import { huge } from "@wowts/math";
@@ -602,7 +602,7 @@ export class OvaleEquipmentClass {
             const [start, duration] = GetItemCooldown(itemId);
             if (start > 0 && duration > 0) {
                 const ending = start + duration;
-                return TestValue(start, ending, duration, start, -1);
+                return ReturnValueBetween(start, ending, duration, start, -1);
             }
         }
         return Compare(0);

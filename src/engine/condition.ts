@@ -301,24 +301,6 @@ export function ReturnBoolean(value: boolean): ConditionResult {
     return [];
 }
 
-export function TestValue(
-    start: number,
-    ending: number,
-    value: number | undefined,
-    origin: number | undefined,
-    rate: number | undefined
-): ConditionResult {
-    if (value === undefined || origin === undefined || rate === undefined) {
-        return [];
-    }
-    start = start || 0;
-    ending = ending || INFINITY;
-    if (start < ending) {
-        return [start, ending, value, origin, rate];
-    }
-    return [0, INFINITY, 0, 0, 0];
-}
-
 export function Compare(value: number): ConditionResult {
-    return TestValue(0, INFINITY, value, 0, 0);
+    return ReturnConstant(value);
 }

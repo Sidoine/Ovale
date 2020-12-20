@@ -1,17 +1,16 @@
 import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import {
-    TestValue,
     Compare,
     ConditionFunction,
-    ReturnValue,
-    OvaleConditionClass,
-    ReturnConstant,
     ConditionResult,
+    OvaleConditionClass,
     ParseCondition,
-    ReturnValueBetween,
     ParameterInfo,
     ReturnBoolean,
+    ReturnConstant,
+    ReturnValue,
+    ReturnValueBetween,
 } from "../engine/condition";
 import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
@@ -328,9 +327,14 @@ export class OvaleConditions {
             mine
         );
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura[statName] || 0;
-            return TestValue(gain, ending, value, start, 0);
+            return ReturnValueBetween(
+                aura.gain,
+                aura.ending,
+                value,
+                aura.start,
+                0
+            );
         }
         return Compare(0);
     };
@@ -365,9 +369,14 @@ export class OvaleConditions {
             mine
         );
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = (aura && aura.combopoints) || 0;
-            return TestValue(gain, ending, value, start, 0);
+            return ReturnValueBetween(
+                aura.gain,
+                aura.ending,
+                value,
+                aura.start,
+                0
+            );
         }
         return Compare(0);
     };
@@ -526,10 +535,14 @@ export class OvaleConditions {
             excludeUnitId
         );
         if (count > 0 && startChangeCount < INFINITY && fractional) {
-            const origin = startChangeCount;
             const rate = -1 / (endingChangeCount - startChangeCount);
-            const [start, ending] = [startFirst, endingLast];
-            return TestValue(start, ending, count, origin, rate);
+            return ReturnValueBetween(
+                startFirst,
+                endingLast,
+                count,
+                startChangeCount,
+                rate
+            );
         }
         return Compare(count);
     };
@@ -568,13 +581,13 @@ export class OvaleConditions {
             mine
         );
         if (aura) {
-            const [gain, , , direction] = [
+            return ReturnValueBetween(
                 aura.gain,
-                aura.start,
-                aura.ending,
+                INFINITY,
                 aura.direction,
-            ];
-            return TestValue(gain, INFINITY, direction, gain, 0);
+                aura.gain,
+                0
+            );
         }
         return Compare(0);
     };
@@ -608,9 +621,14 @@ export class OvaleConditions {
             mine
         );
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
-            const value = ending - start;
-            return TestValue(gain, ending, value, start, 0);
+            const duration = aura.ending - aura.start;
+            return ReturnValueBetween(
+                aura.gain,
+                aura.ending,
+                duration,
+                aura.start,
+                0
+            );
         }
         return Compare(0);
     };
@@ -756,7 +774,7 @@ export class OvaleConditions {
         );
         if (aura) {
             const gain = aura.gain || 0;
-            return TestValue(gain, INFINITY, 0, gain, 1);
+            return ReturnValueBetween(gain, INFINITY, 0, gain, 1);
         }
         return Compare(0);
     };
@@ -803,9 +821,14 @@ export class OvaleConditions {
             mine
         );
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura.damageMultiplier || 1;
-            return TestValue(gain, ending, value, start, 0);
+            return ReturnValueBetween(
+                aura.gain,
+                aura.ending,
+                value,
+                aura.start,
+                0
+            );
         }
         return Compare(1);
     };
@@ -845,8 +868,7 @@ export class OvaleConditions {
             mine
         );
         if (aura && aura.ending >= atTime) {
-            const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1);
+            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
         return Compare(0);
     };
@@ -890,8 +912,7 @@ export class OvaleConditions {
             excludeUnitId
         );
         if (count > 0) {
-            const [start, ending] = [startFirst, endingLast];
-            return TestValue(start, INFINITY, 0, ending, -1);
+            return ReturnValueBetween(startFirst, INFINITY, 0, endingLast, -1);
         }
         return Compare(0);
     };
@@ -933,9 +954,14 @@ export class OvaleConditions {
             mine
         );
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
-            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura.stacks || 0;
-            return TestValue(gain, ending, value, start, 0);
+            return ReturnValueBetween(
+                aura.gain,
+                aura.ending,
+                value,
+                aura.start,
+                0
+            );
         }
         return Compare(0);
     };
@@ -993,8 +1019,13 @@ export class OvaleConditions {
             excludeUnitId
         );
         if (count > 0) {
-            const [start, ending] = [startFirst, endingChangeCount];
-            return TestValue(start, ending, stacks, start, 0);
+            return ReturnValueBetween(
+                startFirst,
+                endingChangeCount,
+                stacks,
+                startFirst,
+                0
+            );
         }
         return Compare(count);
     };
@@ -1595,8 +1626,7 @@ export class OvaleConditions {
             aura = (bpAura.ending < ffAura.ending && bpAura) || ffAura;
         }
         if (aura) {
-            const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1);
+            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
         return Compare(0);
     };
@@ -1769,8 +1799,7 @@ export class OvaleConditions {
             false
         );
         if (aura && aura.ending >= atTime) {
-            const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1);
+            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
         return Compare(0);
     };
@@ -1922,7 +1951,7 @@ export class OvaleConditions {
             const start = (spellcast && spellcast.start) || 0;
             const ending = start + duration;
             if (atTime < ending) {
-                return TestValue(start, INFINITY, 0, ending, -1);
+                return ReturnValueBetween(start, INFINITY, 0, ending, -1);
             }
         }
         return Compare(0);
@@ -1975,13 +2004,8 @@ export class OvaleConditions {
         if (health > 0) {
             const now = this.baseState.currentTime;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-            const [value, origin, rate] = [
-                health,
-                now,
-                (-1 * health) / timeToDie,
-            ];
-            const [start, ending] = [now, INFINITY];
-            return TestValue(start, ending, value, origin, rate);
+            const rate = (-1 * health) / timeToDie;
+            return ReturnValueBetween(now, INFINITY, health, now, rate);
         }
         return Compare(0);
     };
@@ -2012,9 +2036,8 @@ export class OvaleConditions {
 
         const now = this.baseState.currentTime;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-        const [value, origin, rate] = [health, now, (-1 * health) / timeToDie];
-        const [start, ending] = [now, INFINITY];
-        return TestValue(start, ending, value, origin, rate);
+        const rate = (-1 * health) / timeToDie;
+        return ReturnValueBetween(now, INFINITY, health, now, rate);
     };
 
     /** Get the number of health points away from full health of the target.
@@ -2042,9 +2065,8 @@ export class OvaleConditions {
             const now = this.baseState.currentTime;
             const missing = maxHealth - health;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-            const [value, origin, rate] = [missing, now, health / timeToDie];
-            const [start, ending] = [now, INFINITY];
-            return TestValue(start, ending, value, origin, rate);
+            const rate = health / timeToDie;
+            return ReturnValueBetween(now, INFINITY, missing, now, rate);
         }
         return Compare(maxHealth);
     };
@@ -2072,15 +2094,10 @@ export class OvaleConditions {
         if (health > 0) {
             const now = this.baseState.currentTime;
             const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
-            const healthPercent = (health / maxHealth) * 100;
+            const healthPct = (health / maxHealth) * 100;
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-            const [value, origin, rate] = [
-                healthPercent,
-                now,
-                (-1 * healthPercent) / timeToDie,
-            ];
-            const [start, ending] = [now, INFINITY];
-            return TestValue(start, ending, value, origin, rate);
+            const rate = (-1 * healthPct) / timeToDie;
+            return ReturnValueBetween(now, INFINITY, healthPct, now, rate);
         }
         return Compare(0);
     };
@@ -2110,15 +2127,10 @@ export class OvaleConditions {
 
         const now = this.baseState.currentTime;
         const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
-        const healthPercent = (health / maxHealth) * 100;
+        const healthPct = (health / maxHealth) * 100;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-        const [value, origin, rate] = [
-            healthPercent,
-            now,
-            (-1 * healthPercent) / timeToDie,
-        ];
-        const [start, ending] = [now, INFINITY];
-        return TestValue(start, ending, value, origin, rate);
+        const rate = (-1 * healthPct) / timeToDie;
+        return ReturnValueBetween(now, INFINITY, healthPct, now, rate);
     };
 
     /** Get the amount of health points of the target when it is at full health.
@@ -2163,9 +2175,7 @@ export class OvaleConditions {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const now = this.baseState.currentTime;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-        const [value, origin, rate] = [timeToDie, now, -1];
-        const [start] = [now, now + timeToDie];
-        return TestValue(start, INFINITY, value, origin, rate);
+        return ReturnValueBetween(now, INFINITY, timeToDie, now, -1);
     };
 
     /** Get the estimated number of seconds remaining before the target reaches the given percent of max health.
@@ -2191,15 +2201,12 @@ export class OvaleConditions {
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
             const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
-            const healthPercent = (health / maxHealth) * 100;
-            if (healthPercent >= percent) {
+            const healthPct = (health / maxHealth) * 100;
+            if (healthPct >= percent) {
                 const now = this.baseState.currentTime;
                 const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-                const t =
-                    (timeToDie * (healthPercent - percent)) / healthPercent;
-                const [value, origin, rate] = [t, now, -1];
-                const [start, ending] = [now, now + t];
-                return TestValue(start, ending, value, origin, rate);
+                const t = (timeToDie * (healthPct - percent)) / healthPct;
+                return ReturnValueBetween(now, now + t, t, now, -1);
             }
         }
         return Compare(0);
@@ -2695,17 +2702,13 @@ export class OvaleConditions {
     ) {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         if (target == "player") {
-            const [value, origin, rate] = [
-                this.OvalePower.next.power[powerType],
-                atTime,
-                this.OvalePower.getPowerRateAt(
-                    this.OvalePower.next,
-                    powerType,
-                    atTime
-                ),
-            ];
-            const [start, ending] = [atTime, INFINITY];
-            return TestValue(start, ending, value, origin, rate);
+            const value = this.OvalePower.next.power[powerType] || 0;
+            const rate = this.OvalePower.getPowerRateAt(
+                this.OvalePower.next,
+                powerType,
+                atTime
+            );
+            return ReturnValueBetween(atTime, INFINITY, value, atTime, rate);
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
             const value = (powerInfo && UnitPower(target, powerInfo.id)) || 0;
@@ -2725,18 +2728,18 @@ export class OvaleConditions {
             const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
                 const power = this.OvalePower.next.power[powerType] || 0;
-                const [value, origin, rate] = [
+                const rate = this.OvalePower.getPowerRateAt(
+                    this.OvalePower.next,
+                    powerType,
+                    atTime
+                );
+                return ReturnValueBetween(
+                    atTime,
+                    INFINITY,
                     powerMax - power,
                     atTime,
-                    -1 *
-                        this.OvalePower.getPowerRateAt(
-                            this.OvalePower.next,
-                            powerType,
-                            atTime
-                        ),
-                ];
-                const [start, ending] = [atTime, INFINITY];
-                return TestValue(start, ending, value, origin, rate);
+                    -1 * rate
+                );
             }
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
@@ -2766,21 +2769,28 @@ export class OvaleConditions {
         if (target == "player") {
             const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
-                const conversion = 100 / powerMax;
+                const ratio = 100 / powerMax;
                 const power = this.OvalePower.next.power[powerType] || 0;
-                const value = power * conversion;
-                const origin = atTime;
                 let rate =
+                    ratio *
                     this.OvalePower.getPowerRateAt(
                         this.OvalePower.next,
                         powerType,
                         atTime
-                    ) * conversion;
-                if ((rate > 0 && value >= 100) || (rate < 0 && value == 0)) {
+                    );
+                if (
+                    (rate > 0 && power >= powerMax) ||
+                    (rate < 0 && power == 0)
+                ) {
                     rate = 0;
                 }
-                const [start, ending] = [atTime, INFINITY];
-                return TestValue(start, ending, value, origin, rate);
+                return ReturnValueBetween(
+                    atTime,
+                    INFINITY,
+                    power * ratio,
+                    atTime,
+                    rate
+                );
             }
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
@@ -2789,11 +2799,9 @@ export class OvaleConditions {
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
                 0;
             if (powerMax > 0) {
-                const conversion = 100 / powerMax;
+                const ratio = 100 / powerMax;
                 const value =
-                    (powerInfo &&
-                        UnitPower(target, powerInfo.id) * conversion) ||
-                    0;
+                    (powerInfo && ratio * UnitPower(target, powerInfo.id)) || 0;
                 return Compare(value);
             }
         }
@@ -3894,7 +3902,7 @@ l    */
         if (startTime && endTime) {
             startTime = startTime / 1000;
             endTime = endTime / 1000;
-            return TestValue(startTime, endTime, 0, endTime, -1);
+            return ReturnValueBetween(startTime, endTime, 0, endTime, -1);
         }
         return [];
     };
@@ -3917,10 +3925,14 @@ l    */
             atTime
         );
         if (startCooldown < INFINITY) {
-            const origin = startCooldown;
             const rate = 1 / (endCooldown - startCooldown);
-            const [start, ending] = [startCooldown, INFINITY];
-            return TestValue(start, ending, count, origin, rate);
+            return ReturnValueBetween(
+                startCooldown,
+                INFINITY,
+                count,
+                startCooldown,
+                rate
+            );
         }
         return Compare(count);
     };
@@ -3934,10 +3946,14 @@ l    */
             atTime
         );
         if (startCooldown < INFINITY) {
-            const origin = startCooldown;
             const rate = -1 / (endCooldown - startCooldown);
-            const [start, ending] = [startCooldown, INFINITY];
-            return TestValue(start, ending, count, origin, rate);
+            return ReturnValueBetween(
+                startCooldown,
+                INFINITY,
+                count,
+                startCooldown,
+                rate
+            );
         }
         return Compare(count);
     };
@@ -3964,8 +3980,13 @@ l    */
             atTime
         );
         if (startCooldown < INFINITY) {
-            const [start, ending] = [startCooldown, endCooldown];
-            return TestValue(start, ending, count, start, 0);
+            return ReturnValueBetween(
+                startCooldown,
+                endCooldown,
+                count,
+                startCooldown,
+                0
+            );
         }
         return Compare(count);
     };
@@ -4411,7 +4432,7 @@ l    */
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
             const ending = start + duration;
-            return TestValue(start, ending, duration, start, -1);
+            return ReturnValueBetween(start, ending, duration, start, -1);
         }
         return Compare(0);
     };
@@ -4443,7 +4464,7 @@ l    */
             duration,
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (namedParams.count == 0 && charges < maxCharges) {
-            return TestValue(
+            return ReturnValueBetween(
                 atTime,
                 INFINITY,
                 charges + 1,
@@ -4471,12 +4492,12 @@ l    */
             charges,
             maxCharges,
             start,
-            dur,
+            chargeDuration,
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
-            const duration = (maxCharges - charges) * dur;
+            const duration = (maxCharges - charges) * chargeDuration;
             const ending = start + duration;
-            return TestValue(start, ending, duration, start, -1);
+            return ReturnValueBetween(start, ending, duration, start, -1);
         }
         return Compare(0);
     };
@@ -4528,7 +4549,7 @@ l    */
         if (earliest == INFINITY) {
             return Compare(0);
         } else if (earliest > 0) {
-            return TestValue(0, INFINITY, 0, earliest, -1);
+            return ReturnValue(0, earliest, -1);
         }
         return Compare(0);
     };
@@ -4800,7 +4821,7 @@ l    */
         //const swing = positionalParams[1];
         const start = 0;
         OneTimeMessage("Warning: 'LastSwing()' is not implemented.");
-        return TestValue(start, INFINITY, 0, start, 1);
+        return ReturnValueBetween(start, INFINITY, 0, start, 1);
     };
 
     /** Get the time in seconds until the player's next melee swing (white attack).
@@ -4821,7 +4842,7 @@ l    */
         //const swing = positionalParams[1];
         const ending = 0;
         OneTimeMessage("Warning: 'NextSwing()' is not implemented.");
-        return TestValue(0, ending, 0, ending, -1);
+        return ReturnValueBetween(0, ending, 0, ending, -1);
     };
 
     /** Test if the given talent is active.
@@ -5015,14 +5036,15 @@ l    */
             mine
         );
         if (aura) {
-            const [gain, , ending, tick] = [
-                aura.gain,
-                aura.start,
-                aura.ending,
-                aura.tick,
-            ];
+            const tick = aura.tick;
             if (tick && tick > 0) {
-                return TestValue(gain, INFINITY, 1, ending, -1 / tick);
+                return ReturnValueBetween(
+                    aura.gain,
+                    INFINITY,
+                    1,
+                    aura.ending,
+                    -1 / tick
+                );
             }
         }
         return Compare(0);
@@ -5077,7 +5099,7 @@ l    */
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         if (!spellId) return [];
         const t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
-        return TestValue(0, INFINITY, 0, t, 1);
+        return ReturnValue(0, t, 1);
     };
 
     /** Get the time in seconds until the next scheduled Bloodlust cast.
@@ -5103,7 +5125,7 @@ l    */
     ) => {
         const value = 3600 * 24 * 7;
         OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.");
-        return TestValue(0, INFINITY, value, atTime, -1);
+        return ReturnValue(value, atTime, -1);
     };
 
     /** Get the number of seconds before the player reaches the given power level.
@@ -5119,7 +5141,8 @@ l    */
         if (seconds == 0) {
             return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(0, atTime + seconds, seconds, atTime, -1);
+            // XXX Why isn't this (atTime, atTime + seconds)?
+            return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
             return Compare(INFINITY);
         }
@@ -5234,7 +5257,8 @@ l    */
         if (seconds == 0) {
             return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(0, atTime + seconds, seconds, atTime, -1);
+            // XXX Why isn't this (atTime, atTime + seconds)?
+            return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
             return Compare(INFINITY);
         }
@@ -5305,13 +5329,13 @@ l    */
         if (seconds == 0) {
             return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(0, atTime + seconds, seconds, atTime, -1);
+            return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
             return Compare(INFINITY);
         }
         */
         OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
-        return TestValue(0, INFINITY, 0, atTime, -1);
+        return ReturnValue(0, atTime, -1);
     };
     /** Get the time scaled by the specified haste type, defaulting to spell haste.
 	 For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
@@ -5416,7 +5440,7 @@ l    */
             ending !== undefined &&
             count > 0
         ) {
-            return TestValue(start, ending, 0, ending, -1);
+            return ReturnValueBetween(start, ending, 0, ending, -1);
         }
         return Compare(0);
     };
