@@ -8,7 +8,6 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
-    Compare,
     ConditionFunction,
     ReturnBoolean,
     ReturnConstant,
@@ -157,7 +156,7 @@ export class OvaleCombatClass
             const start = state.combatStartTime;
             return ReturnValueBetween(start, INFINITY, 0, start, 1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     private expectedCombatLength: ConditionFunction = (

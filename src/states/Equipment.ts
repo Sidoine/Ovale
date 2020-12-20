@@ -30,7 +30,6 @@ import { OvaleDebugClass } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import {
-    Compare,
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
@@ -605,7 +604,7 @@ export class OvaleEquipmentClass {
                 return ReturnValueBetween(start, ending, duration, start, -1);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     private itemCooldownDuration = (

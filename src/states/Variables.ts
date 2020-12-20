@@ -4,9 +4,9 @@ import { BaseState } from "./BaseState";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleCombatClass } from "./combat";
 import {
-    Compare,
     ConditionAction,
     OvaleConditionClass,
+    ReturnConstant,
 } from "../engine/condition";
 import { huge } from "@wowts/math";
 import {
@@ -130,7 +130,7 @@ export class Variables implements StateModule {
     ) => {
         const name = positionalParams[1];
         const value = this.GetState(name);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the duration in seconds that the simulator was most recently in the named state.
@@ -147,7 +147,7 @@ export class Variables implements StateModule {
     ) => {
         const name = positionalParams[1];
         const value = this.GetStateDuration(name, atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     private setState: ConditionAction = (

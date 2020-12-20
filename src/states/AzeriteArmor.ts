@@ -24,9 +24,9 @@ import { OvaleDebugClass } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import {
-    Compare,
     OvaleConditionClass,
     ReturnBoolean,
+    ReturnConstant,
 } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
@@ -202,7 +202,7 @@ export class OvaleAzeriteArmor {
     ) => {
         const spellId = positionalParams[1];
         const value = this.TraitRank(spellId);
-        return Compare(value);
+        return ReturnConstant(value);
     };
     private HasAzeriteTrait = (
         positionalParams: LuaArray<any>,

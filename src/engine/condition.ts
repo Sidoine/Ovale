@@ -300,7 +300,3 @@ export function ReturnBoolean(value: boolean): ConditionResult {
     if (value) return [0, INFINITY];
     return [];
 }
-
-export function Compare(value: number): ConditionResult {
-    return ReturnConstant(value);
-}

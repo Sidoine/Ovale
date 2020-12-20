@@ -1,7 +1,6 @@
 import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import {
-    Compare,
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
@@ -202,7 +201,7 @@ export class OvaleConditions {
     ) => {
         const value = 0;
         OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     private AzeriteEssenceIsMajor = (
@@ -241,7 +240,7 @@ export class OvaleConditions {
     ) => {
         const essenceId = positionalParams[1];
         const value = this.OvaleAzeriteEssence.EssenceRank(essenceId);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the base duration of the aura in seconds if it is applied at the current time.
@@ -279,7 +278,7 @@ export class OvaleConditions {
                 this.OvalePaperDoll.next
             );
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the value of a buff as a number.  Not all buffs return an amount.
@@ -336,7 +335,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the player's combo points for the given aura at the time the aura was applied on the target.
@@ -378,7 +377,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the number of seconds before a buff can be gained again.
@@ -450,7 +449,7 @@ export class OvaleConditions {
                 count = count + 1;
             }
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     /** Get the duration in seconds of the cooldown before a buff can be gained again.
@@ -482,7 +481,7 @@ export class OvaleConditions {
         } else {
             minCooldown = 0;
         }
-        return Compare(minCooldown);
+        return ReturnConstant(minCooldown);
     };
 
     /** /** Get the total count of the given aura across all targets.
@@ -544,7 +543,7 @@ export class OvaleConditions {
                 rate
             );
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     /** Get the current direction of an aura's stack count.
@@ -589,7 +588,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the total duration of the aura from when it was first applied to when it ended.
@@ -630,7 +629,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Test if an aura is expired, or will expire after a given number of seconds.
@@ -776,7 +775,7 @@ export class OvaleConditions {
             const gain = aura.gain || 0;
             return ReturnValueBetween(gain, INFINITY, 0, gain, 1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     private BuffImproved = (
@@ -786,7 +785,7 @@ export class OvaleConditions {
     ) => {
         let [, ,] = this.ParseCondition(positionalParams, namedParams);
         // TODO Not implemented
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the player's persistent multiplier for the given aura at the time the aura was applied on the target.
@@ -830,7 +829,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(1);
+        return ReturnConstant(1);
     };
 
     /** Get the remaining time in seconds on an aura.
@@ -870,7 +869,7 @@ export class OvaleConditions {
         if (aura && aura.ending >= atTime) {
             return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the remaining time in seconds before the aura expires across all targets.
@@ -914,7 +913,7 @@ export class OvaleConditions {
         if (count > 0) {
             return ReturnValueBetween(startFirst, INFINITY, 0, endingLast, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the number of stacks of an aura on the target.
@@ -963,7 +962,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     private maxStacks = (
@@ -974,7 +973,7 @@ export class OvaleConditions {
         const auraId = positionalParams[1] as number;
         const spellInfo = this.OvaleData.GetSpellInfo(auraId);
         const maxStacks = (spellInfo && spellInfo.max_stacks) || 0;
-        return Compare(maxStacks);
+        return ReturnConstant(maxStacks);
     };
 
     /** Get the total number of stacks of the given aura across all targets.
@@ -1027,7 +1026,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     /** Test if there is a stealable buff on the target.
@@ -1092,7 +1091,7 @@ export class OvaleConditions {
     ) => {
         const spellId = positionalParams[1];
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        return Compare(castTime);
+        return ReturnConstant(castTime);
     };
 
     /** Get the cast time in seconds of the spell for the player or the GCD for the player, whichever is greater.
@@ -1115,7 +1114,7 @@ export class OvaleConditions {
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
         const gcd = this.OvaleFuture.GetGCD(atTime);
         const t = (castTime > gcd && castTime) || gcd;
-        return Compare(t);
+        return ReturnConstant(t);
     };
 
     /** Test if the target is casting the given spell.
@@ -1352,7 +1351,7 @@ export class OvaleConditions {
     ) => {
         const counter = positionalParams[1];
         const value = this.OvaleFuture.GetCounter(counter, atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test whether the target's creature family matches the given name.
@@ -1466,7 +1465,7 @@ export class OvaleConditions {
             }
         }
         value = critMultiplier * value;
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the current estimated damage of a spell on the target.
@@ -1500,7 +1499,7 @@ export class OvaleConditions {
         if (si && si.physical == 1) {
             value = value * (1 - BossArmorDamageReduction(target));
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the total damage taken by the player in the previous time interval.
@@ -1524,7 +1523,7 @@ export class OvaleConditions {
             const [total] = this.OvaleDamageTaken.GetRecentDamage(interval);
             value = total;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the magic damage taken by the player in the previous time interval.
@@ -1550,7 +1549,7 @@ export class OvaleConditions {
             );
             value = totalMagic;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the physical damage taken by the player in the previous time interval.
@@ -1576,7 +1575,7 @@ export class OvaleConditions {
             );
             value = total - totalMagic;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     GetDiseases(
@@ -1628,7 +1627,7 @@ export class OvaleConditions {
         if (aura) {
             return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /**  Test if all diseases applied by the death knight are present on the target.
@@ -1712,7 +1711,7 @@ export class OvaleConditions {
     ) => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = (LibRangeCheck && LibRangeCheck.GetRange(target)) || 0;
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the number of hostile enemies on the battlefield.
@@ -1749,7 +1748,7 @@ export class OvaleConditions {
         if (value < 1) {
             value = 1;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
@@ -1770,7 +1769,7 @@ export class OvaleConditions {
             "energy",
             atTime
         );
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the remaining time in seconds the target is Enraged.
@@ -1801,7 +1800,7 @@ export class OvaleConditions {
         if (aura && aura.ending >= atTime) {
             return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Test if the target exists. The target may be alive or dead.
@@ -1857,7 +1856,7 @@ export class OvaleConditions {
             "focus",
             atTime
         );
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the amount of focus that would be regenerated during the cast time of the given spell for hunters.
@@ -1899,7 +1898,7 @@ export class OvaleConditions {
             }
             power = power + regenRate * 1.5 * seconds;
         }
-        return Compare(power);
+        return ReturnConstant(power);
     };
 
     /** Get the player's global cooldown in seconds.
@@ -1917,7 +1916,7 @@ export class OvaleConditions {
         atTime: number
     ) => {
         const value = this.OvaleFuture.GetGCD(atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the number of seconds before the player's global cooldown expires.
@@ -1954,7 +1953,7 @@ export class OvaleConditions {
                 return ReturnValueBetween(start, INFINITY, 0, ending, -1);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     private Glyph = (
@@ -2007,7 +2006,7 @@ export class OvaleConditions {
             const rate = (-1 * health) / timeToDie;
             return ReturnValueBetween(now, INFINITY, health, now, rate);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the current amount of health points of the target including absorbs.
@@ -2068,7 +2067,7 @@ export class OvaleConditions {
             const rate = health / timeToDie;
             return ReturnValueBetween(now, INFINITY, missing, now, rate);
         }
-        return Compare(maxHealth);
+        return ReturnConstant(maxHealth);
     };
 
     /** Get the current percent level of health of the target.
@@ -2099,7 +2098,7 @@ export class OvaleConditions {
             const rate = (-1 * healthPct) / timeToDie;
             return ReturnValueBetween(now, INFINITY, healthPct, now, rate);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the current effective percent level of health of the target (including absorbs).
@@ -2152,7 +2151,7 @@ export class OvaleConditions {
     ) => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = this.OvaleHealth.UnitHealthMax(target);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /**  Get the estimated number of seconds remaining before the target is dead.
@@ -2209,7 +2208,7 @@ export class OvaleConditions {
                 return ReturnValueBetween(now, now + t, t, now, -1);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
@@ -2478,7 +2477,7 @@ export class OvaleConditions {
     ) => {
         const itemId = positionalParams[1];
         const value = GetItemCount(itemId, false, true);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the current number of the given item in the player's inventory.
@@ -2498,7 +2497,7 @@ export class OvaleConditions {
     ) => {
         const itemId = positionalParams[1];
         const value = GetItemCount(itemId);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the damage done by the most recent damage event for the given spell.
@@ -2521,7 +2520,7 @@ export class OvaleConditions {
         const spellId = positionalParams[1];
         const value = this.OvaleSpellDamage.Get(spellId);
         if (value) {
-            return Compare(value);
+            return ReturnConstant(value);
         }
         return [];
     };
@@ -2550,7 +2549,7 @@ export class OvaleConditions {
         } else {
             value = UnitLevel(target);
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
     /** Test if a list is currently set to the given value.
 	 @name List
@@ -2606,7 +2605,7 @@ export class OvaleConditions {
     ) => {
         const [version, , , uiVersion] = GetBuildInfo();
         const value = ((version > "9.0.2" || uiVersion > 90002) && 1) || 0;
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the persistent multiplier to the given aura if applied.
@@ -2641,7 +2640,7 @@ export class OvaleConditions {
             targetGuid,
             atTime
         );
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test if the pet exists and is alive.
@@ -2690,7 +2689,7 @@ export class OvaleConditions {
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
                 0;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     }
     /** Return the amount of power of the given power type on the target.
      */
@@ -2712,7 +2711,7 @@ export class OvaleConditions {
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
             const value = (powerInfo && UnitPower(target, powerInfo.id)) || 0;
-            return Compare(value);
+            return ReturnConstant(value);
         }
     }
     /**Return the current deficit of power from max power on the target.
@@ -2751,10 +2750,10 @@ export class OvaleConditions {
                 const power =
                     (powerInfo && UnitPower(target, powerInfo.id)) || 0;
                 const value = powerMax - power;
-                return Compare(value);
+                return ReturnConstant(value);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     }
 
     /**Return the current percent level of power (between 0 and 100) on the target.
@@ -2802,10 +2801,10 @@ export class OvaleConditions {
                 const ratio = 100 / powerMax;
                 const value =
                     (powerInfo && ratio * UnitPower(target, powerInfo.id)) || 0;
-                return Compare(value);
+                return ReturnConstant(value);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     }
 
     /**
@@ -3579,7 +3578,7 @@ l    */
                 target,
                 maxCost
             )) || [0];
-        return Compare(value);
+        return ReturnConstant(value);
     }
 
     /** Get the amount of energy required to cast the given spell.
@@ -3848,7 +3847,7 @@ l    */
         } else {
             value = level - this.OvalePaperDoll.level;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     private Refreshable = (
@@ -3934,7 +3933,7 @@ l    */
                 rate
             );
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     private RuneDeficit = (
@@ -3955,7 +3954,7 @@ l    */
                 rate
             );
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     /**  Get the current number of active runes of the given type for death knights.
@@ -3988,7 +3987,7 @@ l    */
                 0
             );
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     /**  Get the number of seconds before the player reaches the given amount of runes.
@@ -4010,7 +4009,7 @@ l    */
         if (seconds < 0) {
             seconds = 0;
         }
-        return Compare(seconds);
+        return ReturnConstant(seconds);
     };
 
     /**  Returns the value of the given snapshot stat.
@@ -4024,7 +4023,7 @@ l    */
     ) {
         const value =
             this.OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
-        return Compare(value);
+        return ReturnConstant(value);
     }
 
     /**  Returns the critical strike chance of the given snapshot stat.
@@ -4041,7 +4040,7 @@ l    */
         if (namedParams.unlimited != 1 && value > 100) {
             value = 100;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     }
 
     /** Get the current agility of the player.
@@ -4404,7 +4403,7 @@ l    */
     ) => {
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = (GetUnitSpeed(target) * 100) / 7;
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the cooldown in seconds on a spell before it gains another charge.
@@ -4434,7 +4433,7 @@ l    */
             const ending = start + duration;
             return ReturnValueBetween(start, ending, duration, start, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the number of charges of the spell.
@@ -4472,7 +4471,7 @@ l    */
                 1 / duration
             );
         }
-        return Compare(charges);
+        return ReturnConstant(charges);
     };
 
     /** Get the number of seconds for a full recharge of the spell.
@@ -4499,7 +4498,7 @@ l    */
             const ending = start + duration;
             return ReturnValueBetween(start, ending, duration, start, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the number of seconds before any of the listed spells are ready for use.
@@ -4547,11 +4546,11 @@ l    */
             }
         }
         if (earliest == INFINITY) {
-            return Compare(0);
+            return ReturnConstant(0);
         } else if (earliest > 0) {
             return ReturnValue(0, earliest, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the cooldown duration in seconds for a given spell.
@@ -4580,7 +4579,7 @@ l    */
             atTime,
             target
         );
-        return Compare(duration);
+        return ReturnConstant(duration);
     };
 
     /** Get the recharge duration in seconds for a given spell.
@@ -4612,7 +4611,7 @@ l    */
                 atTime,
                 target
             );
-        return Compare(duration);
+        return ReturnConstant(duration);
     };
 
     /** Get data for the given spell defined by SpellInfo(...)
@@ -4640,7 +4639,7 @@ l    */
         if (si) {
             const value = si[key];
             if (value) {
-                return Compare(<number>value);
+                return ReturnConstant(<number>value);
             }
         }
         return [];
@@ -4674,7 +4673,7 @@ l    */
             undefined
         );
         if (value) {
-            return Compare(<number>value);
+            return ReturnConstant(<number>value);
         }
         return [];
     };
@@ -4696,7 +4695,7 @@ l    */
     ) => {
         const spellId = positionalParams[1];
         const spellCount = this.OvaleSpells.GetSpellCount(spellId);
-        return Compare(spellCount);
+        return ReturnConstant(spellCount);
     };
 
     /** Test if the given spell is in the spellbook.
@@ -4745,7 +4744,7 @@ l    */
             return [];
         }
         maxCharges = maxCharges || 1;
-        return Compare(maxCharges);
+        return ReturnConstant(maxCharges);
     };
 
     /** Test if the given spell is usable.
@@ -4879,7 +4878,7 @@ l    */
     ) => {
         const talent = positionalParams[1];
         const value = this.OvaleSpellBook.GetTalentPoints(talent);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test if the player is the in-game target of the target.
@@ -4926,7 +4925,7 @@ l    */
             "target"
         );
         const [, , value] = UnitDetailedThreatSituation("player", target);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Get the number of seconds between ticks of a periodic aura on a target.
@@ -4970,9 +4969,9 @@ l    */
             );
         }
         if (tickTime && tickTime > 0) {
-            return Compare(tickTime);
+            return ReturnConstant(tickTime);
         }
-        return Compare(INFINITY);
+        return ReturnConstant(INFINITY);
     };
 
     private CurrentTickTime = (
@@ -4998,7 +4997,7 @@ l    */
         } else {
             tickTime = 0;
         }
-        return Compare(tickTime);
+        return ReturnConstant(tickTime);
     };
 
     /** Get the remaining number of ticks of a periodic aura on a target.
@@ -5047,7 +5046,7 @@ l    */
                 );
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Gets the remaining time until the next tick */
@@ -5075,10 +5074,10 @@ l    */
                 this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
-                return Compare(remainingTime);
+                return ReturnConstant(remainingTime);
             }
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Get the number of seconds elapsed since the player cast the given spell.
@@ -5115,7 +5114,7 @@ l    */
         atTime: number
     ) => {
         const value = 3600;
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     private TimeToEclipse = (
@@ -5139,12 +5138,12 @@ l    */
             atTime
         );
         if (seconds == 0) {
-            return Compare(0);
+            return ReturnConstant(0);
         } else if (seconds < INFINITY) {
             // XXX Why isn't this (atTime, atTime + seconds)?
             return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY);
+            return ReturnConstant(INFINITY);
         }
     }
 
@@ -5255,12 +5254,12 @@ l    */
             powerType
         );
         if (seconds == 0) {
-            return Compare(0);
+            return ReturnConstant(0);
         } else if (seconds < INFINITY) {
             // XXX Why isn't this (atTime, atTime + seconds)?
             return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY);
+            return ReturnConstant(INFINITY);
         }
     }
     /** Get the number of seconds before the player has enough energy to cast the given spell.
@@ -5327,11 +5326,11 @@ l    */
         let [target] = private ParseCondition = (positionalParams, namedParams, "target");
         let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, OvaleGUID.UnitGUID(target));
         if (seconds == 0) {
-            return Compare(0);
+            return ReturnConstant(0);
         } else if (seconds < INFINITY) {
             return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY);
+            return ReturnConstant(INFINITY);
         }
         */
         OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
@@ -5359,7 +5358,7 @@ l    */
         const seconds = positionalParams[1];
         const haste = (namedParams.haste as HasteType) || "spell";
         const value = this.GetHastedTime(seconds, haste);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test if the totem has expired.
@@ -5442,7 +5441,7 @@ l    */
         ) {
             return ReturnValueBetween(start, ending, 0, ending, -1);
         }
-        return Compare(0);
+        return ReturnConstant(0);
     };
 
     /** Check if a tracking is enabled
@@ -5499,7 +5498,7 @@ l    */
                 travelTime = estimatedTravelTime;
             }
         }
-        return Compare(travelTime);
+        return ReturnConstant(travelTime);
     };
 
     /**  A condition that always returns true.
@@ -5542,7 +5541,7 @@ l    */
         } else {
             value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
         }
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test if a sigil is charging
@@ -5650,7 +5649,7 @@ l    */
         atTime: number
     ) => {
         const value = this.OvaleDemonHunterSoulFragments.SoulFragments(atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     /** Test if a specific dispel type is present.

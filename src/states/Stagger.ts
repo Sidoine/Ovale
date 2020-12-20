@@ -7,11 +7,11 @@ import { OvaleClass } from "../Ovale";
 import { StateModule } from "../engine/state";
 import { OvaleCombatClass } from "./combat";
 import {
-    Compare,
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
     ParseCondition,
+    ReturnConstant,
     ReturnValueBetween,
 } from "../engine/condition";
 import { OvaleAuraClass } from "./Aura";
@@ -243,6 +243,6 @@ export class OvaleStaggerClass implements StateModule {
     ) => {
         const count = positionalParams[1];
         const damage = this.LastTickDamage(count);
-        return Compare(damage);
+        return ReturnConstant(damage);
     };
 }

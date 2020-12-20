@@ -14,7 +14,7 @@ import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { Compare, OvaleConditionClass } from "../engine/condition";
+import { OvaleConditionClass, ReturnConstant } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
@@ -234,7 +234,7 @@ export class OvaleWarlockClass implements StateModule {
                 impsSpawned = impsSpawned + 1;
             }
         }
-        return Compare(impsSpawned);
+        return ReturnConstant(impsSpawned);
     };
 
     private getDemonsCount = (
@@ -249,7 +249,7 @@ export class OvaleWarlockClass implements StateModule {
                 count = count + 1;
             }
         }
-        return Compare(count);
+        return ReturnConstant(count);
     };
 
     private demonDuration = (
@@ -259,7 +259,7 @@ export class OvaleWarlockClass implements StateModule {
     ) => {
         const creatureId = positionalParams[1];
         const value = this.getRemainingDemonDuration(creatureId, atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 
     private getRemainingDemonDuration(creatureId: number, atTime: number) {
@@ -344,6 +344,6 @@ export class OvaleWarlockClass implements StateModule {
         atTime: number
     ) => {
         const value = this.getTimeToShard(atTime);
-        return Compare(value);
+        return ReturnConstant(value);
     };
 }
