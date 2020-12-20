@@ -44,7 +44,7 @@ AddFunction armsgetinmeleerange
  if checkboxon(opt_melee_range) and not inflighttotarget(charge) and not inflighttotarget(heroic_leap) and not target.inrange(pummel)
  {
   if target.inrange(charge) spell(charge)
-  if spellcharges(charge) == 0 and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
+  if spellcharges(charge) == 0 and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
   texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
@@ -540,7 +540,7 @@ AddFunction furygetinmeleerange
  if checkboxon(opt_melee_range) and not inflighttotarget(charge) and not inflighttotarget(heroic_leap) and not target.inrange(pummel)
  {
   if target.inrange(charge) spell(charge)
-  if spellcharges(charge) == 0 and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
+  if spellcharges(charge) == 0 and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
   texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
@@ -651,7 +651,7 @@ AddFunction furyprecombatcdpostconditions
 AddFunction furymovementmainactions
 {
  #heroic_leap
- if checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
+ if checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
 }
 
 AddFunction furymovementmainpostconditions
@@ -664,7 +664,7 @@ AddFunction furymovementshortcdactions
 
 AddFunction furymovementshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap)
+ checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 and spell(heroic_leap)
 }
 
 AddFunction furymovementcdactions
@@ -673,7 +673,7 @@ AddFunction furymovementcdactions
 
 AddFunction furymovementcdpostconditions
 {
- checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) and spell(heroic_leap)
+ checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 and spell(heroic_leap)
 }
 
 ### actions.default
@@ -688,7 +688,7 @@ AddFunction fury_defaultmainactions
  unless target.distance() > 5 and furymovementmainpostconditions()
  {
   #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
-  if target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } spell(heroic_leap)
+  if target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } spell(heroic_leap)
   #rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
@@ -715,7 +715,7 @@ AddFunction fury_defaultshortcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementshortcdactions()
 
-  unless target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage)
+  unless target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage)
   {
    #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
    if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } spell(recklessness)
@@ -733,7 +733,7 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
@@ -745,7 +745,7 @@ AddFunction fury_defaultcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementcdactions()
 
-  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap)
+  unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap)
   {
    #potion
    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
@@ -779,7 +779,7 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance(atleast 8) and target.distance(atmost 40) } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies() == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies() > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
@@ -913,7 +913,7 @@ AddFunction protectiongetinmeleerange
  if checkboxon(opt_melee_range) and not inflighttotarget(intercept) and not inflighttotarget(heroic_leap) and not target.inrange(pummel)
  {
   if target.inrange(intercept) spell(intercept)
-  if spellcharges(intercept) == 0 and target.distance(atleast 8) and target.distance(atmost 40) spell(heroic_leap)
+  if spellcharges(intercept) == 0 and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
   texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
 }
