@@ -5,7 +5,6 @@ import {
     Compare,
     TestBoolean,
     ConditionFunction,
-    isComparator,
     ReturnValue,
     OvaleConditionClass,
     ReturnConstant,
@@ -191,8 +190,6 @@ export class OvaleConditions {
 	@param name The name of the armor set.
 	    Valid names: T11, T12, T13, T14, T15.
 	    Valid names for hybrid classes: append _caster, _heal, _melee, _tank.
-	@param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	@param number Optional. The number to compare against.
 	@return The number of pieces of the named set that are equipped by the player.
 	@return A boolean value for the result of the comparison.
 	@usage
@@ -205,14 +202,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         const value = 0;
         OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     private AzeriteEssenceIsMajor = (
@@ -249,21 +241,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [essenceId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const essenceId = positionalParams[1];
         const value = this.OvaleAzeriteEssence.EssenceRank(essenceId);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the base duration of the aura in seconds if it is applied at the current time.
 	@name BaseDuration
 	@paramsig number or boolean
 	@param id The aura spell ID.
-	@param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	@param number Optional. The number to compare against.
 	@return The base duration in seconds.
 	@return A boolean value for the result of the comparison.
 	@see BuffDuration
@@ -276,11 +262,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         let value = 0;
         if (this.OvaleData.buffSpellList[auraId]) {
             const spellList = this.OvaleData.buffSpellList[auraId];
@@ -299,15 +281,13 @@ export class OvaleConditions {
                 this.OvalePaperDoll.next
             );
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the value of a buff as a number.  Not all buffs return an amount.
 	 @name BuffAmount
 	 @paramsig number
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -321,18 +301,13 @@ export class OvaleConditions {
 	 @see DebuffAmount
 	 @see TickValue
 	 @usage
-	 if DebuffAmount(stagger) >10000 Spell(purifying_brew)
-	 if DebuffAmount(stagger more 10000) Spell(purifying_brew) */
+	 if DebuffAmount(stagger) >10000 Spell(purifying_brew) */
     private BuffAmount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -356,17 +331,15 @@ export class OvaleConditions {
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura[statName] || 0;
-            return TestValue(gain, ending, value, start, 0, comparator, limit);
+            return TestValue(gain, ending, value, start, 0);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the player's combo points for the given aura at the time the aura was applied on the target.
 	 @name BuffComboPoints
 	 @paramsig number or boolean
 	 @param id The aura spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -380,11 +353,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -399,17 +368,15 @@ export class OvaleConditions {
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = (aura && aura.combopoints) || 0;
-            return TestValue(gain, ending, value, start, 0, comparator, limit);
+            return TestValue(gain, ending, value, start, 0);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the number of seconds before a buff can be gained again.
 	 @name BuffCooldown
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see DebuffCooldown
@@ -448,8 +415,6 @@ export class OvaleConditions {
 	 @name BuffCount
 	 @paramsig number or boolean
 	 @param id the spell list ID	
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of buffs
 	 @return A boolean value for the result of the comparison
 	 */
@@ -458,11 +423,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -481,15 +442,13 @@ export class OvaleConditions {
                 count = count + 1;
             }
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     /** Get the duration in seconds of the cooldown before a buff can be gained again.
 	 @name BuffCooldownDuration
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see DebuffCooldown
@@ -502,11 +461,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         let minCooldown = INFINITY;
         if (this.OvaleData.buffSpellList[auraId]) {
             for (const [id] of pairs(this.OvaleData.buffSpellList[auraId])) {
@@ -519,15 +474,13 @@ export class OvaleConditions {
         } else {
             minCooldown = 0;
         }
-        return Compare(minCooldown, comparator, limit);
+        return Compare(minCooldown);
     };
 
     /** /** Get the total count of the given aura across all targets.
 	 @name BuffCountOnAny
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param stacks Optional. The minimum number of stacks of the aura required.
 	     Defaults to stacks=1.
 	     Valid values: any number greater than zero.
@@ -549,11 +502,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1]
         const [, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -581,17 +530,9 @@ export class OvaleConditions {
             const origin = startChangeCount;
             const rate = -1 / (endingChangeCount - startChangeCount);
             const [start, ending] = [startFirst, endingLast];
-            return TestValue(
-                start,
-                ending,
-                count,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, count, origin, rate);
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     /** Get the current direction of an aura's stack count.
@@ -600,8 +541,6 @@ export class OvaleConditions {
 	 @name BuffDirection
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	     Defaults to any=0.
 	     Valid values: 0, 1.
@@ -617,11 +556,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -640,25 +575,15 @@ export class OvaleConditions {
                 aura.ending,
                 aura.direction,
             ];
-            return TestValue(
-                gain,
-                INFINITY,
-                direction,
-                gain,
-                0,
-                comparator,
-                limit
-            );
+            return TestValue(gain, INFINITY, direction, gain, 0);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the total duration of the aura from when it was first applied to when it ended.
 	 @name BuffDuration
 	 @paramsig number or boolean
 	 @param id The aura spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -671,11 +596,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -690,9 +611,9 @@ export class OvaleConditions {
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = ending - start;
-            return TestValue(gain, ending, value, start, 0, comparator, limit);
+            return TestValue(gain, ending, value, start, 0);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Test if an aura is expired, or will expire after a given number of seconds.
@@ -808,8 +729,6 @@ export class OvaleConditions {
     /** Get the time elapsed since the aura was last gained on the target.
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	     Defaults to any=0.
 	     Valid values: 0, 1.
@@ -824,11 +743,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -842,9 +757,9 @@ export class OvaleConditions {
         );
         if (aura) {
             const gain = aura.gain || 0;
-            return TestValue(gain, INFINITY, 0, gain, 1, comparator, limit);
+            return TestValue(gain, INFINITY, 0, gain, 1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     private BuffImproved = (
@@ -852,14 +767,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         let [, ,] = this.ParseCondition(positionalParams, namedParams);
         // TODO Not implemented
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the player's persistent multiplier for the given aura at the time the aura was applied on the target.
@@ -867,8 +777,6 @@ export class OvaleConditions {
 	 @name BuffPersistentMultiplier
 	 @paramsig number or boolean
 	 @param id The aura spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -883,11 +791,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -902,17 +806,15 @@ export class OvaleConditions {
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura.damageMultiplier || 1;
-            return TestValue(gain, ending, value, start, 0, comparator, limit);
+            return TestValue(gain, ending, value, start, 0);
         }
-        return Compare(1, comparator, limit);
+        return Compare(1);
     };
 
     /** Get the remaining time in seconds on an aura.
 	 @name BuffRemaining
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	     Defaults to any=0.
 	     Valid values: 0, 1.
@@ -931,11 +833,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -949,17 +847,15 @@ export class OvaleConditions {
         );
         if (aura && aura.ending >= atTime) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit);
+            return TestValue(gain, INFINITY, 0, ending, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the remaining time in seconds before the aura expires across all targets.
 	 @name BuffRemainingOnAny
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param stacks Optional. The minimum number of stacks of the aura required.
 	     Defaults to stacks=1.
 	     Valid values: any number greater than zero.
@@ -978,11 +874,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -1000,17 +892,15 @@ export class OvaleConditions {
         );
         if (count > 0) {
             const [start, ending] = [startFirst, endingLast];
-            return TestValue(start, INFINITY, 0, ending, -1, comparator, limit);
+            return TestValue(start, INFINITY, 0, ending, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the number of stacks of an aura on the target.
 	 @name BuffStacks
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	     Defaults to any=0.
 	     Valid values: 0, 1.
@@ -1031,11 +921,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -1050,9 +936,9 @@ export class OvaleConditions {
         if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
             const value = aura.stacks || 0;
-            return TestValue(gain, ending, value, start, 0, comparator, limit);
+            return TestValue(gain, ending, value, start, 0);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     private maxStacks = (
@@ -1060,22 +946,16 @@ export class OvaleConditions {
         namedParameters: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1] as number,
-            positionalParams[2] as string,
-            positionalParams[3] as number,
-        ];
+        const auraId = positionalParams[1] as number;
         const spellInfo = this.OvaleData.GetSpellInfo(auraId);
         const maxStacks = (spellInfo && spellInfo.max_stacks) || 0;
-        return Compare(maxStacks, comparator, limit);
+        return Compare(maxStacks);
     };
 
     /** Get the total number of stacks of the given aura across all targets.
 	 @name BuffStacksOnAny
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	     Defaults to any=0.
 	     Valid values: 0, 1.
@@ -1091,11 +971,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -1119,17 +995,9 @@ export class OvaleConditions {
         );
         if (count > 0) {
             const [start, ending] = [startFirst, endingChangeCount];
-            return TestValue(
-                start,
-                ending,
-                stacks,
-                start,
-                0,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, stacks, start, 0);
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     /** Test if there is a stealable buff on the target.
@@ -1180,8 +1048,6 @@ export class OvaleConditions {
 	 @name CastTime
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see ExecuteTime
@@ -1194,21 +1060,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        return Compare(castTime, comparator, limit);
+        return Compare(castTime);
     };
 
     /** Get the cast time in seconds of the spell for the player or the GCD for the player, whichever is greater.
 	 @name ExecuteTime
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see CastTime
@@ -1221,15 +1081,11 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
         const gcd = this.OvaleFuture.GetGCD(atTime);
         const t = (castTime > gcd && castTime) || gcd;
-        return Compare(t, comparator, limit);
+        return Compare(t);
     };
 
     /** Test if the target is casting the given spell.
@@ -1465,8 +1321,6 @@ export class OvaleConditions {
 	 @name Counter
 	 @paramsig number or boolean
 	 @param id The name of the counter. It should match one that's defined by inccounter=xxx in SpellInfo(...).
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current value the counter.
 	 @return A boolean value for the result of the comparison.
      */
@@ -1475,13 +1329,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [counter, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const counter = positionalParams[1];
         const value = this.OvaleFuture.GetCounter(counter, atTime);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test whether the target's creature family matches the given name.
@@ -1551,8 +1401,6 @@ export class OvaleConditions {
 	 @name CritDamage
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1565,11 +1413,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -1604,7 +1448,7 @@ export class OvaleConditions {
             }
         }
         value = critMultiplier * value;
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the current estimated damage of a spell on the target.
@@ -1612,8 +1456,6 @@ export class OvaleConditions {
 	 @name Damage
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1629,11 +1471,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -1644,15 +1482,13 @@ export class OvaleConditions {
         if (si && si.physical == 1) {
             value = value * (1 - BossArmorDamageReduction(target));
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the total damage taken by the player in the previous time interval.
 	 @name DamageTaken
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of damage taken in the previous interval.
 	 @return A boolean value for the result of the comparison.
 	 @see IncomingDamage
@@ -1664,25 +1500,19 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [interval, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
             const [total] = this.OvaleDamageTaken.GetRecentDamage(interval);
             value = total;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the magic damage taken by the player in the previous time interval.
 	 @name MagicDamageTaken
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of magic damage taken in the previous interval.
 	 @return A boolean value for the result of the comparison.
 	 @see IncomingMagicDamage
@@ -1694,11 +1524,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [interval, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
             const [, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
@@ -1706,15 +1532,13 @@ export class OvaleConditions {
             );
             value = totalMagic;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the physical damage taken by the player in the previous time interval.
 	 @name PhysicalDamageTaken
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of physical damage taken in the previous interval.
 	 @return A boolean value for the result of the comparison.
 	 @see IncomingPhysicalDamage
@@ -1726,11 +1550,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [interval, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
             const [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
@@ -1738,7 +1558,7 @@ export class OvaleConditions {
             );
             value = total - totalMagic;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     GetDiseases(
@@ -1765,8 +1585,6 @@ export class OvaleConditions {
     /** Get the remaining time in seconds before any diseases applied by the death knight will expire.
 	 @name DiseasesRemaining
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1778,11 +1596,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         const [target, ,] = this.ParseCondition(positionalParams, namedParams);
         const [bpAura, ffAura] = this.GetDiseases(target, atTime);
         let aura;
@@ -1796,9 +1609,9 @@ export class OvaleConditions {
         }
         if (aura) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit);
+            return TestValue(gain, INFINITY, 0, ending, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /**  Test if all diseases applied by the death knight are present on the target.
@@ -1866,8 +1679,6 @@ export class OvaleConditions {
 	 You should not test for equality.
 	 @name Distance
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1882,18 +1693,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = (LibRangeCheck && LibRangeCheck.GetRange(target)) || 0;
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the number of hostile enemies on the battlefield.
 	 The minimum value returned is 1.
 	 @name Enemies
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param tagged Optional. By default, all enemies are counted. To count only enemies directly tagged by the player, set tagged=1.
 	     Defaults to tagged=0.
 	     Valid values: 0, 1.
@@ -1908,7 +1716,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let value = this.OvaleEnemies.next.enemies;
         if (!value) {
             let useTagged = this.ovaleOptions.db.profile.apparence
@@ -1925,14 +1732,12 @@ export class OvaleConditions {
         if (value < 1) {
             value = 1;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
 	 @name EnergyRegenRate
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current rate of energy regeneration.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -1943,20 +1748,17 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const value = this.OvalePower.getPowerRateAt(
             this.OvalePower.next,
             "energy",
             atTime
         );
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the remaining time in seconds the target is Enraged.
 	 @name EnrageRemaining
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1971,7 +1773,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const aura = this.OvaleAura.GetAura(
             target,
@@ -1982,9 +1783,9 @@ export class OvaleConditions {
         );
         if (aura && aura.ending >= atTime) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit);
+            return TestValue(gain, INFINITY, 0, ending, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Test if the target exists. The target may be alive or dead.
@@ -2028,8 +1829,6 @@ export class OvaleConditions {
     /**  Get the amount of regenerated focus per second for hunters.
 	 @name FocusRegenRate
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current rate of focus regeneration.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -2041,21 +1840,18 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const value = this.OvalePower.getPowerRateAt(
             this.OvalePower.next,
             "focus",
             atTime
         );
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the amount of focus that would be regenerated during the cast time of the given spell for hunters.
 	 @name FocusCastingRegen
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of focus.
 	 @return A boolean value for the result of the comparison.
      */
@@ -2064,11 +1860,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const regenRate = this.OvalePower.getPowerRateAt(
             this.OvalePower.next,
             "focus",
@@ -2095,14 +1887,12 @@ export class OvaleConditions {
             }
             power = power + regenRate * 1.5 * seconds;
         }
-        return Compare(power, comparator, limit);
+        return Compare(power);
     };
 
     /** Get the player's global cooldown in seconds.
 	 @name GCD
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -2114,16 +1904,13 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const value = this.OvaleFuture.GetGCD(atTime);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the number of seconds before the player's global cooldown expires.
 	 @name GCDRemaining
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the previous spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -2137,7 +1924,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -2153,18 +1939,10 @@ export class OvaleConditions {
             const start = (spellcast && spellcast.start) || 0;
             const ending = start + duration;
             if (atTime < ending) {
-                return TestValue(
-                    start,
-                    INFINITY,
-                    0,
-                    ending,
-                    -1,
-                    comparator,
-                    limit
-                );
+                return TestValue(start, INFINITY, 0, ending, -1);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     private Glyph = (
@@ -2199,8 +1977,6 @@ export class OvaleConditions {
     /** Get the current amount of health points of the target.
 	 @name Health
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2216,7 +1992,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
@@ -2228,24 +2003,14 @@ export class OvaleConditions {
                 (-1 * health) / timeToDie,
             ];
             const [start, ending] = [now, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                value,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, value, origin, rate);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the current amount of health points of the target including absorbs.
 	 @name EffectiveHealth
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2261,7 +2026,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health =
             this.OvaleHealth.UnitHealth(target) +
@@ -2272,14 +2036,12 @@ export class OvaleConditions {
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
         const [value, origin, rate] = [health, now, (-1 * health) / timeToDie];
         const [start, ending] = [now, INFINITY];
-        return TestValue(start, ending, value, origin, rate, comparator, limit);
+        return TestValue(start, ending, value, origin, rate);
     };
 
     /** Get the number of health points away from full health of the target.
 	 @name HealthMissing
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2295,7 +2057,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
@@ -2305,24 +2066,14 @@ export class OvaleConditions {
             const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
             const [value, origin, rate] = [missing, now, health / timeToDie];
             const [start, ending] = [now, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                value,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, value, origin, rate);
         }
-        return Compare(maxHealth, comparator, limit);
+        return Compare(maxHealth);
     };
 
     /** Get the current percent level of health of the target.
 	 @name HealthPercent
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2338,7 +2089,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
@@ -2352,24 +2102,14 @@ export class OvaleConditions {
                 (-1 * healthPercent) / timeToDie,
             ];
             const [start, ending] = [now, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                value,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, value, origin, rate);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the current effective percent level of health of the target (including absorbs).
 	 @name EffectiveHealthPercent
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2384,7 +2124,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health =
             this.OvaleHealth.UnitHealth(target) +
@@ -2401,14 +2140,12 @@ export class OvaleConditions {
             (-1 * healthPercent) / timeToDie,
         ];
         const [start, ending] = [now, INFINITY];
-        return TestValue(start, ending, value, origin, rate, comparator, limit);
+        return TestValue(start, ending, value, origin, rate);
     };
 
     /** Get the amount of health points of the target when it is at full health.
 	 @name MaxHealth
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2423,17 +2160,14 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = this.OvaleHealth.UnitHealthMax(target);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /**  Get the estimated number of seconds remaining before the target is dead.
 	 @name TimeToDie
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2448,29 +2182,18 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const now = this.baseState.currentTime;
         const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
         const [value, origin, rate] = [timeToDie, now, -1];
         const [start] = [now, now + timeToDie];
-        return TestValue(
-            start,
-            INFINITY,
-            value,
-            origin,
-            rate,
-            comparator,
-            limit
-        );
+        return TestValue(start, INFINITY, value, origin, rate);
     };
 
     /** Get the estimated number of seconds remaining before the target reaches the given percent of max health.
 	 @name TimeToHealthPercent
 	 @paramsig number or boolean
 	 @param percent The percent of maximum health of the target.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2485,11 +2208,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [percent, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const percent = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const health = this.OvaleHealth.UnitHealth(target) || 0;
         if (health > 0) {
@@ -2502,18 +2221,10 @@ export class OvaleConditions {
                     (timeToDie * (healthPercent - percent)) / healthPercent;
                 const [value, origin, rate] = [t, now, -1];
                 const [start, ending] = [now, now + t];
-                return TestValue(
-                    start,
-                    ending,
-                    value,
-                    origin,
-                    rate,
-                    comparator,
-                    limit
-                );
+                return TestValue(start, ending, value, origin, rate);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
@@ -2812,8 +2523,6 @@ export class OvaleConditions {
     /**  Get the current number of charges of the given item in the player's inventory.
 	 @name ItemCharges
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of charges.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -2827,21 +2536,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [itemId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const itemId = positionalParams[1];
         const value = GetItemCount(itemId, false, true);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the current number of the given item in the player's inventory.
 	 Items with more than one charge count as one item.
 	 @name ItemCount
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The count of the item.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -2853,13 +2556,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [itemId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const itemId = positionalParams[1];
         const value = GetItemCount(itemId);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the damage done by the most recent damage event for the given spell.
@@ -2867,8 +2566,6 @@ export class OvaleConditions {
 	 @name LastDamage
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The damage done.
 	 @return A boolean value for the result of the comparison.
 	 @see Damage, LastEstimatedDamage
@@ -2881,14 +2578,10 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const value = this.OvaleSpellDamage.Get(spellId);
         if (value) {
-            return Compare(value, comparator, limit);
+            return Compare(value);
         }
         return [];
     };
@@ -2896,8 +2589,6 @@ export class OvaleConditions {
     /**  Get the level of the target.
 	 @name Level
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2912,7 +2603,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         let value;
         if (target == "player") {
@@ -2920,7 +2610,7 @@ export class OvaleConditions {
         } else {
             value = UnitLevel(target);
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
     /** Test if a list is currently set to the given value.
 	 @name List
@@ -2968,8 +2658,6 @@ export class OvaleConditions {
     /** Test if the game is on a PTR server
 	 @name PTR
 	 @paramsig number
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return 1 if it is a PTR realm, or 0 if it is a live realm.
 	 @usage
 	 if PTR() > 0 Spell(wacky_new_spell)
@@ -2979,10 +2667,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [version, , , uiVersion] = GetBuildInfo();
-        const value = ((version > "8.2.5" || uiVersion > 80205) && 1) || 0;
-        return Compare(value, comparator, limit);
+        const value = ((version > "9.0.2" || uiVersion > 90002) && 1) || 0;
+        return Compare(value);
     };
 
     /** Get the persistent multiplier to the given aura if applied.
@@ -2990,8 +2677,6 @@ export class OvaleConditions {
 	 @name PersistentMultiplier
 	 @paramsig number or boolean
 	 @param id The aura ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -3006,11 +2691,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -3023,7 +2704,7 @@ export class OvaleConditions {
             targetGuid,
             atTime
         );
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test if the pet exists and is alive.
@@ -3065,10 +2746,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         let value;
         if (target == "player") {
@@ -3080,7 +2757,7 @@ export class OvaleConditions {
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
                 0;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     }
     /** Return the amount of power of the given power type on the target.
      */
@@ -3090,10 +2767,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         if (target == "player") {
             const [value, origin, rate] = [
@@ -3106,19 +2779,11 @@ export class OvaleConditions {
                 ),
             ];
             const [start, ending] = [atTime, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                value,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, value, origin, rate);
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
             const value = (powerInfo && UnitPower(target, powerInfo.id)) || 0;
-            return Compare(value, comparator, limit);
+            return Compare(value);
         }
     }
     /**Return the current deficit of power from max power on the target.
@@ -3129,10 +2794,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         if (target == "player") {
             const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
@@ -3149,15 +2810,7 @@ export class OvaleConditions {
                         ),
                 ];
                 const [start, ending] = [atTime, INFINITY];
-                return TestValue(
-                    start,
-                    ending,
-                    value,
-                    origin,
-                    rate,
-                    comparator,
-                    limit
-                );
+                return TestValue(start, ending, value, origin, rate);
             }
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
@@ -3169,10 +2822,10 @@ export class OvaleConditions {
                 const power =
                     (powerInfo && UnitPower(target, powerInfo.id)) || 0;
                 const value = powerMax - power;
-                return Compare(value, comparator, limit);
+                return Compare(value);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     }
 
     /**Return the current percent level of power (between 0 and 100) on the target.
@@ -3183,10 +2836,6 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         if (target == "player") {
             const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
@@ -3205,15 +2854,7 @@ export class OvaleConditions {
                     rate = 0;
                 }
                 const [start, ending] = [atTime, INFINITY];
-                return TestValue(
-                    start,
-                    ending,
-                    value,
-                    origin,
-                    rate,
-                    comparator,
-                    limit
-                );
+                return TestValue(start, ending, value, origin, rate);
             }
         } else {
             const powerInfo = this.OvalePower.POWER_INFO[powerType];
@@ -3227,18 +2868,16 @@ export class OvaleConditions {
                     (powerInfo &&
                         UnitPower(target, powerInfo.id) * conversion) ||
                     0;
-                return Compare(value, comparator, limit);
+                return Compare(value);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     }
 
     /**
      Get the current amount of alternate power displayed on the alternate power bar.
 	 @name AlternatePower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current alternate power.
 	 @return A boolean value for the result of the comparison.
      */
@@ -3252,8 +2891,6 @@ export class OvaleConditions {
     /** Get the current amount of astral power for balance druids.
 	 @name AstralPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current runic power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3271,8 +2908,6 @@ export class OvaleConditions {
     /**Get the current amount of stored Chi for monks.
 	 @name Chi
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of stored Chi.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3289,8 +2924,6 @@ export class OvaleConditions {
     /**  Get the number of combo points for a feral druid or a rogue.
      @name ComboPoints
      @paramsig number or boolean
-     @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-     @param number Optional. The number to compare against.
      @return The number of combo points.
      @return A boolean value for the result of the comparison.
      @usage
@@ -3306,8 +2939,6 @@ export class OvaleConditions {
     /**Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
 	 @name Energy
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current energy.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3325,8 +2956,6 @@ export class OvaleConditions {
     /**Get the current amount of focus for hunters.
 	 @name Focus
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current focus.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3359,8 +2988,6 @@ export class OvaleConditions {
     /** Get the current amount of holy power for a paladin.
 	 @name HolyPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The amount of holy power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3393,8 +3020,6 @@ export class OvaleConditions {
     /**  Get the current level of mana of the target.
 	 @name Mana
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3444,8 +3069,6 @@ export class OvaleConditions {
     /** Get the current amount of rage for guardian druids and warriors.
 	 @name Rage
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current rage.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3463,8 +3086,6 @@ export class OvaleConditions {
     /** Get the current amount of runic power for death knights.
 	 @name RunicPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current runic power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3482,8 +3103,6 @@ export class OvaleConditions {
     /** Get the current number of Soul Shards for warlocks.
 	 @name SoulShards
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of Soul Shards.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -3513,8 +3132,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full alternate power bar, between 0 and maximum alternate power, of the target.
 	 @name AlternatePowerDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3537,8 +3154,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
 	 @name AstralPowerDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3561,8 +3176,6 @@ export class OvaleConditions {
     /**  Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
 	 @name ChiDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3602,8 +3215,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full energy bar, between 0 and maximum energy, of the target.
 	 @name EnergyDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3629,8 +3240,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full focus bar, between 0 and maximum focus, of the target.
 	 @name FocusDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3660,8 +3269,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for full holy power, between 0 and maximum holy power, of the target.
 	 @name HolyPowerDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3684,8 +3291,6 @@ export class OvaleConditions {
     /**  Get the number of lacking resource points for a full mana bar, between 0 and maximum mana, of the target.
 	 @name ManaDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3713,8 +3318,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full rage bar, between 0 and maximum rage, of the target.
 	 @name RageDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3732,8 +3335,6 @@ export class OvaleConditions {
     /** Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
 	 @name RunicPowerDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3756,8 +3357,6 @@ export class OvaleConditions {
     /**  Get the number of lacking resource points for full soul shards, between 0 and maximum soul shards, of the target.
 	 @name SoulShardsDeficit
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3780,8 +3379,6 @@ export class OvaleConditions {
     /** Get the current percent level of mana (between 0 and 100) of the target.
 	 @name ManaPercent
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3803,8 +3400,6 @@ export class OvaleConditions {
 	 Alternate power is the resource tracked by the alternate power bar in certain boss fights.
 	 @name MaxAlternatePower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3834,8 +3429,6 @@ export class OvaleConditions {
     /** Get the maximum amount of Chi of the target.
 	 @name MaxChi
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3859,8 +3452,6 @@ l    */
     /** Get the maximum amount of energy of the target.
 	 @name MaxEnergy
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3878,8 +3469,6 @@ l    */
     /**  Get the maximum amount of focus of the target.
 	 @name MaxFocus
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3904,8 +3493,6 @@ l    */
     /** Get the maximum amount of Holy Power of the target.
 	 @name MaxHolyPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3928,8 +3515,6 @@ l    */
     /** Get the maximum amount of mana of the target.
 	 @name MaxMana
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3956,8 +3541,6 @@ l    */
     /** Get the maximum amount of rage of the target.
 	 @name MaxRage
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3975,8 +3558,6 @@ l    */
     /**  Get the maximum amount of Runic Power of the target.
 	 @name MaxRunicPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3999,8 +3580,6 @@ l    */
     /** Get the maximum amount of Soul Shards of the target.
 	 @name MaxSoulShards
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4023,8 +3602,6 @@ l    */
     /** Get the maximum amount of Arcane Charges of the target.
 	 @name MaxArcaneCharges
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4052,11 +3629,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [spell, comparator, limit] = [
-            <number>positionalParams[1],
-            <string>positionalParams[2],
-            <number>positionalParams[3],
-        ];
+        const spell = <number>positionalParams[1];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         const [target] = this.ParseCondition(
             positionalParams,
@@ -4072,7 +3645,7 @@ l    */
                 target,
                 maxCost
             )) || [0];
-        return Compare(value, comparator, limit);
+        return Compare(value);
     }
 
     /** Get the amount of energy required to cast the given spell.
@@ -4080,8 +3653,6 @@ l    */
 	 @name EnergyCost
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param max Optional. Set max=1 to return the maximum energy cost for the spell.
 	     Defaults to max=0.
 	     Valid values: 0, 1
@@ -4103,8 +3674,6 @@ l    */
 	 @name FocusCost
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param max Optional. Set max=1 to return the maximum focus cost for the spell.
 	     Defaults to max=0.
 	     Valid values: 0, 1
@@ -4127,8 +3696,6 @@ l    */
 	 @name ManaCost
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param max Optional. Set max=1 to return the maximum mana cost for the spell.
 	     Defaults to max=0.
 	     Valid values: 0, 1
@@ -4150,8 +3717,6 @@ l    */
 	 @name RageCost
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param max Optional. Set max=1 to return the maximum rage cost for the spell.
 	     Defaults to max=0.
 	     Valid values: 0, 1
@@ -4173,8 +3738,6 @@ l    */
 	 @name RunicPowerCost
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param max Optional. Set max=1 to return the maximum runic power cost for the spell.
 	     Defaults to max=0.
 	     Valid values: 0, 1
@@ -4336,8 +3899,6 @@ l    */
     /**  Get the result of the target's level minus the player's level. This number may be negative.
 	 @name RelativeLevel
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4354,7 +3915,6 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         let value, level;
         if (target == "player") {
@@ -4367,7 +3927,7 @@ l    */
         } else {
             value = level - this.OvalePaperDoll.level;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     private Refreshable = (
@@ -4401,8 +3961,6 @@ l    */
     /** Get the remaining cast time in seconds of the target's current spell cast.
 	 @name RemainingCastTime
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4418,21 +3976,12 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         let [, , , startTime, endTime] = UnitCastingInfo(target);
         if (startTime && endTime) {
             startTime = startTime / 1000;
             endTime = endTime / 1000;
-            return TestValue(
-                startTime,
-                endTime,
-                0,
-                endTime,
-                -1,
-                comparator,
-                limit
-            );
+            return TestValue(startTime, endTime, 0, endTime, -1);
         }
         return [];
     };
@@ -4440,8 +3989,6 @@ l    */
     /**  Get the current number of active and regenerating (fractional) runes of the given type for death knights.
 	 @name Rune
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of runes.
 	 @return A boolean value for the result of the comparison.
 	 @see RuneCount
@@ -4453,7 +4000,6 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneCount(
             atTime
         );
@@ -4461,17 +4007,9 @@ l    */
             const origin = startCooldown;
             const rate = 1 / (endCooldown - startCooldown);
             const [start, ending] = [startCooldown, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                count,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, count, origin, rate);
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     private RuneDeficit = (
@@ -4479,7 +4017,6 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneDeficit(
             atTime
         );
@@ -4487,24 +4024,14 @@ l    */
             const origin = startCooldown;
             const rate = -1 / (endCooldown - startCooldown);
             const [start, ending] = [startCooldown, INFINITY];
-            return TestValue(
-                start,
-                ending,
-                count,
-                origin,
-                rate,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, count, origin, rate);
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     /**  Get the current number of active runes of the given type for death knights.
 	 @name RuneCount
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param death Optional. Set death=1 to include all active death runes in the count. Set death=0 to exclude all death runes.
 	     Defaults to unset.
 	     Valid values: unset, 0, 1
@@ -4520,23 +4047,20 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneCount(
             atTime
         );
         if (startCooldown < INFINITY) {
             const [start, ending] = [startCooldown, endCooldown];
-            return TestValue(start, ending, count, start, 0, comparator, limit);
+            return TestValue(start, ending, count, start, 0);
         }
-        return Compare(count, comparator, limit);
+        return Compare(count);
     };
 
     /**  Get the number of seconds before the player reaches the given amount of runes.
 	 @name TimeToRunes
 	 @paramsig number or boolean
 	 @param runes. The amount of runes to reach.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -4547,16 +4071,12 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [runes, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const runes = positionalParams[1];
         let seconds = this.OvaleRunes.GetRunesCooldown(atTime, runes);
         if (seconds < 0) {
             seconds = 0;
         }
-        return Compare(seconds, comparator, limit);
+        return Compare(seconds);
     };
 
     /**  Returns the value of the given snapshot stat.
@@ -4568,13 +4088,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         const value =
             this.OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
-        return Compare(value, comparator, limit);
+        return Compare(value);
     }
 
     /**  Returns the critical strike chance of the given snapshot stat.
@@ -4586,23 +4102,17 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [comparator, limit] = [
-            <string>positionalParams[1],
-            <number>positionalParams[2],
-        ];
         let value =
             this.OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
         if (namedParams.unlimited != 1 && value > 100) {
             value = 100;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     }
 
     /** Get the current agility of the player.
 	 @name Agility
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current agility.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4623,8 +4133,6 @@ l    */
     /** Get the current attack power of the player.
 	 @name AttackPower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current attack power.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4645,8 +4153,6 @@ l    */
     /** Get the current critical strike rating of the player.
 	 @name CritRating
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current critical strike rating.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4667,8 +4173,6 @@ l    */
     /** Get the current haste rating of the player.
 	 @name HasteRating
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current haste rating.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4689,8 +4193,6 @@ l    */
     /** Get the current intellect of the player.
 	 @name Intellect
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current intellect.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4713,8 +4215,6 @@ l    */
 	 or a percent-increase to chance to trigger some effect.
 	 @name MasteryEffect
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current mastery effect.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4735,8 +4235,6 @@ l    */
     /** Get the current mastery rating of the player.
 	 @name MasteryRating
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current mastery rating.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4757,8 +4255,6 @@ l    */
     /** Get the current melee critical strike chance of the player.
 	 @name MeleeCritChance
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
@@ -4782,8 +4278,6 @@ l    */
     /**  Get the current percent increase to melee haste of the player.
 	 @name MeleeAttackSpeedPercent
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current percent increase to melee haste.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4804,8 +4298,6 @@ l    */
     /** Get the current ranged critical strike chance of the player.
 	 @name RangedCritChance
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
@@ -4829,8 +4321,6 @@ l    */
     /**  Get the current spell critical strike chance of the player.
 	 @name SpellCritChance
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
@@ -4854,8 +4344,6 @@ l    */
     /**  Get the current percent increase to spell haste of the player.
 	 @name SpellCastSpeedPercent
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current percent increase to spell haste.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4876,8 +4364,6 @@ l    */
     /** Get the current spellpower of the player.
 	 @name Spellpower
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current spellpower.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4898,8 +4384,6 @@ l    */
     /** Get the current stamina of the player.
 	 @name Stamina
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current stamina.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4920,8 +4404,6 @@ l    */
     /** Get the current strength of the player.
 	 @name Strength
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The current strength.
 	 @return A boolean value for the result of the comparison.
      */
@@ -4972,8 +4454,6 @@ l    */
 	 If the target is at running speed, then this condition returns 100.
 	 @name Speed
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4988,18 +4468,15 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const value = (GetUnitSpeed(target) * 100) / 7;
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the cooldown in seconds on a spell before it gains another charge.
 	 @name SpellChargeCooldown
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see SpellCharges
@@ -5012,11 +4489,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [
             charges,
             maxCharges,
@@ -5024,25 +4497,16 @@ l    */
             duration,
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
-            return TestValue(
-                start,
-                start + duration,
-                duration,
-                start,
-                -1,
-                comparator,
-                limit
-            );
+			const ending = start + duration;
+            return TestValue(start, ending, duration, start, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the number of charges of the spell.
 	 @name SpellCharges
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param count Optional. Sets whether a count or a fractional value is returned.
 	     Defaults to count=1.
 	     Valid values: 0, 1.
@@ -5058,11 +4522,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [
             charges,
             maxCharges,
@@ -5075,20 +4535,16 @@ l    */
                 INFINITY,
                 charges + 1,
                 start + duration,
-                1 / duration,
-                comparator,
-                limit
+                1 / duration
             );
         }
-        return Compare(charges, comparator, limit);
+        return Compare(charges);
     };
 
     /** Get the number of seconds for a full recharge of the spell.
      * @name SpellFullRecharge
      * @paramsig number or boolean
      * @param id The spell ID.
-     * @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-     * @param number Optional. The number to compare against.
      * @usage
      * if SpellFullRecharge(dire_frenzy) < GCD()
      *     Spell(dire_frenzy) */
@@ -5098,8 +4554,6 @@ l    */
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const comparator = positionalParams[2];
-        const limit = positionalParams[3];
         const [
             charges,
             maxCharges,
@@ -5109,17 +4563,9 @@ l    */
         if (charges && charges < maxCharges) {
             const duration = (maxCharges - charges) * dur;
             const ending = start + duration;
-            return TestValue(
-                start,
-                ending,
-                ending - start,
-                start,
-                -1,
-                comparator,
-                limit
-            );
+            return TestValue(start, ending, duration, start, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the number of seconds before any of the listed spells are ready for use.
@@ -5127,8 +4573,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @param ... Optional. Additional spell IDs.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see TimeToSpell
@@ -5141,8 +4585,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        let comparator: string | undefined, limit: number | undefined;
-        const usable = namedParams.usable == 1;
+        const usable = (namedParams.usable == 1);
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -5151,11 +4594,8 @@ l    */
         const targetGuid = this.OvaleGUID.UnitGUID(target);
         if (!targetGuid) return [];
         let earliest = INFINITY;
-        for (const [i, spellId] of ipairs(positionalParams)) {
-            if (isComparator(spellId)) {
-                [comparator, limit] = [spellId, positionalParams[i + 1]];
-                break;
-            } else if (
+        for (const [, spellId] of ipairs(positionalParams)) {
+            if (
                 !usable ||
                 this.OvaleSpells.IsUsableSpell(spellId, atTime, targetGuid)
             ) {
@@ -5173,19 +4613,17 @@ l    */
             }
         }
         if (earliest == INFINITY) {
-            return Compare(0, comparator, limit);
+            return Compare(0);
         } else if (earliest > 0) {
-            return TestValue(0, INFINITY, 0, earliest, -1, comparator, limit);
+            return TestValue(0, INFINITY, 0, earliest, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the cooldown duration in seconds for a given spell.
 	 @name SpellCooldownDuration
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -5197,11 +4635,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -5212,15 +4646,13 @@ l    */
             atTime,
             target
         );
-        return Compare(duration, comparator, limit);
+        return Compare(duration);
     };
 
     /** Get the recharge duration in seconds for a given spell.
 	 @name SpellRechargeDuration
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -5232,11 +4664,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -5250,7 +4678,7 @@ l    */
                 atTime,
                 target
             );
-        return Compare(duration, comparator, limit);
+        return Compare(duration);
     };
 
     /** Get data for the given spell defined by SpellInfo(...)
@@ -5259,8 +4687,6 @@ l    */
 	 @param id The spell ID.
 	 @param key The name of the data set by SpellInfo(...).
 	     Valid values are any alphanumeric string.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number data associated with the given key.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -5272,17 +4698,15 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, key, comparator, limit] = [
+        const [spellId, key] = [
             <number>positionalParams[1],
             <keyof SpellInfo>positionalParams[2],
-            <string>positionalParams[3],
-            <number>positionalParams[4],
         ];
         const si = this.OvaleData.spellInfo[spellId];
         if (si) {
             const value = si[key];
             if (value) {
-                return Compare(<number>value, comparator, limit);
+                return Compare(<number>value);
             }
         }
         return [];
@@ -5294,8 +4718,6 @@ l    */
 	 @param id The spell ID.
 	 @param key The name of the data set by SpellInfo(...).
 	     Valid values are any alphanumeric string.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number data associated with the given key after calculations
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -5307,11 +4729,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, key, comparator, limit] = [
+        const [spellId, key] = [
             <number>positionalParams[1],
             <SpellInfoProperty>positionalParams[2],
-            <string>positionalParams[3],
-            <number>positionalParams[4],
         ];
         const value = this.OvaleData.GetSpellInfoProperty(
             spellId,
@@ -5320,7 +4740,7 @@ l    */
             undefined
         );
         if (value) {
-            return Compare(<number>value, comparator, limit);
+            return Compare(<number>value);
         }
         return [];
     };
@@ -5329,8 +4749,6 @@ l    */
 	 @name SpellCount
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of times a spell can be cast.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -5342,13 +4760,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const spellCount = this.OvaleSpells.GetSpellCount(spellId);
-        return Compare(spellCount, comparator, limit);
+        return Compare(spellCount);
     };
 
     /** Test if the given spell is in the spellbook.
@@ -5377,8 +4791,6 @@ l    */
 	 @name SpellMaxCharges
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param count Optional. Sets whether a count or a fractional value is returned.
 	     Defaults to count=1.
 	     Valid values: 0, 1.
@@ -5394,11 +4806,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         let [, maxCharges, ,] = this.OvaleCooldown.GetSpellCharges(
             spellId,
             atTime
@@ -5407,7 +4815,7 @@ l    */
             return [];
         }
         maxCharges = maxCharges || 1;
-        return Compare(maxCharges, comparator, limit);
+        return Compare(maxCharges);
     };
 
     /** Test if the given spell is usable.
@@ -5478,8 +4886,6 @@ l    */
 	 @param hand Optional. Sets which hand weapon's melee swing.
 	     If no hand is specified, then return the time elapsed since the previous swing of either hand's weapon.
 	     Valid values: main, off.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see NextSwing
@@ -5489,18 +4895,10 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const swing = positionalParams[1];
-        let comparator, limit;
-        let start;
-        if ((swing && swing == "main") || swing == "off") {
-            [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            start = 0;
-        } else {
-            [comparator, limit] = [positionalParams[1], positionalParams[2]];
-            start = 0;
-        }
+        //const swing = positionalParams[1];
+        const start = 0;
         OneTimeMessage("Warning: 'LastSwing()' is not implemented.");
-        return TestValue(start, INFINITY, 0, start, 1, comparator, limit);
+        return TestValue(start, INFINITY, 0, start, 1);
     };
 
     /** Get the time in seconds until the player's next melee swing (white attack).
@@ -5509,8 +4907,6 @@ l    */
 	 @param hand Optional. Sets which hand weapon's melee swing.
 	     If no hand is specified, then return the time until the next swing of either hand's weapon.
 	     Valid values: main, off.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds
 	 @return A boolean value for the result of the comparison.
 	 @see LastSwing
@@ -5520,18 +4916,10 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const swing = positionalParams[1];
-        let comparator, limit;
-        let ending;
-        if ((swing && swing == "main") || swing == "off") {
-            [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            ending = 0;
-        } else {
-            [comparator, limit] = [positionalParams[1], positionalParams[2]];
-            ending = 0;
-        }
+        //const swing = positionalParams[1];
+        const ending = 0;
         OneTimeMessage("Warning: 'NextSwing()' is not implemented.");
-        return TestValue(0, ending, 0, ending, -1, comparator, limit);
+        return TestValue(0, ending, 0, ending, -1);
     };
 
     /** Test if the given talent is active.
@@ -5559,8 +4947,6 @@ l    */
 	 @name TalentPoints
 	 @paramsig number or boolean
 	 @param talent Talent to inspect.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of talent points.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -5571,13 +4957,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [talent, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const talent = positionalParams[1];
         const value = this.OvaleSpellBook.GetTalentPoints(talent);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test if the player is the in-game target of the target.
@@ -5608,8 +4990,6 @@ l    */
 	 This is a number between 0 (no threat) and 100 (will become the primary aggro target).
 	 @name Threat
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -5624,22 +5004,19 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
             "target"
         );
         const [, , value] = UnitDetailedThreatSituation("player", target);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Get the number of seconds between ticks of a periodic aura on a target.
 	 @name TickTime
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param filter Optional. The type of aura to check.
 	     Default is any.
 	     Valid values: any, buff, debuff
@@ -5655,11 +5032,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            <number>positionalParams[1],
-            <string>positionalParams[2],
-            <number>positionalParams[3],
-        ];
+        const auraId = <number>positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -5681,9 +5054,9 @@ l    */
             );
         }
         if (tickTime && tickTime > 0) {
-            return Compare(tickTime, comparator, limit);
+            return Compare(tickTime);
         }
-        return Compare(INFINITY, comparator, limit);
+        return Compare(INFINITY);
     };
 
     private CurrentTickTime = (
@@ -5691,11 +5064,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            <number>positionalParams[1],
-            <string>positionalParams[2],
-            <number>positionalParams[3],
-        ];
+        const auraId = <number>positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -5713,15 +5082,13 @@ l    */
         } else {
             tickTime = 0;
         }
-        return Compare(tickTime, comparator, limit);
+        return Compare(tickTime);
     };
 
     /** Get the remaining number of ticks of a periodic aura on a target.
 	 @name TicksRemaining
 	 @paramsig number or boolean
 	 @param id The spell ID of the aura or the name of a spell list.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param filter Optional. The type of aura to check.
 	     Default is any.
 	     Valid values: any, buff, debuff
@@ -5740,11 +5107,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -5764,18 +5127,10 @@ l    */
                 aura.tick,
             ];
             if (tick && tick > 0) {
-                return TestValue(
-                    gain,
-                    INFINITY,
-                    1,
-                    ending,
-                    -1 / tick,
-                    comparator,
-                    limit
-                );
+                return TestValue(gain, INFINITY, 1, ending, -1 / tick);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Gets the remaining time until the next tick */
@@ -5784,11 +5139,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [auraId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const auraId = positionalParams[1];
         const [target, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -5807,18 +5158,16 @@ l    */
                 this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
-                return Compare(remainingTime, comparator, limit);
+                return Compare(remainingTime);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Get the number of seconds elapsed since the player cast the given spell.
 	 @name TimeSincePreviousSpell
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -5829,23 +5178,17 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spell, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spell = positionalParams[1];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         if (!spellId) return [];
         const t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
-        return TestValue(0, INFINITY, 0, t, 1, comparator, limit);
+        return TestValue(0, INFINITY, 0, t, 1);
     };
 
     /** Get the time in seconds until the next scheduled Bloodlust cast.
 	 Not implemented, always returns 3600 seconds.
 	 @name TimeToBloodlust
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
      */
@@ -5854,13 +5197,8 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         const value = 3600;
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     private TimeToEclipse = (
@@ -5868,14 +5206,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         const value = 3600 * 24 * 7;
         OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.");
-        return TestValue(0, INFINITY, value, atTime, -1, comparator, limit);
+        return TestValue(0, INFINITY, value, atTime, -1);
     };
 
     /** Get the number of seconds before the player reaches the given power level.
@@ -5883,8 +5216,6 @@ l    */
     private TimeToPower(
         powerType: PowerType,
         level: number,
-        comparator: string,
-        limit: number,
         atTime: number
     ) {
         level = level || 0;
@@ -5895,19 +5226,11 @@ l    */
             atTime
         );
         if (seconds == 0) {
-            return Compare(0, comparator, limit);
+            return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(
-                0,
-                atTime + seconds,
-                seconds,
-                atTime,
-                -1,
-                comparator,
-                limit
-            );
+            return TestValue(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY, comparator, limit);
+            return Compare(INFINITY);
         }
     }
 
@@ -5915,8 +5238,6 @@ l    */
 	 @name TimeToEnergy
 	 @paramsig number or boolean
 	 @param level. The level of energy to reach.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @see TimeToEnergyFor, TimeToMaxEnergy
 	 @return A boolean value for the result of the comparison.
@@ -5928,19 +5249,13 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [level, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        return this.TimeToPower("energy", level, comparator, limit, atTime);
+        const level = positionalParams[1];
+        return this.TimeToPower("energy", level, atTime);
     };
 
     /** Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
 	 @name TimeToMaxEnergy
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @see TimeToEnergy, TimeToEnergyFor
 	 @return A boolean value for the result of the comparison.
@@ -5953,17 +5268,14 @@ l    */
         atTime: number
     ) => {
         const powerType = "energy";
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, comparator, limit, atTime);
+        return this.TimeToPower(powerType, level, atTime);
     };
 
     /** Get the number of seconds before the player reaches the given focus level for hunters.
 	 @name TimeToFocus
 	 @paramsig number or boolean
 	 @param level. The level of focus to reach.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @see TimeToFocusFor, TimeToMaxFocus
 	 @return A boolean value for the result of the comparison.
@@ -5975,19 +5287,13 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [level, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
-        return this.TimeToPower("focus", level, comparator, limit, atTime);
+        const level = positionalParams[1];
+        return this.TimeToPower("focus", level, atTime);
     };
 
     /** Get the number of seconds before the player reaches maximum focus for hunters.
 	 @name TimeToMaxFocus
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @see TimeToFocus, TimeToFocusFor
 	 @return A boolean value for the result of the comparison.
@@ -6000,9 +5306,8 @@ l    */
         atTime: number
     ) => {
         const powerType: PowerType = "focus";
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, comparator, limit, atTime);
+        return this.TimeToPower(powerType, level, atTime);
     };
 
     private TimeToMaxMana = (
@@ -6011,9 +5316,8 @@ l    */
         atTime: number
     ) => {
         const powerType: PowerType = "mana";
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, comparator, limit, atTime);
+        return this.TimeToPower(powerType, level, atTime);
     };
 
     private TimeToPowerFor(
@@ -6022,11 +5326,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult {
-        const [spellId, comparator, limit] = [
-            <number>positionalParams[1],
-            <string>positionalParams[2],
-            <number>positionalParams[3],
-        ];
+        const spellId = <number>positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -6041,27 +5341,17 @@ l    */
             powerType
         );
         if (seconds == 0) {
-            return Compare(0, comparator, limit);
+            return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(
-                0,
-                atTime + seconds,
-                seconds,
-                atTime,
-                -1,
-                comparator,
-                limit
-            );
+            return TestValue(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY, comparator, limit);
+            return Compare(INFINITY);
         }
     }
     /** Get the number of seconds before the player has enough energy to cast the given spell.
 	 @name TimeToEnergyFor
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -6086,8 +5376,6 @@ l    */
 	 @name TimeToFocusFor
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see TimeToFocusFor
@@ -6109,8 +5397,6 @@ l    */
 	 @name TimeToSpell
 	 @paramsig number or boolean
 	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -6122,32 +5408,25 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
         /*
         let [target] = private ParseCondition = (positionalParams, namedParams, "target");
         let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, OvaleGUID.UnitGUID(target));
         if (seconds == 0) {
-            return Compare(0, comparator, limit);
+            return Compare(0);
         } else if (seconds < INFINITY) {
-            return TestValue(0, atTime + seconds, seconds, atTime, -1, comparator, limit);
+            return TestValue(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return Compare(INFINITY, comparator, limit);
+            return Compare(INFINITY);
         }
         */
         OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
-        return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit);
+        return TestValue(0, INFINITY, 0, atTime, -1);
     };
     /** Get the time scaled by the specified haste type, defaulting to spell haste.
 	 For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
 	 @name TimeWithHaste
 	 @paramsig number or boolean
 	 @param time The time in seconds.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param haste Optional. Sets whether "time" should be lengthened or shortened due to haste.
 	     Defaults to haste=spell.
 	     Valid values: melee, spell.
@@ -6162,14 +5441,10 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [seconds, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const seconds = positionalParams[1];
         const haste = (namedParams.haste as HasteType) || "spell";
         const value = this.GetHastedTime(seconds, haste);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test if the totem has expired.
@@ -6231,8 +5506,6 @@ l    */
 	 @name TotemRemaining
 	 @paramsig number or boolean
 	 @param id The ID of the spell used to summon the totem or one of the four shaman totem categories (air, earth, fire, water).
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @see TotemExpires, TotemPresent
@@ -6244,11 +5517,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [id, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            <number>positionalParams[3],
-        ];
+        const id = positionalParams[1];
         const [count, start, ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
         if (
             count !== undefined &&
@@ -6256,9 +5525,9 @@ l    */
             ending !== undefined &&
             count > 0
         ) {
-            return TestValue(start, ending, 0, ending, -1, comparator, limit);
+            return TestValue(start, ending, 0, ending, -1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     /** Check if a tracking is enabled
@@ -6288,8 +5557,6 @@ l    */
 	 This is a fixed guess at 0s or the travel time of the spell in the spell information if given.
 	 @name TravelTime
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
@@ -6304,11 +5571,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         //let target = private ParseCondition = (positionalParams, namedParams, "target");
         const si = spellId && this.OvaleData.spellInfo[spellId];
         let travelTime = 0;
@@ -6321,7 +5584,7 @@ l    */
                 travelTime = estimatedTravelTime;
             }
         }
-        return Compare(travelTime, comparator, limit);
+        return Compare(travelTime);
     };
 
     /**  A condition that always returns true.
@@ -6343,8 +5606,6 @@ l    */
 	 @param hand Optional. Sets which hand weapon.
 	     Defaults to main.
 	     Valid values: main, off
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The weapon DPS.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -6358,19 +5619,15 @@ l    */
         atTime: number
     ) => {
         const hand = positionalParams[1];
-        let comparator, limit;
         let value = 0;
         if (hand == "offhand" || hand == "off") {
-            [comparator, limit] = [positionalParams[2], positionalParams[3]];
             value = this.OvalePaperDoll.current.offHandWeaponDPS || 0;
         } else if (hand == "mainhand" || hand == "main") {
-            [comparator, limit] = [positionalParams[2], positionalParams[3]];
             value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
         } else {
-            [comparator, limit] = [positionalParams[1], positionalParams[2]];
             value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
         }
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test if a sigil is charging
@@ -6477,9 +5734,8 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const value = this.OvaleDemonHunterSoulFragments.SoulFragments(atTime);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
 
     /** Test if a specific dispel type is present.

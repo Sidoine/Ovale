@@ -226,8 +226,6 @@ export class OvaleStaggerClass implements StateModule {
 	 @name StaggerTick
      @paramsig number or boolean
      @param count Optional. Counts n amount of previous stagger ticks.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -243,12 +241,8 @@ export class OvaleStaggerClass implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[2],
-        ];
+        const count = positionalParams[1];
         const damage = this.LastTickDamage(count);
-        return Compare(damage, comparator, limit);
+        return Compare(damage);
     };
 }

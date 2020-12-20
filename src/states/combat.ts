@@ -14,7 +14,7 @@ import {
     ConditionFunction,
     ReturnConstant,
 } from "../engine/condition";
-import { huge } from "@wowts/math";
+import { huge as INFINITY } from "@wowts/math";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 export class CombatState {
@@ -143,24 +143,22 @@ export class OvaleCombatClass
     /** Get the number of seconds elapsed since the player entered combat.
 	 @name TimeInCombat
 	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if TimeInCombat(more 5) Spell(bloodlust)
+	 if TimeInCombat() > 5 Spell(bloodlust)
      */
     private TimeInCombat = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         if (this.isInCombat(atTime)) {
-            const start = this.GetState(atTime).combatStartTime;
-            return TestValue(start, huge, 0, start, 1, comparator, limit);
+            const state = this.GetState(atTime);
+            const start = state.combatStartTime;
+            return TestValue(start, INFINITY, 0, start, 1);
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     private expectedCombatLength: ConditionFunction = (

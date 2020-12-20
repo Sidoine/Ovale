@@ -592,8 +592,6 @@ export class OvaleEquipmentClass {
 	 @name ItemCooldown
 	 @paramsig number or boolean
 	 @param id The item ID or the equipped slot name.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
@@ -607,29 +605,18 @@ export class OvaleEquipmentClass {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        let [itemId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        let itemId = positionalParams[1];
         if (itemId && type(itemId) != "number") {
             itemId = this.GetEquippedItemBySlotName(itemId);
         }
         if (itemId) {
             const [start, duration] = GetItemCooldown(itemId);
             if (start > 0 && duration > 0) {
-                return TestValue(
-                    start,
-                    start + duration,
-                    duration,
-                    start,
-                    -1,
-                    comparator,
-                    limit
-                );
+                const ending = start + duration;
+                return TestValue(start, ending, duration, start, -1);
             }
         }
-        return Compare(0, comparator, limit);
+        return Compare(0);
     };
 
     private itemCooldownDuration = (

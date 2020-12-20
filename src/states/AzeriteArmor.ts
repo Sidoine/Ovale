@@ -196,13 +196,9 @@ export class OvaleAzeriteArmor {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const spellId = positionalParams[1];
         const value = this.TraitRank(spellId);
-        return Compare(value, comparator, limit);
+        return Compare(value);
     };
     private HasAzeriteTrait = (
         positionalParams: LuaArray<any>,
