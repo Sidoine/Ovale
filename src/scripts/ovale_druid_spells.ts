@@ -349,6 +349,13 @@ Define(sunfire 93402)
   SpellInfo(sunfire lunarpower=0)
   # Suffering w2 Nature damage every t2 sec.
   SpellAddBuff(sunfire sunfire add=1)
+  # Suffering w2 Nature damage every t2 seconds.
+  SpellAddTargetDebuff(sunfire sunfire_debuff add=1)
+Define(sunfire_debuff 164815)
+# A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+  SpellInfo(sunfire_debuff duration=12 gcd=0 offgcd=1 tick=2)
+  # Suffering w2 Nature damage every t2 seconds.
+  SpellAddTargetDebuff(sunfire_debuff sunfire_debuff add=1)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
   SpellInfo(swipe gcd=1)

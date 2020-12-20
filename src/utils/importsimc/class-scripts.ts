@@ -54,8 +54,8 @@ function truncateFile(fileName: string, newCode: string) {
         }
         output.push(line);
     }
-    output.push(limitLine1);
-    output.push(limitLine2);
+    output.push("     " + limitLine1);
+    output.push("     " + limitLine2);
     output.push("");
     output.push(newCode);
     output.push("}");

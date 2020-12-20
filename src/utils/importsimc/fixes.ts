@@ -1,4 +1,4 @@
-import { getSpellData } from "./importspells";
+import { EffectType, getSpellData } from "./importspells";
 
 export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     const customIdentifiers = new Map<string, number>();
@@ -83,6 +83,46 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
             spellData.identifiers[identifier] = spellId;
         }
     }
+
+    function fixAddAura(identifier: string, buffIdentifier: string) {
+        const spellId = spellData.identifiers[identifier];
+        const spell = spellData.spellDataById.get(spellId);
+        const buffId = spellData.identifiers[buffIdentifier];
+        const buff = spellData.spellDataById.get(buffId);
+        if (spell && buff) {
+            spell.spellEffects ??= [];
+            spell.spellEffects.push({
+                type: EffectType.E_APPLY_AURA,
+                trigger_spell_id: buffId,
+                amplitude: 0,
+                ap_coeff: 0,
+                base_value: 0,
+                chain_target: 0,
+                class_flags: [],
+                id: 0,
+                index: 0,
+                m_chain: 0,
+                m_coeff: 0,
+                m_delta: 0,
+                m_unk: 0,
+                m_value: 0,
+                mechanic: 0,
+                misc_value: 0,
+                misc_value_2: 0,
+                pp_combo_points: 0,
+                pvp_coeff: 0,
+                radius: 0,
+                radius_max: 0,
+                real_ppl: 0,
+                sp_coeff: 0,
+                spell_id: spellId,
+                subtype: 0,
+                targeting_1: 0,
+                targeting_2: 0,
+            });
+        }
+    }
+
     fixIdentifier("shining_light_free_buff", 327510);
     fixIdentifier("sun_kings_blessing_ready_buff", 333315);
     fixIdentifier("clearcasting_channel_buff", 277726);
@@ -93,6 +133,8 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("kindred_empowerment_energize", 327139);
     fixIdentifier("symbols_of_death_autocrit", 227151);
     fixIdentifier("weapons_of_order_ww", 311054);
+    fixIdentifier("sunfire_debuff", 164815);
+    fixAddAura("sunfire", "sunfire_debuff");
 
     // Bombs
     fixIdentifier("pheromone_bomb", 270323);

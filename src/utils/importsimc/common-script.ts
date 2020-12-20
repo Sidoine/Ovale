@@ -37,7 +37,7 @@ const enum InventoryType {
 }
 
 export function exportCommon(dbc: DbcData) {
-    let lines: string[] = ["let code = `"];
+    let lines: string[] = ["    let code = `"];
     for (const item of dbc.itemsById.values()) {
         if (
             item.req_level === 60 &&
