@@ -337,8 +337,9 @@ export class OvaleActionBarClass {
             if (slot <= 24 || slot > 72) {
                 name = `ActionButton${((slot - 1) % 12) + 1}`;
             } else {
-                const actionBar = (slot - (slot % 12)) / 12;
-                name = `${ActionBars[actionBar]}${slot % 12}`;
+                const slotIndex = slot - 1;
+                const actionBar = (slotIndex - (slotIndex % 12)) / 12;
+                name = `${ActionBars[actionBar]}${(slotIndex % 12) + 1}`;
             }
         }
         return _G[name];

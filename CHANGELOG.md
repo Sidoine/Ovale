@@ -11,15 +11,6 @@ All notable changes to this project will be documented in this file. See [standa
 -   spells that required either a spec or a talent weren't working ([5f46648](https://github.com/Sidoine/Ovale/commit/5f466489215175b18ea2832c24bb3e3796392a69))
 -   update the license and include in the addon releases ([#755](https://github.com/Sidoine/Ovale/issues/755)) ([ec4ef7c](https://github.com/Sidoine/Ovale/commit/ec4ef7c22f85e0b85660ab9bd866f1c36f28c777))
 
-### [9.0.29](https://github.com/Sidoine/Ovale/compare/9.0.28...9.0.29) (2020-12-20)
-
-### Bug Fixes
-
--   add missing sudden_death_buff ([8226eda](https://github.com/Sidoine/Ovale/commit/8226eda1d40630d7f02da3ec25586eb36e4b3b10))
--   execute_fury didn't have the health requirement ([2c348ac](https://github.com/Sidoine/Ovale/commit/2c348acdf97c35015f803d3312c5d7c89b5ed153))
--   spells that required either a spec or a talent weren't working ([5f46648](https://github.com/Sidoine/Ovale/commit/5f466489215175b18ea2832c24bb3e3796392a69))
--   update the license and include in the addon releases ([#755](https://github.com/Sidoine/Ovale/issues/755)) ([ec4ef7c](https://github.com/Sidoine/Ovale/commit/ec4ef7c22f85e0b85660ab9bd866f1c36f28c777))
-
 ### [9.0.28](https://github.com/Sidoine/Ovale/compare/9.0.27...9.0.28) (2020-12-19)
 
 ### Bug Fixes
