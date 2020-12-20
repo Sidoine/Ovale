@@ -34,8 +34,8 @@ import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
+    ReturnBoolean,
     ReturnConstant,
-    TestBoolean,
     TestValue,
 } from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
@@ -506,16 +506,13 @@ export class OvaleEquipmentClass {
 	 @name HasEquippedItem
 	 @paramsig boolean
 	 @param item Item to be checked whether it is equipped.
-	 @param yesno Optional. If yes, then return true if the item is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
      */
     private hasEquippedItem = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [itemId, yesno] = [positionalParams[1], positionalParams[2]];
+        const itemId = positionalParams[1];
         let boolean = false;
         let slotId;
         if (type(itemId) == "number") {
@@ -532,15 +529,12 @@ export class OvaleEquipmentClass {
                 }
             }
         }
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the player has a shield equipped.
 	 @name HasShield
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if a shield is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if HasShield() Spell(shield_wall)
@@ -550,19 +544,14 @@ export class OvaleEquipmentClass {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean = this.HasShield();
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the player has a particular trinket equipped.
 	 @name HasTrinket
 	 @paramsig boolean
 	 @param id The item ID of the trinket or the name of an item list.
-	 @param yesno Optional. If yes, then return true if the trinket is equipped. If no, then return true if it isn't equipped.
-	     Default is yes.
-	     Valid values: yes, no.
-	 @return A boolean value.
 	 @usage
 	 ItemList(rune_of_reorigination 94532 95802 96546)
 	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
@@ -573,7 +562,7 @@ export class OvaleEquipmentClass {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
+        const trinketId = positionalParams[1];
         let boolean: boolean | undefined = undefined;
         if (type(trinketId) == "number") {
             boolean = this.HasTrinket(trinketId);
@@ -585,7 +574,7 @@ export class OvaleEquipmentClass {
                 }
             }
         }
-        return TestBoolean(boolean !== undefined, yesno);
+        return ReturnBoolean(boolean !== undefined);
     };
 
     /** Get the cooldown time in seconds of an item, e.g., trinket.

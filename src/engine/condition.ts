@@ -271,19 +271,6 @@ export function ParseCondition(
     return [target, filter, mine];
 }
 
-export function TestBoolean(a: boolean, yesno: "yes" | "no"): ConditionResult {
-    if (!yesno || yesno == "yes") {
-        if (a) {
-            return [0, INFINITY];
-        }
-    } else {
-        if (!a) {
-            return [0, INFINITY];
-        }
-    }
-    return [];
-}
-
 export function ReturnValue(
     value: number,
     origin: number,
@@ -332,8 +319,6 @@ export function TestValue(
     return [0, INFINITY, 0, 0, 0];
 }
 
-export function Compare(
-    value: number
-): ConditionResult {
+export function Compare(value: number): ConditionResult {
     return TestValue(0, INFINITY, value, 0, 0);
 }

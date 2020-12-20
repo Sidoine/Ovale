@@ -8,10 +8,10 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
-    TestBoolean,
     TestValue,
     Compare,
     ConditionFunction,
+    ReturnBoolean,
     ReturnConstant,
 } from "../engine/condition";
 import { huge as INFINITY } from "@wowts/math";
@@ -128,16 +128,15 @@ export class OvaleCombatClass
 	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
-	 if InCombat(no) and Stealthed(no) Spell(stealth)
+	 if not InCombat() and not Stealthed() Spell(stealth)
      */
     private InCombat = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean = this.isInCombat(atTime);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the number of seconds elapsed since the player entered combat.

@@ -23,7 +23,11 @@ import { OvaleClass } from "../Ovale";
 import { OvaleDebugClass } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { Compare, OvaleConditionClass, TestBoolean } from "../engine/condition";
+import {
+    Compare,
+    OvaleConditionClass,
+    ReturnBoolean,
+} from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const azeriteSlots: LuaArray<boolean> = {
@@ -205,8 +209,8 @@ export class OvaleAzeriteArmor {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const value = this.HasTrait(spellId);
-        return TestBoolean(value, yesno);
+        return ReturnBoolean(value);
     };
 }

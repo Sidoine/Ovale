@@ -3,7 +3,6 @@ import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import {
     TestValue,
     Compare,
-    TestBoolean,
     ConditionFunction,
     ReturnValue,
     OvaleConditionClass,
@@ -212,29 +211,29 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        const essenceId = positionalParams[1];
         const value = this.OvaleAzeriteEssence.IsMajorEssence(essenceId);
-        return TestBoolean(value, yesno);
+        return ReturnBoolean(value);
     };
     private AzeriteEssenceIsMinor = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        const essenceId = positionalParams[1];
         const value = this.OvaleAzeriteEssence.IsMinorEssence(essenceId);
-        return TestBoolean(value, yesno);
+        return ReturnBoolean(value);
     };
     private AzeriteEssenceIsEnabled = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        const essenceId = positionalParams[1];
         const value =
             this.OvaleAzeriteEssence.IsMajorEssence(essenceId) ||
             this.OvaleAzeriteEssence.IsMinorEssence(essenceId);
-        return TestBoolean(value, yesno);
+        return ReturnBoolean(value);
     };
     private AzeriteEssenceRank = (
         positionalParams: LuaArray<any>,
@@ -502,7 +501,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const auraId = positionalParams[1]
+        const auraId = positionalParams[1];
         const [, filter, mine] = this.ParseCondition(
             positionalParams,
             namedParams
@@ -1233,9 +1232,6 @@ export class OvaleConditions {
 	 @paramsig boolean
 	 @param class The class to check.
 	     Valid values: DEATHKNIGHT, DRUID, HUNTER, MAGE, MONK, PALADIN, PRIEST, ROGUE, SHAMAN, WARLOCK, WARRIOR.
-	 @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1248,7 +1244,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [className, yesno] = [positionalParams[1], positionalParams[2]];
+        const className = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
 
         let classToken;
@@ -1258,7 +1254,7 @@ export class OvaleConditions {
             [, classToken] = UnitClass(target);
         }
         const boolean = classToken == upper(className);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test whether the target's classification matches the given classification.
@@ -1266,9 +1262,6 @@ export class OvaleConditions {
 	 @paramsig boolean
 	 @param classification The unit classification to check.
 	     Valid values: normal, elite, worldboss.
-	 @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1281,10 +1274,7 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [classification, yesno] = [
-            positionalParams[1],
-            positionalParams[2],
-        ];
+        const classification = positionalParams[1];
         let targetClassification;
         const [target] = this.ParseCondition(positionalParams, namedParams);
         if (UnitLevel(target) < 0) {
@@ -1314,7 +1304,7 @@ export class OvaleConditions {
             }
         }
         const boolean = targetClassification == classification;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Get the current value of a script counter.
@@ -1342,9 +1332,6 @@ export class OvaleConditions {
 	 @paramsig boolean
 	 @param name The English name of the creature family to check.
 	     Valid values: Bat, Beast, Felguard, Imp, Ravager, etc.
-	 @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -1791,26 +1778,22 @@ export class OvaleConditions {
     /** Test if the target exists. The target may be alive or dead.
 	 @name Exists
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
 	 @see Present
 	 @usage
-	 if pet.Exists(no) Spell(summon_imp)
+	 if not pet.Exists() Spell(summon_imp)
      */
     private Exists = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitExists(target);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** A condition that always returns false.
@@ -1950,28 +1933,23 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [, yesno] = [positionalParams[1], positionalParams[2]];
-        return TestBoolean(false, yesno);
+        return ReturnBoolean(false);
     };
 
     /** Test if the player has full control, i.e., isn't feared, charmed, etc.
 	 @name HasFullControl
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
-	 if HasFullControl(no) Spell(barkskin)
+	 if not HasFullControl() Spell(barkskin)
      */
     private HasFullControlCondition = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean = HasFullControl();
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the current amount of health points of the target.
@@ -2231,9 +2209,6 @@ export class OvaleConditions {
 	 @name InFlightToTarget
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if the spell is in flight. If no, then return true if it isn't in flight.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if target.DebuffRemaining(haunt) <3 and not InFlightToTarget(haunt)
@@ -2244,20 +2219,17 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const boolean =
             this.OvaleFuture.next.currentCast.spellId == spellId ||
             this.OvaleFuture.InFlight(spellId);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the distance from the player to the target is within the spell's range.
 	 @name InRange
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if the target is in range. If no, then return true if it isn't in range.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if target.IsInterruptible() and target.InRange(kick)
@@ -2268,10 +2240,10 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = this.OvaleSpells.IsSpellInRange(spellId, target);
-        return TestBoolean(boolean || false, yesno);
+        return ReturnBoolean(boolean || false);
     };
 
     /** Test if the target's primary aggro is on the player.
@@ -2279,9 +2251,6 @@ export class OvaleConditions {
 	 this condition returns true as long as the player is highest on the threat table.
 	 @name IsAggroed
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target is aggroed. If no, then return true if it isn't aggroed.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2294,18 +2263,14 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const [boolean] = UnitDetailedThreatSituation("player", target);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean || false);
     };
 
     /**  Test if the target is dead.
 	 @name IsDead
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target is dead. If no, then return true if it isn't dead.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2318,18 +2283,14 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitIsDead(target);
-        return TestBoolean(boolean || false, yesno);
+        return ReturnBoolean(boolean || false);
     };
 
     /** Test if the target is enraged.
 	 @name IsEnraged
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if enraged. If no, then return true if not enraged.
-	     Default is yes.
-	     Valid values: yes.  "no" currently doesn't work.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2360,9 +2321,6 @@ export class OvaleConditions {
     /**  Test if the player is feared.
 	 @name IsFeared
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if feared. If no, then return true if it not feared.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if IsFeared() Spell(every_man_for_himself)
@@ -2372,19 +2330,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean =
             !HasFullControl() &&
             this.OvaleLossOfControl.HasLossOfControl("FEAR", atTime);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the target is friendly to the player.
 	 @name IsFriend
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target is friendly (able to help in combat). If no, then return true if it isn't friendly.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2397,18 +2351,14 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitIsFriend("player", target);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the player is incapacitated.
 	 @name IsIncapacitated
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if incapacitated. If no, then return true if it not incapacitated.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if IsIncapacitated() Spell(every_man_for_himself)
@@ -2418,19 +2368,15 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean =
             !HasFullControl() &&
             this.OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Test if the target is currently casting an interruptible spell.
 	 @name IsInterruptible
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target is interruptible. If no, then return true if it isn't interruptible.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2443,22 +2389,18 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         let [name, , , , , , , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
             [name, , , , , , notInterruptible] = UnitChannelInfo(target);
         }
         const boolean = notInterruptible != undefined && !notInterruptible;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Test if the target is flagged for PvP activity.
 	 @name IsPVP
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target is flagged for PvP activity. If no, then return true if it isn't PvP-flagged.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2471,17 +2413,13 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitIsPVP(target);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
     /** Test if the player is rooted.
 	 @name IsRooted
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if rooted. If no, then return true if it not rooted.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if IsRooted() Item(Trinket0Slot usable=1)
@@ -2491,20 +2429,16 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean = this.OvaleLossOfControl.HasLossOfControl(
             "ROOT",
             atTime
         );
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the player is stunned.
 	 @name IsStunned
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if stunned. If no, then return true if it not stunned.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if IsStunned() Item(Trinket0Slot usable=1)
@@ -2514,11 +2448,10 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean =
             !HasFullControl() &&
             this.OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
     /**  Get the current number of charges of the given item in the player's inventory.
 	 @name ItemCharges
@@ -2643,9 +2576,6 @@ export class OvaleConditions {
 	 @name Name
 	 @paramsig boolean
 	 @param name The localized target name.
-	 @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -2711,9 +2641,6 @@ export class OvaleConditions {
 	 PetPresent() is equivalent to pet.Present().
 	 @name PetPresent
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @see Present
 	 @usage
@@ -2728,14 +2655,13 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const name = namedParams.name;
         const target = "pet";
         const boolean =
             UnitExists(target) &&
             !UnitIsDead(target) &&
             (name == undefined || name == UnitName(target));
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Return the maximum power of the given power type on the target.
@@ -3802,9 +3728,6 @@ l    */
     /** Test if the target exists and is alive.
 	 @name Present
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -3819,19 +3742,15 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitExists(target) && !UnitIsDead(target);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the previous spell cast that invoked the GCD matches the given spell.
 	 @name PreviousGCDSpell
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
      */
     private PreviousGCDSpell = (
@@ -3839,7 +3758,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spell = positionalParams[1];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         const count = namedParams.count as number | undefined;
         let boolean;
@@ -3852,16 +3771,13 @@ l    */
         } else {
             boolean = spellId == this.OvaleFuture.next.lastGCDSpellId;
         }
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the previous spell cast that did not trigger the GCD matches the given spell.
 	 @name PreviousOffGCDSpell
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
      */
     private PreviousOffGCDSpell = (
@@ -3869,20 +3785,17 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spell = positionalParams[1];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         const boolean =
             spellId == this.OvaleFuture.next.lastOffGCDSpellcast.spellId;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Test if the previous spell cast matches the given spell.
 	 @name PreviousSpell
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
      */
     private PreviousSpell = (
@@ -3890,10 +3803,10 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spell = positionalParams[1];
         const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         const boolean = spellId == this.OvaleFuture.next.lastGCDSpellId;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /**  Get the result of the target's level minus the player's level. This number may be negative.
@@ -4497,7 +4410,7 @@ l    */
             duration,
         ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
-			const ending = start + duration;
+            const ending = start + duration;
             return TestValue(start, ending, duration, start, -1);
         }
         return Compare(0);
@@ -4585,7 +4498,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const usable = (namedParams.usable == 1);
+        const usable = namedParams.usable == 1;
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -4770,10 +4683,6 @@ l    */
 	 @name SpellKnown
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if the spell has been learned.
-	     If no, then return true if the player hasn't learned the spell.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @see SpellUsable
      */
@@ -4782,9 +4691,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const boolean = this.OvaleSpellBook.IsKnownSpell(spellId);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the maximum number of charges of the spell.
@@ -4824,9 +4733,6 @@ l    */
 	 @name SpellUsable
 	 @paramsig boolean
 	 @param id The spell ID.
-	 @param yesno Optional. If yes, then return true if the spell is usable. If no, then return true if it isn't usable.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @see SpellKnown
      */
@@ -4835,7 +4741,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const [target] = this.ParseCondition(
             positionalParams,
             namedParams,
@@ -4849,16 +4755,13 @@ l    */
             targetGuid
         );
         const boolean = isUsable || noMana;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Test if the player is currently stealthed.
 	 The player is stealthed if rogue Stealth, druid Prowl, or a similar ability is active.
 	 @name Stealthed
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if stealthed. If no, then return true if it not stealthed.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if Stealthed() or BuffPresent(shadow_dance)
@@ -4869,7 +4772,6 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const boolean =
             this.OvaleAura.GetAura(
                 "player",
@@ -4877,7 +4779,7 @@ l    */
                 atTime,
                 "HELPFUL"
             ) !== undefined || IsStealthed();
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the time elapsed in seconds since the player's previous melee swing (white attack).
@@ -4926,9 +4828,6 @@ l    */
 	 @name Talent
 	 @paramsig boolean
 	 @param id The talent ID.
-	 @param yesno Optional. If yes, then return true if the talent is active. If no, then return true if it isn't active.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 if Talent(blood_tap_talent) Spell(blood_tap)
@@ -4938,9 +4837,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [talentId, yesno] = [positionalParams[1], positionalParams[2]];
+        const talentId = positionalParams[1];
         const boolean = this.OvaleSpellBook.GetTalentPoints(talentId) > 0;
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the number of points spent in a talent (0 or 1)
@@ -4965,9 +4864,6 @@ l    */
     /** Test if the player is the in-game target of the target.
 	 @name TargetIsPlayer
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
@@ -4980,10 +4876,9 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const yesno = positionalParams[1];
         const [target] = this.ParseCondition(positionalParams, namedParams);
         const boolean = UnitIsUnit("player", `${target}target`);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** Get the amount of threat on the current target relative to the its primary aggro target, scaled to between 0 (zero) and 100.
@@ -5213,11 +5108,7 @@ l    */
 
     /** Get the number of seconds before the player reaches the given power level.
      */
-    private TimeToPower(
-        powerType: PowerType,
-        level: number,
-        atTime: number
-    ) {
+    private TimeToPower(powerType: PowerType, level: number, atTime: number) {
         level = level || 0;
         const seconds = this.OvalePower.getTimeToPowerAt(
             this.OvalePower.next,
@@ -5539,7 +5430,7 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = positionalParams[1];
         const spellName = this.OvaleSpellBook.GetSpellName(spellId);
         const numTrackingTypes = GetNumTrackingTypes();
         let boolean = false;
@@ -5550,7 +5441,7 @@ l    */
                 break;
             }
         }
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     /** The travel time of a spell to the target in seconds.
@@ -5647,7 +5538,7 @@ l    */
         for (const [, v] of ipairs(positionalParams)) {
             charging = charging || this.OvaleSigil.IsSigilCharging(v, atTime);
         }
-        return TestBoolean(charging, "yes");
+        return ReturnBoolean(charging);
     };
 
     /** Test with DBM or BigWigs (if available) whether a boss is currently engaged
@@ -5663,7 +5554,7 @@ l    */
         atTime: number
     ) => {
         const bossEngaged = this.OvaleBossMod.IsBossEngaged(atTime);
-        return TestBoolean(bossEngaged, "yes");
+        return ReturnBoolean(bossEngaged);
     };
 
     /** Check for the target's race
@@ -5686,7 +5577,7 @@ l    */
         for (const [, v] of ipairs(positionalParams)) {
             isRace = isRace || v == targetRaceId;
         }
-        return TestBoolean(isRace, "yes");
+        return ReturnBoolean(isRace);
     };
 
     /**  Check if the unit is in a party
@@ -5703,8 +5594,8 @@ l    */
         atTime: number
     ) => {
         const target = (namedParams.target as string | undefined) || "player";
-        const isTrue = UnitInParty(target);
-        return TestBoolean(isTrue, "yes");
+        const boolean = UnitInParty(target);
+        return ReturnBoolean(boolean);
     };
 
     /**  Check if the unit is in raid
@@ -5722,7 +5613,7 @@ l    */
     ) => {
         const target = (namedParams.target as string | undefined) || "player";
         const raidIndex = UnitInRaid(target);
-        return TestBoolean(raidIndex != undefined, "yes");
+        return ReturnBoolean(raidIndex != undefined);
     };
 
     /** Check the amount of Soul Fragments for Vengeance DH
@@ -5741,9 +5632,6 @@ l    */
     /** Test if a specific dispel type is present.
 	 @name HasDebuffType
 	 @paramsig boolean
-	 @param yesno Optional. If yes, then return true if enraged. If no, then return true if not enraged.
-	     Default is yes.
-	     Valid values: yes.  "no" currently doesn't work.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
