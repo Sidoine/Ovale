@@ -22,7 +22,8 @@ function checkNoMessage() {
         // These spells does not exist in SC
         if (
             message.indexOf("Unknown spell with ID 296208") < 0 &&
-            message.indexOf("Unknown spell with ID 51514") < 0
+            message.indexOf("Unknown spell with ID 51514") < 0 &&
+            message.indexOf("Unknown spell with ID 280776") < 0
         ) {
             messages.push(message);
         }

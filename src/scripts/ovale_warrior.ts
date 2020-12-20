@@ -57,6 +57,8 @@ AddFunction armssingle_targetmainactions
  if target.debuffremaining(rend) <= baseduration(rend) * 0.3 spell(rend)
  #cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
  if enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() spell(cleave)
+ #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
+ if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
  #overpower,if=charges=2
  if charges(overpower) == 2 spell(overpower)
  #mortal_strike,if=buff.overpower.stack>=2&buff.deadly_calm.down|(dot.deep_wounds.remains<=gcd&cooldown.colossus_smash.remains>gcd)
@@ -92,10 +94,8 @@ AddFunction armssingle_targetshortcdactions
   spell(warbreaker)
   #colossus_smash
   spell(colossus_smash)
-  #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
-  if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
 
-  unless charges(overpower) == 2 and spell(overpower)
+  unless buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or charges(overpower) == 2 and spell(overpower)
   {
    #bladestorm,if=buff.deadly_calm.down&(debuff.colossus_smash.up&rage<30|rage<70)
    if buffexpires(deadly_calm) and { target.debuffpresent(colossus_smash_debuff) and rage() < 30 or rage() < 70 } spell(bladestorm)
@@ -111,7 +111,7 @@ AddFunction armssingle_targetshortcdactions
 
 AddFunction armssingle_targetshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or charges(overpower) == 2 and spell(overpower) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and rage() > 60 and spell(whirlwind) or spell(slam)
+ target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or charges(overpower) == 2 and spell(overpower) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and rage() > 60 and spell(whirlwind) or spell(slam)
 }
 
 AddFunction armssingle_targetcdactions
@@ -157,6 +157,8 @@ AddFunction armshacmainactions
  if rage() < 60 and buffexpires(deadly_calm) spell(skullsplitter)
  #cleave,if=dot.deep_wounds.remains<=gcd
  if target.debuffremaining(deep_wounds) <= gcd() spell(cleave)
+ #ravager
+ spell(ravager)
  #rend,if=remains<=duration*0.3&buff.sweeping_strikes.up
  if target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) spell(rend)
  #cleave
@@ -192,17 +194,19 @@ AddFunction armshacshortcdactions
    spell(warbreaker)
    #bladestorm
    spell(bladestorm)
-   #ravager
-   spell(ravager)
-   #colossus_smash
-   spell(colossus_smash)
+
+   unless spell(ravager)
+   {
+    #colossus_smash
+    spell(colossus_smash)
+   }
   }
  }
 }
 
 AddFunction armshacshortcdpostconditions
 {
- rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or target.debuffremaining(deep_wounds) <= gcd() and spell(cleave) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or spell(condemn) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
+ rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or target.debuffremaining(deep_wounds) <= gcd() and spell(cleave) or spell(ravager) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or spell(condemn) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
 }
 
 AddFunction armshaccdactions
@@ -222,6 +226,8 @@ AddFunction armsexecutemainactions
  if target.debuffremaining(rend) <= baseduration(rend) * 0.3 spell(rend)
  #skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down)
  if rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } spell(skullsplitter)
+ #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
+ if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
  #cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
  if enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() spell(cleave)
  #condemn,if=debuff.colossus_smash.up|buff.sudden_death.react|rage>65
@@ -253,10 +259,8 @@ AddFunction armsexecuteshortcdactions
  {
   #avatar,if=cooldown.colossus_smash.remains<8&gcd.remains=0
   if spellcooldown(colossus_smash) < 8 and not 0 > 0 spell(avatar)
-  #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
-  if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
 
-  unless enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave)
+  unless buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave)
   {
    #warbreaker
    spell(warbreaker)
@@ -274,7 +278,7 @@ AddFunction armsexecuteshortcdactions
 
 AddFunction armsexecuteshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and spell(skullsplitter) or enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or { target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 } and spell(condemn) or charges(overpower) == 2 and spell(overpower) or target.debuffremaining(deep_wounds) <= gcd() and spell(mortal_strike) or rage() < 40 and spell(skullsplitter) or spell(overpower) or spell(condemn) or spell(execute)
+ target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and spell(skullsplitter) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or enemies() > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or { target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 } and spell(condemn) or charges(overpower) == 2 and spell(overpower) or target.debuffremaining(deep_wounds) <= gcd() and spell(mortal_strike) or rage() < 40 and spell(skullsplitter) or spell(overpower) or spell(condemn) or spell(execute)
 }
 
 AddFunction armsexecutecdactions

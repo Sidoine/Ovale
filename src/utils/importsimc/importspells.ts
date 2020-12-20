@@ -949,7 +949,7 @@ export interface SpellData {
     spellPowers?: SpellPowerData[];
     identifier: string;
     identifierScore: number;
-    talent?: TalentData;
+    talent?: TalentData[];
     azeriteTrait?: AzeriteTrait;
     className?: ClassId | "PET";
     specializationName: SpecializationName[];
@@ -1427,6 +1427,24 @@ function toMap<TKey, TValue>(array: TValue[], key: (v: TValue) => TKey) {
     return map;
 }
 
+function getSpellSpecializations(spell: SpellData) {
+    const specializations: string[] = [];
+    if (spell.specializationName)
+        specializations.push(...spell.specializationName);
+    if (spell.talent) {
+        specializations.push(
+            ...spell.talent
+                .filter((x) => x.spec !== 0)
+                .map((x) => {
+                    const ret = specIdToSpecName.get(x.spec);
+                    if (!ret) throw Error(` can't find spec ${x.spec}`);
+                    return ret;
+                })
+        );
+    }
+    return specializations;
+}
+
 export function getSpellData(directory: string) {
     const toto = readFileSync(`${directory}/dbc_extract3/SpellShapeshift.csv`, {
         encoding: "ucs2",
@@ -1813,14 +1831,16 @@ export function getSpellData(directory: string) {
         if (talent.spell_id) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
-                spell.talent = talent;
-                const spec = specIdToSpecName.get(talent.spec);
-                if (spec) {
-                    if (spell.specializationName.indexOf(spec) < 0)
-                        spell.specializationName.push(spec);
-                    if (!spell.spellAttributes.includes(SpellAttribute.Passive))
-                        spell.identifierScore += 10;
-                }
+                if (!spell.talent) spell.talent = [];
+                spell.talent.push(talent);
+                if (!spell.spellAttributes.includes(SpellAttribute.Passive))
+                    spell.identifierScore += 10;
+                // const spec = specIdToSpecName.get(talent.spec);
+                // if (spec) {
+                //     if (spell.specializationName.indexOf(spec) < 0)
+                //         spell.specializationName.push(spec);
+                //
+                // }
             }
         }
     }
@@ -1876,12 +1896,26 @@ export function getSpellData(directory: string) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other) {
                 if (other.identifierScore === spell.identifierScore) {
-                    if (
-                        other.className === spell.className &&
-                        spell.specializationName.length > 0
-                    ) {
-                        spell.identifier +=
-                            "_" + spell.specializationName[0].toLowerCase();
+                    if (other.className === spell.className) {
+                        const otherNames = getSpellSpecializations(other);
+                        const spellNames = getSpellSpecializations(spell);
+                        if (
+                            otherNames.length === 0 &&
+                            spellNames.length === 0
+                        ) {
+                            spell.identifier = getRandomIdentifier(
+                                spell,
+                                other
+                            );
+                        } else if (spellNames.length > 0) {
+                            spell.identifier +=
+                                "_" + spellNames[0].toLowerCase();
+                        } else if (otherNames.length > 0) {
+                            // TODO aliases
+                            other.identifier +=
+                                "_" + otherNames[0].toLowerCase();
+                            identifiers[other.identifier] = other.id;
+                        }
                     } else if (
                         spell.className &&
                         spell.className !== other.className

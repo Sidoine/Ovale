@@ -6,6 +6,7 @@ import {
     EffectType,
     isFriendlyTarget,
     ItemData,
+    TalentData,
 } from "./importspells";
 import { writeFileSync } from "fs";
 import { SpellInfo } from "../../engine/data";
@@ -27,13 +28,30 @@ export interface CustomSpellDataIf {
     spellInfo?: SpellInfo;
 }
 
+export interface CustomSpellHasTalent {
+    condition: "hastalent";
+    talent: TalentData;
+}
+
+export interface CustomSpellSealthed {
+    condition: "stealthed";
+}
+
+export interface CustomSpellSpecialization {
+    condition: "specialization";
+    specializationName: string;
+}
+
+export type CustomSpellRequireCondition =
+    | CustomSpellHasTalent
+    | CustomSpellSpecialization
+    | CustomSpellSealthed;
+
 export interface CustomSpellRequire {
-    condition: "hastalent" | "stealthed" | "specialization";
     property: keyof SpellInfo;
     value: string | number;
-    talentId?: number;
-    specializationName?: string[];
     not?: boolean;
+    conditions: CustomSpellRequireCondition[];
 }
 
 export interface CustomSpellData {
@@ -125,6 +143,27 @@ function hasAttribute(spell: SpellData, attribute: SpellAttributes) {
     return (spell.attributes[i] & (1 << bit)) > 0;
 }
 
+function getConditions(replacedBy: SpellData) {
+    let conditions: CustomSpellRequireCondition[] = [];
+    if (replacedBy.talent) {
+        for (const talent of replacedBy.talent) {
+            conditions.push({
+                condition: "hastalent",
+                talent,
+            });
+        }
+    }
+    if (replacedBy.specializationName.length > 0) {
+        for (const specializationName of replacedBy.specializationName) {
+            conditions.push({
+                condition: "specialization",
+                specializationName,
+            });
+        }
+    }
+    return conditions;
+}
+
 export function convertFromSpellData(
     spell: SpellData,
     spellDataById: Map<number, SpellData>
@@ -170,7 +209,7 @@ export function convertFromSpellData(
         spell.shapeshifts?.some((x) => x.flags_1 === 536870912)
     ) {
         require.push({
-            condition: "stealthed",
+            conditions: [{ condition: "stealthed" }],
             property: "unusable",
             value: 1,
             not: true,
@@ -274,39 +313,37 @@ export function convertFromSpellData(
     if (playerAuras.length > 0) auras.player = playerAuras;
     if (targetAuras.length > 0) auras.target = targetAuras;
 
-    if (spell.talent) {
-        require.push({
-            condition: "hastalent",
-            talentId: spell.talent.id,
-            property: "unusable",
-            value: 1,
-            not: true,
-        });
+    if (
+        (spell.talent || spell.specializationName.length > 0) &&
+        !spell.replace_spell_id
+    ) {
+        const conditions = getConditions(spell);
+        if (conditions.some((x) => x.condition !== "specialization")) {
+            require.push({
+                conditions,
+                property: "unusable",
+                value: 1,
+                not: true,
+            });
+        }
     }
 
     if (spell.replaced_by) {
         for (const replacedById of spell.replaced_by) {
             const replacedBy = spellDataById.get(replacedById);
             if (!replacedBy) throw Error(`Spell ${replacedById} not found`);
-            if (replacedBy.talent) {
-                require.push({
-                    condition: "hastalent",
-                    talentId: replacedBy.talent.id,
-                    property: "replaced_by",
-                    value: replacedBy.identifier,
-                });
-            } else if (replacedBy.specializationName.length > 0) {
-                require.push({
-                    condition: "specialization",
-                    specializationName: replacedBy.specializationName,
-                    property: "replaced_by",
-                    value: replacedBy.identifier,
-                });
-            } else {
+            const conditions = getConditions(replacedBy);
+            if (conditions.length === 0) {
                 throw Error(
                     `Unknown replace condition in ${replacedBy.name} [${replacedBy.id}]`
                 );
             }
+
+            require.push({
+                conditions,
+                property: "replaced_by",
+                value: replacedBy.identifier,
+            });
         }
     }
 

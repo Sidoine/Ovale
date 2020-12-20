@@ -18,7 +18,7 @@ Define(arcane_torrent 25046)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 gcd=0 offgcd=1 rage=-20)
-  SpellRequire(avatar unusable set=1 enabled=(not hastalent(avatar_talent)))
+  SpellRequire(avatar unusable set=1 enabled=(not {hastalent(avatar_talent) or specialization("protection")}))
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar add=1)
 Define(bag_of_tricks 312411)
@@ -92,11 +92,11 @@ Define(devastate 20243)
 Define(dragon_roar 118000)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(dragon_roar cd=30 rage=-10)
-  SpellRequire(dragon_roar unusable set=1 enabled=(not hastalent(dragon_roar_talent_protection)))
+  SpellRequire(dragon_roar unusable set=1 enabled=(not {hastalent(dragon_roar_talent) or hastalent(dragon_roar_talent_protection)}))
 Define(execute 163201)
 # Attempts to finish off a foe, causing up to <damage> Physical damage based on Rage spent. Only usable on enemies that have less than 20 health.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
   SpellInfo(execute rage=20 max_rage=20 cd=6)
-  SpellRequire(execute replaced_by set=execute_fury enabled=(specialization(fury)))
+  SpellRequire(execute replaced_by set=execute_fury enabled=(specialization("fury")))
 Define(execute_fury 5308)
 # Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
   SpellInfo(execute_fury rage=0 max_rage=20 cd=6)
@@ -213,7 +213,7 @@ Define(skullsplitter 260643)
 Define(slam 1464)
 # Slams an opponent, causing s1 Physical damage.
   SpellInfo(slam rage=20)
-  SpellRequire(slam replaced_by set=revenge enabled=(specialization(protection)))
+  SpellRequire(slam replaced_by set=revenge enabled=(specialization("protection")))
 Define(spear_of_bastion 307865)
 # Throw a Kyrian spear at the target location, dealing 307871s1 Arcane damage instantly and an additional 307871o4 damage over 4 seconds. Deals reduced damage beyond <cap> targets.rnrnEnemies hit are tethered to Spear of Bastion's location for the duration.rnrn|cFFFFFFFFGenerates /10;307871s3 Rage.|r
   SpellInfo(spear_of_bastion cd=60)
@@ -225,7 +225,7 @@ Define(spear_of_bastion_debuff 307871)
 Define(storm_bolt 107570)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
   SpellInfo(storm_bolt cd=30)
-  SpellRequire(storm_bolt unusable set=1 enabled=(not hastalent(storm_bolt_talent_fury)))
+  SpellRequire(storm_bolt unusable set=1 enabled=(not {hastalent(storm_bolt_talent) or hastalent(storm_bolt_talent_arms) or hastalent(storm_bolt_talent_fury)}))
   # Stunned.
   SpellAddBuff(storm_bolt storm_bolt add=1)
 Define(sweeping_strikes 260708)
@@ -250,7 +250,7 @@ Define(warbreaker 262161)
 Define(whirlwind 1680)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking up to s1 nearby targets for <baseDmg> Physical damage.
   SpellInfo(whirlwind rage=30)
-  SpellRequire(whirlwind replaced_by set=whirlwind_fury enabled=(specialization(fury)))
+  SpellRequire(whirlwind replaced_by set=whirlwind_fury enabled=(specialization("fury")))
 Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
   SpellInfo(whirlwind_fury rage=30)
@@ -276,6 +276,8 @@ Define(deadly_calm_talent 22399)
 Define(deadly_calm_talent 22399)
 # Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.
 Define(dragon_roar_talent_protection 23260)
+# Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+Define(dragon_roar_talent 22398)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(dreadnaught_talent 22407)
 # Overpower has 1+s1 charges and causes a seismic wave, dealing 315961s1 damage to up to 315961s2 enemies in a 315961A1 yd line.
@@ -304,6 +306,10 @@ Define(siegebreaker_talent 16037)
 Define(skullsplitter_talent 22371)
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(storm_bolt_talent_fury 23093)
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
+Define(storm_bolt_talent_arms 22789)
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
+Define(storm_bolt_talent 22409)
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
 Define(unstoppable_force_talent 22544)
 # Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.

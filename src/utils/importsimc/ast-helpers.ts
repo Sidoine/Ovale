@@ -59,18 +59,28 @@ export function getDefinition(
     output += `)\n`;
 
     for (const require of customSpellData.require) {
-        let parameter;
-        if (require.talentId) {
-            parameter = spellData.talentsById.get(require.talentId)?.identifier;
-            talentIds.push(require.talentId);
-        } else if (require.specializationName) {
-            parameter = require.specializationName.join(" ");
+        const conditions: string[] = [];
+        for (const condition of require.conditions) {
+            if (condition.condition === "hastalent") {
+                conditions.push(
+                    `${condition.condition}(${condition.talent.identifier})`
+                );
+                talentIds.push(condition.talent.id);
+            } else if (condition.condition === "specialization") {
+                conditions.push(
+                    `${condition.condition}("${condition.specializationName}")`
+                );
+            } else if (condition.condition === "stealthed") {
+                conditions.push(`${condition.condition}()`);
+            }
         }
-        output += `  SpellRequire(${customSpellData.identifier} ${
-            require.property
-        } set=${require.value} enabled=(${require.not ? "not " : ""}${
-            require.condition
-        }(${parameter ?? ""})))\n`;
+
+        let condition = conditions.join(" or ");
+        if (require.not) {
+            if (conditions.length > 1) condition = `not {${condition}}`;
+            else condition = `not ${condition}`;
+        }
+        output += `  SpellRequire(${customSpellData.identifier} ${require.property} set=${require.value} enabled=(${condition}))\n`;
     }
 
     const auras = customSpellData.auras;
