@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.31](https://github.com/Sidoine/Ovale/compare/9.0.30...9.0.31) (2020-12-20)
+
+### Bug Fixes
+
+-   **druid:** sunfire_debuff hadn't the right id ([0937372](https://github.com/Sidoine/Ovale/commit/093737263e0f372b3fa03197e6c28eeb31fe3f76)), closes [#757](https://github.com/Sidoine/Ovale/issues/757)
+-   **hunter:** kill short was not working for survival ([1dabbc3](https://github.com/Sidoine/Ovale/commit/1dabbc33daeaec80dfbdd13108bf9cfdd49dc338))
+-   **spellflash:** bug with action icon frame ids ([e68218b](https://github.com/Sidoine/Ovale/commit/e68218b1216defbb02ea7f11b1a09846b4cdcd0e))
+
 ### [9.0.30](https://github.com/Sidoine/Ovale/compare/9.0.28...9.0.30) (2020-12-20)
 
 ### Bug Fixes
