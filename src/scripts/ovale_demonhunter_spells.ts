@@ -280,6 +280,9 @@ Define(arcane_torrent 202719)
     SpellInfo(arcane_torrent cd=120 fury=-15)
 #blade_dance
     SpellRequire(blade_dance fury add=-20 enabled=(hastalent(first_blood_talent)))
+    SpellRequire(blade_dance replaced_by set=death_sweep enabled=(buffpresent(metamorphosis_buff)))
+#chaos_strike_havoc
+    SpellRequire(chaos_strike_havoc replaced_by set=annihilation enabled=(buffpresent(metamorphosis_buff)))
 #death_sweep
     SpellRequire(death_sweep fury add=-20 enabled=(hastalent(first_blood_talent)))
 Define(frailty_debuff 247456)
