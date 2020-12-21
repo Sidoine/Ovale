@@ -1,5 +1,5 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
+import { ipairs, pairs, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
@@ -13,13 +13,6 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 
 let self_serial = 0;
-const TOTEM_CLASS: LuaObj<boolean> = {
-    DRUID: true,
-    MAGE: true,
-    MONK: true,
-    PALADIN: true,
-    SHAMAN: true,
-};
 
 interface Totem {
     duration: number;
@@ -62,30 +55,16 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     }
 
     private OnInitialize = () => {
-        if (TOTEM_CLASS[this.ovale.playerClass]) {
-            this.debug.DebugTimestamp(
-                "Initialzing OvaleTotem for class %s",
-                this.ovale.playerClass
-            );
-            this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Update);
-            this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.Update);
-            this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.Update);
-            this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.Update);
-        } else {
-            this.debug.DebugTimestamp(
-                "Class %s is not a TOTEM_CLASS!",
-                this.ovale.playerClass
-            );
-        }
+        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Update);
+        this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.Update);
+        this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.Update);
+        this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.Update);
     };
-
     private OnDisable = () => {
-        if (TOTEM_CLASS[this.ovale.playerClass]) {
-            this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
-            this.module.UnregisterEvent("PLAYER_TALENT_UPDATE");
-            this.module.UnregisterEvent("PLAYER_TOTEM_UPDATE");
-            this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
-        }
+        this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
+        this.module.UnregisterEvent("PLAYER_TALENT_UPDATE");
+        this.module.UnregisterEvent("PLAYER_TOTEM_UPDATE");
+        this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
     };
     private Update = () => {
         self_serial = self_serial + 1;
@@ -124,16 +103,9 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         spellcast: SpellCast
     ) => {
         this.profiler.StartProfiling("OvaleTotem_ApplySpellAfterCast");
-        if (TOTEM_CLASS[this.ovale.playerClass]) {
-            this.debug.Log(
-                "OvaleTotem_ApplySpellAfterCast: spellId %s, endCast %s",
-                spellId,
-                endCast
-            );
-            const si = this.ovaleData.spellInfo[spellId];
-            if (si && si.totem) {
-                this.SummonTotem(spellId, endCast);
-            }
+        const si = this.ovaleData.spellInfo[spellId];
+        if (si && si.totem) {
+            this.SummonTotem(spellId, endCast);
         }
         this.profiler.StopProfiling("OvaleTotem_ApplySpellAfterCast");
     };
@@ -244,6 +216,11 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             totem.duration = duration || 15;
             totem.icon = icon;
             totem.slot = totemSlot;
+            this.debug.Log(
+                "Spell ID '%d' summoned a totem in state slot %d",
+                spellId,
+                totemSlot
+            );
         }
         this.profiler.StopProfiling("OvaleTotem_state_SummonTotem");
     }
