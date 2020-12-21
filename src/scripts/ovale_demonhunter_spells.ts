@@ -278,6 +278,10 @@ Define(serrated_glaive_conduit 152)
     code += `
 Define(arcane_torrent 202719)
     SpellInfo(arcane_torrent cd=120 fury=-15)
+#blade_dance
+    SpellRequire(blade_dance fury add=-20 enabled=(hastalent(first_blood_talent)))
+#death_sweep
+    SpellRequire(death_sweep fury add=-20 enabled=(hastalent(first_blood_talent)))
 Define(frailty_debuff 247456)
     SpellInfo(frailty_debuff duration=20)
 #spirit_bomb
