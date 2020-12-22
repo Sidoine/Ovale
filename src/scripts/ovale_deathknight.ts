@@ -350,7 +350,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and specialization(blood)
  blood_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and not specialization(blood)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_deathknight_blood_aoe) and specialization(blood)) enemies=1 help=cd
 {
  if not incombat() bloodprecombatcdactions()
  blood_defaultcdactions()
@@ -1194,7 +1194,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)
  frost_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and not specialization(frost)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_deathknight_frost_aoe) and specialization(frost)) enemies=1 help=cd
 {
  if not incombat() frostprecombatcdactions()
  frost_defaultcdactions()
@@ -1859,7 +1859,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
  unholy_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and not specialization(unholy)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_deathknight_unholy_aoe) and specialization(unholy)) enemies=1 help=cd
 {
  if not incombat() unholyprecombatcdactions()
  unholy_defaultcdactions()

@@ -740,7 +740,7 @@ AddIcon enabled=(checkboxon(opt_druid_balance_aoe) and specialization(balance)) 
  balance_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_druid_balance_aoe) and not specialization(balance)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_druid_balance_aoe) and specialization(balance)) enemies=1 help=cd
 {
  if not incombat() balanceprecombatcdactions()
  balance_defaultcdactions()
@@ -1443,7 +1443,7 @@ AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and specialization(feral)) help
  feral_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and not specialization(feral)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_druid_feral_aoe) and specialization(feral)) enemies=1 help=cd
 {
  if not incombat() feralprecombatcdactions()
  feral_defaultcdactions()
@@ -2150,7 +2150,7 @@ AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and specialization(feral)) help
  feral_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and not specialization(feral)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_druid_feral_aoe) and specialization(feral)) enemies=1 help=cd
 {
  if not incombat() feralprecombatcdactions()
  feral_defaultcdactions()
@@ -2847,7 +2847,7 @@ AddIcon enabled=(checkboxon(opt_druid_guardian_aoe) and specialization(guardian)
  guardian_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_druid_guardian_aoe) and not specialization(guardian)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_druid_guardian_aoe) and specialization(guardian)) enemies=1 help=cd
 {
  if not incombat() guardianprecombatcdactions()
  guardian_defaultcdactions()
