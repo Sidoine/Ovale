@@ -3510,23 +3510,10 @@ export class Emiter {
         const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         const token = tokenIterator();
         if (token == "pet") {
-            let name = tokenIterator();
+            const name = tokenIterator();
             const property = tokenIterator();
-            [name] = this.Disambiguate(
-                annotation,
-                name,
-                annotation.classId,
-                annotation.specialization
-            );
-            const isTotem = IsTotem(name);
-            let code;
-            if (isTotem && property == "active") {
-                code = format("TotemPresent(%s)", name);
-            } else if (isTotem && property == "remains") {
-                code = format("TotemRemaining(%s)", name);
-            } else if (property == "active") {
-                code = "pet.Present()";
-            } else if (name == "buff") {
+            const target = "pet";
+            if (name == "buff") {
                 const pattern = format("^pet%%.([%%w_.]+)", operand);
                 const [petOperand] = match(operand, pattern);
                 node = this.EmitOperandBuff(
@@ -3535,12 +3522,11 @@ export class Emiter {
                     nodeList,
                     annotation,
                     action,
-                    "pet"
+                    target
                 );
             } else {
                 const pattern = format("^pet%%.%s%%.([%%w_.]+)", name);
                 let [petOperand] = match(operand, pattern);
-                const target = "pet";
                 if (petOperand) {
                     node = this.EmitOperandSpecial(
                         petOperand,
@@ -3550,6 +3536,33 @@ export class Emiter {
                         action,
                         target
                     );
+                }
+                if (!node) {
+                    let code: string | undefined;
+                    const [spellName] = this.Disambiguate(
+                        annotation,
+                        name,
+                        annotation.classId,
+                        annotation.specialization
+                    );
+                    if (IsTotem(spellName)) {
+                        if (property == "active") {
+                            code = format("TotemPresent(%s)", spellName);
+                        } else if (property == "remains") {
+                            code = format("TotemRemaining(%s)", spellName);
+                        }
+                        this.AddSymbol(annotation, spellName);
+                    } else if (property == "active") {
+                        code = "pet.Present()";
+                    }
+                    if (code) {
+                        [node] = this.ovaleAst.ParseCode(
+                            "expression",
+                            code,
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    }
                     if (!node) {
                         node = this.EmitOperandAction(
                             petOperand,
@@ -3629,15 +3642,6 @@ export class Emiter {
                         }
                     }
                 }
-            }
-            if (code) {
-                [node] = this.ovaleAst.ParseCode(
-                    "expression",
-                    code,
-                    nodeList,
-                    annotation.astAnnotation
-                );
-                if (isTotem) this.AddSymbol(annotation, name);
             }
         }
         return node;
