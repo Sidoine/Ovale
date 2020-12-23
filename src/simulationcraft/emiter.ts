@@ -91,6 +91,10 @@ function IsTotem(name: string) {
         return true;
     } else if (sub(name, -6, -1) == "_totem") {
         return true;
+    } else if (name == "raise_dead") {
+        return true;
+    } else if (name == "summon_gargoyle") {
+        return true;
     }
     return false;
 }
@@ -359,6 +363,14 @@ export class Emiter {
             "deeper_stratagem_talent",
             "ROGUE"
         );
+        this.AddDisambiguation(
+            "gargoyle",
+            "summon_gargoyle",
+            "DEATHKNIGHT",
+            "unholy"
+        );
+        this.AddDisambiguation("ghoul", "raise_dead", "DEATHKNIGHT", "blood");
+        this.AddDisambiguation("ghoul", "raise_dead", "DEATHKNIGHT", "frost");
         this.AddDisambiguation(
             "dark_trasnformation",
             "dark_transformation",
@@ -3944,6 +3956,40 @@ export class Emiter {
                     action,
                     target
                 );
+            }
+        } else if (
+            className == "DEATHKNIGHT" &&
+            sub(operand, 1, 15) == "pet.army_ghoul."
+        ) {
+            const petOperand = sub(operand, 15);
+            const tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
+            const token = tokenIterator();
+            if (token == "active") {
+                const spell = "army_of_the_dead";
+                // Army of the Dead ghouls last for 30 seconds after summoning.
+                code = format(
+                    "SpellCooldownDuration(%s) - SpellCooldown(%s) < 30",
+                    spell,
+                    spell
+                );
+                this.AddSymbol(annotation, spell);
+            }
+        } else if (
+            className == "DEATHKNIGHT" &&
+            sub(operand, 1, 15) == "pet.apoc_ghoul."
+        ) {
+            const petOperand = sub(operand, 15);
+            const tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
+            const token = tokenIterator();
+            if (token == "active") {
+                const spell = "apocalypse";
+                // Apocalypse ghouls last for 15 seconds after summoning.
+                code = format(
+                    "SpellCooldownDuration(%s) - SpellCooldown(%s) < 15",
+                    spell,
+                    spell
+                );
+                this.AddSymbol(annotation, spell);
             }
         } else if (
             className == "DEMONHUNTER" &&
