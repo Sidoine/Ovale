@@ -87,7 +87,7 @@ function IsTotem(name: string) {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
         return true;
-    } else if (truthy(match(name, "invoke_(niuzao|xuen|chiji)"))) {
+    } else if (truthy(match(name, "invoke_(chiji|yulon)"))) {
         return true;
     } else if (sub(name, -6, -1) == "_totem") {
         return true;
@@ -270,6 +270,18 @@ export class Emiter {
             "energizing_elixir_talent",
             "MONK",
             "windwalker"
+        );
+        this.AddDisambiguation(
+            "chiji_the_red_crane",
+            "invoke_chiji_the_red_crane",
+            "MONK",
+            "mistweaver"
+        );
+        this.AddDisambiguation(
+            "yulon_the_jade_serpent",
+            "invoke_yulon_the_jade_serpent",
+            "MONK",
+            "mistweaver"
         );
         this.AddDisambiguation("blink_any", "blink", "MAGE");
         this.AddDisambiguation(
