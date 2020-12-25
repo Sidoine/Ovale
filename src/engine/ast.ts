@@ -19,12 +19,13 @@ import {
     pairs,
     tonumber,
     tostring,
+    truthy,
     type,
     wipe,
     lualength,
     kpairs,
 } from "@wowts/lua";
-import { format, gsub, lower, sub } from "@wowts/string";
+import { format, gsub, lower, match, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
 import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
@@ -1754,7 +1755,10 @@ export class OvaleASTClass {
             if (node.func) return `${node.func}(${node.name})`;
             return node.name;
         }
-        return `"${node.value}"`;
+        if (truthy(match(node.value, "%s"))) {
+            return `"${node.value}"`;
+        }
+        return `${node.value}`;
     };
     private UnparseUnless: UnparserFunction<AstUnlessNode> = (node) => {
         if (node.child[2].type == "group") {
