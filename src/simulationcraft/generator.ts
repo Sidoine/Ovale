@@ -21,6 +21,8 @@ import {
 import { format } from "@wowts/string";
 import { OvaleDataClass } from "../engine/data";
 
+const MAX_DESIRED_TARGETS = 3;
+
 const self_functionDefined: LuaObj<boolean> = {};
 const self_functionUsed: LuaObj<boolean> = {};
 
@@ -583,6 +585,34 @@ export class Generator {
         let count = 0;
         const nodeList = annotation.astAnnotation.nodeList;
         const camelSpecialization = LowerSpecialization(annotation);
+        const lowerSpecialization = LowerSpecialization(annotation);
+        if (annotation.desired_targets) {
+            const lines: LuaArray<string> = {};
+            for (let k = MAX_DESIRED_TARGETS; k > 1; k += -1) {
+                insert(
+                    lines,
+                    `if List(opt_${lowerSpecialization}_desired_targets desired_targets_${k}) ${k}`
+                );
+            }
+            insert(lines, "1");
+            const fmt = `
+                AddFunction %sDesiredTargets
+                {
+                    %s
+                }
+            `;
+            const code = format(fmt, camelSpecialization, concat(lines, "\n"));
+            const [node] = this.ovaleAst.ParseCode(
+                "add_function",
+                code,
+                nodeList,
+                annotation.astAnnotation
+            );
+            if (node) {
+                insert(child, 1, node);
+                count = count + 1;
+            }
+        }
         if (annotation.melee == "DEATHKNIGHT") {
             const fmt = `
                 AddFunction %sGetInMeleeRange
@@ -1030,6 +1060,7 @@ export class Generator {
                 );
         }
         const nodeList = annotation.astAnnotation.nodeList;
+        const lowerSpecialization = LowerSpecialization(annotation);
         const ifSpecialization = `enabled=(specialization(${annotation.specialization}))`;
         if (annotation.using_apl && next(annotation.using_apl)) {
             for (const [name] of pairs(annotation.using_apl)) {
@@ -1058,6 +1089,27 @@ export class Generator {
                     annotation.astAnnotation
                 );
                 insert(child, 1, node);
+            }
+        }
+        if (annotation.desired_targets) {
+            for (let k = MAX_DESIRED_TARGETS; k > 0; k += -1) {
+                const fmt = "AddListItem(%s %s %s %s%s)";
+                const code = format(
+                    fmt,
+                    `opt_${lowerSpecialization}_desired_targets`,
+                    `desired_targets_${k}`,
+                    `"Desired targets: ${k}"`,
+                    (k == 1 && "default ") || "",
+                    ifSpecialization
+                );
+                const [node] = this.ovaleAst.ParseCode(
+                    "list_item",
+                    code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
+                insert(child, 1, node);
+                count = count + 1;
             }
         }
         if (annotation.options) {

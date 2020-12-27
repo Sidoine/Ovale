@@ -672,10 +672,6 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["demon_soul_fragments"]: {
         name: "soulfragments", // GREATER/demon
     },
-    ["desired_targets"]: {
-        name: "enemies",
-        extraNamedParameter: { name: "tagged", value: 1 },
-    },
     ["druid"]: {
         name: "checkboxon",
         modifiers: {
@@ -1124,6 +1120,7 @@ export class Annotation implements InterruptAnnotation {
 
     sync?: LuaObj<ActionParseNode>;
 
+    desired_targets?: boolean;
     using_apl?: LuaObj<boolean>;
     currentVariable?: AstAddFunctionNode;
     variable: LuaObj<AstAddFunctionNode> = {};

@@ -3908,7 +3908,10 @@ export class Emiter {
         target = (target && `${target}.`) || "";
         operand = lower(operand);
         let code;
-        if (
+        if (operand == "desired_targets") {
+            code = `${CamelCase(specialization)}DesiredTargets()`;
+            annotation.desired_targets = true;
+        } else if (
             className == "DEATHKNIGHT" &&
             operand == "dot.breath_of_sindragosa.ticking"
         ) {
