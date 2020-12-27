@@ -191,8 +191,6 @@ export class OvaleConditions {
 	@return A boolean value for the result of the comparison.
 	@usage
 	if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
-	    Spell(ferocious_bite)
-	if ArmorSetParts(T13 more 1) and target.HealthPercent(less 60)
 	    Spell(ferocious_bite) */
     private ArmorSetParts = (
         positionalParams: LuaArray<any>,
@@ -1701,7 +1699,7 @@ export class OvaleConditions {
 	 @return The distance to the target.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if target.Distance(less 25)
+	 if target.Distance() < 25
 	     Texture(ability_rogue_sprint)
      */
     private Distance = (
@@ -1724,8 +1722,7 @@ export class OvaleConditions {
 	 @return The number of enemies.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Enemies() >4 Spell(fan_of_knives)
-	 if Enemies(more 4) Spell(fan_of_knives)
+	 if Enemies() > 4 Spell(fan_of_knives)
      */
     private Enemies = (
         positionalParams: LuaArray<any>,
@@ -1843,8 +1840,7 @@ export class OvaleConditions {
 	 @return The current rate of focus regeneration.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if FocusRegenRate() >20 Spell(arcane_shot)
-	 if FocusRegenRate(more 20) Spell(arcane_shot)
+	 if FocusRegenRate() > 20 Spell(arcane_shot)
      */
     private FocusRegenRate = (
         positionalParams: LuaArray<any>,
@@ -1907,8 +1903,7 @@ export class OvaleConditions {
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if GCD() <1.1 Spell(frostfire_bolt)
-	 if GCD(less 1.1) Spell(frostfire_bolt)
+	 if GCD() < 1.1 Spell(frostfire_bolt)
      */
     private GCD = (
         positionalParams: LuaArray<any>,
@@ -1990,8 +1985,7 @@ export class OvaleConditions {
 	 @return A boolean value for the result of the comparison.
 	 @see Life
 	 @usage
-	 if Health() <10000 Spell(last_stand)
-	 if Health(less 10000) Spell(last_stand)
+	 if Health() < 10000 Spell(last_stand)
      */
     private Health = (
         positionalParams: LuaArray<any>,
@@ -2019,8 +2013,7 @@ export class OvaleConditions {
 	 @return A boolean value for the result of the comparison.
 	 @see Life
 	 @usage
-	 if EffectiveHealth() <10000 Spell(last_stand)
-	 if EffectiveHealth(less 10000) Spell(last_stand)
+	 if EffectiveHealth() < 10000 Spell(last_stand)
      */
     private EffectiveHealth = (
         positionalParams: LuaArray<any>,
@@ -2049,8 +2042,7 @@ export class OvaleConditions {
 	 @return A boolean value for the result of the comparison.
 	 @see LifeMissing
 	 @usage
-	 if HealthMissing() <20000 Item(healthstone)
-	 if HealthMissing(less 20000) Item(healthstone)
+	 if HealthMissing() < 20000 Item(healthstone)
      */
     private HealthMissing = (
         positionalParams: LuaArray<any>,
@@ -2080,8 +2072,8 @@ export class OvaleConditions {
 	 @return A boolean value for the result of the comparison.
 	 @see LifePercent
 	 @usage
-	 if HealthPercent() <20 Spell(last_stand)
-	 if target.HealthPercent(less 25) Spell(kill_shot)
+	 if HealthPercent() < 20 Spell(last_stand)
+	 if target.HealthPercent() < 25 Spell(kill_shot)
      */
     private HealthPercent = (
         positionalParams: LuaArray<any>,
@@ -2110,8 +2102,8 @@ export class OvaleConditions {
 	 @return The current health percent including absorbs.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if EffectiveHealthPercent() <20 Spell(last_stand)
-	 if target.EffectiveHealthPercent(less 25) Spell(kill_shot)
+	 if EffectiveHealthPercent() < 20 Spell(last_stand)
+	 if target.EffectiveHealthPercent() < 25 Spell(kill_shot)
      */
     private EffectiveHealthPercent = (
         positionalParams: LuaArray<any>,
@@ -2141,8 +2133,7 @@ export class OvaleConditions {
 	 @return The maximum health.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if target.MaxHealth() >10000000 Item(mogu_power_potion)
-	 if target.MaxHealth(more 10000000) Item(mogu_power_potion)
+	 if target.MaxHealth() > 10000000 Item(mogu_power_potion)
      */
     private MaxHealth = (
         positionalParams: LuaArray<any>,
@@ -2467,8 +2458,6 @@ export class OvaleConditions {
 	 @usage
 	 if ItemCount(mana_gem) ==0 or ItemCharges(mana_gem) <3
 	     Spell(conjure_mana_gem)
-	 if ItemCount(mana_gem equal 0) or ItemCharges(mana_gem less 3)
-	     Spell(conjure_mana_gem)
      */
     private ItemCharges = (
         positionalParams: LuaArray<any>,
@@ -2487,8 +2476,7 @@ export class OvaleConditions {
 	 @return The count of the item.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if ItemCount(mana_gem) ==0 Spell(conjure_mana_gem)
-	 if ItemCount(mana_gem equal 0) Spell(conjure_mana_gem)
+	 if ItemCount(mana_gem) == 0 Spell(conjure_mana_gem)
      */
     private ItemCount = (
         positionalParams: LuaArray<any>,
@@ -2509,8 +2497,7 @@ export class OvaleConditions {
 	 @return A boolean value for the result of the comparison.
 	 @see Damage, LastEstimatedDamage
 	 @usage
-	 if LastDamage(ignite) >10000 Spell(combustion)
-	 if LastDamage(ignite more 10000) Spell(combustion)
+	 if LastDamage(ignite) > 10000 Spell(combustion)
      */
     private LastDamage = (
         positionalParams: LuaArray<any>,
@@ -2534,8 +2521,7 @@ export class OvaleConditions {
 	 @return The level of the target.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Level() >=34 Spell(tiger_palm)
-	 if Level(more 33) Spell(tiger_palm)
+	 if Level() >= 34 Spell(tiger_palm)
      */
     private Level = (
         positionalParams: LuaArray<any>,
@@ -2827,8 +2813,7 @@ export class OvaleConditions {
 	 @return The current runic power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if AstraPower() >70 Spell(frost_strike)
-	 if AstraPower(more 70) Spell(frost_strike)
+	 if AstraPower() > 70 Spell(frost_strike)
      */
     private AstralPower = (
         positionalParams: LuaArray<any>,
@@ -2844,8 +2829,7 @@ export class OvaleConditions {
 	 @return The amount of stored Chi.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Chi() ==4 Spell(chi_burst)
-	 if Chi(more 3) Spell(chi_burst)
+	 if Chi() == 4 Spell(chi_burst)
      */
     private Chi = (
         positionalParams: LuaArray<any>,
@@ -2875,8 +2859,7 @@ export class OvaleConditions {
 	 @return The current energy.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Energy() >70 Spell(vanish)
-	 if Energy(more 70) Spell(vanish)
+	 if Energy() > 70 Spell(vanish)
      */
     private Energy = (
         positionalParams: LuaArray<any>,
@@ -2892,8 +2875,7 @@ export class OvaleConditions {
 	 @return The current focus.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Focus() >70 Spell(arcane_shot)
-	 if Focus(more 70) Spell(arcane_shot)
+	 if Focus() > 70 Spell(arcane_shot)
      */
     private Focus = (
         positionalParams: LuaArray<any>,
@@ -2924,8 +2906,7 @@ export class OvaleConditions {
 	 @return The amount of holy power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if HolyPower() >=3 Spell(word_of_glory)
-	 if HolyPower(more 2) Spell(word_of_glory)
+	 if HolyPower() >= 3 Spell(word_of_glory)
      */
     private HolyPower = (
         positionalParams: LuaArray<any>,
@@ -3005,8 +2986,7 @@ export class OvaleConditions {
 	 @return The current rage.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Rage() >70 Spell(heroic_strike)
-	 if Rage(more 70) Spell(heroic_strike)
+	 if Rage() > 70 Spell(heroic_strike)
      */
     private Rage = (
         positionalParams: LuaArray<any>,
@@ -3022,8 +3002,7 @@ export class OvaleConditions {
 	 @return The current runic power.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if RunicPower() >70 Spell(frost_strike)
-	 if RunicPower(more 70) Spell(frost_strike)
+	 if RunicPower() > 70 Spell(frost_strike)
      */
     private RunicPower = (
         positionalParams: LuaArray<any>,
@@ -3039,8 +3018,7 @@ export class OvaleConditions {
 	 @return The number of Soul Shards.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if SoulShards() >0 Spell(summon_felhunter)
-	 if SoulShards(more 0) Spell(summon_felhunter)
+	 if SoulShards() > 0 Spell(summon_felhunter)
      */
     private SoulShards = (
         positionalParams: LuaArray<any>,
@@ -3115,8 +3093,7 @@ export class OvaleConditions {
 	 @return The current chi deficit.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if ChiDeficit() >=2 Spell(keg_smash)
-	 if ChiDeficit(more 1) Spell(keg_smash)
+	 if ChiDeficit() >= 2 Spell(keg_smash)
      */
     private ChiDeficit = (
         positionalParams: LuaArray<any>,
@@ -3154,8 +3131,7 @@ export class OvaleConditions {
 	 @return The current energy deficit.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if EnergyDeficit() >60 Spell(tigers_fury)
-	 if EnergyDeficit(more 60) Spell(tigers_fury)
+	 if EnergyDeficit() > 60 Spell(tigers_fury)
      */
     private EnergyDeficit = (
         positionalParams: LuaArray<any>,
@@ -3230,8 +3206,7 @@ export class OvaleConditions {
 	 @return The current mana deficit.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if ManaDeficit() >30000 Item(mana_gem)
-	 if ManaDeficit(more 30000) Item(mana_gem)
+	 if ManaDeficit() > 30000 Item(mana_gem)
      */
     private ManaDeficit = (
         positionalParams: LuaArray<any>,
@@ -3318,8 +3293,7 @@ export class OvaleConditions {
 	 @return The current mana percent.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if ManaPercent() >90 Spell(arcane_blast)
-	 if ManaPercent(more 90) Spell(arcane_blast)
+	 if ManaPercent() > 90 Spell(arcane_blast)
      */
     private ManaPercent = (
         positionalParams: LuaArray<any>,
@@ -3825,9 +3799,7 @@ l    */
 	 @return The difference in levels.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if target.RelativeLevel() >3
-	     Texture(ability_rogue_sprint)
-	 if target.RelativeLevel(more 3)
+	 if target.RelativeLevel() > 3
 	     Texture(ability_rogue_sprint)
      */
     private RelativeLevel = (
@@ -4393,7 +4365,7 @@ l    */
 	 @return The speed of the target.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Speed(more 0) and not BuffPresent(aspect_of_the_fox)
+	 if Speed() > 0 and not BuffPresent(aspect_of_the_fox)
 	     Spell(aspect_of_the_fox)
      */
     private Speed = (
@@ -4911,8 +4883,7 @@ l    */
 	 @return The amount of threat.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 if Threat() >90 Spell(fade)
-	 if Threat(more 90) Spell(fade)
+	 if Threat() > 90 Spell(fade)
      */
     private Threat = (
         positionalParams: LuaArray<any>,
