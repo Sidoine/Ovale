@@ -206,16 +206,29 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
     OnUpdate(elapsed: number) {
         this.ovaleFrameModule.module.SendMessage("Ovale_OnUpdate");
         this.timeSinceLastUpdate = this.timeSinceLastUpdate + elapsed;
-        const refresh =
-            this.ovaleDebug.trace ||
-            ((this.visible || this.ovaleSpellFlash.IsSpellFlashEnabled()) &&
-                ((this.timeSinceLastUpdate >
-                    this.ovaleOptions.db.profile.apparence.minFrameRefresh /
-                        1000 &&
-                    next(this.ovale.refreshNeeded)) ||
-                    this.timeSinceLastUpdate >
-                        this.ovaleOptions.db.profile.apparence.maxFrameRefresh /
-                            1000));
+        let refresh = false;
+        if (this.ovaleDebug.trace) {
+            // Always refresh if we are tracing the execution.
+            refresh = true;
+        } else if (this.visible || this.ovaleSpellFlash.IsSpellFlashEnabled()) {
+            /* Require that the Ovale frame be visible or that SpellFlash is
+               enabled so Ovale is still triggering flashing buttons on the
+               action bar. */
+            const minSeconds =
+                this.ovaleOptions.db.profile.apparence.minFrameRefresh / 1000;
+            const maxSeconds =
+                this.ovaleOptions.db.profile.apparence.maxFrameRefresh / 1000;
+            if (
+                this.timeSinceLastUpdate > minSeconds &&
+                next(this.ovale.refreshNeeded)
+            ) {
+                // Throttle refreshes at every minSeconds.
+                refresh = true;
+            } else if (this.timeSinceLastUpdate > maxSeconds) {
+                // Always refresh if more than maxSeconds have elapsed.
+                refresh = true;
+            }
+        }
         if (refresh) {
             this.ovale.AddRefreshInterval(this.timeSinceLastUpdate * 1000);
             this.ovaleState.InitializeState();
