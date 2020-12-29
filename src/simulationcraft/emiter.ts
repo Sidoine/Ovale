@@ -87,9 +87,13 @@ function IsTotem(name: string) {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
         return true;
-    } else if (truthy(match(name, "invoke_(niuzao|xuen|chiji)"))) {
+    } else if (truthy(match(name, "invoke_(chiji|yulon)"))) {
         return true;
     } else if (sub(name, -6, -1) == "_totem") {
+        return true;
+    } else if (name == "raise_dead") {
+        return true;
+    } else if (name == "summon_gargoyle") {
         return true;
     }
     return false;
@@ -267,6 +271,18 @@ export class Emiter {
             "MONK",
             "windwalker"
         );
+        this.AddDisambiguation(
+            "chiji_the_red_crane",
+            "invoke_chiji_the_red_crane",
+            "MONK",
+            "mistweaver"
+        );
+        this.AddDisambiguation(
+            "yulon_the_jade_serpent",
+            "invoke_yulon_the_jade_serpent",
+            "MONK",
+            "mistweaver"
+        );
         this.AddDisambiguation("blink_any", "blink", "MAGE");
         this.AddDisambiguation(
             "buff_disciplinary_command",
@@ -359,6 +375,14 @@ export class Emiter {
             "deeper_stratagem_talent",
             "ROGUE"
         );
+        this.AddDisambiguation(
+            "gargoyle",
+            "summon_gargoyle",
+            "DEATHKNIGHT",
+            "unholy"
+        );
+        this.AddDisambiguation("ghoul", "raise_dead", "DEATHKNIGHT", "blood");
+        this.AddDisambiguation("ghoul", "raise_dead", "DEATHKNIGHT", "frost");
         this.AddDisambiguation(
             "dark_trasnformation",
             "dark_transformation",
@@ -3510,23 +3534,10 @@ export class Emiter {
         const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         const token = tokenIterator();
         if (token == "pet") {
-            let name = tokenIterator();
+            const name = tokenIterator();
             const property = tokenIterator();
-            [name] = this.Disambiguate(
-                annotation,
-                name,
-                annotation.classId,
-                annotation.specialization
-            );
-            const isTotem = IsTotem(name);
-            let code;
-            if (isTotem && property == "active") {
-                code = format("TotemPresent(%s)", name);
-            } else if (isTotem && property == "remains") {
-                code = format("TotemRemaining(%s)", name);
-            } else if (property == "active") {
-                code = "pet.Present()";
-            } else if (name == "buff") {
+            const target = "pet";
+            if (name == "buff") {
                 const pattern = format("^pet%%.([%%w_.]+)", operand);
                 const [petOperand] = match(operand, pattern);
                 node = this.EmitOperandBuff(
@@ -3535,12 +3546,11 @@ export class Emiter {
                     nodeList,
                     annotation,
                     action,
-                    "pet"
+                    target
                 );
             } else {
                 const pattern = format("^pet%%.%s%%.([%%w_.]+)", name);
                 let [petOperand] = match(operand, pattern);
-                const target = "pet";
                 if (petOperand) {
                     node = this.EmitOperandSpecial(
                         petOperand,
@@ -3550,6 +3560,33 @@ export class Emiter {
                         action,
                         target
                     );
+                }
+                if (!node) {
+                    let code: string | undefined;
+                    const [spellName] = this.Disambiguate(
+                        annotation,
+                        name,
+                        annotation.classId,
+                        annotation.specialization
+                    );
+                    if (IsTotem(spellName)) {
+                        if (property == "active") {
+                            code = format("TotemPresent(%s)", spellName);
+                        } else if (property == "remains") {
+                            code = format("TotemRemaining(%s)", spellName);
+                        }
+                        this.AddSymbol(annotation, spellName);
+                    } else if (property == "active") {
+                        code = "pet.Present()";
+                    }
+                    if (code) {
+                        [node] = this.ovaleAst.ParseCode(
+                            "expression",
+                            code,
+                            nodeList,
+                            annotation.astAnnotation
+                        );
+                    }
                     if (!node) {
                         node = this.EmitOperandAction(
                             petOperand,
@@ -3629,15 +3666,6 @@ export class Emiter {
                         }
                     }
                 }
-            }
-            if (code) {
-                [node] = this.ovaleAst.ParseCode(
-                    "expression",
-                    code,
-                    nodeList,
-                    annotation.astAnnotation
-                );
-                if (isTotem) this.AddSymbol(annotation, name);
             }
         }
         return node;
@@ -3943,6 +3971,40 @@ export class Emiter {
                     action,
                     target
                 );
+            }
+        } else if (
+            className == "DEATHKNIGHT" &&
+            sub(operand, 1, 15) == "pet.army_ghoul."
+        ) {
+            const petOperand = sub(operand, 15);
+            const tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
+            const token = tokenIterator();
+            if (token == "active") {
+                const spell = "army_of_the_dead";
+                // Army of the Dead ghouls last for 30 seconds after summoning.
+                code = format(
+                    "SpellCooldownDuration(%s) - SpellCooldown(%s) < 30",
+                    spell,
+                    spell
+                );
+                this.AddSymbol(annotation, spell);
+            }
+        } else if (
+            className == "DEATHKNIGHT" &&
+            sub(operand, 1, 15) == "pet.apoc_ghoul."
+        ) {
+            const petOperand = sub(operand, 15);
+            const tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
+            const token = tokenIterator();
+            if (token == "active") {
+                const spell = "apocalypse";
+                // Apocalypse ghouls last for 15 seconds after summoning.
+                code = format(
+                    "SpellCooldownDuration(%s) - SpellCooldown(%s) < 15",
+                    spell,
+                    spell
+                );
+                this.AddSymbol(annotation, spell);
             }
         } else if (
             className == "DEMONHUNTER" &&
