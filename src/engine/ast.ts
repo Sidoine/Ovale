@@ -2065,7 +2065,7 @@ export class OvaleASTClass {
             tokenStream,
             "ParseAddListItem",
             annotation,
-            0,
+            1,
             checkListItemParameters
         );
         if (!positionalParams || !namedParams) return undefined;

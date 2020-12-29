@@ -42,6 +42,7 @@ export class Controls {
                 name: name,
                 text: text,
                 defaultValue: defaultValue,
+                triggerEvaluation: true,
                 enabled: enabled,
             };
             this.checkBoxesByName[name] = checkBox;
@@ -70,6 +71,7 @@ export class Controls {
                 items: {},
                 itemsByName: {},
                 defaultValue: listName,
+                triggerEvaluation: true,
             };
             this.listsByName[listName] = list;
             insert(this.lists, list);
