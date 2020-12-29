@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.32](https://github.com/Sidoine/Ovale/compare/9.0.31...9.0.32) (2020-12-29)
+
+### Features
+
+-   **simulationcraft:** improve meaning of "desired_targets" ([9c1a7d8](https://github.com/Sidoine/Ovale/commit/9c1a7d8e72f90b34d58db11a09173597ac470658)), closes [#236](https://github.com/Sidoine/Ovale/issues/236)
+
+### Bug Fixes
+
+-   **demonhunters:** some spell definitions for Havoc Demon Hunters ([#762](https://github.com/Sidoine/Ovale/issues/762)) ([607a235](https://github.com/Sidoine/Ovale/commit/607a2359557c9b3bfdfbae80eea495e05e7e5768))
+-   cd icon ([#765](https://github.com/Sidoine/Ovale/issues/765)) ([98ad6f5](https://github.com/Sidoine/Ovale/commit/98ad6f5ad787489c20c06a9cb5460018d33846b6))
+-   script translations of totem pets ([#768](https://github.com/Sidoine/Ovale/issues/768)) ([be32bcb](https://github.com/Sidoine/Ovale/commit/be32bcb155b6d2258ad9b2b792b04721dd6366b8))
+-   **ast:** action AddListItem() should accept "default" as parameter ([11ea3a8](https://github.com/Sidoine/Ovale/commit/11ea3a8d97dfb3d7b1ce866969c6a279f54d1696))
+-   **controls:** re-evaluate script when controls are modified ([059ba2e](https://github.com/Sidoine/Ovale/commit/059ba2e2698bf244b3773ee6dcb47e1f6c36ab16))
+
 ### [9.0.31](https://github.com/Sidoine/Ovale/compare/9.0.30...9.0.31) (2020-12-20)
 
 ### Bug Fixes
