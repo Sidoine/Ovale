@@ -914,7 +914,7 @@ interface AstDefineNode extends AstBaseNode<"define"> {
     value: string | number;
 }
 
-type AstUndefinedNode = AstBaseNode<"undefined">;
+export type AstUndefinedNode = AstBaseNode<"undefined">;
 
 // export interface AstNode {
 //     child: LuaArray<AstNode>;

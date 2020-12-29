@@ -21,6 +21,7 @@ import {
     AstNodeWithParameters,
     AstStringNode,
     AstTypedFunctionNode,
+    AstUndefinedNode,
     AstUnlessNode,
     AstValueNode,
     AstVariableNode,
@@ -44,6 +45,7 @@ import {
     OvaleTimeSpan,
     releaseTimeSpans,
     UNIVERSE,
+    EMPTY_SET,
 } from "../tools/TimeSpan";
 import { isNumber, isString, OneTimeMessage } from "../tools/tools";
 
@@ -210,17 +212,7 @@ export class Runner {
             element.asString || element.type,
             atTime
         );
-        if (element.result.constant) {
-            // Constant value
-            this.tracer.Log(
-                "[%d] <<< '%s' returns %s with constant %s",
-                element.nodeId,
-                element.asString || element.type,
-                element.result.timeSpan,
-                this.resultToString(element.result)
-            );
-            return element.result;
-        } else if (element.result.serial == -1) {
+        if (element.result.serial == -1) {
             OneTimeMessage(
                 "Recursive call is not supported in '%s'. Please fix the script.",
                 element.asString || element.type
@@ -1105,6 +1097,14 @@ export class Runner {
         return element.result;
     };
 
+    private computeUndefined: ComputerFunction<AstUndefinedNode> = (
+        element
+    ) => {
+        this.tracer.Log("[%d]    value is %s", element.nodeId, element.type);
+        this.GetTimeSpan(element, EMPTY_SET);
+        return element.result;
+    };
+
     private computeVariable: ComputerFunction<AstVariableNode> = (element) => {
         // TODO This should not happen but it's to support many old cases where an undefined variable name is used
         // as a string
@@ -1270,6 +1270,7 @@ export class Runner {
         ["state"]: this.ComputeFunction,
         ["string"]: this.computeString,
         ["typed_function"]: this.computeTypedFunction,
+        ["undefined"]: this.computeUndefined,
         ["unless"]: this.ComputeIf,
         ["value"]: this.ComputeValue,
         ["variable"]: this.computeVariable,
