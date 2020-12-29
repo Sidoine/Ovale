@@ -2340,8 +2340,6 @@ export class OvaleASTClass {
         );
         if (!positionalParams || !namedParams) return undefined;
 
-        if (!this.parseToken(tokenStream, "FUNCTION", ")")) return undefined;
-
         if (target) {
             namedParams.target = this.newString(annotation, target);
         }
@@ -2449,6 +2447,7 @@ export class OvaleASTClass {
                 }
             }
         }
+        if (!this.parseToken(tokenStream, "FUNCTION", ")")) return undefined;
 
         const node = this.newNodeWithParameters(
             "typed_function",
