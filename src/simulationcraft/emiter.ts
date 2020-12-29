@@ -1369,9 +1369,9 @@ export class Emiter {
             } else if (className == "MAGE" && action == "ice_floes") {
                 conditionCode = "Speed() > 0";
             } else if (className == "MAGE" && action == "blast_wave") {
-                conditionCode = "target.Distance(less 8)";
+                conditionCode = "target.Distance() < 8";
             } else if (className == "MAGE" && action == "dragons_breath") {
-                conditionCode = "target.Distance(less 12)";
+                conditionCode = "target.Distance() < 12";
             } else if (className == "MAGE" && action == "arcane_blast") {
                 conditionCode = "Mana() > ManaCost(arcane_blast)";
             } else if (className == "MAGE" && action == "cone_of_cold") {
@@ -1545,7 +1545,7 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "WARRIOR" && action == "heroic_leap") {
                 conditionCode =
-                    "CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40)";
+                    "CheckBoxOn(opt_melee_range) and target.Distance() >= 8 and target.Distance() <= 40";
             } else if (action == "auto_attack") {
                 bodyCode = `${camelSpecialization}GetInMeleeRange()`;
                 isSpellAction = false;

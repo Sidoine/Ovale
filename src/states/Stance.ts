@@ -16,7 +16,7 @@ import { OvaleClass } from "../Ovale";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { OvaleConditionClass, TestBoolean } from "../engine/condition";
+import { OvaleConditionClass, ReturnBoolean } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const [druidCatForm] = GetSpellInfo(768);
@@ -124,9 +124,6 @@ export class OvaleStanceClass
 	 @name Stance
 	 @paramsig boolean
 	 @param stance The stance name or a number representing the stance index.
-	 @param yesno Optional. If yes, then return true if the player is in the given stance. If no, then return true otherwise.
-	     Default is yes.
-	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
 	 unless Stance(druid_bear_form) Spell(bear_form)
@@ -136,9 +133,9 @@ export class OvaleStanceClass
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [stance, yesno] = [positionalParams[1], positionalParams[2]];
+        const stance = positionalParams[1];
         const boolean = this.IsStance(stance, atTime);
-        return TestBoolean(boolean, yesno);
+        return ReturnBoolean(boolean);
     };
 
     private OnInitialize = () => {

@@ -38,20 +38,6 @@ export type ConditionAction = (
     result: AstNodeSnapshot
 ) => void;
 
-export type ComparatorId = "atleast" | "atmost" | "equal" | "less" | "more";
-
-const COMPARATOR: { [k in ComparatorId]: boolean } = {
-    atleast: true,
-    atmost: true,
-    equal: true,
-    less: true,
-    more: true,
-};
-
-export function isComparator(token: string): token is ComparatorId {
-    return COMPARATOR[token as ComparatorId] !== undefined;
-}
-
 interface NumberParameterInfo<Optional = boolean> {
     type: "number";
     name: string;
@@ -285,19 +271,6 @@ export function ParseCondition(
     return [target, filter, mine];
 }
 
-export function TestBoolean(a: boolean, yesno: "yes" | "no"): ConditionResult {
-    if (!yesno || yesno == "yes") {
-        if (a) {
-            return [0, INFINITY];
-        }
-    } else {
-        if (!a) {
-            return [0, INFINITY];
-        }
-    }
-    return [];
-}
-
 export function ReturnValue(
     value: number,
     origin: number,
@@ -326,68 +299,4 @@ export function ReturnConstant(
 export function ReturnBoolean(value: boolean): ConditionResult {
     if (value) return [0, INFINITY];
     return [];
-}
-
-export function TestValue(
-    start: number,
-    ending: number,
-    value: number | undefined,
-    origin: number | undefined,
-    rate: number | undefined,
-    comparator?: string | undefined,
-    limit?: number | undefined
-): ConditionResult {
-    if (value === undefined || origin === undefined || rate === undefined) {
-        return [];
-    }
-    start = start || 0;
-    ending = ending || INFINITY;
-    if (!comparator) {
-        if (start < ending) {
-            return [start, ending, value, origin, rate];
-        } else {
-            return [0, INFINITY, 0, 0, 0];
-        }
-    } else if (!isComparator(comparator)) {
-        return [];
-    } else if (!limit) {
-        return [];
-    } else if (rate == 0) {
-        if (
-            (comparator == "less" && value < limit) ||
-            (comparator == "atmost" && value <= limit) ||
-            (comparator == "equal" && value == limit) ||
-            (comparator == "atleast" && value >= limit) ||
-            (comparator == "more" && value > limit)
-        ) {
-            return [start, ending];
-        }
-    } else if (
-        (comparator == "less" && rate > 0) ||
-        (comparator == "atmost" && rate > 0) ||
-        (comparator == "atleast" && rate < 0) ||
-        (comparator == "more" && rate < 0)
-    ) {
-        const t = (limit - value) / rate + origin;
-        ending = (ending < t && ending) || t;
-        return [start, ending];
-    } else if (
-        (comparator == "less" && rate < 0) ||
-        (comparator == "atmost" && rate < 0) ||
-        (comparator == "atleast" && rate > 0) ||
-        (comparator == "more" && rate > 0)
-    ) {
-        const t = (limit - value) / rate + origin;
-        start = (start > t && start) || t;
-        return [start, INFINITY];
-    }
-    return [];
-}
-
-export function Compare(
-    value: number,
-    comparator: string | undefined,
-    limit: number | undefined
-): ConditionResult {
-    return TestValue(0, INFINITY, value, 0, 0, comparator, limit);
 }

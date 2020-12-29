@@ -262,7 +262,7 @@ export class Generator {
                 name: "war_stomp",
                 stun: 1,
                 order: 99,
-                range: "target.Distance(less 5)",
+                range: "target.Distance() < 5",
             });
         }
 
@@ -287,7 +287,7 @@ export class Generator {
                 insert(interrupts, {
                     name: "blinding_sleet",
                     disorient: 1,
-                    range: "target.Distance(less 12)",
+                    range: "target.Distance() < 12",
                     order: 20,
                 });
             }
@@ -309,7 +309,7 @@ export class Generator {
                 insert(interrupts, {
                     name: "chaos_nova",
                     stun: 1,
-                    range: "target.Distance(less 8)",
+                    range: "target.Distance() < 8",
                     order: 100,
                 });
                 insert(interrupts, {
@@ -378,14 +378,14 @@ export class Generator {
                     name: "incapacitating_roar",
                     incapacitate: 1,
                     order: 30,
-                    range: "target.Distance(less 10)",
+                    range: "target.Distance() < 10",
                 });
             }
             insert(interrupts, {
                 name: "typhoon",
                 knockback: 1,
                 order: 110,
-                range: "target.Distance(less 15)",
+                range: "target.Distance() < 15",
             });
             if (annotation.specialization == "feral") {
                 insert(interrupts, {
@@ -435,7 +435,7 @@ export class Generator {
                 name: "leg_sweep",
                 stun: 1,
                 order: 30,
-                range: "target.Distance(less 5)",
+                range: "target.Distance() < 5",
             });
         }
         if (annotation.rebuke == "PALADIN") {
@@ -461,7 +461,7 @@ export class Generator {
                     name: "blinding_light",
                     disorient: 1,
                     order: 50,
-                    range: "target.Distance(less 10)",
+                    range: "target.Distance() < 10",
                 });
             }
         }
@@ -528,7 +528,7 @@ export class Generator {
                     name: "sundering",
                     knockback: 1,
                     order: 20,
-                    range: "target.Distance(less 5)",
+                    range: "target.Distance() < 5",
                 });
             }
             insert(interrupts, {
@@ -558,7 +558,7 @@ export class Generator {
                 stun: 1,
                 worksOnBoss: 0,
                 order: 20,
-                range: "target.Distance(less 10)",
+                range: "target.Distance() < 10",
             });
             insert(interrupts, {
                 name: "storm_bolt",
@@ -951,7 +951,7 @@ export class Generator {
                     if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
                     {
                         if target.InRange(%s) Spell(%s)
-                        if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+                        if SpellCharges(%s) == 0 and target.Distance() >= 8 and target.Distance() <= 40 Spell(heroic_leap)
                         Texture(misc_arrowlup help=L(not_in_melee_range))
                     }
                 }

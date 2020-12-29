@@ -4,9 +4,9 @@ import { BaseState } from "./BaseState";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleCombatClass } from "./combat";
 import {
-    Compare,
     ConditionAction,
     OvaleConditionClass,
+    ReturnConstant,
 } from "../engine/condition";
 import { huge } from "@wowts/math";
 import {
@@ -120,8 +120,6 @@ export class Variables implements StateModule {
 	 @name GetState
 	 @paramsig number or boolean
 	 @param name The name of the state variable.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The value of the state variable.
 	 @return A boolean value for the result of the comparison.
      */
@@ -130,21 +128,15 @@ export class Variables implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [name, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const name = positionalParams[1];
         const value = this.GetState(name);
-        return Compare(value, comparator, limit);
+        return ReturnConstant(value);
     };
 
     /** Get the duration in seconds that the simulator was most recently in the named state.
 	 @name GetStateDuration
 	 @paramsig number or boolean
 	 @param name The name of the state variable.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
 	 @return The number of seconds.
 	 @return A boolean value for the result of the comparison.
      */
@@ -153,13 +145,9 @@ export class Variables implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [name, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const name = positionalParams[1];
         const value = this.GetStateDuration(name, atTime);
-        return Compare(value, comparator, limit);
+        return ReturnConstant(value);
     };
 
     private setState: ConditionAction = (

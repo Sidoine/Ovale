@@ -190,8 +190,8 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     // ["raid_event.adds.remains"]: "0", // TODO
     // ["raid_event.invulnerable.exists"]: "0", //TODO
     // ["raw_haste_pct"]: "SpellCastSpeedPercent()",
-    // ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
-    // ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
+    // ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff) > 4)",
+    // ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff) > 5)",
     // ["rune.deficit"]: "RuneDeficit()",
     // ["runic_power"]: "RunicPower()",
     // ["runic_power.deficit"]: "RunicPowerDeficit()",

@@ -14,7 +14,7 @@ import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { Compare, OvaleConditionClass } from "../engine/condition";
+import { OvaleConditionClass, ReturnConstant } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
@@ -209,14 +209,10 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [ms, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const ms = positionalParams[1];
         const delay = (ms || 0) / 1000;
         let impsSpawned = 0;
-        // check for hand of guldan
+        // check for Hand of Guldan
         if (this.future.next.currentCast.spellId == SpellId.hand_of_guldan) {
             let soulshards = this.power.current.power["soulshards"] || 0;
             if (soulshards >= 3) {
@@ -238,7 +234,7 @@ export class OvaleWarlockClass implements StateModule {
                 impsSpawned = impsSpawned + 1;
             }
         }
-        return Compare(impsSpawned, comparator, limit);
+        return ReturnConstant(impsSpawned);
     };
 
     private getDemonsCount = (
@@ -246,18 +242,14 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [creatureId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const creatureId = positionalParams[1];
         let count = 0;
         for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
                 count = count + 1;
             }
         }
-        return Compare(count, comparator, limit);
+        return ReturnConstant(count);
     };
 
     private demonDuration = (
@@ -265,13 +257,9 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [creatureId, comparator, limit] = [
-            positionalParams[1],
-            positionalParams[2],
-            positionalParams[3],
-        ];
+        const creatureId = positionalParams[1];
         const value = this.getRemainingDemonDuration(creatureId, atTime);
-        return Compare(value, comparator, limit);
+        return ReturnConstant(value);
     };
 
     private getRemainingDemonDuration(creatureId: number, atTime: number) {
@@ -355,8 +343,7 @@ export class OvaleWarlockClass implements StateModule {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [comparator, limit] = [positionalParams[1], positionalParams[2]];
         const value = this.getTimeToShard(atTime);
-        return Compare(value, comparator, limit);
+        return ReturnConstant(value);
     };
 }
