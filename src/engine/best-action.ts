@@ -100,8 +100,9 @@ export class OvaleBestActionClass {
         const [spellName] = GetItemSpell(itemId);
         if (node.cachedParams.named.texture) {
             result.actionTexture = `Interface\\Icons\\${node.cachedParams.named.texture}`;
+        } else {
+            result.actionTexture = GetItemIcon(itemId);
         }
-        result.actionTexture = result.actionTexture || GetItemIcon(itemId);
         result.actionInRange = IsItemInRange(itemId, target);
         [
             result.actionCooldownStart,
@@ -138,9 +139,9 @@ export class OvaleBestActionClass {
         }
         if (element.cachedParams.named.texture) {
             result.actionTexture = `Interface\\Icons\\${element.cachedParams.named.texture}`;
+        } else {
+            result.actionTexture = GetActionTexture(actionSlot);
         }
-        result.actionTexture =
-            result.actionTexture || GetActionTexture(actionSlot);
         result.actionInRange = IsActionInRange(actionSlot, target);
         [
             result.actionCooldownStart,
@@ -260,8 +261,9 @@ export class OvaleBestActionClass {
         setResultType(result, "action");
         if (element.cachedParams.named.texture) {
             result.actionTexture = `Interface\\Icons\\${element.cachedParams.named.texture}`;
+        } else {
+            result.actionTexture = GetSpellTexture(spellId);
         }
-        result.actionTexture = result.actionTexture || GetSpellTexture(spellId);
         result.actionInRange = this.OvaleSpells.IsSpellInRange(spellId, target);
         [
             result.actionCooldownStart,
