@@ -278,7 +278,7 @@ AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discip
  discipline_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and not specialization(discipline)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_priest_discipline_aoe) and specialization(discipline)) enemies=1 help=cd
 {
  if not incombat() disciplineprecombatcdactions()
  discipline_defaultcdactions()
@@ -846,7 +846,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
  shadow_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and not specialization(shadow)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) enemies=1 help=cd
 {
  if not incombat() shadowprecombatcdactions()
  shadow_defaultcdactions()
@@ -1390,7 +1390,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
  shadow_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and not specialization(shadow)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) enemies=1 help=cd
 {
  if not incombat() shadowprecombatcdactions()
  shadow_defaultcdactions()

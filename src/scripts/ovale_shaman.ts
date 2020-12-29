@@ -507,7 +507,7 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
  elemental_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and not specialization(elemental)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) enemies=1 help=cd
 {
  if not incombat() elementalprecombatcdactions()
  elemental_defaultcdactions()
@@ -1091,7 +1091,7 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
  elemental_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and not specialization(elemental)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_shaman_elemental_aoe) and specialization(elemental)) enemies=1 help=cd
 {
  if not incombat() elementalprecombatcdactions()
  elemental_defaultcdactions()
@@ -1638,7 +1638,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
  enhancement_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and not specialization(enhancement)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) enemies=1 help=cd
 {
  if not incombat() enhancementprecombatcdactions()
  enhancement_defaultcdactions()
@@ -2182,7 +2182,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
  enhancement_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and not specialization(enhancement)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_shaman_enhancement_aoe) and specialization(enhancement)) enemies=1 help=cd
 {
  if not incombat() enhancementprecombatcdactions()
  enhancement_defaultcdactions()
@@ -2442,7 +2442,7 @@ AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and specialization(resto
  restoration_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_shaman_restoration_aoe) and not specialization(restoration)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_shaman_restoration_aoe) and specialization(restoration)) enemies=1 help=cd
 {
  if not incombat() restorationprecombatcdactions()
  restoration_defaultcdactions()

@@ -568,7 +568,7 @@ export class OvaleSimulationCraftClass {
             }
             {
                 const fmt = `
-				AddIcon enemies=1 help=cd enabled=(checkboxon(%s) and not specialization(%s))
+				AddIcon enemies=1 help=cd enabled=(not checkboxon(%s) and specialization(%s))
 				{
 					%s
 				}

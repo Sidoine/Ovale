@@ -435,7 +435,7 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
  arms_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and not specialization(arms)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_warrior_arms_aoe) and specialization(arms)) enemies=1 help=cd
 {
  if not incombat() armsprecombatcdactions()
  arms_defaultcdactions()
@@ -810,7 +810,7 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
  fury_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and not specialization(fury)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_warrior_fury_aoe) and specialization(fury)) enemies=1 help=cd
 {
  if not incombat() furyprecombatcdactions()
  fury_defaultcdactions()
@@ -1190,7 +1190,7 @@ AddIcon enabled=(checkboxon(opt_warrior_protection_aoe) and specialization(prote
  protection_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_warrior_protection_aoe) and not specialization(protection)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_warrior_protection_aoe) and specialization(protection)) enemies=1 help=cd
 {
  if not incombat() protectionprecombatcdactions()
  protection_defaultcdactions()

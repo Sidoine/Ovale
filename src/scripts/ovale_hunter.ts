@@ -437,7 +437,7 @@ AddIcon enabled=(checkboxon(opt_hunter_beast_mastery_aoe) and specialization(bea
  beast_mastery_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_hunter_beast_mastery_aoe) and not specialization(beast_mastery)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_hunter_beast_mastery_aoe) and specialization(beast_mastery)) enemies=1 help=cd
 {
  if not incombat() beast_masteryprecombatcdactions()
  beast_mastery_defaultcdactions()
@@ -915,7 +915,7 @@ AddIcon enabled=(checkboxon(opt_hunter_marksmanship_aoe) and specialization(mark
  marksmanship_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_hunter_marksmanship_aoe) and not specialization(marksmanship)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_hunter_marksmanship_aoe) and specialization(marksmanship)) enemies=1 help=cd
 {
  if not incombat() marksmanshipprecombatcdactions()
  marksmanship_defaultcdactions()
@@ -1772,7 +1772,7 @@ AddIcon enabled=(checkboxon(opt_hunter_survival_aoe) and specialization(survival
  survival_defaultmainactions()
 }
 
-AddIcon enabled=(checkboxon(opt_hunter_survival_aoe) and not specialization(survival)) enemies=1 help=cd
+AddIcon enabled=(not checkboxon(opt_hunter_survival_aoe) and specialization(survival)) enemies=1 help=cd
 {
  if not incombat() survivalprecombatcdactions()
  survival_defaultcdactions()
