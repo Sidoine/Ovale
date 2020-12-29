@@ -93,6 +93,7 @@ export class Runner {
 
     public refresh() {
         this.self_serial = this.self_serial + 1;
+        this.tracer.Log("Advancing age to %d.", this.self_serial);
     }
 
     public PostOrderCompute(element: AstNode, atTime: number): AstNodeSnapshot {
@@ -100,6 +101,11 @@ export class Runner {
         let result: AstNodeSnapshot | undefined;
         const postOrder = element.postOrder;
         if (postOrder && element.result.serial !== this.self_serial) {
+            this.tracer.Log(
+                "[%d] [[[ Compute '%s' post-order nodes.",
+                element.nodeId,
+                element.type
+            );
             let index = 1;
             const N = lualength(postOrder);
             while (index < N) {
@@ -120,9 +126,11 @@ export class Runner {
                         result.timeSpan.Measure() == 0
                     ) {
                         this.tracer.Log(
-                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.",
+                            "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with zero-measure time span.",
                             element.nodeId,
                             childNode.type,
+                            childNode.nodeId,
+                            parentNode.type,
                             parentNode.nodeId
                         );
                         shortCircuit = true;
@@ -131,9 +139,11 @@ export class Runner {
                         result.timeSpan.IsUniverse()
                     ) {
                         this.tracer.Log(
-                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
+                            "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with universe as time span.",
                             element.nodeId,
                             childNode.type,
+                            childNode.nodeId,
+                            parentNode.type,
                             parentNode.nodeId
                         );
                         shortCircuit = true;
@@ -143,9 +153,11 @@ export class Runner {
                         result.timeSpan.Measure() == 0
                     ) {
                         this.tracer.Log(
-                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.",
+                            "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with zero measure.",
                             element.nodeId,
                             childNode.type,
+                            childNode.nodeId,
+                            parentNode.type,
                             parentNode.nodeId
                         );
                         shortCircuit = true;
@@ -155,9 +167,11 @@ export class Runner {
                         result.timeSpan.IsUniverse()
                     ) {
                         this.tracer.Log(
-                            "[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.",
+                            "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with universe as time span.",
                             element.nodeId,
                             childNode.type,
+                            childNode.nodeId,
+                            parentNode.type,
                             parentNode.nodeId
                         );
                         shortCircuit = true;
@@ -175,6 +189,11 @@ export class Runner {
                     }
                 }
             }
+            this.tracer.Log(
+                "[%d] ]]] Compute '%s' post-order nodes: complete.",
+                element.nodeId,
+                element.type
+            );
         }
         this.RecursiveCompute(element, atTime);
         this.profiler.StopProfiling("OvaleBestAction_PostOrderCompute");
@@ -185,8 +204,21 @@ export class Runner {
         atTime: number
     ): AstNodeSnapshot {
         this.profiler.StartProfiling("OvaleBestAction_RecursiveCompute");
+        this.tracer.Log(
+            "[%d] >>> Computing '%s' at time=%f",
+            element.nodeId,
+            element.asString || element.type,
+            atTime
+        );
         if (element.result.constant) {
             // Constant value
+            this.tracer.Log(
+                "[%d] <<< '%s' returns %s with constant %s",
+                element.nodeId,
+                element.asString || element.type,
+                element.result.timeSpan,
+                this.resultToString(element.result)
+            );
             return element.result;
         } else if (element.result.serial == -1) {
             OneTimeMessage(
@@ -196,20 +228,13 @@ export class Runner {
             return element.result;
         } else if (element.result.serial === this.self_serial) {
             this.tracer.Log(
-                "[%d] >>> Returning for '%s' cached value %s at %s",
+                "[%d] <<< '%s' returns %s with cached %s",
                 element.nodeId,
                 element.asString || element.type,
-                this.resultToString(element.result),
-                element.result.timeSpan
+                element.result.timeSpan,
+                this.resultToString(element.result)
             );
         } else {
-            this.tracer.Log(
-                "[%d] >>> Computing '%s' at time=%f",
-                element.nodeId,
-                element.asString || element.type,
-                atTime
-            );
-
             // Set to -1 to prevent recursive call of this same node (see check above)
             element.result.serial = -1;
             const visitor = this.COMPUTE_VISITOR[
@@ -221,11 +246,11 @@ export class Runner {
                 element.result.serial = this.self_serial;
 
                 this.tracer.Log(
-                    "[%d] <<< '%s' returns %s with value = %s",
+                    "[%d] <<< '%s' returns %s with computed %s",
                     element.nodeId,
                     element.asString || element.type,
                     result.timeSpan,
-                    this.resultToString(result)
+                    this.resultToString(element.result)
                 );
             } else {
                 this.tracer.Error(
@@ -834,12 +859,12 @@ export class Runner {
         const best = newTimeSpan();
         const currentTimeSpanAfterTime = newTimeSpan();
         for (const [, child] of ipairs(group.child)) {
-            const nodeString = child.asString || `[${child.type}]`;
+            const nodeString = child.asString || child.type;
             this.tracer.Log(
-                "[%d]    group checking child [%d-%s]",
+                "[%d]    checking child '%s' [%d]",
                 group.nodeId,
-                child.nodeId,
-                nodeString
+                nodeString,
+                child.nodeId
             );
             const currentElement = this.Compute(child, atTime);
             const currentElementTimeSpan = currentElement.timeSpan;
@@ -850,20 +875,20 @@ export class Runner {
                 currentTimeSpanAfterTime
             );
             this.tracer.Log(
-                "[%d]    group checking child [%d-%s] result: %s",
+                "[%d]    child '%s' [%d]: %s",
                 group.nodeId,
-                child.nodeId,
                 nodeString,
+                child.nodeId,
                 currentTimeSpanAfterTime
             );
             if (currentTimeSpanAfterTime.Measure() > 0) {
                 let currentIsBetter = false;
                 if (best.Measure() == 0 || bestElement === undefined) {
                     this.tracer.Log(
-                        "[%d]    group first best is [%d-%s]: %s",
+                        "[%d]    group first best is '%s' [%d]: %s",
                         group.nodeId,
-                        child.nodeId,
                         nodeString,
+                        child.nodeId,
                         currentTimeSpanAfterTime
                     );
                     currentIsBetter = true;
@@ -883,16 +908,16 @@ export class Runner {
                             currentElement.actionUsable)
                     ) {
                         this.tracer.Log(
-                            "[%d]    group new best is [%d-%s]: %s",
+                            "[%d]    group new best is '%s' [%d]: %s",
                             group.nodeId,
-                            child.nodeId,
                             nodeString,
+                            child.nodeId,
                             currentElementTimeSpan
                         );
                         currentIsBetter = true;
                     } else {
                         this.tracer.Log(
-                            "[%d] group best is still %s: %s",
+                            "[%d]    group best is still %s: %s",
                             group.nodeId,
                             this.resultToString(group.result),
                             best
@@ -906,8 +931,9 @@ export class Runner {
                 }
             } else {
                 this.tracer.Log(
-                    "[%d]   child [%d] measure is 0, skipping",
+                    "[%d]    child '%s' [%d] has zero measure, skipping",
                     group.nodeId,
+                    nodeString,
                     child.nodeId
                 );
             }
