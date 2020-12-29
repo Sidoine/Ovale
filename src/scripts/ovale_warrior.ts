@@ -25,10 +25,10 @@ AddFunction armsinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(pummel) and target.isinterruptible() spell(pummel)
-  if target.distance(less 10) and not target.classification(worldboss) spell(shockwave)
+  if target.distance() < 10 and not target.classification(worldboss) spell(shockwave)
   if target.inrange(storm_bolt) and not target.classification(worldboss) spell(storm_bolt)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(intimidating_shout) and not target.classification(worldboss) spell(intimidating_shout)
  }
 }
@@ -521,10 +521,10 @@ AddFunction furyinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(pummel) and target.isinterruptible() spell(pummel)
-  if target.distance(less 10) and not target.classification(worldboss) spell(shockwave)
+  if target.distance() < 10 and not target.classification(worldboss) spell(shockwave)
   if target.inrange(storm_bolt) and not target.classification(worldboss) spell(storm_bolt)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(intimidating_shout) and not target.classification(worldboss) spell(intimidating_shout)
  }
 }
@@ -894,10 +894,10 @@ AddFunction protectioninterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(pummel) and target.isinterruptible() spell(pummel)
-  if target.distance(less 10) and not target.classification(worldboss) spell(shockwave)
+  if target.distance() < 10 and not target.classification(worldboss) spell(shockwave)
   if target.inrange(storm_bolt) and not target.classification(worldboss) spell(storm_bolt)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(intimidating_shout) and not target.classification(worldboss) spell(intimidating_shout)
  }
 }

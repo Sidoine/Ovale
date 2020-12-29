@@ -379,7 +379,7 @@ AddFunction shadowinterruptactions
   if target.inrange(silence) and target.isinterruptible() spell(silence)
   if target.inrange(mind_bomb) and not target.classification(worldboss) and target.remainingcasttime() > 2 spell(mind_bomb)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 
@@ -966,7 +966,7 @@ AddFunction shadowinterruptactions
   if target.inrange(silence) and target.isinterruptible() spell(silence)
   if target.inrange(mind_bomb) and not target.classification(worldboss) and target.remainingcasttime() > 2 spell(mind_bomb)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 

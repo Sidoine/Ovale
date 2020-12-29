@@ -25,7 +25,7 @@ AddFunction beast_masteryinterruptactions
  {
   if target.inrange(counter_shot) and target.isinterruptible() spell(counter_shot)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 
@@ -527,7 +527,7 @@ AddFunction marksmanshipinterruptactions
  {
   if target.inrange(counter_shot) and target.isinterruptible() spell(counter_shot)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 
@@ -1008,7 +1008,7 @@ AddFunction survivalinterruptactions
  {
   if target.inrange(muzzle) and target.isinterruptible() spell(muzzle)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 

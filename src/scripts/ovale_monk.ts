@@ -26,9 +26,9 @@ AddFunction brewmasterinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(spear_hand_strike) and target.isinterruptible() spell(spear_hand_strike)
-  if target.distance(less 5) and not target.classification(worldboss) spell(leg_sweep)
+  if target.distance() < 5 and not target.classification(worldboss) spell(leg_sweep)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(paralysis) and not target.classification(worldboss) spell(paralysis)
  }
 }
@@ -370,9 +370,9 @@ AddFunction windwalkerinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(spear_hand_strike) and target.isinterruptible() spell(spear_hand_strike)
-  if target.distance(less 5) and not target.classification(worldboss) spell(leg_sweep)
+  if target.distance() < 5 and not target.classification(worldboss) spell(leg_sweep)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(paralysis) and not target.classification(worldboss) spell(paralysis)
  }
 }
@@ -1250,9 +1250,9 @@ AddFunction windwalkerinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(spear_hand_strike) and target.isinterruptible() spell(spear_hand_strike)
-  if target.distance(less 5) and not target.classification(worldboss) spell(leg_sweep)
+  if target.distance() < 5 and not target.classification(worldboss) spell(leg_sweep)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(paralysis) and not target.classification(worldboss) spell(paralysis)
  }
 }

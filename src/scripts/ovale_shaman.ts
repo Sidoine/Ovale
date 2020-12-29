@@ -26,7 +26,7 @@ AddFunction elementalinterruptactions
   if target.inrange(wind_shear) and target.isinterruptible() spell(wind_shear)
   if not target.classification(worldboss) and target.remainingcasttime() > 2 spell(capacitor_totem)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
  }
 }
@@ -610,7 +610,7 @@ AddFunction elementalinterruptactions
   if target.inrange(wind_shear) and target.isinterruptible() spell(wind_shear)
   if not target.classification(worldboss) and target.remainingcasttime() > 2 spell(capacitor_totem)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
  }
 }
@@ -1194,10 +1194,10 @@ AddFunction enhancementinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(wind_shear) and target.isinterruptible() spell(wind_shear)
-  if target.distance(less 5) and not target.classification(worldboss) spell(sundering)
+  if target.distance() < 5 and not target.classification(worldboss) spell(sundering)
   if not target.classification(worldboss) and target.remainingcasttime() > 2 spell(capacitor_totem)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
  }
 }
@@ -1738,10 +1738,10 @@ AddFunction enhancementinterruptactions
  if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
  {
   if target.inrange(wind_shear) and target.isinterruptible() spell(wind_shear)
-  if target.distance(less 5) and not target.classification(worldboss) spell(sundering)
+  if target.distance() < 5 and not target.classification(worldboss) spell(sundering)
   if not target.classification(worldboss) and target.remainingcasttime() > 2 spell(capacitor_totem)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
  }
 }
@@ -2282,7 +2282,7 @@ AddFunction restorationinterruptactions
   if target.inrange(wind_shear) and target.isinterruptible() spell(wind_shear)
   if not target.classification(worldboss) and target.remainingcasttime() > 2 spell(capacitor_totem)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(hex) and not target.classification(worldboss) and target.remainingcasttime() > casttime(hex) + gcdremaining() and target.creaturetype(humanoid beast) spell(hex)
  }
 }

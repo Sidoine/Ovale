@@ -82,8 +82,8 @@ AddFunction balanceinterruptactions
  {
   if target.inrange(solar_beam) and target.isinterruptible() spell(solar_beam)
   if target.inrange(mighty_bash) and not target.classification(worldboss) spell(mighty_bash)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
-  if target.distance(less 15) and not target.classification(worldboss) spell(typhoon)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 15 and not target.classification(worldboss) spell(typhoon)
  }
 }
 
@@ -880,8 +880,8 @@ AddFunction feralinterruptactions
   if target.inrange(skull_bash) and target.isinterruptible() spell(skull_bash)
   if target.inrange(mighty_bash) and not target.classification(worldboss) spell(mighty_bash)
   if target.inrange(maim) and not target.classification(worldboss) spell(maim)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
-  if target.distance(less 15) and not target.classification(worldboss) spell(typhoon)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 15 and not target.classification(worldboss) spell(typhoon)
  }
 }
 
@@ -1587,8 +1587,8 @@ AddFunction feralinterruptactions
   if target.inrange(skull_bash) and target.isinterruptible() spell(skull_bash)
   if target.inrange(mighty_bash) and not target.classification(worldboss) spell(mighty_bash)
   if target.inrange(maim) and not target.classification(worldboss) spell(maim)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
-  if target.distance(less 15) and not target.classification(worldboss) spell(typhoon)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 15 and not target.classification(worldboss) spell(typhoon)
  }
 }
 
@@ -2257,9 +2257,9 @@ AddFunction guardianinterruptactions
  {
   if target.inrange(skull_bash) and target.isinterruptible() spell(skull_bash)
   if target.inrange(mighty_bash) and not target.classification(worldboss) spell(mighty_bash)
-  if target.distance(less 10) and not target.classification(worldboss) spell(incapacitating_roar)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
-  if target.distance(less 15) and not target.classification(worldboss) spell(typhoon)
+  if target.distance() < 10 and not target.classification(worldboss) spell(incapacitating_roar)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 15 and not target.classification(worldboss) spell(typhoon)
  }
 }
 

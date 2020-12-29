@@ -27,8 +27,8 @@ AddFunction protectioninterruptactions
   if target.inrange(rebuke) and target.isinterruptible() spell(rebuke)
   if target.inrange(avengers_shield) and target.isinterruptible() spell(avengers_shield)
   if target.inrange(hammer_of_justice) and not target.classification(worldboss) spell(hammer_of_justice)
-  if target.distance(less 10) and not target.classification(worldboss) spell(blinding_light)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 10 and not target.classification(worldboss) spell(blinding_light)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 
@@ -386,7 +386,7 @@ AddFunction retributioninterruptactions
  {
   if target.inrange(rebuke) and target.isinterruptible() spell(rebuke)
   if target.inrange(hammer_of_justice) and not target.classification(worldboss) spell(hammer_of_justice)
-  if target.distance(less 5) and not target.classification(worldboss) spell(war_stomp)
+  if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
 }
 
