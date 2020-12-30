@@ -290,13 +290,16 @@ export class OvaleIcon {
             } else {
                 this.remains.Hide();
             }
-            if (profile.apparence.raccourcis) {
+            let showShortcut = false;
+            if (profile.apparence.raccourcis && element.actionSlot) {
+                const binding = this.actionBar.getBindings(element.actionSlot);
+                if (binding) {
+                    this.shortcut.SetText(binding);
+                    showShortcut = true;
+                }
+            }
+            if (showShortcut) {
                 this.shortcut.Show();
-                this.shortcut.SetText(
-                    (element.actionSlot !== undefined &&
-                        this.actionBar.getBindings(element.actionSlot)) ||
-                        undefined
-                );
             } else {
                 this.shortcut.Hide();
             }
