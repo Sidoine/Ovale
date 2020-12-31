@@ -4929,7 +4929,13 @@ l    */
                 this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
-                return ReturnConstant(remainingTime);
+                return ReturnValueBetween(
+                    aura.gain,
+                    INFINITY,
+                    tick,
+                    lastTickTime,
+                    -1
+                );
             }
         }
         return ReturnConstant(0);
