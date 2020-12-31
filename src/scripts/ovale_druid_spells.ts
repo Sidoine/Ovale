@@ -510,6 +510,9 @@ Define(first_strike_soulbind 325069)
     // END
     code += `
     SpellRequire(berserk_0 replaced_by set=incarnation_guardian_of_ursoc enabled=(talent(incarnation_guardian_of_ursoc_talent)))
+#bloodtalons
+    SpellAddBuff(ferocious_bite bloodtalons add=-1 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
+    SpellAddBuff(rip bloodtalons add=-1 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
 Define(frenzied_regeneration 22842)
     SpellInfo(frenzied_regeneration duration=3)
     # TODO max_charges not implemented SpellRequire(frenzied_regeneration max_charges set=2 enabled=(specialization(guardian)))
@@ -528,6 +531,17 @@ Define(thrash_bear_debuff 192090)
     SpellInfo(thrash_bear_debuff duration=15 max_stacks=3)
     SpellRequire(pulverize unusable set=1 enabled=(not targetdebuffpresent(thrash_bear_debuff)))
     SpellAddTargetDebuff(pulverize thrash_bear_debuff add=-2)
+
+#snapshots
+    SpellDamageBuff(moonfire_cat tigers_fury set=1.15)
+    SpellDamageBuff(rake berserk_cat set=1.6)
+    SpellDamageBuff(rake incarnation_king_of_the_jungle set=1.6)
+    SpellDamageBuff(rake shadowmeld set=1.6)
+    SpellDamageBuff(rake prowl set=1.6)
+    SpellDamageBuff(rake tigers_fury set=1.15)
+    SpellDamageBuff(rip bloodtalons set=1.3 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
+    SpellDamageBuff(rip tigers_fury set=1.15)
+    SpellDamageBuff(thrash_cat tigers_fury set=1.15)
   
 SpellInfo(starfire inccounter="solar" resetcounter="lunar")
 SpellInfo(wrath inccounter="lunar" resetcounter="solar")
