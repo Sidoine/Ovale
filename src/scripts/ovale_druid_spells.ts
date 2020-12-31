@@ -520,7 +520,7 @@ Define(frenzied_regeneration 22842)
 #incapacitating_roar    
     SpellRequire(incapacitating_roar unusable set=1 enabled=(not stance(druid_bear_form)))
 #prowl
-    SpellRequire(prowl unusable set=1 enabled=(stealthed()))
+    SpellRequire(prowl unusable set=1 enabled=(incombat() or buffpresent(prowl)))
 Define(thrash_bear 77758)
     SpellAddBuff(thrash_bear earthwarden_buff add=1 enabled=(talent(earthwarden_talent)))
     SpellAddTargetDebuff(thrash_bear thrash_bear_debuff add=1)
