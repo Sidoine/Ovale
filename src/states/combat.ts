@@ -142,7 +142,6 @@ export class OvaleCombatClass
 	 @name TimeInCombat
 	 @paramsig number or boolean
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeInCombat() > 5 Spell(bloodlust)
      */
