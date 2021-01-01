@@ -18,6 +18,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     pairs,
     tonumber,
+    tostring,
     wipe,
     lualength,
     LuaObj,
@@ -38,12 +39,18 @@ import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
 import { isNumber, isString } from "../tools/tools";
 import {
+    PositionalParameters,
+    NamedParametersOf,
+    AstFunctionNode,
+} from "../engine/ast";
+import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
     ParseCondition,
     ReturnConstant,
     ReturnValue,
+    ReturnValueBetween,
 } from "../engine/condition";
 import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
@@ -751,9 +758,48 @@ export class OvaleAuraClass
         return ReturnValue(0, aura.ending, 1);
     };
 
-    private ticksGainedOnRefresh: ConditionFunction = () => {
-        // TODO see sc_druid.cpp
-        return ReturnConstant(0);
+    private ticksGainedOnRefresh: ConditionFunction = (
+        positionalParameters: PositionalParameters,
+        namedParameters: NamedParametersOf<AstFunctionNode>,
+        atTime: number
+    ): ConditionResult => {
+        const [target, filter, mine] = ParseCondition(
+            namedParameters,
+            this.baseState
+        );
+        let [auraId, spellId] = unpack(positionalParameters);
+        auraId = tonumber(auraId);
+        if (isNumber(spellId)) {
+            spellId = tonumber(spellId);
+        } else if (isString(spellId)) {
+            spellId = tostring(spellId);
+        } else {
+            spellId = undefined;
+        }
+        const duration = this.GetBaseDuration(
+            auraId,
+            spellId,
+            atTime,
+            this.ovalePaperDoll.next
+        );
+        const tick = this.GetTickLength(auraId, this.ovalePaperDoll.next);
+        const aura = this.GetAura(target, auraId, atTime, filter, mine);
+        if (aura) {
+            const remainingDuration = aura.ending - atTime;
+            const pandemicDuration = 0.3 * (aura.ending - aura.start);
+            let refreshedDuration = pandemicDuration + duration;
+            if (remainingDuration < pandemicDuration) {
+                refreshedDuration = remainingDuration + duration;
+            }
+            return ReturnValueBetween(
+                aura.gain,
+                INFINITY,
+                (refreshedDuration - remainingDuration) / tick,
+                atTime,
+                -1 / tick
+            );
+        }
+        return ReturnConstant(duration / tick);
     };
 
     IsActiveAura(aura: Aura, atTime: number): aura is Aura {
