@@ -159,6 +159,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     addSpellList("berserk", "berserk_cat", "berserk_bear");
 
     fixIdentifier("shiv_debuff", 319504);
+    fixIdentifier("frenzy_pet_buff", 272790);
 
     const customIdentifierById = new Map<
         number,
