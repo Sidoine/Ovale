@@ -440,6 +440,8 @@ Define(lead_by_example_soulbind 342156)
     code += `
 # raise_dead
   SpellInfo(raise_dead totem=1)
+# raise_dead_unholy
+  SpellRequire(raise_dead_unholy unusable set=1 enabled=(pet.present()))
 # sacrificial_pact
   SpellRequire(sacrificial_pact unusable set=1 enabled=((specialization(unholy) and not pet.present()) or (not specialization(unholy) and totemexpires(raise_dead))))
 # summon_gargoyle
