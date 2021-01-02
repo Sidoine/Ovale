@@ -3036,10 +3036,10 @@ export class Emiter {
 
                 // target
                 target = (target && `${target}.`) || "";
-                if (buffName == "dark_transformation_buff" && target == "") {
+                if (buffName == "dark_transformation" && target == "") {
                     target = "pet.";
                 }
-                if (buffName == "pet_beast_cleave_buff" && target == "") {
+                if (buffName == "beast_cleave_buff" && target == "") {
                     target = "pet.";
                 }
                 if (buffName == "pet_frenzy_buff" && target == "") {
