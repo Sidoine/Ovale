@@ -2,6 +2,61 @@ import { test, expect } from "@jest/globals";
 import { huge } from "@wowts/math";
 import { newFromArgs } from "./TimeSpan";
 
+test("HasTime with point to left of interval", () => {
+    // Arrange
+    const timeSpan = newFromArgs(10, 20);
+
+    // Act
+    const bool = timeSpan.HasTime(5);
+
+    // Assert
+    expect(bool).toBe(false);
+});
+
+test("HasTime with point on left endpoint of interval", () => {
+    // Arrange
+    const timeSpan = newFromArgs(10, 20);
+
+    // Act
+    const bool = timeSpan.HasTime(10);
+
+    // Assert
+    expect(bool).toBe(true);
+});
+
+test("HasTime with point inside interval", () => {
+    // Arrange
+    const timeSpan = newFromArgs(10, 20);
+
+    // Act
+    const bool = timeSpan.HasTime(15);
+
+    // Assert
+    expect(bool).toBe(true);
+});
+
+test("HasTime with point on right endpoint of interval", () => {
+    // Arrange
+    const timeSpan = newFromArgs(10, 20);
+
+    // Act
+    const bool = timeSpan.HasTime(20);
+
+    // Assert
+    expect(bool).toBe(false);
+});
+
+test("HasTime with point to right of interval", () => {
+    // Arrange
+    const timeSpan = newFromArgs(10, 20);
+
+    // Act
+    const bool = timeSpan.HasTime(25);
+
+    // Assert
+    expect(bool).toBe(false);
+});
+
 test("intersectInterval with one interval which is within the first", () => {
     // Arrange
     const timeSpan = newFromArgs(0, 10);
