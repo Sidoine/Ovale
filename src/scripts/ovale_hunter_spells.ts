@@ -159,9 +159,11 @@ Define(flayers_mark 324156)
 Define(freezing_trap 187650)
 # Hurls a frost trap to the target location that incapacitates the first enemy that approaches for 60 seconds. Damage will break the effect. Limit 1. Trap will exist for 60 seconds.
   SpellInfo(freezing_trap cd=30)
-Define(frenzy 138895)
-# Haste increased by s1 for 10 seconds.
-  SpellInfo(frenzy duration=10 max_stacks=5 gcd=0 offgcd=1)
+Define(frenzy_pet_buff 272790)
+# Fire a shot that tears through your enemy, causing them to bleed for s1*s2 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
+  SpellInfo(frenzy_pet_buff duration=8 max_stacks=3 gcd=0 offgcd=1)
+  # Attack speed increased by s1.
+  SpellAddBuff(frenzy_pet_buff frenzy_pet_buff add=1)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
   SpellInfo(harpoon cd=1 charge_cd=30 duration=3 gcd=0 offgcd=1)

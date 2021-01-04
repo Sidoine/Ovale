@@ -45,7 +45,7 @@ AddFunction beast_masterysummonpet
 AddFunction beast_masterystmainactions
 {
  #barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd
- if pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() spell(barbed_shot)
+ if pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() spell(barbed_shot)
  #flare,if=tar_trap.up&runeforge.soulforge_embers
  if buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) spell(flare)
  #kill_shot,if=buff.flayers_mark.remains<5|target.health.pct<=20
@@ -70,7 +70,7 @@ AddFunction beast_masterystmainpostconditions
 
 AddFunction beast_masterystshortcdactions
 {
- unless pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot)
+ unless pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot)
  {
   #tar_trap,if=runeforge.soulforge_embers&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() spell(tar_trap)
@@ -113,7 +113,7 @@ AddFunction beast_masterystshortcdactions
 
 AddFunction beast_masterystshortcdpostconditions
 {
- pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { buffremaining(flayers_mark) < 5 or target.healthpercent() <= 20 } and spell(kill_shot) or { spellcooldown(bestial_wrath) < 12 * charges(barbed_shot count=0) + gcd() and hastalent(scent_of_blood_talent_beast_mastery) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or target.timetodie() < 9 } and spell(barbed_shot) or spell(chimaera_shot) or pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { focus() - powercost(cobra_shot) + focusregenrate() * { spellcooldown(kill_command) - 1 } > powercost(kill_command) or spellcooldown(kill_command) > 1 + gcd() or { buffpresent(bestial_wrath) or buffpresent(nesingwarys_trapping_apparatus) } and not runeforge(qapla_eredun_war_order_runeforge) or target.timetodie() < 3 } and spell(cobra_shot) or buffpresent(wild_spirits) and spell(barbed_shot)
+ pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { buffremaining(flayers_mark) < 5 or target.healthpercent() <= 20 } and spell(kill_shot) or { spellcooldown(bestial_wrath) < 12 * charges(barbed_shot count=0) + gcd() and hastalent(scent_of_blood_talent_beast_mastery) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or target.timetodie() < 9 } and spell(barbed_shot) or spell(chimaera_shot) or pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or spell(dire_beast) or { focus() - powercost(cobra_shot) + focusregenrate() * { spellcooldown(kill_command) - 1 } > powercost(kill_command) or spellcooldown(kill_command) > 1 + gcd() or { buffpresent(bestial_wrath) or buffpresent(nesingwarys_trapping_apparatus) } and not runeforge(qapla_eredun_war_order_runeforge) or target.timetodie() < 3 } and spell(cobra_shot) or buffpresent(wild_spirits) and spell(barbed_shot)
 }
 
 AddFunction beast_masterystcdactions
@@ -121,7 +121,7 @@ AddFunction beast_masterystcdactions
  #aspect_of_the_wild
  spell(aspect_of_the_wild)
 
- unless pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(bloodshed)
+ unless pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(bloodshed)
  {
   #wild_spirits
   spell(wild_spirits)
@@ -142,7 +142,7 @@ AddFunction beast_masterystcdactions
 
 AddFunction beast_masterystcdpostconditions
 {
- pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(bloodshed) or spell(flayed_shot) or { buffremaining(flayers_mark) < 5 or target.healthpercent() <= 20 } and spell(kill_shot) or { spellcooldown(bestial_wrath) < 12 * charges(barbed_shot count=0) + gcd() and hastalent(scent_of_blood_talent_beast_mastery) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or target.timetodie() < 9 } and spell(barbed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or spell(a_murder_of_crows) or { buffpresent(bestial_wrath) or target.timetodie() < 10 } and spell(resonating_arrow) or { spellcooldown(wild_spirits) > 15 or not iscovenant("night_fae") or target.timetodie() < 15 } and spell(bestial_wrath) or spell(chimaera_shot) or pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or { buffexpires(bestial_wrath) or target.timetodie() < 5 } and spell(bag_of_tricks) or spell(dire_beast) or { focus() - powercost(cobra_shot) + focusregenrate() * { spellcooldown(kill_command) - 1 } > powercost(kill_command) or spellcooldown(kill_command) > 1 + gcd() or { buffpresent(bestial_wrath) or buffpresent(nesingwarys_trapping_apparatus) } and not runeforge(qapla_eredun_war_order_runeforge) or target.timetodie() < 3 } and spell(cobra_shot) or buffpresent(wild_spirits) and spell(barbed_shot) or { runeforge(soulforge_embers_runeforge) or runeforge(nessingwarys_trapping_apparatus_runeforge) } and spell(tar_trap) or runeforge(nessingwarys_trapping_apparatus_runeforge) and spell(freezing_trap)
+ pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(bloodshed) or spell(flayed_shot) or { buffremaining(flayers_mark) < 5 or target.healthpercent() <= 20 } and spell(kill_shot) or { spellcooldown(bestial_wrath) < 12 * charges(barbed_shot count=0) + gcd() and hastalent(scent_of_blood_talent_beast_mastery) or spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or target.timetodie() < 9 } and spell(barbed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or spell(a_murder_of_crows) or { buffpresent(bestial_wrath) or target.timetodie() < 10 } and spell(resonating_arrow) or { spellcooldown(wild_spirits) > 15 or not iscovenant("night_fae") or target.timetodie() < 15 } and spell(bestial_wrath) or spell(chimaera_shot) or pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() and spell(kill_command) or { buffexpires(bestial_wrath) or target.timetodie() < 5 } and spell(bag_of_tricks) or spell(dire_beast) or { focus() - powercost(cobra_shot) + focusregenrate() * { spellcooldown(kill_command) - 1 } > powercost(kill_command) or spellcooldown(kill_command) > 1 + gcd() or { buffpresent(bestial_wrath) or buffpresent(nesingwarys_trapping_apparatus) } and not runeforge(qapla_eredun_war_order_runeforge) or target.timetodie() < 3 } and spell(cobra_shot) or buffpresent(wild_spirits) and spell(barbed_shot) or { runeforge(soulforge_embers_runeforge) or runeforge(nessingwarys_trapping_apparatus_runeforge) } and spell(tar_trap) or runeforge(nessingwarys_trapping_apparatus_runeforge) and spell(freezing_trap)
 }
 
 ### actions.precombat
@@ -187,7 +187,7 @@ AddFunction beast_masteryprecombatcdpostconditions
 AddFunction beast_masterycleavemainactions
 {
  #barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd
- if pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() spell(barbed_shot)
+ if pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() spell(barbed_shot)
  #multishot,if=gcd-pet.main.buff.beast_cleave.remains>0.25
  if gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 spell(multishot)
  #flare,if=tar_trap.up&runeforge.soulforge_embers
@@ -199,7 +199,7 @@ AddFunction beast_masterycleavemainactions
  #chimaera_shot
  spell(chimaera_shot)
  #barrage,if=pet.main.buff.frenzy.remains>execute_time
- if pet.buffremaining(frenzy) > executetime(barrage) spell(barrage)
+ if pet.buffremaining(frenzy_pet_buff) > executetime(barrage) spell(barrage)
  #kill_command,if=focus>cost+action.multishot.cost
  if focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } spell(kill_command)
  #dire_beast
@@ -216,7 +216,7 @@ AddFunction beast_masterycleavemainpostconditions
 
 AddFunction beast_masterycleaveshortcdactions
 {
- unless pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot)
+ unless pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot)
  {
   #tar_trap,if=runeforge.soulforge_embers&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() spell(tar_trap)
@@ -242,7 +242,7 @@ AddFunction beast_masterycleaveshortcdactions
      #a_murder_of_crows
      spell(a_murder_of_crows)
 
-     unless pet.buffremaining(frenzy) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command)
+     unless pet.buffremaining(frenzy_pet_buff) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command)
      {
       #bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
       if buffexpires(bestial_wrath) or target.timetodie() < 5 spell(bag_of_tricks)
@@ -263,7 +263,7 @@ AddFunction beast_masterycleaveshortcdactions
 
 AddFunction beast_masterycleaveshortcdpostconditions
 {
- pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or spellcooldown(bestial_wrath) < 12 + gcd() and hastalent(scent_of_blood_talent_beast_mastery) } and spell(barbed_shot) or spell(kill_shot) or spell(chimaera_shot) or pet.buffremaining(frenzy) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command) or spell(dire_beast) or target.timetodie() < 9 and spell(barbed_shot) or timetomaxfocus() < gcd() * 2 and spell(cobra_shot)
+ pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or spellcooldown(bestial_wrath) < 12 + gcd() and hastalent(scent_of_blood_talent_beast_mastery) } and spell(barbed_shot) or spell(kill_shot) or spell(chimaera_shot) or pet.buffremaining(frenzy_pet_buff) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command) or spell(dire_beast) or target.timetodie() < 9 and spell(barbed_shot) or timetomaxfocus() < gcd() * 2 and spell(cobra_shot)
 }
 
 AddFunction beast_masterycleavecdactions
@@ -271,7 +271,7 @@ AddFunction beast_masterycleavecdactions
  #aspect_of_the_wild
  spell(aspect_of_the_wild)
 
- unless pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram)
+ unless pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram)
  {
   #wild_spirits
   spell(wild_spirits)
@@ -286,7 +286,7 @@ AddFunction beast_masterycleavecdactions
 
 AddFunction beast_masterycleavecdpostconditions
 {
- pet.buffpresent(frenzy) and pet.buffremaining(frenzy) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or { spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or spellcooldown(bestial_wrath) < 12 + gcd() and hastalent(scent_of_blood_talent_beast_mastery) } and spell(barbed_shot) or spell(bestial_wrath) or spell(resonating_arrow) or spell(flayed_shot) or spell(kill_shot) or spell(chimaera_shot) or spell(bloodshed) or spell(a_murder_of_crows) or pet.buffremaining(frenzy) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command) or { buffexpires(bestial_wrath) or target.timetodie() < 5 } and spell(bag_of_tricks) or spell(dire_beast) or target.timetodie() < 9 and spell(barbed_shot) or timetomaxfocus() < gcd() * 2 and spell(cobra_shot) or { runeforge(soulforge_embers_runeforge) or runeforge(nessingwarys_trapping_apparatus_runeforge) } and spell(tar_trap) or runeforge(nessingwarys_trapping_apparatus_runeforge) and spell(freezing_trap)
+ pet.buffpresent(frenzy_pet_buff) and pet.buffremaining(frenzy_pet_buff) <= gcd() and spell(barbed_shot) or gcd() - pet.buffremaining(beast_cleave_buff) > 0.25 and spell(multishot) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or { spellfullrecharge(barbed_shot) < gcd() and spellcooldown(bestial_wrath) > 0 or spellcooldown(bestial_wrath) < 12 + gcd() and hastalent(scent_of_blood_talent_beast_mastery) } and spell(barbed_shot) or spell(bestial_wrath) or spell(resonating_arrow) or spell(flayed_shot) or spell(kill_shot) or spell(chimaera_shot) or spell(bloodshed) or spell(a_murder_of_crows) or pet.buffremaining(frenzy_pet_buff) > executetime(barrage) and spell(barrage) or focus() > powercost(kill_command) + powercost(multishot) and { pet.present() and not pet.isincapacitated() and not pet.isfeared() and not pet.isstunned() } and spell(kill_command) or { buffexpires(bestial_wrath) or target.timetodie() < 5 } and spell(bag_of_tricks) or spell(dire_beast) or target.timetodie() < 9 and spell(barbed_shot) or timetomaxfocus() < gcd() * 2 and spell(cobra_shot) or { runeforge(soulforge_embers_runeforge) or runeforge(nessingwarys_trapping_apparatus_runeforge) } and spell(tar_trap) or runeforge(nessingwarys_trapping_apparatus_runeforge) and spell(freezing_trap)
 }
 
 ### actions.cds
@@ -472,7 +472,7 @@ AddIcon enabled=(checkboxon(opt_hunter_beast_mastery_aoe) and specialization(bea
 # flayed_shot
 # flayers_mark
 # freezing_trap
-# frenzy
+# frenzy_pet_buff
 # kill_command
 # kill_shot
 # killer_instinct_talent

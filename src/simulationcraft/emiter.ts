@@ -388,6 +388,7 @@ export class Emiter {
             "dark_transformation",
             "DEATHKNIGHT"
         );
+        this.AddDisambiguation("frenzy", "frenzy_pet_buff", "HUNTER");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -664,7 +665,7 @@ export class Emiter {
         } else if (modifier == "five_stacks" && action == "focus_fire") {
             const value = tonumber(this.unparser.Unparse(parseNode));
             if (value == 1) {
-                const buffName = "pet_frenzy_buff";
+                const buffName = "frenzy_pet_buff";
                 this.AddSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= 5", buffName);
             }
@@ -705,7 +706,7 @@ export class Emiter {
         } else if (modifier == "min_frenzy" && action == "focus_fire") {
             const value = tonumber(this.unparser.Unparse(parseNode));
             if (value) {
-                const buffName = "pet_frenzy_buff";
+                const buffName = "frenzy_pet_buff";
                 this.AddSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= %d", buffName, value);
             }
@@ -3036,13 +3037,13 @@ export class Emiter {
 
                 // target
                 target = (target && `${target}.`) || "";
-                if (buffName == "dark_transformation_buff" && target == "") {
+                if (buffName == "dark_transformation" && target == "") {
                     target = "pet.";
                 }
-                if (buffName == "pet_beast_cleave_buff" && target == "") {
+                if (buffName == "beast_cleave_buff" && target == "") {
                     target = "pet.";
                 }
-                if (buffName == "pet_frenzy_buff" && target == "") {
+                if (buffName == "frenzy_pet_buff" && target == "") {
                     target = "pet.";
                 }
 

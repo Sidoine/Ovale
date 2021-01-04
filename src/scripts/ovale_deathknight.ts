@@ -1365,7 +1365,7 @@ AddFunction unholyprecombatcdpostconditions
 AddFunction unholygeneric_aoemainactions
 {
  #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
+ if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
  #epidemic,if=buff.sudden_doom.react
  if buffpresent(sudden_doom_buff) spell(epidemic)
  #epidemic,if=!variable.pooling_for_gargoyle
@@ -1388,7 +1388,7 @@ AddFunction unholygeneric_aoeshortcdactions
 
 AddFunction unholygeneric_aoeshortcdpostconditions
 {
- buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound) or target.debuffstacks(festering_wound) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound) < 1 and spell(festering_strike)
+ pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound) or target.debuffstacks(festering_wound) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound) < 1 and spell(festering_strike)
 }
 
 AddFunction unholygeneric_aoecdactions
@@ -1397,7 +1397,7 @@ AddFunction unholygeneric_aoecdactions
 
 AddFunction unholygeneric_aoecdpostconditions
 {
- buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound) or target.debuffstacks(festering_wound) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound) < 1 and spell(festering_strike)
+ pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound) or target.debuffstacks(festering_wound) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound) < 1 and spell(festering_strike)
 }
 
 ### actions.generic
@@ -1512,9 +1512,9 @@ AddFunction unholycooldownsmainpostconditions
 AddFunction unholycooldownsshortcdactions
 {
  #unholy_blight,if=variable.st_planning&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)&(!runeforge.deadliest_coil|!talent.army_of_the_damned|conduit.convocation_of_the_dead.rank<5)
- if st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } spell(unholy_blight)
+ if st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } spell(unholy_blight)
  #unholy_blight,if=variable.st_planning&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)&runeforge.deadliest_coil&talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5&cooldown.apocalypse.remains<3&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
- if st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } spell(unholy_blight)
+ if st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } spell(unholy_blight)
  #unholy_blight,if=active_enemies>=2
  if enemies() >= 2 spell(unholy_blight)
  #dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight)
@@ -1530,7 +1530,7 @@ AddFunction unholycooldownsshortcdactions
  #apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
  if enemies() >= 2 and target.debuffstacks(festering_wound) >= 4 and not buffpresent(death_and_decay) spell(apocalypse)
  #unholy_assault,if=variable.st_planning&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead&buff.dark_transformation.up&!pet.army_ghoul.active)
- if st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } spell(unholy_assault)
+ if st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } spell(unholy_assault)
  #unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
  if enemies() >= 2 and target.debuffstacks(festering_wound) < 2 spell(unholy_assault)
 
@@ -1563,22 +1563,22 @@ AddFunction unholycooldownscdactions
  #army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.dark_transformation.remains<3&talent.unholy_blight|!talent.unholy_blight
  if spellcooldown(unholy_blight) < 3 and spellcooldown(dark_transformation) < 3 and hastalent(unholy_blight_talent) or not hastalent(unholy_blight_talent) spell(army_of_the_dead)
 
- unless st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } and spell(unholy_blight) or enemies() >= 2 and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or enemies() >= 2 and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse)
+ unless st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or enemies() >= 2 and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or enemies() >= 2 and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse)
  {
   #summon_gargoyle,if=runic_power.deficit<14&(cooldown.unholy_blight.remains<10|dot.unholy_blight_dot.remains)
   if runicpowerdeficit() < 14 and { spellcooldown(unholy_blight) < 10 or target.debuffremaining(unholy_blight) } spell(summon_gargoyle)
 
-  unless st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
+  unless st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
   {
    #sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready
-   if enemies() >= 2 and not buffpresent(dark_transformation) and not spellcooldown(dark_transformation) <= 0 spell(sacrificial_pact)
+   if enemies() >= 2 and not pet.buffpresent(dark_transformation) and not spellcooldown(dark_transformation) <= 0 spell(sacrificial_pact)
   }
  }
 }
 
 AddFunction unholycooldownscdpostconditions
 {
- st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or buffpresent(dark_transformation) } and spell(unholy_blight) or enemies() >= 2 and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or enemies() >= 2 and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse) or st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
+ st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and { spellcooldown(army_of_the_dead) > 5 or checkboxon("disable_aotd") } and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or enemies() >= 2 and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or enemies() >= 2 and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse) or st_planning() and target.debuffstacks(festering_wound) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
 }
 
 ### actions.aoe_setup
@@ -1586,7 +1586,7 @@ AddFunction unholycooldownscdpostconditions
 AddFunction unholyaoe_setupmainactions
 {
  #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
+ if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
  #epidemic,if=!variable.pooling_for_gargoyle
  if not pooling_for_gargoyle() spell(epidemic)
  #festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3
@@ -1611,7 +1611,7 @@ AddFunction unholyaoe_setupshortcdactions
 
 AddFunction unholyaoe_setupshortcdpostconditions
 {
- buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
+ pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
 }
 
 AddFunction unholyaoe_setupcdactions
@@ -1620,7 +1620,7 @@ AddFunction unholyaoe_setupcdactions
 
 AddFunction unholyaoe_setupcdpostconditions
 {
- { buffcountonany == enemies() or never(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
+ { buffcountonany == enemies() or never(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
 }
 
 ### actions.aoe_burst
@@ -1628,7 +1628,7 @@ AddFunction unholyaoe_setupcdpostconditions
 AddFunction unholyaoe_burstmainactions
 {
  #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
+ if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
  #epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle|buff.swarming_mist.up
  if runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) spell(epidemic)
  #epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle
@@ -1651,7 +1651,7 @@ AddFunction unholyaoe_burstshortcdactions
 
 AddFunction unholyaoe_burstshortcdpostconditions
 {
- buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 AddFunction unholyaoe_burstcdactions
@@ -1660,7 +1660,7 @@ AddFunction unholyaoe_burstcdactions
 
 AddFunction unholyaoe_burstcdpostconditions
 {
- buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
 }
 
 ### actions.default
