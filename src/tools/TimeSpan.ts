@@ -144,7 +144,7 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
     HasTime(atTime: number) {
         const A = this;
         for (let i = 1; i <= lualength(A); i += 2) {
-            if (A[i] <= atTime && atTime <= A[i + 1]) {
+            if (A[i] <= atTime && atTime < A[i + 1]) {
                 return true;
             }
         }
