@@ -519,6 +519,8 @@ Define(frenzied_regeneration 22842)
     SpellRequire(frenzied_regeneration charge_cd set=30 enabled=(specialization(guardian)))
     SpellRequire(frenzied_regeneration cd set=30 enabled=(not specialization(guardian)))
     SpellAddBuff(frenzied_regeneration frenzied_regeneration add=1)
+#moonfire_cat
+    SpellRequire(moonfire_cat unusable set=1 enabled=(not hastalent(lunar_inspiration_talent)))
 #prowl
     SpellRequire(prowl unusable set=1 enabled=(incombat() or buffpresent(prowl)))
 Define(thrash_bear 77758)
