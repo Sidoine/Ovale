@@ -287,6 +287,10 @@ Define(arcane_torrent 202719)
     SpellRequire(death_sweep fury add=-20 enabled=(hastalent(first_blood_talent)))
 Define(frailty_debuff 247456)
     SpellInfo(frailty_debuff duration=20)
+#infernal_strike
+    SpellRequire(infernal_strike unusable set=1 enabled=(isrooted()))
+#metamorphosis
+    SpellRequire(metamorphosis unusable set=1 enabled=(isrooted()))
 #spirit_bomb
     SpellRequire(spirit_bomb unusable set=1 enabled=(soulfragments() == 0))
 	SpellAddTargetDebuff(spirit_bomb frailty_debuff add=1)
