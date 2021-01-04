@@ -147,7 +147,6 @@ export class OvaleStaggerClass implements StateModule {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of damage.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
      */
@@ -230,7 +229,6 @@ export class OvaleStaggerClass implements StateModule {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return Stagger tick damage.
-	 @return A boolean value for the result of the comparison.
 	 @usage
      if StaggerTick() > 1000 Spell(purifying_brew) #return current tick of stagger
      or 

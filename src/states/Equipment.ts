@@ -581,7 +581,6 @@ export class OvaleEquipmentClass {
 	 @paramsig number or boolean
 	 @param id The item ID or the equipped slot name.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if not ItemCooldown(ancient_petrified_seed) > 0
 	     Spell(berserk_cat)

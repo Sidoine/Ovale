@@ -188,7 +188,6 @@ export class OvaleConditions {
 	    Valid names: T11, T12, T13, T14, T15.
 	    Valid names for hybrid classes: append _caster, _heal, _melee, _tank.
 	@return The number of pieces of the named set that are equipped by the player.
-	@return A boolean value for the result of the comparison.
 	@usage
 	if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 	    Spell(ferocious_bite) */
@@ -246,7 +245,6 @@ export class OvaleConditions {
 	@paramsig number or boolean
 	@param id The aura spell ID.
 	@return The base duration in seconds.
-	@return A boolean value for the result of the comparison.
 	@see BuffDuration
 	@usage
 	if BaseDuration(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
@@ -344,7 +342,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of combo points.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffComboPoints
 	 @usage
 	 if target.DebuffComboPoints(rip) <5 Spell(rip) */
@@ -383,7 +380,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffCooldown
 	 @usage
 	 if BuffCooldown(trinket_stat_agility_buff) > 45
@@ -421,7 +417,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id the spell list ID	
 	 @return The number of buffs
-	 @return A boolean value for the result of the comparison
 	 */
     private BuffCount = (
         positionalParams: LuaArray<any>,
@@ -455,7 +450,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffCooldown
 	 @usage
 	 if target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff)
@@ -499,7 +493,6 @@ export class OvaleConditions {
 	     Defaults to count=1.
 	     Valid values: 0, 1.
 	 @return The total aura count.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffCountOnAny
      */
     private BuffCountOnAny = (
@@ -557,7 +550,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current direction.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffDirection
      */
     private BuffDirection = (
@@ -597,7 +589,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The total duration of the aura.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffDuration
      */
     private BuffDuration = (
@@ -750,7 +741,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffGain */
     private BuffGain = (
         positionalParams: LuaArray<any>,
@@ -795,7 +785,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The persistent multiplier.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffPersistentMultiplier
 	 @usage
 	 if target.DebuffPersistentMultiplier(rake) < 1 Spell(rake)
@@ -841,7 +830,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds remaining on the aura.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffRemaining
 	 @usage
 	 if BuffRemaining(slice_and_dice) <2
@@ -884,7 +872,6 @@ export class OvaleConditions {
 	     Defaults to excludeTarget=0.
 	     Valid values: 0, 1.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffRemainingOnAny
      */
     private BuffRemainingOnAny = (
@@ -925,7 +912,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of stacks of the aura.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffStacks
 	 @usage
 	 if BuffStacks(pet_frenzy any=1) ==5
@@ -985,7 +971,6 @@ export class OvaleConditions {
 	     Defaults to excludeTarget=0.
 	     Valid values: 0, 1.
 	 @return The total number of stacks.
-	 @return A boolean value for the result of the comparison.
 	 @see DebuffStacksOnAny
      */
     private BuffStacksOnAny = (
@@ -1076,7 +1061,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see ExecuteTime
 	 @usage
 	 if target.DebuffRemaining(flame_shock) < CastTime(lava_burst)
@@ -1097,7 +1081,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see CastTime
 	 @usage
 	 if target.DebuffRemaining(flame_shock) < ExecuteTime(lava_burst)
@@ -1340,7 +1323,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The name of the counter. It should match one that's defined by inccounter=xxx in SpellInfo(...).
 	 @return The current value the counter.
-	 @return A boolean value for the result of the comparison.
      */
     private Counter = (
         positionalParams: LuaArray<any>,
@@ -1420,7 +1402,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The estimated critical strike damage of the given spell.
-	 @return A boolean value for the result of the comparison.
 	 @see Damage
      */
     private CritDamage = (
@@ -1475,7 +1456,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The estimated damage of the given spell on the target.
-	 @return A boolean value for the result of the comparison.
 	 @see CritDamage, LastDamage, LastEstimatedDamage
 	 @usage
 	 if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
@@ -1505,7 +1485,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
 	 @return The amount of damage taken in the previous interval.
-	 @return A boolean value for the result of the comparison.
 	 @see IncomingDamage
 	 @usage
 	 if DamageTaken(5) > 50000 Spell(death_strike)
@@ -1529,7 +1508,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
 	 @return The amount of magic damage taken in the previous interval.
-	 @return A boolean value for the result of the comparison.
 	 @see IncomingMagicDamage
 	 @usage
 	 if MagicDamageTaken(1.5) > 0 Spell(antimagic_shell)
@@ -1555,7 +1533,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param interval The number of seconds before now.
 	 @return The amount of physical damage taken in the previous interval.
-	 @return A boolean value for the result of the comparison.
 	 @see IncomingPhysicalDamage
 	 @usage
 	 if PhysicalDamageTaken(1.5) > 0 Spell(shield_block)
@@ -1604,7 +1581,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private DiseasesRemaining = (
         positionalParams: LuaArray<any>,
@@ -1697,7 +1673,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The distance to the target.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if target.Distance() < 25
 	     Texture(ability_rogue_sprint)
@@ -1720,7 +1695,6 @@ export class OvaleConditions {
 	     Defaults to tagged=0.
 	     Valid values: 0, 1.
 	 @return The number of enemies.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Enemies() > 4 Spell(fan_of_knives)
      */
@@ -1752,7 +1726,6 @@ export class OvaleConditions {
 	 @name EnergyRegenRate
 	 @paramsig number or boolean
 	 @return The current rate of energy regeneration.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if EnergyRegenRage() >11 Spell(stance_of_the_sturdy_ox)
      */
@@ -1776,7 +1749,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see IsEnraged
 	 @usage
 	 if EnrageRemaining() < 3 Spell(berserker_rage)
@@ -1838,7 +1810,6 @@ export class OvaleConditions {
 	 @name FocusRegenRate
 	 @paramsig number or boolean
 	 @return The current rate of focus regeneration.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if FocusRegenRate() > 20 Spell(arcane_shot)
      */
@@ -1860,7 +1831,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The amount of focus.
-	 @return A boolean value for the result of the comparison.
      */
     private FocusCastingRegen = (
         positionalParams: LuaArray<any>,
@@ -1901,7 +1871,6 @@ export class OvaleConditions {
 	 @name GCD
 	 @paramsig number or boolean
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if GCD() < 1.1 Spell(frostfire_bolt)
      */
@@ -1921,7 +1890,6 @@ export class OvaleConditions {
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 unless SpellCooldown(seraphim) < GCDRemaining() Spell(judgment)
      */
@@ -1982,7 +1950,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current health.
-	 @return A boolean value for the result of the comparison.
 	 @see Life
 	 @usage
 	 if Health() < 10000 Spell(last_stand)
@@ -2010,7 +1977,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current health including absorbs.
-	 @return A boolean value for the result of the comparison.
 	 @see Life
 	 @usage
 	 if EffectiveHealth() < 10000 Spell(last_stand)
@@ -2039,7 +2005,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current missing health.
-	 @return A boolean value for the result of the comparison.
 	 @see LifeMissing
 	 @usage
 	 if HealthMissing() < 20000 Item(healthstone)
@@ -2069,7 +2034,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current health percent.
-	 @return A boolean value for the result of the comparison.
 	 @see LifePercent
 	 @usage
 	 if HealthPercent() < 20 Spell(last_stand)
@@ -2100,7 +2064,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current health percent including absorbs.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if EffectiveHealthPercent() < 20 Spell(last_stand)
 	 if target.EffectiveHealthPercent() < 25 Spell(kill_shot)
@@ -2131,7 +2094,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum health.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if target.MaxHealth() > 10000000 Item(mogu_power_potion)
      */
@@ -2152,7 +2114,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see DeadIn
 	 @usage
 	 if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
@@ -2176,7 +2137,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TimeToDie
 	 @usage
 	 if target.TimeToHealthPercent(25) <15 Item(virmens_bite_potion)
@@ -2454,7 +2414,6 @@ export class OvaleConditions {
 	 @name ItemCharges
 	 @paramsig number or boolean
 	 @return The number of charges.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if ItemCount(mana_gem) ==0 or ItemCharges(mana_gem) <3
 	     Spell(conjure_mana_gem)
@@ -2474,7 +2433,6 @@ export class OvaleConditions {
 	 @name ItemCount
 	 @paramsig number or boolean
 	 @return The count of the item.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if ItemCount(mana_gem) == 0 Spell(conjure_mana_gem)
      */
@@ -2494,7 +2452,6 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The damage done.
-	 @return A boolean value for the result of the comparison.
 	 @see Damage, LastEstimatedDamage
 	 @usage
 	 if LastDamage(ignite) > 10000 Spell(combustion)
@@ -2519,7 +2476,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The level of the target.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Level() >= 34 Spell(tiger_palm)
      */
@@ -2603,7 +2559,6 @@ export class OvaleConditions {
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The persistent multiplier.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff)
 	     Spell(rake)
@@ -2798,7 +2753,6 @@ export class OvaleConditions {
 	 @name AlternatePower
 	 @paramsig number or boolean
 	 @return The current alternate power.
-	 @return A boolean value for the result of the comparison.
      */
     private AlternatePower = (
         positionalParams: LuaArray<any>,
@@ -2811,7 +2765,6 @@ export class OvaleConditions {
 	 @name AstralPower
 	 @paramsig number or boolean
 	 @return The current runic power.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if AstraPower() > 70 Spell(frost_strike)
      */
@@ -2827,7 +2780,6 @@ export class OvaleConditions {
 	 @name Chi
 	 @paramsig number or boolean
 	 @return The amount of stored Chi.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Chi() == 4 Spell(chi_burst)
      */
@@ -2842,7 +2794,6 @@ export class OvaleConditions {
      @name ComboPoints
      @paramsig number or boolean
      @return The number of combo points.
-     @return A boolean value for the result of the comparison.
      @usage
      if ComboPoints() >=1 Spell(savage_roar)
      */
@@ -2857,7 +2808,6 @@ export class OvaleConditions {
 	 @name Energy
 	 @paramsig number or boolean
 	 @return The current energy.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Energy() > 70 Spell(vanish)
      */
@@ -2873,7 +2823,6 @@ export class OvaleConditions {
 	 @name Focus
 	 @paramsig number or boolean
 	 @return The current focus.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Focus() > 70 Spell(arcane_shot)
      */
@@ -2904,7 +2853,6 @@ export class OvaleConditions {
 	 @name HolyPower
 	 @paramsig number or boolean
 	 @return The amount of holy power.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if HolyPower() >= 3 Spell(word_of_glory)
      */
@@ -2938,7 +2886,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current mana.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if {MaxMana() - Mana()} > 12500 Item(mana_gem)
         */
@@ -2984,7 +2931,6 @@ export class OvaleConditions {
 	 @name Rage
 	 @paramsig number or boolean
 	 @return The current rage.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Rage() > 70 Spell(heroic_strike)
      */
@@ -3000,7 +2946,6 @@ export class OvaleConditions {
 	 @name RunicPower
 	 @paramsig number or boolean
 	 @return The current runic power.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if RunicPower() > 70 Spell(frost_strike)
      */
@@ -3016,7 +2961,6 @@ export class OvaleConditions {
 	 @name SoulShards
 	 @paramsig number or boolean
 	 @return The number of Soul Shards.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if SoulShards() > 0 Spell(summon_felhunter)
      */
@@ -3047,7 +2991,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current alternate power deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private AlternatePowerDeficit = (
         positionalParams: LuaArray<any>,
@@ -3069,7 +3012,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current runic power deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private AstralPowerDeficit = (
         positionalParams: LuaArray<any>,
@@ -3091,7 +3033,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current chi deficit.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if ChiDeficit() >= 2 Spell(keg_smash)
      */
@@ -3129,7 +3070,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current energy deficit.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if EnergyDeficit() > 60 Spell(tigers_fury)
      */
@@ -3153,7 +3093,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current focus deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private FocusDeficit = (
         positionalParams: LuaArray<any>,
@@ -3182,7 +3121,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current holy power deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private HolyPowerDeficit = (
         positionalParams: LuaArray<any>,
@@ -3204,7 +3142,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current mana deficit.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if ManaDeficit() > 30000 Item(mana_gem)
      */
@@ -3230,7 +3167,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current rage deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private RageDeficit = (
         positionalParams: LuaArray<any>,
@@ -3247,7 +3183,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current runic power deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private RunicPowerDeficit = (
         positionalParams: LuaArray<any>,
@@ -3269,7 +3204,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current soul shards deficit.
-	 @return A boolean value for the result of the comparison.
      */
     private SoulShardsDeficit = (
         positionalParams: LuaArray<any>,
@@ -3291,7 +3225,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The current mana percent.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if ManaPercent() > 90 Spell(arcane_blast)
      */
@@ -3311,7 +3244,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxAlternatePower = (
         positionalParams: LuaArray<any>,
@@ -3340,7 +3272,6 @@ export class OvaleConditions {
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
 
 l    */
     private MaxComboPoints = (
@@ -3363,7 +3294,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxEnergy = (
         positionalParams: LuaArray<any>,
@@ -3380,7 +3310,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxFocus = (
         positionalParams: LuaArray<any>,
@@ -3404,7 +3333,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxHolyPower = (
         positionalParams: LuaArray<any>,
@@ -3426,7 +3354,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if {MaxMana() - Mana()} > 12500 Item(mana_gem)
      */
@@ -3452,7 +3379,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxRage = (
         positionalParams: LuaArray<any>,
@@ -3469,7 +3395,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxRunicPower = (
         positionalParams: LuaArray<any>,
@@ -3491,7 +3416,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxSoulShards = (
         positionalParams: LuaArray<any>,
@@ -3513,7 +3437,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
      */
     private MaxArcaneCharges = (
         positionalParams: LuaArray<any>,
@@ -3567,7 +3490,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of energy.
-	 @return A boolean value for the result of the comparison.
      */
     private EnergyCost = (
         positionalParams: LuaArray<any>,
@@ -3588,7 +3510,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of focus.
-	 @return A boolean value for the result of the comparison.
      */
     private FocusCost = (
         positionalParams: LuaArray<any>,
@@ -3610,7 +3531,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of mana.
-	 @return A boolean value for the result of the comparison.
      */
     private ManaCost = (
         positionalParams: LuaArray<any>,
@@ -3631,7 +3551,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of rage.
-	 @return A boolean value for the result of the comparison.
      */
     private RageCost = (
         positionalParams: LuaArray<any>,
@@ -3652,7 +3571,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of runic power.
-	 @return A boolean value for the result of the comparison.
      */
     private RunicPowerCost = (
         positionalParams: LuaArray<any>,
@@ -3797,7 +3715,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The difference in levels.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if target.RelativeLevel() > 3
 	     Texture(ability_rogue_sprint)
@@ -3857,7 +3774,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see CastTime
 	 @usage
 	 if target.Casting(hour_of_twilight) and target.RemainingCastTime() <2
@@ -3882,7 +3798,6 @@ l    */
 	 @name Rune
 	 @paramsig number or boolean
 	 @return The number of runes.
-	 @return A boolean value for the result of the comparison.
 	 @see RuneCount
 	 @usage
 	 if Rune() > 1 Spell(blood_tap)
@@ -3936,7 +3851,6 @@ l    */
 	     Defaults to unset.
 	     Valid values: unset, 0, 1
 	 @return The number of runes.
-	 @return A boolean value for the result of the comparison.
 	 @see Rune
 	 @usage
 	 if RuneCount() ==2
@@ -3967,7 +3881,6 @@ l    */
 	 @paramsig number or boolean
 	 @param runes. The amount of runes to reach.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeToRunes(2) > 5 Spell(horn_of_winter)
      */
@@ -4019,7 +3932,6 @@ l    */
 	 @name Agility
 	 @paramsig number or boolean
 	 @return The current agility.
-	 @return A boolean value for the result of the comparison.
      */
     private Agility = (
         positionalParams: LuaArray<any>,
@@ -4039,7 +3951,6 @@ l    */
 	 @name AttackPower
 	 @paramsig number or boolean
 	 @return The current attack power.
-	 @return A boolean value for the result of the comparison.
      */
     private AttackPower = (
         positionalParams: LuaArray<any>,
@@ -4059,7 +3970,6 @@ l    */
 	 @name CritRating
 	 @paramsig number or boolean
 	 @return The current critical strike rating.
-	 @return A boolean value for the result of the comparison.
      */
     private CritRating = (
         positionalParams: LuaArray<any>,
@@ -4079,7 +3989,6 @@ l    */
 	 @name HasteRating
 	 @paramsig number or boolean
 	 @return The current haste rating.
-	 @return A boolean value for the result of the comparison.
      */
     private HasteRating = (
         positionalParams: LuaArray<any>,
@@ -4099,7 +4008,6 @@ l    */
 	 @name Intellect
 	 @paramsig number or boolean
 	 @return The current intellect.
-	 @return A boolean value for the result of the comparison.
      */
     private Intellect = (
         positionalParams: LuaArray<any>,
@@ -4121,7 +4029,6 @@ l    */
 	 @name MasteryEffect
 	 @paramsig number or boolean
 	 @return The current mastery effect.
-	 @return A boolean value for the result of the comparison.
      */
     private MasteryEffect = (
         positionalParams: LuaArray<any>,
@@ -4141,7 +4048,6 @@ l    */
 	 @name MasteryRating
 	 @paramsig number or boolean
 	 @return The current mastery rating.
-	 @return A boolean value for the result of the comparison.
      */
     private MasteryRating = (
         positionalParams: LuaArray<any>,
@@ -4164,7 +4070,6 @@ l    */
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
-	 @return A boolean value for the result of the comparison.
      */
     private MeleeCritChance = (
         positionalParams: LuaArray<any>,
@@ -4184,7 +4089,6 @@ l    */
 	 @name MeleeAttackSpeedPercent
 	 @paramsig number or boolean
 	 @return The current percent increase to melee haste.
-	 @return A boolean value for the result of the comparison.
      */
     private MeleeAttackSpeedPercent = (
         positionalParams: LuaArray<any>,
@@ -4207,7 +4111,6 @@ l    */
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
-	 @return A boolean value for the result of the comparison.
      */
     private RangedCritChance = (
         positionalParams: LuaArray<any>,
@@ -4230,7 +4133,6 @@ l    */
 	     Defaults to unlimited=0.
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
-	 @return A boolean value for the result of the comparison.
      */
     private SpellCritChance = (
         positionalParams: LuaArray<any>,
@@ -4250,7 +4152,6 @@ l    */
 	 @name SpellCastSpeedPercent
 	 @paramsig number or boolean
 	 @return The current percent increase to spell haste.
-	 @return A boolean value for the result of the comparison.
      */
     private SpellCastSpeedPercent = (
         positionalParams: LuaArray<any>,
@@ -4270,7 +4171,6 @@ l    */
 	 @name Spellpower
 	 @paramsig number or boolean
 	 @return The current spellpower.
-	 @return A boolean value for the result of the comparison.
      */
     private Spellpower = (
         positionalParams: LuaArray<any>,
@@ -4290,7 +4190,6 @@ l    */
 	 @name Stamina
 	 @paramsig number or boolean
 	 @return The current stamina.
-	 @return A boolean value for the result of the comparison.
      */
     private Stamina = (
         positionalParams: LuaArray<any>,
@@ -4310,7 +4209,6 @@ l    */
 	 @name Strength
 	 @paramsig number or boolean
 	 @return The current strength.
-	 @return A boolean value for the result of the comparison.
      */
     private Strength = (
         positionalParams: LuaArray<any>,
@@ -4363,7 +4261,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The speed of the target.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Speed() > 0 and not BuffPresent(aspect_of_the_fox)
 	     Spell(aspect_of_the_fox)
@@ -4383,7 +4280,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see SpellCharges
 	 @usage
 	 if SpellChargeCooldown(roll) <2
@@ -4416,7 +4312,6 @@ l    */
 	     Defaults to count=1.
 	     Valid values: 0, 1.
 	 @return The number of charges.
-	 @return A boolean value for the result of the comparison.
 	 @see SpellChargeCooldown
 	 @usage
 	 if SpellCharges(savage_defense) >1
@@ -4479,7 +4374,6 @@ l    */
 	 @param id The spell ID.
 	 @param ... Optional. Additional spell IDs.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TimeToSpell
 	 @usage
 	 if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
@@ -4533,7 +4427,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private SpellCooldownDuration = (
         positionalParams: LuaArray<any>,
@@ -4562,7 +4455,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private SpellRechargeDuration = (
         positionalParams: LuaArray<any>,
@@ -4593,7 +4485,6 @@ l    */
 	 @param key The name of the data set by SpellInfo(...).
 	     Valid values are any alphanumeric string.
 	 @return The number data associated with the given key.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	     Spell(shadow_blades)
@@ -4624,7 +4515,6 @@ l    */
 	 @param key The name of the data set by SpellInfo(...).
 	     Valid values are any alphanumeric string.
 	 @return The number data associated with the given key after calculations
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
 	     Spell(mind_blast)
@@ -4655,7 +4545,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of times a spell can be cast.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if SpellCount(expel_harm) > 1
          Spell(expel_harm)  
@@ -4696,7 +4585,6 @@ l    */
 	     Defaults to count=1.
 	     Valid values: 0, 1.
 	 @return The number of charges.
-	 @return A boolean value for the result of the comparison.
 	 @see SpellChargeCooldown
 	 @usage
 	 if SpellCharges(savage_defense) >1
@@ -4781,7 +4669,6 @@ l    */
 	     If no hand is specified, then return the time elapsed since the previous swing of either hand's weapon.
 	     Valid values: main, off.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see NextSwing
      */
     private LastSwing = (
@@ -4802,7 +4689,6 @@ l    */
 	     If no hand is specified, then return the time until the next swing of either hand's weapon.
 	     Valid values: main, off.
 	 @return The number of seconds
-	 @return A boolean value for the result of the comparison.
 	 @see LastSwing
      */
     private NextSwing = (
@@ -4839,7 +4725,6 @@ l    */
 	 @paramsig number or boolean
 	 @param talent Talent to inspect.
 	 @return The number of talent points.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TalentPoints(blood_tap_talent) Spell(blood_tap)
      */
@@ -4881,7 +4766,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The amount of threat.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if Threat() > 90 Spell(fade)
      */
@@ -4910,7 +4794,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TicksRemaining
      */
     private TickTime = (
@@ -4982,7 +4865,6 @@ l    */
 	     Defaults to target=player.
 	     Valid values: player, target, focus, pet.
 	 @return The number of ticks.
-	 @return A boolean value for the result of the comparison.
 	 @see TickTime
 	 @usage
 	 if target.TicksRemaining(shadow_word_pain) <2
@@ -5056,7 +4938,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
      */
@@ -5077,7 +4958,6 @@ l    */
 	 @name TimeToBloodlust
 	 @paramsig number or boolean
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private TimeToBloodlust = (
         positionalParams: LuaArray<any>,
@@ -5124,7 +5004,6 @@ l    */
 	 @param level. The level of energy to reach.
 	 @return The number of seconds.
 	 @see TimeToEnergyFor, TimeToMaxEnergy
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeToEnergy(100) < 1.2 Spell(sinister_strike)
      */
@@ -5142,7 +5021,6 @@ l    */
 	 @paramsig number or boolean
 	 @return The number of seconds.
 	 @see TimeToEnergy, TimeToEnergyFor
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
      */
@@ -5162,7 +5040,6 @@ l    */
 	 @param level. The level of focus to reach.
 	 @return The number of seconds.
 	 @see TimeToFocusFor, TimeToMaxFocus
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeToFocus(100) < 1.2 Spell(cobra_shot)
      */
@@ -5180,7 +5057,6 @@ l    */
 	 @paramsig number or boolean
 	 @return The number of seconds.
 	 @see TimeToFocus, TimeToFocusFor
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if TimeToMaxFocus() < 1.2 Spell(cobra_shot)
      */
@@ -5241,7 +5117,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TimeToEnergyFor, TimeToMaxEnergy
      */
     private TimeToEnergyFor: ConditionFunction = (
@@ -5262,7 +5137,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The spell ID.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TimeToFocusFor
      */
     private TimeToFocusFor = (
@@ -5286,7 +5160,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private TimeToSpell = (
         positionalParams: LuaArray<any>,
@@ -5316,7 +5189,6 @@ l    */
 	     Defaults to haste=spell.
 	     Valid values: melee, spell.
 	 @return The time in seconds scaled by haste.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if target.DebuffRemaining(flame_shock) < TimeWithHaste(3)
 	     Spell(flame_shock)
@@ -5392,7 +5264,6 @@ l    */
 	 @paramsig number or boolean
 	 @param id The ID of the spell used to summon the totem or one of the four shaman totem categories (air, earth, fire, water).
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @see TotemExpires, TotemPresent
 	 @usage
 	 if TotemRemaining(healing_stream_totem) <2 Spell(totemic_recall)
@@ -5446,7 +5317,6 @@ l    */
 	     Defaults to target=target.
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 if target.DebuffPresent(shadowflame_debuff) < TravelTime(hand_of_guldan) + GCD()
 	     Spell(hand_of_guldan)
@@ -5492,7 +5362,6 @@ l    */
 	     Defaults to main.
 	     Valid values: main, off
 	 @return The weapon DPS.
-	 @return A boolean value for the result of the comparison.
 	 @usage
 	 AddFunction AbilityAttackPower {
 	    (AttackPower() + WeaponDPS() * 7)

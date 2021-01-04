@@ -121,7 +121,6 @@ export class Variables implements StateModule {
 	 @paramsig number or boolean
 	 @param name The name of the state variable.
 	 @return The value of the state variable.
-	 @return A boolean value for the result of the comparison.
      */
     private getState = (
         positionalParams: LuaArray<any>,
@@ -138,7 +137,6 @@ export class Variables implements StateModule {
 	 @paramsig number or boolean
 	 @param name The name of the state variable.
 	 @return The number of seconds.
-	 @return A boolean value for the result of the comparison.
      */
     private getStateDuration = (
         positionalParams: LuaArray<any>,
