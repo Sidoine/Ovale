@@ -54,8 +54,8 @@ function truncateFile(fileName: string, newCode: string) {
         }
         output.push(line);
     }
-    output.push("     " + limitLine1);
-    output.push("     " + limitLine2);
+    output.push("    " + limitLine1);
+    output.push("    " + limitLine2);
     output.push("");
     output.push(newCode);
     output.push("}");
@@ -194,22 +194,24 @@ export class ClassScripts {
             desc = profileName;
         }
         const name = canonicalize(desc);
-        output.push("	{");
-        output.push(format('	 	const name = "sc_%s";', name));
-        output.push(format('	 	const desc = "[9.0] Simulationcraft: %s";', desc));
-        output.push("	const code = `");
+        output.push("    {");
+        output.push(format('        const name = "sc_%s";', name));
+        output.push(
+            format('        const desc = "[9.0] Simulationcraft: %s";', desc)
+        );
+        output.push("        const code = `");
         output.push(ioc.simulationCraft.Emit(profile, true));
         output.push("`;");
         output.push(
             format(
-                `         OvaleScripts.RegisterScript(
-                    "%s",
-                    "%s",
-                    name,
-                    desc,
-                    code,
-                    "%s"
-                );`,
+                `        OvaleScripts.RegisterScript(
+            "%s",
+            "%s",
+            name,
+            desc,
+            code,
+            "%s"
+        );`,
                 profile.annotation.classId,
                 profile.annotation.specialization,
                 "script"

@@ -252,6 +252,12 @@ Define(serpent_sting 259491)
   SpellInfo(serpent_sting focus=20 duration=12 tick=3)
   # Suffering w2 Nature damage every t2 sec.?a265428[ The Hunter's pet deals w3 increased damage to you.][]
   SpellAddTargetDebuff(serpent_sting serpent_sting add=1)
+Define(serpent_sting_marksmanship 271788)
+# Fire a shot that poisons your target, causing them to take s1 Nature damage instantly and an additional o2 Nature damage over 18 seconds.
+  SpellInfo(serpent_sting_marksmanship focus=10 duration=18 tick=3)
+  SpellRequire(serpent_sting_marksmanship unusable set=1 enabled=(not hastalent(serpent_sting_talent)))
+  # Suffering s2 Nature damage every t2 sec.
+  SpellAddTargetDebuff(serpent_sting_marksmanship serpent_sting_marksmanship add=1)
 Define(shrapnel_bomb 270335)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb cd=18)
@@ -259,10 +265,11 @@ Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=120 duration=12)
   SpellRequire(stampede unusable set=1 enabled=(not hastalent(stampede_talent)))
-Define(steady_focus_marksmanship 193533)
+Define(steady_focus_buff 193534)
 # Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
-  SpellInfo(steady_focus_marksmanship gcd=0 offgcd=1)
-  SpellRequire(steady_focus_marksmanship unusable set=1 enabled=(not hastalent(steady_focus_talent)))
+  SpellInfo(steady_focus_buff duration=15 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(steady_focus_buff steady_focus_buff add=1)
 Define(steady_shot 56641)
 # A steady shot that causes s1 Physical damage.rnrnUsable while moving.?s321018[rnrn|cFFFFFFFFGenerates s2 Focus.][]
   SpellInfo(steady_shot)
@@ -355,10 +362,10 @@ Define(mongoose_bite_talent 22278)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
 Define(scent_of_blood_talent_beast_mastery 22500)
 # Activating Bestial Wrath grants s1 charges of Barbed Shot.
+Define(serpent_sting_talent 22501)
+# Fire a shot that poisons your target, causing them to take s1 Nature damage instantly and an additional o2 Nature damage over 18 seconds.
 Define(stampede_talent 23044)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
-Define(steady_focus_talent 22267)
-# Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
 Define(steady_focus_talent 22267)
 # Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
 Define(steel_trap_talent 19361)
@@ -394,6 +401,7 @@ Define(niyas_tools_poison_soulbind 320660)
 SpellRequire(kill_shot unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(kill_shot_survival unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(harpoon unusable set=1 enabled=(target.distance() < 8))
+SpellAddBuff(steady_shot steady_focus_buff add=1 enabled=(previousgcdspell(steady_shot count=2) and talent(steady_focus_talent)))
   `;
 
     OvaleScripts.RegisterScript(

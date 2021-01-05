@@ -135,6 +135,9 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("weapons_of_order_ww", 311054);
     fixIdentifier("sunfire_debuff", 164815);
     fixAddAura("sunfire", "sunfire_debuff");
+    fixIdentifier("steady_focus", 193533);
+    fixIdentifier("steady_focus_buff", 193534);
+    fixIdentifier("serpent_sting_marksmanship", 271788);
 
     // Bombs
     fixIdentifier("pheromone_bomb", 270323);

@@ -542,7 +542,7 @@ AddFunction marksmanshipuseitemactions
 AddFunction marksmanshiptrickshotsmainactions
 {
  #steady_shot,if=talent.steady_focus&in_flight&buff.steady_focus.remains<5
- if hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 spell(steady_shot)
+ if hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_buff) < 5 spell(steady_shot)
  #flare,if=tar_trap.up&runeforge.soulforge_embers
  if buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) spell(flare)
  #barrage
@@ -560,7 +560,7 @@ AddFunction marksmanshiptrickshotsmainactions
  #kill_shot,if=buff.dead_eye.down
  if buffexpires(dead_eye_buff) spell(kill_shot)
  #serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable
- if target.refreshable(serpent_sting) spell(serpent_sting)
+ if target.refreshable(serpent_sting_marksmanship) spell(serpent_sting_marksmanship)
  #multishot,if=focus>cost+action.aimed_shot.cost
  if focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) spell(multishot_marksmanship)
  #steady_shot
@@ -573,7 +573,7 @@ AddFunction marksmanshiptrickshotsmainpostconditions
 
 AddFunction marksmanshiptrickshotsshortcdactions
 {
- unless hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 and spell(steady_shot)
+ unless hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_buff) < 5 and spell(steady_shot)
  {
   #double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.trueshot.remains>55)|target.time_to_die<10
   if iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 10 spell(double_tap)
@@ -608,12 +608,12 @@ AddFunction marksmanshiptrickshotsshortcdactions
 
 AddFunction marksmanshiptrickshotsshortcdpostconditions
 {
- hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 and spell(steady_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(barrage) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and runeforge(surging_shots_runeforge) and buffexpires(double_tap) and spell(rapid_fire) or buffremaining(trick_shots_buff) >= executetime(aimed_shot) and { buffexpires(precise_shots) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) + gcd() or buffpresent(trueshot) } and spell(aimed_shot) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots) and focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and { not hastalent(chimaera_shot_talent) or enemies() > 3 } } and spell(multishot_marksmanship) or buffpresent(precise_shots) and focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) and enemies() < 4 and spell(chimaera_shot_marksmanship) or buffexpires(dead_eye_buff) and spell(kill_shot) or target.refreshable(serpent_sting) and spell(serpent_sting) or focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and spell(multishot_marksmanship) or spell(steady_shot)
+ hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_buff) < 5 and spell(steady_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(barrage) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and runeforge(surging_shots_runeforge) and buffexpires(double_tap) and spell(rapid_fire) or buffremaining(trick_shots_buff) >= executetime(aimed_shot) and { buffexpires(precise_shots) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) + gcd() or buffpresent(trueshot) } and spell(aimed_shot) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots) and focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and { not hastalent(chimaera_shot_talent) or enemies() > 3 } } and spell(multishot_marksmanship) or buffpresent(precise_shots) and focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) and enemies() < 4 and spell(chimaera_shot_marksmanship) or buffexpires(dead_eye_buff) and spell(kill_shot) or target.refreshable(serpent_sting_marksmanship) and spell(serpent_sting_marksmanship) or focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and spell(multishot_marksmanship) or spell(steady_shot)
 }
 
 AddFunction marksmanshiptrickshotscdactions
 {
- unless hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 and spell(steady_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 10 } and spell(double_tap) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(explosive_shot)
+ unless hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_buff) < 5 and spell(steady_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 10 } and spell(double_tap) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(explosive_shot)
  {
   #wild_spirits
   spell(wild_spirits)
@@ -628,7 +628,7 @@ AddFunction marksmanshiptrickshotscdactions
 
 AddFunction marksmanshiptrickshotscdpostconditions
 {
- hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 and spell(steady_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 10 } and spell(double_tap) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(explosive_shot) or spell(resonating_arrow) or checkboxon(opt_volley) and spell(volley) or spell(barrage) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and runeforge(surging_shots_runeforge) and buffexpires(double_tap) and spell(rapid_fire) or buffremaining(trick_shots_buff) >= executetime(aimed_shot) and { buffexpires(precise_shots) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) + gcd() or buffpresent(trueshot) } and spell(aimed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots) and focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and { not hastalent(chimaera_shot_talent) or enemies() > 3 } } and spell(multishot_marksmanship) or buffpresent(precise_shots) and focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) and enemies() < 4 and spell(chimaera_shot_marksmanship) or buffexpires(dead_eye_buff) and spell(kill_shot) or spell(a_murder_of_crows) or spell(flayed_shot) or target.refreshable(serpent_sting) and spell(serpent_sting) or focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and spell(multishot_marksmanship) or spell(steady_shot)
+ hastalent(steady_focus_talent) and inflighttotarget(steady_shot) and buffremaining(steady_focus_buff) < 5 and spell(steady_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 10 } and spell(double_tap) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or spell(explosive_shot) or spell(resonating_arrow) or checkboxon(opt_volley) and spell(volley) or spell(barrage) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and runeforge(surging_shots_runeforge) and buffexpires(double_tap) and spell(rapid_fire) or buffremaining(trick_shots_buff) >= executetime(aimed_shot) and { buffexpires(precise_shots) or spellfullrecharge(aimed_shot) < casttime(aimed_shot) + gcd() or buffpresent(trueshot) } and spell(aimed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or buffremaining(trick_shots_buff) >= executetime(rapid_fire) and spell(rapid_fire) or { buffexpires(trick_shots_buff) or buffpresent(precise_shots) and focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and { not hastalent(chimaera_shot_talent) or enemies() > 3 } } and spell(multishot_marksmanship) or buffpresent(precise_shots) and focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) and enemies() < 4 and spell(chimaera_shot_marksmanship) or buffexpires(dead_eye_buff) and spell(kill_shot) or spell(a_murder_of_crows) or spell(flayed_shot) or target.refreshable(serpent_sting_marksmanship) and spell(serpent_sting_marksmanship) or focus() > powercost(multishot_marksmanship) + powercost(aimed_shot) and spell(multishot_marksmanship) or spell(steady_shot)
 }
 
 ### actions.st
@@ -636,7 +636,7 @@ AddFunction marksmanshiptrickshotscdpostconditions
 AddFunction marksmanshipstmainactions
 {
  #steady_shot,if=talent.steady_focus&(prev_gcd.1.steady_shot&buff.steady_focus.remains<5|buff.steady_focus.down)
- if hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 or buffexpires(steady_focus_marksmanship) } spell(steady_shot)
+ if hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_buff) < 5 or buffexpires(steady_focus_buff) } spell(steady_shot)
  #kill_shot
  spell(kill_shot)
  #flare,if=tar_trap.up&runeforge.soulforge_embers
@@ -650,7 +650,7 @@ AddFunction marksmanshipstmainactions
  #arcane_shot,if=buff.precise_shots.up|focus>cost+action.aimed_shot.cost
  if buffpresent(precise_shots) or focus() > powercost(arcane_shot) + powercost(aimed_shot) spell(arcane_shot)
  #serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>duration
- if target.refreshable(serpent_sting) and target.timetodie() > baseduration(serpent_sting) spell(serpent_sting)
+ if target.refreshable(serpent_sting_marksmanship) and target.timetodie() > baseduration(serpent_sting_marksmanship) spell(serpent_sting_marksmanship)
  #barrage,if=active_enemies>1
  if enemies() > 1 spell(barrage)
  #rapid_fire,if=focus+cast_regen<focus.max&(buff.double_tap.down|talent.streamline)
@@ -665,7 +665,7 @@ AddFunction marksmanshipstmainpostconditions
 
 AddFunction marksmanshipstshortcdactions
 {
- unless hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 or buffexpires(steady_focus_marksmanship) } and spell(steady_shot) or spell(kill_shot)
+ unless hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_buff) < 5 or buffexpires(steady_focus_buff) } and spell(steady_shot) or spell(kill_shot)
  {
   #double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.trueshot.remains>55)|target.time_to_die<15
   if iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 15 spell(double_tap)
@@ -692,12 +692,12 @@ AddFunction marksmanshipstshortcdactions
 
 AddFunction marksmanshipstshortcdpostconditions
 {
- hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 or buffexpires(steady_focus_marksmanship) } and spell(steady_shot) or spell(kill_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { buffexpires(precise_shots) or { buffpresent(trueshot) or spellfullrecharge(aimed_shot) < gcd() + casttime(aimed_shot) } and { not hastalent(chimaera_shot_talent) or enemies() < 2 } or buffremaining(trick_shots_buff) > executetime(aimed_shot) and enemies() > 1 } and spell(aimed_shot) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(trueshot) or not runeforge(eagletalons_true_focus_runeforge) } and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or { buffpresent(precise_shots) or focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) } and spell(chimaera_shot_marksmanship) or { buffpresent(precise_shots) or focus() > powercost(arcane_shot) + powercost(aimed_shot) } and spell(arcane_shot) or target.refreshable(serpent_sting) and target.timetodie() > baseduration(serpent_sting) and spell(serpent_sting) or enemies() > 1 and spell(barrage) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or spell(steady_shot)
+ hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_buff) < 5 or buffexpires(steady_focus_buff) } and spell(steady_shot) or spell(kill_shot) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or { buffexpires(precise_shots) or { buffpresent(trueshot) or spellfullrecharge(aimed_shot) < gcd() + casttime(aimed_shot) } and { not hastalent(chimaera_shot_talent) or enemies() < 2 } or buffremaining(trick_shots_buff) > executetime(aimed_shot) and enemies() > 1 } and spell(aimed_shot) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(trueshot) or not runeforge(eagletalons_true_focus_runeforge) } and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or { buffpresent(precise_shots) or focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) } and spell(chimaera_shot_marksmanship) or { buffpresent(precise_shots) or focus() > powercost(arcane_shot) + powercost(aimed_shot) } and spell(arcane_shot) or target.refreshable(serpent_sting_marksmanship) and target.timetodie() > baseduration(serpent_sting_marksmanship) and spell(serpent_sting_marksmanship) or enemies() > 1 and spell(barrage) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or spell(steady_shot)
 }
 
 AddFunction marksmanshipstcdactions
 {
- unless hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 or buffexpires(steady_focus_marksmanship) } and spell(steady_shot) or spell(kill_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 15 } and spell(double_tap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or spell(explosive_shot)
+ unless hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_buff) < 5 or buffexpires(steady_focus_buff) } and spell(steady_shot) or spell(kill_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 15 } and spell(double_tap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or spell(explosive_shot)
  {
   #wild_spirits
   spell(wild_spirits)
@@ -712,7 +712,7 @@ AddFunction marksmanshipstcdactions
 
 AddFunction marksmanshipstcdpostconditions
 {
- hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_marksmanship) < 5 or buffexpires(steady_focus_marksmanship) } and spell(steady_shot) or spell(kill_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 15 } and spell(double_tap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or spell(explosive_shot) or spell(flayed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or spell(a_murder_of_crows) or spell(resonating_arrow) or { buffexpires(precise_shots) or not hastalent(chimaera_shot_talent) or enemies() < 2 } and checkboxon(opt_volley) and spell(volley) or { buffexpires(precise_shots) or { buffpresent(trueshot) or spellfullrecharge(aimed_shot) < gcd() + casttime(aimed_shot) } and { not hastalent(chimaera_shot_talent) or enemies() < 2 } or buffremaining(trick_shots_buff) > executetime(aimed_shot) and enemies() > 1 } and spell(aimed_shot) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(trueshot) or not runeforge(eagletalons_true_focus_runeforge) } and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or { buffpresent(precise_shots) or focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) } and spell(chimaera_shot_marksmanship) or { buffpresent(precise_shots) or focus() > powercost(arcane_shot) + powercost(aimed_shot) } and spell(arcane_shot) or target.refreshable(serpent_sting) and target.timetodie() > baseduration(serpent_sting) and spell(serpent_sting) or enemies() > 1 and spell(barrage) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or spell(steady_shot)
+ hastalent(steady_focus_talent) and { previousgcdspell(steady_shot) and buffremaining(steady_focus_buff) < 5 or buffexpires(steady_focus_buff) } and spell(steady_shot) or spell(kill_shot) or { iscovenant("kyrian") and spellcooldown(resonating_arrow) < gcd() or not iscovenant("kyrian") and not iscovenant("night_fae") or iscovenant("night_fae") and { spellcooldown(wild_spirits) < gcd() or spellcooldown(trueshot) > 55 } or target.timetodie() < 15 } and spell(double_tap) or buffpresent(tar_trap) and runeforge(soulforge_embers_runeforge) and spell(flare) or runeforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and spell(tar_trap) or spell(explosive_shot) or spell(flayed_shot) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or spell(a_murder_of_crows) or spell(resonating_arrow) or { buffexpires(precise_shots) or not hastalent(chimaera_shot_talent) or enemies() < 2 } and checkboxon(opt_volley) and spell(volley) or { buffexpires(precise_shots) or { buffpresent(trueshot) or spellfullrecharge(aimed_shot) < gcd() + casttime(aimed_shot) } and { not hastalent(chimaera_shot_talent) or enemies() < 2 } or buffremaining(trick_shots_buff) > executetime(aimed_shot) and enemies() > 1 } and spell(aimed_shot) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(trueshot) or not runeforge(eagletalons_true_focus_runeforge) } and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or { buffpresent(precise_shots) or focus() > powercost(chimaera_shot_marksmanship) + powercost(aimed_shot) } and spell(chimaera_shot_marksmanship) or { buffpresent(precise_shots) or focus() > powercost(arcane_shot) + powercost(aimed_shot) } and spell(arcane_shot) or target.refreshable(serpent_sting_marksmanship) and target.timetodie() > baseduration(serpent_sting_marksmanship) and spell(serpent_sting_marksmanship) or enemies() > 1 and spell(barrage) or focus() + focuscastingregen(rapid_fire) < maxfocus() and { buffexpires(double_tap) or hastalent(streamline_talent) } and spell(rapid_fire) or spell(steady_shot)
 }
 
 ### actions.precombat
@@ -960,9 +960,9 @@ AddIcon enabled=(checkboxon(opt_hunter_marksmanship_aoe) and specialization(mark
 # resonating_arrow
 # reversal_of_fortune_conduit
 # sephuzs_proclamation_runeforge
-# serpent_sting
+# serpent_sting_marksmanship
 # soulforge_embers_runeforge
-# steady_focus_marksmanship
+# steady_focus_buff
 # steady_focus_talent
 # steady_shot
 # streamline_talent
