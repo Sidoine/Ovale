@@ -310,7 +310,11 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         this.profiler.StartProfiling("OvaleRunes_state_GetRunesCooldown");
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
             const rune = state.rune[slot];
-            usedRune[slot] = rune.endCooldown - atTime;
+            if (IsActiveRune(rune, atTime)) {
+                usedRune[slot] = 0;
+            } else {
+                usedRune[slot] = rune.endCooldown - atTime;
+            }
         }
         sort(usedRune);
         this.profiler.StopProfiling("OvaleRunes_state_GetRunesCooldown");
