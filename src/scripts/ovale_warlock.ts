@@ -69,11 +69,11 @@ AddFunction afflictionprecombatmainactions
  #summon_pet
  if not pet.present() spell(summon_imp)
  #seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
- if enemies() >= 3 and not hasequippeditem(169314) spell(seed_of_corruption)
+ if enemies(tagged=1) >= 3 and not hasequippeditem(169314) spell(seed_of_corruption)
  #haunt
  spell(haunt)
  #shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3&!equipped.169314
- if not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) spell(shadow_bolt)
+ if not hastalent(haunt_talent) and enemies(tagged=1) < 3 and not hasequippeditem(169314) spell(shadow_bolt)
 }
 
 AddFunction afflictionprecombatmainpostconditions
@@ -91,7 +91,7 @@ AddFunction afflictionprecombatshortcdactions
 
 AddFunction afflictionprecombatshortcdpostconditions
 {
- not pet.present() and spell(summon_imp) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
+ not pet.present() and spell(summon_imp) or enemies(tagged=1) >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies(tagged=1) < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
 }
 
 AddFunction afflictionprecombatcdactions
@@ -106,7 +106,7 @@ AddFunction afflictionprecombatcdactions
 
 AddFunction afflictionprecombatcdpostconditions
 {
- not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies() >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies() < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
+ not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or enemies(tagged=1) >= 3 and not hasequippeditem(169314) and spell(seed_of_corruption) or spell(haunt) or not hastalent(haunt_talent) and enemies(tagged=1) < 3 and not hasequippeditem(169314) and spell(shadow_bolt)
 }
 
 ### actions.item
@@ -1773,7 +1773,7 @@ AddFunction destruction_defaultshortcdactions
  unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavocshortcdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate)
  {
   #cataclysm,if=!(pet.infernal.active&dot.immolate.remains+1>pet.infernal.remains)|spell_targets.cataclysm>1
-  if not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 spell(cataclysm)
+  if not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies(tagged=1) > 1 spell(cataclysm)
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoeshortcdactions()
 
@@ -1823,7 +1823,7 @@ AddFunction destruction_defaultcdactions
  #call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
  if debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } destructionhavoccdactions()
 
- unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm)
+ unless debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies(tagged=1) > 1 } and spell(cataclysm)
  {
   #call_action_list,name=aoe,if=active_enemies>2
   if enemies() > 2 destructionaoecdactions()
@@ -1844,7 +1844,7 @@ AddFunction destruction_defaultcdactions
 
 AddFunction destruction_defaultcdpostconditions
 {
- debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies() > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or spell(scouring_tithe) or spell(decimating_bolt) or not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or spell(impending_catastrophe) or spell(soul_rot) or equippedruneforge(odr_shawl_of_the_ymirjar_runeforge) and enemies() > 1 and spell(havoc) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
+ debuffcountonany(havoc) > 0 and enemies() > 1 and enemies() < 5 - talentpoints(inferno_talent) + { hastalent(inferno_talent) and hastalent(internal_combustion_talent) } and destructionhavoccdpostconditions() or hastalent(roaring_blaze_talent) and target.debuffremaining(roaring_blaze) < 1.5 and spell(conflagrate) or { not { demonduration(infernal) > 0 and target.debuffremaining(immolate_debuff) + 1 > demonduration(infernal) } or enemies(tagged=1) > 1 } and spell(cataclysm) or enemies() > 2 and destructionaoecdpostconditions() or target.refreshable(soul_fire) and soulshards() <= 4 and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > buffremaining(soul_fire) } and spell(soul_fire) or target.refreshable(immolate_debuff) and { not hastalent(cataclysm_talent) or spellcooldown(cataclysm) > target.debuffremaining(immolate_debuff) } and spell(immolate) or hastalent(internal_combustion_talent) and inflighttotarget(chaos_bolt) and target.debuffremaining(immolate_debuff) < baseduration(immolate_debuff) * 0.5 and spell(immolate) or destructioncdscdpostconditions() or destructionessencescdpostconditions() or spell(channel_demonfire) or spell(scouring_tithe) or spell(decimating_bolt) or not never(target_is_target) and { target.debuffremaining(immolate_debuff) > target.debuffduration(immolate_debuff) * 0.5 or not hastalent(internal_combustion_talent) } and enemies() > 1 and spell(havoc) or spell(impending_catastrophe) or spell(soul_rot) or equippedruneforge(odr_shawl_of_the_ymirjar_runeforge) and enemies() > 1 and spell(havoc) or buffexpires(backdraft) and soulshards() >= 1.5 - 0.3 * talentpoints(flashover_talent) and not pool_soul_shards() and spell(conflagrate) or buffpresent(dark_soul_instability) and spell(chaos_bolt) or buffpresent(backdraft) and not pool_soul_shards() and not hastalent(eradication_talent) and spell(chaos_bolt) or not pool_soul_shards() and hastalent(eradication_talent) and { target.debuffremaining(eradication) < casttime(chaos_bolt) or buffpresent(backdraft) } and spell(chaos_bolt) or { not pool_soul_shards() or soulshards() >= 4.5 } and spell(shadowburn) or soulshards() >= 4.5 - 0.2 * enemies() and spell(chaos_bolt) or charges(conflagrate) > 1 and spell(conflagrate) or spell(incinerate)
 }
 
 ### Destruction icons.

@@ -44,7 +44,7 @@ AddFunction pooling_for_meta
 
 AddFunction blade_dance
 {
- hastalent(first_blood_talent) or enemies() >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_theory)
+ hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_theory)
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))
@@ -606,7 +606,7 @@ AddFunction pooling_for_meta
 
 AddFunction blade_dance
 {
- hastalent(first_blood_talent) or enemies() >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_theory)
+ hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_theory)
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))

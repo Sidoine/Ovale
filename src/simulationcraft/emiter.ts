@@ -3236,7 +3236,7 @@ export class Emiter {
         ) {
             code = "100 / { 100 + MeleeAttackSpeedPercent() }";
         } else if (sub(operand, 1, 13) == "spell_targets") {
-            code = "Enemies()";
+            code = "Enemies(tagged=1)";
         } else if (operand == "t18_class_trinket") {
             code = format("HasTrinket(%s)", operand);
             this.AddSymbol(annotation, operand);

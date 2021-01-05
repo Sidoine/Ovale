@@ -194,24 +194,28 @@ export class ClassScripts {
             desc = profileName;
         }
         const name = canonicalize(desc);
-        output.push("");
-        output.push("{");
-        output.push(format('	const name = "sc_%s"', name));
-        output.push(format('	const desc = "[9.0] Simulationcraft: %s"', desc));
+        output.push("	{");
+        output.push(format('	 	const name = "sc_%s";', name));
+        output.push(format('	 	const desc = "[9.0] Simulationcraft: %s";', desc));
         output.push("	const code = `");
         output.push(ioc.simulationCraft.Emit(profile, true));
-        output.push("`");
+        output.push("`;");
         output.push(
             format(
-                '	OvaleScripts.RegisterScript("%s", "%s", name, desc, code, "%s")',
+                `         OvaleScripts.RegisterScript(
+                    "%s",
+                    "%s",
+                    name,
+                    desc,
+                    code,
+                    "%s"
+                );`,
                 profile.annotation.classId,
                 profile.annotation.specialization,
                 "script"
             )
         );
-        output.push("}");
-        output.push("");
-
+        output.push("    }");
         const outputFileName = "ovale_" + className.toLowerCase() + ".ts";
         console.log("Appending to " + outputFileName + ": " + name);
         const outputName = this.outputDirectory + "/" + outputFileName;
@@ -220,7 +224,7 @@ export class ClassScripts {
         if (!existing) {
             this.modifiedFiles.set(outputName, outputCode);
         } else {
-            this.modifiedFiles.set(outputName, existing + outputCode);
+            this.modifiedFiles.set(outputName, existing + "\n\n" + outputCode);
         }
         const classSpells = getOrSet(this.spellsByClass, className);
         const classTalents = getOrSet(this.talentsByClass, className);
@@ -295,7 +299,7 @@ export class ClassScripts {
 
     private writeSpellScripts() {
         for (const [className, spellIds] of this.spellsByClass) {
-            let output = `let code = \``;
+            let output = `    let code = \``;
             const talentIds = this.talentsByClass.get(className) || [];
             const spells: CustomSpellData[] = [];
             const remainingsSpellIds = spellIds.concat();
