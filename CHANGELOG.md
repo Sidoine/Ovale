@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.33](https://github.com/Sidoine/Ovale/compare/9.0.32...9.0.33) (2021-01-05)
+
+### Bug Fixes
+
+-   call enemies(tagged=1) ([f6f36e8](https://github.com/Sidoine/Ovale/commit/f6f36e865e6efc6ccc1c7988f6855de4db4d9355)), closes [#475](https://github.com/Sidoine/Ovale/issues/475)
+-   the constant values were propagating to parent nodes ([04c102c](https://github.com/Sidoine/Ovale/commit/04c102c842c24e056d68f014142c2a5ec5b57d43))
+-   **conditions:** return a proper value for TimeToRunes() ([#793](https://github.com/Sidoine/Ovale/issues/793)) ([8f895c1](https://github.com/Sidoine/Ovale/commit/8f895c12c3c5962c41389b6821c9e75f581fac63))
+-   **deathknight:** mark totem spells and fix sacrificial_pact ([#782](https://github.com/Sidoine/Ovale/issues/782)) ([9424a67](https://github.com/Sidoine/Ovale/commit/9424a67fc4c074ed7a51f66ff3f030584a68c675))
+-   **demonhunter:** leaping not possible when rooted ([#785](https://github.com/Sidoine/Ovale/issues/785)) ([061d6cf](https://github.com/Sidoine/Ovale/commit/061d6cfb579d5e491ddfe9c34f695d218a944572))
+-   **icon:** fix nil arguments to SetText() ([#781](https://github.com/Sidoine/Ovale/issues/781)) ([c296780](https://github.com/Sidoine/Ovale/commit/c296780d43126c866118277dfa94ce4927c328f7)), closes [#780](https://github.com/Sidoine/Ovale/issues/780)
+-   **runes:** ensure GetRunesCooldown() returns >=0 ([#790](https://github.com/Sidoine/Ovale/issues/790)) ([dad666d](https://github.com/Sidoine/Ovale/commit/dad666d61de412fa22f941533cb52b2d8f03efbf))
+-   check for correct buffs on pets ([#786](https://github.com/Sidoine/Ovale/issues/786)) ([1d0c864](https://github.com/Sidoine/Ovale/commit/1d0c8643320e6e87ea203620a31725229c728cd2))
+-   **timespan:** improve check for a time contained in a timespan ([#787](https://github.com/Sidoine/Ovale/issues/787)) ([f5b7783](https://github.com/Sidoine/Ovale/commit/f5b77836bb69a0146cf062f17dbb68f57c83b59e))
+
 ### [9.0.32](https://github.com/Sidoine/Ovale/compare/9.0.31...9.0.32) (2020-12-29)
 
 ### Features
