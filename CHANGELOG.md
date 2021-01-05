@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.34](https://github.com/Sidoine/Ovale/compare/9.0.33...9.0.34) (2021-01-05)
+
+### Bug Fixes
+
+-   **best-action:** always use the correct texture for actions ([#798](https://github.com/Sidoine/Ovale/issues/798)) ([10d05e5](https://github.com/Sidoine/Ovale/commit/10d05e5e7c89e24ee86b4207887043f4fc0f4e90)), closes [#749](https://github.com/Sidoine/Ovale/issues/749)
+-   improve and fix log messages ([#797](https://github.com/Sidoine/Ovale/issues/797)) ([a7e9b3a](https://github.com/Sidoine/Ovale/commit/a7e9b3a0430ed9bfa4a171a7a0267b438b39788f))
+-   **hunter:** spell ids and steady focus ([3330ab8](https://github.com/Sidoine/Ovale/commit/3330ab85e3d0acb02a7683f09bb47b9b86463f66)), closes [#795](https://github.com/Sidoine/Ovale/issues/795)
+
 ### [9.0.33](https://github.com/Sidoine/Ovale/compare/9.0.32...9.0.33) (2021-01-05)
 
 ### Bug Fixes
