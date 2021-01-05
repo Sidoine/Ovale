@@ -3894,7 +3894,7 @@ l    */
         if (seconds < 0) {
             seconds = 0;
         }
-        return ReturnConstant(seconds);
+        return ReturnValue(seconds, atTime, -1);
     };
 
     /**  Returns the value of the given snapshot stat.
