@@ -384,12 +384,8 @@ export class OvaleBestActionClass {
         if (element.type == "state" && element.timeSpan.HasTime(atTime)) {
             const [variable, value] = [element.name, element.value];
             const isFuture = !element.timeSpan.HasTime(atTime);
-            this.variables.PutState(
-                <string>variable,
-                <number>value,
-                isFuture,
-                atTime
-            );
+            if (variable !== undefined && value !== undefined)
+                this.variables.PutState(variable, value, isFuture, atTime);
         }
         this.profiler.StopProfiling("OvaleBestAction_GetAction");
         return element;

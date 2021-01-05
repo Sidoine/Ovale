@@ -736,7 +736,12 @@ export class Runner {
         }
         for (const [k, v] of kpairs(source)) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (k !== "timeSpan" && k !== "serial" && target[k] !== v) {
+            if (
+                k !== "timeSpan" &&
+                k !== "serial" &&
+                k !== "constant" &&
+                target[k] !== v
+            ) {
                 (target[k] as any) = v;
             }
         }
