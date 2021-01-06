@@ -13,6 +13,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
+import { OvalePowerClass } from "./Power";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     pairs,
@@ -343,7 +344,8 @@ export class OvaleAuraClass
         private ovaleDebug: OvaleDebugClass,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private ovalePower: OvalePowerClass
     ) {
         super(AuraInterface);
         this.module = ovale.createModule(
@@ -1871,7 +1873,11 @@ export class OvaleAuraClass
         for (const [filter, filterInfo] of kpairs(auraList)) {
             for (const [auraIdKey, spellData] of pairs(filterInfo)) {
                 const auraId = tonumber(auraIdKey);
-                const duration = this.GetBaseDuration(auraId, spellcast);
+                const duration = this.GetBaseDuration(
+                    auraId,
+                    atTime,
+                    spellcast
+                );
                 let stacks = 1;
                 let count: number | undefined = undefined;
                 let extend = 0;
@@ -2175,9 +2181,12 @@ export class OvaleAuraClass
         }
     }
 
-    GetBaseDuration(auraId: number, spellcast?: PaperDollSnapshot) {
-        spellcast = spellcast || this.ovalePaperDoll.current;
-        const combopoints = spellcast.combopoints || 0;
+    GetBaseDuration(
+        auraId: number,
+        atTime?: number,
+        spellcast?: PaperDollSnapshot
+    ) {
+        spellcast = spellcast || this.ovalePaperDoll.GetState(atTime);
         let duration = INFINITY;
         const si = this.ovaleData.spellInfo[auraId];
         if (si && si.duration) {
@@ -2188,7 +2197,10 @@ export class OvaleAuraClass
                 undefined,
                 true
             ) || [15, 1];
-            if (si.add_duration_combopoints && combopoints) {
+            if (si.add_duration_combopoints) {
+                const powerState = this.ovalePower.GetState(atTime);
+                const combopoints =
+                    spellcast.combopoints || powerState.power.combopoints || 0;
                 duration =
                     (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {
