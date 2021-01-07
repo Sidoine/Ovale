@@ -7,7 +7,7 @@ import {
     tostring,
     wipe,
 } from "@wowts/lua";
-import { abs, huge, min } from "@wowts/math";
+import { abs, huge, huge as INFINITY, max, min } from "@wowts/math";
 import {
     AstActionNode,
     AstBooleanNode,
@@ -594,24 +594,53 @@ export class Runner {
                     m = 0;
                     n = 0;
                 }
-            } else if (operator === ">?") {
-                // A(t) >? B(t) = max(A(t), B(t))
-                l = min(A, B);
-                m = t;
-                // TODO should change the end
-                if (l === A) {
-                    n = c;
-                } else {
-                    n = z;
-                }
-            } else if (operator === "<?") {
+            } else if (operator === "<?" || operator === ">?") {
                 // A(t) <? B(t) = min(A(t), B(t))
-                l = min(A, B);
-                m = t;
-                if (l === A) {
+                // A(t) >? B(t) = max(A(t), B(t))
+                if (z === c) {
+                    // A(t) and B(t) have the same slope.
+                    l = (operator === "<?" && min(A, B)) || max(A, B);
+                    m = t;
                     n = z;
                 } else {
-                    n = c;
+                    /**
+                     * A(t) and B(t) intersect when:
+                     *                   A(t) = B(t)
+                     *     A(t0) - (t - t0)*c = B(t0) - (t - t0)*z
+                     *       (t - t0)*(z - c) = B(t0) - A(t0)
+                     *                 t - t0 = [B(t0) - A(t0)]/(z - c)
+                     */
+                    const C = (B - A) / (z - c);
+                    if (C <= 0) {
+                        // A(t) and B(t) intersect at or to the left of t0.
+                        const scratch = timeSpan.IntersectInterval(
+                            t + C,
+                            INFINITY
+                        );
+                        timeSpan.copyFromArray(scratch);
+                        scratch.Release();
+                        if (z < c) {
+                            // A(t) has a greater slope than B(t).
+                            l = (operator === ">?" && A) || B;
+                        } else {
+                            // B(t) has a greater slope than A(t).
+                            l = (operator === "<?" && A) || B;
+                        }
+                    } else {
+                        // A(t) and B(t) intersect to the right of t0.
+                        const scratch = timeSpan.IntersectInterval(0, t + C);
+                        timeSpan.copyFromArray(scratch);
+                        scratch.Release();
+                        if (z < c) {
+                            // A(t) has a greater slope than B(t).
+                            l = (operator === "<?" && A) || B;
+                        } else {
+                            // B(t) has a greater slope than A(t).
+                            l = (operator === ">?" && A) || B;
+                        }
+                    }
+                    m = t;
+                    n = (l === A && c) || z;
                 }
             }
             this.tracer.Log(
