@@ -27,7 +27,7 @@ import {
     UITexture,
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { AceGUIRegisterAsContainer } from "./acegui-helpers";
+import { WidgetContainer } from "./acegui-helpers";
 import { OvaleFutureClass } from "../states/Future";
 import { BaseState } from "../states/BaseState";
 import { AstIconNode, AstNodeSnapshot } from "../engine/ast";
@@ -52,7 +52,7 @@ import { OvaleActionBarClass } from "../engine/action-bar";
 
 const strmatch = match;
 const INFINITY = huge;
-const BARRE = 8;
+const DRAG_HANDLER_HEIGHT = 8;
 
 interface Action {
     icons: OvaleIcon;
@@ -65,7 +65,7 @@ interface Action {
     dy: number;
 }
 
-class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
+class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox> = {};
     listWidget: LuaObj<AceGUIWidgetDropDown> = {};
     visible = true;
@@ -93,23 +93,23 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
 
     OnRelease() {}
 
-    OnWidthSet(width: number) {
+    OnWidthSet = (width: number) => {
         const content = this.content;
         let contentwidth = width - 34;
         if (contentwidth < 0) {
             contentwidth = 0;
         }
         content.SetWidth(contentwidth);
-    }
+    };
 
-    OnHeightSet(height: number) {
+    OnHeightSet = (height: number) => {
         const content = this.content;
         let contentheight = height - 57;
         if (contentheight < 0) {
             contentheight = 0;
         }
         content.SetHeight(contentheight);
-    }
+    };
 
     OnLayoutFinished(width: number, height: number) {
         if (!width) {
@@ -146,27 +146,28 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
     private goNextIcon(
         action: Action,
         left: number,
-        top: number
-    ): [left: number, top: number] {
-        const BARRE = 8;
+        top: number,
+        maxWidth: number,
+        maxHeight: number
+    ): [left: number, top: number, maxWidth: number, maxHeight: number] {
         const profile = this.ovaleOptions.db.profile;
         const margin = profile.apparence.margin;
         const width = action.scale * 36 + margin;
         const height = action.scale * 36 + margin;
+        action.left = left;
+        action.top = top;
         if (profile.apparence.vertical) {
-            action.left = top;
-            action.top = -left - BARRE - margin;
+            action.dx = 0;
+            action.dy = -height;
+        } else {
             action.dx = width;
             action.dy = 0;
-        } else {
-            action.left = left;
-            action.top = -top - BARRE - margin;
-            action.dx = 0;
-            action.dy = height;
         }
-        // top = top + height;
-        left = left + width;
-        return [left, top];
+        if (left + width > maxWidth) maxWidth = left + width;
+        if (height - top > maxHeight) maxHeight = height - top;
+        left = left + action.dx;
+        top = top + action.dy;
+        return [left, top, maxWidth, maxHeight];
     }
 
     UpdateVisibility() {
@@ -174,7 +175,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
         const profile = this.ovaleOptions.db.profile;
         if (!profile.apparence.enableIcons) {
             this.visible = false;
-        } else if (!this.hider.IsVisible()) {
+        } else if (!this.frame.IsVisible()) {
             this.visible = false;
         } else {
             if (profile.apparence.hideVehicule && UnitHasVehicleUI("player")) {
@@ -242,7 +243,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
             const iconNodes = this.ovaleCompile.GetIconNodes();
             let left = 0;
             let top = 0;
-            const maxHeight = 0;
+            let maxHeight = 0;
+            let maxWidth = 0;
 
             for (const [k, node] of ipairs(iconNodes)) {
                 const icon = this.actions[k];
@@ -251,7 +253,13 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 const [element, atTime] = this.getIconAction(node);
 
                 if (element && atTime) {
-                    [left, top] = this.goNextIcon(icon, left, top);
+                    [left, top, maxWidth, maxHeight] = this.goNextIcon(
+                        icon,
+                        left,
+                        top,
+                        maxWidth,
+                        maxHeight
+                    );
                     icon.icons.Show();
                     let start;
                     if (element.type === "action" && element.offgcd) {
@@ -278,7 +286,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                     icon.icons.Hide();
                 }
             }
-            this.updateBarSize(left, maxHeight);
+            this.updateDragHandle(maxWidth, maxHeight);
             wipe(this.ovale.refreshNeeded);
             this.ovaleDebug.UpdateTrace();
             PrintOneTimeMessages();
@@ -364,21 +372,21 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 icons.cooldownStart &&
                 icons.cooldownEnd
             ) {
-                let top =
+                let ratio =
                     1 -
                     (now - icons.cooldownStart) /
                         (icons.cooldownEnd - icons.cooldownStart);
-                if (top < 0) {
-                    top = 0;
-                } else if (top > 1) {
-                    top = 1;
+                if (ratio < 0) {
+                    ratio = 0;
+                } else if (ratio > 1) {
+                    ratio = 1;
                 }
                 icons.SetPoint(
                     "TOPLEFT",
                     this.frame,
                     "TOPLEFT",
-                    (action.left + top * action.dx) / action.scale,
-                    (action.top - top * action.dy) / action.scale
+                    (action.left + ratio * action.dx) / action.scale,
+                    (action.top + ratio * action.dy) / action.scale
                 );
             }
         }
@@ -389,18 +397,18 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 this.frame,
                 "TOPLEFT",
                 action.left / action.scale,
-                action.top / action.scale
+                action.top / action.scale -
+                    DRAG_HANDLER_HEIGHT -
+                    profile.apparence.margin
             );
         }
     }
 
     UpdateFrame() {
         const profile = this.ovaleOptions.db.profile;
-        if (this.hider.IsVisible()) {
+        if (this.frame.IsVisible()) {
             this.frame.ClearAllPoints();
             this.frame.SetPoint(
-                "CENTER",
-                this.hider,
                 "CENTER",
                 profile.apparence.offsetX,
                 profile.apparence.offsetY
@@ -556,11 +564,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
         }
         const profile = this.ovaleOptions.db.profile;
         this.frame.EnableMouse(!profile.apparence.clickThru);
-        let left = 0;
-        let maxHeight = 0;
-        let maxWidth = 0;
-        let top = 0;
-        const margin = profile.apparence.margin;
+
         const iconNodes = this.ovaleCompile.GetIconNodes();
         for (const [k, node] of ipairs(iconNodes)) {
             if (!this.actions[k]) {
@@ -582,36 +586,19 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 };
             }
             const action = this.actions[k];
-            let width, height, newScale;
+            let newScale;
             if (
                 node.rawNamedParams.size != undefined &&
                 node.rawNamedParams.size.type === "string" &&
                 node.rawNamedParams.size.value === "small"
             ) {
                 newScale = profile.apparence.smallIconScale;
-                width = newScale * 36 + margin;
-                height = newScale * 36 + margin;
             } else {
                 newScale = profile.apparence.iconScale;
-                width = newScale * 36 + margin;
-                height = newScale * 36 + margin;
             }
-            if (top + height > profile.apparence.iconScale * 36 + margin) {
-                top = 0;
-                left = maxWidth;
-            }
+
             action.scale = newScale;
-            if (profile.apparence.vertical) {
-                action.left = top;
-                action.top = -left - BARRE - margin;
-                action.dx = width;
-                action.dy = 0;
-            } else {
-                action.left = left;
-                action.top = -top - BARRE - margin;
-                action.dx = 0;
-                action.dy = height;
-            }
+
             let icon: OvaleIcon;
             icon = action.icons;
             let scale = action.scale;
@@ -633,60 +620,38 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 this.skinGroup.AddButton(icon.frame);
             }
             icon.Show();
-            top = top + height;
-            if (top > maxHeight) {
-                maxHeight = top;
-            }
-            if (left + width > maxWidth) {
-                maxWidth = left + width;
-            }
         }
 
         this.content.SetAlpha(profile.apparence.optionsAlpha);
-        this.updateBarSize(maxWidth, maxHeight);
     }
 
-    private updateBarSize(maxWidth: number, maxHeight: number) {
+    private updateDragHandle(maxWidth: number, maxHeight: number) {
         const profile = this.ovaleOptions.db.profile;
         const margin = profile.apparence.margin;
-        if (profile.apparence.vertical) {
-            this.barre.SetWidth(maxHeight - margin);
-            this.barre.SetHeight(BARRE);
-            this.frame.SetWidth(maxHeight + profile.apparence.iconShiftY);
-            this.frame.SetHeight(
-                maxWidth + BARRE + margin + profile.apparence.iconShiftX
-            );
-            this.content.SetPoint(
-                "TOPLEFT",
-                this.frame,
-                "TOPLEFT",
-                maxHeight + profile.apparence.iconShiftX,
-                profile.apparence.iconShiftY
-            );
-        } else {
-            this.barre.SetWidth(maxWidth - margin);
-            this.barre.SetHeight(BARRE);
-            this.frame.SetWidth(maxWidth);
-            this.frame.SetHeight(maxHeight + BARRE + margin);
-            this.content.SetPoint(
-                "TOPLEFT",
-                this.frame,
-                "TOPLEFT",
-                maxWidth + profile.apparence.iconShiftX,
-                profile.apparence.iconShiftY
-            );
-        }
+        this.dragHandleTexture.SetWidth(maxWidth - margin);
+        this.dragHandleTexture.SetHeight(DRAG_HANDLER_HEIGHT);
+        this.frame.SetWidth(maxWidth);
+        this.frame.SetHeight(maxHeight + DRAG_HANDLER_HEIGHT + margin);
+        this.content.SetPoint(
+            "TOPLEFT",
+            this.frame,
+            "TOPLEFT",
+            maxWidth + profile.apparence.iconShiftX,
+            profile.apparence.iconShiftY
+        );
     }
 
     type = "Frame";
     //   frame: UIFrame;
     localstatus = {};
     actions: LuaArray<Action> = {};
-    hider: UIFrame;
+
+    /** Only used to know the update interval */
     updateFrame: UIFrame;
-    // content: UIFrame;
     timeSinceLastUpdate: number;
-    barre: UITexture;
+
+    /** Used to drag the frame */
+    dragHandleTexture: UITexture;
     skinGroup?: MasqueSkinGroup;
 
     private tracer: Tracer;
@@ -710,46 +675,53 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
         private scripts: OvaleScriptsClass,
         private actionBar: OvaleActionBarClass
     ) {
-        super();
+        super(
+            CreateFrame(
+                "Frame",
+                undefined,
+                UIParent,
+                "SecureHandlerStateTemplate"
+            )
+        );
 
         this.traceLog = LibTextDump.New(`Ovale - ${L.icon_snapshot}`, 750, 500);
 
-        const hider = CreateFrame(
-            "Frame",
-            `${ovale.GetName()}PetBattleFrameHider`,
-            UIParent,
-            "SecureHandlerStateTemplate"
-        );
-        const newFrame = CreateFrame("Frame", undefined, hider);
-        hider.SetAllPoints(UIParent);
-        RegisterStateDriver(hider, "visibility", "[petbattle] hide; show");
+        // const hider = CreateFrame(
+        //     "Frame",
+        //     `${ovale.GetName()}PetBattleFrameHider`,
+        //     UIParent,
+        //     "SecureHandlerStateTemplate"
+        // );
+        // const newFrame = ;
+        // hider.SetAllPoints(UIParent);
+        RegisterStateDriver(this.frame, "visibility", "[petbattle] hide; show");
         this.tracer = ovaleDebug.create("OvaleFrame");
-        this.frame = newFrame;
-        this.hider = hider;
+        // this.frame = newFrame;
+        // this.hider = hider;
         this.updateFrame = CreateFrame(
             "Frame",
             `${ovale.GetName()}UpdateFrame`
         );
-        this.barre = this.frame.CreateTexture();
-        this.content = CreateFrame("Frame", undefined, this.updateFrame);
+        this.dragHandleTexture = this.frame.CreateTexture();
         if (Masque) {
             this.skinGroup = Masque.Group(ovale.GetName());
         }
         this.timeSinceLastUpdate = INFINITY;
-        newFrame.SetWidth(100);
-        newFrame.SetHeight(100);
-        newFrame.SetMovable(true);
-        newFrame.SetFrameStrata("MEDIUM");
-        newFrame.SetScript("OnMouseDown", () => {
+        const frame = this.frame;
+        frame.SetWidth(100);
+        frame.SetHeight(100);
+        frame.SetMovable(true);
+        frame.SetFrameStrata("MEDIUM");
+        frame.SetScript("OnMouseDown", () => {
             if (!ovaleOptions.db.profile.apparence.verrouille) {
-                newFrame.StartMoving();
+                frame.StartMoving();
                 AceGUI.ClearFocus();
             }
         });
-        newFrame.SetScript("OnMouseUp", () => {
-            newFrame.StopMovingOrSizing();
-            const [x, y] = newFrame.GetCenter();
-            const parent = newFrame.GetParent();
+        frame.SetScript("OnMouseUp", () => {
+            frame.StopMovingOrSizing();
+            const [x, y] = frame.GetCenter();
+            const parent = frame.GetParent();
             if (parent) {
                 const profile = ovaleOptions.db.profile;
                 const [parentX, parentY] = parent.GetCenter();
@@ -757,29 +729,28 @@ class OvaleFrame extends AceGUI.WidgetContainerBase implements IconParent {
                 profile.apparence.offsetY = y - parentY;
             }
         });
-        newFrame.SetScript("OnEnter", () => {
+        frame.SetScript("OnEnter", () => {
             const profile = ovaleOptions.db.profile;
             if (
                 !(profile.apparence.enableIcons && profile.apparence.verrouille)
             ) {
-                this.barre.Show();
+                this.dragHandleTexture.Show();
             }
         });
-        newFrame.SetScript("OnLeave", () => {
-            this.barre.Hide();
+        frame.SetScript("OnLeave", () => {
+            this.dragHandleTexture.Hide();
         });
-        newFrame.SetScript("OnHide", () => this.Hide());
+        frame.SetScript("OnHide", () => this.Hide());
         this.updateFrame.SetScript("OnUpdate", (updateFrame, elapsed) =>
             this.OnUpdate(elapsed)
         );
-        this.barre.SetColorTexture(0.8, 0.8, 0.8, 0.5);
-        this.barre.SetPoint("TOPLEFT", 0, 0);
-        this.barre.Hide();
+        this.dragHandleTexture.SetColorTexture(0.8, 0.8, 0.8, 0.5);
+        this.dragHandleTexture.SetPoint("TOPLEFT", 0, 0);
+        this.dragHandleTexture.Hide();
         const content = this.content;
         content.SetWidth(200);
         content.SetHeight(100);
         content.Hide();
-        AceGUIRegisterAsContainer(this);
     }
 
     debugIcon(index: number): void {

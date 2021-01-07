@@ -1,37 +1,74 @@
 import { LuaArray, LuaObj } from "@wowts/lua";
-import { UIFrame } from "@wowts/wow-mock";
+import { CreateFrame, UIFrame } from "@wowts/wow-mock";
+import AceGUI, { AceGUIWidgetBase } from "@wowts/ace_gui-3.0";
 
-interface Widget<T> {
-    frame: UIFrame & { obj?: T };
-    children?: unknown;
-    userdata?: unknown;
-    events?: unknown;
-    base?: unknown;
-    content: UIFrame & { obj?: T };
-    SetLayout(list: string): void;
+export class Widget<T extends UIFrame> extends AceGUI.WidgetBase {
+    userdata: LuaObj<unknown> = {};
+    events: LuaObj<unknown> = {};
+    base = AceGUI.WidgetBase;
+    frame: T & { obj?: Widget<T> };
+
+    protected OnWidthSet?: (width: number) => void;
+    protected OnHeightSet?: (height: number) => void;
+
+    constructor(frame: T) {
+        super();
+        this.frame = frame;
+        this.frame.obj = this;
+        this.frame.SetScript("OnSizeChanged", this.handleFrameResize);
+    }
+
+    private handleFrameResize = () => {
+        if (this.frame.GetWidth() && this.frame.GetHeight()) {
+            if (this.OnWidthSet) this.OnWidthSet(this.frame.GetWidth());
+            if (this.OnHeightSet) this.OnHeightSet(this.frame.GetHeight());
+        }
+    };
 }
 
-export function AceGUIRegisterAsContainer<T extends Widget<U>, U>(
-    widget: T & U
-) {
-    widget.children = {};
-    widget.userdata = {};
-    widget.events = {};
-    // widget.base = WidgetContainerBase
-    widget.content.obj = widget;
-    widget.frame.obj = widget;
-    // widget.content.SetScript("OnSizeChanged", ContentResize)
-    // widget.frame.SetScript("OnSizeChanged", FrameResize)
-    widget.SetLayout("List");
-}
+export class WidgetContainer<
+    T extends UIFrame
+> extends AceGUI.WidgetContainerBase {
+    children: LuaArray<AceGUIWidgetBase> = {};
+    userdata: LuaObj<unknown> = {};
+    events: LuaObj<unknown> = {};
 
-export function AceGUIRegisterAsWidget<T extends Widget<U>, U>(widget: T & U) {
-    widget.userdata = {};
-    widget.events = {};
-    // widget.base = WidgetBase
-    widget.frame.obj = widget;
-    // widget.frame.SetScript("OnSizeChanged", FrameResize)
-    return widget;
+    /** Where the child frames are placed */
+    content: UIFrame & { obj?: WidgetContainer<T> };
+    frame: T & { obj?: WidgetContainer<T> };
+    base = AceGUI.WidgetContainerBase;
+    width = 0;
+    height = 0;
+
+    protected OnWidthSet?: (width: number) => void;
+    protected OnHeightSet?: (height: number) => void;
+
+    constructor(frame: T) {
+        super();
+        const content = CreateFrame("Frame", undefined, frame);
+        content.SetScript("OnSizeChanged", this.handleFrameResize);
+        frame.SetScript("OnSizeChanged", this.handleContentResize);
+        this.content = content;
+        this.content.obj = this;
+        this.frame = frame;
+        this.frame.obj = this;
+        this.SetLayout("List");
+    }
+
+    private handleFrameResize = () => {
+        if (this.frame.GetWidth() && this.frame.GetHeight()) {
+            if (this.OnWidthSet) this.OnWidthSet(this.frame.GetWidth());
+            if (this.OnHeightSet) this.OnHeightSet(this.frame.GetHeight());
+        }
+    };
+
+    private handleContentResize = () => {
+        if (this.content.GetWidth() && this.content.GetHeight()) {
+            this.width = this.content.GetWidth();
+            this.height = this.content.GetHeight();
+            this.DoLayout();
+        }
+    };
 }
 
 interface OptionUiBase {

@@ -58,7 +58,7 @@ export class OvaleIcon {
     rangeIndicator: UIFontString;
     remains: UIFontString;
     shortcut: UIFontString;
-    icone: UITexture;
+    icon: UITexture;
     frame: UICheckButton;
 
     HasScriptControls() {
@@ -77,23 +77,15 @@ export class OvaleIcon {
         private ovaleSpellBook: OvaleSpellBookClass,
         private actionBar: OvaleActionBarClass
     ) {
-        if (!secure) {
-            this.frame = CreateFrame(
-                "CheckButton",
-                name,
-                parent.frame,
+        this.frame = CreateFrame(
+            "CheckButton",
+            name,
+            parent.frame,
+            (secure && "SecureActionButtonTemplate, ActionButtonTemplate") ||
                 "ActionButtonTemplate"
-            );
-        } else {
-            this.frame = CreateFrame(
-                "CheckButton",
-                name,
-                parent.frame,
-                "SecureActionButtonTemplate, ActionButtonTemplate"
-            );
-        }
+        );
         const profile = this.ovaleOptions.db.profile;
-        this.icone = _G[`${name}Icon`];
+        this.icon = _G[`${name}Icon`];
         this.shortcut = _G[`${name}HotKey`];
         this.remains = _G[`${name}Name`];
         this.rangeIndicator = _G[`${name}Count`];
@@ -120,9 +112,9 @@ export class OvaleIcon {
         this.actionType = undefined;
         this.actionId = undefined;
         this.actionHelp = undefined;
-        this.frame.SetScript("OnMouseUp", this.OvaleIcon_OnMouseUp);
-        this.frame.SetScript("OnEnter", () => this.OvaleIcon_OnEnter());
-        this.frame.SetScript("OnLeave", () => this.OvaleIcon_OnLeave());
+        this.frame.SetScript("OnMouseUp", this.onMouseUp);
+        this.frame.SetScript("OnEnter", this.onEnter);
+        this.frame.SetScript("OnLeave", this.onLeave);
         this.focusText.SetFontObject("GameFontNormalSmall");
         this.focusText.SetAllPoints(this.frame);
         this.focusText.SetTextColor(1, 1, 1);
@@ -134,9 +126,9 @@ export class OvaleIcon {
     }
 
     SetValue(value: number | undefined, actionTexture: string | undefined) {
-        this.icone.Show();
-        this.icone.SetTexture(actionTexture);
-        this.icone.SetAlpha(this.ovaleOptions.db.profile.apparence.alpha);
+        this.icon.Show();
+        this.icon.SetTexture(actionTexture);
+        this.icon.SetAlpha(this.ovaleOptions.db.profile.apparence.alpha);
         this.cd.Hide();
         this.focusText.Hide();
         this.rangeIndicator.Hide();
@@ -227,12 +219,12 @@ export class OvaleIcon {
             } else {
                 cd.Hide();
             }
-            this.icone.Show();
-            this.icone.SetTexture(element.actionTexture);
+            this.icon.Show();
+            this.icon.SetTexture(element.actionTexture);
             if (element.actionUsable) {
-                this.icone.SetAlpha(1);
+                this.icon.SetAlpha(1);
             } else {
-                this.icone.SetAlpha(0.5);
+                this.icon.SetAlpha(0.5);
             }
 
             const options = element.options;
@@ -242,9 +234,9 @@ export class OvaleIcon {
                     element.actionResourceExtend &&
                     element.actionResourceExtend > 0
                 ) {
-                    this.icone.SetVertexColor(0.75, 0.2, 0.2);
+                    this.icon.SetVertexColor(0.75, 0.2, 0.2);
                 } else {
-                    this.icone.SetVertexColor(1, 1, 1);
+                    this.icon.SetVertexColor(1, 1, 1);
                 }
                 if (isString(options.help)) this.actionHelp = options.help;
                 if (!(this.cooldownStart && this.cooldownEnd)) {
@@ -326,7 +318,7 @@ export class OvaleIcon {
             }
             this.frame.Show();
         } else {
-            this.icone.Hide();
+            this.icon.Hide();
             this.rangeIndicator.Hide();
             this.shortcut.Hide();
             this.remains.Hide();
@@ -406,7 +398,7 @@ export class OvaleIcon {
     SetRangeIndicator(text: string) {
         this.rangeIndicator.SetText(text);
     }
-    OvaleIcon_OnMouseUp = (
+    onMouseUp = (
         _: unknown,
         button:
             | "LeftButton"
@@ -423,7 +415,7 @@ export class OvaleIcon {
         }
         this.frame.SetChecked(true);
     };
-    OvaleIcon_OnEnter() {
+    onEnter = () => {
         if (this.help || this.actionType || this.HasScriptControls()) {
             GameTooltip.SetOwner(this.frame, "ANCHOR_BOTTOMLEFT");
             if (this.help) {
@@ -460,12 +452,12 @@ export class OvaleIcon {
             }
             GameTooltip.Show();
         }
-    }
-    OvaleIcon_OnLeave() {
+    };
+    onLeave = () => {
         if (this.help || this.HasScriptControls()) {
             GameTooltip.Hide();
         }
-    }
+    };
     SetPoint(
         anchor: UIPosition,
         reference: UIFrame,
