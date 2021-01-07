@@ -122,6 +122,7 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
     fury: true,
     gcd: true,
     gcd_haste: true,
+    half_duration: true,
     haste: true,
     health: true,
     holypower: true,

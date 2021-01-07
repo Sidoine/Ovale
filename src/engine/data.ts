@@ -139,6 +139,7 @@ export interface SpellInfoValues
         SpellInfoPowerRefundValues {
     duration?: number;
     add_duration_combopoints?: number;
+    half_duration?: number;
     tick?: number;
     stacking?: number;
     max_stacks?: number;

@@ -1875,6 +1875,7 @@ export class OvaleAuraClass
                 const auraId = tonumber(auraIdKey);
                 const duration = this.GetBaseDuration(
                     auraId,
+                    spellId,
                     atTime,
                     spellcast
                 );
@@ -2183,6 +2184,7 @@ export class OvaleAuraClass
 
     GetBaseDuration(
         auraId: number,
+        spellId?: number | string,
         atTime?: number,
         spellcast?: PaperDollSnapshot
     ) {
@@ -2205,6 +2207,20 @@ export class OvaleAuraClass
                     (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {
                 duration = value * ratio;
+            }
+        }
+        if (si && si.half_duration && spellId) {
+            if (this.ovaleData.buffSpellList[spellId]) {
+                for (const [id] of pairs(
+                    this.ovaleData.buffSpellList[spellId]
+                )) {
+                    if (id === si.half_duration) {
+                        duration = duration * 0.5;
+                        break;
+                    }
+                }
+            } else if (spellId === si.half_duration) {
+                duration = duration * 0.5;
             }
         }
         // Most aura durations are no longer reduced by haste
