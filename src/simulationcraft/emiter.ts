@@ -1289,6 +1289,8 @@ export class Emiter {
                 bodyCode = "texture(spell_shadow_soulgem text=pickup)";
                 conditionCode = "soulfragments() > 0";
                 isSpellAction = false;
+            } else if (className == "DRUID" && action == "primal_wrath") {
+                conditionCode = "Enemies(tagged=1) > 1";
             } else if (className == "DRUID" && action == "pulverize") {
                 const debuffName = "thrash_bear_debuff";
                 this.AddSymbol(annotation, debuffName);
