@@ -524,7 +524,7 @@ Define(frenzied_regeneration 22842)
 #prowl
     SpellRequire(prowl unusable set=1 enabled=(incombat() or buffpresent(prowl)))
 #rip
-    SpellInfo(rip add_duration_combopoints=4)
+    SpellInfo(rip add_duration_combopoints=4 half_duration=primal_wrath)
 Define(thrash_bear 77758)
     SpellAddBuff(thrash_bear earthwarden_buff add=1 enabled=(talent(earthwarden_talent)))
     SpellAddTargetDebuff(thrash_bear thrash_bear_debuff add=1)
