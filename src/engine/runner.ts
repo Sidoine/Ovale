@@ -552,7 +552,7 @@ export class Runner {
                  *      C(t) = C(t0) + C'(t0)*(t - t0) + O(t^2) (Taylor series at t = t0)
                  *           = 1/B(t0) + [-z/B(t0)^2]*(t - t0) + O(t^2) converges when |t - t0| < |B(t0)/z|
                  * A(t)/B(t) = A(t0)/B(t0) + (t - t0)*{[B(t0)*c - A(t0)*z]/B(t0)^2} + O(t^2)
-                 *           = A(t0)/B(t0) + (t - t0)*{[z/B(t0)] - [A(t0)/B(t0)]*[z/B(t0)]} + O(t^2)
+                 *           = A(t0)/B(t0) + (t - t0)*{[c/B(t0)] - [A(t0)/B(t0)]*[z/B(t0)]} + O(t^2)
                  */
                 if (B === 0) {
                     if (A !== 0) {
@@ -566,12 +566,7 @@ export class Runner {
                 }
                 l = A / B;
                 m = t;
-                const numerator = B * c - A * z;
-                if (numerator != huge) {
-                    n = numerator / (B ^ 2);
-                } else {
-                    n = numerator;
-                }
+                n = c / B - (A / B) * (z / B);
                 let bound;
                 if (z == 0) {
                     bound = huge;
