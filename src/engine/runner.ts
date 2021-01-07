@@ -514,19 +514,46 @@ export class Runner {
             }
             const A = a + (t - b) * c; // the A value at time t
             let B = x + (t - y) * z; // The B value at time t
+            /**
+             * A(t) = a + (t - b)*c
+             *      = a + (t - t0 + t0 - b)*c, for all t0
+             *      = a + (t - t0)*c + (t0 - b)*c
+             *      = [a + (t0 - b)*c] + (t - t0)*c
+             *      = A(t0) + (t - t0)*c
+             * B(t) = B(t0) + (t - t0)*z
+             */
             if (operator == "+") {
+                /**
+                 * A(t) + B(t) = [A(t0) + B(t0)] + (t - t0)*(c + z)
+                 */
                 l = A + B;
                 m = t;
                 n = c + z;
             } else if (operator == "-") {
+                /**
+                 * A(t) - B(t) = [A(t0) - B(t0)] + (t - t0)*(c - z)
+                 */
                 l = A - B;
                 m = t;
                 n = c - z;
             } else if (operator == "*") {
+                /**
+                 * A(t)*B(t) = [A(t0) + (t - t0)*c] * [B(t0) + (t - t0)*z]
+                 *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + (t - t0)^2*(c*z)
+                 *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + O(t^2)
+                 */
                 l = A * B;
                 m = t;
                 n = A * z + B * c;
             } else if (operator == "/") {
+                /**
+                 *      C(t) = 1/B(t)
+                 *           = 1/[B(t0) - (t - t0)*z]
+                 *      C(t) = C(t0) + C'(t0)*(t - t0) + O(t^2) (Taylor series at t = t0)
+                 *           = 1/B(t0) + [-z/B(t0)^2]*(t - t0) + O(t^2) converges when |t - t0| < |B(t0)/z|
+                 * A(t)/B(t) = A(t0)/B(t0) + (t - t0)*{[B(t0)*c - A(t0)*z]/B(t0)^2} + O(t^2)
+                 *           = A(t0)/B(t0) + (t - t0)*{[z/B(t0)] - [A(t0)/B(t0)]*[z/B(t0)]} + O(t^2)
+                 */
                 if (B === 0) {
                     if (A !== 0) {
                         OneTimeMessage(
@@ -558,6 +585,7 @@ export class Runner {
                 timeSpan.copyFromArray(scratch);
                 scratch.Release();
             } else if (operator == "%") {
+                // A % B = A mod B
                 if (c == 0 && z == 0) {
                     l = A % B;
                     m = t;
@@ -572,6 +600,7 @@ export class Runner {
                     n = 0;
                 }
             } else if (operator === ">?") {
+                // A(t) >? B(t) = max(A(t), B(t))
                 l = min(A, B);
                 m = t;
                 // TODO should change the end
@@ -581,6 +610,7 @@ export class Runner {
                     n = z;
                 }
             } else if (operator === "<?") {
+                // A(t) <? B(t) = min(A(t), B(t))
                 l = min(A, B);
                 m = t;
                 if (l === A) {
