@@ -4035,6 +4035,35 @@ export class Emiter {
             code =
                 "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis) <= 0";
             this.AddSymbol(annotation, "metamorphosis");
+        } else if (className == "DRUID" && truthy(match(operand, "^druid%."))) {
+            const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+            tokenIterator(); // consume "druid."
+            const [name] = this.Disambiguate(
+                annotation,
+                lower(tokenIterator()),
+                annotation.classId,
+                annotation.specialization
+            );
+            const [debuffName] = this.Disambiguate(
+                annotation,
+                `${name}_debuff`,
+                annotation.classId,
+                annotation.specialization
+            );
+            const property = tokenIterator();
+            if (property == "ticks_gained_on_refresh") {
+                if (debuffName == "primal_wrath") {
+                    code = "target.TicksGainedOnRefresh(rip primal_wrath)";
+                    this.AddSymbol(annotation, "primal_wrath");
+                    this.AddSymbol(annotation, "rip");
+                } else {
+                    code = format(
+                        "target.TicksGainedOnRefresh(%s)",
+                        debuffName
+                    );
+                    this.AddSymbol(annotation, debuffName);
+                }
+            }
         } else if (
             className == "DRUID" &&
             operand == "buff.wild_charge_movement.down"
