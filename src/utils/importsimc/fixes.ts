@@ -138,6 +138,8 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("steady_focus", 193533);
     fixIdentifier("steady_focus_buff", 193534);
     fixIdentifier("serpent_sting_marksmanship", 271788);
+    fixIdentifier("unstable_affliction_silence_debuff", 196364);
+    fixIdentifier("corruption_debuff_affliction", 146739);
 
     // Bombs
     fixIdentifier("pheromone_bomb", 270323);

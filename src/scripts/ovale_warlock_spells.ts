@@ -60,15 +60,10 @@ Define(corruption 172)
 # Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
   SpellInfo(corruption)
   # Suffering w1 Shadow damage every t1 sec.
-  SpellAddTargetDebuff(corruption corruption_debuff_unused_3 add=1)
-Define(corruption_debuff 13530)
-# Corrupts the target, causing o1 damage over 3 seconds.
-  SpellInfo(corruption_debuff duration=3 tick=1)
-  # Inflicts s1 Shadow damage every t1 sec.
-  SpellAddTargetDebuff(corruption_debuff corruption_debuff add=1)
-Define(corruption_debuff_unused_3 146739)
+  SpellAddTargetDebuff(corruption corruption_debuff_affliction add=1)
+Define(corruption_debuff_affliction 146739)
 # Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
-  SpellInfo(corruption_debuff_unused_3 duration=14 gcd=0 offgcd=1 tick=2)
+  SpellInfo(corruption_debuff_affliction duration=14 gcd=0 offgcd=1 tick=2)
 Define(dark_soul_instability 113858)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
   SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 gcd=0 offgcd=1)
@@ -313,11 +308,6 @@ Define(unstable_affliction 316099)
   SpellInfo(unstable_affliction duration=16 max_stacks=1 tick=2)
   # Suffering w2 Shadow damage every t2 sec. If dispelled, will cause w2*s1/100 damage to the dispeller and silence them for 196364d.
   SpellAddTargetDebuff(unstable_affliction unstable_affliction add=1)
-Define(unstable_affliction_debuff 196364)
-# Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
-  SpellInfo(unstable_affliction_debuff duration=4 gcd=0 offgcd=1)
-  # Silenced.
-  SpellAddTargetDebuff(unstable_affliction_debuff unstable_affliction_debuff add=1)
 Define(vile_taint 278350)
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
   SpellInfo(vile_taint soulshards=1 cd=20 duration=10 tick=2)
