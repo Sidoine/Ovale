@@ -376,6 +376,8 @@ export function convertFromItemData(
             itemInfo.cd = effect.cooldown_duration / 1000;
         if (effect.cooldown_group_duration > 0)
             itemInfo.cd = effect.cooldown_group_duration / 1000;
+        if (effect.cooldown_group > 0)
+            itemInfo.shared_cd = `item_cd_${effect.cooldown_group}`;
         if (effect.spell_id) {
             const spell = spellDataById.get(effect.spell_id);
             if (spell) {

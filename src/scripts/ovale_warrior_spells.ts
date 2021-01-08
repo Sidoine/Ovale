@@ -316,8 +316,10 @@ Define(unstoppable_force_talent 22544)
 Define(warbreaker_talent 22391)
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(sudden_death_buff 280776)
+Define(potion_of_spectral_strength_item 171275)
+    ItemInfo(potion_of_spectral_strength_item cd=1 shared_cd="item_cd_4" proc=307164)
 Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 rppm=6 proc=307495)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
 Define(will_of_the_berserker_runeforge 6966)
 Define(vicious_contempt_conduit 64)
     `;

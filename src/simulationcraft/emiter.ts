@@ -2647,7 +2647,7 @@ export class Emiter {
             code = format("channeling(%s)", name);
         } else if (property == "cooldown") {
             if (name === "use_item") {
-                code = format("ItemCooldown(trinket0slot)");
+                code = format('ItemCooldown(slot="trinket0slot")');
             } else {
                 code = format("SpellCooldown(%s)", name);
             }
@@ -3270,13 +3270,21 @@ export class Emiter {
             let name = tokenIterator();
             const property = tokenIterator();
             let prefix;
-            [name, prefix] = this.Disambiguate(
-                annotation,
-                name,
-                annotation.classId,
-                annotation.specialization,
-                "spell"
-            );
+            let isSymbol;
+            if (truthy(match(name, "^item_cd_"))) {
+                name = `shared="${name}"`;
+                prefix = "Item";
+                isSymbol = false;
+            } else {
+                [name, prefix] = this.Disambiguate(
+                    annotation,
+                    name,
+                    annotation.classId,
+                    annotation.specialization,
+                    "spell"
+                );
+                isSymbol = true;
+            }
             let code;
             if (property == "execute_time") {
                 code = format("ExecuteTime(%s)", name);
@@ -3316,7 +3324,7 @@ export class Emiter {
                     nodeList,
                     annotation.astAnnotation
                 );
-                this.AddSymbol(annotation, name);
+                if (isSymbol) this.AddSymbol(annotation, name);
             }
         }
         return node;
@@ -4629,7 +4637,10 @@ export class Emiter {
                 this.AddSymbol(annotation, item);
             } else if (procType === "cooldown") {
                 if (statName == "remains") {
-                    code = emitTrinketCondition(`ItemCooldown("%s")`, slot);
+                    code = emitTrinketCondition(
+                        `ItemCooldown(slot="%s")`,
+                        slot
+                    );
                 } else if (statName === "duration") {
                     code = emitTrinketCondition(
                         `ItemCooldownDuration(slot="%s")`,

@@ -33,6 +33,7 @@ import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
+    ParameterInfo,
     ReturnBoolean,
     ReturnConstant,
     ReturnValueBetween,
@@ -112,6 +113,7 @@ export class OvaleEquipmentClass {
     ready = false;
     equippedItemById: LuaArray<number> = {};
     equippedItemBySlot: LuaObj<number> = {};
+    equippedItemBySharedCooldown: LuaObj<number> = {};
     // equippedItemLevels = {}
     mainHandItemType?: WeaponType;
     offHandItemType?: WeaponType;
@@ -174,10 +176,25 @@ export class OvaleEquipmentClass {
         );
         ovaleCondition.RegisterCondition("hasshield", false, this.hasShield);
         ovaleCondition.RegisterCondition("hastrinket", false, this.hasTrinket);
-        ovaleCondition.RegisterCondition(
+        const slotParameter: ParameterInfo<SlotName> = {
+            type: "string",
+            name: "slot",
+            checkTokens: checkSlotName,
+            optional: true,
+        };
+        const itemParameter: ParameterInfo<number> = {
+            name: "item",
+            type: "number",
+            optional: true,
+            isItem: true,
+        };
+        ovaleCondition.register(
             "itemcooldown",
-            false,
-            this.ItemCooldown
+            this.ItemCooldown,
+            { type: "number" },
+            itemParameter,
+            slotParameter,
+            { name: "shared", type: "string", optional: true }
         );
         ovaleCondition.register(
             "itemrppm",
@@ -195,13 +212,8 @@ export class OvaleEquipmentClass {
             "itemcooldownduration",
             this.itemCooldownDuration,
             { type: "number" },
-            { type: "number", name: "item", isItem: true, optional: true },
-            {
-                type: "string",
-                name: "slot",
-                checkTokens: checkSlotName,
-                optional: true,
-            }
+            itemParameter,
+            slotParameter
         );
         ovaleCondition.RegisterCondition(
             "weaponenchantexpires",
@@ -281,6 +293,13 @@ export class OvaleEquipmentClass {
         }
         return undefined;
     }
+
+    getEquippedItemBySharedCooldown(
+        sharedCooldown: string
+    ): number | undefined {
+        return this.equippedItemBySharedCooldown[sharedCooldown];
+    }
+
     // What's the purpose with doing it this way vs the above
     /*
     GetEquippedItem(...__args):number[] {
@@ -416,6 +435,14 @@ export class OvaleEquipmentClass {
                 );
                 this.offHandItemType = itemEquipLoc;
                 this.offHandDPS = dps;
+            }
+            const itemInfo = this.OvaleData.itemInfo[newItemId];
+            if (itemInfo) {
+                if (itemInfo.shared_cd) {
+                    this.equippedItemBySharedCooldown[
+                        itemInfo.shared_cd
+                    ] = newItemId;
+                }
             }
         } else {
             delete this.equippedItemBySlot[slotId];
@@ -588,13 +615,16 @@ export class OvaleEquipmentClass {
 	     Spell(berserk_cat)
      */
     private ItemCooldown = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined,
+        sharedCooldown: string | undefined
     ) => {
-        let itemId = positionalParams[1];
-        if (itemId && type(itemId) != "number") {
-            itemId = this.GetEquippedItemBySlotName(itemId);
+        if (sharedCooldown) {
+            itemId = this.getEquippedItemBySharedCooldown(sharedCooldown);
+        }
+        if (slot) {
+            itemId = this.GetEquippedItemBySlotName(slot);
         }
         if (itemId) {
             const [start, duration] = GetItemCooldown(itemId);

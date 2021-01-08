@@ -228,6 +228,11 @@ Define(storm_earth_and_fire 137639)
   SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=0 offgcd=1)
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire add=1)
+Define(storm_earth_and_fire_fixate 221771)
+# Direct your Earth and Fire spirits to focus their attacks only on the target.
+  SpellInfo(storm_earth_and_fire_fixate cd=1 gcd=0 offgcd=1)
+  # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
+  SpellAddBuff(storm_earth_and_fire_fixate storm_earth_and_fire_fixate add=1)
 Define(the_emperors_capacitor_buff 235054)
 # Chi spenders increase the damage of your next Crackling Jade Lightning by 235054s1 and reduce its cost by 235054s2, stacking up to 235054u times.
   SpellInfo(the_emperors_capacitor_buff max_stacks=20 gcd=0 offgcd=1)
@@ -307,9 +312,9 @@ Define(whirling_dragon_punch_talent 22105)
 Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(potion_of_spectral_agility_item 171270)
-    ItemInfo(potion_of_spectral_agility_item cd=1 proc=307159)
+    ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
 Define(charred_passions_runeforge 7076)
-Define(calculated_strikes_conduit 19)
+Define(coordinated_offensive_conduit 22)
     `;
     // END
     code += `

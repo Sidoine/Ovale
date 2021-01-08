@@ -10,6 +10,7 @@ import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "../engine/debug";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
+import { isNumber } from "../tools/tools";
 
 const GLOBAL_COOLDOWN = 61304;
 const COOLDOWN_THRESHOLD = 0.1;
@@ -200,7 +201,7 @@ export class OvaleCooldownClass
         return [cd.start, cd.duration];
     }
     GetSpellCooldown(
-        spellId: number,
+        spellId: number | string,
         atTime: number | undefined
     ): [number, number, boolean] {
         if (atTime) {
@@ -281,7 +282,7 @@ export class OvaleCooldownClass
         }
     };
 
-    GetCD(spellId: number, atTime: number) {
+    GetCD(spellId: number | string, atTime: number) {
         this.profiler.StartProfiling("OvaleCooldown_state_GetCD");
         let cdName: string | number = spellId;
         const si = this.ovaleData.spellInfo[spellId];
@@ -319,17 +320,19 @@ export class OvaleCooldownClass
             cd.start = start - COOLDOWN_THRESHOLD;
             cd.duration = duration;
             cd.enable = enable;
-            const [
-                charges,
-                maxCharges,
-                chargeStart,
-                chargeDuration,
-            ] = GetSpellCharges(spellId);
-            if (charges) {
-                cd.charges = charges;
-                cd.maxCharges = maxCharges;
-                cd.chargeStart = chargeStart;
-                cd.chargeDuration = chargeDuration;
+            if (isNumber(spellId)) {
+                const [
+                    charges,
+                    maxCharges,
+                    chargeStart,
+                    chargeDuration,
+                ] = GetSpellCharges(spellId);
+                if (charges) {
+                    cd.charges = charges;
+                    cd.maxCharges = maxCharges;
+                    cd.chargeStart = chargeStart;
+                    cd.chargeDuration = chargeDuration;
+                }
             }
         }
         const now = atTime;

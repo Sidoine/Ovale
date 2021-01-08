@@ -383,7 +383,7 @@ Define(volley_talent 22288)
 Define(wildfire_infusion_talent 22301)
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(potion_of_spectral_agility_item 171270)
-    ItemInfo(potion_of_spectral_agility_item cd=1 proc=307159)
+    ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
 Define(dreadfire_vessel_item 184030)
     ItemInfo(dreadfire_vessel_item cd=90 proc=344732)
 Define(nessingwarys_trapping_apparatus_runeforge 7004)

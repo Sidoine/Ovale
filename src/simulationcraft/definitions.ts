@@ -687,6 +687,10 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 type: MiscOperandModifierType.Parameter,
                 createOptions: true,
             },
+            no_cds: {
+                type: MiscOperandModifierType.Parameter,
+                createOptions: true,
+            },
         },
         symbol: "",
     },

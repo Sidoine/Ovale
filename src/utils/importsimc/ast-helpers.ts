@@ -100,11 +100,20 @@ export function getDefinition(
     return output;
 }
 
+function unparseValue(value: string | number | undefined) {
+    if (typeof value === "string") {
+        return `"${value}"`;
+    }
+    return value;
+}
+
 export function getItemProps(itemData: CustomItemData) {
     let output = "";
     for (const key in itemData.itemInfo) {
         if (key === "require") continue;
-        output += ` ${key}=${itemData.itemInfo[key as SpellInfoProperty]}`;
+        output += ` ${key}=${unparseValue(
+            itemData.itemInfo[key as SpellInfoProperty]
+        )}`;
     }
     return output;
 }

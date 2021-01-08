@@ -71,10 +71,10 @@ AddFunction armssingle_targetmainactions
  if buffpresent(sudden_death_buff) spell(execute)
  #mortal_strike
  spell(mortal_strike)
- #whirlwind,if=talent.fervor_of_battle.enabled&rage>60
- if hastalent(fervor_of_battle_talent) and rage() > 60 spell(whirlwind)
- #slam
- spell(slam)
+ #whirlwind,if=talent.fervor_of_battle.enabled
+ if hastalent(fervor_of_battle_talent) spell(whirlwind)
+ #slam,if=!talent.fervor_of_battle.enabled
+ if not hastalent(fervor_of_battle_talent) spell(slam)
 }
 
 AddFunction armssingle_targetmainpostconditions
@@ -111,7 +111,7 @@ AddFunction armssingle_targetshortcdactions
 
 AddFunction armssingle_targetshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or charges(overpower) == 2 and spell(overpower) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and rage() > 60 and spell(whirlwind) or spell(slam)
+ target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or charges(overpower) == 2 and spell(overpower) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
 }
 
 AddFunction armssingle_targetcdactions
@@ -120,7 +120,7 @@ AddFunction armssingle_targetcdactions
 
 AddFunction armssingle_targetcdpostconditions
 {
- spellcooldown(colossus_smash) < 8 and not 0 > 0 and spell(avatar) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or spell(warbreaker) or spell(colossus_smash) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or charges(overpower) == 2 and spell(overpower) or buffexpires(deadly_calm) and { target.debuffpresent(colossus_smash_debuff) and rage() < 30 or rage() < 70 } and spell(bladestorm) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or spell(deadly_calm) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and rage() > 60 and spell(whirlwind) or spell(slam)
+ spellcooldown(colossus_smash) < 8 and not 0 > 0 and spell(avatar) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds) < gcd() and spell(cleave) or spell(warbreaker) or spell(colossus_smash) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or charges(overpower) == 2 and spell(overpower) or buffexpires(deadly_calm) and { target.debuffpresent(colossus_smash_debuff) and rage() < 30 or rage() < 70 } and spell(bladestorm) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or spell(deadly_calm) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
 }
 
 ### actions.precombat
@@ -358,7 +358,7 @@ AddFunction arms_defaultcdactions
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
   #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
+  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
   #blood_fury,if=debuff.colossus_smash.up
   if target.debuffpresent(colossus_smash_debuff) spell(blood_fury)
 
@@ -474,7 +474,7 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 # massacre_talent_arms
 # mortal_strike
 # overpower
-# potion_of_phantom_fire_item
+# potion_of_spectral_strength_item
 # pummel
 # quaking_palm
 # ravager

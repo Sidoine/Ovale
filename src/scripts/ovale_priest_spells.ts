@@ -118,6 +118,11 @@ Define(mindbender_shadow 200174)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
   SpellInfo(mindbender_shadow cd=60 duration=15)
   SpellRequire(mindbender_shadow unusable set=1 enabled=(not hastalent(mindbender_talent)))
+Define(mindgames 323673)
+# Assault an enemy's mind, dealing (300 of Spell Power)*m3/100 Shadow damage and briefly reversing their perception of reality.rnrn?c3[For 5 seconds, the next <damage> damage they deal will heal their target, and the next <healing> healing they deal will damage their target.rnrn|cFFFFFFFFReversed damage and healing generate up to 323706s2*2 Insanity.|r]rn][For 5 seconds, the next <damage> damage they deal will heal their target, and the next <healing> healing they deal will damage their target.rnrn|cFFFFFFFFReversed damage and healing restore up to 323706s3*2 mana.|r]
+  SpellInfo(mindgames cd=45 duration=5)
+  # The next w2 damage and w7 healing dealt will be reversed.
+  SpellAddTargetDebuff(mindgames mindgames add=1)
 Define(penance 47540)
 # Launches a volley of holy light at the target, causing ?s193134[(40 of Spell Power)*4][(40 of Spell Power)*3] Holy damage to an enemy or ?s193134[(125 of Spell Power)*4][(125 of Spell Power)*3] healing to an ally over 2 seconds. Castable while moving.
   SpellInfo(penance cd=9 channel=0)
@@ -194,6 +199,12 @@ Define(smite 585)
 # Smites an enemy for (47 of Spell Power) Holy damage?s231687[ and has a 231687s1 chance to reset the cooldown of Holy Fire][].
   SpellInfo(smite)
   SpellRequire(smite replaced_by set=mind_flay enabled=(specialization("shadow")))
+Define(spirit_shell 109964)
+# For 10 seconds, Penance, Power Word: Radiance, and Atonement create absorb shields for s1 of their value, instead of healing.
+  SpellInfo(spirit_shell cd=60 duration=10 gcd=0 offgcd=1)
+  SpellRequire(spirit_shell unusable set=1 enabled=(not hastalent(spirit_shell_talent)))
+  # Penance, Power Word: Radiance, and Atonement create absorb shields for w1 of their healing.
+  SpellAddBuff(spirit_shell spirit_shell add=1)
 Define(surrender_to_madness 319952)
 # Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
   SpellInfo(surrender_to_madness cd=90 duration=25)
@@ -288,6 +299,8 @@ Define(shadow_covenant_talent 19766)
 # Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
 Define(shadow_crash_talent 21755)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (153 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
+Define(spirit_shell_talent 21184)
+# For 10 seconds, Penance, Power Word: Radiance, and Atonement create absorb shields for s1 of their value, instead of healing.
 Define(surrender_to_madness_talent 21979)
 # Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
 Define(twist_of_fate_talent_shadow 23125)
@@ -295,9 +308,9 @@ Define(twist_of_fate_talent_shadow 23125)
 Define(void_torrent_talent 21720)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
 Define(potion_of_spectral_intellect_item 171273)
-    ItemInfo(potion_of_spectral_intellect_item cd=1 proc=307162)
+    ItemInfo(potion_of_spectral_intellect_item cd=1 shared_cd="item_cd_4" proc=307162)
 Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 rppm=6 proc=307495)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
 Define(painbreaker_psalm_runeforge 6981)
 Define(sephuzs_proclamation_runeforge 7103)
 Define(shadowflame_prism_runeforge 6982)

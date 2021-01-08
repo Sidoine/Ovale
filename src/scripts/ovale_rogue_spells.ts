@@ -69,11 +69,6 @@ Define(broadside 193356)
   SpellInfo(broadside gcd=0 offgcd=1)
   # Your combo-point generating abilities generate s1 additional combo point and deal s4 increased damage.
   SpellAddBuff(broadside broadside add=1)
-Define(buried_treasure 199600)
-# Your base Energy regeneration is increased by s1/5 per sec for the duration of Roll the Bones.
-  SpellInfo(buried_treasure gcd=0 offgcd=1)
-  # Increases Energy regeneration by s1/5 per sec.
-  SpellAddBuff(buried_treasure buried_treasure add=1)
 Define(cheap_shot 1833)
 # Stuns the target for 4 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-1)
@@ -167,11 +162,6 @@ Define(gouge 1776)
   SpellInfo(gouge energy=25 cd=15 duration=4 gcd=1 combopoints=-1)
   # Incapacitated.
   SpellAddTargetDebuff(gouge gouge add=1)
-Define(grand_melee 193358)
-# Finishing moves grant s1 sec. of Slice and Dice per combo point spent.rnrnIncreases your Leech by s2 for the duration of Roll the Bones.
-  SpellInfo(grand_melee gcd=0 offgcd=1)
-  # Gaining s1 sec of Slice and Dice per combo point spent.rnLeech increased by s2.
-  SpellAddBuff(grand_melee grand_melee add=1)
 Define(greenskins_wickers 340573)
 # Between the Eyes has a s1 chance per Combo Point to increase the damage of your next Pistol Shot by 340573s1.
   SpellInfo(greenskins_wickers duration=15 gcd=0 offgcd=1)
@@ -411,6 +401,8 @@ Define(exsanguinate_talent 22344)
 # Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
 Define(exsanguinate_talent 22344)
 # Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
+Define(ghostly_strike_talent 22120)
+# Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for 10 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 Define(ghostly_strike_talent 22120)
 # Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for 10 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 Define(gloomblade_talent 19235)

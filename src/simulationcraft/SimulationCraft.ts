@@ -246,6 +246,9 @@ export class OvaleSimulationCraftClass {
                 if (node) {
                     actionList[lualength(actionList) + 1] = node;
                 } else {
+                    this.tracer.Error(
+                        `Error while parsing action list ${name}`
+                    );
                     break;
                 }
             }

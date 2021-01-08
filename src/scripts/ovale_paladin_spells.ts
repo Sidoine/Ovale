@@ -238,7 +238,7 @@ Define(seraphim_talent 17601)
 Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(potion_of_spectral_strength_item 171275)
-    ItemInfo(potion_of_spectral_strength_item cd=1 proc=307164)
+    ItemInfo(potion_of_spectral_strength_item cd=1 shared_cd="item_cd_4" proc=307164)
     `;
     // END
     code += `

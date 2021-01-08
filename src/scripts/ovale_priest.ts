@@ -79,6 +79,12 @@ AddFunction disciplineracialscdpostconditions
 
 AddFunction disciplineprecombatmainactions
 {
+ #flask
+ #food
+ #augmentation
+ #snapshot_stats
+ #smite
+ spell(smite)
 }
 
 AddFunction disciplineprecombatmainpostconditions
@@ -91,6 +97,7 @@ AddFunction disciplineprecombatshortcdactions
 
 AddFunction disciplineprecombatshortcdpostconditions
 {
+ spell(smite)
 }
 
 AddFunction disciplineprecombatcdactions
@@ -99,6 +106,7 @@ AddFunction disciplineprecombatcdactions
 
 AddFunction disciplineprecombatcdpostconditions
 {
+ spell(smite)
 }
 
 ### actions.boon
@@ -197,6 +205,12 @@ AddFunction discipline_defaultshortcdactions
 
    unless spell(schism)
    {
+    #mindgames
+    spell(mindgames)
+    #fae_guardians
+    spell(fae_guardians)
+    #unholy_nova
+    spell(unholy_nova)
     #call_action_list,name=boon,if=buff.boon_of_the_ascended.up
     if buffpresent(boon_of_the_ascended) disciplineboonshortcdactions()
 
@@ -204,6 +218,8 @@ AddFunction discipline_defaultshortcdactions
     {
      #mindbender
      spell(mindbender)
+     #spirit_shell
+     spell(spirit_shell)
 
      unless not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain)
      {
@@ -235,7 +251,7 @@ AddFunction discipline_defaultcdactions
   #power_infusion
   spell(power_infusion)
 
-  unless spell(divine_star) or spell(halo) or spell(penance) or spell(power_word_solace) or { not iscovenant("kyrian") or not { not spellcooldown(boon_of_the_ascended) > 0 } and not buffpresent(boon_of_the_ascended) } and spell(shadow_covenant) or spell(schism)
+  unless spell(divine_star) or spell(halo) or spell(penance) or spell(power_word_solace) or { not iscovenant("kyrian") or not { not spellcooldown(boon_of_the_ascended) > 0 } and not buffpresent(boon_of_the_ascended) } and spell(shadow_covenant) or spell(schism) or spell(mindgames) or spell(fae_guardians) or spell(unholy_nova)
   {
    #boon_of_the_ascended
    spell(boon_of_the_ascended)
@@ -247,7 +263,7 @@ AddFunction discipline_defaultcdactions
 
 AddFunction discipline_defaultcdpostconditions
 {
- disciplineracialscdpostconditions() or spell(divine_star) or spell(halo) or spell(penance) or spell(power_word_solace) or { not iscovenant("kyrian") or not { not spellcooldown(boon_of_the_ascended) > 0 } and not buffpresent(boon_of_the_ascended) } and spell(shadow_covenant) or spell(schism) or buffpresent(boon_of_the_ascended) and disciplinebooncdpostconditions() or spell(mindbender) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(mind_blast) or target.refreshable(purge_the_wicked_debuff) and spell(purge_the_wicked) or target.refreshable(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or enemies(tagged=1) < 3 and spell(smite) or enemies(tagged=1) >= 3 and spell(holy_nova) or spell(shadow_word_pain)
+ disciplineracialscdpostconditions() or spell(divine_star) or spell(halo) or spell(penance) or spell(power_word_solace) or { not iscovenant("kyrian") or not { not spellcooldown(boon_of_the_ascended) > 0 } and not buffpresent(boon_of_the_ascended) } and spell(shadow_covenant) or spell(schism) or spell(mindgames) or spell(fae_guardians) or spell(unholy_nova) or buffpresent(boon_of_the_ascended) and disciplinebooncdpostconditions() or spell(mindbender) or spell(spirit_shell) or not target.debuffpresent(purge_the_wicked_debuff) and spell(purge_the_wicked) or not target.debuffpresent(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or spell(shadow_word_death) or spell(mind_blast) or target.refreshable(purge_the_wicked_debuff) and spell(purge_the_wicked) or target.refreshable(shadow_word_pain) and not hastalent(purge_the_wicked_talent) and spell(shadow_word_pain) or enemies(tagged=1) < 3 and spell(smite) or enemies(tagged=1) >= 3 and spell(holy_nova) or spell(shadow_word_pain)
 }
 
 ### Discipline icons.
@@ -301,12 +317,14 @@ AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discip
 # bloodlust
 # boon_of_the_ascended
 # divine_star
+# fae_guardians
 # fireblood
 # halo
 # holy_nova
 # lights_judgment
 # mind_blast
 # mindbender
+# mindgames
 # penance
 # potion_of_spectral_intellect_item
 # power_infusion
@@ -319,6 +337,8 @@ AddIcon enabled=(checkboxon(opt_priest_discipline_aoe) and specialization(discip
 # shadow_word_death
 # shadow_word_pain
 # smite
+# spirit_shell
+# unholy_nova
 `;
         OvaleScripts.RegisterScript(
             "PRIEST",
@@ -697,8 +717,8 @@ AddFunction shadowcdsshortcdpostconditions
 
 AddFunction shadowcdscdactions
 {
- #power_infusion,if=buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains
- if buffpresent(voidform) or not enabledsoulbind(combat_meditation_soulbind) and spellcooldown(void_eruption) >= 10 or fightremains() < spellcooldown(void_eruption) spell(power_infusion)
+ #power_infusion,if=priest.self_power_infusion&(buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains)
+ if checkboxon("self_power_infusion") and { buffpresent(voidform) or not enabledsoulbind(combat_meditation_soulbind) and spellcooldown(void_eruption) >= 10 or fightremains() < spellcooldown(void_eruption) } spell(power_infusion)
  #silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
  if equippedruneforge(sephuzs_proclamation_runeforge) and { not target.classification(worldboss) or target.isinterruptible() } shadowinterruptactions()
  #boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
@@ -1271,8 +1291,8 @@ AddFunction shadowcdsshortcdpostconditions
 
 AddFunction shadowcdscdactions
 {
- #power_infusion,if=buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains
- if buffpresent(voidform) or not enabledsoulbind(combat_meditation_soulbind) and spellcooldown(void_eruption) >= 10 or fightremains() < spellcooldown(void_eruption) spell(power_infusion)
+ #power_infusion,if=priest.self_power_infusion&(buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains)
+ if checkboxon("self_power_infusion") and { buffpresent(voidform) or not enabledsoulbind(combat_meditation_soulbind) and spellcooldown(void_eruption) >= 10 or fightremains() < spellcooldown(void_eruption) } spell(power_infusion)
  #silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
  if equippedruneforge(sephuzs_proclamation_runeforge) and { not target.classification(worldboss) or target.isinterruptible() } shadowinterruptactions()
 
