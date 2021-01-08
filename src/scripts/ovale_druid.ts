@@ -911,8 +911,8 @@ AddFunction feralstealthmainactions
  {
   #pool_resource,for_next=1
   #rake,target_if=(dot.rake.pmultiplier<1.5|refreshable)&druid.rake.ticks_gained_on_refresh>2
-  if { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 spell(rake)
-  unless { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+  if { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 spell(rake)
+  unless { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
   {
    #brutal_slash,if=spell_targets.brutal_slash>2
    if enemies(tagged=1) > 2 spell(brutal_slash)
@@ -936,7 +936,7 @@ AddFunction feralstealthshortcdactions
 
 AddFunction feralstealthshortcdpostconditions
 {
- hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
+ hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
 }
 
 AddFunction feralstealthcdactions
@@ -947,7 +947,7 @@ AddFunction feralstealthcdactions
 
 AddFunction feralstealthcdpostconditions
 {
- hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
+ hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
 }
 
 ### actions.precombat
@@ -1005,9 +1005,9 @@ AddFunction feralfinishermainactions
  #variable,name=best_rip,value=0,if=talent.primal_wrath.enabled
  #cycling_variable,name=best_rip,op=max,value=druid.rip.ticks_gained_on_refresh,if=talent.primal_wrath.enabled
  #primal_wrath,if=druid.primal_wrath.ticks_gained_on_refresh>(variable.rip_ticks>?variable.best_rip)|spell_targets.primal_wrath>(3+1*talent.sabertooth.enabled)
- if ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) spell(primal_wrath)
+ if { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 spell(primal_wrath)
  #rip,target_if=refreshable&druid.rip.ticks_gained_on_refresh>variable.rip_ticks&((buff.tigers_fury.up|cooldown.tigers_fury.remains>5)&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&dot.rip.pmultiplier<=persistent_multiplier|!talent.sabertooth.enabled)
- if target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } spell(rip)
+ if target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } spell(rip)
  #ferocious_bite,max_energy=1,target_if=max:time_to_die
  if energy() >= energycost(ferocious_bite max=1) spell(ferocious_bite)
 }
@@ -1022,7 +1022,7 @@ AddFunction feralfinishershortcdactions
 
 AddFunction feralfinishershortcdpostconditions
 {
- { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and spell(primal_wrath) or target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
+ { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 } and spell(primal_wrath) or target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
 }
 
 AddFunction feralfinishercdactions
@@ -1031,7 +1031,7 @@ AddFunction feralfinishercdactions
 
 AddFunction feralfinishercdpostconditions
 {
- { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and spell(primal_wrath) or target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
+ { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 } and spell(primal_wrath) or target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
 }
 
 ### actions.filler
@@ -1141,11 +1141,11 @@ AddFunction feralcooldowncdpostconditions
 AddFunction feralbloodtalonsmainactions
 {
  #rake,target_if=(!ticking|(refreshable&persistent_multiplier>dot.rake.pmultiplier))&buff.bt_rake.down&druid.rake.ticks_gained_on_refresh>=2
- if { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 spell(rake)
+ if { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 spell(rake)
  #lunar_inspiration,target_if=refreshable&buff.bt_moonfire.down
  if target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) spell(lunar_inspiration_feral)
  #thrash_cat,target_if=refreshable&buff.bt_thrash.down&druid.thrash_cat.ticks_gained_on_refresh>8
- if target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 spell(thrash_cat)
+ if target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 spell(thrash_cat)
  #brutal_slash,if=buff.bt_brutal_slash.down
  if buffexpires(bt_brutal_slash_buff) spell(brutal_slash)
  #swipe_cat,if=buff.bt_swipe.down&spell_targets.swipe_cat>1
@@ -1168,7 +1168,7 @@ AddFunction feralbloodtalonsshortcdactions
 
 AddFunction feralbloodtalonsshortcdpostconditions
 {
- { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
+ { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
 }
 
 AddFunction feralbloodtalonscdactions
@@ -1177,7 +1177,7 @@ AddFunction feralbloodtalonscdactions
 
 AddFunction feralbloodtalonscdpostconditions
 {
- { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
+ { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
 }
 
 ### actions.default
@@ -1228,11 +1228,11 @@ AddFunction feral_defaultmainactions
        if buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } spell(ferocious_bite)
        #pool_resource,for_next=1
        #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-       if { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 spell(rake)
-       unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+       if { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 spell(rake)
+       unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
        {
         #moonfire_cat,target_if=refreshable&druid.moonfire.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-        if target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 spell(moonfire_cat)
+        if target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 spell(moonfire_cat)
         #pool_resource,for_next=1
         #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
         if 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) spell(brutal_slash)
@@ -1243,7 +1243,7 @@ AddFunction feral_defaultmainactions
          #shred,if=buff.clearcasting.up
          if buffpresent(clearcasting) spell(shred)
          #rake,target_if=buff.bs_inc.up&druid.rake.ticks_gained_on_refresh>2
-         if buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 spell(rake)
+         if buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 spell(rake)
          #call_action_list,name=filler
          feralfillermainactions()
         }
@@ -1258,7 +1258,7 @@ AddFunction feral_defaultmainactions
 
 AddFunction feral_defaultmainpostconditions
 {
- { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthmainpostconditions() or feralcooldownmainpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishermainpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthmainpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsmainpostconditions() or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and feralfillermainpostconditions() } }
+ { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthmainpostconditions() or feralcooldownmainpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishermainpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthmainpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsmainpostconditions() or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and feralfillermainpostconditions() } }
 }
 
 AddFunction feral_defaultshortcdactions
@@ -1309,15 +1309,15 @@ AddFunction feral_defaultshortcdactions
           if combopoints() < 3 spell(feral_frenzy)
           #pool_resource,for_next=1
           #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-          unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+          unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
           {
-           unless target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
+           unless target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
            {
             #pool_resource,for_next=1
             #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
             unless 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) }
             {
-             unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake)
+             unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake)
              {
               #call_action_list,name=filler
               feralfillershortcdactions()
@@ -1338,7 +1338,7 @@ AddFunction feral_defaultshortcdactions
 
 AddFunction feral_defaultshortcdpostconditions
 {
- buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or feralcooldownshortcdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake) or feralfillershortcdpostconditions() } } }
+ buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or feralcooldownshortcdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or feralfillershortcdpostconditions() } } }
 }
 
 AddFunction feral_defaultcdactions
@@ -1384,15 +1384,15 @@ AddFunction feral_defaultcdactions
         {
          #pool_resource,for_next=1
          #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-         unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+         unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
          {
-          unless target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
+          unless target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
           {
            #pool_resource,for_next=1
            #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
            unless 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) }
            {
-            unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake)
+            unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake)
             {
              #call_action_list,name=filler
              feralfillercdactions()
@@ -1412,7 +1412,7 @@ AddFunction feral_defaultcdactions
 
 AddFunction feral_defaultcdpostconditions
 {
- buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(tigers_fury) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthcdpostconditions() or feralcooldowncdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishercdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or combopoints() < 3 and spell(feral_frenzy) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake) or feralfillercdpostconditions() } } }
+ buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(tigers_fury) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthcdpostconditions() or feralcooldowncdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishercdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or combopoints() < 3 and spell(feral_frenzy) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or feralfillercdpostconditions() } } }
 }
 
 ### Feral icons.
@@ -1618,8 +1618,8 @@ AddFunction feralstealthmainactions
  {
   #pool_resource,for_next=1
   #rake,target_if=(dot.rake.pmultiplier<1.5|refreshable)&druid.rake.ticks_gained_on_refresh>2
-  if { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 spell(rake)
-  unless { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+  if { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 spell(rake)
+  unless { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
   {
    #brutal_slash,if=spell_targets.brutal_slash>2
    if enemies(tagged=1) > 2 spell(brutal_slash)
@@ -1643,7 +1643,7 @@ AddFunction feralstealthshortcdactions
 
 AddFunction feralstealthshortcdpostconditions
 {
- hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
+ hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
 }
 
 AddFunction feralstealthcdactions
@@ -1654,7 +1654,7 @@ AddFunction feralstealthcdactions
 
 AddFunction feralstealthcdpostconditions
 {
- hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and ticksgainedonrefresh(rake) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
+ hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or not { { target.debuffpersistentmultiplier(rake_debuff) < 1.5 or target.refreshable(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { enemies(tagged=1) > 2 and spell(brutal_slash) or combopoints() < 4 and spell(shred) }
 }
 
 ### actions.precombat
@@ -1712,9 +1712,9 @@ AddFunction feralfinishermainactions
  #variable,name=best_rip,value=0,if=talent.primal_wrath.enabled
  #cycling_variable,name=best_rip,op=max,value=druid.rip.ticks_gained_on_refresh,if=talent.primal_wrath.enabled
  #primal_wrath,if=druid.primal_wrath.ticks_gained_on_refresh>(variable.rip_ticks>?variable.best_rip)|spell_targets.primal_wrath>(3+1*talent.sabertooth.enabled)
- if ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) spell(primal_wrath)
+ if { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 spell(primal_wrath)
  #rip,target_if=refreshable&druid.rip.ticks_gained_on_refresh>variable.rip_ticks&((buff.tigers_fury.up|cooldown.tigers_fury.remains>5)&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&dot.rip.pmultiplier<=persistent_multiplier|!talent.sabertooth.enabled)
- if target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } spell(rip)
+ if target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } spell(rip)
  #ferocious_bite,max_energy=1,target_if=max:time_to_die
  if energy() >= energycost(ferocious_bite max=1) spell(ferocious_bite)
 }
@@ -1729,7 +1729,7 @@ AddFunction feralfinishershortcdactions
 
 AddFunction feralfinishershortcdpostconditions
 {
- { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and spell(primal_wrath) or target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
+ { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 } and spell(primal_wrath) or target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
 }
 
 AddFunction feralfinishercdactions
@@ -1738,7 +1738,7 @@ AddFunction feralfinishercdactions
 
 AddFunction feralfinishercdpostconditions
 {
- { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { ticksgainedonrefresh(primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and spell(primal_wrath) or target.refreshable(rip) and ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
+ { buffexpires(savage_roar) or buffremaining(savage_roar) < { combopoints() * 6 + 1 } * 0.3 } and spell(savage_roar) or { { target.ticksgainedonrefresh(rip primal_wrath) > rip_ticks() >? best_rip() or enemies(tagged=1) > 3 + 1 * talentpoints(sabertooth_talent) } and enemies(tagged=1) > 1 } and spell(primal_wrath) or target.refreshable(rip) and target.ticksgainedonrefresh(rip) > rip_ticks() and { { buffpresent(tigers_fury) or spellcooldown(tigers_fury) > 5 } and { buffpresent(bloodtalons) or not hastalent(bloodtalons_talent) } and target.debuffpersistentmultiplier(rip) <= persistentmultiplier(rip) or not hastalent(sabertooth_talent) } and spell(rip) or energy() >= energycost(ferocious_bite max=1) and spell(ferocious_bite)
 }
 
 ### actions.filler
@@ -1848,11 +1848,11 @@ AddFunction feralcooldowncdpostconditions
 AddFunction feralbloodtalonsmainactions
 {
  #rake,target_if=(!ticking|(refreshable&persistent_multiplier>dot.rake.pmultiplier))&buff.bt_rake.down&druid.rake.ticks_gained_on_refresh>=2
- if { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 spell(rake)
+ if { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 spell(rake)
  #lunar_inspiration,target_if=refreshable&buff.bt_moonfire.down
  if target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) spell(lunar_inspiration_feral)
  #thrash_cat,target_if=refreshable&buff.bt_thrash.down&druid.thrash_cat.ticks_gained_on_refresh>8
- if target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 spell(thrash_cat)
+ if target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 spell(thrash_cat)
  #brutal_slash,if=buff.bt_brutal_slash.down
  if buffexpires(bt_brutal_slash_buff) spell(brutal_slash)
  #swipe_cat,if=buff.bt_swipe.down&spell_targets.swipe_cat>1
@@ -1875,7 +1875,7 @@ AddFunction feralbloodtalonsshortcdactions
 
 AddFunction feralbloodtalonsshortcdpostconditions
 {
- { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
+ { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
 }
 
 AddFunction feralbloodtalonscdactions
@@ -1884,7 +1884,7 @@ AddFunction feralbloodtalonscdactions
 
 AddFunction feralbloodtalonscdpostconditions
 {
- { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and ticksgainedonrefresh(rake) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
+ { not target.debuffpresent(rake_debuff) or target.refreshable(rake_debuff) and persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and buffexpires(bt_rake_buff) and target.ticksgainedonrefresh(rake_debuff) >= 2 and spell(rake) or target.refreshable(lunar_inspiration_feral) and buffexpires(bt_moonfire_buff) and spell(lunar_inspiration_feral) or target.refreshable(thrash_cat) and buffexpires(bt_thrash_buff) and target.ticksgainedonrefresh(thrash_cat) > 8 and spell(thrash_cat) or buffexpires(bt_brutal_slash_buff) and spell(brutal_slash) or buffexpires(bt_swipe_buff) and enemies(tagged=1) > 1 and spell(swipe_cat) or buffexpires(bt_shred_buff) and spell(shred) or buffexpires(bt_swipe_buff) and spell(swipe_cat) or buffexpires(bt_thrash_buff) and spell(thrash_cat)
 }
 
 ### actions.default
@@ -1935,11 +1935,11 @@ AddFunction feral_defaultmainactions
        if buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } spell(ferocious_bite)
        #pool_resource,for_next=1
        #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-       if { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 spell(rake)
-       unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+       if { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 spell(rake)
+       unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
        {
         #moonfire_cat,target_if=refreshable&druid.moonfire.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-        if target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 spell(moonfire_cat)
+        if target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 spell(moonfire_cat)
         #pool_resource,for_next=1
         #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
         if 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) spell(brutal_slash)
@@ -1950,7 +1950,7 @@ AddFunction feral_defaultmainactions
          #shred,if=buff.clearcasting.up
          if buffpresent(clearcasting) spell(shred)
          #rake,target_if=buff.bs_inc.up&druid.rake.ticks_gained_on_refresh>2
-         if buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 spell(rake)
+         if buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 spell(rake)
          #call_action_list,name=filler
          feralfillermainactions()
         }
@@ -1965,7 +1965,7 @@ AddFunction feral_defaultmainactions
 
 AddFunction feral_defaultmainpostconditions
 {
- { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthmainpostconditions() or feralcooldownmainpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishermainpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthmainpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsmainpostconditions() or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and feralfillermainpostconditions() } }
+ { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthmainpostconditions() or feralcooldownmainpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishermainpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthmainpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsmainpostconditions() or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and feralfillermainpostconditions() } }
 }
 
 AddFunction feral_defaultshortcdactions
@@ -2016,15 +2016,15 @@ AddFunction feral_defaultshortcdactions
           if combopoints() < 3 spell(feral_frenzy)
           #pool_resource,for_next=1
           #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-          unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+          unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
           {
-           unless target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
+           unless target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
            {
             #pool_resource,for_next=1
             #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
             unless 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) }
             {
-             unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake)
+             unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake)
              {
               #call_action_list,name=filler
               feralfillershortcdactions()
@@ -2045,7 +2045,7 @@ AddFunction feral_defaultshortcdactions
 
 AddFunction feral_defaultshortcdpostconditions
 {
- buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or feralcooldownshortcdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake) or feralfillershortcdpostconditions() } } }
+ buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthshortcdpostconditions() or feralcooldownshortcdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishershortcdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthshortcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonsshortcdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or feralfillershortcdpostconditions() } } }
 }
 
 AddFunction feral_defaultcdactions
@@ -2091,15 +2091,15 @@ AddFunction feral_defaultcdactions
         {
          #pool_resource,for_next=1
          #rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-         unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
+         unless { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) }
          {
-          unless target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
+          unless target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat)
           {
            #pool_resource,for_next=1
            #brutal_slash,if=(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time)&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
            unless 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) }
            {
-            unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake)
+            unless enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake)
             {
              #call_action_list,name=filler
              feralfillercdactions()
@@ -2119,7 +2119,7 @@ AddFunction feral_defaultcdactions
 
 AddFunction feral_defaultcdpostconditions
 {
- buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(tigers_fury) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthcdpostconditions() or feralcooldowncdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishercdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or combopoints() < 3 and spell(feral_frenzy) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and ticksgainedonrefresh(rake) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and ticksgainedonrefresh(moonfire) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and ticksgainedonrefresh(rake) > 2 and spell(rake) or feralfillercdpostconditions() } } }
+ buffpresent(heart_of_the_wild) and spell(starsurge) or not previousgcdspell(sunfire) and spell(sunfire) or buffexpires(cat_form) and spell(tigers_fury) or buffexpires(cat_form) and spell(cat_form) or spell(prowl) or energy() < 40 and target.debuffremaining(rake_debuff) > 4.5 and { target.debuffremaining(rip) > 4.5 or combopoints() < 5 } and spellcooldown(tigers_fury) >= 4.5 and buffstacks(clearcasting) < 1 and not buffpresent(apex_predators_craving_buff) and not { not spellcooldown(convoke_the_spirits) > 0 } and owlweave() == 1 and spell(moonkin_form) or { buffpresent(shadowmeld) or buffpresent(prowl) } and feralstealthcdpostconditions() or feralcooldowncdpostconditions() or combopoints() >= 5 - _4cp_bite() and feralfinishercdpostconditions() or { buffpresent(bs_inc_buff) or buffpresent(sudden_ambush_buff) } and feralstealthcdpostconditions() or not { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and energy() + 3.5 * energyregenrate() + 40 * buffpresent(clearcasting) < 115 - 23 * buffpresent(incarnation_king_of_the_jungle) and buffcount(bt_buffs) == 0 } and { hastalent(bloodtalons_talent) and buffexpires(bloodtalons) and feralbloodtalonscdpostconditions() or buffpresent(apex_predators_craving_buff) and { not hastalent(bloodtalons_talent) or buffpresent(bloodtalons) } and spell(ferocious_bite) or combopoints() < 3 and spell(feral_frenzy) or not { { target.refreshable(rake_debuff) or persistentmultiplier(rake_debuff) > target.debuffpersistentmultiplier(rake_debuff) } and target.ticksgainedonrefresh(rake_debuff) > enemies(tagged=1) * 2 - 2 and { spellusable(rake) and spellcooldown(rake) < timetoenergyfor(rake) } } and { target.refreshable(moonfire_cat) and target.ticksgainedonrefresh(moonfire_cat) > enemies(tagged=1) * 2 - 2 and spell(moonfire_cat) or not { 600 > { 1 + spellmaxcharges(brutal_slash) - charges(brutal_slash count=0) } * spellchargecooldown(brutal_slash) and enemies(tagged=1) * damage(brutal_slash) / powercost(brutal_slash) > damage(shred) / powercost(shred) and { spellusable(brutal_slash) and spellcooldown(brutal_slash) < timetoenergyfor(brutal_slash) } } and { enemies(tagged=1) > 1 + buffpresent(bs_inc_buff) * 2 and spell(swipe_cat) or buffpresent(clearcasting) and spell(shred) or buffpresent(bs_inc_buff) and target.ticksgainedonrefresh(rake_debuff) > 2 and spell(rake) or feralfillercdpostconditions() } } }
 }
 
 ### Feral icons.

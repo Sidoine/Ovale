@@ -687,10 +687,6 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 type: MiscOperandModifierType.Parameter,
                 createOptions: true,
             },
-            ticks_gained_on_refresh: {
-                type: MiscOperandModifierType.Replace,
-                name: "ticksgainedonrefresh",
-            },
         },
         symbol: "",
     },

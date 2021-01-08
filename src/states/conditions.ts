@@ -262,6 +262,8 @@ export class OvaleConditions {
             for (const [id] of pairs(spellList)) {
                 value = this.OvaleAura.GetBaseDuration(
                     id,
+                    undefined,
+                    atTime,
                     this.OvalePaperDoll.next
                 );
                 if (value != INFINITY) {
@@ -271,6 +273,8 @@ export class OvaleConditions {
         } else {
             value = this.OvaleAura.GetBaseDuration(
                 auraId,
+                undefined,
+                atTime,
                 this.OvalePaperDoll.next
             );
         }
@@ -3757,7 +3761,11 @@ l    */
             mine
         );
         if (aura) {
-            let baseDuration = this.OvaleAura.GetBaseDuration(auraId);
+            let baseDuration = this.OvaleAura.GetBaseDuration(
+                auraId,
+                undefined,
+                atTime
+            );
             if (baseDuration === INFINITY) {
                 baseDuration = aura.ending - aura.start;
             }
@@ -4927,7 +4935,13 @@ l    */
                 this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
-                return ReturnConstant(remainingTime);
+                return ReturnValueBetween(
+                    aura.gain,
+                    INFINITY,
+                    tick,
+                    lastTickTime,
+                    -1
+                );
             }
         }
         return ReturnConstant(0);

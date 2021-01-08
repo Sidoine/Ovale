@@ -13,10 +13,12 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
+import { OvalePowerClass } from "./Power";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     pairs,
     tonumber,
+    tostring,
     wipe,
     lualength,
     LuaObj,
@@ -37,12 +39,18 @@ import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
 import { isNumber, isString } from "../tools/tools";
 import {
+    PositionalParameters,
+    NamedParametersOf,
+    AstFunctionNode,
+} from "../engine/ast";
+import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
     ParseCondition,
     ReturnConstant,
     ReturnValue,
+    ReturnValueBetween,
 } from "../engine/condition";
 import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
@@ -343,7 +351,8 @@ export class OvaleAuraClass
         private ovaleDebug: OvaleDebugClass,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private ovalePower: OvalePowerClass
     ) {
         super(AuraInterface);
         this.module = ovale.createModule(
@@ -749,9 +758,48 @@ export class OvaleAuraClass
         return ReturnValue(0, aura.ending, 1);
     };
 
-    private ticksGainedOnRefresh: ConditionFunction = () => {
-        // TODO see sc_druid.cpp
-        return ReturnConstant(0);
+    private ticksGainedOnRefresh: ConditionFunction = (
+        positionalParameters: PositionalParameters,
+        namedParameters: NamedParametersOf<AstFunctionNode>,
+        atTime: number
+    ): ConditionResult => {
+        const [target, filter, mine] = ParseCondition(
+            namedParameters,
+            this.baseState
+        );
+        let [auraId, spellId] = unpack(positionalParameters);
+        auraId = tonumber(auraId);
+        if (isNumber(spellId)) {
+            spellId = tonumber(spellId);
+        } else if (isString(spellId)) {
+            spellId = tostring(spellId);
+        } else {
+            spellId = undefined;
+        }
+        const duration = this.GetBaseDuration(
+            auraId,
+            spellId,
+            atTime,
+            this.ovalePaperDoll.next
+        );
+        const tick = this.GetTickLength(auraId, this.ovalePaperDoll.next);
+        const aura = this.GetAura(target, auraId, atTime, filter, mine);
+        if (aura) {
+            const remainingDuration = aura.ending - atTime;
+            const pandemicDuration = 0.3 * (aura.ending - aura.start);
+            let refreshedDuration = pandemicDuration + duration;
+            if (remainingDuration < pandemicDuration) {
+                refreshedDuration = remainingDuration + duration;
+            }
+            return ReturnValueBetween(
+                aura.gain,
+                INFINITY,
+                (refreshedDuration - remainingDuration) / tick,
+                atTime,
+                -1 / tick
+            );
+        }
+        return ReturnConstant(duration / tick);
     };
 
     IsActiveAura(aura: Aura, atTime: number): aura is Aura {
@@ -1871,7 +1919,12 @@ export class OvaleAuraClass
         for (const [filter, filterInfo] of kpairs(auraList)) {
             for (const [auraIdKey, spellData] of pairs(filterInfo)) {
                 const auraId = tonumber(auraIdKey);
-                const duration = this.GetBaseDuration(auraId, spellcast);
+                const duration = this.GetBaseDuration(
+                    auraId,
+                    spellId,
+                    atTime,
+                    spellcast
+                );
                 let stacks = 1;
                 let count: number | undefined = undefined;
                 let extend = 0;
@@ -2175,9 +2228,13 @@ export class OvaleAuraClass
         }
     }
 
-    GetBaseDuration(auraId: number, spellcast?: PaperDollSnapshot) {
-        spellcast = spellcast || this.ovalePaperDoll.current;
-        const combopoints = spellcast.combopoints || 0;
+    GetBaseDuration(
+        auraId: number,
+        spellId?: number | string,
+        atTime?: number,
+        spellcast?: PaperDollSnapshot
+    ) {
+        spellcast = spellcast || this.ovalePaperDoll.GetState(atTime);
         let duration = INFINITY;
         const si = this.ovaleData.spellInfo[auraId];
         if (si && si.duration) {
@@ -2188,11 +2245,28 @@ export class OvaleAuraClass
                 undefined,
                 true
             ) || [15, 1];
-            if (si.add_duration_combopoints && combopoints) {
+            if (si.add_duration_combopoints) {
+                const powerState = this.ovalePower.GetState(atTime);
+                const combopoints =
+                    spellcast.combopoints || powerState.power.combopoints || 0;
                 duration =
                     (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {
                 duration = value * ratio;
+            }
+        }
+        if (si && si.half_duration && spellId) {
+            if (this.ovaleData.buffSpellList[spellId]) {
+                for (const [id] of pairs(
+                    this.ovaleData.buffSpellList[spellId]
+                )) {
+                    if (id === si.half_duration) {
+                        duration = duration * 0.5;
+                        break;
+                    }
+                }
+            } else if (spellId === si.half_duration) {
+                duration = duration * 0.5;
             }
         }
         // Most aura durations are no longer reduced by haste

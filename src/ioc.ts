@@ -164,6 +164,20 @@ export class IoC {
             this.ovale,
             this.spellBook
         );
+        const combat = new OvaleCombatClass(
+            this.ovale,
+            this.debug,
+            this.spellBook
+        );
+        this.power = new OvalePowerClass(
+            this.debug,
+            this.ovale,
+            this.profiler,
+            this.data,
+            this.baseState,
+            this.spellBook,
+            combat
+        );
         this.state = new OvaleStateClass();
         this.aura = new OvaleAuraClass(
             this.state,
@@ -176,7 +190,8 @@ export class IoC {
             this.debug,
             this.ovale,
             this.profiler,
-            this.spellBook
+            this.spellBook,
+            this.power
         );
         this.stance = new OvaleStanceClass(
             this.debug,
@@ -226,11 +241,6 @@ export class IoC {
             this.ovale,
             this.debug
         );
-        const combat = new OvaleCombatClass(
-            this.ovale,
-            this.debug,
-            this.spellBook
-        );
         this.scripts = new OvaleScriptsClass(
             this.ovale,
             this.options,
@@ -264,15 +274,6 @@ export class IoC {
             this.spellBook,
             controls,
             this.scripts
-        );
-        this.power = new OvalePowerClass(
-            this.debug,
-            this.ovale,
-            this.profiler,
-            this.data,
-            this.baseState,
-            this.spellBook,
-            combat
         );
         this.stagger = new OvaleStaggerClass(
             this.ovale,
@@ -343,7 +344,7 @@ export class IoC {
             this.profiler,
             this.data,
             this.power,
-            this.runes,
+            this.runes
         );
         this.bestAction = new OvaleBestActionClass(
             this.equipment,

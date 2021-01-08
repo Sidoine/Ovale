@@ -510,17 +510,21 @@ Define(first_strike_soulbind 325069)
     // END
     code += `
     SpellRequire(berserk_0 replaced_by set=incarnation_guardian_of_ursoc enabled=(talent(incarnation_guardian_of_ursoc_talent)))
+#bloodtalons
+    SpellAddBuff(ferocious_bite bloodtalons add=-1 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
+    SpellAddBuff(rip bloodtalons add=-1 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
 Define(frenzied_regeneration 22842)
     SpellInfo(frenzied_regeneration duration=3)
     # TODO max_charges not implemented SpellRequire(frenzied_regeneration max_charges set=2 enabled=(specialization(guardian)))
     SpellRequire(frenzied_regeneration charge_cd set=30 enabled=(specialization(guardian)))
     SpellRequire(frenzied_regeneration cd set=30 enabled=(not specialization(guardian)))
     SpellAddBuff(frenzied_regeneration frenzied_regeneration add=1)
-    SpellRequire(frenzied_regeneration unusable set=1 enabled=(not stance(druid_bear_form)))
-#incapacitating_roar    
-    SpellRequire(incapacitating_roar unusable set=1 enabled=(not stance(druid_bear_form)))
+#moonfire_cat
+    SpellRequire(moonfire_cat unusable set=1 enabled=(not hastalent(lunar_inspiration_talent)))
 #prowl
-    SpellRequire(prowl unusable set=1 enabled=(stealthed()))
+    SpellRequire(prowl unusable set=1 enabled=(incombat() or buffpresent(prowl)))
+#rip
+    SpellInfo(rip add_duration_combopoints=4 half_duration=primal_wrath)
 Define(thrash_bear 77758)
     SpellAddBuff(thrash_bear earthwarden_buff add=1 enabled=(talent(earthwarden_talent)))
     SpellAddTargetDebuff(thrash_bear thrash_bear_debuff add=1)
@@ -528,7 +532,40 @@ Define(thrash_bear_debuff 192090)
     SpellInfo(thrash_bear_debuff duration=15 max_stacks=3)
     SpellRequire(pulverize unusable set=1 enabled=(not targetdebuffpresent(thrash_bear_debuff)))
     SpellAddTargetDebuff(pulverize thrash_bear_debuff add=-2)
+
+#snapshots
+    SpellDamageBuff(moonfire_cat tigers_fury set=1.15)
+    SpellDamageBuff(rake berserk_cat set=1.6)
+    SpellDamageBuff(rake incarnation_king_of_the_jungle set=1.6)
+    SpellDamageBuff(rake shadowmeld set=1.6)
+    SpellDamageBuff(rake prowl set=1.6)
+    SpellDamageBuff(rake tigers_fury set=1.15)
+    SpellDamageBuff(rip bloodtalons set=1.3 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
+    SpellDamageBuff(rip tigers_fury set=1.15)
+    SpellDamageBuff(thrash_cat tigers_fury set=1.15)
   
+#balance_affinity_talent
+Define(balance_affinity_talent_restoration 22366)
+    SpellRequire(moonkin_form unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+    SpellRequire(starfire unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+    SpellRequire(starsurge unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+    SpellRequire(sunfire unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+    SpellRequire(typhoon unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+
+Define(feral_affinity_talent_balance 22155)
+#feral_affinity_talent_guardian
+Define(feral_affinity_talent_restoration 22367)
+    SpellRequire(maim unusable set=1 enabled=(not ((specialization(feral) or hastalent(feral_affinity_talent_balance) or hastalent(feral_affinity_talent_guardian) or hastalent(feral_affinity_talent_restoration)) and stance(druid_cat_form))))
+    SpellRequire(rake unusable set=1 enabled=(not ((specialization(feral) or hastalent(feral_affinity_talent_balance) or hastalent(feral_affinity_talent_guardian) or hastalent(feral_affinity_talent_restoration)) and stance(druid_cat_form))))
+    SpellRequire(rip unusable set=1 enabled=(not ((specialization(feral) or hastalent(feral_affinity_talent_balance) or hastalent(feral_affinity_talent_guardian) or hastalent(feral_affinity_talent_restoration)) and stance(druid_cat_form))))
+    SpellRequire(swipe_cat unusable set=1 enabled=(not ((specialization(feral) or hastalent(feral_affinity_talent_balance) or hastalent(feral_affinity_talent_guardian) or hastalent(feral_affinity_talent_restoration)) and stance(druid_cat_form))))
+
+Define(guardian_affinity_talent_balance 22157)
+Define(guardian_affinity_talent_feral 22158)
+Define(guardian_affinity_talent_restoration 22160)
+    SpellRequire(frenzied_regeneration unusable set=1 enabled=(not ((specialization(guardian) or hastalent(guardian_affinity_talent_balance) or hastalent(guardian_affinity_talent_feral) or hastalent(guardian_affinity_restoration)) and stance(druid_bear_form))))
+    SpellRequire(incapacitating_roar unusable set=1 enabled=(not ((specialization(guardian) or hastalent(guardian_affinity_talent_balance) or hastalent(guardian_affinity_talent_feral) or hastalent(guardian_affinity_restoration)) and stance(druid_bear_form))))
+
 SpellInfo(starfire inccounter="solar" resetcounter="lunar")
 SpellInfo(wrath inccounter="lunar" resetcounter="solar")
   SpellAddBuff(starfire eclipse_solar set=1 enabled=(counter("solar") == 1))
