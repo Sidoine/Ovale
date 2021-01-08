@@ -7,7 +7,7 @@ import {
     tostring,
     wipe,
 } from "@wowts/lua";
-import { abs, huge, min } from "@wowts/math";
+import { abs, huge, huge as INFINITY, max, min } from "@wowts/math";
 import {
     AstActionNode,
     AstBooleanNode,
@@ -514,19 +514,46 @@ export class Runner {
             }
             const A = a + (t - b) * c; // the A value at time t
             let B = x + (t - y) * z; // The B value at time t
+            /**
+             * A(t) = a + (t - b)*c
+             *      = a + (t - t0 + t0 - b)*c, for all t0
+             *      = a + (t - t0)*c + (t0 - b)*c
+             *      = [a + (t0 - b)*c] + (t - t0)*c
+             *      = A(t0) + (t - t0)*c
+             * B(t) = B(t0) + (t - t0)*z
+             */
             if (operator == "+") {
+                /**
+                 * A(t) + B(t) = [A(t0) + B(t0)] + (t - t0)*(c + z)
+                 */
                 l = A + B;
                 m = t;
                 n = c + z;
             } else if (operator == "-") {
+                /**
+                 * A(t) - B(t) = [A(t0) - B(t0)] + (t - t0)*(c - z)
+                 */
                 l = A - B;
                 m = t;
                 n = c - z;
             } else if (operator == "*") {
+                /**
+                 * A(t)*B(t) = [A(t0) + (t - t0)*c] * [B(t0) + (t - t0)*z]
+                 *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + (t - t0)^2*(c*z)
+                 *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + O(t^2)
+                 */
                 l = A * B;
                 m = t;
                 n = A * z + B * c;
             } else if (operator == "/") {
+                /**
+                 *      C(t) = 1/B(t)
+                 *           = 1/[B(t0) - (t - t0)*z]
+                 *      C(t) = C(t0) + C'(t0)*(t - t0) + O(t^2) (Taylor series at t = t0)
+                 *           = 1/B(t0) + [-z/B(t0)^2]*(t - t0) + O(t^2) converges when |t - t0| < |B(t0)/z|
+                 * A(t)/B(t) = A(t0)/B(t0) + (t - t0)*{[B(t0)*c - A(t0)*z]/B(t0)^2} + O(t^2)
+                 *           = A(t0)/B(t0) + (t - t0)*{[c/B(t0)] - [A(t0)/B(t0)]*[z/B(t0)]} + O(t^2)
+                 */
                 if (B === 0) {
                     if (A !== 0) {
                         OneTimeMessage(
@@ -539,12 +566,7 @@ export class Runner {
                 }
                 l = A / B;
                 m = t;
-                const numerator = B * c - A * z;
-                if (numerator != huge) {
-                    n = numerator / (B ^ 2);
-                } else {
-                    n = numerator;
-                }
+                n = c / B - (A / B) * (z / B);
                 let bound;
                 if (z == 0) {
                     bound = huge;
@@ -558,6 +580,7 @@ export class Runner {
                 timeSpan.copyFromArray(scratch);
                 scratch.Release();
             } else if (operator == "%") {
+                // A % B = A mod B
                 if (c == 0 && z == 0) {
                     l = A % B;
                     m = t;
@@ -571,22 +594,53 @@ export class Runner {
                     m = 0;
                     n = 0;
                 }
-            } else if (operator === ">?") {
-                l = min(A, B);
-                m = t;
-                // TODO should change the end
-                if (l === A) {
-                    n = c;
-                } else {
-                    n = z;
-                }
-            } else if (operator === "<?") {
-                l = min(A, B);
-                m = t;
-                if (l === A) {
+            } else if (operator === "<?" || operator === ">?") {
+                // A(t) <? B(t) = min(A(t), B(t))
+                // A(t) >? B(t) = max(A(t), B(t))
+                if (z === c) {
+                    // A(t) and B(t) have the same slope.
+                    l = (operator === "<?" && min(A, B)) || max(A, B);
+                    m = t;
                     n = z;
                 } else {
-                    n = c;
+                    /**
+                     * A(t) and B(t) intersect when:
+                     *                   A(t) = B(t)
+                     *     A(t0) - (t - t0)*c = B(t0) - (t - t0)*z
+                     *       (t - t0)*(z - c) = B(t0) - A(t0)
+                     *                 t - t0 = [B(t0) - A(t0)]/(z - c)
+                     */
+                    const C = (B - A) / (z - c);
+                    if (C <= 0) {
+                        // A(t) and B(t) intersect at or to the left of t0.
+                        const scratch = timeSpan.IntersectInterval(
+                            t + C,
+                            INFINITY
+                        );
+                        timeSpan.copyFromArray(scratch);
+                        scratch.Release();
+                        if (z < c) {
+                            // A(t) has a greater slope than B(t).
+                            l = (operator === ">?" && A) || B;
+                        } else {
+                            // B(t) has a greater slope than A(t).
+                            l = (operator === "<?" && A) || B;
+                        }
+                    } else {
+                        // A(t) and B(t) intersect to the right of t0.
+                        const scratch = timeSpan.IntersectInterval(0, t + C);
+                        timeSpan.copyFromArray(scratch);
+                        scratch.Release();
+                        if (z < c) {
+                            // A(t) has a greater slope than B(t).
+                            l = (operator === "<?" && A) || B;
+                        } else {
+                            // B(t) has a greater slope than A(t).
+                            l = (operator === ">?" && A) || B;
+                        }
+                    }
+                    m = t;
+                    n = (l === A && c) || z;
                 }
             }
             this.tracer.Log(
