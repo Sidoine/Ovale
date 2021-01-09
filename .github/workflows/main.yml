@@ -76,7 +76,7 @@ jobs:
             #       path: ovale/CHANGELOG.md
 
             - name: Publish
-              uses: wowts/publisher@main
+              uses: wowts/publisher@v2
               with:
                   name: Ovale
                   path: ovale
