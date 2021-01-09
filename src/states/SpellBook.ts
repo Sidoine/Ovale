@@ -27,6 +27,7 @@ import {
     HasPetSpells,
     IsHarmfulSpell,
     IsHelpfulSpell,
+    IsSpellKnown,
     BOOKTYPE_PET,
     BOOKTYPE_SPELL,
     MAX_TALENT_TIERS,
@@ -391,7 +392,22 @@ export class OvaleSpellBookClass {
         return (spellId && this.isHelpful[spellId] && true) || false;
     }
     IsKnownSpell(spellId: number): boolean {
-        return (spellId && this.spell[spellId] && true) || false;
+        /**
+         * A spell is known if it's in the spellbook, or is a temporary spell
+         * or action granted by an encounter that may not be in the spellbook.
+         */
+
+        let isKnown = this.spell[spellId] !== undefined;
+        if (!isKnown) {
+            isKnown = IsSpellKnown(spellId) || IsSpellKnown(spellId, true);
+            if (isKnown) {
+                this.tracer.Log(
+                    "Spell ID '%s' is not in the spellbook, but is still known.",
+                    spellId
+                );
+            }
+        }
+        return (isKnown && true) || false;
     }
     IsKnownTalent(talentId: number): boolean {
         return (talentId && this.talentPoints[talentId] && true) || false;

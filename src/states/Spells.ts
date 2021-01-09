@@ -1,5 +1,5 @@
 import { huge as INFINITY } from "@wowts/math";
-import { kpairs } from "@wowts/lua";
+import { kpairs, tonumber } from "@wowts/lua";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     GetSpellCount,
@@ -151,57 +151,59 @@ export class OvaleSpellsClass implements StateModule {
         targetGUID: string | undefined
     ): [boolean, boolean] {
         this.profiler.StartProfiling("OvaleSpellBook_state_IsUsableSpell");
-        let [isUsable, noMana] = [true, false]
+        let [isUsable, noMana] = [false, false];
         let isKnown = this.OvaleSpellBook.IsKnownSpell(spellId);
-        if (!isKnown) {
-            // check the WOW API if the spell is usable, if it is than we assume that it is a known spell
-            [isUsable, noMana] = IsUsableSpell(spellId); 
-            isKnown = isUsable;
-            this.tracer.Log("Checked WoW API for spell %s. Returns [%s, %s]", spellId, isUsable, noMana);
-        }
         const si = this.ovaleData.spellInfo[spellId];
         if (si && isKnown) {
-            this.tracer.Log(
-                "Found spell info about %s (isKnown = %s)",
-                spellId,
-                isKnown
-            );
-
             const unusable = this.ovaleData.GetSpellInfoProperty(
                 spellId,
                 atTime,
                 "unusable",
                 targetGUID
             );
-            if (unusable !== undefined && unusable > 0) {
+            if (unusable !== undefined && tonumber(unusable) > 0) {
                 this.tracer.Log(
                     "Spell ID '%s' is flagged as unusable.",
                     spellId
                 );
-                isUsable = false;
-            }
-            if (isUsable) {
+                [isUsable, noMana] = [false, false];
+            } else {
                 const seconds = this.TimeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,
                     undefined
                 );
-                noMana = (seconds > 0);
-                if (noMana) {
-                    isUsable = false;
+                if (seconds > 0) {
                     this.tracer.Log(
                         "Spell ID '%s' does not have enough power.",
                         spellId
                     );
+                    [isUsable, noMana] = [false, true];
                 } else {
                     this.tracer.Log(
-                        "Spell ID '%s' passed power requirements.",
+                        "Spell ID '%s' meets power requirements.",
                         spellId
                     );
+                    [isUsable, noMana] = [true, false];
                 }
             }
-        } 
+        } else {
+            const [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(
+                spellId
+            );
+            if (index && bookType) {
+                [isUsable, noMana] = IsUsableSpell(index, bookType);
+            } else if (isKnown) {
+                const name = this.OvaleSpellBook.GetSpellName(spellId);
+                if (name) {
+                    [isUsable, noMana] = IsUsableSpell(name);
+                }
+            } else {
+                this.tracer.Log("Spell ID '%s' is not known.", spellId);
+                [isUsable, noMana] = [false, false];
+            }
+        }
         this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
     }
