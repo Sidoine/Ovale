@@ -1,6 +1,6 @@
 {
     "name": "ovale",
-    "version": "9.0.34",
+    "version": "9.0.35",
     "description": "Show the icon of the next spell to cast",
     "main": "dist/index.js",
     "scripts": {

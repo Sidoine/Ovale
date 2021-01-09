@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.35](https://github.com/Sidoine/Ovale/compare/9.0.34...9.0.35) (2021-01-09)
+
+### Bug Fixes
+
+-   **warlock:** spell ids for affliction warlock ([67ccf0a](https://github.com/Sidoine/Ovale/commit/67ccf0a49b6a1d7fe14861a3fe3a4da4d463e230))
+-   import last version of simc scripts ([0ed97dc](https://github.com/Sidoine/Ovale/commit/0ed97dc0b42b8601c45ebda2612655260915efe0))
+-   **druid:** many fixes and improvements to feral script ([#803](https://github.com/Sidoine/Ovale/issues/803)) ([10a6054](https://github.com/Sidoine/Ovale/commit/10a6054bb1990876f749dcf359eb3aaadb3b7a11))
+-   **runner:** fix ComputeArithmetic() for >? and <? operators ([#802](https://github.com/Sidoine/Ovale/issues/802)) ([22f28c1](https://github.com/Sidoine/Ovale/commit/22f28c141070cac126d812e1285f3ac223dd17dd))
+-   vertical icons weren't working ([bfc5ae3](https://github.com/Sidoine/Ovale/commit/bfc5ae383f0ac2e18b9c48a131bef66e7e2b3054))
+
 ### [9.0.34](https://github.com/Sidoine/Ovale/compare/9.0.33...9.0.34) (2021-01-05)
 
 ### Bug Fixes
