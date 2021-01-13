@@ -66,6 +66,9 @@ Define(colossus_smash_debuff 208086)
 Define(condemn 317349)
 # Condemn a foe to suffer for their sins, causing up to <damage> Shadow damage. Only usable on enemies who are above 80 health or below 20 health.rnrnThe primary target is weakened, preventing up to <absorb> damage they would deal to you.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
   SpellInfo(condemn rage=20 max_rage=20 cd=6)
+Define(condemn_fury 317485)
+# Condemn a foe to suffer for their sins, causing 317488sw1+317489sw1 Shadow damage. Only usable on enemies who are above 80 health or below 20 health.rnrnThe primary target is weakened, preventing <absorb> damage they would deal to you.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
+  SpellInfo(condemn_fury rage=0 max_rage=20 cd=6)
 Define(conquerors_banner 324143)
 # Plant the Conqueror's Banner in the ground, granting 325862s1 maximum health and 325862s2 critical strike chance to you and 325862i allies within s1 yds of the banner for 20 seconds.rnrnWhile active, spending ?c1[<armsRage>]?c2[<furyRage>][<protRage>] Rage and killing enemies grants you Glory. Glory increases your critical strike damage by 325787s1 per stack, up to 325787s1*325787u, for 30 seconds.
   SpellInfo(conquerors_banner cd=180 duration=20)
@@ -328,6 +331,8 @@ Define(vicious_contempt_conduit 64)
     code += `
 SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(execute_fury unusable set=1 enabled=(target.healthpercent() > 20 and buffexpires(sudden_death_buff)))
+SpellRequire(condemn unusable set=1 enabled=(target.healthpercent() > 20 and target.healthpercent() < 80))
+SpellRequire(condemn_fury unusable set=1 enabled=(target.healthpercent() > 20 and target.healthpercent() < 80 and buffexpires(sudden_death_buff)))
   `;
 
     OvaleScripts.RegisterScript(

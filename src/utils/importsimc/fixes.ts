@@ -140,6 +140,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("serpent_sting_marksmanship", 271788);
     fixIdentifier("unstable_affliction_silence_debuff", 196364);
     fixIdentifier("corruption_debuff_affliction", 146739);
+    fixIdentifier("condemn_fury", 317485);
 
     // Bombs
     fixIdentifier("pheromone_bomb", 270323);

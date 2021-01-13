@@ -556,7 +556,7 @@ AddFunction furysingle_targetmainactions
  #rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
  if buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 spell(rampage)
  #condemn
- spell(condemn)
+ spell(condemn_fury)
  #execute
  spell(execute_fury)
  #bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
@@ -592,7 +592,7 @@ AddFunction furysingle_targetshortcdactions
   #siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
   if enemies(tagged=1) > 1 or 600 > 15 spell(siegebreaker)
 
-  unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury)
+  unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury)
   {
    #bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
    if isenraged() and { enemies(tagged=1) > 1 or 600 > 45 } spell(bladestorm)
@@ -608,7 +608,7 @@ AddFunction furysingle_targetshortcdactions
 
 AddFunction furysingle_targetshortcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 AddFunction furysingle_targetcdactions
@@ -617,7 +617,7 @@ AddFunction furysingle_targetcdactions
 
 AddFunction furysingle_targetcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { enemies(tagged=1) > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn) or spell(execute_fury) or isenraged() and { enemies(tagged=1) > 1 or 600 > 45 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker) < gcd() and spell(crushing_blow) or { enemies(tagged=1) > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or isenraged() and { enemies(tagged=1) > 1 or 600 > 45 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -833,7 +833,7 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
 # bloodlust
 # bloodthirst
 # charge
-# condemn
+# condemn_fury
 # cruelty_talent
 # crushing_blow
 # dragon_roar
