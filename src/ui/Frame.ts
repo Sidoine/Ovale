@@ -175,7 +175,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         const profile = this.ovaleOptions.db.profile;
         if (!profile.apparence.enableIcons) {
             this.visible = false;
-        } else if (!this.frame.IsVisible()) {
+        } else if (!this.petFrame.IsVisible()) {
             this.visible = false;
         } else {
             if (profile.apparence.hideVehicule && UnitHasVehicleUI("player")) {
@@ -673,16 +673,10 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         private runner: Runner,
         private controls: Controls,
         private scripts: OvaleScriptsClass,
-        private actionBar: OvaleActionBarClass
+        private actionBar: OvaleActionBarClass,
+        private petFrame: UIFrame
     ) {
-        super(
-            CreateFrame(
-                "Frame",
-                undefined,
-                UIParent,
-                "SecureHandlerStateTemplate"
-            )
-        );
+        super(CreateFrame("Frame", undefined, petFrame));
 
         this.traceLog = LibTextDump.New(`Ovale - ${L.icon_snapshot}`, 750, 500);
 
@@ -694,7 +688,6 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         // );
         // const newFrame = ;
         // hider.SetAllPoints(UIParent);
-        RegisterStateDriver(this.frame, "visibility", "[petbattle] hide; show");
         this.tracer = ovaleDebug.create("OvaleFrame");
         // this.frame = newFrame;
         // this.hider = hider;
@@ -917,6 +910,14 @@ export class OvaleFrameModuleClass {
         scripts: OvaleScriptsClass,
         actionBar: OvaleActionBarClass
     ) {
+        const petFrame = CreateFrame(
+            "Frame",
+            undefined,
+            UIParent,
+            "SecureHandlerStateTemplate"
+        );
+        RegisterStateDriver(petFrame, "visibility", "[petbattle] hide; show");
+        petFrame.SetAllPoints(UIParent);
         this.module = ovale.createModule(
             "OvaleFrame",
             this.OnInitialize,
@@ -940,7 +941,8 @@ export class OvaleFrameModuleClass {
             runner,
             controls,
             scripts,
-            actionBar
+            actionBar,
+            petFrame
         );
     }
 }
