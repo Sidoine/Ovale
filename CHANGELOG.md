@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.38](https://github.com/Sidoine/Ovale/compare/9.0.37...9.0.38) (2021-01-14)
+
+### Bug Fixes
+
+-   display the key if the help text doesn't exist ([446e76b](https://github.com/Sidoine/Ovale/commit/446e76b610fea8dea1d761c51646a681afcc0536))
+-   pet cast were delaying player cast ([7c3c80a](https://github.com/Sidoine/Ovale/commit/7c3c80af89f239226486f3250931ea1478ef8c0e)), closes [#807](https://github.com/Sidoine/Ovale/issues/807)
+-   **ui:** ovale was not hidding out of combat ([4e151d7](https://github.com/Sidoine/Ovale/commit/4e151d72f27b9e5a4ffa1d75f494af81da81f0c2))
+-   **warrior:** add support for condemn ([e1e836c](https://github.com/Sidoine/Ovale/commit/e1e836cbf9fc2d089b19a9960b1011ab0b3cda80))
+
 ### [9.0.37](https://github.com/Sidoine/Ovale/compare/9.0.36...9.0.37) (2021-01-10)
 
 ### [9.0.36](https://github.com/Sidoine/Ovale/compare/9.0.35...9.0.36) (2021-01-09)
