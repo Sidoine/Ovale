@@ -419,7 +419,7 @@ export class OvaleIcon {
         if (this.help || this.actionType || this.HasScriptControls()) {
             GameTooltip.SetOwner(this.frame, "ANCHOR_BOTTOMLEFT");
             if (this.help) {
-                GameTooltip.SetText(L[this.help]);
+                GameTooltip.SetText(L[this.help] || this.help);
             }
             if (this.actionType) {
                 let actionHelp: string;
