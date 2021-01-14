@@ -824,6 +824,7 @@ export class OvaleFutureClass
         const spellcast = self_pool.Get();
         spellcast.lineId = lineId;
         spellcast.caster = caster;
+        spellcast.castByPlayer = caster === this.ovale.playerGUID;
         spellcast.spellId = spellId;
         spellcast.spellName = spellName || "Unknown spell";
         spellcast.queued = now;
@@ -1065,7 +1066,8 @@ export class OvaleFutureClass
                 if (success) {
                     const targetGUID = spellcast.target;
                     this.UpdateLastSpellcast(now, spellcast);
-                    this.next.PushGCDSpellId(spellcast.spellId);
+                    if (!spellcast.offgcd)
+                        this.next.PushGCDSpellId(spellcast.spellId);
                     this.UpdateCounters(spellId, spellcast.stop, targetGUID);
                     let finished = false;
                     let finish = "miss";
@@ -1425,28 +1427,30 @@ export class OvaleFutureClass
     UpdateLastSpellcast(atTime: number, spellcast: SpellCast) {
         this.profiler.StartProfiling("OvaleFuture_UpdateLastSpellcast");
         this.current.lastCastTime[spellcast.spellId] = atTime;
-        if (spellcast.offgcd) {
-            this.tracer.Debug(
-                "    Caching spell %s (%d) as most recent off-GCD spellcast.",
-                spellcast.spellName,
-                spellcast.spellId
-            );
-            for (const [k, v] of kpairs(spellcast)) {
-                (<any>this.current.lastOffGCDSpellcast)[k] = v;
+        if (spellcast.castByPlayer) {
+            if (spellcast.offgcd) {
+                this.tracer.Debug(
+                    "    Caching spell %s (%d) as most recent off-GCD spellcast.",
+                    spellcast.spellName,
+                    spellcast.spellId
+                );
+                for (const [k, v] of kpairs(spellcast)) {
+                    (<any>this.current.lastOffGCDSpellcast)[k] = v;
+                }
+                this.lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
+                this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast;
+            } else {
+                this.tracer.Debug(
+                    "    Caching spell %s (%d) as most recent GCD spellcast.",
+                    spellcast.spellName,
+                    spellcast.spellId
+                );
+                for (const [k, v] of kpairs(spellcast)) {
+                    (<any>this.lastSpell.lastGCDSpellcast)[k] = v;
+                }
+                this.lastSpell.lastSpellcast = this.lastSpell.lastGCDSpellcast;
+                this.next.lastGCDSpellId = this.lastSpell.lastGCDSpellcast.spellId;
             }
-            this.lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
-            this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast;
-        } else {
-            this.tracer.Debug(
-                "    Caching spell %s (%d) as most recent GCD spellcast.",
-                spellcast.spellName,
-                spellcast.spellId
-            );
-            for (const [k, v] of kpairs(spellcast)) {
-                (<any>this.lastSpell.lastGCDSpellcast)[k] = v;
-            }
-            this.lastSpell.lastSpellcast = this.lastSpell.lastGCDSpellcast;
-            this.next.lastGCDSpellId = this.lastSpell.lastGCDSpellcast.spellId;
         }
         this.profiler.StopProfiling("OvaleFuture_UpdateLastSpellcast");
     }
@@ -1639,7 +1643,11 @@ export class OvaleFutureClass
                     }
                     lastSpellcastFound = true;
                 }
-                if (!lastGCDSpellcastFound && !spellcast.offgcd) {
+                if (
+                    !lastGCDSpellcastFound &&
+                    !spellcast.offgcd &&
+                    spellcast.castByPlayer
+                ) {
                     // this.next.PushGCDSpellId(spellcast.spellId);
                     if (spellcast.stop && this.next.nextCast < spellcast.stop) {
                         this.next.nextCast = spellcast.stop;
@@ -1759,6 +1767,7 @@ export class OvaleFutureClass
                 spellcast = OvaleFutureClass.staticSpellcast;
                 wipe(spellcast);
                 spellcast.caster = this.ovale.playerGUID;
+                spellcast.castByPlayer = true;
                 spellcast.spellId = spellId;
                 spellcast.spellName =
                     this.ovaleSpellBook.GetSpellName(spellId) ||
@@ -1782,13 +1791,26 @@ export class OvaleFutureClass
                 }
             }
             // this.next.lastCast = this.next.currentCast;
-            this.next.currentCast = spellcast;
-            this.next.lastCast[spellId] = endCast;
-            const gcd = this.GetGCD(spellId, startCast, targetGUID);
-            const nextCast = (castTime > gcd && endCast) || startCast + gcd;
-            if (this.next.nextCast < nextCast) {
-                this.next.nextCast = nextCast;
+            if (spellcast.castByPlayer) {
+                this.next.currentCast = spellcast;
+                this.next.lastCast[spellId] = endCast;
+                const gcd = this.GetGCD(spellId, startCast, targetGUID);
+                const nextCast = (castTime > gcd && endCast) || startCast + gcd;
+                if (this.next.nextCast < nextCast) {
+                    this.next.nextCast = nextCast;
+                }
+
+                this.tracer.Log(
+                    "Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s",
+                    spellId,
+                    startCast,
+                    this.baseState.currentTime,
+                    nextCast,
+                    endCast,
+                    targetGUID
+                );
             }
+
             // if (gcd > 0) {
             //     this.next.PushGCDSpellId(spellId);
             // } else {
@@ -1800,15 +1822,6 @@ export class OvaleFutureClass
             // } else {
             //     baseState.next.currentTime = now;
             // }
-            this.tracer.Log(
-                "Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s",
-                spellId,
-                startCast,
-                this.baseState.currentTime,
-                nextCast,
-                endCast,
-                targetGUID
-            );
 
             if (startCast > this.baseState.currentTime) {
                 this.ovaleState.ApplySpellStartCast(

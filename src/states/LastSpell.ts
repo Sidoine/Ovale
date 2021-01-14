@@ -17,6 +17,7 @@ export interface SpellCast extends PaperDollSnapshot {
     auraGUID?: string;
     channel?: boolean;
     caster?: string;
+    castByPlayer?: boolean;
     offgcd?: boolean;
     damageMultiplier?: number;
     combopoints?: number;
