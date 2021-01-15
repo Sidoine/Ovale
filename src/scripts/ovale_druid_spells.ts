@@ -42,11 +42,13 @@ Define(bear_form 5487)
 Define(berserk_bear 50334)
 # Go berserk for 15 seconds, reducing the cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration by s1 and the cost of Ironfur by s3.
   SpellInfo(berserk_bear cd=180 duration=15 gcd=0 offgcd=1)
+  SpellRequire(berserk_bear replaced_by set=incarnation_guardian_of_ursoc enabled=(hastalent(incarnation_guardian_of_ursoc_talent)))
   # Cooldowns of Mangle, Thrash, Growl, and Frenzied Regeneration are reduced by w1. Ironfur cost reduced by w3.
   SpellAddBuff(berserk_bear berserk_bear add=1)
 Define(berserk_cat 106951)
 # Go berserk for 20 seconds, causing Rake and Shred to deal damage as though you were stealthed, and giving finishing moves a s1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellInfo(berserk_cat cd=180 duration=20 gcd=0 offgcd=1)
+  SpellRequire(berserk_cat replaced_by set=incarnation_king_of_the_jungle enabled=(hastalent(incarnation_king_of_the_jungle_talent)))
   # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellAddBuff(berserk_cat berserk_cat add=1)
 Define(berserking 59621)
@@ -74,6 +76,7 @@ Define(cat_form 768)
 Define(celestial_alignment 194223)
 # Celestial bodies align, maintaining both Eclipses and granting s1 haste for 20 seconds.
   SpellInfo(celestial_alignment cd=180 duration=20 gcd=0 offgcd=1)
+  SpellRequire(celestial_alignment replaced_by set=incarnation_chosen_of_elune enabled=(hastalent(incarnation_chosen_of_elune_talent)))
   # Both Eclipses active. Haste increased by w1.
   SpellAddBuff(celestial_alignment celestial_alignment add=1)
 Define(clearcasting 16870)
@@ -152,6 +155,12 @@ Define(incarnation 117679)
   SpellInfo(incarnation duration=30 gcd=0 offgcd=1)
   # Incarnation: Tree of Life activated.
   SpellAddBuff(incarnation incarnation add=1)
+Define(incarnation_chosen_of_elune 102560)
+# An improved Moonkin Form that grants the benefits of Celestial Alignment, and s2 critical strike chance.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
+  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 gcd=0 offgcd=1)
+  SpellRequire(incarnation_chosen_of_elune unusable set=1 enabled=(not hastalent(incarnation_chosen_of_elune_talent)))
+  # Both Eclipses active. Haste increased by w1 and critical strike chance by w2.
+  SpellAddBuff(incarnation_chosen_of_elune incarnation_chosen_of_elune add=1)
 Define(incarnation_guardian_of_ursoc 102558)
 # An improved Bear Form that grants the benefits of Berserk, causes Mangle to hit up to (25 of Spell Power) targets, and increases maximum health by s5.rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
   SpellInfo(incarnation_guardian_of_ursoc cd=180 duration=30 gcd=0 offgcd=1)
@@ -186,7 +195,7 @@ Define(kindred_spirits 326434)
   SpellAddBuff(kindred_spirits kindred_spirits add=1)
 Define(lunar_inspiration_feral 155580)
 # Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
-  SpellInfo(lunar_inspiration_feral gcd=0 offgcd=1)
+  SpellInfo(lunar_inspiration_feral gcd=0 offgcd=1 unusable=1)
   SpellRequire(lunar_inspiration_feral unusable set=1 enabled=(not hastalent(lunar_inspiration_talent)))
 Define(lycaras_fleeting_glimpse 340060)
 # Every s1 sec while in combat, cast a spell based on your form:rnrnNo Form: @spellname48438rnCat Form: @spellname285381rnBear Form: @spellname22812rnMoonkin Form: @spellname191034rnTravel Form: @spellname77764
@@ -362,6 +371,7 @@ Define(sunfire_debuff 164815)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
   SpellInfo(swipe gcd=1)
+  SpellRequire(swipe replaced_by set=brutal_slash enabled=(hastalent(brutal_slash_talent)))
 Define(swipe_cat 106785)
 # Swipe up to s4 nearby enemies, inflicting s3 Physical damage.?a231283[ Deals s2 increased damage against bleeding targets.][]rnrn|cFFFFFFFFAwards s1 combo lpoint:points;.|r
   SpellInfo(swipe_cat energy=35 gcd=1 combopoints=-1)
@@ -445,8 +455,6 @@ Define(fury_of_elune_talent 21193)
 # Calls down a beam of pure celestial energy that follows the enemy, dealing up to <dmg> Astral damage over 8 seconds within its area. Damage reduced on secondary targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
 Define(heart_of_the_wild_talent 18577)
 # Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
-Define(heart_of_the_wild_talent 18577)
-# Abilities associated with your chosen Affinity are substantially empowered for 45 seconds.?s197492[rnrn|cFFFFFFFFRestoration:|r Healing of your Restoration spells increased by 108294s1, and mana costs reduced by 108294s3.]?s197490|s202155|s202157[rnrn|cFFFFFFFFFeral:|r Damage of your Feral abilities increased by 108292s1, and critical strikes with attacks that generate a combo point generate an additional combo point.]?s197632|s197488[rnrn|cFFFFFFFFBalance:|r Damage of your Balance abilities increased by 108291s1, and Starsurge is instant.]?s217615|s197491[rnrn|cFFFFFFFFGuardian:|r Bear Form gives an additional 108293s1 Stamina, multiple uses of Ironfur may overlap, and Frenzied Regeneration has 108293s3+1 charges.][]rn
 Define(incarnation_chosen_of_elune_talent 21702)
 # An improved Moonkin Form that grants the benefits of Celestial Alignment, and s2 critical strike chance.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
 Define(incarnation_guardian_of_ursoc_talent 22388)
@@ -463,8 +471,6 @@ Define(new_moon_talent 21655)
 # Deals m1 Astral damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(predator_talent 22363)
 # The cooldown on Tiger's Fury resets when a target dies with one of your Bleed effects active, and Tiger's Fury last s1/1000 additional seconds.
-Define(primal_wrath_talent 22370)
-# Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
 Define(primal_wrath_talent 22370)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
 Define(pulverize_talent 22425)

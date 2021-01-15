@@ -1360,6 +1360,14 @@ AddFunction subtletystealthedcdpostconditions
 
 AddFunction subtletystealth_cdsmainactions
 {
+}
+
+AddFunction subtletystealth_cdsmainpostconditions
+{
+}
+
+AddFunction subtletystealth_cdsshortcdactions
+{
  #pool_resource,for_next=1,extra_amount=40,if=race.night_elf
  unless race(nightelf)
  {
@@ -1373,17 +1381,8 @@ AddFunction subtletystealth_cdsmainactions
  }
 }
 
-AddFunction subtletystealth_cdsmainpostconditions
-{
-}
-
-AddFunction subtletystealth_cdsshortcdactions
-{
-}
-
 AddFunction subtletystealth_cdsshortcdpostconditions
 {
- not race(nightelf) and { shd_combo_points() and { shd_threshold() or buffremaining(symbols_of_death) >= 1.2 or enemies(tagged=1) >= 4 and spellcooldown(symbols_of_death) > 10 } and spell(shadow_dance) or shd_combo_points() and fightremains() < spellcooldown(symbols_of_death) and spell(shadow_dance) }
 }
 
 AddFunction subtletystealth_cdscdactions
@@ -1505,8 +1504,6 @@ AddFunction subtletyfinishcdpostconditions
 
 AddFunction subtletycdsmainactions
 {
- #shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
- if not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 spell(shadow_dance)
  #pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
  unless hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent)
  {
@@ -1514,8 +1511,6 @@ AddFunction subtletycdsmainactions
   if snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 spell(serrated_bone_spike)
   #sepsis,if=variable.snd_condition&combo_points.deficit>=1
   if snd_condition() and combopointsdeficit() >= 1 spell(sepsis)
-  #shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
-  if not buffpresent(shadow_dance_buff) and fightremains() <= 8 + talentpoints(subterfuge_talent) spell(shadow_dance)
   #berserking,if=buff.symbols_of_death.up
   if buffpresent(symbols_of_death) spell(berserking)
  }
@@ -1527,40 +1522,41 @@ AddFunction subtletycdsmainpostconditions
 
 AddFunction subtletycdsshortcdactions
 {
- unless not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance)
+ #shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+ if not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 spell(shadow_dance)
+ #symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+ if buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 spell(symbols_of_death)
+ #flagellation,if=variable.snd_condition&!stealthed.mantle
+ if snd_condition() and not buffpresent(mantle_stealthed_buff) spell(flagellation)
+ #flagellation_cleanse,if=debuff.flagellation.remains<2
+ if target.debuffremaining(flagellation) < 2 spell(flagellation)
+ #pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
+ unless hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent)
  {
-  #symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
-  if buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 spell(symbols_of_death)
-  #flagellation,if=variable.snd_condition&!stealthed.mantle
-  if snd_condition() and not buffpresent(mantle_stealthed_buff) spell(flagellation)
-  #flagellation_cleanse,if=debuff.flagellation.remains<2
-  if target.debuffremaining(flagellation) < 2 spell(flagellation)
-  #pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
-  unless hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent)
-  {
-   #shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
-   if energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 spell(shuriken_tornado)
+  #shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
+  if energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 spell(shuriken_tornado)
 
-   unless { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis)
-   {
-    #symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
-    if snd_condition() and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } spell(symbols_of_death)
-    #marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
-    if never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(stealthed_buff) and combopointsdeficit() >= maxcombopoints() } spell(marked_for_death)
-    #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
-    if 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() spell(marked_for_death)
-    #echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
-    if snd_condition() and combopointsdeficit() >= 2 and { use_priority_rotation() or enemies(tagged=1) <= 4 } spell(echoing_reprimand)
-    #shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
-    if hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) spell(shuriken_tornado)
-   }
+  unless { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis)
+  {
+   #symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
+   if snd_condition() and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } spell(symbols_of_death)
+   #marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
+   if never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(stealthed_buff) and combopointsdeficit() >= maxcombopoints() } spell(marked_for_death)
+   #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
+   if 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() spell(marked_for_death)
+   #echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
+   if snd_condition() and combopointsdeficit() >= 2 and { use_priority_rotation() or enemies(tagged=1) <= 4 } spell(echoing_reprimand)
+   #shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
+   if hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) spell(shuriken_tornado)
+   #shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
+   if not buffpresent(shadow_dance_buff) and fightremains() <= 8 + talentpoints(subterfuge_talent) spell(shadow_dance)
   }
  }
 }
 
 AddFunction subtletycdsshortcdpostconditions
 {
- not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or not buffpresent(shadow_dance_buff) and fightremains() <= 8 + talentpoints(subterfuge_talent) and spell(shadow_dance) or buffpresent(symbols_of_death) and spell(berserking) }
+ not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or buffpresent(symbols_of_death) and spell(berserking) }
 }
 
 AddFunction subtletycdscdactions

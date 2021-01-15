@@ -31,6 +31,7 @@ Define(arcane_torrent 25046)
 Define(backstab 53)
 # Stab the target, causing s2*<mult> Physical damage. Damage increased by s4 when you are behind your target?s319949[, and critical strikes apply Find Weakness for 319949s1 sec][].rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(backstab energy=35 gcd=1 combopoints=-1)
+  SpellRequire(backstab replaced_by set=gloomblade enabled=(hastalent(gloomblade_talent)))
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -289,7 +290,7 @@ Define(shadow_blades 121471)
   SpellAddBuff(shadow_blades shadow_blades add=1)
 Define(shadow_dance 185313)
 # Allows use of all Stealth abilities and grants all the combat benefits of Stealth for 8 seconds, and increases damage by s2. Effect not broken from taking damage or attacking. ?s14062[Movement speed while active is increased by 1784s3 and damage dealt is increased by 1784s4. ]?s108209[Abilities cost 112942s1 less while active. ][]?s31223[Attacks from Shadow Dance and for 31223s1 sec after deal 31665s1 more damage.  ][]
-  SpellInfo(shadow_dance cd=8 charge_cd=60 duration=8 gcd=0 offgcd=1 tick=1)
+  SpellInfo(shadow_dance cd=60 duration=8 gcd=0 offgcd=1 tick=1)
 Define(shadow_dance_buff 185422)
 # Allows use of all Stealth abilities and grants all the combat benefits of Stealth for 8 seconds, and increases damage by s2. Effect not broken from taking damage or attacking. ?s14062[Movement speed while active is increased by 1784s3 and damage dealt is increased by 1784s4. ]?s108209[Abilities cost 112942s1 less while active. ][]?s31223[Attacks from Shadow Dance and for 31223s1 sec after deal 31665s1 more damage.  ][]
   SpellInfo(shadow_dance_buff duration=8 gcd=0 offgcd=1)
@@ -302,7 +303,7 @@ Define(shadowmeld 58984)
   SpellAddBuff(shadowmeld shadowmeld add=1)
 Define(shadowstep 36554)
 # Step through the shadows to appear behind your target and gain s2 increased movement speed for 2 seconds.
-  SpellInfo(shadowstep cd=1 charge_cd=30 duration=2 gcd=0 offgcd=1)
+  SpellInfo(shadowstep cd=30 duration=2 gcd=0 offgcd=1)
   # Movement speed increased by s2.
   SpellAddBuff(shadowstep shadowstep add=1)
 Define(shadowstrike 185438)
@@ -399,18 +400,12 @@ Define(enveloping_shadows_talent 22336)
 # Deepening Shadows reduces the remaining cooldown of Shadow Dance by an additional @switch<s3>[s1/10][s1/10.1] sec per combo point spent.rnrnShadow Dance gains s2 additional charge.
 Define(exsanguinate_talent 22344)
 # Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
-Define(exsanguinate_talent 22344)
-# Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
-Define(ghostly_strike_talent 22120)
-# Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for 10 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 Define(ghostly_strike_talent 22120)
 # Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for 10 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 Define(gloomblade_talent 19235)
 # Punctures your target with your shadow-infused blade for s1 Shadow damage, bypassing armor.?s319949[ Critical strikes apply Find Weakness for 319949s1 sec.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 Define(internal_bleeding_talent 19245)
 # Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 6 seconds, based on combo points spent.
-Define(killing_spree_talent 23175)
-# Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5 nearby enemies for s2 damage.
 Define(killing_spree_talent 23175)
 # Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits up to s5 nearby enemies for s2 damage.
 Define(marked_for_death_talent 19241)
@@ -429,8 +424,6 @@ Define(secret_technique_talent 23183)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
 Define(shadow_focus_talent 22333)
 # ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
-Define(shuriken_tornado_talent 21188)
-# Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
 Define(shuriken_tornado_talent 21188)
 # Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
 Define(subterfuge_talent 22332)

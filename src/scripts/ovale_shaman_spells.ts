@@ -114,6 +114,7 @@ Define(feral_spirit 51533)
 Define(fire_elemental 198067)
 # Calls forth a Greater Fire Elemental to rain destruction on your enemies for 30 seconds. rnrnWhile the Fire Elemental is active, Flame Shock deals damage 188592s2 faster?a343226[, and newly applied Flame Shocks last 343226s1 longer][].
   SpellInfo(fire_elemental cd=150)
+  SpellRequire(fire_elemental replaced_by set=storm_elemental enabled=(hastalent(storm_elemental_talent)))
 Define(fire_nova 333974)
 # Erupt a burst of fiery damage from all targets affected by your Flame Shock, dealing 333977s1 Fire damage to up to 333977I targets within 333977A1 yds of your Flame Shock targets.
   SpellInfo(fire_nova cd=15)
@@ -274,12 +275,6 @@ Define(ascendance_talent_enhancement 21972)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(ascendance_talent 21675)
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.rnrnWhen you transform into the Flame Ascendant, instantly cast a Lava Burst at all enemies affected by your Flame Shock, and refresh your Flame Shock durations to 18 seconds.
-Define(ascendance_talent_restoration 22359)
-# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
-Define(ascendance_talent_enhancement 21972)
-# Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
-Define(ascendance_talent 21675)
-# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.rnrnWhen you transform into the Flame Ascendant, instantly cast a Lava Burst at all enemies affected by your Flame Shock, and refresh your Flame Shock durations to 18 seconds.
 Define(crashing_storm_talent 21973)
 # Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 6 seconds. 
 Define(earthen_spike_talent 22977)
@@ -288,10 +283,6 @@ Define(echo_of_the_elements_talent_elemental 22357)
 # ?c1[Lava Burst now has s2+1][Riptide, Healing Stream Totem, and Lava Burst now have s2+1] charges. Effects that reset ?c1[its][their] remaining cooldown will instead grant 1 charge.
 Define(echoing_shock_talent 23460)
 # Shock the target for (65 of Spell Power) Elemental damage and create an ancestral echo, causing your next damage or healing spell to be cast a second time s2/1000.1 sec later for free.
-Define(echoing_shock_talent 23460)
-# Shock the target for (65 of Spell Power) Elemental damage and create an ancestral echo, causing your next damage or healing spell to be cast a second time s2/1000.1 sec later for free.
-Define(elemental_blast_talent_elemental 23190)
-# Harnesses the raw power of the elements, dealing (140 of Spell Power) Elemental damage and increasing your Critical Strike or Haste by 118522s1 or Mastery by 173184s1*168534bc1 for 10 seconds.?a343725[rnrn|cFFFFFFFFGenerates 343725s10 Maelstrom.|r][]
 Define(elemental_blast_talent 22353)
 # Harnesses the raw power of the elements, dealing (140 of Spell Power) Elemental damage and increasing your Critical Strike or Haste by 118522s1 or Mastery by 173184s1*168534bc1 for 10 seconds.?a343725[rnrn|cFFFFFFFFGenerates 343725s10 Maelstrom.|r][]
 Define(elemental_blast_talent_elemental 23190)
@@ -300,18 +291,12 @@ Define(feral_lunge_talent 22149)
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
 Define(fire_nova_talent 22171)
 # Erupt a burst of fiery damage from all targets affected by your Flame Shock, dealing 333977s1 Fire damage to up to 333977I targets within 333977A1 yds of your Flame Shock targets.
-Define(fire_nova_talent 22171)
-# Erupt a burst of fiery damage from all targets affected by your Flame Shock, dealing 333977s1 Fire damage to up to 333977I targets within 333977A1 yds of your Flame Shock targets.
 Define(ice_strike_talent 23109)
 # Strike your target with an icy blade, dealing s1 Frost damage and snaring them by s2 for 6 seconds.rnrnSuccessful Ice Strikes reset the cooldown of your Flame Shock and Frost Shock spells.
 Define(icefury_talent 23111)
 # Hurls frigid ice at the target, dealing (82.5 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s2 increased damage and generate 343725s7 Maelstrom.rnrn|cFFFFFFFFGenerates 343725s8 Maelstrom.|r
-Define(icefury_talent 23111)
-# Hurls frigid ice at the target, dealing (82.5 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s2 increased damage and generate 343725s7 Maelstrom.rnrn|cFFFFFFFFGenerates 343725s8 Maelstrom.|r
 Define(lashing_flames_talent 22354)
 # Lava Lash now increases the damage of Flame Shock on its target by 334168s1 for 20 seconds.
-Define(liquid_magma_totem_talent 19273)
-# Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
 Define(liquid_magma_totem_talent 19273)
 # Summons a totem at the target location for 15 seconds that hurls liquid magma at a random nearby target every 192226t1 sec, dealing (15 of Spell Power)*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
 Define(master_of_the_elements_talent 19271)
@@ -320,16 +305,8 @@ Define(primal_elementalist_talent 19266)
 # Your Earth, Fire, and Storm Elementals are drawn from primal elementals s1 more powerful than regular elementals, with additional abilities, and you gain direct control over them.
 Define(static_discharge_talent 22358)
 # Discharge excess energy from your Lightning Shield, dealing (23 of Spell Power) Nature damage to an enemy within 342244A1 yds every t1 sec for 3 seconds.rnrnTargets with your Flame Shock on them are preferred.
-Define(static_discharge_talent 22358)
-# Discharge excess energy from your Lightning Shield, dealing (23 of Spell Power) Nature damage to an enemy within 342244A1 yds every t1 sec for 3 seconds.rnrnTargets with your Flame Shock on them are preferred.
 Define(storm_elemental_talent 19272)
 # Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
-Define(storm_elemental_talent 19272)
-# Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
-Define(stormkeeper_talent_enhancement 22352)
-# Charge yourself with lightning, causing your next n Lightning Bolts or Chain Lightnings to deal s2 more damage and be instant cast.
-Define(stormkeeper_talent 22153)
-# Charge yourself with lightning, causing your next n Lightning Bolts to deal s2 more damage, and also causes your next n Lightning Bolts or Chain Lightnings to be instant cast and trigger an Elemental Overload on every target.
 Define(stormkeeper_talent_enhancement 22352)
 # Charge yourself with lightning, causing your next n Lightning Bolts or Chain Lightnings to deal s2 more damage and be instant cast.
 Define(stormkeeper_talent 22153)

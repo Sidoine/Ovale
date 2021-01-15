@@ -26,7 +26,7 @@ interface AllData {
     active_class_spell_t?: CellValue[][];
 }
 
-const enum SpellAttribute {
+export const enum SpellAttribute {
     "Ranged Ability" = 1,
     "Tradeskill ability" = 5,
     "Passive" = 6,
@@ -1835,12 +1835,14 @@ export function getSpellData(directory: string) {
                 spell.talent.push(talent);
                 if (!spell.spellAttributes.includes(SpellAttribute.Passive))
                     spell.identifierScore += 10;
-                // const spec = specIdToSpecName.get(talent.spec);
-                // if (spec) {
-                //     if (spell.specializationName.indexOf(spec) < 0)
-                //         spell.specializationName.push(spec);
-                //
-                // }
+
+                const replacedSpell = spellDataById.get(talent.replace_id);
+                if (replacedSpell) {
+                    if (!replacedSpell.replaced_by)
+                        replacedSpell.replaced_by = [];
+                    replacedSpell.replaced_by.push(talent.spell_id);
+                    spell.replace_spell_id = talent.replace_id;
+                }
             }
         }
     }

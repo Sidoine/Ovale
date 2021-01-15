@@ -50,7 +50,8 @@ Define(berserking 59621)
   SpellInfo(berserking gcd=0 offgcd=1)
 Define(blink 1953)
 # Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
-  SpellInfo(blink cd=0.5 charge_cd=15 duration=0.3)
+  SpellInfo(blink cd=15 duration=0.3)
+  SpellRequire(blink replaced_by set=shimmer enabled=(hastalent(shimmer_talent)))
   # Blinking.
   SpellAddBuff(blink blink add=1)
 Define(blizzard 190356)
@@ -146,11 +147,11 @@ Define(fingers_of_frost 44544)
   SpellInfo(fingers_of_frost duration=15 max_stacks=2 gcd=0 offgcd=1)
 Define(fire_blast 319836)
 # Blasts the enemy for (72 of Spell Power) Fire damage.?a231568[rnrn|cFFFFFFFFFire:|r Always deals a critical strike.][]
-  SpellInfo(fire_blast cd=0.5 charge_cd=12)
+  SpellInfo(fire_blast cd=12)
   SpellRequire(fire_blast replaced_by set=fire_blast_fire enabled=(specialization("fire")))
 Define(fire_blast_fire 108853)
 # Blasts the enemy for (79.2 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
-  SpellInfo(fire_blast_fire cd=0.5 charge_cd=12 gcd=0 offgcd=1)
+  SpellInfo(fire_blast_fire cd=12 gcd=0 offgcd=1)
 Define(fireball 133)
 # Throws a fiery ball that causes (65 of Spell Power) Fire damage.?a157642[rnrnEach time your Fireball fails to critically strike a target, it gains a stacking 157644s1 increased critical strike chance. Effect ends when Fireball critically strikes.][]
   SpellInfo(fireball)
@@ -222,7 +223,7 @@ Define(heating_up 48107)
   SpellAddBuff(heating_up heating_up add=1)
 Define(hot_streak 195283)
 # Getting two direct-damage critical strikes in a row with Fire spells will make your next Pyroblast or Flamestrike spell instant cast, and cause double the normal Ignite damage.
-  SpellInfo(hot_streak max_stacks=1 gcd=0 offgcd=1)
+  SpellInfo(hot_streak max_stacks=1 gcd=0 offgcd=1 unusable=1)
   # Your next Pyroblast or Flamestrike spell is instant cast, and causes double the normal Ignite damage.
   SpellAddBuff(hot_streak hot_streak add=1)
 Define(ice_floes 108839)
@@ -264,6 +265,10 @@ Define(living_bomb 44457)
   SpellRequire(living_bomb unusable set=1 enabled=(not hastalent(living_bomb_talent)))
   # Causes w1 Fire damage every t1 sec. After d, the target explodes, causing w2 Fire damage to the target and all other enemies within 44461A2 yards?w3>0[, and spreading Living Bomb][].
   SpellAddBuff(living_bomb living_bomb add=1)
+Define(lonely_winter 205024)
+# You can no longer summon your Water Elemental, but Frostbolt, Ice Lance, and Flurry deal s1 increased damage. 
+  SpellInfo(lonely_winter gcd=0 offgcd=1 unusable=1)
+  SpellRequire(lonely_winter unusable set=1 enabled=(not hastalent(lonely_winter_talent)))
 Define(meteor 153561)
 # Calls down a meteor which lands at the target location after 3 seconds, dealing (260 of Spell Power) Fire damage, split evenly between all targets within 8 yards, and burns the ground, dealing 8*(8.25 of Spell Power) Fire damage over 8.5 seconds to all enemies in the area. 
   SpellInfo(meteor cd=45)
@@ -331,11 +336,11 @@ Define(replenish_mana 5405)
   SpellAddBuff(replenish_mana replenish_mana add=1)
 Define(rule_of_threes_arcane 264354)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
-  SpellInfo(rule_of_threes_arcane gcd=0 offgcd=1)
+  SpellInfo(rule_of_threes_arcane gcd=0 offgcd=1 unusable=1)
   SpellRequire(rule_of_threes_arcane unusable set=1 enabled=(not hastalent(rule_of_threes_talent)))
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
-  SpellInfo(rune_of_power cd=10 charge_cd=45 duration=12)
+  SpellInfo(rune_of_power cd=45 duration=12)
   SpellRequire(rune_of_power unusable set=1 enabled=(not hastalent(rune_of_power_talent)))
 Define(rune_of_power_buff 116014)
 # Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
@@ -352,6 +357,12 @@ Define(shifting_power 314791)
   SpellAddBuff(shifting_power shifting_power add=1)
   # Rooted in place.
   SpellAddBuff(shifting_power fae_tendrils_unused_0 add=1)
+Define(shimmer 212653)
+# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
+  SpellInfo(shimmer cd=25 duration=0.65 gcd=0 offgcd=1)
+  SpellRequire(shimmer unusable set=1 enabled=(not hastalent(shimmer_talent)))
+  # Shimmering.
+  SpellAddBuff(shimmer shimmer add=1)
 Define(siphon_storm_buff 332934)
 # Evocation grants 332929s1 LArcane Charge:Charges;, and while channeling Evocation, your Intellect is increased by 332934s1 every 12051t2 sec. Lasts 30 seconds.
   SpellInfo(siphon_storm_buff duration=30 max_stacks=6 gcd=0 offgcd=1)
@@ -365,6 +376,7 @@ Define(soul_ignition 345211)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
+  SpellRequire(summon_water_elemental replaced_by set=lonely_winter enabled=(hastalent(lonely_winter_talent)))
 Define(sun_kings_blessing_ready_buff 333315)
 # After consuming s1 Hot Streaks, your next non-instant Pyroblast cast within 15 seconds grants you Combustion for s2 sec.
   SpellInfo(sun_kings_blessing_ready_buff duration=15 max_stacks=5 gcd=0 offgcd=1)
@@ -402,8 +414,6 @@ Define(arcane_familiar_talent 22464)
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for 3600 seconds.
 Define(arcane_orb_talent 22449)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
-Define(arcane_orb_talent 22449)
-# Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (109.2 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
 Define(comet_storm_talent 22473)
 # Calls down a series of 7 icy comets on and around the target, that deals up to 7*(42 of Spell Power) Frost damage to all enemies within 228601A1 yds of its impacts.
 Define(ebonbolt_talent 22469)
@@ -426,6 +436,8 @@ Define(kindling_talent 21631)
 # Your Fireball, Pyroblast, Fire Blast, and Phoenix Flames critical strikes reduce the remaining cooldown on Combustion by <cdr> sec.
 Define(living_bomb_talent 22472)
 # The target becomes a Living Bomb, taking 217694o1 Fire damage over 4 seconds, and then exploding to deal an additional (14.000000000000002 of Spell Power) Fire damage to the target and reduced damage to all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
+Define(lonely_winter_talent 22460)
+# You can no longer summon your Water Elemental, but Frostbolt, Ice Lance, and Flurry deal s1 increased damage. 
 Define(meteor_talent 21633)
 # Calls down a meteor which lands at the target location after 3 seconds, dealing (260 of Spell Power) Fire damage, split evenly between all targets within 8 yards, and burns the ground, dealing 8*(8.25 of Spell Power) Fire damage over 8.5 seconds to all enemies in the area. 
 Define(nether_tempest_talent 22470)
@@ -440,10 +452,10 @@ Define(rule_of_threes_talent 22461)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
 Define(rune_of_power_talent 22447)
 # Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
-Define(rune_of_power_talent 22447)
-# Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
 Define(searing_touch_talent 22462)
 # Scorch deals s2 increased damage and is a guaranteed Critical Strike when the target is below s1 health.
+Define(shimmer_talent 22443)
+# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(splitting_ice_talent 23176)
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2-15 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 22474)

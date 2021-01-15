@@ -91,7 +91,7 @@ Define(dance_of_chiji_buff 325202)
   SpellInfo(dance_of_chiji_buff duration=15 gcd=0 offgcd=1)
 Define(dance_of_chiji_windwalker 325201)
 # Spending Chi has a chance to make your next Spinning Crane Kick free and deal an additional s1 damage.
-  SpellInfo(dance_of_chiji_windwalker gcd=0 offgcd=1)
+  SpellInfo(dance_of_chiji_windwalker gcd=0 offgcd=1 unusable=1)
   SpellRequire(dance_of_chiji_windwalker unusable set=1 enabled=(not hastalent(dance_of_chiji_talent)))
   # Your next Spinning Crane Kick is free and deals w1 additional damage.
   SpellAddBuff(dance_of_chiji_windwalker dance_of_chiji_buff add=1)
@@ -115,7 +115,7 @@ Define(expel_harm 322101)
   SpellInfo(expel_harm energy=15 cd=15 gcd=1 chi=0)
 Define(faeline_stomp 327104)
 # Strike the ground fiercely to expose a faeline for 30 seconds, dealing 345727s1 Nature damage to up to 5 enemies, and restores (91 of Spell Power) health to up to 5 allies within 345727a1 yds caught in the faeline. ?a137024[Up to 5 allies]?a137025[Up to 5 enemies][Stagger is s3 more effective for 8 seconds against enemies] caught in the faeline?a137023[]?a137024[ are healed with an Essence Font bolt][ suffer an additional 327264s1 damage].rnrnYour abilities have a s2 chance of resetting the cooldown of Faeline Stomp while fighting on a faeline.
-  SpellInfo(faeline_stomp cd=0.5 charge_cd=30 duration=30 gcd=1)
+  SpellInfo(faeline_stomp cd=30 duration=30 gcd=1)
   # Fighting on a faeline has a s2 chance of resetting the cooldown of Faeline Stomp.
   SpellAddBuff(faeline_stomp faeline_stomp add=1)
 Define(fallen_order 326860)
@@ -164,7 +164,7 @@ Define(invoke_xuen_the_white_tiger 123904)
   SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=24 gcd=1 tick=4)
 Define(keg_smash 121253)
 # Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
-  SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
+  SpellInfo(keg_smash energy=40 cd=8 duration=15 gcd=1)
   # ?w3!=0[Movement speed reduced by w3.rn][]Drenched in brew, vulnerable to Breath of Fire.
   SpellAddTargetDebuff(keg_smash keg_smash add=1)
 Define(leg_sweep 119381)
@@ -185,7 +185,7 @@ Define(phantom_fire 321937)
   SpellInfo(phantom_fire gcd=0 offgcd=1)
 Define(purifying_brew 119582)
 # Clears s1 of your damage delayed with Stagger.?s322510[rnrnIncreases the absorption of your next Celestial Brew by up to 322510s1, based on your current level of Stagger][]
-  SpellInfo(purifying_brew cd=1 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(purifying_brew cd=20 gcd=0 offgcd=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -225,7 +225,8 @@ Define(spinning_crane_kick_buff 107270)
   SpellInfo(spinning_crane_kick_buff gcd=0 offgcd=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
-  SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(storm_earth_and_fire cd=90 duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellRequire(storm_earth_and_fire replaced_by set=serenity enabled=(hastalent(serenity_talent)))
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire add=1)
 Define(storm_earth_and_fire_fixate 221771)
@@ -277,8 +278,6 @@ Define(blackout_combo_talent 22108)
 # Blackout Kick also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnCelestial Brew: Pauses Stagger damage for s4 sec.
 Define(chi_burst_talent 20185)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
-Define(chi_burst_talent 20185)
-# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
 Define(chi_wave_talent 19820)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 20175)
@@ -289,8 +288,6 @@ Define(diffuse_magic_talent 20173)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 22096)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
-Define(energizing_elixir_talent 22096)
-# Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
 Define(fist_of_the_white_tiger_talent 19771)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(hit_combo_talent 22093)
@@ -299,16 +296,10 @@ Define(rushing_jade_wind_talent_windwalker 23122)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
 Define(rushing_jade_wind_talent 20184)
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-Define(rushing_jade_wind_talent 20184)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
-Define(serenity_talent 21191)
-# Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(serenity_talent 21191)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(spitfire_talent 22097)
 # Tiger Palm has a h chance to reset the cooldown of Breath of Fire.
-Define(whirling_dragon_punch_talent 22105)
-# Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(potion_of_spectral_agility_item 171270)

@@ -15,9 +15,17 @@ Define(avengers_shield 31935)
   SpellInfo(avengers_shield cd=15 duration=3 interrupt=1 holypower=-1)
   # Silenced.
   SpellAddTargetDebuff(avengers_shield avengers_shield add=1)
+Define(avenging_crusader 216331)
+# You become the ultimate crusader of light, increasing your Crusader Strike, Judgment, and auto-attack damage by s1.rnrnCrusader Strike and Judgment cool down s2 faster and heal up to s6 injured allies for s5 of the damage they deal. Lasts 20 seconds.
+  SpellInfo(avenging_crusader cd=120 duration=20 gcd=0 offgcd=1)
+  SpellRequire(avenging_crusader unusable set=1 enabled=(not hastalent(avenging_crusader_talent)))
+  # Crusader Strike, Judgment and auto-attack damage increased by w1.rnrnCrusader Strike and Judgment cool down w2 faster.rnrnw6 nearby allies will be healed for w5 of the damage done.
+  SpellAddBuff(avenging_crusader avenging_crusader add=1)
 Define(avenging_wrath 31884)
 # Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds.
   SpellInfo(avenging_wrath cd=180 duration=20 gcd=0 offgcd=1)
+  SpellRequire(avenging_wrath replaced_by set=avenging_crusader enabled=(hastalent(avenging_crusader_talent)))
+  SpellRequire(avenging_wrath replaced_by set=crusade enabled=(hastalent(crusade_talent)))
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath add=1)
 Define(blade_of_justice 184575)
@@ -46,7 +54,7 @@ Define(consecration 26573)
   SpellAddBuff(consecration consecration add=1)
 Define(crusade 231895)
 # Call upon the Light and begin a crusade, increasing your damage done and haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and haste by an additional <damage>.rnrnMaximum u stacks.
-  SpellInfo(crusade cd=20 charge_cd=120 duration=25 max_stacks=10 gcd=0 offgcd=1)
+  SpellInfo(crusade cd=120 duration=25 max_stacks=10 gcd=0 offgcd=1)
   SpellRequire(crusade unusable set=1 enabled=(not hastalent(crusade_talent)))
   # ?a206338[Damage done increased by w1.rnHaste increased by w3.][Damage done and haste increased by <damage>.]
   SpellAddBuff(crusade crusade add=1)
@@ -102,6 +110,7 @@ Define(hammer_of_justice 853)
 Define(hammer_of_the_righteous 53595)
 # Hammers the current target for 53595sw1 Physical damage.?s26573&s203785[rnrnHammer of the Righteous also causes a wave of light that hits all other targets within 88263A1 yds for 88263sw1 Holy damage.]?s26573[rnrnWhile you are standing in your Consecration, Hammer of the Righteous also causes a wave of light that hits all other targets within 88263A1 yds for 88263sw1 Holy damage.][]rnrn|cFFFFFFFFGenerates s2 Holy Power.
   SpellInfo(hammer_of_the_righteous cd=6 holypower=-1)
+  SpellRequire(hammer_of_the_righteous replaced_by set=blessed_hammer enabled=(hastalent(blessed_hammer_talent)))
 Define(hammer_of_wrath 24275)
 # Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health?s326730[, or during Avenging Wrath][].rnrn|cFFFFFFFFGenerates s2 Holy Power.
   SpellInfo(hammer_of_wrath cd=7.5 holypower=-1)
@@ -207,34 +216,26 @@ Define(word_of_glory 85673)
 Define(worldvein_resonance 298606)
 # Infuse your Heart of Azeroth with Worldvein Resonance.
   SpellInfo(worldvein_resonance)
+Define(avenging_crusader_talent 22190)
+# You become the ultimate crusader of light, increasing your Crusader Strike, Judgment, and auto-attack damage by s1.rnrnCrusader Strike and Judgment cool down s2 faster and heal up to s6 injured allies for s5 of the damage they deal. Lasts 20 seconds.
 Define(blessed_hammer_talent 23469)
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
 Define(blinding_light_talent 21811)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 22215)
 # Call upon the Light and begin a crusade, increasing your damage done and haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and haste by an additional <damage>.rnrnMaximum u stacks.
-Define(crusade_talent 22215)
-# Call upon the Light and begin a crusade, increasing your damage done and haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and haste by an additional <damage>.rnrnMaximum u stacks.
 Define(crusaders_judgment_talent 22604)
 # Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
 Define(execution_sentence_talent 23467)
 # A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
-Define(execution_sentence_talent 23467)
-# A hammer slowly falls from the sky upon the target. After 8 seconds, they suffer s1*<mult> Holy damage, plus s2 of damage taken from your abilities in that time.
 Define(final_reckoning_talent 22634)
 # Call down a blast of heavenly energy, dealing s2 Holy damage to all targets in the target area and causing them to take s3 increased damage from your Holy Power abilities for 8 seconds.rnrn|cFFFFFFFFPassive:|r While off cooldown, your attacks have a high chance to call down a bolt that deals 343724s1 Holy damage and causes the target to take 343724s2 increased damage from your next Holy Power ability.
-Define(final_reckoning_talent 22634)
-# Call down a blast of heavenly energy, dealing s2 Holy damage to all targets in the target area and causing them to take s3 increased damage from your Holy Power abilities for 8 seconds.rnrn|cFFFFFFFFPassive:|r While off cooldown, your attacks have a high chance to call down a bolt that deals 343724s1 Holy damage and causes the target to take 343724s2 increased damage from your next Holy Power ability.
-Define(holy_avenger_talent 17599)
-# Your Holy Power generation is tripled for 20 seconds.
 Define(holy_avenger_talent 17599)
 # Your Holy Power generation is tripled for 20 seconds.
 Define(moment_of_glory_talent 23468)
 # Reset the cooldown of Avenger's Shield. Your next n Avenger's Shields have no cooldown and deal s2 additional damage.
 Define(sanctified_wrath_talent_protection 23457)
 # Avenging Wrath lasts s1 longer and causes Judgment to generate s2 additional Holy Power.
-Define(seraphim_talent 17601)
-# The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
 Define(potion_of_spectral_strength_item 171275)

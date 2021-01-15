@@ -30,6 +30,7 @@ Define(berserking 59621)
 Define(bladestorm 227847)
 # Become an unstoppable storm of destructive force, striking up to s1 nearby targets for (1+6 seconds)*50622s1 Physical damage over 6 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
   SpellInfo(bladestorm cd=90 duration=6 tick=1)
+  SpellRequire(bladestorm replaced_by set=ravager enabled=(hastalent(ravager_talent)))
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
   SpellAddBuff(bladestorm bladestorm add=1)
 Define(blood_fury 20572)
@@ -50,7 +51,7 @@ Define(bloodthirst 23881)
   SpellInfo(bloodthirst cd=4.5 rage=-8)
 Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 7922d][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(charge cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-10)
+  SpellInfo(charge cd=20 gcd=0 offgcd=1 rage=-10)
 Define(cleave 845)
 # Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
   SpellInfo(cleave rage=20 cd=6)
@@ -58,6 +59,7 @@ Define(cleave 845)
 Define(colossus_smash 167105)
 # Smashes the enemy's armor, dealing s1 Physical damage, and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(colossus_smash cd=90)
+  SpellRequire(colossus_smash replaced_by set=warbreaker enabled=(hastalent(warbreaker_talent)))
 Define(colossus_smash_debuff 208086)
 # Smashes the enemy's armor, dealing s1 Physical damage, and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(colossus_smash_debuff duration=10 gcd=0 offgcd=1)
@@ -92,6 +94,11 @@ Define(demoralizing_shout 1160)
 Define(devastate 20243)
 # A direct strike, dealing s1 Physical damage.
   SpellInfo(devastate max_stacks=3)
+  SpellRequire(devastate replaced_by set=devastator_passive enabled=(hastalent(devastator_talent)))
+Define(devastator_passive 236279)
+# Your auto attacks deal an additional 236282s1 Physical damage and have a s2 chance to reset the remaining cooldown on Shield Slam.
+  SpellInfo(devastator_passive gcd=0 offgcd=1 unusable=1)
+  SpellRequire(devastator_passive unusable set=1 enabled=(not hastalent(devastator_talent)))
 Define(dragon_roar 118000)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(dragon_roar cd=30 rage=-10)
@@ -111,7 +118,7 @@ Define(frenzy 138895)
   SpellInfo(frenzy duration=10 max_stacks=5 gcd=0 offgcd=1)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?c3[, and resetting the remaining cooldown on Taunt][].
-  SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
+  SpellInfo(heroic_leap cd=45 gcd=0 offgcd=1)
 Define(ignore_pain 190456)
 # Fight through the pain, ignoring s2 of damage taken, up to <absorb> total damage prevented.
   SpellInfo(ignore_pain rage=40 cd=12 duration=12 gcd=0 offgcd=1)
@@ -119,7 +126,7 @@ Define(ignore_pain 190456)
   SpellAddBuff(ignore_pain ignore_pain add=1)
 Define(intercept 198304)
 # Run at high speed toward an enemy or ally.rnrnWhen targeting an enemy, deals 126664s2 Physical damage and roots the target for 1 second.rnrnWhen targeting an ally, intercepts the next melee or ranged attack against them within 6 seconds while the ally remains within 147833A2 yards.rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(intercept cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-15)
+  SpellInfo(intercept cd=20 gcd=0 offgcd=1 rage=-15)
 Define(intimidating_shout 5246)
 # ?s275338[Causes the targeted enemy and up to s1 additional enemies within 5246A3 yards to cower in fear.][Causes the targeted enemy to cower in fear, and up to s1 additional enemies within 5246A3 yards to flee.] Targets are disoriented for 8 seconds.
   SpellInfo(intimidating_shout cd=90 duration=8)
@@ -130,7 +137,7 @@ Define(lights_judgment 255647)
   SpellInfo(lights_judgment cd=150)
 Define(meat_cleaver 280392)
 # Whirlwind deals s1 more damage and now affects your next s2+s3 single-target melee attacks, instead of the next s3 attacks.
-  SpellInfo(meat_cleaver gcd=0 offgcd=1)
+  SpellInfo(meat_cleaver gcd=0 offgcd=1 unusable=1)
   SpellRequire(meat_cleaver unusable set=1 enabled=(not hastalent(meat_cleaver_talent)))
 Define(mortal_strike 12294)
 # A vicious strike that deals s1 Physical damage and reduces the effectiveness of healing on the target by 115804s1 for 10 seconds.
@@ -186,7 +193,7 @@ Define(revenge 6572)
   SpellInfo(revenge rage=20)
 Define(shield_block 2565)
 # Raise your shield, blocking all melee attacks against you for 6 seconds.?s76857[ These blocks can be critical blocks.][]?c3[ Increases Shield Slam damage by 132404s2 while active.][]
-  SpellInfo(shield_block rage=30 cd=1 charge_cd=16 gcd=0 offgcd=1)
+  SpellInfo(shield_block rage=30 cd=16 gcd=0 offgcd=1)
 Define(shield_block_buff 132404)
 # Raise your shield, blocking all melee attacks against you for 6 seconds.?s76857[ These blocks can be critical blocks.][]?c3[ Increases Shield Slam damage by 132404s2 while active.][]
   SpellInfo(shield_block_buff duration=6 gcd=0 offgcd=1)
@@ -270,14 +277,12 @@ Define(booming_voice_talent 22626)
 # Demoralizing Shout also generates m1/10 Rage, and increases damage you deal to affected targets by s2.
 Define(cleave_talent 22362)
 # Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
-Define(cleave_talent 22362)
-# Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
 Define(cruelty_talent 19140)
 # While Enraged, Raging Blow deals s1 more damage and has a s2 chance to instantly reset its own cooldown.
 Define(deadly_calm_talent 22399)
 # Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.
-Define(deadly_calm_talent 22399)
-# Reduces the Rage cost of your next n abilities by s1.rnrn|cFFFFFFFFPassive:|r Your maximum Rage is increased by 314522s1/10.
+Define(devastator_talent 15774)
+# Your auto attacks deal an additional 236282s1 Physical damage and have a s2 chance to reset the remaining cooldown on Shield Slam.
 Define(dragon_roar_talent_protection 23260)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(dragon_roar_talent 22398)
@@ -296,8 +301,6 @@ Define(onslaught_talent 23372)
 # Brutally attack an enemy for s1 Physical damage. Requires Enrage.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(ravager_talent_protection 22401)
 # Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
-Define(ravager_talent 21667)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
 Define(ravager_talent 21667)
 # Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
 Define(reckless_abandon_talent 22402)

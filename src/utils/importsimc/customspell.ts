@@ -7,6 +7,7 @@ import {
     isFriendlyTarget,
     ItemData,
     TalentData,
+    SpellAttribute,
 } from "./importspells";
 import { writeFileSync } from "fs";
 import { SpellInfo } from "../../engine/data";
@@ -186,11 +187,7 @@ export function convertFromSpellData(
         spellInfo.cd = spell.cooldown / 1000;
     }
     if (spell.charge_cooldown) {
-        if (spell.cooldown) {
-            spellInfo.charge_cd = spell.charge_cooldown / 1000;
-        } else {
-            spellInfo.cd = spell.charge_cooldown / 1000;
-        }
+        spellInfo.cd = spell.charge_cooldown / 1000;
     }
     if (spell.duration && spell.duration > 0) {
         spellInfo.duration = spell.duration / 1000;
@@ -246,6 +243,12 @@ export function convertFromSpellData(
     if (tick > 0) {
         spellInfo.tick = tick;
     }
+
+    if (
+        spell.spellAttributes.includes(SpellAttribute.Passive) &&
+        !spell.identifier.endsWith("buff")
+    )
+        spellInfo.unusable = 1;
 
     let buffAdded = false;
     let debuffAdded = false;
@@ -313,10 +316,7 @@ export function convertFromSpellData(
     if (playerAuras.length > 0) auras.player = playerAuras;
     if (targetAuras.length > 0) auras.target = targetAuras;
 
-    if (
-        (spell.talent || spell.specializationName.length > 0) &&
-        !spell.replace_spell_id
-    ) {
+    if (spell.talent || spell.specializationName.length > 0) {
         const conditions = getConditions(spell);
         if (conditions.some((x) => x.condition !== "specialization")) {
             require.push({

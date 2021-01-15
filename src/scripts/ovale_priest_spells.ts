@@ -178,11 +178,14 @@ Define(shadow_word_death 32379)
 Define(shadow_word_pain 589)
 # A word of darkness that causes (12.920000000000002 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 12 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
   SpellInfo(shadow_word_pain duration=12 insanity=-4 tick=2)
+  SpellRequire(shadow_word_pain replaced_by set=purge_the_wicked enabled=(hastalent(purge_the_wicked_talent)))
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain add=1)
 Define(shadowfiend 34433)
 # Summons a shadowy fiend to attack the target for 15 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
   SpellInfo(shadowfiend cd=180 duration=15)
+  SpellRequire(shadowfiend replaced_by set=mindbender_shadow enabled=(hastalent(mindbender_talent)))
+  SpellRequire(shadowfiend replaced_by set=mindbender enabled=(hastalent(mindbender_talent_unknown)))
   # 343726
   SpellAddBuff(shadowfiend shadowfiend add=1)
 Define(shadowform 232698)
@@ -287,12 +290,8 @@ Define(psychic_link_talent 22311)
 # ?s205351[Shadow Word: Void][Mind Blast] deals s1 of its damage to all other targets afflicted by your Vampiric Touch within 199486A2 yards.
 Define(purge_the_wicked_talent 22161)
 # Cleanses the target with fire, causing (22.3 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
-Define(purge_the_wicked_talent 22161)
-# Cleanses the target with fire, causing (22.3 of Spell Power) Fire damage and an additional 204213o1 Fire damage over 20 seconds. Spreads to an additional nearby enemy when you cast Penance on the target.
 Define(schism_talent 22329)
 # Attack the enemy's soul with a surge of Shadow energy, dealing (150 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
-Define(searing_nightmare_talent 23127)
-# Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
 Define(searing_nightmare_talent 23127)
 # Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
 Define(shadow_covenant_talent 19766)

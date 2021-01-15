@@ -41,7 +41,7 @@ Define(chaos_strike_havoc 162794)
   SpellInfo(chaos_strike_havoc fury=40)
 Define(chaos_theory 248072)
 # Blade Dance has a s1 chance to grant you Chaos Blades for s2 sec.
-  SpellInfo(chaos_theory gcd=0 offgcd=1)
+  SpellInfo(chaos_theory gcd=0 offgcd=1 unusable=1)
 Define(consume_magic 278326)
 # Consume m1 beneficial Magic effect removing it from the target?s320313[ and granting you s2 Fury][].
   SpellInfo(consume_magic cd=10 fury=-20)
@@ -50,12 +50,17 @@ Define(death_sweep 210152)
   SpellInfo(death_sweep fury=35 cd=9)
   # Dodge chance increased by s3.
   SpellAddBuff(death_sweep death_sweep add=1)
+Define(demon_blades_unused_0 203555)
+# Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
+  SpellInfo(demon_blades_unused_0 gcd=0 offgcd=1 unusable=1)
+  SpellRequire(demon_blades_unused_0 unusable set=1 enabled=(not hastalent(demon_blades_talent)))
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100?s321028[, and your Parry chance by 203819s1, for 6 seconds][].
-  SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(demon_spikes cd=20 gcd=0 offgcd=1)
 Define(demons_bite_havoc 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates ?a258876[m3+258876s3 to M3+258876s4][m3 to M3] Fury.|r
   SpellInfo(demons_bite_havoc fury=-25)
+  SpellRequire(demons_bite_havoc replaced_by set=demon_blades_unused_0 enabled=(hastalent(demon_blades_talent)))
 Define(disrupt 183752)
 # Interrupts the enemy's spellcasting and locks them from that school of magic for 3 seconds.|cFFFFFFFF?s183782[rnrnGenerates 218903s1 Fury on a successful interrupt.][]|r
   SpellInfo(disrupt cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -98,7 +103,7 @@ Define(fel_eruption 211881)
   SpellAddTargetDebuff(fel_eruption fel_eruption add=1)
 Define(fel_rush_havoc 195072)
 # Rush forward, incinerating anything in your path for 192611s1 Chaos damage.
-  SpellInfo(fel_rush_havoc cd=1 charge_cd=10 gcd=0.25)
+  SpellInfo(fel_rush_havoc cd=10 gcd=0.25)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]
   SpellInfo(felblade cd=15)
@@ -138,7 +143,7 @@ Define(imprison 217832)
   SpellAddTargetDebuff(imprison imprison add=1)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
-  SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(infernal_strike cd=20 gcd=0 offgcd=1)
 Define(metamorphosis 191427)
 # Leap into the air and land with explosive force, dealing 200166s2 Chaos damage to enemies within 8 yds, and stunning them for 3 seconds. Players are Dazed for 3 seconds instead.rnrnUpon landing, you are transformed into a hellish demon for 30 seconds, ?s320645[immediately resetting the cooldown of your Eye Beam and Blade Dance abilities, ][]greatly empowering your Chaos Strike and Blade Dance abilities?s320422[ and gaining 320422s1 Haste][]?s204909[ and 162264s3 Leech][].
   SpellInfo(metamorphosis cd=300)
@@ -169,6 +174,7 @@ Define(prepared_buff 203650)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2 Fury.|r
   SpellInfo(shear fury=-10)
+  SpellRequire(shear replaced_by set=fracture enabled=(hastalent(fracture_talent)))
 Define(sigil_of_chains 202138)
 # Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
   SpellInfo(sigil_of_chains cd=90 duration=2)
@@ -239,8 +245,6 @@ Define(demonic_talent 21900)
 # Eye Beam causes you to enter demon form for s1/1000 sec after it finishes dealing damage.
 Define(essence_break_talent 21868)
 # Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
-Define(essence_break_talent 21868)
-# Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
 Define(fel_barrage_talent 22547)
 # Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
 Define(fel_eruption_talent 22767)
@@ -253,16 +257,12 @@ Define(first_blood_talent 21867)
 # Reduces the Fury cost of Blade Dance by s2 and increases its damage to <firstbloodDmg> against the first target struck.
 Define(fracture_talent 22770)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
-Define(fracture_talent 22770)
-# Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
 Define(glaive_tempest_talent 21862)
 # Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
 Define(momentum_talent 21901)
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
 Define(sigil_of_chains_talent 22511)
 # Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
-Define(spirit_bomb_talent 22540)
-# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(spirit_bomb_talent 22540)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 22909)

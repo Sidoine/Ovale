@@ -65,7 +65,8 @@ export function getDefinition(
                 conditions.push(
                     `${condition.condition}(${condition.talent.identifier})`
                 );
-                talentIds.push(condition.talent.id);
+                if (!talentIds.includes(condition.talent.id))
+                    talentIds.push(condition.talent.id);
             } else if (condition.condition === "specialization") {
                 conditions.push(
                     `${condition.condition}("${condition.specializationName}")`

@@ -27,6 +27,7 @@ Define(arcane_pulse_buff 260369)
 Define(arcane_shot 185358)
 # A quick shot that causes sw2 Arcane damage.
   SpellInfo(arcane_shot focus=40)
+  SpellRequire(arcane_shot replaced_by set=chimaera_shot_marksmanship enabled=(hastalent(chimaera_shot_talent)))
 Define(arcane_torrent 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
@@ -86,6 +87,7 @@ Define(butchery 212436)
 Define(carve 187708)
 # A sweeping attack that strikes up to I enemies in front of you for s1 Physical damage.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
   SpellInfo(carve focus=35 cd=6)
+  SpellRequire(carve replaced_by set=butchery enabled=(hastalent(butchery_talent)))
 Define(chakrams 259391)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
   SpellInfo(chakrams focus=15 cd=20)
@@ -166,7 +168,7 @@ Define(frenzy_pet_buff 272790)
   SpellAddBuff(frenzy_pet_buff frenzy_pet_buff add=1)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
-  SpellInfo(harpoon cd=1 charge_cd=30 duration=3 gcd=0 offgcd=1)
+  SpellInfo(harpoon cd=30 duration=3 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(harpoon harpoon_debuff add=1)
   # Rooted.
@@ -241,6 +243,7 @@ Define(rapid_fire 257044)
 Define(raptor_strike 186270)
 # A vicious slash dealing s1 Physical damage.
   SpellInfo(raptor_strike focus=30)
+  SpellRequire(raptor_strike replaced_by set=mongoose_bite enabled=(hastalent(mongoose_bite_talent)))
 Define(resonating_arrow 308491)
 # Fire a resonating arrow to the target location that deals 308495s1 Arcane damage to any enemy in the area, and fill the area with echoing anima for 10 seconds. The effect causes your attacks to ignore line of sight to enemies in the area, and you have 308498s1 increased critical strike chance against them. rnrnLeaving the area of echoing anima will still allow the hunter to ignore line of sight towards the enemy for 308495s3/1000 sec.
   SpellInfo(resonating_arrow cd=60)
@@ -340,8 +343,6 @@ Define(butchery_talent 22297)
 # Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
 Define(chakrams_talent 23105)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
-Define(chimaera_shot_talent 21998)
-# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for  344121sw1*(s1/100) Frost damage.
 Define(chimaera_shot_talent_beast_mastery 22290)
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
 Define(chimaera_shot_talent 21998)
@@ -370,14 +371,10 @@ Define(steady_focus_talent 22267)
 # Using Steady Shot twice in a row increases your Haste by 193534s1 for 15 seconds.
 Define(steel_trap_talent 19361)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
-Define(steel_trap_talent 19361)
-# Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
 Define(streamline_talent 22286)
 # Rapid Fire's damage is increased by s1, and Rapid Fire also causes your next Aimed Shot to cast 342076s1 faster.
 Define(terms_of_engagement_talent 22283)
 # Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*10 seconds Focus over 10 seconds. Killing an enemy resets the cooldown of Harpoon.
-Define(volley_talent 22288)
-# Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
 Define(volley_talent 22288)
 # Rain a volley of arrows down over 6 seconds, dealing up to 260247s1*12 Physical damage to any enemy in the area, and gain the effects of Trick Shots for as long as Volley is active.
 Define(wildfire_infusion_talent 22301)

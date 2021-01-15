@@ -102,6 +102,10 @@ Define(chains_of_ice 45524)
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
   # Movement slowed s1 by frozen chains.
   SpellAddTargetDebuff(chains_of_ice chains_of_ice add=1)
+Define(clawing_shadows 207311)
+# Deals s2 Shadow damage and causes 1 Festering Wound to burst.
+  SpellInfo(clawing_shadows runes=1 runicpower=-10)
+  SpellRequire(clawing_shadows unusable set=1 enabled=(not hastalent(clawing_shadows_talent)))
 Define(cold_heart_buff 281209)
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
@@ -130,6 +134,7 @@ Define(dark_transformation 63560)
 Define(death_and_decay 43265)
 # Corrupts the targeted ground, causing 52212m1*11 Shadow damage over 10 seconds to targets within the area.?!c2[rnrnWhile you remain within the area, your ][]?s223829&!c2[Necrotic Strike and ][]?c1[Heart Strike will hit up to 188290m3 additional targets.]?s207311&!c2[Clawing Shadows will hit up to 55090s4-1 enemies near the target.]?!c2[Scourge Strike will hit up to 55090s4-1 enemies near the target.][]
   SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 duration=10 tick=1)
+  SpellRequire(death_and_decay replaced_by set=defile enabled=(hastalent(defile_talent)))
 Define(death_coil 47541)
 # Fires a blast of unholy energy at the target, causing 47632s1 Shadow damage to an enemy or healing an Undead ally for 47633s1 health.?s316941[rnrnReduces the cooldown of Dark Transformation by s2/1000 sec.][]
   SpellInfo(death_coil runicpower=40)
@@ -196,7 +201,7 @@ Define(frostwyrms_fury 279302)
   SpellInfo(frostwyrms_fury cd=180 duration=10)
 Define(frozen_pulse_frost 194909)
 # While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
-  SpellInfo(frozen_pulse_frost gcd=0 offgcd=1)
+  SpellInfo(frozen_pulse_frost gcd=0 offgcd=1 unusable=1)
   SpellRequire(frozen_pulse_frost unusable set=1 enabled=(not hastalent(frozen_pulse_talent)))
 Define(glacial_advance 194913)
 # Summon glacial spikes from the ground that advance forward, each dealing 195975s1*<CAP>/AP Frost damage and applying Razorice to enemies near their eruption point.
@@ -231,7 +236,7 @@ Define(inscrutable_quantum_device 330323)
   SpellInfo(inscrutable_quantum_device cd=180 gcd=0 offgcd=1)
 Define(killing_machine_frost 317214)
 # Your next Obliterate also deals Frost damage.
-  SpellInfo(killing_machine_frost gcd=0 offgcd=1)
+  SpellInfo(killing_machine_frost gcd=0 offgcd=1 unusable=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -275,7 +280,7 @@ Define(remorseless_winter 196770)
   SpellAddBuff(remorseless_winter remorseless_winter add=1)
 Define(rime_frost 316838)
 # Increases Howling Blasts damage done by an additional s1.
-  SpellInfo(rime_frost gcd=0 offgcd=1)
+  SpellInfo(rime_frost gcd=0 offgcd=1 unusable=1)
 Define(runic_corruption 51460)
 # Increases your rune regeneration rate for 3 seconds.
   SpellInfo(runic_corruption duration=3 gcd=0 offgcd=1)
@@ -287,6 +292,7 @@ Define(sacrificial_pact 327574)
 Define(scourge_strike 55090)
 # An unholy strike that deals s2 Physical damage and 70890sw2 Shadow damage, and causes 1 Festering Wound to burst.
   SpellInfo(scourge_strike runes=1 runicpower=-10)
+  SpellRequire(scourge_strike replaced_by set=clawing_shadows enabled=(hastalent(clawing_shadows_talent)))
 Define(shackle_the_unworthy 312202)
 # Admonish your target for their past transgressions, reducing the damage they deal to you by s2 and dealing o Arcane damage over 14 seconds.rnrnWhile Shackle the Unworthy is active on an enemy, your direct-damage attacks that spend runes have a s5 chance to spread Shackle the Unworthy to a nearby enemy.
   SpellInfo(shackle_the_unworthy cd=60 duration=14 tick=2)
@@ -359,28 +365,20 @@ Define(blood_tap_talent 22135)
 # Consume the essence around you to generate s1 Rune.rnrnRecharge time reduced by s2 sec whenever a Bone Shield charge is consumed.
 Define(blooddrinker_talent 19166)
 # Drains o1 health from the target over 3 seconds.rnrnYou can move, parry, dodge, and use defensive abilities while channeling this ability.
-Define(blooddrinker_talent 19166)
-# Drains o1 health from the target over 3 seconds.rnrnYou can move, parry, dodge, and use defensive abilities while channeling this ability.
 Define(bonestorm_talent 21209)
 # A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
 Define(breath_of_sindragosa_talent 22537)
 # Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
-Define(breath_of_sindragosa_talent 22537)
-# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
+Define(clawing_shadows_talent 22026)
+# Deals s2 Shadow damage and causes 1 Festering Wound to burst.
 Define(cold_heart_talent 22018)
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
 Define(consumption_talent 19220)
 # Strikes up to s3 enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
 Define(defile_talent 22536)
 # Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
-Define(defile_talent 22536)
-# Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit 55090s4-1 enemies near the target?a315442|a331119[ and inflict Death's Due for 12 seconds.rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.][.]rnrnIf any enemies are standing in the Defile, it grows in size and deals increasing damage every sec.
 Define(frostscythe_talent 22525)
 # A sweeping attack that strikes up to s5 enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
-Define(frostscythe_talent 22525)
-# A sweeping attack that strikes up to s5 enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
-Define(frozen_pulse_talent 22523)
-# While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
 Define(frozen_pulse_talent 22523)
 # While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
 Define(gathering_storm_talent 22531)
@@ -407,14 +405,10 @@ Define(soul_reaper_talent 22526)
 # Strike an enemy for s1 Shadow damage and afflict the enemy with Soul Reaper. rnrnAfter 5 seconds, if the target is below s3 health this effect will explode dealing an additional 343295s1 Shadow damage to the target. If the enemy that yields experience or honor dies while afflicted by Soul Reaper, gain Runic Corruption.
 Define(summon_gargoyle_talent 22110)
 # Summon a Gargoyle into the area to bombard the target for 30 seconds.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
-Define(summon_gargoyle_talent 22110)
-# Summon a Gargoyle into the area to bombard the target for 30 seconds.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
 Define(tombstone_talent 23454)
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for 8 seconds.
 Define(unholy_assault_talent 22538)
 # Strike your target dealing s2 Shadow damage, infecting the target with s3 Festering Wounds and sending you into an Unholy Frenzy increasing haste by s1 for 12 seconds.
-Define(unholy_blight_talent 22029)
-# Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
 Define(unholy_blight_talent 22029)
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
 Define(fallen_crusader_enchant 3368)

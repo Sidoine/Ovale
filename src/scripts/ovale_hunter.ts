@@ -1262,8 +1262,6 @@ AddFunction survivalcleavecdpostconditions
 
 AddFunction survivalcdsmainactions
 {
- #harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
- if hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) spell(harpoon)
  #berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
  if spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 spell(berserking)
  #flare,if=focus+cast_regen<focus.max&tar_trap.up&runeforge.soulforge_embers.equipped&time_to_die>4*gcd
@@ -1282,32 +1280,31 @@ AddFunction survivalcdsmainpostconditions
 
 AddFunction survivalcdsshortcdactions
 {
- unless hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon)
+ #harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
+ if hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) spell(harpoon)
+ #bag_of_tricks,if=cooldown.kill_command.full_recharge_time>gcd
+ if spellcooldown(kill_command_survival) > gcd() spell(bag_of_tricks)
+
+ unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
  {
-  #bag_of_tricks,if=cooldown.kill_command.full_recharge_time>gcd
-  if spellcooldown(kill_command_survival) > gcd() spell(bag_of_tricks)
+  #steel_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max
+  if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(steel_trap) < maxfocus() spell(steel_trap)
+  #freezing_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max
+  if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(freezing_trap) < maxfocus() spell(freezing_trap)
+  #tar_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max|focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
+  if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(tar_trap) < maxfocus() or focus() + focuscastingregen(tar_trap) < maxfocus() and equippedruneforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and { enemies() > 1 or enemies() == 1 and target.timetodie() > 5 * gcd() } spell(tar_trap)
 
-  unless { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking)
+  unless focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
   {
-   #steel_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max
-   if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(steel_trap) < maxfocus() spell(steel_trap)
-   #freezing_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max
-   if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(freezing_trap) < maxfocus() spell(freezing_trap)
-   #tar_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max|focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
-   if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(tar_trap) < maxfocus() or focus() + focuscastingregen(tar_trap) < maxfocus() and equippedruneforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and { enemies() > 1 or enemies() == 1 and target.timetodie() > 5 * gcd() } spell(tar_trap)
-
-   unless focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
-   {
-    #aspect_of_the_eagle,if=target.distance>=6
-    if target.distance() >= 6 spell(aspect_of_the_eagle)
-   }
+   #aspect_of_the_eagle,if=target.distance>=6
+   if target.distance() >= 6 spell(aspect_of_the_eagle)
   }
  }
 }
 
 AddFunction survivalcdsshortcdpostconditions
 {
- hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon) or { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
+ { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
 }
 
 AddFunction survivalcdscdactions

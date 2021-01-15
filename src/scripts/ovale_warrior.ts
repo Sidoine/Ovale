@@ -650,8 +650,6 @@ AddFunction furyprecombatcdpostconditions
 
 AddFunction furymovementmainactions
 {
- #heroic_leap
- if checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
 }
 
 AddFunction furymovementmainpostconditions
@@ -660,11 +658,12 @@ AddFunction furymovementmainpostconditions
 
 AddFunction furymovementshortcdactions
 {
+ #heroic_leap
+ if checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
 }
 
 AddFunction furymovementshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 and spell(heroic_leap)
 }
 
 AddFunction furymovementcdactions
@@ -687,8 +686,6 @@ AddFunction fury_defaultmainactions
 
  unless target.distance() > 5 and furymovementmainpostconditions()
  {
-  #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
-  if target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } spell(heroic_leap)
   #rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
@@ -715,17 +712,23 @@ AddFunction fury_defaultshortcdactions
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementshortcdactions()
 
-  unless target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage)
+  unless target.distance() > 5 and furymovementshortcdpostconditions()
   {
-   #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-   if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(meat_cleaver) } spell(recklessness)
+   #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
+   if target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } spell(heroic_leap)
 
-   unless { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking)
+   unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage)
    {
-    #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
-    if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
-    #run_action_list,name=single_target
-    furysingle_targetshortcdactions()
+    #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(meat_cleaver) } spell(recklessness)
+
+    unless { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking)
+    {
+     #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
+     if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
+     #run_action_list,name=single_target
+     furysingle_targetshortcdactions()
+    }
    }
   }
  }
@@ -733,7 +736,7 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
