@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.39](https://github.com/Sidoine/Ovale/compare/9.0.38...9.0.39) (2021-01-15)
+
+### Bug Fixes
+
+-   condemn is available only to Venthyr ([d27c0c4](https://github.com/Sidoine/Ovale/commit/d27c0c447a984db98623543fde69a27ba500adfd)), closes [#808](https://github.com/Sidoine/Ovale/issues/808)
+
 ### [9.0.38](https://github.com/Sidoine/Ovale/compare/9.0.37...9.0.38) (2021-01-14)
 
 ### Bug Fixes
