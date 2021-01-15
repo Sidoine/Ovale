@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.40](https://github.com/Sidoine/Ovale/compare/9.0.39...9.0.40) (2021-01-15)
+
+### Bug Fixes
+
+-   charge_cooldown and replaced_by ([ab3e0aa](https://github.com/Sidoine/Ovale/commit/ab3e0aaaf61e2a0c7c9ed5b27992175579ee0db2)), closes [#806](https://github.com/Sidoine/Ovale/issues/806)
+
 ### [9.0.39](https://github.com/Sidoine/Ovale/compare/9.0.38...9.0.39) (2021-01-15)
 
 ### Bug Fixes
