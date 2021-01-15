@@ -331,7 +331,9 @@ Define(vicious_contempt_conduit 64)
     code += `
 SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(execute_fury unusable set=1 enabled=(target.healthpercent() > 20 and buffexpires(sudden_death_buff)))
+SpellRequire(condemn unusable set=1 enabled=(not iscovenant("venthyr")))
 SpellRequire(condemn unusable set=1 enabled=(target.healthpercent() > 20 and target.healthpercent() < 80))
+SpellRequire(condemn_fury unusable set=1 enabled=(not iscovenant("venthyr")))
 SpellRequire(condemn_fury unusable set=1 enabled=(target.healthpercent() > 20 and target.healthpercent() < 80 and buffexpires(sudden_death_buff)))
   `;
 
