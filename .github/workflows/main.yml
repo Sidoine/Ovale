@@ -76,6 +76,7 @@ jobs:
             #       path: ovale/CHANGELOG.md
 
             - name: Publish
+              id: publish
               uses: wowts/publisher@main
               with:
                   name: Ovale
@@ -85,3 +86,24 @@ jobs:
                   cf-id: 7749
                   wowi-api-token: ${{ secrets.WOWI_API_TOKEN }}
                   wowi-id: 22949
+
+            - name: Create release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: Release ${{ github.ref }}
+                  body: ${{ steps.publish.outputs.changelog }}
+
+            - name: Upload Release Asset
+              id: upload-release-asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ steps.publish.outputs.zip_path }}
+                  asset_name: ${{ steps.publish.outputs.zip_name }}
+                  asset_content_type: application/zip
