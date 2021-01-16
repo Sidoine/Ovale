@@ -369,6 +369,8 @@ AddFunction elemental_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
+ #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+ if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) spell(berserking)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
@@ -394,7 +396,7 @@ AddFunction elemental_defaultmainpostconditions
 
 AddFunction elemental_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) spell(bag_of_tricks)
@@ -421,7 +423,7 @@ AddFunction elemental_defaultshortcdactions
 
 AddFunction elemental_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
 }
 
 AddFunction elemental_defaultcdactions
@@ -441,10 +443,8 @@ AddFunction elemental_defaultcdactions
   spell(fire_elemental)
   #storm_elemental
   spell(storm_elemental)
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury)
 
-  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
   {
    #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
    if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(fireblood)
@@ -476,7 +476,7 @@ AddFunction elemental_defaultcdactions
 
 AddFunction elemental_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
 }
 
 ### Elemental icons.
@@ -953,6 +953,8 @@ AddFunction elemental_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
+ #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+ if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) spell(berserking)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
@@ -978,7 +980,7 @@ AddFunction elemental_defaultmainpostconditions
 
 AddFunction elemental_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) spell(bag_of_tricks)
@@ -1005,7 +1007,7 @@ AddFunction elemental_defaultshortcdactions
 
 AddFunction elemental_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
 }
 
 AddFunction elemental_defaultcdactions
@@ -1025,10 +1027,8 @@ AddFunction elemental_defaultcdactions
   spell(fire_elemental)
   #storm_elemental
   spell(storm_elemental)
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury)
 
-  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
   {
    #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
    if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(fireblood)
@@ -1060,7 +1060,7 @@ AddFunction elemental_defaultcdactions
 
 AddFunction elemental_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
 }
 
 ### Elemental icons.
@@ -1515,6 +1515,8 @@ AddFunction enhancement_defaultmainactions
 {
  #heart_essence
  spell(296208)
+ #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+ if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
@@ -1539,7 +1541,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+ unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -1560,7 +1562,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -1576,10 +1578,8 @@ AddFunction enhancement_defaultcdactions
  {
   #use_items
   enhancementuseitemactions()
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury)
 
-  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
   {
    #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
    if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
@@ -1613,7 +1613,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.
@@ -2065,6 +2065,8 @@ AddFunction enhancement_defaultmainactions
 {
  #heart_essence
  spell(296208)
+ #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+ if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
@@ -2089,7 +2091,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+ unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -2110,7 +2112,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -2126,10 +2128,8 @@ AddFunction enhancement_defaultcdactions
  {
   #use_items
   enhancementuseitemactions()
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury)
 
-  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
   {
    #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
    if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
@@ -2163,7 +2163,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.
@@ -2345,6 +2345,8 @@ AddFunction restoration_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
+ #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+ if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(blood_fury)
  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
  if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) spell(berserking)
  #lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
@@ -2365,7 +2367,7 @@ AddFunction restoration_defaultmainpostconditions
 
 AddFunction restoration_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) spell(bag_of_tricks)
@@ -2384,7 +2386,7 @@ AddFunction restoration_defaultshortcdactions
 
 AddFunction restoration_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction restoration_defaultcdactions
@@ -2402,10 +2404,8 @@ AddFunction restoration_defaultcdactions
  {
   #earth_elemental
   spell(earth_elemental)
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(blood_fury)
 
-  unless { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
   {
    #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
    if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(fireblood)
@@ -2423,7 +2423,7 @@ AddFunction restoration_defaultcdactions
 
 AddFunction restoration_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or iscovenant("necrolord") and spell(primordial_wave) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 } and spell(blood_fury) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or iscovenant("necrolord") and spell(primordial_wave) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### Restoration icons.

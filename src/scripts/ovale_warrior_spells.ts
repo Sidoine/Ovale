@@ -18,7 +18,7 @@ Define(arcane_torrent 25046)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 gcd=0 offgcd=1 rage=-20)
-  SpellRequire(avatar unusable set=1 enabled=(not {hastalent(avatar_talent) or specialization("protection")}))
+  SpellRequire(avatar unusable set=1 enabled=(not hastalent(avatar_talent)))
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar add=1)
 Define(bag_of_tricks 312411)
@@ -27,17 +27,21 @@ Define(bag_of_tricks 312411)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(bladestorm 227847)
-# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for (1+6 seconds)*50622s1 Physical damage over 6 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
-  SpellInfo(bladestorm cd=90 duration=6 tick=1)
-  SpellRequire(bladestorm replaced_by set=ravager enabled=(hastalent(ravager_talent)))
+Define(bladestorm 46924)
+# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
+  SpellInfo(bladestorm cd=60 duration=4 tick=1)
+  SpellRequire(bladestorm unusable set=1 enabled=(not hastalent(bladestorm_talent)))
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
   SpellAddBuff(bladestorm bladestorm add=1)
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+Define(bladestorm_arms 227847)
+# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for (1+6 seconds)*50622s1 Physical damage over 6 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
+  SpellInfo(bladestorm_arms cd=90 duration=6 tick=1)
+  SpellRequire(bladestorm_arms replaced_by set=ravager enabled=(hastalent(ravager_talent)))
+  # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
+  SpellAddBuff(bladestorm_arms bladestorm_arms add=1)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
 Define(bloodbath 335096)
 # Assault the target in a bloodthirsty craze, dealing s1 Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(bloodbath cd=3 rage=-8)
@@ -273,6 +277,8 @@ Define(anger_management_talent_fury 22405)
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar and Shield Wall] by 1 sec.
 Define(avatar_talent 22397)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
+Define(bladestorm_talent 22400)
+# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
 Define(booming_voice_talent 22626)
 # Demoralizing Shout also generates m1/10 Rage, and increases damage you deal to affected targets by s2.
 Define(cleave_talent 22362)

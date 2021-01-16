@@ -37,9 +37,10 @@ Define(army_of_the_dead 42650)
   SpellInfo(army_of_the_dead runes=1 runicpower=-10 cd=480 duration=4 tick=0.5)
   # Summoning ghouls.
   SpellAddBuff(army_of_the_dead army_of_the_dead add=1)
-Define(asphyxiate 221562)
-# Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 5 seconds.
-  SpellInfo(asphyxiate cd=45 duration=5)
+Define(asphyxiate 108194)
+# Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
+  SpellInfo(asphyxiate cd=45 duration=4)
+  SpellRequire(asphyxiate unusable set=1 enabled=(not {hastalent(asphyxiate_talent) or hastalent(asphyxiate_talent_unholy)}))
   # Stunned.
   SpellAddTargetDebuff(asphyxiate asphyxiate add=1)
 Define(bag_of_tricks 312411)
@@ -62,11 +63,14 @@ Define(blinding_sleet 207167)
 Define(blood_boil 50842)
 # Deals s1 Shadow damage?s212744[ to all enemies within A1 yds.][ and infects all enemies within A1 yds with Blood Plague.rnrn|Tinterfaceiconsspell_deathknight_bloodplague.blp:24|t |cFFFFFFFFBlood Plague|rrnA shadowy disease that drains o1 health from the target over 24 seconds.  ]
   SpellInfo(blood_boil cd=7.5)
-Define(blood_fury 20572)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(blood_fury_buff 20572)
 # Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
+  SpellInfo(blood_fury_buff cd=120 duration=15 gcd=0 offgcd=1)
   # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+  SpellAddBuff(blood_fury_buff blood_fury_buff add=1)
 Define(blood_plague 55078)
 # A shadowy disease that drains o1 health from the target over 24 seconds.  
   SpellInfo(blood_plague duration=24 gcd=0 offgcd=1 tick=3)
@@ -171,11 +175,9 @@ Define(eradicating_blow 337936)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
   SpellInfo(festering_strike runes=2 runicpower=-20)
-Define(festering_wound 194310)
-# A pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
-  SpellInfo(festering_wound duration=30 max_stacks=6 gcd=0 offgcd=1)
-  # Suffering from a wound that will deal 194311s1/s1 Shadow damage when damaged by Scourge Strike.
-  SpellAddTargetDebuff(festering_wound festering_wound add=1)
+Define(festering_wound_unholy 197147)
+# Festering Strike applies a pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.rnrnStacks up to 194310u times on any target.
+  SpellInfo(festering_wound_unholy gcd=0 offgcd=1 unusable=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -184,11 +186,11 @@ Define(fireblood_buff 265226)
   SpellInfo(fireblood_buff duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_buff fireblood_buff add=1)
-Define(frost_fever 55095)
+Define(frost_fever_debuff 55095)
 # A disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
-  SpellInfo(frost_fever duration=24 gcd=0 offgcd=1 tick=3)
+  SpellInfo(frost_fever_debuff duration=24 gcd=0 offgcd=1 tick=3)
   # Suffering w1 Frost damage every t1 sec.
-  SpellAddTargetDebuff(frost_fever frost_fever add=1)
+  SpellAddTargetDebuff(frost_fever_debuff frost_fever_debuff add=1)
 Define(frost_strike 49143)
 # Chill your ?owb==0[weapon with icy power and quickly strike the enemy, dealing <2hDamage> Frost damage.][weapons with icy power and quickly strike the enemy with both, dealing a total of <dualWieldDamage> Frost damage.]
   SpellInfo(frost_strike runicpower=25)
@@ -234,9 +236,9 @@ Define(icy_talons_buff 194879)
 Define(inscrutable_quantum_device 330323)
 # ???
   SpellInfo(inscrutable_quantum_device cd=180 gcd=0 offgcd=1)
-Define(killing_machine_frost 317214)
-# Your next Obliterate also deals Frost damage.
-  SpellInfo(killing_machine_frost gcd=0 offgcd=1 unusable=1)
+Define(killing_machine_buff 51124)
+# Your auto attack has a chance to cause your next Obliterate ?s207230[or Frostscythe ][]to be a guaranteed critical strike.
+  SpellInfo(killing_machine_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -278,9 +280,9 @@ Define(remorseless_winter 196770)
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
   # Dealing 196771s1 Frost damage to enemies within 196771A1 yards each second.
   SpellAddBuff(remorseless_winter remorseless_winter add=1)
-Define(rime_frost 316838)
-# Increases Howling Blasts damage done by an additional s1.
-  SpellInfo(rime_frost gcd=0 offgcd=1 unusable=1)
+Define(rime_buff 59052)
+# Your next Howling Blast will consume no Runes, generate no Runic Power, and deal s2 additional damage.
+  SpellInfo(rime_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
 Define(runic_corruption 51460)
 # Increases your rune regeneration rate for 3 seconds.
   SpellInfo(runic_corruption duration=3 gcd=0 offgcd=1)
@@ -357,6 +359,10 @@ Define(war_stomp 20549)
   SpellAddTargetDebuff(war_stomp war_stomp add=1)
 Define(army_of_the_damned_talent 22030)
 # ?s207317[Death Coil and Epidemic reduce][Death Coil reduces] the cooldown of Apocalypse by <cd1> sec and Army of the Dead by <cd2> sec. rnrnAdditionally Apocalypse and Army of the Dead summon a Magus of the Dead for 15 seconds who hurls Frostbolts and Shadow Bolts at your foes.rn
+Define(asphyxiate_talent_unholy 22520)
+# Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
+Define(asphyxiate_talent 22517)
+# Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
 Define(avalanche_talent 22521)
 # Casting Howling Blast with Rime active causes jagged icicles to fall on enemies nearby your target, dealing 207150s1 Frost damage.
 Define(blinding_sleet_talent 22519)

@@ -22,11 +22,9 @@ Define(bag_of_tricks 312411)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
 Define(bloodlust 2825)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
@@ -113,11 +111,11 @@ Define(mind_sear_debuff 49821)
 Define(mindbender 123040)
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
   SpellInfo(mindbender cd=60 duration=12)
-  SpellRequire(mindbender unusable set=1 enabled=(not hastalent(mindbender_talent_unknown)))
+  SpellRequire(mindbender unusable set=1 enabled=(not hastalent(mindbender_talent)))
 Define(mindbender_shadow 200174)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
   SpellInfo(mindbender_shadow cd=60 duration=15)
-  SpellRequire(mindbender_shadow unusable set=1 enabled=(not hastalent(mindbender_talent)))
+  SpellRequire(mindbender_shadow unusable set=1 enabled=(not hastalent(mindbender_talent_shadow)))
 Define(mindgames 323673)
 # Assault an enemy's mind, dealing (300 of Spell Power)*m3/100 Shadow damage and briefly reversing their perception of reality.rnrn?c3[For 5 seconds, the next <damage> damage they deal will heal their target, and the next <healing> healing they deal will damage their target.rnrn|cFFFFFFFFReversed damage and healing generate up to 323706s2*2 Insanity.|r]rn][For 5 seconds, the next <damage> damage they deal will heal their target, and the next <healing> healing they deal will damage their target.rnrn|cFFFFFFFFReversed damage and healing restore up to 323706s3*2 mana.|r]
   SpellInfo(mindgames cd=45 duration=5)
@@ -184,8 +182,8 @@ Define(shadow_word_pain 589)
 Define(shadowfiend 34433)
 # Summons a shadowy fiend to attack the target for 15 seconds.?s319904[rnrn|cFFFFFFFFGenerates 262485s1/100 Insanity each time the Shadowfiend attacks.|r][]?s343726[rnrn|cFFFFFFFFGenerates 343726s1 Mana each time the Shadowfiend attacks.|r][]
   SpellInfo(shadowfiend cd=180 duration=15)
-  SpellRequire(shadowfiend replaced_by set=mindbender_shadow enabled=(hastalent(mindbender_talent)))
-  SpellRequire(shadowfiend replaced_by set=mindbender enabled=(hastalent(mindbender_talent_unknown)))
+  SpellRequire(shadowfiend replaced_by set=mindbender_shadow enabled=(hastalent(mindbender_talent_shadow)))
+  SpellRequire(shadowfiend replaced_by set=mindbender enabled=(hastalent(mindbender_talent)))
   # 343726
   SpellAddBuff(shadowfiend shadowfiend add=1)
 Define(shadowform 232698)
@@ -278,9 +276,9 @@ Define(hungering_void_talent 21978)
 # Void Bolt causes the target to become vulnerable to the void, increasing their damage taken from you by 345219m2 for 6 seconds. This effect may only be active on one target at a time.rnrnCasting Void Bolt on an enemy that is already vulnerable extends the duration of your Voidform by m3 sec, or m4 sec if Void Bolt critically strikes.
 Define(mind_bomb_talent 23375)
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 6 seconds.
-Define(mindbender_talent 21719)
+Define(mindbender_talent_shadow 21719)
 # Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
-Define(mindbender_talent_unknown 22094)
+Define(mindbender_talent 22094)
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(misery_talent 23126)
 # Vampiric Touch also applies Shadow Word: Pain to the target.

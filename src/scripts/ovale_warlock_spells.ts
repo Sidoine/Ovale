@@ -9,11 +9,11 @@ export function registerWarlockSpells(OvaleScripts: OvaleScriptsClass) {
   SpellInfo(agony duration=18 max_stacks=6 tick=2)
   # Suffering w1 Shadow damage every t1 sec. Damage increases over time.
   SpellAddTargetDebuff(agony agony add=1)
-Define(backdraft 117828)
+Define(backdraft_buff 117828)
 # Conflagrate reduces the cast time of your next Incinerate or Chaos Bolt by 117828s1. Maximum ?s267115[s2][s1] charges.
-  SpellInfo(backdraft duration=10 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(backdraft_buff duration=10 max_stacks=2 gcd=0 offgcd=1)
   # Incinerate and Chaos Bolt cast times reduced by s1.
-  SpellAddBuff(backdraft backdraft add=1)
+  SpellAddBuff(backdraft_buff backdraft_buff add=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -26,11 +26,9 @@ Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6)
   SpellRequire(bilescourge_bombers unusable set=1 enabled=(not hastalent(bilescourge_bombers_talent)))
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
 Define(blood_of_the_enemy 297969)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy)
@@ -48,11 +46,9 @@ Define(channel_demonfire 196447)
 Define(chaos_bolt 116858)
 # Unleashes a devastating blast of chaos, dealing a critical strike for 2*(146 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
   SpellInfo(chaos_bolt soulshards=2)
-Define(concentrated_flame 295368)
+Define(concentrated_flame 295373)
 # Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame add=1)
+  SpellInfo(concentrated_flame cd=30)
 Define(conflagrate 17962)
 # Triggers an explosion on the target, dealing (100 of Spell Power) Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 10 seconds.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
   SpellInfo(conflagrate cd=12.96)
@@ -82,11 +78,11 @@ Define(decimating_bolt 325289)
 Define(demonbolt 264178)
 # Send the fiery soul of a fallen demon at the enemy, causing (73.4 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
-Define(demonic_core 264173)
+Define(demonic_core_buff 264173)
 # When your Wild Imps expend all of their energy or are imploded, you have a s1 chance to absorb their life essence, granting you a stack of Demonic Core. rnrnWhen your summoned Dreadstalkers fade away, you have a s2 chance to absorb their life essence, granting you a stack of Demonic Core.rnrnDemonic Core reduces the cast time of Demonbolt by 264173s1. Maximum 264173u stacks.
-  SpellInfo(demonic_core duration=20 max_stacks=4 gcd=0 offgcd=1)
+  SpellInfo(demonic_core_buff duration=20 max_stacks=4 gcd=0 offgcd=1)
   # The cast time of Demonbolt is reduced by s1. ?a334581[Demonbolt damage is increased by 334581s1.][]
-  SpellAddBuff(demonic_core demonic_core add=1)
+  SpellAddBuff(demonic_core_buff demonic_core_buff add=1)
 Define(demonic_strength 267171)
 # Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
   SpellInfo(demonic_strength cd=60 duration=20)

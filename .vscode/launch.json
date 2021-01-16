@@ -10,7 +10,7 @@
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/src/utils/importsimc/index.js",
             "protocol": "inspector",
-            "args": ["../../simc/", "T26_Druid_Balance.simc"],
+            "args": ["../../simc/", "T26_Shaman_Enhancement.simc"],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {

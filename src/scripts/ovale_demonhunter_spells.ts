@@ -36,6 +36,9 @@ Define(chaos_strike 344862)
   SpellInfo(chaos_strike fury=40)
   SpellRequire(chaos_strike replaced_by set=chaos_strike_havoc enabled=(specialization("havoc")))
   SpellRequire(chaos_strike replaced_by set=soul_cleave enabled=(specialization("vengeance")))
+Define(chaos_strike_havoc 343206)
+# Chaos Strike damage increased by s1.
+  SpellInfo(chaos_strike_havoc gcd=0 offgcd=1 unusable=1)
 Define(chaos_strike_havoc 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike_havoc fury=40)
@@ -101,9 +104,9 @@ Define(fel_eruption 211881)
   SpellRequire(fel_eruption unusable set=1 enabled=(not hastalent(fel_eruption_talent)))
   # Stunned.
   SpellAddTargetDebuff(fel_eruption fel_eruption add=1)
-Define(fel_rush_havoc 195072)
-# Rush forward, incinerating anything in your path for 192611s1 Chaos damage.
-  SpellInfo(fel_rush_havoc cd=10 gcd=0.25)
+Define(fel_rush_havoc 343017)
+# Fel Rush damage increased by s1.
+  SpellInfo(fel_rush_havoc gcd=0 offgcd=1 unusable=1)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3 Fury.|r]
   SpellInfo(felblade cd=15)

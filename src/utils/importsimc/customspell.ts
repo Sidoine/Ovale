@@ -153,8 +153,7 @@ function getConditions(replacedBy: SpellData) {
                 talent,
             });
         }
-    }
-    if (replacedBy.specializationName.length > 0) {
+    } else if (replacedBy.specializationName.length > 0) {
         for (const specializationName of replacedBy.specializationName) {
             conditions.push({
                 condition: "specialization",

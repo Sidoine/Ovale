@@ -53,11 +53,9 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2)
   SpellRequire(barrage unusable set=1 enabled=(not {hastalent(barrage_talent) or hastalent(barrage_talent_marksmanship)}))
-Define(beast_cleave_buff 118455)
+Define(beast_cleave_beast_mastery 115939)
 # After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
-  SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
-  # Melee attacks also strike all other nearby enemy targets.
-  SpellAddBuff(beast_cleave_buff beast_cleave_buff add=1)
+  SpellInfo(beast_cleave_beast_mastery gcd=0 offgcd=1 unusable=1)
 Define(berserking 59621)
 # Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
   SpellInfo(berserking gcd=0 offgcd=1)
@@ -66,11 +64,9 @@ Define(bestial_wrath 19574)
   SpellInfo(bestial_wrath cd=90 duration=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath add=1)
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
 Define(bloodlust 2825)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)

@@ -62,11 +62,9 @@ Define(blizzard_debuff 12486)
   SpellInfo(blizzard_debuff duration=3 gcd=0 offgcd=1)
   # Movement speed reduced by w1.
   SpellAddTargetDebuff(blizzard_debuff blizzard_debuff add=1)
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury add=1)
+Define(blood_fury 24571)
+# Instantly increases your rage by 300/10.
+  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
 Define(brain_freeze 190446)
 # Frostbolt has a m1 chance to empower your next Flurry to be instant cast?a231584[,][ and] deal 190446s2 increased damage?a231584[, and apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen][].
   SpellInfo(brain_freeze duration=15 max_stacks=1 gcd=0 offgcd=1)
@@ -329,15 +327,14 @@ Define(ray_of_frost 205021)
   SpellRequire(ray_of_frost unusable set=1 enabled=(not hastalent(ray_of_frost_talent)))
   # Movement slowed by w1.rnTaking w2 Frost damage every t2 sec.
   SpellAddTargetDebuff(ray_of_frost ray_of_frost add=1)
-Define(replenish_mana 5405)
+Define(replenish_mana 33394)
 # Restores s1 mana.
-  SpellInfo(replenish_mana cd=120 gcd=0 offgcd=1)
-  # Restoring w2 mana every t1 sec.
-  SpellAddBuff(replenish_mana replenish_mana add=1)
-Define(rule_of_threes_arcane 264354)
-# When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
-  SpellInfo(rule_of_threes_arcane gcd=0 offgcd=1 unusable=1)
-  SpellRequire(rule_of_threes_arcane unusable set=1 enabled=(not hastalent(rule_of_threes_talent)))
+  SpellInfo(replenish_mana cd=60 gcd=0 offgcd=1 mana=0)
+Define(rule_of_threes_buff 187292)
+# Arcane Missiles now fires m2 additional Missiles. 
+  SpellInfo(rule_of_threes_buff duration=10 gcd=0 offgcd=1)
+  # Arcane Missiles now fires m2 additional Missiles.
+  SpellAddBuff(rule_of_threes_buff rule_of_threes_buff add=1)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
   SpellInfo(rune_of_power cd=45 duration=12)
@@ -368,11 +365,14 @@ Define(siphon_storm_buff 332934)
   SpellInfo(siphon_storm_buff duration=30 max_stacks=6 gcd=0 offgcd=1)
   # Intellect increased by s1
   SpellAddBuff(siphon_storm_buff siphon_storm_buff add=1)
-Define(soul_ignition 345211)
+Define(soul_ignition 345251)
 # Activate Soul Igniter, sacrificing up to 345214s1 health over 15 seconds to empower Blazing Surge.rnrnReactivate to cast Blazing Surge, dealing 345214s2*(1+@versadmg) Fire damage split between enemies in a 345215a1 yd cone, plus up to 345214s4 additional damage, based on how long Soul Igniter was active.rnrnDamage is increased per enemy struck, up to s2 enemies. (1 min Cooldown)
-  SpellInfo(soul_ignition duration=15 gcd=0 offgcd=1 tick=1)
+  SpellInfo(soul_ignition cd=0.5 gcd=0 offgcd=1)
+Define(soul_ignition_buff 345211)
+# Activate Soul Igniter, sacrificing up to 345214s1 health over 15 seconds to empower Blazing Surge.rnrnReactivate to cast Blazing Surge, dealing 345214s2*(1+@versadmg) Fire damage split between enemies in a 345215a1 yd cone, plus up to 345214s4 additional damage, based on how long Soul Igniter was active.rnrnDamage is increased per enemy struck, up to s2 enemies. (1 min Cooldown)
+  SpellInfo(soul_ignition_buff duration=15 gcd=0 offgcd=1 tick=1)
   # Reactivate Soul Igniter to cast Blazing Surge.
-  SpellAddBuff(soul_ignition soul_ignition add=1)
+  SpellAddBuff(soul_ignition_buff soul_ignition_buff add=1)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
@@ -448,8 +448,6 @@ Define(ray_of_frost_talent 22309)
 # Channel an icy beam at the enemy for 5 seconds, dealing (120 of Spell Power) Frost damage every t2 sec and slowing movement by s4. Each time Ray of Frost deals damage, its damage and snare increases by 208141s1.rnrnGenerates s3 charges of Fingers of Frost over its duration.
 Define(resonance_talent 22453)
 # Arcane Barrage deals s1 increased damage per target it hits.
-Define(rule_of_threes_talent 22461)
-# When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
 Define(rune_of_power_talent 22447)
 # Places a Rune of Power on the ground for 12 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.rnrnCasting ?a137021[Arcane Power]?a137019[Combustion][Icy Veins] will also create a Rune of Power at your location.
 Define(searing_touch_talent 22462)

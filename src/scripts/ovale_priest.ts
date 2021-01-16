@@ -28,6 +28,8 @@ AddFunction disciplineuseitemactions
 
 AddFunction disciplineracialsmainactions
 {
+ #blood_fury
+ spell(blood_fury)
  #berserking
  spell(berserking)
 }
@@ -38,7 +40,7 @@ AddFunction disciplineracialsmainpostconditions
 
 AddFunction disciplineracialsshortcdactions
 {
- unless spell(berserking)
+ unless spell(blood_fury) or spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -47,17 +49,15 @@ AddFunction disciplineracialsshortcdactions
 
 AddFunction disciplineracialsshortcdpostconditions
 {
- spell(berserking)
+ spell(blood_fury) or spell(berserking)
 }
 
 AddFunction disciplineracialscdactions
 {
  #arcane_torrent,if=mana.pct<=95
  if manapercent() <= 95 spell(arcane_torrent)
- #blood_fury
- spell(blood_fury)
 
- unless spell(berserking)
+ unless spell(blood_fury) or spell(berserking)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -72,7 +72,7 @@ AddFunction disciplineracialscdactions
 
 AddFunction disciplineracialscdpostconditions
 {
- spell(berserking) or spell(bag_of_tricks)
+ spell(blood_fury) or spell(berserking) or spell(bag_of_tricks)
 }
 
 ### actions.precombat

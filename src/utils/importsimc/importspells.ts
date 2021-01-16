@@ -140,11 +140,57 @@ const specIdToName: { [k in keyof typeof specIds]?: SpecializationName } = {
     WARRIOR_PROTECTION: "protection",
 };
 
+const specIdToClassId: { [k in keyof typeof specIds]?: ClassId } = {
+    DEATH_KNIGHT_BLOOD: "DEATHKNIGHT",
+    DEATH_KNIGHT_FROST: "DEATHKNIGHT",
+    DEATH_KNIGHT_UNHOLY: "DEATHKNIGHT",
+    DEMON_HUNTER_HAVOC: "DEMONHUNTER",
+    DEMON_HUNTER_VENGEANCE: "DEMONHUNTER",
+    DRUID_BALANCE: "DRUID",
+    DRUID_FERAL: "DRUID",
+    DRUID_GUARDIAN: "DRUID",
+    DRUID_RESTORATION: "DRUID",
+    HUNTER_BEAST_MASTERY: "HUNTER",
+    HUNTER_MARKSMANSHIP: "HUNTER",
+    HUNTER_SURVIVAL: "HUNTER",
+    MAGE_ARCANE: "MAGE",
+    MAGE_FIRE: "MAGE",
+    MAGE_FROST: "MAGE",
+    MONK_BREWMASTER: "MONK",
+    MONK_MISTWEAVER: "MONK",
+    MONK_WINDWALKER: "MONK",
+    PALADIN_HOLY: "PALADIN",
+    PALADIN_PROTECTION: "PALADIN",
+    PALADIN_RETRIBUTION: "PALADIN",
+    PRIEST_DISCIPLINE: "PRIEST",
+    PRIEST_HOLY: "PRIEST",
+    PRIEST_SHADOW: "PRIEST",
+    ROGUE_ASSASSINATION: "ROGUE",
+    ROGUE_OUTLAW: "ROGUE",
+    ROGUE_SUBTLETY: "ROGUE",
+    SHAMAN_ELEMENTAL: "SHAMAN",
+    SHAMAN_ENHANCEMENT: "SHAMAN",
+    SHAMAN_RESTORATION: "SHAMAN",
+    WARLOCK_AFFLICTION: "WARLOCK",
+    WARLOCK_DEMONOLOGY: "WARLOCK",
+    WARLOCK_DESTRUCTION: "WARLOCK",
+    WARRIOR_ARMS: "WARRIOR",
+    WARRIOR_FURY: "WARRIOR",
+    WARRIOR_PROTECTION: "WARRIOR",
+};
+
 const specIdToSpecName = new Map<number, SpecializationName>();
 for (const key in specIdToName) {
     const k = key as keyof typeof specIds;
     const name = specIdToName[k];
     if (name) specIdToSpecName.set(specIds[k], name);
+}
+
+const specIdToClassName = new Map<number, ClassId>();
+for (const key in specIdToClassId) {
+    const k = key as keyof typeof specIds;
+    const name = specIdToClassId[k];
+    if (name) specIdToClassName.set(specIds[k], name);
 }
 
 export interface SpellPowerData {
@@ -1260,7 +1306,8 @@ function readFile(directory: string, fileName: string, output: AllData) {
                     i++;
                 }
                 const number = $data.substring(start, i);
-                columns.push(parseFloat(number));
+                if (number.indexOf(".") >= 0) columns.push(parseFloat(number));
+                else columns.push(parseInt(number));
             } else if (c === "{") {
                 const [innerData, newIndex] = getColumns($data, i + 1);
                 columns.push(<(number | string)[]>innerData);
@@ -1589,8 +1636,9 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
         if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
         if (spell.rank_str === "Passive") spell.identifierScore--;
-        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)
+        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0) {
             spell.identifierScore--;
+        }
         if (spell.spellAttributes.indexOf(SpellAttribute.Hidden) >= 0)
             spell.identifierScore--;
     }
@@ -1813,14 +1861,25 @@ export function getSpellData(directory: string) {
         };
         (talent.identifier = getIdentifier(talent.name) + "_talent"),
             (talent.talentId = 3 * talent.row + talent.col + 1);
+        let className =
+            classBitToNumber[talent.m_class] !== undefined
+                ? classBitToNumber[talent.m_class]
+                : undefined;
+        if (!talent.m_class && talent.spec) {
+            className = specIdToClassName.get(talent.spec);
+        }
         if (identifiers[talent.identifier]) {
+            const other = talentsById.get(identifiers[talent.identifier]);
             if (talent.spec) {
                 const specName = specIdToSpecName.get(talent.spec);
                 talent.identifier += "_" + specName;
+            } else if (other?.spec) {
+                const specName = specIdToSpecName.get(other.spec);
+                other.identifier += "_" + specName;
+                identifiers[other.identifier] = other.id;
             } else {
-                if (classBitToNumber[talent.m_class]) {
-                    talent.identifier +=
-                        "_" + classBitToNumber[talent.m_class].toLowerCase();
+                if (className) {
+                    talent.identifier += "_" + className.toLowerCase();
                 } else {
                     talent.identifier += "_unknown";
                 }
@@ -1832,10 +1891,15 @@ export function getSpellData(directory: string) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
                 if (!spell.talent) spell.talent = [];
+                if (!spell.className) spell.className = className as ClassId;
                 spell.talent.push(talent);
                 if (!spell.spellAttributes.includes(SpellAttribute.Passive))
                     spell.identifierScore += 10;
 
+                if (talent.spec) {
+                    const specName = specIdToSpecName.get(talent.spec);
+                    if (specName) spell.specializationName.push(specName);
+                }
                 const replacedSpell = spellDataById.get(talent.replace_id);
                 if (replacedSpell) {
                     if (!replacedSpell.replaced_by)
@@ -1897,10 +1961,25 @@ export function getSpellData(directory: string) {
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other) {
-                if (other.identifierScore === spell.identifierScore) {
-                    if (other.className === spell.className) {
-                        const otherNames = getSpellSpecializations(other);
-                        const spellNames = getSpellSpecializations(spell);
+                if (
+                    other.identifierScore === spell.identifierScore ||
+                    (other.identifierScore >= 10 && spell.identifierScore >= 10)
+                ) {
+                    const otherNames = getSpellSpecializations(other);
+                    const spellNames = getSpellSpecializations(spell);
+                    if (other.tooltip && other.gcd === 0 && !spell.tooltip) {
+                        other.identifier = getRandomIdentifier(other, spell);
+                        identifiers[other.identifier] = other.id;
+                    } else if (
+                        !other.tooltip &&
+                        spell.tooltip &&
+                        spell.gcd === 0
+                    ) {
+                        spell.identifier = getRandomIdentifier(spell, other);
+                    } else if (
+                        otherNames.some((x) => !spellNames.includes(x)) ||
+                        spellNames.some((x) => !otherNames.includes(x))
+                    ) {
                         if (
                             otherNames.length === 0 &&
                             spellNames.length === 0

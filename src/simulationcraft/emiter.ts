@@ -149,14 +149,14 @@ export class Emiter {
         specialization: SpecializationName | "ALL_SPECIALIZATIONS",
         _type?: "spell" | "item"
     ): [string, string | undefined] {
-        if (className && annotation.dictionary[`${name}_${className}`]) {
-            return [`${name}_${className}`, _type];
-        }
         if (
             specialization &&
             annotation.dictionary[`${name}_${specialization}`]
         ) {
             return [`${name}_${specialization}`, _type];
+        }
+        if (className && annotation.dictionary[`${name}_${lower(className)}`]) {
+            return [`${name}_${lower(className)}`, _type];
         }
 
         const [disname, distype] = this.GetPerClassSpecialization(
