@@ -389,6 +389,31 @@ export class Emiter {
             "DEATHKNIGHT"
         );
         this.AddDisambiguation("frenzy", "frenzy_pet_buff", "HUNTER");
+
+        this.AddDisambiguation("blood_fury", "blood_fury_ap_int", "MONK");
+        this.AddDisambiguation("blood_fury", "blood_fury_ap_int", "SHAMAN");
+        this.AddDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT");
+        this.AddDisambiguation("blood_fury", "blood_fury_ap", "HUNTER");
+        this.AddDisambiguation("blood_fury", "blood_fury_ap", "ROGUE");
+        this.AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
+        this.AddDisambiguation("blood_fury", "blood_fury_int", "MAGE");
+        this.AddDisambiguation("blood_fury", "blood_fury_int", "WARLOCK");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_ap_int", "MONK");
+        this.AddDisambiguation(
+            "blood_fury_buff",
+            "blood_fury_ap_int",
+            "SHAMAN"
+        );
+        this.AddDisambiguation(
+            "blood_fury_buff",
+            "blood_fury_ap",
+            "DEATHKNIGHT"
+        );
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_ap", "HUNTER");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_ap", "ROGUE");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_ap", "WARRIOR");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_int", "MAGE");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_int", "WARLOCK");
     }
 
     /** Transform a ParseNode to an AstNode

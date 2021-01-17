@@ -63,14 +63,11 @@ Define(blinding_sleet 207167)
 Define(blood_boil 50842)
 # Deals s1 Shadow damage?s212744[ to all enemies within A1 yds.][ and infects all enemies within A1 yds with Blood Plague.rnrn|Tinterfaceiconsspell_deathknight_bloodplague.blp:24|t |cFFFFFFFFBlood Plague|rrnA shadowy disease that drains o1 health from the target over 24 seconds.  ]
   SpellInfo(blood_boil cd=7.5)
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
-Define(blood_fury_buff 20572)
+Define(blood_fury_ap 20572)
 # Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury_buff cd=120 duration=15 gcd=0 offgcd=1)
+  SpellInfo(blood_fury_ap cd=120 duration=15 gcd=0 offgcd=1)
   # Attack power increased by w1.
-  SpellAddBuff(blood_fury_buff blood_fury_buff add=1)
+  SpellAddBuff(blood_fury_ap blood_fury_ap add=1)
 Define(blood_plague 55078)
 # A shadowy disease that drains o1 health from the target over 24 seconds.  
   SpellInfo(blood_plague duration=24 gcd=0 offgcd=1 tick=3)

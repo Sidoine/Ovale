@@ -296,7 +296,7 @@ AddFunction beast_masterycdsmainactions
  #berserking,if=(buff.wild_spirits.up|!covenant.night_fae&buff.aspect_of_the_wild.up&buff.bestial_wrath.up)&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct))|target.time_to_die<13
  if { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 spell(berserking)
  #blood_fury,if=(buff.wild_spirits.up|!covenant.night_fae&buff.aspect_of_the_wild.up&buff.bestial_wrath.up)&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<35|!talent.killer_instinct))|target.time_to_die<16
- if { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 spell(blood_fury)
+ if { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury_ap) + baseduration(blood_fury_ap) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 spell(blood_fury_ap)
 }
 
 AddFunction beast_masterycdsmainpostconditions
@@ -309,7 +309,7 @@ AddFunction beast_masterycdsshortcdactions
 
 AddFunction beast_masterycdsshortcdpostconditions
 {
- { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury)
+ { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury_ap) + baseduration(blood_fury_ap) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury_ap)
 }
 
 AddFunction beast_masterycdscdactions
@@ -319,7 +319,7 @@ AddFunction beast_masterycdscdactions
  #fireblood,if=cooldown.bestial_wrath.remains>30
  if spellcooldown(bestial_wrath) > 30 spell(fireblood)
 
- unless { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury)
+ unless { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury_ap) + baseduration(blood_fury_ap) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury_ap)
  {
   #lights_judgment
   spell(lights_judgment)
@@ -330,7 +330,7 @@ AddFunction beast_masterycdscdactions
 
 AddFunction beast_masterycdscdpostconditions
 {
- { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury) + baseduration(blood_fury) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury)
+ { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(berserking) + baseduration(berserking) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 13 } and spell(berserking) or { { buffpresent(wild_spirits) or not iscovenant("night_fae") and buffpresent(aspect_of_the_wild) and buffpresent(bestial_wrath) } and { target.timetodie() > spellcooldownduration(blood_fury_ap) + baseduration(blood_fury_ap) or target.healthpercent() < 35 or not hastalent(killer_instinct_talent) } or target.timetodie() < 16 } and spell(blood_fury_ap)
 }
 
 ### actions.default
@@ -460,7 +460,7 @@ AddIcon enabled=(checkboxon(opt_hunter_beast_mastery_aoe) and specialization(bea
 # beast_cleave_beast_mastery
 # berserking
 # bestial_wrath
-# blood_fury
+# blood_fury_ap
 # bloodshed
 # chimaera_shot
 # cobra_shot
@@ -762,7 +762,7 @@ AddFunction marksmanshipcdsmainactions
  #berserking,if=buff.trueshot.up|target.time_to_die<13
  if buffpresent(trueshot) or target.timetodie() < 13 spell(berserking)
  #blood_fury,if=buff.trueshot.up|target.time_to_die<16
- if buffpresent(trueshot) or target.timetodie() < 16 spell(blood_fury)
+ if buffpresent(trueshot) or target.timetodie() < 16 spell(blood_fury_ap)
 }
 
 AddFunction marksmanshipcdsmainpostconditions
@@ -771,7 +771,7 @@ AddFunction marksmanshipcdsmainpostconditions
 
 AddFunction marksmanshipcdsshortcdactions
 {
- unless { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury)
+ unless { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury_ap)
  {
   #bag_of_tricks,if=buff.trueshot.down
   if buffexpires(trueshot) spell(bag_of_tricks)
@@ -780,12 +780,12 @@ AddFunction marksmanshipcdsshortcdactions
 
 AddFunction marksmanshipcdsshortcdpostconditions
 {
- { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury)
+ { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury_ap)
 }
 
 AddFunction marksmanshipcdscdactions
 {
- unless { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury)
+ unless { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury_ap)
  {
   #ancestral_call,if=buff.trueshot.up|target.time_to_die<16
   if buffpresent(trueshot) or target.timetodie() < 16 spell(ancestral_call)
@@ -804,7 +804,7 @@ AddFunction marksmanshipcdscdactions
 
 AddFunction marksmanshipcdscdpostconditions
 {
- { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury) or buffexpires(trueshot) and spell(bag_of_tricks)
+ { buffpresent(trueshot) or target.timetodie() < 13 } and spell(berserking) or { buffpresent(trueshot) or target.timetodie() < 16 } and spell(blood_fury_ap) or buffexpires(trueshot) and spell(bag_of_tricks)
 }
 
 ### actions.default
@@ -935,7 +935,7 @@ AddIcon enabled=(checkboxon(opt_hunter_marksmanship_aoe) and specialization(mark
 # bag_of_tricks
 # barrage
 # berserking
-# blood_fury
+# blood_fury_ap
 # bloodlust
 # chimaera_shot_marksmanship
 # chimaera_shot_talent
@@ -1263,7 +1263,7 @@ AddFunction survivalcleavecdpostconditions
 AddFunction survivalcdsmainactions
 {
  #blood_fury,if=cooldown.coordinated_assault.remains>30
- if spellcooldown(coordinated_assault) > 30 spell(blood_fury)
+ if spellcooldown(coordinated_assault) > 30 spell(blood_fury_ap)
  #berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
  if spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 spell(berserking)
  #flare,if=focus+cast_regen<focus.max&tar_trap.up&runeforge.soulforge_embers.equipped&time_to_die>4*gcd
@@ -1285,7 +1285,7 @@ AddFunction survivalcdsshortcdactions
  #harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
  if hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) spell(harpoon)
 
- unless spellcooldown(coordinated_assault) > 30 and spell(blood_fury)
+ unless spellcooldown(coordinated_assault) > 30 and spell(blood_fury_ap)
  {
   #bag_of_tricks,if=cooldown.kill_command.full_recharge_time>gcd
   if spellcooldown(kill_command_survival) > gcd() spell(bag_of_tricks)
@@ -1310,12 +1310,12 @@ AddFunction survivalcdsshortcdactions
 
 AddFunction survivalcdsshortcdpostconditions
 {
- spellcooldown(coordinated_assault) > 30 and spell(blood_fury) or { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
+ spellcooldown(coordinated_assault) > 30 and spell(blood_fury_ap) or { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike)
 }
 
 AddFunction survivalcdscdactions
 {
- unless hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon) or spellcooldown(coordinated_assault) > 30 and spell(blood_fury)
+ unless hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon) or spellcooldown(coordinated_assault) > 30 and spell(blood_fury_ap)
  {
   #ancestral_call,if=cooldown.coordinated_assault.remains>30
   if spellcooldown(coordinated_assault) > 30 spell(ancestral_call)
@@ -1336,7 +1336,7 @@ AddFunction survivalcdscdactions
 
 AddFunction survivalcdscdpostconditions
 {
- hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon) or spellcooldown(coordinated_assault) > 30 and spell(blood_fury) or spellcooldown(kill_command_survival) > gcd() and spell(bag_of_tricks) or { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(steel_trap) < maxfocus() and spell(steel_trap) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(freezing_trap) < maxfocus() and spell(freezing_trap) or { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(tar_trap) < maxfocus() or focus() + focuscastingregen(tar_trap) < maxfocus() and equippedruneforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and { enemies() > 1 or enemies() == 1 and target.timetodie() > 5 * gcd() } } and spell(tar_trap) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike) or target.distance() >= 6 and spell(aspect_of_the_eagle)
+ hastalent(terms_of_engagement_talent) and focus() < maxfocus() and checkboxon(opt_harpoon) and spell(harpoon) or spellcooldown(coordinated_assault) > 30 and spell(blood_fury_ap) or spellcooldown(kill_command_survival) > gcd() and spell(bag_of_tricks) or { spellcooldown(coordinated_assault) > 60 or target.timetodie() < 13 } and spell(berserking) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(steel_trap) < maxfocus() and spell(steel_trap) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(freezing_trap) < maxfocus() and spell(freezing_trap) or { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() + focuscastingregen(tar_trap) < maxfocus() or focus() + focuscastingregen(tar_trap) < maxfocus() and equippedruneforge(soulforge_embers_runeforge) and buffremaining(tar_trap) < gcd() and spellcooldown(flare) < gcd() and { enemies() > 1 or enemies() == 1 and target.timetodie() > 5 * gcd() } } and spell(tar_trap) or focus() + focuscastingregen(flare) < maxfocus() and buffpresent(tar_trap) and equippedruneforge(soulforge_embers_runeforge) and target.timetodie() > 4 * gcd() and spell(flare) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(kill_shot_survival) } * gcd() and spell(kill_shot_survival) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(mongoose_bite) } * gcd() and spell(mongoose_bite) or enemies() == 1 and target.timetodie() < focus() / { powercost(mongoose_bite) - focuscastingregen(raptor_strike) } * gcd() and spell(raptor_strike) or target.distance() >= 6 and spell(aspect_of_the_eagle)
 }
 
 ### actions.bop
@@ -1793,7 +1793,7 @@ AddIcon enabled=(checkboxon(opt_hunter_survival_aoe) and specialization(survival
 # aspect_of_the_eagle
 # bag_of_tricks
 # berserking
-# blood_fury
+# blood_fury_ap
 # butchery
 # carve
 # chakrams

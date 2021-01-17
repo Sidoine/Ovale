@@ -62,9 +62,11 @@ Define(blizzard_debuff 12486)
   SpellInfo(blizzard_debuff duration=3 gcd=0 offgcd=1)
   # Movement speed reduced by w1.
   SpellAddTargetDebuff(blizzard_debuff blizzard_debuff add=1)
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(blood_fury_int 33702)
+# Increases your Intellect by s1 for 15 seconds.
+  SpellInfo(blood_fury_int cd=120 duration=15 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(blood_fury_int blood_fury_int add=1)
 Define(brain_freeze 190446)
 # Frostbolt has a m1 chance to empower your next Flurry to be instant cast?a231584[,][ and] deal 190446s2 increased damage?a231584[, and apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen][].
   SpellInfo(brain_freeze duration=15 max_stacks=1 gcd=0 offgcd=1)

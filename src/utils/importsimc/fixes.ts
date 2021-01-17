@@ -143,6 +143,11 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("condemn_fury", 317485);
     fixIdentifier("devastator_passive", 236279);
 
+    // Blood fury
+    fixIdentifier("blood_fury_ap_int", 33697);
+    fixIdentifier("blood_fury_ap", 20572);
+    fixIdentifier("blood_fury_int", 33702);
+
     // Bombs
     fixIdentifier("pheromone_bomb", 270323);
     fixIdentifier("shrapnel_bomb", 270335);

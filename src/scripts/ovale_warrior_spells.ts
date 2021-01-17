@@ -39,9 +39,11 @@ Define(bladestorm_arms 227847)
   SpellRequire(bladestorm_arms replaced_by set=ravager enabled=(hastalent(ravager_talent)))
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
   SpellAddBuff(bladestorm_arms bladestorm_arms add=1)
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(blood_fury_ap 20572)
+# Increases your attack power by s1 for 15 seconds.
+  SpellInfo(blood_fury_ap cd=120 duration=15 gcd=0 offgcd=1)
+  # Attack power increased by w1.
+  SpellAddBuff(blood_fury_ap blood_fury_ap add=1)
 Define(bloodbath 335096)
 # Assault the target in a bloodthirsty craze, dealing s1 Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
   SpellInfo(bloodbath cd=3 rage=-8)

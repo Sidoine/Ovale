@@ -55,9 +55,11 @@ Define(blade_rush 271877)
 # Charge to your target with your blades out, dealing 271881sw1*271881s2/100 Physical damage to the target and 271881sw1 to all other nearby enemies.rnrnWhile Blade Flurry is active, damage to non-primary targets is increased by s1.rnrn|cFFFFFFFFGenerates 271896s1*5 seconds/271896t1 Energy over 5 seconds.
   SpellInfo(blade_rush cd=45 gcd=1)
   SpellRequire(blade_rush unusable set=1 enabled=(not hastalent(blade_rush_talent)))
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(blood_fury_ap 20572)
+# Increases your attack power by s1 for 15 seconds.
+  SpellInfo(blood_fury_ap cd=120 duration=15 gcd=0 offgcd=1)
+  # Attack power increased by w1.
+  SpellAddBuff(blood_fury_ap blood_fury_ap add=1)
 Define(bloodlust 2825)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)

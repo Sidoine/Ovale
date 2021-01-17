@@ -144,7 +144,7 @@ AddFunction afflictiondarkglare_prepmainactions
  #vile_taint,if=cooldown.summon_darkglare.remains<2
  if spellcooldown(summon_darkglare) < 2 spell(vile_taint)
  #blood_fury
- spell(blood_fury)
+ spell(blood_fury_int)
  #berserking
  spell(berserking)
  #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
@@ -158,7 +158,7 @@ AddFunction afflictiondarkglare_prepmainpostconditions
 
 AddFunction afflictiondarkglare_prepshortcdactions
 {
- unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury) or spell(berserking)
+ unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking)
  {
   #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
   if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantshortcdactions()
@@ -167,7 +167,7 @@ AddFunction afflictiondarkglare_prepshortcdactions
 
 AddFunction afflictiondarkglare_prepshortcdpostconditions
 {
- spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantshortcdpostconditions()
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantshortcdpostconditions()
 }
 
 AddFunction afflictiondarkglare_prepcdactions
@@ -181,7 +181,7 @@ AddFunction afflictiondarkglare_prepcdactions
   #fireblood
   spell(fireblood)
 
-  unless spell(blood_fury) or spell(berserking)
+  unless spell(blood_fury_int) or spell(berserking)
   {
    #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
    if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantcdactions()
@@ -197,7 +197,7 @@ AddFunction afflictiondarkglare_prepcdactions
 
 AddFunction afflictiondarkglare_prepcdpostconditions
 {
- spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
 }
 
 ### actions.covenant
@@ -840,7 +840,7 @@ AddIcon enabled=(checkboxon(opt_warlock_affliction_aoe) and specialization(affli
 # 169314
 # agony
 # berserking
-# blood_fury
+# blood_fury_int
 # corrupting_leer_conduit
 # corruption
 # corruption_debuff_affliction
@@ -1061,7 +1061,7 @@ AddFunction demonologyoff_gcdmainactions
  #berserking,if=pet.demonic_tyrant.active
  if demonduration(demonic_tyrant) > 0 spell(berserking)
  #blood_fury,if=pet.demonic_tyrant.active
- if demonduration(demonic_tyrant) > 0 spell(blood_fury)
+ if demonduration(demonic_tyrant) > 0 spell(blood_fury_int)
 }
 
 AddFunction demonologyoff_gcdmainpostconditions
@@ -1074,7 +1074,7 @@ AddFunction demonologyoff_gcdshortcdactions
 
 AddFunction demonologyoff_gcdshortcdpostconditions
 {
- demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury)
+ demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
 }
 
 AddFunction demonologyoff_gcdcdactions
@@ -1084,7 +1084,7 @@ AddFunction demonologyoff_gcdcdactions
   #potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
   if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
 
-  unless demonduration(demonic_tyrant) > 0 and spell(blood_fury)
+  unless demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
   {
    #fireblood,if=pet.demonic_tyrant.active
    if demonduration(demonic_tyrant) > 0 spell(fireblood)
@@ -1094,7 +1094,7 @@ AddFunction demonologyoff_gcdcdactions
 
 AddFunction demonologyoff_gcdcdpostconditions
 {
- demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury)
+ demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
 }
 
 ### actions.covenant
@@ -1335,7 +1335,7 @@ AddIcon enabled=(checkboxon(opt_warlock_demonology_aoe) and specialization(demon
 # berserking
 # berserking_buff
 # bilescourge_bombers
-# blood_fury
+# blood_fury_int
 # call_dreadstalkers
 # decimating_bolt
 # demonbolt
@@ -1556,7 +1556,7 @@ AddFunction destructioncdsmainactions
  #berserking,if=pet.infernal.active
  if demonduration(infernal) > 0 spell(berserking)
  #blood_fury,if=pet.infernal.active
- if demonduration(infernal) > 0 spell(blood_fury)
+ if demonduration(infernal) > 0 spell(blood_fury_int)
 }
 
 AddFunction destructioncdsmainpostconditions
@@ -1569,7 +1569,7 @@ AddFunction destructioncdsshortcdactions
 
 AddFunction destructioncdsshortcdpostconditions
 {
- demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury)
+ demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
 }
 
 AddFunction destructioncdscdactions
@@ -1581,7 +1581,7 @@ AddFunction destructioncdscdactions
  #potion,if=pet.infernal.active
  if demonduration(infernal) > 0 and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
 
- unless demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury)
+ unless demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
  {
   #fireblood,if=pet.infernal.active
   if demonduration(infernal) > 0 spell(fireblood)
@@ -1592,7 +1592,7 @@ AddFunction destructioncdscdactions
 
 AddFunction destructioncdscdpostconditions
 {
- demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury)
+ demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
 }
 
 ### actions.aoe
@@ -1893,7 +1893,7 @@ AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(dest
 ### Required symbols
 # backdraft_buff
 # berserking
-# blood_fury
+# blood_fury_int
 # blood_of_the_enemy
 # cataclysm
 # cataclysm_talent

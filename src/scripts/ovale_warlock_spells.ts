@@ -26,9 +26,11 @@ Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6)
   SpellRequire(bilescourge_bombers unusable set=1 enabled=(not hastalent(bilescourge_bombers_talent)))
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(blood_fury_int 33702)
+# Increases your Intellect by s1 for 15 seconds.
+  SpellInfo(blood_fury_int cd=120 duration=15 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(blood_fury_int blood_fury_int add=1)
 Define(blood_of_the_enemy 297969)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy)

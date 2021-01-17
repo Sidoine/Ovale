@@ -329,7 +329,7 @@ AddFunction assassinationcdsmainactions
  #shiv,if=dot.rupture.ticking|dot.sepsis.ticking
  if target.debuffpresent(rupture) or target.debuffpresent(sepsis) spell(shiv)
  #blood_fury,if=debuff.vendetta.up
- if target.debuffpresent(vendetta) spell(blood_fury)
+ if target.debuffpresent(vendetta) spell(blood_fury_ap)
  #berserking,if=debuff.vendetta.up
  if target.debuffpresent(vendetta) spell(berserking)
  #call_action_list,name=vanish,if=!stealthed.all&master_assassin_remains=0
@@ -354,7 +354,7 @@ AddFunction assassinationcdsshortcdactions
  #exsanguinate,if=!stealthed.rogue&(!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend|dot.rupture.remains*0.5>target.time_to_die)&target.time_to_die>4
  if not buffpresent(rogue_stealthed_buff) and { not target.debuffrefreshable(garrote) and target.debuffremaining(rupture) > 4 + 4 * maxcombopoints() or target.debuffremaining(rupture) * 0.5 > target.timetodie() } and target.timetodie() > 4 spell(exsanguinate)
 
- unless { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury) or target.debuffpresent(vendetta) and spell(berserking)
+ unless { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury_ap) or target.debuffpresent(vendetta) and spell(berserking)
  {
   #call_action_list,name=vanish,if=!stealthed.all&master_assassin_remains=0
   if not buffpresent(stealthed_buff) and buffremaining(master_assassin) == 0 assassinationvanishshortcdactions()
@@ -363,7 +363,7 @@ AddFunction assassinationcdsshortcdactions
 
 AddFunction assassinationcdsshortcdpostconditions
 {
- { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury) or target.debuffpresent(vendetta) and spell(berserking) or not buffpresent(stealthed_buff) and buffremaining(master_assassin) == 0 and assassinationvanishshortcdpostconditions()
+ { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury_ap) or target.debuffpresent(vendetta) and spell(berserking) or not buffpresent(stealthed_buff) and buffremaining(master_assassin) == 0 and assassinationvanishshortcdpostconditions()
 }
 
 AddFunction assassinationcdscdactions
@@ -379,7 +379,7 @@ AddFunction assassinationcdscdactions
    #potion,if=buff.bloodlust.react|fight_remains<30|debuff.vendetta.up
    if { buffpresent(bloodlust) or fightremains() < 30 or target.debuffpresent(vendetta) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(phantom_fire usable=1)
 
-   unless target.debuffpresent(vendetta) and spell(blood_fury) or target.debuffpresent(vendetta) and spell(berserking)
+   unless target.debuffpresent(vendetta) and spell(blood_fury_ap) or target.debuffpresent(vendetta) and spell(berserking)
    {
     #fireblood,if=debuff.vendetta.up
     if target.debuffpresent(vendetta) spell(fireblood)
@@ -404,7 +404,7 @@ AddFunction assassinationcdscdactions
 
 AddFunction assassinationcdscdpostconditions
 {
- spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() * 1.5 or combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or not buffpresent(rogue_stealthed_buff) and { not target.debuffrefreshable(garrote) and target.debuffremaining(rupture) > 4 + 4 * maxcombopoints() or target.debuffremaining(rupture) * 0.5 > target.timetodie() } and target.timetodie() > 4 and spell(exsanguinate) or { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury) or target.debuffpresent(vendetta) and spell(berserking) or not buffpresent(stealthed_buff) and buffremaining(master_assassin) == 0 and assassinationvanishcdpostconditions()
+ spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() * 1.5 or combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or not buffpresent(rogue_stealthed_buff) and { not target.debuffrefreshable(garrote) and target.debuffremaining(rupture) > 4 + 4 * maxcombopoints() or target.debuffremaining(rupture) * 0.5 > target.timetodie() } and target.timetodie() > 4 and spell(exsanguinate) or { target.debuffpresent(rupture) or target.debuffpresent(sepsis) } and spell(shiv) or target.debuffpresent(vendetta) and spell(blood_fury_ap) or target.debuffpresent(vendetta) and spell(berserking) or not buffpresent(stealthed_buff) and buffremaining(master_assassin) == 0 and assassinationvanishcdpostconditions()
 }
 
 ### actions.default
@@ -577,7 +577,7 @@ AddIcon enabled=(checkboxon(opt_rogue_assassination_aoe) and specialization(assa
 # arcane_torrent
 # bag_of_tricks
 # berserking
-# blood_fury
+# blood_fury_ap
 # bloodlust
 # cheap_shot
 # crimson_tempest
@@ -814,7 +814,7 @@ AddFunction outlawfinishcdpostconditions
 AddFunction outlawcdsmainactions
 {
  #blood_fury
- spell(blood_fury)
+ spell(blood_fury_ap)
  #berserking
  spell(berserking)
 }
@@ -845,7 +845,7 @@ AddFunction outlawcdsshortcdactions
 
 AddFunction outlawcdsshortcdpostconditions
 {
- spell(blood_fury) or spell(berserking)
+ spell(blood_fury_ap) or spell(berserking)
 }
 
 AddFunction outlawcdscdactions
@@ -872,7 +872,7 @@ AddFunction outlawcdscdactions
      #potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up
      if { buffpresent(bloodlust) or fightremains() < 30 or buffpresent(adrenaline_rush) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(phantom_fire usable=1)
 
-     unless spell(blood_fury) or spell(berserking)
+     unless spell(blood_fury_ap) or spell(berserking)
      {
       #fireblood
       spell(fireblood)
@@ -889,7 +889,7 @@ AddFunction outlawcdscdactions
 
 AddFunction outlawcdscdpostconditions
 {
- enemies(tagged=1) >= 2 and not buffpresent(blade_flurry) and checkboxon(opt_blade_flurry) and spell(blade_flurry) or spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or { buffremaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and spell(roll_the_bones) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(rogue_stealthed_buff) and combopointsdeficit() >= maxcombopoints() - 1 } and spell(marked_for_death) or 600 > 30 - 10 and not buffpresent(rogue_stealthed_buff) and combopointsdeficit() >= maxcombopoints() - 1 and spell(marked_for_death) or blade_flurry_sync() and { timetomaxenergy() > 2 or enemies(tagged=1) > 2 } and spell(blade_rush) or not buffpresent(stealthed_buff) and combopoints() <= 1 and spell(dreadblades) or spell(blood_fury) or spell(berserking)
+ enemies(tagged=1) >= 2 and not buffpresent(blade_flurry) and checkboxon(opt_blade_flurry) and spell(blade_flurry) or spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or { buffremaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and spell(roll_the_bones) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(rogue_stealthed_buff) and combopointsdeficit() >= maxcombopoints() - 1 } and spell(marked_for_death) or 600 > 30 - 10 and not buffpresent(rogue_stealthed_buff) and combopointsdeficit() >= maxcombopoints() - 1 and spell(marked_for_death) or blade_flurry_sync() and { timetomaxenergy() > 2 or enemies(tagged=1) > 2 } and spell(blade_rush) or not buffpresent(stealthed_buff) and combopoints() <= 1 and spell(dreadblades) or spell(blood_fury_ap) or spell(berserking)
 }
 
 ### actions.build
@@ -1120,7 +1120,7 @@ AddIcon enabled=(checkboxon(opt_rogue_outlaw_aoe) and specialization(outlaw)) he
 # between_the_eyes
 # blade_flurry
 # blade_rush
-# blood_fury
+# blood_fury_ap
 # bloodlust
 # broadside
 # cheap_shot
@@ -1512,7 +1512,7 @@ AddFunction subtletycdsmainactions
   #sepsis,if=variable.snd_condition&combo_points.deficit>=1
   if snd_condition() and combopointsdeficit() >= 1 spell(sepsis)
   #blood_fury,if=buff.symbols_of_death.up
-  if buffpresent(symbols_of_death) spell(blood_fury)
+  if buffpresent(symbols_of_death) spell(blood_fury_ap)
   #berserking,if=buff.symbols_of_death.up
   if buffpresent(symbols_of_death) spell(berserking)
  }
@@ -1558,7 +1558,7 @@ AddFunction subtletycdsshortcdactions
 
 AddFunction subtletycdsshortcdpostconditions
 {
- not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or buffpresent(symbols_of_death) and spell(blood_fury) or buffpresent(symbols_of_death) and spell(berserking) }
+ not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or buffpresent(symbols_of_death) and spell(blood_fury_ap) or buffpresent(symbols_of_death) and spell(berserking) }
 }
 
 AddFunction subtletycdscdactions
@@ -1580,7 +1580,7 @@ AddFunction subtletycdscdactions
      #potion,if=buff.bloodlust.react|fight_remains<30|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
      if { buffpresent(bloodlust) or fightremains() < 30 or buffpresent(symbols_of_death) and { buffpresent(shadow_blades) or spellcooldown(shadow_blades) <= 10 } } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(phantom_fire usable=1)
 
-     unless buffpresent(symbols_of_death) and spell(blood_fury) or buffpresent(symbols_of_death) and spell(berserking)
+     unless buffpresent(symbols_of_death) and spell(blood_fury_ap) or buffpresent(symbols_of_death) and spell(berserking)
      {
       #fireblood,if=buff.symbols_of_death.up
       if buffpresent(symbols_of_death) spell(fireblood)
@@ -1597,7 +1597,7 @@ AddFunction subtletycdscdactions
 
 AddFunction subtletycdscdpostconditions
 {
- not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not buffpresent(mantle_stealthed_buff) and spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 and spell(shuriken_tornado) or { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or snd_condition() and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } and spell(symbols_of_death) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(stealthed_buff) and combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or snd_condition() and combopointsdeficit() >= 2 and { use_priority_rotation() or enemies(tagged=1) <= 4 } and spell(echoing_reprimand) or hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) and spell(shuriken_tornado) or not buffpresent(shadow_dance_buff) and fightremains() <= 8 + talentpoints(subterfuge_talent) and spell(shadow_dance) or buffpresent(symbols_of_death) and spell(blood_fury) or buffpresent(symbols_of_death) and spell(berserking) }
+ not buffpresent(shadow_dance_buff) and buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(shadow_dance) or buffpresent(shuriken_tornado) and buffremaining(shuriken_tornado) <= 3.5 and spell(symbols_of_death) or snd_condition() and not buffpresent(mantle_stealthed_buff) and spell(flagellation) or target.debuffremaining(flagellation) < 2 and spell(flagellation) or not { hastalent(shuriken_tornado_talent) and not hastalent(shadow_focus_talent) } and { energy() >= 60 and snd_condition() and not spellcooldown(symbols_of_death) > 0 and spellcharges(shadow_dance) >= 1 and spell(shuriken_tornado) or { snd_condition() and not target.debuffpresent(serrated_bone_spike_debuff) and target.timetodie() >= 21 or fightremains() <= 5 and enemies(tagged=1) < 3 } and spell(serrated_bone_spike) or snd_condition() and combopointsdeficit() >= 1 and spell(sepsis) or snd_condition() and { hastalent(enveloping_shadows_talent) or spellcharges(shadow_dance) >= 1 } and { not hastalent(shuriken_tornado_talent) or hastalent(shadow_focus_talent) or spellcooldown(shuriken_tornado) > 2 } and spell(symbols_of_death) or never(raid_event_adds_exists) and { target.timetodie() < combopointsdeficit() or not buffpresent(stealthed_buff) and combopointsdeficit() >= maxcombopoints() } and spell(marked_for_death) or 600 > 30 - 10 and combopointsdeficit() >= maxcombopoints() and spell(marked_for_death) or snd_condition() and combopointsdeficit() >= 2 and { use_priority_rotation() or enemies(tagged=1) <= 4 } and spell(echoing_reprimand) or hastalent(shadow_focus_talent) and snd_condition() and buffpresent(symbols_of_death) and spell(shuriken_tornado) or not buffpresent(shadow_dance_buff) and fightremains() <= 8 + talentpoints(subterfuge_talent) and spell(shadow_dance) or buffpresent(symbols_of_death) and spell(blood_fury_ap) or buffpresent(symbols_of_death) and spell(berserking) }
 }
 
 ### actions.build
@@ -1886,7 +1886,7 @@ AddIcon enabled=(checkboxon(opt_rogue_subtlety_aoe) and specialization(subtlety)
 # bag_of_tricks
 # berserking
 # black_powder
-# blood_fury
+# blood_fury_ap
 # bloodlust
 # cheap_shot
 # dark_shadow_talent

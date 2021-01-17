@@ -218,8 +218,6 @@ AddFunction bloodcovenantscdpostconditions
 
 AddFunction blood_defaultmainactions
 {
- #blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
- if spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } spell(blood_fury)
  #berserking
  spell(berserking)
  #blood_boil,if=charges>=2&(covenant.kyrian|buff.dancing_rune_weapon.up)
@@ -246,7 +244,7 @@ AddFunction blood_defaultshortcdactions
  #auto_attack
  bloodgetinmeleerange()
 
- unless spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } and spell(blood_fury) or spell(berserking)
+ unless spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -269,14 +267,16 @@ AddFunction blood_defaultshortcdactions
 
 AddFunction blood_defaultshortcdpostconditions
 {
- spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } and spell(blood_fury) or spell(berserking) or charges(blood_boil) >= 2 and { iscovenant("kyrian") or buffpresent(dancing_rune_weapon_buff) } and spell(blood_boil) or fightremains() < 3 and spell(death_strike) or bloodcovenantsshortcdpostconditions() or bloodstandardshortcdpostconditions()
+ spell(berserking) or charges(blood_boil) >= 2 and { iscovenant("kyrian") or buffpresent(dancing_rune_weapon_buff) } and spell(blood_boil) or fightremains() < 3 and spell(death_strike) or bloodcovenantsshortcdpostconditions() or bloodstandardshortcdpostconditions()
 }
 
 AddFunction blood_defaultcdactions
 {
  bloodinterruptactions()
+ #blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
+ if spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } spell(blood_fury_ap)
 
- unless spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } and spell(blood_fury) or spell(berserking)
+ unless spell(berserking)
  {
   #arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
   if enemies() >= 2 or runecount() < 1 and runicpowerdeficit() > 60 spell(arcane_pulse)
@@ -319,7 +319,7 @@ AddFunction blood_defaultcdactions
 
 AddFunction blood_defaultcdpostconditions
 {
- spellcooldown(dancing_rune_weapon) <= 0 and { not spellcooldown(blooddrinker) <= 0 or not hastalent(blooddrinker_talent) } and spell(blood_fury) or spell(berserking) or spell(bag_of_tricks) or not buffpresent(dancing_rune_weapon_buff) and { not iscovenant("night_fae") or buffremaining(deaths_due_buff) > 7 } and spell(blooddrinker) or charges(blood_boil) >= 2 and { iscovenant("kyrian") or buffpresent(dancing_rune_weapon_buff) } and spell(blood_boil) or fightremains() < 3 and spell(death_strike) or bloodcovenantscdpostconditions() or bloodstandardcdpostconditions()
+ spell(berserking) or spell(bag_of_tricks) or not buffpresent(dancing_rune_weapon_buff) and { not iscovenant("night_fae") or buffremaining(deaths_due_buff) > 7 } and spell(blooddrinker) or charges(blood_boil) >= 2 and { iscovenant("kyrian") or buffpresent(dancing_rune_weapon_buff) } and spell(blood_boil) or fightremains() < 3 and spell(death_strike) or bloodcovenantscdpostconditions() or bloodstandardcdpostconditions()
 }
 
 ### Blood icons.
@@ -372,7 +372,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_blood_aoe) and specialization(blood)
 # bag_of_tricks
 # berserking
 # blood_boil
-# blood_fury
+# blood_fury_ap
 # blood_tap
 # blooddrinker
 # blooddrinker_talent
@@ -679,8 +679,6 @@ AddFunction frostcovenantscdpostconditions
 
 AddFunction frostcooldownsmainactions
 {
- #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
- if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(blood_fury)
  #berserking,if=buff.pillar_of_frost.up
  if buffpresent(pillar_of_frost) spell(berserking)
 }
@@ -691,7 +689,7 @@ AddFunction frostcooldownsmainpostconditions
 
 AddFunction frostcooldownsshortcdactions
 {
- unless buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and spell(blood_fury) or buffpresent(pillar_of_frost) and spell(berserking)
+ unless buffpresent(pillar_of_frost) and spell(berserking)
  {
   #bag_of_tricks,if=buff.pillar_of_frost.up&active_enemies=1&(buff.pillar_of_frost.remains<5&talent.cold_heart.enabled|!talent.cold_heart.enabled&buff.pillar_of_frost.remains<3)
   if buffpresent(pillar_of_frost) and enemies() == 1 and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } spell(bag_of_tricks)
@@ -710,7 +708,7 @@ AddFunction frostcooldownsshortcdactions
 
 AddFunction frostcooldownsshortcdpostconditions
 {
- buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and spell(blood_fury) or buffpresent(pillar_of_frost) and spell(berserking)
+ buffpresent(pillar_of_frost) and spell(berserking)
 }
 
 AddFunction frostcooldownscdactions
@@ -719,8 +717,10 @@ AddFunction frostcooldownscdactions
  if spellcooldown(pillar_of_frost) <= 0 or spellcooldown(pillar_of_frost) > 20 frostuseitemactions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
+ #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(blood_fury_ap)
 
- unless buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and spell(blood_fury) or buffpresent(pillar_of_frost) and spell(berserking)
+ unless buffpresent(pillar_of_frost) and spell(berserking)
  {
   #arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
   if not buffpresent(pillar_of_frost) and enemies() >= 2 or not buffpresent(pillar_of_frost) and runedeficit() >= 5 and runicpowerdeficit() >= 60 spell(arcane_pulse)
@@ -765,7 +765,7 @@ AddFunction frostcooldownscdactions
 
 AddFunction frostcooldownscdpostconditions
 {
- buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) and spell(blood_fury) or buffpresent(pillar_of_frost) and spell(berserking) or buffpresent(pillar_of_frost) and enemies() == 1 and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and spell(bag_of_tricks) or hastalent(breath_of_sindragosa_talent) and { spellcooldown(breath_of_sindragosa) > 0 or spellcooldown(breath_of_sindragosa) <= 0 and runicpowerdeficit() < 60 } and spell(pillar_of_frost) or hastalent(icecap_talent) and not buffpresent(pillar_of_frost) and spell(pillar_of_frost) or hastalent(obliteration_talent) and { hastalent(gathering_storm_talent) and buffpresent(remorseless_winter) or not hastalent(gathering_storm_talent) } and spell(pillar_of_frost) or { hastalent(breath_of_sindragosa_talent) and runicpowerdeficit() > 40 and runecount() >= 3 and buffpresent(pillar_of_frost) or not hastalent(breath_of_sindragosa_talent) and runicpowerdeficit() >= 25 } and spell(hypothermic_presence) or { enemies() > 5 or runeforge(phearomones_runeforge) } and spell(death_and_decay)
+ buffpresent(pillar_of_frost) and spell(berserking) or buffpresent(pillar_of_frost) and enemies() == 1 and { buffremaining(pillar_of_frost) < 5 and hastalent(cold_heart_talent) or not hastalent(cold_heart_talent) and buffremaining(pillar_of_frost) < 3 } and spell(bag_of_tricks) or hastalent(breath_of_sindragosa_talent) and { spellcooldown(breath_of_sindragosa) > 0 or spellcooldown(breath_of_sindragosa) <= 0 and runicpowerdeficit() < 60 } and spell(pillar_of_frost) or hastalent(icecap_talent) and not buffpresent(pillar_of_frost) and spell(pillar_of_frost) or hastalent(obliteration_talent) and { hastalent(gathering_storm_talent) and buffpresent(remorseless_winter) or not hastalent(gathering_storm_talent) } and spell(pillar_of_frost) or { hastalent(breath_of_sindragosa_talent) and runicpowerdeficit() > 40 and runecount() >= 3 and buffpresent(pillar_of_frost) or not hastalent(breath_of_sindragosa_talent) and runicpowerdeficit() >= 25 } and spell(hypothermic_presence) or { enemies() > 5 or runeforge(phearomones_runeforge) } and spell(death_and_decay)
 }
 
 ### actions.cold_heart
@@ -1216,7 +1216,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_frost_aoe) and specialization(frost)
 # berserking
 # biting_cold_runeforge
 # blinding_sleet
-# blood_fury
+# blood_fury_ap
 # breath_of_sindragosa
 # breath_of_sindragosa_talent
 # chains_of_ice
@@ -1668,8 +1668,6 @@ AddFunction unholyaoe_burstcdpostconditions
 
 AddFunction unholy_defaultmainactions
 {
- #blood_fury,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.blood_fury.duration%3)|target.time_to_die<=buff.blood_fury.duration
- if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury) / 3 } or target.timetodie() <= baseduration(blood_fury_buff) spell(blood_fury)
  #berserking,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.berserking.duration%3)|target.time_to_die<=buff.berserking.duration
  if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) spell(berserking)
  #outbreak,if=dot.virulent_plague.refreshable&!talent.unholy_blight&!raid_event.adds.exists
@@ -1722,7 +1720,7 @@ AddFunction unholy_defaultshortcdactions
  #auto_attack
  unholygetinmeleerange()
 
- unless { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury) / 3 } or target.timetodie() <= baseduration(blood_fury_buff) } and spell(blood_fury) or { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking)
+ unless { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking)
  {
   #bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
   if buffpresent(unholy_strength) and enemies() == 1 spell(bag_of_tricks)
@@ -1767,7 +1765,7 @@ AddFunction unholy_defaultshortcdactions
 
 AddFunction unholy_defaultshortcdpostconditions
 {
- { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury) / 3 } or target.timetodie() <= baseduration(blood_fury_buff) } and spell(blood_fury) or { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague) } and spell(outbreak) or unholycovenantsshortcdpostconditions() or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
+ { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague) } and spell(outbreak) or unholycovenantsshortcdpostconditions() or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
 }
 
 AddFunction unholy_defaultcdactions
@@ -1777,8 +1775,10 @@ AddFunction unholy_defaultcdactions
  #variable,name=st_planning,value=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15)
  #arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
  if runicpowerdeficit() > 65 and { totempresent(summon_gargoyle) or not hastalent(summon_gargoyle_talent) } and runedeficit() >= 5 spell(arcane_torrent)
+ #blood_fury,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.blood_fury.duration%3)|target.time_to_die<=buff.blood_fury.duration
+ if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury_ap) / 3 } or target.timetodie() <= baseduration(blood_fury_ap) spell(blood_fury_ap)
 
- unless { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury) / 3 } or target.timetodie() <= baseduration(blood_fury_buff) } and spell(blood_fury) or { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking)
+ unless { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking)
  {
   #lights_judgment,if=buff.unholy_strength.up
   if buffpresent(unholy_strength) spell(lights_judgment)
@@ -1829,7 +1829,7 @@ AddFunction unholy_defaultcdactions
 
 AddFunction unholy_defaultcdpostconditions
 {
- { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury) / 3 } or target.timetodie() <= baseduration(blood_fury_buff) } and spell(blood_fury) or { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking) or buffpresent(unholy_strength) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague) } and spell(outbreak) or unholycovenantscdpostconditions() or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
+ { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking_buff) } and spell(berserking) or buffpresent(unholy_strength) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague) } and spell(outbreak) or unholycovenantscdpostconditions() or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
 }
 
 ### Unholy icons.
@@ -1884,8 +1884,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
 # bag_of_tricks
 # berserking
 # berserking_buff
-# blood_fury
-# blood_fury_buff
+# blood_fury_ap
 # blood_plague
 # convocation_of_the_dead_conduit
 # dark_transformation
