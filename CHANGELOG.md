@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.41](https://github.com/Sidoine/Ovale/compare/9.0.40...9.0.41) (2021-01-17)
+
+### Bug Fixes
+
+-   blood fury spells ([7057f66](https://github.com/Sidoine/Ovale/commit/7057f66d0f2fe5d56d0197ec61eccc091c1c94c7))
+-   duplicate spell identifiers ([14ddaff](https://github.com/Sidoine/Ovale/commit/14ddaffa23380903c0ace0fd1d11a4f3b9544095))
+-   options position was broken ([f8a2163](https://github.com/Sidoine/Ovale/commit/f8a21635e7e92d961812f23930c0284261a2ceef)), closes [#810](https://github.com/Sidoine/Ovale/issues/810)
+-   some spell were not correctly imported ([472bc16](https://github.com/Sidoine/Ovale/commit/472bc167e0faf97acab920e120a3bee7d6cf9f22))
+
 ### [9.0.40](https://github.com/Sidoine/Ovale/compare/9.0.39...9.0.40) (2021-01-15)
 
 ### Bug Fixes
