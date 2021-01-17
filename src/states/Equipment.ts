@@ -15,12 +15,30 @@ import {
     GetInventoryItemLink,
     GetItemStats,
     GetItemInfoInstant,
-    GetInventorySlotInfo,
     INVSLOT_FIRST_EQUIPPED,
     INVSLOT_LAST_EQUIPPED,
     GetItemCooldown,
     GetWeaponEnchantInfo,
     GetTime,
+    INVSLOT_AMMO,
+    INVSLOT_HEAD,
+    INVSLOT_NECK,
+    INVSLOT_BODY,
+    INVSLOT_LEGS,
+    INVSLOT_FEET,
+    INVSLOT_HAND,
+    INVSLOT_FINGER1,
+    INVSLOT_TRINKET1,
+    INVSLOT_BACK,
+    INVSLOT_OFFHAND,
+    INVSLOT_MAINHAND,
+    INVSLOT_TABARD,
+    INVSLOT_FINGER2,
+    INVSLOT_TRINKET2,
+    INVSLOT_WRIST,
+    INVSLOT_WAIST,
+    INVSLOT_CHEST,
+    INVSLOT_SHOULDER,
 } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
 import { isNumber, KeyCheck } from "../tools/tools";
@@ -43,25 +61,25 @@ import { huge } from "@wowts/math";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const OVALE_SLOTID_BY_SLOTNAME = {
-    ammoslot: 0,
-    headslot: 1,
-    neckslot: 2,
-    shoulderslot: 3,
-    shirtslot: 4,
-    chestslot: 5,
-    waistslot: 6,
-    legsslot: 7,
-    feetslot: 8,
-    wristslot: 9,
-    handsslot: 10,
-    finger0slot: 11,
-    finger1slot: 12,
-    trinket0slot: 13,
-    trinket1slot: 14,
-    backslot: 15,
-    mainhandslot: 16,
-    secondaryhandslot: 17,
-    tabardslot: 19,
+    ammoslot: INVSLOT_AMMO,
+    headslot: INVSLOT_HEAD,
+    neckslot: INVSLOT_NECK,
+    shoulderslot: INVSLOT_SHOULDER,
+    shirtslot: INVSLOT_BODY,
+    chestslot: INVSLOT_CHEST,
+    waistslot: INVSLOT_WAIST,
+    legsslot: INVSLOT_LEGS,
+    feetslot: INVSLOT_FEET,
+    wristslot: INVSLOT_WRIST,
+    handsslot: INVSLOT_HAND,
+    finger0slot: INVSLOT_FINGER1,
+    finger1slot: INVSLOT_FINGER2,
+    trinket0slot: INVSLOT_TRINKET1,
+    trinket1slot: INVSLOT_TRINKET2,
+    backslot: INVSLOT_BACK,
+    mainhandslot: INVSLOT_MAINHAND,
+    secondaryhandslot: INVSLOT_OFFHAND,
+    tabardslot: INVSLOT_TABARD,
 };
 export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
 const OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
@@ -161,9 +179,7 @@ export class OvaleEquipmentClass {
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
         }
-        for (const [slotName] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
-            const [invSlotId] = GetInventorySlotInfo(slotName);
-            OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId; // Should already match but in case Blizzard ever changes the slotIds
+        for (const [slotName, invSlotId] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
         }
     }
