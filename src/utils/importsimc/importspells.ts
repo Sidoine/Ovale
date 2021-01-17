@@ -1989,12 +1989,22 @@ export function getSpellData(directory: string) {
                                 other
                             );
                         } else if (spellNames.length > 0) {
-                            spell.identifier +=
-                                "_" + spellNames[0].toLowerCase();
+                            let identifier =
+                                spell.identifier +
+                                "_" +
+                                spellNames[0].toLowerCase();
+                            if (identifiers[identifier])
+                                identifier = getRandomIdentifier(spell, other);
+                            spell.identifier = identifier;
                         } else if (otherNames.length > 0) {
                             // TODO aliases
-                            other.identifier +=
-                                "_" + otherNames[0].toLowerCase();
+                            let identifier =
+                                other.identifier +
+                                "_" +
+                                otherNames[0].toLowerCase();
+                            if (identifiers[identifier])
+                                identifier = getRandomIdentifier(other, spell);
+                            other.identifier = identifier;
                             identifiers[other.identifier] = other.id;
                         }
                     } else if (

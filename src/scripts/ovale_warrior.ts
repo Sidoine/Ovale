@@ -292,8 +292,6 @@ AddFunction arms_defaultmainactions
 {
  #charge
  if checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) spell(charge)
- #blood_fury,if=debuff.colossus_smash.up
- if target.debuffpresent(colossus_smash_debuff) spell(blood_fury_ap)
  #berserking,if=debuff.colossus_smash.remains>6
  if target.debuffremaining(colossus_smash_debuff) > 6 spell(berserking)
  #run_action_list,name=hac,if=raid_event.adds.exists
@@ -324,7 +322,7 @@ AddFunction arms_defaultshortcdactions
   #auto_attack
   armsgetinmeleerange()
 
-  unless target.debuffpresent(colossus_smash_debuff) and spell(blood_fury_ap) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking)
+  unless target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking)
   {
    #bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
    if target.debuffexpires(colossus_smash_debuff) and spellcooldown(mortal_strike) > 0 spell(bag_of_tricks)
@@ -350,7 +348,7 @@ AddFunction arms_defaultshortcdactions
 
 AddFunction arms_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.debuffpresent(colossus_smash_debuff) and spell(blood_fury_ap) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking) or never(raid_event_adds_exists) and armshacshortcdpostconditions() or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecuteshortcdpostconditions() or armssingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking) or never(raid_event_adds_exists) and armshacshortcdpostconditions() or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecuteshortcdpostconditions() or armssingle_targetshortcdpostconditions()
 }
 
 AddFunction arms_defaultcdactions
@@ -361,8 +359,10 @@ AddFunction arms_defaultcdactions
  {
   #potion
   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
+  #blood_fury,if=debuff.colossus_smash.up
+  if target.debuffpresent(colossus_smash_debuff) spell(blood_fury_ap)
 
-  unless target.debuffpresent(colossus_smash_debuff) and spell(blood_fury_ap) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking)
+  unless target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking)
   {
    #arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
    if spellcooldown(mortal_strike) > 1.5 and rage() < 50 spell(arcane_torrent)
@@ -404,7 +404,7 @@ AddFunction arms_defaultcdactions
 
 AddFunction arms_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.debuffpresent(colossus_smash_debuff) and spell(blood_fury_ap) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking) or target.debuffexpires(colossus_smash_debuff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks) or enemies(tagged=1) > 1 and { spellcooldown(bladestorm_arms) > 15 or hastalent(ravager_talent) } and spell(sweeping_strikes) or never(raid_event_adds_exists) and armshaccdpostconditions() or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecutecdpostconditions() or armssingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.debuffremaining(colossus_smash_debuff) > 6 and spell(berserking) or target.debuffexpires(colossus_smash_debuff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks) or enemies(tagged=1) > 1 and { spellcooldown(bladestorm_arms) > 15 or hastalent(ravager_talent) } and spell(sweeping_strikes) or never(raid_event_adds_exists) and armshaccdpostconditions() or { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecutecdpostconditions() or armssingle_targetcdpostconditions()
 }
 
 ### Arms icons.
@@ -690,8 +690,6 @@ AddFunction fury_defaultmainactions
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
   if enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) spell(whirlwind_fury)
-  #blood_fury
-  spell(blood_fury_ap)
   #berserking,if=buff.recklessness.up
   if buffpresent(recklessness) spell(berserking)
   #run_action_list,name=single_target
@@ -724,7 +722,7 @@ AddFunction fury_defaultshortcdactions
     #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
     if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(meat_cleaver) } spell(recklessness)
 
-    unless { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or spell(blood_fury_ap) or buffpresent(recklessness) and spell(berserking)
+    unless { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking)
     {
      #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
      if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
@@ -738,7 +736,7 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or spell(blood_fury_ap) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
@@ -759,8 +757,10 @@ AddFunction fury_defaultcdactions
    {
     #use_item,name=dreadfire_vessel
     furyuseitemactions()
+    #blood_fury
+    spell(blood_fury_ap)
 
-    unless spell(blood_fury_ap) or buffpresent(recklessness) and spell(berserking)
+    unless buffpresent(recklessness) and spell(berserking)
     {
      #lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
      if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) spell(lights_judgment)
@@ -782,7 +782,7 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or spell(blood_fury_ap) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(meat_cleaver) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(meat_cleaver) or 600 < gcd() and not buffpresent(meat_cleaver) } and spell(whirlwind_fury) or buffpresent(recklessness) and spell(berserking) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
@@ -1057,8 +1057,6 @@ AddFunction protection_defaultmainactions
 {
  #charge,if=time=0
  if timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } spell(charge)
- #blood_fury
- spell(blood_fury_ap)
  #berserking
  spell(berserking)
  #ignore_pain,if=buff.ignore_pain.down
@@ -1083,7 +1081,7 @@ AddFunction protection_defaultshortcdactions
  #auto_attack
  protectiongetinmeleerange()
 
- unless timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(blood_fury_ap) or spell(berserking)
+ unless timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -1110,7 +1108,7 @@ AddFunction protection_defaultshortcdactions
 
 AddFunction protection_defaultshortcdpostconditions
 {
- timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(blood_fury_ap) or spell(berserking) or buffexpires(ignore_pain) and spell(ignore_pain) or enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions() or protectionstshortcdpostconditions()
+ timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(berserking) or buffexpires(ignore_pain) and spell(ignore_pain) or enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions() or protectionstshortcdpostconditions()
 }
 
 AddFunction protection_defaultcdactions
@@ -1121,8 +1119,10 @@ AddFunction protection_defaultcdactions
  {
   #use_items,if=cooldown.avatar.remains<=gcd|buff.avatar.up
   if spellcooldown(avatar) <= gcd() or buffpresent(avatar) protectionuseitemactions()
+  #blood_fury
+  spell(blood_fury_ap)
 
-  unless spell(blood_fury_ap) or spell(berserking)
+  unless spell(berserking)
   {
    #arcane_torrent
    spell(arcane_torrent)
@@ -1162,7 +1162,7 @@ AddFunction protection_defaultcdactions
 
 AddFunction protection_defaultcdpostconditions
 {
- timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(blood_fury_ap) or spell(berserking) or spell(bag_of_tricks) or buffexpires(ignore_pain) and spell(ignore_pain) or spell(ancient_aftershock) or spell(spear_of_bastion) or spell(avatar) or enemies(tagged=1) >= 3 and protectionaoecdpostconditions() or protectionstcdpostconditions()
+ timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(berserking) or spell(bag_of_tricks) or buffexpires(ignore_pain) and spell(ignore_pain) or spell(ancient_aftershock) or spell(spear_of_bastion) or spell(avatar) or enemies(tagged=1) >= 3 and protectionaoecdpostconditions() or protectionstcdpostconditions()
 }
 
 ### Protection icons.

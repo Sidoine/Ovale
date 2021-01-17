@@ -143,8 +143,6 @@ AddFunction afflictiondarkglare_prepmainactions
 {
  #vile_taint,if=cooldown.summon_darkglare.remains<2
  if spellcooldown(summon_darkglare) < 2 spell(vile_taint)
- #blood_fury
- spell(blood_fury_int)
  #berserking
  spell(berserking)
  #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
@@ -158,7 +156,7 @@ AddFunction afflictiondarkglare_prepmainpostconditions
 
 AddFunction afflictiondarkglare_prepshortcdactions
 {
- unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking)
+ unless spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking)
  {
   #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
   if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantshortcdactions()
@@ -167,7 +165,7 @@ AddFunction afflictiondarkglare_prepshortcdactions
 
 AddFunction afflictiondarkglare_prepshortcdpostconditions
 {
- spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantshortcdpostconditions()
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantshortcdpostconditions()
 }
 
 AddFunction afflictiondarkglare_prepcdactions
@@ -180,8 +178,10 @@ AddFunction afflictiondarkglare_prepcdactions
   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_intellect_item usable=1)
   #fireblood
   spell(fireblood)
+  #blood_fury
+  spell(blood_fury_int)
 
-  unless spell(blood_fury_int) or spell(berserking)
+  unless spell(berserking)
   {
    #call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
    if not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 afflictioncovenantcdactions()
@@ -197,7 +197,7 @@ AddFunction afflictiondarkglare_prepcdactions
 
 AddFunction afflictiondarkglare_prepcdpostconditions
 {
- spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(blood_fury_int) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
+ spellcooldown(summon_darkglare) < 2 and spell(vile_taint) or spell(berserking) or not iscovenant("necrolord") and spellcooldown(summon_darkglare) < 2 and afflictioncovenantcdpostconditions()
 }
 
 ### actions.covenant
@@ -1060,8 +1060,6 @@ AddFunction demonologyoff_gcdmainactions
 {
  #berserking,if=pet.demonic_tyrant.active
  if demonduration(demonic_tyrant) > 0 spell(berserking)
- #blood_fury,if=pet.demonic_tyrant.active
- if demonduration(demonic_tyrant) > 0 spell(blood_fury_int)
 }
 
 AddFunction demonologyoff_gcdmainpostconditions
@@ -1074,7 +1072,7 @@ AddFunction demonologyoff_gcdshortcdactions
 
 AddFunction demonologyoff_gcdshortcdpostconditions
 {
- demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
+ demonduration(demonic_tyrant) > 0 and spell(berserking)
 }
 
 AddFunction demonologyoff_gcdcdactions
@@ -1083,18 +1081,16 @@ AddFunction demonologyoff_gcdcdactions
  {
   #potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
   if { buffpresent(berserking_buff) or demonduration(demonic_tyrant) > 0 and not race(troll) } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
-
-  unless demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
-  {
-   #fireblood,if=pet.demonic_tyrant.active
-   if demonduration(demonic_tyrant) > 0 spell(fireblood)
-  }
+  #blood_fury,if=pet.demonic_tyrant.active
+  if demonduration(demonic_tyrant) > 0 spell(blood_fury_int)
+  #fireblood,if=pet.demonic_tyrant.active
+  if demonduration(demonic_tyrant) > 0 spell(fireblood)
  }
 }
 
 AddFunction demonologyoff_gcdcdpostconditions
 {
- demonduration(demonic_tyrant) > 0 and spell(berserking) or demonduration(demonic_tyrant) > 0 and spell(blood_fury_int)
+ demonduration(demonic_tyrant) > 0 and spell(berserking)
 }
 
 ### actions.covenant
@@ -1555,8 +1551,6 @@ AddFunction destructioncdsmainactions
 {
  #berserking,if=pet.infernal.active
  if demonduration(infernal) > 0 spell(berserking)
- #blood_fury,if=pet.infernal.active
- if demonduration(infernal) > 0 spell(blood_fury_int)
 }
 
 AddFunction destructioncdsmainpostconditions
@@ -1569,7 +1563,7 @@ AddFunction destructioncdsshortcdactions
 
 AddFunction destructioncdsshortcdpostconditions
 {
- demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
+ demonduration(infernal) > 0 and spell(berserking)
 }
 
 AddFunction destructioncdscdactions
@@ -1581,8 +1575,10 @@ AddFunction destructioncdscdactions
  #potion,if=pet.infernal.active
  if demonduration(infernal) > 0 and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
 
- unless demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
+ unless demonduration(infernal) > 0 and spell(berserking)
  {
+  #blood_fury,if=pet.infernal.active
+  if demonduration(infernal) > 0 spell(blood_fury_int)
   #fireblood,if=pet.infernal.active
   if demonduration(infernal) > 0 spell(fireblood)
   #use_items,if=pet.infernal.active|target.time_to_die<20
@@ -1592,7 +1588,7 @@ AddFunction destructioncdscdactions
 
 AddFunction destructioncdscdpostconditions
 {
- demonduration(infernal) > 0 and spell(berserking) or demonduration(infernal) > 0 and spell(blood_fury_int)
+ demonduration(infernal) > 0 and spell(berserking)
 }
 
 ### actions.aoe

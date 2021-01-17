@@ -86,8 +86,6 @@ AddFunction brewmasterprecombatcdpostconditions
 
 AddFunction brewmaster_defaultmainactions
 {
- #blood_fury
- spell(blood_fury_ap_int)
  #berserking
  spell(berserking)
  #weapons_of_order
@@ -133,7 +131,7 @@ AddFunction brewmaster_defaultshortcdactions
  #auto_attack
  brewmastergetinmeleerange()
 
- unless spell(blood_fury_ap_int) or spell(berserking)
+ unless spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -172,7 +170,7 @@ AddFunction brewmaster_defaultshortcdactions
 
 AddFunction brewmaster_defaultshortcdpostconditions
 {
- spell(blood_fury_ap_int) or spell(berserking) or spell(weapons_of_order) or spell(purifying_brew) or enemies(tagged=1) >= 2 and spell(keg_smash) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ spell(berserking) or spell(weapons_of_order) or spell(purifying_brew) or enemies(tagged=1) >= 2 and spell(keg_smash) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 AddFunction brewmaster_defaultcdactions
@@ -188,8 +186,10 @@ AddFunction brewmaster_defaultcdactions
  brewmasteruseitemactions()
  #potion
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(phantom_fire usable=1)
+ #blood_fury
+ spell(blood_fury_ap_int)
 
- unless spell(blood_fury_ap_int) or spell(berserking)
+ unless spell(berserking)
  {
   #lights_judgment
   spell(lights_judgment)
@@ -236,7 +236,7 @@ AddFunction brewmaster_defaultcdactions
 
 AddFunction brewmaster_defaultcdpostconditions
 {
- spell(blood_fury_ap_int) or spell(berserking) or spell(bag_of_tricks) or spell(weapons_of_order) or spell(bonedust_brew) or spell(purifying_brew) or enemies(tagged=1) >= 2 and spell(keg_smash) or enemies(tagged=1) >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
+ spell(berserking) or spell(bag_of_tricks) or spell(weapons_of_order) or spell(bonedust_brew) or spell(purifying_brew) or enemies(tagged=1) >= 2 and spell(keg_smash) or enemies(tagged=1) >= 2 and spell(faeline_stomp) or buffpresent(weapons_of_order_buff) and spell(keg_smash) or buffexpires(blackout_combo_buff) and incomingdamage(1.999) > maxhealth() * 0.1 + staggertick() and buffstacks(elusive_brawler) < 2 and spell(celestial_brew) or hastalent(rushing_jade_wind_talent) and buffpresent(blackout_combo_buff) and buffpresent(rushing_jade_wind) and spell(tiger_palm) or buffexpires(charred_passions_buff) and equippedruneforge(charred_passions_runeforge) and spell(breath_of_fire) or spell(blackout_kick_brewmaster) or spell(keg_smash) or spell(faeline_stomp) or buffstacks(gift_of_the_ox) >= 3 and spell(expel_harm) or buffexpires(rushing_jade_wind) and spell(rushing_jade_wind) or buffpresent(charred_passions_buff) and spell(spinning_crane_kick_brewmaster) or buffexpires(blackout_combo_buff) and { buffexpires(bloodlust) or buffpresent(bloodlust) and target.debuffrefreshable(breath_of_fire_debuff) } and spell(breath_of_fire) or checkboxon(opt_chi_burst) and spell(chi_burst) or spell(chi_wave) or enemies() >= 3 and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + executetime(spinning_crane_kick_brewmaster) } >= 65 and { not hastalent(spitfire_talent) or not equippedruneforge(charred_passions_runeforge) } and spell(spinning_crane_kick_brewmaster) or not hastalent(blackout_combo_talent) and spellcooldown(keg_smash) > gcd() and energy() + energyregenrate() * { spellcooldown(keg_smash) + gcd() } >= 65 and spell(tiger_palm) or spell(rushing_jade_wind)
 }
 
 ### Brewmaster icons.
@@ -715,8 +715,6 @@ AddFunction windwalkeropenercdpostconditions
 
 AddFunction windwalkercd_serenitymainactions
 {
- #blood_fury,if=variable.serenity_burst
- if serenity_burst() spell(blood_fury_ap_int)
  #berserking,if=variable.serenity_burst
  if serenity_burst() spell(berserking)
  #weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
@@ -729,7 +727,7 @@ AddFunction windwalkercd_serenitymainpostconditions
 
 AddFunction windwalkercd_serenityshortcdactions
 {
- unless serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking)
+ unless serenity_burst() and spell(berserking)
  {
   #bag_of_tricks,if=variable.serenity_burst
   if serenity_burst() spell(bag_of_tricks)
@@ -752,7 +750,7 @@ AddFunction windwalkercd_serenityshortcdactions
 
 AddFunction windwalkercd_serenityshortcdpostconditions
 {
- serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order)
+ serenity_burst() and spell(berserking) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order)
 }
 
 AddFunction windwalkercd_serenitycdactions
@@ -762,8 +760,10 @@ AddFunction windwalkercd_serenitycdactions
  if not hold_xuen() or fightremains() < 25 spell(invoke_xuen_the_white_tiger)
  #use_item,name=dreadfire_vessel
  windwalkeruseitemactions()
+ #blood_fury,if=variable.serenity_burst
+ if serenity_burst() spell(blood_fury_ap_int)
 
- unless serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking)
+ unless serenity_burst() and spell(berserking)
  {
   #arcane_torrent,if=chi.max-chi>=1
   if maxchi() - chi() >= 1 spell(arcane_torrent)
@@ -790,7 +790,7 @@ AddFunction windwalkercd_serenitycdactions
 
 AddFunction windwalkercd_serenitycdpostconditions
 {
- serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or { fightremains() > 90 or pet.present() or fightremains() < 10 } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or spell(faeline_stomp) or spell(bonedust_brew) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
+ serenity_burst() and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or { fightremains() > 90 or pet.present() or fightremains() < 10 } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or spell(faeline_stomp) or spell(bonedust_brew) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
 }
 
 ### actions.cd_sef
@@ -801,8 +801,6 @@ AddFunction windwalkercd_sefmainactions
  if { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) spell(weapons_of_order)
  #storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
  if conduit(coordinated_offensive_conduit) spell(storm_earth_and_fire_fixate)
- #blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
- if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(blood_fury_ap_int)
  #berserking,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<15
  if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 spell(berserking)
 }
@@ -829,7 +827,7 @@ AddFunction windwalkercd_sefshortcdactions
    #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
    if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
 
-   unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+   unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
    {
     #bag_of_tricks,if=buff.storm_earth_and_fire.down
     if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
@@ -840,7 +838,7 @@ AddFunction windwalkercd_sefshortcdactions
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+ { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -862,14 +860,20 @@ AddFunction windwalkercd_sefcdactions
    #use_item,name=dreadfire_vessel
    windwalkeruseitemactions()
 
-   unless { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+   unless { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma)
    {
-    #lights_judgment
-    spell(lights_judgment)
-    #fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<10
-    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 10 spell(fireblood)
-    #ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
-    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(ancestral_call)
+    #blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
+    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(blood_fury_ap_int)
+
+    unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+    {
+     #lights_judgment
+     spell(lights_judgment)
+     #fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<10
+     if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 10 spell(fireblood)
+     #ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
+     if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(ancestral_call)
+    }
    }
   }
  }
@@ -877,7 +881,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order_buff) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order_buff) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe
@@ -1584,8 +1588,6 @@ AddFunction windwalkeropenercdpostconditions
 
 AddFunction windwalkercd_serenitymainactions
 {
- #blood_fury,if=variable.serenity_burst
- if serenity_burst() spell(blood_fury_ap_int)
  #berserking,if=variable.serenity_burst
  if serenity_burst() spell(berserking)
  #weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
@@ -1598,7 +1600,7 @@ AddFunction windwalkercd_serenitymainpostconditions
 
 AddFunction windwalkercd_serenityshortcdactions
 {
- unless serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking)
+ unless serenity_burst() and spell(berserking)
  {
   #bag_of_tricks,if=variable.serenity_burst
   if serenity_burst() spell(bag_of_tricks)
@@ -1621,7 +1623,7 @@ AddFunction windwalkercd_serenityshortcdactions
 
 AddFunction windwalkercd_serenityshortcdpostconditions
 {
- serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order)
+ serenity_burst() and spell(berserking) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order)
 }
 
 AddFunction windwalkercd_serenitycdactions
@@ -1631,8 +1633,10 @@ AddFunction windwalkercd_serenitycdactions
  if not hold_xuen() or fightremains() < 25 spell(invoke_xuen_the_white_tiger)
  #use_item,name=dreadfire_vessel
  windwalkeruseitemactions()
+ #blood_fury,if=variable.serenity_burst
+ if serenity_burst() spell(blood_fury_ap_int)
 
- unless serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking)
+ unless serenity_burst() and spell(berserking)
  {
   #arcane_torrent,if=chi.max-chi>=1
   if maxchi() - chi() >= 1 spell(arcane_torrent)
@@ -1659,7 +1663,7 @@ AddFunction windwalkercd_serenitycdactions
 
 AddFunction windwalkercd_serenitycdpostconditions
 {
- serenity_burst() and spell(blood_fury_ap_int) or serenity_burst() and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or { fightremains() > 90 or pet.present() or fightremains() < 10 } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or spell(faeline_stomp) or spell(bonedust_brew) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
+ serenity_burst() and spell(berserking) or serenity_burst() and spell(bag_of_tricks) or { fightremains() > 90 or pet.present() or fightremains() < 10 } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or spell(faeline_stomp) or spell(bonedust_brew) or { spellcooldown(rising_sun_kick) < 2 or fightremains() < 15 } and spell(serenity) or spell(bag_of_tricks)
 }
 
 ### actions.cd_sef
@@ -1670,8 +1674,6 @@ AddFunction windwalkercd_sefmainactions
  if { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) spell(weapons_of_order)
  #storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
  if conduit(coordinated_offensive_conduit) spell(storm_earth_and_fire_fixate)
- #blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
- if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(blood_fury_ap_int)
  #berserking,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<15
  if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 spell(berserking)
 }
@@ -1698,7 +1700,7 @@ AddFunction windwalkercd_sefshortcdactions
    #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
    if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
 
-   unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+   unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
    {
     #bag_of_tricks,if=buff.storm_earth_and_fire.down
     if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
@@ -1709,7 +1711,7 @@ AddFunction windwalkercd_sefshortcdactions
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+ { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -1731,14 +1733,20 @@ AddFunction windwalkercd_sefcdactions
    #use_item,name=dreadfire_vessel
    windwalkeruseitemactions()
 
-   unless { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+   unless { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma)
    {
-    #lights_judgment
-    spell(lights_judgment)
-    #fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<10
-    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 10 spell(fireblood)
-    #ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
-    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(ancestral_call)
+    #blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
+    if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(blood_fury_ap_int)
+
+    unless { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking)
+    {
+     #lights_judgment
+     spell(lights_judgment)
+     #fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<10
+     if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 10 spell(fireblood)
+     #ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
+     if spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 spell(ancestral_call)
+    }
    }
   }
  }
@@ -1746,7 +1754,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order_buff) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 20 } and spell(blood_fury_ap_int) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ { 600 > 45 or never(raid_event_adds_exists) } and spellcooldown(rising_sun_kick) < executetime(weapons_of_order) and spell(weapons_of_order) or not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order_buff) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or { spellcooldown(invoke_xuen_the_white_tiger) > 30 or hold_xuen() or fightremains() < 15 } and spell(berserking) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe

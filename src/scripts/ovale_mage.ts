@@ -210,8 +210,6 @@ AddFunction arcaneshared_cdsmainactions
 {
  #berserking,if=buff.arcane_power.up
  if buffpresent(arcane_power) spell(berserking)
- #blood_fury,if=buff.arcane_power.up
- if buffpresent(arcane_power) spell(blood_fury_int)
 }
 
 AddFunction arcaneshared_cdsmainpostconditions
@@ -228,7 +226,7 @@ AddFunction arcaneshared_cdsshortcdactions
 
 AddFunction arcaneshared_cdsshortcdpostconditions
 {
- buffpresent(arcane_power) and spell(berserking) or buffpresent(arcane_power) and spell(blood_fury_int)
+ buffpresent(arcane_power) and spell(berserking)
 }
 
 AddFunction arcaneshared_cdscdactions
@@ -242,8 +240,10 @@ AddFunction arcaneshared_cdscdactions
   #lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
   if buffexpires(arcane_power) and buffexpires(rune_of_power_buff) and target.debuffexpires(touch_of_the_magi) spell(lights_judgment)
 
-  unless buffexpires(arcane_power) and buffexpires(rune_of_power_buff) and target.debuffexpires(touch_of_the_magi) and spell(bag_of_tricks) or buffpresent(arcane_power) and spell(berserking) or buffpresent(arcane_power) and spell(blood_fury_int)
+  unless buffexpires(arcane_power) and buffexpires(rune_of_power_buff) and target.debuffexpires(touch_of_the_magi) and spell(bag_of_tricks) or buffpresent(arcane_power) and spell(berserking)
   {
+   #blood_fury,if=buff.arcane_power.up
+   if buffpresent(arcane_power) spell(blood_fury_int)
    #fireblood,if=buff.arcane_power.up
    if buffpresent(arcane_power) spell(fireblood)
    #ancestral_call,if=buff.arcane_power.up
@@ -270,7 +270,7 @@ AddFunction arcaneshared_cdscdactions
 
 AddFunction arcaneshared_cdscdpostconditions
 {
- { hastalent(enlightened_talent) and manapercent() <= 80 and manapercent() >= 65 or not hastalent(enlightened_talent) and manapercent() <= 85 } and spell(replenish_mana) or buffexpires(arcane_power) and buffexpires(rune_of_power_buff) and target.debuffexpires(touch_of_the_magi) and spell(bag_of_tricks) or buffpresent(arcane_power) and spell(berserking) or buffpresent(arcane_power) and spell(blood_fury_int)
+ { hastalent(enlightened_talent) and manapercent() <= 80 and manapercent() >= 65 or not hastalent(enlightened_talent) and manapercent() <= 85 } and spell(replenish_mana) or buffexpires(arcane_power) and buffexpires(rune_of_power_buff) and target.debuffexpires(touch_of_the_magi) and spell(bag_of_tricks) or buffpresent(arcane_power) and spell(berserking)
 }
 
 ### actions.rotation
@@ -1663,8 +1663,6 @@ AddFunction firecombustion_phasecdpostconditions
 
 AddFunction firecombustion_cooldownsmainactions
 {
- #blood_fury
- spell(blood_fury_int)
  #berserking
  spell(berserking)
 }
@@ -1679,15 +1677,17 @@ AddFunction firecombustion_cooldownsshortcdactions
 
 AddFunction firecombustion_cooldownsshortcdpostconditions
 {
- spell(blood_fury_int) or spell(berserking)
+ spell(berserking)
 }
 
 AddFunction firecombustion_cooldownscdactions
 {
  #potion
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_intellect_item usable=1)
+ #blood_fury
+ spell(blood_fury_int)
 
- unless spell(blood_fury_int) or spell(berserking)
+ unless spell(berserking)
  {
   #fireblood
   spell(fireblood)
@@ -1704,7 +1704,7 @@ AddFunction firecombustion_cooldownscdactions
 
 AddFunction firecombustion_cooldownscdpostconditions
 {
- spell(blood_fury_int) or spell(berserking)
+ spell(berserking)
 }
 
 ### actions.active_talents
@@ -2203,8 +2203,6 @@ AddFunction frostmovementcdpostconditions
 
 AddFunction frostcdsmainactions
 {
- #blood_fury
- spell(blood_fury_int)
  #berserking
  spell(berserking)
 }
@@ -2220,7 +2218,7 @@ AddFunction frostcdsshortcdactions
  #rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
  if spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) spell(rune_of_power)
 
- unless spell(blood_fury_int) or spell(berserking)
+ unless spell(berserking)
  {
   #bag_of_tricks
   spell(bag_of_tricks)
@@ -2229,7 +2227,7 @@ AddFunction frostcdsshortcdactions
 
 AddFunction frostcdsshortcdpostconditions
 {
- spell(blood_fury_int) or spell(berserking)
+ spell(berserking)
 }
 
 AddFunction frostcdscdactions
@@ -2247,8 +2245,10 @@ AddFunction frostcdscdactions
   if runeforge(temporal_warp_runeforge) and buffpresent(exhaustion) and { previousoffgcdspell(icy_veins) or fightremains() < 30 } and { checkboxon(opt_time_warp) and debuffexpires(burst_haste_debuff any=1) } spell(time_warp)
   #use_items
   frostuseitemactions()
+  #blood_fury
+  spell(blood_fury_int)
 
-  unless spell(blood_fury_int) or spell(berserking)
+  unless spell(berserking)
   {
    #lights_judgment
    spell(lights_judgment)
@@ -2262,7 +2262,7 @@ AddFunction frostcdscdactions
 
 AddFunction frostcdscdpostconditions
 {
- enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } and spell(mirrors_of_torment) or spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) and spell(rune_of_power) or spell(blood_fury_int) or spell(berserking) or spell(bag_of_tricks)
+ enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } and spell(mirrors_of_torment) or spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) and spell(rune_of_power) or spell(berserking) or spell(bag_of_tricks)
 }
 
 ### actions.aoe
