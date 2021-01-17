@@ -95,7 +95,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
     OnWidthSet = (width: number) => {
         const content = this.content;
-        let contentwidth = width - 34;
+        let contentwidth = width;
         if (contentwidth < 0) {
             contentwidth = 0;
         }
@@ -104,20 +104,20 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
     OnHeightSet = (height: number) => {
         const content = this.content;
-        let contentheight = height - 57;
+        let contentheight = height;
         if (contentheight < 0) {
             contentheight = 0;
         }
         content.SetHeight(contentheight);
     };
 
-    OnLayoutFinished(width: number, height: number) {
-        if (!width) {
-            width = this.content.GetWidth();
-        }
-        this.content.SetWidth(width);
-        this.content.SetHeight(height + 50);
-    }
+    // OnLayoutFinished(width: number, height: number) {
+    //     if (!width) {
+    //         width = this.content.GetWidth();
+    //     }
+    //     this.content.SetWidth(width);
+    //     this.content.SetHeight(height + 50);
+    // }
 
     // TODO need to be moved elsewhere
     public GetScore(spellId: number) {
@@ -383,7 +383,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 }
                 icons.SetPoint(
                     "TOPLEFT",
-                    this.frame,
+                    this.updateFrame,
                     "TOPLEFT",
                     (action.left + ratio * action.dx) / action.scale,
                     (action.top + ratio * action.dy) / action.scale
@@ -394,7 +394,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         if (!profile.apparence.moving) {
             icons.SetPoint(
                 "TOPLEFT",
-                this.frame,
+                this.updateFrame,
                 "TOPLEFT",
                 action.left / action.scale,
                 action.top / action.scale -
@@ -406,9 +406,11 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
     UpdateFrame() {
         const profile = this.ovaleOptions.db.profile;
-        if (this.frame.IsVisible()) {
+        if (this.petFrame.IsVisible()) {
             this.frame.ClearAllPoints();
             this.frame.SetPoint(
+                "CENTER",
+                this.petFrame,
                 "CENTER",
                 profile.apparence.offsetX,
                 profile.apparence.offsetY
@@ -634,10 +636,8 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         this.frame.SetHeight(maxHeight + DRAG_HANDLER_HEIGHT + margin);
         this.content.SetPoint(
             "TOPLEFT",
-            this.frame,
-            "TOPLEFT",
             maxWidth + profile.apparence.iconShiftX,
-            profile.apparence.iconShiftY
+            profile.apparence.iconShiftY - DRAG_HANDLER_HEIGHT
         );
     }
 
@@ -676,7 +676,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         private actionBar: OvaleActionBarClass,
         private petFrame: UIFrame
     ) {
-        super(CreateFrame("Frame", undefined, petFrame));
+        super(CreateFrame("Frame", "OvaleIcons", petFrame));
 
         this.traceLog = LibTextDump.New(`Ovale - ${L.icon_snapshot}`, 750, 500);
 
@@ -693,8 +693,10 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         // this.hider = hider;
         this.updateFrame = CreateFrame(
             "Frame",
-            `${ovale.GetName()}UpdateFrame`
+            `${ovale.GetName()}UpdateFrame`,
+            this.frame
         );
+        this.updateFrame.SetAllPoints(this.frame);
         this.dragHandleTexture = this.frame.CreateTexture();
         if (Masque) {
             this.skinGroup = Masque.Group(ovale.GetName());
@@ -740,9 +742,18 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         this.dragHandleTexture.SetColorTexture(0.8, 0.8, 0.8, 0.5);
         this.dragHandleTexture.SetPoint("TOPLEFT", 0, 0);
         this.dragHandleTexture.Hide();
+        // const t = this.updateFrame.CreateTexture();
+        // t.SetColorTexture(0, 1, 0, 0.5);
+        // t.SetAllPoints(this.updateFrame);
+        // const u = this.frame.CreateTexture();
+        // u.SetColorTexture(0, 1, 0);
+        // u.SetAllPoints(this.frame);
         const content = this.content;
-        content.SetWidth(200);
-        content.SetHeight(100);
+        // const texture = content.CreateTexture();
+        // texture.SetColorTexture(1, 0, 0);
+        // texture.SetAllPoints(content);
+        // content.SetWidth(200);
+        // content.SetHeight(100);
         content.Hide();
     }
 

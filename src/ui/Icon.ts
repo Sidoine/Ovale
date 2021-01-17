@@ -28,7 +28,7 @@ const COOLDOWN_THRESHOLD = 0.1;
 export interface IconParent {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox>;
     listWidget: LuaObj<AceGUIWidgetDropDown>;
-    frame: UIFrame;
+    updateFrame: UIFrame;
     ToggleOptions(): void;
     debugIcon(index: number): void;
 }
@@ -80,7 +80,7 @@ export class OvaleIcon {
         this.frame = CreateFrame(
             "CheckButton",
             name,
-            parent.frame,
+            parent.updateFrame,
             (secure && "SecureActionButtonTemplate, ActionButtonTemplate") ||
                 "ActionButtonTemplate"
         );

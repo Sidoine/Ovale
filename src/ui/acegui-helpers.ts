@@ -46,8 +46,8 @@ export class WidgetContainer<
     constructor(frame: T) {
         super();
         const content = CreateFrame("Frame", undefined, frame);
-        content.SetScript("OnSizeChanged", this.handleFrameResize);
-        frame.SetScript("OnSizeChanged", this.handleContentResize);
+        content.SetScript("OnSizeChanged", this.handleContentResize);
+        frame.SetScript("OnSizeChanged", this.handleFrameResize);
         this.content = content;
         this.content.obj = this;
         this.frame = frame;
