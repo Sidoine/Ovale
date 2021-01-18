@@ -1329,9 +1329,6 @@ export class Emiter {
                 conditionCode = "SpellKnown(half_moon)";
             } else if (className == "DRUID" && action == "full_moon") {
                 conditionCode = "SpellKnown(full_moon)";
-            } else if (className == "HUNTER" && action == "kill_command") {
-                conditionCode =
-                    "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
             } else if (className == "MAGE" && action == "arcane_brilliance") {
                 conditionCode =
                     "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)";
