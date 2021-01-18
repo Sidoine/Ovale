@@ -1445,10 +1445,6 @@ export class Emiter {
                 bodyCode = `${camelSpecialization}Bloodlust()`;
                 annotation[action] = className;
                 isSpellAction = false;
-            } else if (className == "SHAMAN" && action == "magma_totem") {
-                const spellName = "primal_strike";
-                this.AddSymbol(annotation, spellName);
-                conditionCode = format("target.InRange(%s)", spellName);
             } else if (
                 className == "WARLOCK" &&
                 action == "felguard_felstorm"
