@@ -387,7 +387,10 @@ Define(corrupting_leer_conduit 174)
 Define(lead_by_example_soulbind 342156)
     `;
     // END
-
+    code += `
+#soul_strike
+    SpellRequire(soul_strike unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felguard")))
+    `;
     OvaleScripts.RegisterScript(
         "WARLOCK",
         undefined,
