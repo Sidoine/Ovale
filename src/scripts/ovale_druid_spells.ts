@@ -540,7 +540,7 @@ Define(thrash_bear 77758)
     SpellAddTargetDebuff(thrash_bear thrash_bear_debuff add=1)
 Define(thrash_bear_debuff 192090)
     SpellInfo(thrash_bear_debuff duration=15 max_stacks=3)
-    SpellRequire(pulverize unusable set=1 enabled=(not targetdebuffpresent(thrash_bear_debuff)))
+    SpellRequire(pulverize unusable set=1 enabled=(target.debuffstacks(thrash_bear_debuff) < 2))
     SpellAddTargetDebuff(pulverize thrash_bear_debuff add=-2)
 
 #snapshots

@@ -1316,14 +1316,6 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "primal_wrath") {
                 conditionCode = "Enemies(tagged=1) > 1";
-            } else if (className == "DRUID" && action == "pulverize") {
-                const debuffName = "thrash_bear_debuff";
-                this.AddSymbol(annotation, debuffName);
-                conditionCode = format(
-                    "target.DebuffGain(%s) <= BaseDuration(%s)",
-                    debuffName,
-                    debuffName
-                );
             } else if (
                 className == "DRUID" &&
                 specialization == "guardian" &&
