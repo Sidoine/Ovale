@@ -172,9 +172,11 @@ Define(eradicating_blow 337936)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
   SpellInfo(festering_strike runes=2 runicpower=-20)
-Define(festering_wound_unholy 197147)
-# Festering Strike applies a pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.rnrnStacks up to 194310u times on any target.
-  SpellInfo(festering_wound_unholy gcd=0 offgcd=1 unusable=1)
+Define(festering_wound_unholy 194310)
+# A pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
+  SpellInfo(festering_wound_unholy duration=30 max_stacks=6 gcd=0 offgcd=1)
+  # Suffering from a wound that will deal 194311s1/s1 Shadow damage when damaged by Scourge Strike.
+  SpellAddTargetDebuff(festering_wound_unholy festering_wound_unholy add=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
