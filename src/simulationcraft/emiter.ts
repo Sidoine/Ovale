@@ -1626,21 +1626,6 @@ export class Emiter {
             } else if (action === "sequence" || action == "strict_sequence") {
                 // TODO doesn't seem to be supported
                 isSpellAction = false;
-            } else if (action == "stance") {
-                if (modifiers.choose) {
-                    const name = this.unparser.Unparse(modifiers.choose);
-                    if (name) {
-                        if (className == "MONK") {
-                            action = `stance_of_the_${name}`;
-                        } else if (className == "WARRIOR") {
-                            action = `${name}_stance`;
-                        } else {
-                            action = name;
-                        }
-                    }
-                } else {
-                    isSpellAction = false;
-                }
             } else if (action == "summon_pet") {
                 bodyCode = `${camelSpecialization}SummonPet()`;
                 annotation[action] = className;
