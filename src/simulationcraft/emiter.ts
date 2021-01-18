@@ -1371,8 +1371,6 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "MONK" && action == "gift_of_the_ox") {
                 isSpellAction = false;
-            } else if (className == "MONK" && action == "nimble_brew") {
-                conditionCode = "IsFeared() or IsRooted() or IsStunned()";
             } else if (
                 className == "MONK" &&
                 action == "storm_earth_and_fire"
