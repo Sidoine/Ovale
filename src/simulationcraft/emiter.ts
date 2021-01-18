@@ -1329,16 +1329,6 @@ export class Emiter {
                 conditionCode = "SpellKnown(half_moon)";
             } else if (className == "DRUID" && action == "full_moon") {
                 conditionCode = "SpellKnown(full_moon)";
-            } else if (
-                className == "DRUID" &&
-                action == "regrowth" &&
-                specialization == "feral"
-            ) {
-                conditionCode =
-                    "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())";
-                this.AddSymbol(annotation, "bloodtalons_talent");
-                this.AddSymbol(annotation, "bloodtalons_buff");
-                this.AddSymbol(annotation, "regrowth");
             } else if (className == "HUNTER" && action == "kill_command") {
                 conditionCode =
                     "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
