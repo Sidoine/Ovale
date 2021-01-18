@@ -142,6 +142,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("corruption_debuff_affliction", 146739);
     fixIdentifier("condemn_fury", 317485);
     fixIdentifier("devastator_passive", 236279);
+    fixIdentifier("festering_wound_unholy", 194310);
 
     // Blood fury
     fixIdentifier("blood_fury_ap_int", 33697);
