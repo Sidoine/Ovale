@@ -1316,14 +1316,6 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "primal_wrath") {
                 conditionCode = "Enemies(tagged=1) > 1";
-            } else if (
-                className == "DRUID" &&
-                specialization == "guardian" &&
-                action == "rejuvenation"
-            ) {
-                const spellName = "enhanced_rejuvenation";
-                this.AddSymbol(annotation, spellName);
-                conditionCode = format("SpellKnown(%s)", spellName);
             } else if (className == "DRUID" && action == "wild_charge") {
                 bodyCode = `${camelSpecialization}GetInMeleeRange()`;
                 annotation[action] = className;
