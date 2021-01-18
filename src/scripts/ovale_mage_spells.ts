@@ -504,5 +504,9 @@ Define(grove_invigoration_soulbind 322721)
 Define(wasteland_propriety_soulbind 319983)
     `;
     // END
+    code += `
+#summon_water_elemental
+    SpellRequire(summon_water_elemental unusable set=1 enabled=(pet.present()))
+`;
     OvaleScripts.RegisterScript("MAGE", undefined, name, desc, code, "include");
 }

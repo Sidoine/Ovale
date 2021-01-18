@@ -1357,11 +1357,6 @@ export class Emiter {
                 conditionCode =
                     "CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1)";
                 annotation[action] = className;
-            } else if (
-                className == "MAGE" &&
-                action == "summon_water_elemental"
-            ) {
-                conditionCode = "not pet.Present()";
             } else if (className == "MAGE" && action == "ice_floes") {
                 conditionCode = "Speed() > 0";
             } else if (className == "MAGE" && action == "blast_wave") {
