@@ -1422,8 +1422,6 @@ export class Emiter {
                 conditionCode = format("BuffRemaining(%s) < 1200", buffName);
             } else if (className == "ROGUE" && action == "cancel_autoattack") {
                 isSpellAction = false;
-            } else if (className == "ROGUE" && action == "premeditation") {
-                conditionCode = "ComboPoints() < 5";
             } else if (
                 className == "ROGUE" &&
                 specialization == "assassination" &&
