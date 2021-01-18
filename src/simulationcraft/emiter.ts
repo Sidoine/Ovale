@@ -1485,12 +1485,6 @@ export class Emiter {
             ) {
                 conditionCode =
                     "pet.Present() and pet.CreatureFamily(Wrathguard)";
-            } else if (
-                className == "WARRIOR" &&
-                action == "battle_shout" &&
-                role == "tank"
-            ) {
-                conditionCode = "BuffExpires(stamina_buff)";
             } else if (className == "WARRIOR" && action == "charge") {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)";
