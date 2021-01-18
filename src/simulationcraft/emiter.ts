@@ -1271,7 +1271,6 @@ export class Emiter {
         const className = annotation.classId;
         const specialization = annotation.specialization;
         const camelSpecialization = LowerSpecialization(annotation);
-        const role = annotation.role;
         let [action, type] = this.Disambiguate(
             annotation,
             canonicalizedName,
@@ -1489,12 +1488,6 @@ export class Emiter {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)";
                 this.AddSymbol(annotation, "pummel");
-            } else if (
-                className == "WARRIOR" &&
-                action == "commanding_shout" &&
-                role == "attack"
-            ) {
-                conditionCode = "BuffExpires(attack_power_multiplier_buff)";
             } else if (
                 className == "WARRIOR" &&
                 action == "enraged_regeneration"
