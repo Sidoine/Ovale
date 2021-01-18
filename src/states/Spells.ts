@@ -152,9 +152,12 @@ export class OvaleSpellsClass implements StateModule {
     ): [boolean, boolean] {
         this.profiler.StartProfiling("OvaleSpellBook_state_IsUsableSpell");
         let [isUsable, noMana] = [false, false];
-        let isKnown = this.OvaleSpellBook.IsKnownSpell(spellId);
+        const isKnown = this.OvaleSpellBook.IsKnownSpell(spellId);
         const si = this.ovaleData.spellInfo[spellId];
-        if (si && isKnown) {
+        if (!isKnown) {
+            this.tracer.Log("Spell ID '%s' is not known.", spellId);
+            [isUsable, noMana] = [false, false];
+        } else if (si !== undefined) {
             const unusable = this.ovaleData.GetSpellInfoProperty(
                 spellId,
                 atTime,
@@ -189,20 +192,7 @@ export class OvaleSpellsClass implements StateModule {
                 }
             }
         } else {
-            const [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(
-                spellId
-            );
-            if (index && bookType) {
-                [isUsable, noMana] = IsUsableSpell(index, bookType);
-            } else if (isKnown) {
-                const name = this.OvaleSpellBook.GetSpellName(spellId);
-                if (name) {
-                    [isUsable, noMana] = IsUsableSpell(name);
-                }
-            } else {
-                this.tracer.Log("Spell ID '%s' is not known.", spellId);
-                [isUsable, noMana] = [false, false];
-            }
+            [isUsable, noMana] = IsUsableSpell(spellId);
         }
         this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
