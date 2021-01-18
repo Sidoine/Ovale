@@ -1490,11 +1490,6 @@ export class Emiter {
                 this.AddSymbol(annotation, "pummel");
             } else if (
                 className == "WARRIOR" &&
-                action == "enraged_regeneration"
-            ) {
-                conditionCode = "HealthPercent() < 80";
-            } else if (
-                className == "WARRIOR" &&
                 sub(action, 1, 7) == "execute"
             ) {
                 if (modifiers.target) {
