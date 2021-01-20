@@ -270,7 +270,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                         start = element.timeSpan.NextTime(atTime);
                     }
                     if (profile.apparence.enableIcons) {
-                        this.UpdateActionIcon(icon, element, start || 0);
+                        this.updateActionIcon(icon, element, start || 0);
                     }
                     if (profile.apparence.spellFlash.enabled) {
                         this.ovaleSpellFlash.Flash(
@@ -294,7 +294,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
     }
 
-    UpdateActionIcon(
+    private updateActionIcon(
         action: Action,
         element: AstNodeSnapshot,
         start: number,
@@ -383,7 +383,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 }
                 icons.SetPoint(
                     "TOPLEFT",
-                    this.updateFrame,
+                    this.iconsFrame,
                     "TOPLEFT",
                     (action.left + ratio * action.dx) / action.scale,
                     (action.top + ratio * action.dy) / action.scale
@@ -394,7 +394,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         if (!profile.apparence.moving) {
             icons.SetPoint(
                 "TOPLEFT",
-                this.updateFrame,
+                this.iconsFrame,
                 "TOPLEFT",
                 action.left / action.scale,
                 action.top / action.scale -
@@ -646,8 +646,11 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     localstatus = {};
     actions: LuaArray<Action> = {};
 
-    /** Only used to know the update interval */
+    iconsFrame: UIFrame;
+
+    /** Only used to know the update interval, must be visible */
     updateFrame: UIFrame;
+
     timeSinceLastUpdate: number;
 
     /** Used to drag the frame */
@@ -693,10 +696,12 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         // this.hider = hider;
         this.updateFrame = CreateFrame(
             "Frame",
-            `${ovale.GetName()}UpdateFrame`,
-            this.frame
+            `${ovale.GetName()}UpdateFrame`
         );
         this.updateFrame.SetAllPoints(this.frame);
+        this.updateFrame.Show();
+        this.iconsFrame = CreateFrame("Frame", undefined, this.frame);
+        this.iconsFrame.SetAllPoints(this.frame);
         this.dragHandleTexture = this.frame.CreateTexture();
         if (Masque) {
             this.skinGroup = Masque.Group(ovale.GetName());

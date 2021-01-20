@@ -376,9 +376,9 @@ Define(lead_by_example_soulbind 342156)
     // END
     code += `
 #grimoire_of_sacrifice
-    SpellRequire(grimoire_of_sacrifice unusable set=1 enabled=(not pet.present()))
+  SpellRequire(grimoire_of_sacrifice unusable set=1 enabled=(not pet.present()))
 #soul_strike
-    SpellRequire(soul_strike unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felguard")))
+  SpellRequire(soul_strike unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felguard")))
     `;
     OvaleScripts.RegisterScript(
         "WARLOCK",
