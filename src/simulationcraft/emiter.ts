@@ -1343,7 +1343,6 @@ export class Emiter {
         const className = annotation.classId;
         const specialization = annotation.specialization;
         const camelSpecialization = LowerSpecialization(annotation);
-        const role = annotation.role;
         let [action, type] = this.Disambiguate(
             annotation,
             canonicalizedName,
@@ -1388,22 +1387,6 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "primal_wrath") {
                 conditionCode = "Enemies(tagged=1) > 1";
-            } else if (className == "DRUID" && action == "pulverize") {
-                const debuffName = "thrash_bear_debuff";
-                this.AddSymbol(annotation, debuffName);
-                conditionCode = format(
-                    "target.DebuffGain(%s) <= BaseDuration(%s)",
-                    debuffName,
-                    debuffName
-                );
-            } else if (
-                className == "DRUID" &&
-                specialization == "guardian" &&
-                action == "rejuvenation"
-            ) {
-                const spellName = "enhanced_rejuvenation";
-                this.AddSymbol(annotation, spellName);
-                conditionCode = format("SpellKnown(%s)", spellName);
             } else if (className == "DRUID" && action == "wild_charge") {
                 bodyCode = `${camelSpecialization}GetInMeleeRange()`;
                 annotation[action] = className;
@@ -1417,22 +1400,6 @@ export class Emiter {
                 conditionCode = "SpellKnown(half_moon)";
             } else if (className == "DRUID" && action == "full_moon") {
                 conditionCode = "SpellKnown(full_moon)";
-            } else if (
-                className == "DRUID" &&
-                action == "regrowth" &&
-                specialization == "feral"
-            ) {
-                conditionCode =
-                    "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())";
-                this.AddSymbol(annotation, "bloodtalons_talent");
-                this.AddSymbol(annotation, "bloodtalons_buff");
-                this.AddSymbol(annotation, "regrowth");
-            } else if (className == "HUNTER" && action == "kill_command") {
-                conditionCode =
-                    "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
-            } else if (className == "MAGE" && action == "arcane_brilliance") {
-                conditionCode =
-                    "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)";
             } else if (className == "MAGE" && truthy(find(action, "pet_"))) {
                 conditionCode = "pet.Present()";
             } else if (
@@ -1461,11 +1428,6 @@ export class Emiter {
                 conditionCode =
                     "CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1)";
                 annotation[action] = className;
-            } else if (
-                className == "MAGE" &&
-                action == "summon_water_elemental"
-            ) {
-                conditionCode = "not pet.Present()";
             } else if (className == "MAGE" && action == "ice_floes") {
                 conditionCode = "Speed() > 0";
             } else if (className == "MAGE" && action == "blast_wave") {
@@ -1480,8 +1442,6 @@ export class Emiter {
                 isSpellAction = false;
             } else if (className == "MONK" && action == "gift_of_the_ox") {
                 isSpellAction = false;
-            } else if (className == "MONK" && action == "nimble_brew") {
-                conditionCode = "IsFeared() or IsRooted() or IsStunned()";
             } else if (
                 className == "MONK" &&
                 action == "storm_earth_and_fire"
@@ -1499,12 +1459,6 @@ export class Emiter {
                 //     annotation,
                 //     "hidden_masters_forbidden_touch_buff"
                 // );
-            } else if (
-                className == "MONK" &&
-                action == "whirling_dragon_punch"
-            ) {
-                conditionCode =
-                    "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0";
             } else if (
                 className == "PALADIN" &&
                 action == "blessing_of_kings"
@@ -1539,8 +1493,6 @@ export class Emiter {
                 conditionCode = format("BuffRemaining(%s) < 1200", buffName);
             } else if (className == "ROGUE" && action == "cancel_autoattack") {
                 isSpellAction = false;
-            } else if (className == "ROGUE" && action == "premeditation") {
-                conditionCode = "ComboPoints() < 5";
             } else if (
                 className == "ROGUE" &&
                 specialization == "assassination" &&
@@ -1566,10 +1518,6 @@ export class Emiter {
                 bodyCode = `${camelSpecialization}Bloodlust()`;
                 annotation[action] = className;
                 isSpellAction = false;
-            } else if (className == "SHAMAN" && action == "magma_totem") {
-                const spellName = "primal_strike";
-                this.AddSymbol(annotation, spellName);
-                conditionCode = format("target.InRange(%s)", spellName);
             } else if (
                 className == "WARLOCK" &&
                 action == "felguard_felstorm"
@@ -1610,27 +1558,10 @@ export class Emiter {
             ) {
                 conditionCode =
                     "pet.Present() and pet.CreatureFamily(Wrathguard)";
-            } else if (
-                className == "WARRIOR" &&
-                action == "battle_shout" &&
-                role == "tank"
-            ) {
-                conditionCode = "BuffExpires(stamina_buff)";
             } else if (className == "WARRIOR" && action == "charge") {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)";
                 this.AddSymbol(annotation, "pummel");
-            } else if (
-                className == "WARRIOR" &&
-                action == "commanding_shout" &&
-                role == "attack"
-            ) {
-                conditionCode = "BuffExpires(attack_power_multiplier_buff)";
-            } else if (
-                className == "WARRIOR" &&
-                action == "enraged_regeneration"
-            ) {
-                conditionCode = "HealthPercent() < 80";
             } else if (
                 className == "WARRIOR" &&
                 sub(action, 1, 7) == "execute"
@@ -1643,8 +1574,6 @@ export class Emiter {
                         isSpellAction = false;
                     }
                 }
-            } else if (className == "WARRIOR" && action == "heroic_charge") {
-                isSpellAction = false;
             } else if (className == "WARRIOR" && action == "heroic_leap") {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.Distance() >= 8 and target.Distance() <= 40";
@@ -1772,21 +1701,6 @@ export class Emiter {
             } else if (action === "sequence" || action == "strict_sequence") {
                 // TODO doesn't seem to be supported
                 isSpellAction = false;
-            } else if (action == "stance") {
-                if (modifiers.choose) {
-                    const name = this.unparser.Unparse(modifiers.choose);
-                    if (name) {
-                        if (className == "MONK") {
-                            action = `stance_of_the_${name}`;
-                        } else if (className == "WARRIOR") {
-                            action = `${name}_stance`;
-                        } else {
-                            action = name;
-                        }
-                    }
-                } else {
-                    isSpellAction = false;
-                }
             } else if (action == "summon_pet") {
                 bodyCode = `${camelSpecialization}SummonPet()`;
                 annotation[action] = className;

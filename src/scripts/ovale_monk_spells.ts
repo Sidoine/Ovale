@@ -303,6 +303,8 @@ Define(healing_elixir 122281)
 #touch_of_death
     SpellInfo(touch_of_death unusable=1)
     SpellRequire(touch_of_death unusable set=0 enabled=(target.Health() < player.Health() or (Level() >= 44 and target.HealthPercent() < 15)))
+#whirling_dragon_punch
+    SpellRequire(whirling_dragon_punch unusable set=1 enabled=(not spellcooldown(fists_of_fury) > 0 or not spellcooldown(rising_sun_kick) > 0))
 
 ## Stagger
 Define(stagger 115069)
