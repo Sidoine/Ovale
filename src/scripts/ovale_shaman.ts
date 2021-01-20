@@ -42,7 +42,7 @@ AddFunction elementaluseitemactions
 AddFunction elementalsingle_targetmainactions
 {
  #flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4)&(buff.lava_surge.up|!buff.bloodlust.up)
- if { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } spell(flame_shock)
+ if { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } spell(flame_shock)
  #elemental_blast,if=talent.elemental_blast.enabled&(talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up&maelstrom<60|!buff.master_of_the_elements.up)|!talent.master_of_the_elements.enabled)
  if hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } spell(elemental_blast)
  #lava_burst,if=talent.echoing_shock.enabled&buff.echoing_shock.up
@@ -60,7 +60,7 @@ AddFunction elementalsingle_targetmainactions
  #frost_shock,if=talent.icefury.enabled&talent.master_of_the_elements.enabled&buff.icefury.up&buff.master_of_the_elements.up
  if hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) spell(frost_shock)
  #lava_burst,if=buff.ascendance.up
- if buffpresent(ascendance_buff) spell(lava_burst)
+ if buffpresent(ascendance) spell(lava_burst)
  #lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
  if not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) spell(lava_burst)
  #lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
@@ -93,7 +93,7 @@ AddFunction elementalsingle_targetmainpostconditions
 
 AddFunction elementalsingle_targetshortcdactions
 {
- unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast)
+ unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast)
  {
   #stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(maelstrom<44)
   if hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 spell(stormkeeper)
@@ -105,7 +105,7 @@ AddFunction elementalsingle_targetshortcdactions
    #liquid_magma_totem,if=talent.liquid_magma_totem.enabled
    if hastalent(liquid_magma_totem_talent) spell(liquid_magma_totem)
 
-   unless buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
+   unless buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
    {
     #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
     if hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } spell(icefury)
@@ -124,17 +124,17 @@ AddFunction elementalsingle_targetshortcdactions
 
 AddFunction elementalsingle_targetshortcdpostconditions
 {
- { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalsingle_targetcdactions
 {
- unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock)
+ unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock)
  {
   #ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&(cooldown.lava_burst.remains>0)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
   if hastalent(ascendance_talent) and { timeincombat() >= 60 or buffpresent(bloodlust) } and spellcooldown(lava_burst) > 0 and { not hastalent(icefury_talent) or not buffpresent(icefury) and not { not spellcooldown(icefury) > 0 } } spell(ascendance)
 
-  unless hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
+  unless hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
   {
    #earth_elemental,if=!talent.primal_elementalist.enabled|!pet.fire_elemental.active
    if not hastalent(primal_elementalist_talent) or not pet.present() spell(earth_elemental)
@@ -144,7 +144,7 @@ AddFunction elementalsingle_targetcdactions
 
 AddFunction elementalsingle_targetcdpostconditions
 {
- { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.se_single_target
@@ -152,11 +152,11 @@ AddFunction elementalsingle_targetcdpostconditions
 AddFunction elementalse_single_targetmainactions
 {
  #flame_shock,target_if=(remains<=gcd)&(buff.lava_surge.up|!buff.bloodlust.up)
- if target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } spell(flame_shock)
+ if target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } spell(flame_shock)
  #elemental_blast,if=talent.elemental_blast.enabled
  if hastalent(elemental_blast_talent_elemental) spell(elemental_blast)
  #lava_burst,if=buff.wind_gust.stack<18|buff.lava_surge.up
- if buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) spell(lava_burst)
+ if buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) spell(lava_burst)
  #lightning_bolt,if=buff.stormkeeper.up
  if buffpresent(stormkeeper) spell(lightning_bolt)
  #earthquake,if=buff.echoes_of_great_sundering.up
@@ -170,7 +170,7 @@ AddFunction elementalse_single_targetmainactions
  #frost_shock,if=talent.icefury.enabled&talent.master_of_the_elements.enabled&buff.icefury.up&buff.master_of_the_elements.up
  if hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) spell(frost_shock)
  #lava_burst,if=buff.ascendance.up
- if buffpresent(ascendance_buff) spell(lava_burst)
+ if buffpresent(ascendance) spell(lava_burst)
  #lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
  if not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) spell(lava_burst)
  #lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
@@ -193,14 +193,14 @@ AddFunction elementalse_single_targetmainpostconditions
 
 AddFunction elementalse_single_targetshortcdactions
 {
- unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast)
+ unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast)
  {
   #stormkeeper,if=talent.stormkeeper.enabled&(maelstrom<44)
   if hastalent(stormkeeper_talent) and maelstrom() < 44 spell(stormkeeper)
   #echoing_shock,if=talent.echoing_shock.enabled
   if hastalent(echoing_shock_talent) spell(echoing_shock)
 
-  unless { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
+  unless { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
   {
    #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
    if hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } spell(icefury)
@@ -218,12 +218,12 @@ AddFunction elementalse_single_targetshortcdactions
 
 AddFunction elementalse_single_targetshortcdpostconditions
 {
- target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalse_single_targetcdactions
 {
- unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
+ unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
  {
   #earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(!pet.storm_elemental.active)
   if not hastalent(primal_elementalist_talent) or hastalent(primal_elementalist_talent) and not pet.present() spell(earth_elemental)
@@ -232,7 +232,7 @@ AddFunction elementalse_single_targetcdactions
 
 AddFunction elementalse_single_targetcdpostconditions
 {
- target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.precombat
@@ -294,13 +294,13 @@ AddFunction elementalaoemainactions
  #earth_shock,if=runeforge.echoes_of_great_sundering.equipped&!buff.echoes_of_great_sundering.up
  if equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) spell(earth_shock)
  #lava_burst,target_if=dot.flame_shock.remains,if=spell_targets.chain_lightning<4|buff.lava_surge.up|(talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=60)
- if target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } spell(lava_burst)
+ if target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } spell(lava_burst)
  #earthquake,if=!talent.master_of_the_elements.enabled|buff.stormkeeper.up|maelstrom>=(100-4*spell_targets.chain_lightning)|buff.master_of_the_elements.up|spell_targets.chain_lightning>3
  if not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 spell(earthquake)
  #chain_lightning,if=buff.stormkeeper.remains<3*gcd*buff.stormkeeper.stack
  if buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) spell(chain_lightning)
  #lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!pet.storm_elemental.active)&dot.flame_shock.ticking
- if buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) spell(lava_burst)
+ if buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) spell(lava_burst)
  #elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<5&(!pet.storm_elemental.active)
  if hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() spell(elemental_blast)
  #lava_beam,if=talent.ascendance.enabled
@@ -308,7 +308,7 @@ AddFunction elementalaoemainactions
  #chain_lightning
  spell(chain_lightning)
  #lava_burst,moving=1,if=buff.lava_surge.up&cooldown_react
- if speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } spell(lava_burst)
+ if speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } spell(lava_burst)
  #flame_shock,moving=1,target_if=refreshable
  if speed() > 0 and target.refreshable(flame_shock) spell(flame_shock)
  #frost_shock,moving=1
@@ -340,7 +340,7 @@ AddFunction elementalaoeshortcdactions
 
 AddFunction elementalaoeshortcdpostconditions
 {
- buffpresent(echoing_shock) and spell(earthquake) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ buffpresent(echoing_shock) and spell(earthquake) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalaoecdactions
@@ -360,7 +360,7 @@ AddFunction elementalaoecdactions
 
 AddFunction elementalaoecdpostconditions
 {
- buffpresent(echoing_shock) and spell(earthquake) or spell(chain_harvest) or hastalent(stormkeeper_talent) and spell(stormkeeper) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or hastalent(echoing_shock_talent) and maelstrom() >= 60 and spell(echoing_shock) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ buffpresent(echoing_shock) and spell(earthquake) or spell(chain_harvest) or hastalent(stormkeeper_talent) and spell(stormkeeper) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or hastalent(echoing_shock_talent) and maelstrom() >= 60 and spell(echoing_shock) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.default
@@ -369,8 +369,6 @@ AddFunction elemental_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
- #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) spell(berserking)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoemainactions()
 
@@ -394,10 +392,10 @@ AddFunction elemental_defaultmainpostconditions
 
 AddFunction elemental_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
-  if not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) spell(bag_of_tricks)
+  if not hastalent(ascendance_talent) or not buffpresent(ascendance) spell(bag_of_tricks)
   #primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
   if not buffpresent(primordial_wave_buff) spell(primordial_wave)
   #vesper_totem,if=covenant.kyrian
@@ -421,7 +419,7 @@ AddFunction elemental_defaultshortcdactions
 
 AddFunction elemental_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
 }
 
 AddFunction elemental_defaultcdactions
@@ -442,32 +440,30 @@ AddFunction elemental_defaultcdactions
   #storm_elemental
   spell(storm_elemental)
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury_ap_int)
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(blood_fury_ap_int)
+  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) spell(berserking)
+  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(fireblood)
+  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(ancestral_call)
 
-  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+  unless { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem)
   {
-   #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(fireblood)
-   #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(ancestral_call)
+   #fae_transfusion,if=covenant.night_fae
+   if iscovenant("night_fae") spell(fae_transfusion)
+   #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+   if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoecdactions()
 
-   unless { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem)
+   unless enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions()
    {
-    #fae_transfusion,if=covenant.night_fae
-    if iscovenant("night_fae") spell(fae_transfusion)
-    #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-    if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoecdactions()
+    #run_action_list,name=single_target,if=!talent.storm_elemental.enabled&active_enemies<=2
+    if not hastalent(storm_elemental_talent) and enemies() <= 2 elementalsingle_targetcdactions()
 
-    unless enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions()
+    unless not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions()
     {
-     #run_action_list,name=single_target,if=!talent.storm_elemental.enabled&active_enemies<=2
-     if not hastalent(storm_elemental_talent) and enemies() <= 2 elementalsingle_targetcdactions()
-
-     unless not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions()
-     {
-      #run_action_list,name=se_single_target,if=talent.storm_elemental.enabled&active_enemies<=2
-      if hastalent(storm_elemental_talent) and enemies() <= 2 elementalse_single_targetcdactions()
-     }
+     #run_action_list,name=se_single_target,if=talent.storm_elemental.enabled&active_enemies<=2
+     if hastalent(storm_elemental_talent) and enemies() <= 2 elementalse_single_targetcdactions()
     }
    }
   }
@@ -476,7 +472,7 @@ AddFunction elemental_defaultcdactions
 
 AddFunction elemental_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
 }
 
 ### Elemental icons.
@@ -522,7 +518,6 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
 ### Required symbols
 # ancestral_call
 # ascendance
-# ascendance_buff
 # ascendance_talent
 # bag_of_tricks
 # berserking
@@ -554,7 +549,7 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
 # icefury_talent
 # lava_beam
 # lava_burst
-# lava_surge
+# lava_surge_buff
 # lightning_bolt
 # liquid_magma_totem
 # liquid_magma_totem_talent
@@ -626,7 +621,7 @@ AddFunction elementaluseitemactions
 AddFunction elementalsingle_targetmainactions
 {
  #flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4)&(buff.lava_surge.up|!buff.bloodlust.up)
- if { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } spell(flame_shock)
+ if { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } spell(flame_shock)
  #elemental_blast,if=talent.elemental_blast.enabled&(talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up&maelstrom<60|!buff.master_of_the_elements.up)|!talent.master_of_the_elements.enabled)
  if hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } spell(elemental_blast)
  #lava_burst,if=talent.echoing_shock.enabled&buff.echoing_shock.up
@@ -644,7 +639,7 @@ AddFunction elementalsingle_targetmainactions
  #frost_shock,if=talent.icefury.enabled&talent.master_of_the_elements.enabled&buff.icefury.up&buff.master_of_the_elements.up
  if hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) spell(frost_shock)
  #lava_burst,if=buff.ascendance.up
- if buffpresent(ascendance_buff) spell(lava_burst)
+ if buffpresent(ascendance) spell(lava_burst)
  #lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
  if not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) spell(lava_burst)
  #lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
@@ -677,7 +672,7 @@ AddFunction elementalsingle_targetmainpostconditions
 
 AddFunction elementalsingle_targetshortcdactions
 {
- unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast)
+ unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast)
  {
   #stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(maelstrom<44)
   if hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 spell(stormkeeper)
@@ -689,7 +684,7 @@ AddFunction elementalsingle_targetshortcdactions
    #liquid_magma_totem,if=talent.liquid_magma_totem.enabled
    if hastalent(liquid_magma_totem_talent) spell(liquid_magma_totem)
 
-   unless buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
+   unless buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
    {
     #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
     if hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } spell(icefury)
@@ -708,17 +703,17 @@ AddFunction elementalsingle_targetshortcdactions
 
 AddFunction elementalsingle_targetshortcdpostconditions
 {
- { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalsingle_targetcdactions
 {
- unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock)
+ unless { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock)
  {
   #ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&(cooldown.lava_burst.remains>0)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
   if hastalent(ascendance_talent) and { timeincombat() >= 60 or buffpresent(bloodlust) } and spellcooldown(lava_burst) > 0 and { not hastalent(icefury_talent) or not buffpresent(icefury) and not { not spellcooldown(icefury) > 0 } } spell(ascendance)
 
-  unless hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
+  unless hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
   {
    #earth_elemental,if=!talent.primal_elementalist.enabled|!pet.fire_elemental.active
    if not hastalent(primal_elementalist_talent) or not pet.present() spell(earth_elemental)
@@ -728,7 +723,7 @@ AddFunction elementalsingle_targetcdactions
 
 AddFunction elementalsingle_targetcdpostconditions
 {
- { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance_buff) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ { not target.debuffpresent(flame_shock) or target.debuffremaining(flame_shock) <= gcd() or hastalent(ascendance_talent) and target.debuffremaining(flame_shock) < spellcooldown(ascendance) + baseduration(ascendance) and spellcooldown(ascendance) < 4 } and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) and maelstrom() < 60 or not buffpresent(master_of_the_elements_buff) } or not hastalent(master_of_the_elements_talent) } and spell(elemental_blast) or hastalent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spellcooldown(lava_burst) <= 0 and spell(echoing_shock) or hastalent(echoing_shock_talent) and buffpresent(echoing_shock) and spell(lava_burst) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or buffpresent(stormkeeper) and enemies(tagged=1) < 2 and buffpresent(master_of_the_elements_buff) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) } and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and not equippedruneforge(echoes_of_great_sundering_runeforge) and { not hastalent(master_of_the_elements_talent) or buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 } and spell(earthquake) or { hastalent(master_of_the_elements_talent) and { buffpresent(master_of_the_elements_buff) or spellcooldown(lava_burst) > 0 and maelstrom() >= 92 or enemies(tagged=1) < 2 and buffpresent(stormkeeper) and spellcooldown(lava_burst) <= gcd() } or not hastalent(master_of_the_elements_talent) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and buffremaining(icefury) < 1.1 * gcd() * buffstacks(icefury) and spell(frost_shock) or not spellcooldown(lava_burst) > 0 and spell(lava_burst) or target.refreshable(flame_shock) and spell(flame_shock) or { enemies(tagged=1) > 1 and not equippedruneforge(echoes_of_great_sundering_runeforge) or buffpresent(echoes_of_great_sundering_buff) } and spell(earthquake) or hastalent(icefury_talent) and buffpresent(icefury) and { buffremaining(icefury) < gcd() * 4 * buffstacks(icefury) or buffpresent(stormkeeper) or not hastalent(master_of_the_elements_talent) } and spell(frost_shock) or equippedruneforge(elemental_equilibrium_runeforge) and not buffpresent(elemental_equilibrium_buff) and not hastalent(elemental_blast_talent_elemental) and not hastalent(echoing_shock_talent) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.se_single_target
@@ -736,11 +731,11 @@ AddFunction elementalsingle_targetcdpostconditions
 AddFunction elementalse_single_targetmainactions
 {
  #flame_shock,target_if=(remains<=gcd)&(buff.lava_surge.up|!buff.bloodlust.up)
- if target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } spell(flame_shock)
+ if target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } spell(flame_shock)
  #elemental_blast,if=talent.elemental_blast.enabled
  if hastalent(elemental_blast_talent_elemental) spell(elemental_blast)
  #lava_burst,if=buff.wind_gust.stack<18|buff.lava_surge.up
- if buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) spell(lava_burst)
+ if buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) spell(lava_burst)
  #lightning_bolt,if=buff.stormkeeper.up
  if buffpresent(stormkeeper) spell(lightning_bolt)
  #earthquake,if=buff.echoes_of_great_sundering.up
@@ -754,7 +749,7 @@ AddFunction elementalse_single_targetmainactions
  #frost_shock,if=talent.icefury.enabled&talent.master_of_the_elements.enabled&buff.icefury.up&buff.master_of_the_elements.up
  if hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) spell(frost_shock)
  #lava_burst,if=buff.ascendance.up
- if buffpresent(ascendance_buff) spell(lava_burst)
+ if buffpresent(ascendance) spell(lava_burst)
  #lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
  if not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) spell(lava_burst)
  #lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
@@ -777,14 +772,14 @@ AddFunction elementalse_single_targetmainpostconditions
 
 AddFunction elementalse_single_targetshortcdactions
 {
- unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast)
+ unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast)
  {
   #stormkeeper,if=talent.stormkeeper.enabled&(maelstrom<44)
   if hastalent(stormkeeper_talent) and maelstrom() < 44 spell(stormkeeper)
   #echoing_shock,if=talent.echoing_shock.enabled
   if hastalent(echoing_shock_talent) spell(echoing_shock)
 
-  unless { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
+  unless { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst)
   {
    #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
    if hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } spell(icefury)
@@ -802,12 +797,12 @@ AddFunction elementalse_single_targetshortcdactions
 
 AddFunction elementalse_single_targetshortcdpostconditions
 {
- target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalse_single_targetcdactions
 {
- unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
+ unless target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge)
  {
   #earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(!pet.storm_elemental.active)
   if not hastalent(primal_elementalist_talent) or hastalent(primal_elementalist_talent) and not pet.present() spell(earth_elemental)
@@ -816,7 +811,7 @@ AddFunction elementalse_single_targetcdactions
 
 AddFunction elementalse_single_targetcdpostconditions
 {
- target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance_buff) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ target.debuffremaining(flame_shock) <= gcd() and { buffpresent(lava_surge_buff) or not buffpresent(bloodlust) } and spell(flame_shock) or hastalent(elemental_blast_talent_elemental) and spell(elemental_blast) or hastalent(stormkeeper_talent) and maelstrom() < 44 and spell(stormkeeper) or hastalent(echoing_shock_talent) and spell(echoing_shock) or { buffstacks(wind_gust_buff) < 18 or buffpresent(lava_surge_buff) } and spell(lava_burst) or buffpresent(stormkeeper) and spell(lightning_bolt) or buffpresent(echoes_of_great_sundering_buff) and spell(earthquake) or enemies(tagged=1) > 1 and not target.debuffrefreshable(flame_shock) and spell(earthquake) or { enemies(tagged=1) < 2 and maelstrom() >= 60 and { buffstacks(wind_gust_buff) < 20 or maelstrom() > 90 } or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) } and spell(earth_shock) or { buffremaining(stormkeeper) < 1.1 * gcd() * buffstacks(stormkeeper) or buffpresent(stormkeeper) and buffpresent(master_of_the_elements_buff) } and spell(lightning_bolt) or hastalent(icefury_talent) and hastalent(master_of_the_elements_talent) and buffpresent(icefury) and buffpresent(master_of_the_elements_buff) and spell(frost_shock) or buffpresent(ascendance) and spell(lava_burst) or not spellcooldown(lava_burst) > 0 and not hastalent(master_of_the_elements_talent) and spell(lava_burst) or hastalent(icefury_talent) and not { maelstrom() > 75 and spellcooldown(lava_burst) <= 0 } and spell(icefury) or not spellcooldown(lava_burst) > 0 and charges(lava_burst) > talentpoints(echo_of_the_elements_talent_elemental) and spell(lava_burst) or hastalent(icefury_talent) and buffpresent(icefury) and spell(frost_shock) or spell(chain_harvest) or hastalent(static_discharge_talent) and spell(static_discharge) or spell(lightning_bolt) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and target.distance() > 6 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.precombat
@@ -878,13 +873,13 @@ AddFunction elementalaoemainactions
  #earth_shock,if=runeforge.echoes_of_great_sundering.equipped&!buff.echoes_of_great_sundering.up
  if equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) spell(earth_shock)
  #lava_burst,target_if=dot.flame_shock.remains,if=spell_targets.chain_lightning<4|buff.lava_surge.up|(talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=60)
- if target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } spell(lava_burst)
+ if target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } spell(lava_burst)
  #earthquake,if=!talent.master_of_the_elements.enabled|buff.stormkeeper.up|maelstrom>=(100-4*spell_targets.chain_lightning)|buff.master_of_the_elements.up|spell_targets.chain_lightning>3
  if not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 spell(earthquake)
  #chain_lightning,if=buff.stormkeeper.remains<3*gcd*buff.stormkeeper.stack
  if buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) spell(chain_lightning)
  #lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!pet.storm_elemental.active)&dot.flame_shock.ticking
- if buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) spell(lava_burst)
+ if buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) spell(lava_burst)
  #elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<5&(!pet.storm_elemental.active)
  if hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() spell(elemental_blast)
  #lava_beam,if=talent.ascendance.enabled
@@ -892,7 +887,7 @@ AddFunction elementalaoemainactions
  #chain_lightning
  spell(chain_lightning)
  #lava_burst,moving=1,if=buff.lava_surge.up&cooldown_react
- if speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } spell(lava_burst)
+ if speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } spell(lava_burst)
  #flame_shock,moving=1,target_if=refreshable
  if speed() > 0 and target.refreshable(flame_shock) spell(flame_shock)
  #frost_shock,moving=1
@@ -924,7 +919,7 @@ AddFunction elementalaoeshortcdactions
 
 AddFunction elementalaoeshortcdpostconditions
 {
- buffpresent(echoing_shock) and spell(earthquake) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ buffpresent(echoing_shock) and spell(earthquake) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction elementalaoecdactions
@@ -944,7 +939,7 @@ AddFunction elementalaoecdactions
 
 AddFunction elementalaoecdpostconditions
 {
- buffpresent(echoing_shock) and spell(earthquake) or spell(chain_harvest) or hastalent(stormkeeper_talent) and spell(stormkeeper) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or hastalent(echoing_shock_talent) and maelstrom() >= 60 and spell(echoing_shock) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ buffpresent(echoing_shock) and spell(earthquake) or spell(chain_harvest) or hastalent(stormkeeper_talent) and spell(stormkeeper) or { debuffcountonany(flame_shock) < 3 and enemies() <= 5 or equippedruneforge(skybreakers_fiery_demise_runeforge) } and target.refreshable(flame_shock) and spell(flame_shock) or not debuffcountonany(flame_shock) and spell(flame_shock) or hastalent(echoing_shock_talent) and maelstrom() >= 60 and spell(echoing_shock) or hastalent(liquid_magma_totem_talent) and spell(liquid_magma_totem) or equippedruneforge(echoes_of_great_sundering_runeforge) and not buffpresent(echoes_of_great_sundering_buff) and spell(earth_shock) or target.debuffremaining(flame_shock) and { enemies(tagged=1) < 4 or buffpresent(lava_surge_buff) or hastalent(master_of_the_elements_talent) and not buffpresent(master_of_the_elements_buff) and maelstrom() >= 60 } and spell(lava_burst) or { not hastalent(master_of_the_elements_talent) or buffpresent(stormkeeper) or maelstrom() >= 100 - 4 * enemies(tagged=1) or buffpresent(master_of_the_elements_buff) or enemies(tagged=1) > 3 } and spell(earthquake) or buffremaining(stormkeeper) < 3 * gcd() * buffstacks(stormkeeper) and spell(chain_lightning) or buffpresent(lava_surge_buff) and enemies(tagged=1) < 4 and not pet.present() and target.debuffpresent(flame_shock) and spell(lava_burst) or hastalent(elemental_blast_talent_elemental) and enemies(tagged=1) < 5 and not pet.present() and spell(elemental_blast) or hastalent(ascendance_talent) and spell(lava_beam) or spell(chain_lightning) or speed() > 0 and { buffpresent(lava_surge_buff) and not spellcooldown(lava_burst) > 0 } and spell(lava_burst) or speed() > 0 and target.refreshable(flame_shock) and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### actions.default
@@ -953,8 +948,6 @@ AddFunction elemental_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
- #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) spell(berserking)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoemainactions()
 
@@ -978,10 +971,10 @@ AddFunction elemental_defaultmainpostconditions
 
 AddFunction elemental_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
-  if not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) spell(bag_of_tricks)
+  if not hastalent(ascendance_talent) or not buffpresent(ascendance) spell(bag_of_tricks)
   #primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
   if not buffpresent(primordial_wave_buff) spell(primordial_wave)
   #vesper_totem,if=covenant.kyrian
@@ -1005,7 +998,7 @@ AddFunction elemental_defaultshortcdactions
 
 AddFunction elemental_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoeshortcdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetshortcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetshortcdpostconditions()
 }
 
 AddFunction elemental_defaultcdactions
@@ -1026,32 +1019,30 @@ AddFunction elemental_defaultcdactions
   #storm_elemental
   spell(storm_elemental)
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(blood_fury_ap_int)
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(blood_fury_ap_int)
+  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) spell(berserking)
+  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(fireblood)
+  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent) or buffpresent(ascendance) or spellcooldown(ascendance) > 50 spell(ancestral_call)
 
-  unless { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking)
+  unless { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem)
   {
-   #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(fireblood)
-   #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent) or buffpresent(ascendance_buff) or spellcooldown(ascendance) > 50 spell(ancestral_call)
+   #fae_transfusion,if=covenant.night_fae
+   if iscovenant("night_fae") spell(fae_transfusion)
+   #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+   if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoecdactions()
 
-   unless { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem)
+   unless enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions()
    {
-    #fae_transfusion,if=covenant.night_fae
-    if iscovenant("night_fae") spell(fae_transfusion)
-    #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-    if enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } elementalaoecdactions()
+    #run_action_list,name=single_target,if=!talent.storm_elemental.enabled&active_enemies<=2
+    if not hastalent(storm_elemental_talent) and enemies() <= 2 elementalsingle_targetcdactions()
 
-    unless enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions()
+    unless not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions()
     {
-     #run_action_list,name=single_target,if=!talent.storm_elemental.enabled&active_enemies<=2
-     if not hastalent(storm_elemental_talent) and enemies() <= 2 elementalsingle_targetcdactions()
-
-     unless not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions()
-     {
-      #run_action_list,name=se_single_target,if=talent.storm_elemental.enabled&active_enemies<=2
-      if hastalent(storm_elemental_talent) and enemies() <= 2 elementalse_single_targetcdactions()
-     }
+     #run_action_list,name=se_single_target,if=talent.storm_elemental.enabled&active_enemies<=2
+     if hastalent(storm_elemental_talent) and enemies() <= 2 elementalse_single_targetcdactions()
     }
    }
   }
@@ -1060,7 +1051,7 @@ AddFunction elemental_defaultcdactions
 
 AddFunction elemental_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or buffpresent(ascendance_buff) } and spell(berserking) or { not hastalent(ascendance_talent) or not buffpresent(ascendance_buff) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent) or not buffpresent(ascendance) } and spell(bag_of_tricks) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or iscovenant("kyrian") and spell(vesper_totem) or enemies() > 2 and { enemies(tagged=1) > 2 or enemies(tagged=1) > 2 } and elementalaoecdpostconditions() or not hastalent(storm_elemental_talent) and enemies() <= 2 and elementalsingle_targetcdpostconditions() or hastalent(storm_elemental_talent) and enemies() <= 2 and elementalse_single_targetcdpostconditions()
 }
 
 ### Elemental icons.
@@ -1106,7 +1097,6 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
 ### Required symbols
 # ancestral_call
 # ascendance
-# ascendance_buff
 # ascendance_talent
 # bag_of_tricks
 # berserking
@@ -1138,7 +1128,7 @@ AddIcon enabled=(checkboxon(opt_shaman_elemental_aoe) and specialization(element
 # icefury_talent
 # lava_beam
 # lava_burst
-# lava_surge
+# lava_surge_buff
 # lightning_bolt
 # liquid_magma_totem
 # liquid_magma_totem_talent
@@ -1233,15 +1223,15 @@ AddFunction enhancementsinglemainactions
  #windstrike
  spell(windstrike)
  #stormstrike,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(stormstrike)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(stormstrike)
  #crash_lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(crash_lightning)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(crash_lightning)
  #ice_strike,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(ice_strike)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(ice_strike)
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
  #frost_shock,if=buff.hailstorm.up
- if buffpresent(hailstorm) spell(frost_shock)
+ if buffpresent(hailstorm_buff) spell(frost_shock)
  #earthen_spike
  spell(earthen_spike)
  #lightning_bolt,if=buff.stormkeeper.up
@@ -1283,12 +1273,12 @@ AddFunction enhancementsingleshortcdactions
   #primordial_wave,if=!buff.primordial_wave.up
   if not buffpresent(primordial_wave_buff) spell(primordial_wave)
 
-  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock)
+  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock)
   {
    #vesper_totem
    spell(vesper_totem)
 
-   unless buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
+   unless buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
    {
     #chain_harvest,if=buff.maelstrom_weapon.stack>=5
     if buffstacks(maelstrom_weapon_buff) >= 5 spell(chain_harvest)
@@ -1311,12 +1301,12 @@ AddFunction enhancementsingleshortcdactions
 
 AddFunction enhancementsingleshortcdpostconditions
 {
- spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 AddFunction enhancementsinglecdactions
 {
- unless spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike)
+ unless spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike)
  {
   #fae_transfusion
   spell(fae_transfusion)
@@ -1331,7 +1321,7 @@ AddFunction enhancementsinglecdactions
 
 AddFunction enhancementsinglecdpostconditions
 {
- spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.precombat
@@ -1390,9 +1380,9 @@ AddFunction enhancementaoemainactions
  #windstrike,if=buff.crash_lightning.up
  if buffpresent(crash_lightning) spell(windstrike)
  #crash_lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(crash_lightning)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(crash_lightning)
  #frost_shock,if=buff.hailstorm.up
- if buffpresent(hailstorm) spell(frost_shock)
+ if buffpresent(hailstorm_buff) spell(frost_shock)
  #flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled|talent.lashing_flames.enabled|covenant.necrolord
  if target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } spell(flame_shock)
  #fire_nova,if=active_dot.flame_shock>=3
@@ -1447,7 +1437,7 @@ AddFunction enhancementaoemainpostconditions
 
 AddFunction enhancementaoeshortcdactions
 {
- unless buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock)
+ unless buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock)
  {
   #sundering
   spell(sundering)
@@ -1480,7 +1470,7 @@ AddFunction enhancementaoeshortcdactions
 
 AddFunction enhancementaoeshortcdpostconditions
 {
- buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 AddFunction enhancementaoecdactions
@@ -1490,7 +1480,7 @@ AddFunction enhancementaoecdactions
   #fae_transfusion,if=soulbind.grove_invigoration|soulbind.field_of_blossoms
   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) spell(fae_transfusion)
 
-  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock)
+  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock)
   {
    #fae_transfusion
    spell(fae_transfusion)
@@ -1506,7 +1496,7 @@ AddFunction enhancementaoecdactions
 
 AddFunction enhancementaoecdpostconditions
 {
- buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.default
@@ -1515,8 +1505,6 @@ AddFunction enhancement_defaultmainactions
 {
  #heart_essence
  spell(296208)
- #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
  if equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } spell(windfury_totem)
  #call_action_list,name=single,if=active_enemies=1
@@ -1539,7 +1527,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+ unless spell(296208)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -1560,7 +1548,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -1578,33 +1566,31 @@ AddFunction enhancement_defaultcdactions
   enhancementuseitemactions()
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury_ap_int)
+  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
+  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
+  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(ancestral_call)
 
-  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks)
   {
-   #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
-   #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(ancestral_call)
+   #feral_spirit
+   spell(feral_spirit)
+   #fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
+   if { hastalent(ascendance_talent_enhancement) or equippedruneforge(doom_winds_runeforge) } and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() == 1 } spell(fae_transfusion)
+   #ascendance,if=raid_event.adds.in>=90|active_enemies>1
+   if { 600 >= 90 or enemies() > 1 } and buffexpires(ascendance_enhancement) spell(ascendance_enhancement)
 
-   unless { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks)
+   unless equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem)
    {
-    #feral_spirit
-    spell(feral_spirit)
-    #fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
-    if { hastalent(ascendance_talent_enhancement) or equippedruneforge(doom_winds_runeforge) } and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() == 1 } spell(fae_transfusion)
-    #ascendance,if=raid_event.adds.in>=90|active_enemies>1
-    if { 600 >= 90 or enemies() > 1 } and buffexpires(ascendance_enhancement) spell(ascendance_enhancement)
+    #call_action_list,name=single,if=active_enemies=1
+    if enemies() == 1 enhancementsinglecdactions()
 
-    unless equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem)
+    unless enemies() == 1 and enhancementsinglecdpostconditions()
     {
-     #call_action_list,name=single,if=active_enemies=1
-     if enemies() == 1 enhancementsinglecdactions()
-
-     unless enemies() == 1 and enhancementsinglecdpostconditions()
-     {
-      #call_action_list,name=aoe,if=active_enemies>1
-      if enemies() > 1 enhancementaoecdactions()
-     }
+     #call_action_list,name=aoe,if=active_enemies>1
+     if enemies() > 1 enhancementaoecdactions()
     }
    }
   }
@@ -1613,7 +1599,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.
@@ -1670,6 +1656,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
 # crash_lightning
 # crashing_storm_talent
 # doom_winds
+# doom_winds_buff
 # doom_winds_runeforge
 # earth_elemental
 # earthen_spike
@@ -1685,7 +1672,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
 # flametongue_weapon
 # frost_shock
 # grove_invigoration_soulbind
-# hailstorm
+# hailstorm_buff
 # heroism
 # hex
 # hot_hand_buff
@@ -1783,15 +1770,15 @@ AddFunction enhancementsinglemainactions
  #windstrike
  spell(windstrike)
  #stormstrike,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(stormstrike)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(stormstrike)
  #crash_lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(crash_lightning)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(crash_lightning)
  #ice_strike,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(ice_strike)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(ice_strike)
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
  #frost_shock,if=buff.hailstorm.up
- if buffpresent(hailstorm) spell(frost_shock)
+ if buffpresent(hailstorm_buff) spell(frost_shock)
  #earthen_spike
  spell(earthen_spike)
  #lightning_bolt,if=buff.stormkeeper.up
@@ -1833,12 +1820,12 @@ AddFunction enhancementsingleshortcdactions
   #primordial_wave,if=!buff.primordial_wave.up
   if not buffpresent(primordial_wave_buff) spell(primordial_wave)
 
-  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock)
+  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock)
   {
    #vesper_totem
    spell(vesper_totem)
 
-   unless buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
+   unless buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
    {
     #chain_harvest,if=buff.maelstrom_weapon.stack>=5
     if buffstacks(maelstrom_weapon_buff) >= 5 spell(chain_harvest)
@@ -1861,12 +1848,12 @@ AddFunction enhancementsingleshortcdactions
 
 AddFunction enhancementsingleshortcdpostconditions
 {
- spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 AddFunction enhancementsinglecdactions
 {
- unless spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike)
+ unless spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike)
  {
   #fae_transfusion
   spell(fae_transfusion)
@@ -1881,7 +1868,7 @@ AddFunction enhancementsinglecdactions
 
 AddFunction enhancementsinglecdpostconditions
 {
- spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.precombat
@@ -1940,9 +1927,9 @@ AddFunction enhancementaoemainactions
  #windstrike,if=buff.crash_lightning.up
  if buffpresent(crash_lightning) spell(windstrike)
  #crash_lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up
- if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) spell(crash_lightning)
+ if equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) spell(crash_lightning)
  #frost_shock,if=buff.hailstorm.up
- if buffpresent(hailstorm) spell(frost_shock)
+ if buffpresent(hailstorm_buff) spell(frost_shock)
  #flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled|talent.lashing_flames.enabled|covenant.necrolord
  if target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } spell(flame_shock)
  #fire_nova,if=active_dot.flame_shock>=3
@@ -1997,7 +1984,7 @@ AddFunction enhancementaoemainpostconditions
 
 AddFunction enhancementaoeshortcdactions
 {
- unless buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock)
+ unless buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock)
  {
   #sundering
   spell(sundering)
@@ -2030,7 +2017,7 @@ AddFunction enhancementaoeshortcdactions
 
 AddFunction enhancementaoeshortcdpostconditions
 {
- buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 AddFunction enhancementaoecdactions
@@ -2040,7 +2027,7 @@ AddFunction enhancementaoecdactions
   #fae_transfusion,if=soulbind.grove_invigoration|soulbind.field_of_blossoms
   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) spell(fae_transfusion)
 
-  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock)
+  unless equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock)
   {
    #fae_transfusion
    spell(fae_transfusion)
@@ -2056,7 +2043,7 @@ AddFunction enhancementaoecdactions
 
 AddFunction enhancementaoecdpostconditions
 {
- buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds) and spell(crash_lightning) or buffpresent(hailstorm) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ buffpresent(crash_lightning) and spell(windstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(sundering) or target.refreshable(flame_shock) and { hastalent(fire_nova_talent) or hastalent(lashing_flames_talent) or iscovenant("necrolord") } and spell(flame_shock) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or debuffcountonany(flame_shock) >= 3 and spell(fire_nova) or spell(vesper_totem) or buffpresent(primordial_wave_buff) and { buffpresent(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) >= 5 } and spell(lightning_bolt) or { hastalent(crashing_storm_talent) or buffexpires(crash_lightning) } and spell(crash_lightning) or hastalent(lashing_flames_talent) and spell(lava_lash) or buffpresent(crash_lightning) and spell(stormstrike) or spell(crash_lightning) or buffpresent(stormkeeper_enhancement) and spell(chain_lightning) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or buffstacks(maelstrom_weapon_buff) == 10 and spell(chain_lightning) or target.refreshable(flame_shock) and hastalent(fire_nova_talent) and spell(flame_shock) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 and spell(lava_lash) or buffstacks(maelstrom_weapon_buff) >= 5 and enemies() >= 3 and spell(chain_lightning) or spell(windstrike) or spell(stormstrike) or spell(lava_lash) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_lightning) or debuffcountonany(flame_shock) > 1 and spell(fire_nova) or spell(earthen_spike) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.default
@@ -2065,8 +2052,6 @@ AddFunction enhancement_defaultmainactions
 {
  #heart_essence
  spell(296208)
- #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
  if equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } spell(windfury_totem)
  #call_action_list,name=single,if=active_enemies=1
@@ -2089,7 +2074,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+ unless spell(296208)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -2110,7 +2095,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -2128,33 +2113,31 @@ AddFunction enhancement_defaultcdactions
   enhancementuseitemactions()
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(blood_fury_ap_int)
+  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) spell(berserking)
+  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
+  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(ancestral_call)
 
-  unless { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks)
   {
-   #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(fireblood)
-   #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) or spellcooldown(ascendance_enhancement) > 50 spell(ancestral_call)
+   #feral_spirit
+   spell(feral_spirit)
+   #fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
+   if { hastalent(ascendance_talent_enhancement) or equippedruneforge(doom_winds_runeforge) } and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() == 1 } spell(fae_transfusion)
+   #ascendance,if=raid_event.adds.in>=90|active_enemies>1
+   if { 600 >= 90 or enemies() > 1 } and buffexpires(ascendance_enhancement) spell(ascendance_enhancement)
 
-   unless { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks)
+   unless equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem)
    {
-    #feral_spirit
-    spell(feral_spirit)
-    #fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
-    if { hastalent(ascendance_talent_enhancement) or equippedruneforge(doom_winds_runeforge) } and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() == 1 } spell(fae_transfusion)
-    #ascendance,if=raid_event.adds.in>=90|active_enemies>1
-    if { 600 >= 90 or enemies() > 1 } and buffexpires(ascendance_enhancement) spell(ascendance_enhancement)
+    #call_action_list,name=single,if=active_enemies=1
+    if enemies() == 1 enhancementsinglecdactions()
 
-    unless equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem)
+    unless enemies() == 1 and enhancementsinglecdpostconditions()
     {
-     #call_action_list,name=single,if=active_enemies=1
-     if enemies() == 1 enhancementsinglecdactions()
-
-     unless enemies() == 1 and enhancementsinglecdpostconditions()
-     {
-      #call_action_list,name=aoe,if=active_enemies>1
-      if enemies() > 1 enhancementaoecdactions()
-     }
+     #call_action_list,name=aoe,if=active_enemies>1
+     if enemies() > 1 enhancementaoecdactions()
     }
    }
   }
@@ -2163,7 +2146,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or buffpresent(ascendance_enhancement) } and spell(berserking) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.
@@ -2220,6 +2203,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
 # crash_lightning
 # crashing_storm_talent
 # doom_winds
+# doom_winds_buff
 # doom_winds_runeforge
 # earth_elemental
 # earthen_spike
@@ -2235,7 +2219,7 @@ AddIcon enabled=(checkboxon(opt_shaman_enhancement_aoe) and specialization(enhan
 # flametongue_weapon
 # frost_shock
 # grove_invigoration_soulbind
-# hailstorm
+# hailstorm_buff
 # heroism
 # hex
 # hot_hand_buff
@@ -2345,8 +2329,6 @@ AddFunction restoration_defaultmainactions
 {
  #flame_shock,if=!ticking
  if not target.debuffpresent(flame_shock) spell(flame_shock)
- #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
- if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) spell(berserking)
  #lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
  if target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 spell(lava_burst)
  #lightning_bolt,if=spell_targets.chain_lightning<3
@@ -2365,7 +2347,7 @@ AddFunction restoration_defaultmainpostconditions
 
 AddFunction restoration_defaultshortcdactions
 {
- unless not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
+ unless not target.debuffpresent(flame_shock) and spell(flame_shock)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) spell(bag_of_tricks)
@@ -2384,7 +2366,7 @@ AddFunction restoration_defaultshortcdactions
 
 AddFunction restoration_defaultshortcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 AddFunction restoration_defaultcdactions
@@ -2404,26 +2386,24 @@ AddFunction restoration_defaultcdactions
   spell(earth_elemental)
   #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
   if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(blood_fury_ap_int)
+  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+  if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) spell(berserking)
+  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(fireblood)
+  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+  if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(ancestral_call)
 
-  unless { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking)
+  unless { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst)
   {
-   #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(fireblood)
-   #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-   if not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) or spellcooldown(ascendance_restoration) > 50 spell(ancestral_call)
-
-   unless { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst)
-   {
-    #fae_transfusion,if=covenant.night_fae
-    if iscovenant("night_fae") spell(fae_transfusion)
-   }
+   #fae_transfusion,if=covenant.night_fae
+   if iscovenant("night_fae") spell(fae_transfusion)
   }
  }
 }
 
 AddFunction restoration_defaultcdpostconditions
 {
- not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or buffpresent(ascendance_restoration) } and spell(berserking) or { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or iscovenant("necrolord") and spell(primordial_wave) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
+ not target.debuffpresent(flame_shock) and spell(flame_shock) or { not hastalent(ascendance_talent_restoration) or not buffpresent(ascendance_restoration) } and spell(bag_of_tricks) or iscovenant("venthyr") and spell(chain_harvest) or iscovenant("kyrian") and spell(vesper_totem) or target.debuffremaining(flame_shock) > casttime(lava_burst) and not spellcooldown(lava_burst) > 0 and spell(lava_burst) or iscovenant("necrolord") and spell(primordial_wave) or enemies(tagged=1) < 3 and spell(lightning_bolt) or enemies(tagged=1) > 2 and spell(chain_lightning) or speed() > 0 and spell(flame_shock) or speed() > 0 and spell(frost_shock)
 }
 
 ### Restoration icons.

@@ -13,9 +13,11 @@ Define(arcane_torrent 25046)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
 Define(black_ox_brew 115399)
 # Chug some Black Ox Brew, which instantly refills your Energy, Purifying Brew charges, and resets the cooldown of Celestial Brew.
   SpellInfo(black_ox_brew cd=120 gcd=0 offgcd=1 energy=-200)
@@ -27,9 +29,9 @@ Define(blackout_kick 100784)
 # Kick with a blast of Chi energy, dealing ?s137025[s1*<CAP>/AP][s1] Physical damage.?s261917[rnrnReduces the cooldown of Rising Sun Kick and Fists of Fury by m3/1000.1 sec when used.][]
   SpellInfo(blackout_kick chi=3 cd=3)
   SpellRequire(blackout_kick replaced_by set=blackout_kick_brewmaster enabled=(specialization("brewmaster")))
-Define(blackout_kick_aura 116768)
+Define(blackout_kick_aura_buff 116768)
 # You have a m1 chance when you Tiger Palm to cause your next Blackout Kick to cost no Chi within 15 seconds.
-  SpellInfo(blackout_kick_aura duration=15 gcd=0 offgcd=1)
+  SpellInfo(blackout_kick_aura_buff duration=15 gcd=0 offgcd=1)
 Define(blackout_kick_brewmaster 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and granting Shuffle for s2 sec][].
   SpellInfo(blackout_kick_brewmaster cd=4)
@@ -68,9 +70,9 @@ Define(chi_burst 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1)
   SpellRequire(chi_burst unusable set=1 enabled=(not hastalent(chi_burst_talent)))
-Define(chi_energy 337571)
+Define(chi_energy_buff 337571)
 # Whenever you deal damage to a target with Fists of Fury, you gain a stack of Chi Energy up to a maximum of m2 stacks.rnrnUsing Spinning Crane Kick will cause the energy to detonate in a Chi Explosion, dealing 337342s1 damage to all enemies within 337342A1 yards. The damage is increased by 337571m1 for each stack of Chi Energy.
-  SpellInfo(chi_energy duration=45 max_stacks=30 gcd=0 offgcd=1)
+  SpellInfo(chi_energy_buff duration=45 max_stacks=30 gcd=0 offgcd=1)
 Define(chi_wave 115098)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
   SpellInfo(chi_wave cd=15)
@@ -89,21 +91,15 @@ Define(dampen_harm 122278)
 Define(dance_of_chiji_buff 325202)
 # Spending Chi has a chance to make your next Spinning Crane Kick free and deal s1 additional damage.
   SpellInfo(dance_of_chiji_buff duration=15 gcd=0 offgcd=1)
-Define(dance_of_chiji_windwalker 325201)
-# Spending Chi has a chance to make your next Spinning Crane Kick free and deal an additional s1 damage.
-  SpellInfo(dance_of_chiji_windwalker gcd=0 offgcd=1 unusable=1)
-  SpellRequire(dance_of_chiji_windwalker unusable set=1 enabled=(not hastalent(dance_of_chiji_talent)))
-  # Your next Spinning Crane Kick is free and deals w1 additional damage.
-  SpellAddBuff(dance_of_chiji_windwalker dance_of_chiji_buff add=1)
 Define(diffuse_magic 122783)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
   SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1)
   SpellRequire(diffuse_magic unusable set=1 enabled=(not hastalent(diffuse_magic_talent)))
   # Spell damage taken reduced by m1.
   SpellAddBuff(diffuse_magic diffuse_magic add=1)
-Define(elusive_brawler 195630)
+Define(elusive_brawler_buff 195630)
 # Each time you are hit by a melee attack, or hit with Blackout Kick, you gain stacking (100 of Spell Power).1 increased Dodge chance until your next successful Dodge.rnrnAlso increases your attack power by (100 of Spell Power).1.
-  SpellInfo(elusive_brawler duration=10 max_stacks=100 gcd=0 offgcd=1)
+  SpellInfo(elusive_brawler_buff duration=10 max_stacks=100 gcd=0 offgcd=1)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
   SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=0 offgcd=1 chi=-2)
@@ -139,21 +135,13 @@ Define(flying_serpent_kick 101545)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>?s322960[, increasing the effectiveness of Stagger by s1,][] and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=360 gcd=0 offgcd=1)
-  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_mistweaver enabled=(specialization("mistweaver") or specialization("windwalker")))
-  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_mistweaver enabled=(specialization("mistweaver") or specialization("windwalker")))
-Define(fortifying_brew_buff 120954)
-# Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>?s322960[, increasing the effectiveness of Stagger by s1,][] and reducing all damage you take by <damage>.
-  SpellInfo(fortifying_brew_buff duration=15 gcd=0 offgcd=1)
-  # Health increased by <health>, damage taken reduced by <damage>, and effectiveness of Stagger increased by 115203s1.
-  SpellAddBuff(fortifying_brew_buff fortifying_brew_buff add=1)
-Define(fortifying_brew_mistweaver 243435)
+  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_windwalker enabled=(specialization("mistweaver") or specialization("windwalker")))
+  SpellRequire(fortifying_brew replaced_by set=fortifying_brew_windwalker enabled=(specialization("mistweaver") or specialization("windwalker")))
+Define(fortifying_brew_windwalker 243435)
 # Turns your skin to stone, increasing your current and maximum health by s1 and reducing damage taken by s2 for 15 seconds.
-  SpellInfo(fortifying_brew_mistweaver cd=420 duration=15 gcd=0 offgcd=1)
+  SpellInfo(fortifying_brew_windwalker cd=420 duration=15 gcd=0 offgcd=1)
   # Maximum health increased by w1.rnDamage taken reduced by w2.?w4>1[rnAbsorbs w4 damage.][]
-  SpellAddBuff(fortifying_brew_mistweaver fortifying_brew_mistweaver add=1)
-Define(gift_of_the_ox 124503)
-# When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
-  SpellInfo(gift_of_the_ox duration=30 gcd=0 offgcd=1)
+  SpellAddBuff(fortifying_brew_windwalker fortifying_brew_windwalker add=1)
 Define(invoke_niuzao_the_black_ox 132578)
 # Summons an effigy of Niuzao, the Black Ox for 25 seconds. Niuzao attacks your primary target, and frequently Stomps, damaging all nearby enemies?s322740[ for 227291s1 plus 322740s1 of Stagger damage you have recently purified.][.]rnrnWhile active, s2 of damage delayed by Stagger is instead Staggered by Niuzao.
   SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=25 gcd=1)
@@ -180,9 +168,6 @@ Define(paralysis 115078)
   SpellInfo(paralysis energy=20 cd=45 duration=60)
   # Incapacitated.
   SpellAddTargetDebuff(paralysis paralysis add=1)
-Define(phantom_fire 321937)
-# Deal s1 Shadow Fire damage to your current target.
-  SpellInfo(phantom_fire gcd=0 offgcd=1)
 Define(purifying_brew 119582)
 # Clears s1 of your damage delayed with Stagger.?s322510[rnrnIncreases the absorption of your next Celestial Brew by up to 322510s1, based on your current level of Stagger][]
   SpellInfo(purifying_brew cd=20 gcd=0 offgcd=1)
@@ -217,12 +202,12 @@ Define(spinning_crane_kick_brewmaster 322729)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
   SpellInfo(spinning_crane_kick_brewmaster energy=25 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.rnrnMovement speed reduced by s2.
-  SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_buff add=1)
+  SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster_buff add=1)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster add=1)
-Define(spinning_crane_kick_buff 107270)
+Define(spinning_crane_kick_brewmaster_buff 107270)
 # Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
-  SpellInfo(spinning_crane_kick_buff gcd=0 offgcd=1)
+  SpellInfo(spinning_crane_kick_brewmaster_buff gcd=0 offgcd=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
   SpellInfo(storm_earth_and_fire cd=90 duration=15 max_stacks=2 gcd=0 offgcd=1)
@@ -234,7 +219,7 @@ Define(storm_earth_and_fire_fixate 221771)
   SpellInfo(storm_earth_and_fire_fixate cd=1 gcd=0 offgcd=1)
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire_fixate storm_earth_and_fire_fixate add=1)
-Define(the_emperors_capacitor_buff 235054)
+Define(the_emperors_capacitor_buff 337291)
 # Chi spenders increase the damage of your next Crackling Jade Lightning by 235054s1 and reduce its cost by 235054s2, stacking up to 235054u times.
   SpellInfo(the_emperors_capacitor_buff max_stacks=20 gcd=0 offgcd=1)
 Define(tiger_palm 100780)
@@ -255,14 +240,11 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp add=1)
-Define(weapons_of_order 311123)
+Define(weapons_of_order 310454)
 # For the next 30 seconds, your Mastery is increased by ?c1[117906bc1*s1]?c2[117907bc1*s1][115636bc1*s1.1]. Additionally, ?a137025[Rising Sun Kick reduces Chi costs by 311054s1 for 5 seconds, and Blackout Kick reduces the cooldown of affected abilities by an additional s8/1000 sec.][]?a137023 [Keg Smash cooldown is reset instantly and enemies hit by Keg Smash take 312106s1 increased damage from you for 10 seconds, stacking up to 312106u times.][]?a137024[Essence Font cooldown is reset instantly and heals up to 311123s2 nearby allies for (40 of Spell Power) health on channel start and end.][]
-  SpellInfo(weapons_of_order gcd=0 offgcd=1)
-Define(weapons_of_order_buff 310454)
-# For the next 30 seconds, your Mastery is increased by ?c1[117906bc1*s1]?c2[117907bc1*s1][115636bc1*s1.1]. Additionally, ?a137025[Rising Sun Kick reduces Chi costs by 311054s1 for 5 seconds, and Blackout Kick reduces the cooldown of affected abilities by an additional s8/1000 sec.][]?a137023 [Keg Smash cooldown is reset instantly and enemies hit by Keg Smash take 312106s1 increased damage from you for 10 seconds, stacking up to 312106u times.][]?a137024[Essence Font cooldown is reset instantly and heals up to 311123s2 nearby allies for (40 of Spell Power) health on channel start and end.][]
-  SpellInfo(weapons_of_order_buff cd=120 duration=30 max_stacks=1)
+  SpellInfo(weapons_of_order cd=120 duration=30 max_stacks=1)
   # Increases your Mastery by ?c1[117906bc1*w1]?c2[117907bc1*w1][115636bc1*w1]?a137025[, Rising Sun Kick reduces Chi costs by 311054s1 for 311054d, and Blackout Kick reduces the cooldown of affected abilities by an additional s8/1000 sec.]?a137023 [ and your Keg Smash increases the damage you deal to those enemies by 312106s1, up to 312106s1*312106u for 312106d.]?a137024[ and your Essence Font heals nearby allies for 311123s1 health on channel start and end.][ and your abilities are enhanced.]
-  SpellAddBuff(weapons_of_order_buff weapons_of_order_buff add=1)
+  SpellAddBuff(weapons_of_order weapons_of_order add=1)
 Define(weapons_of_order_ww 311054)
 # For the next 30 seconds, your Mastery is increased by ?c1[117906bc1*s1]?c2[117907bc1*s1][115636bc1*s1.1]. Additionally, ?a137025[Rising Sun Kick reduces Chi costs by 311054s1 for 5 seconds, and Blackout Kick reduces the cooldown of affected abilities by an additional s8/1000 sec.][]?a137023 [Keg Smash cooldown is reset instantly and enemies hit by Keg Smash take 312106s1 increased damage from you for 10 seconds, stacking up to 312106u times.][]?a137024[Essence Font cooldown is reset instantly and heals up to 311123s2 nearby allies for (40 of Spell Power) health on channel start and end.][]
   SpellInfo(weapons_of_order_ww duration=5 gcd=0 offgcd=1)
@@ -282,8 +264,6 @@ Define(chi_wave_talent 19820)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 20175)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
-Define(dance_of_chiji_talent 22102)
-# Spending Chi has a chance to make your next Spinning Crane Kick free and deal an additional s1 damage.
 Define(diffuse_magic_talent 20173)
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 22096)
@@ -302,6 +282,8 @@ Define(spitfire_talent 22097)
 # Tiger Palm has a h chance to reset the cooldown of Breath of Fire.
 Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+Define(potion_of_phantom_fire_item 171349)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
 Define(potion_of_spectral_agility_item 171270)
     ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
 Define(charred_passions_runeforge 7076)

@@ -187,7 +187,11 @@ export class OvaleSimulationCraftClass {
         return parsedProfile as Profile;
     }
 
-    ParseProfile(simc: string, dictionary?: LuaObj<number>, dbc?: DbcData) {
+    ParseProfile(
+        simc: string,
+        dictionary?: LuaObj<number | string>,
+        dbc?: DbcData
+    ) {
         const profile = this.readProfile(simc);
 
         let classId: ClassId | undefined = undefined;

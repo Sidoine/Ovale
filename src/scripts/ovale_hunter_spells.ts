@@ -53,12 +53,16 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2)
   SpellRequire(barrage unusable set=1 enabled=(not {hastalent(barrage_talent) or hastalent(barrage_talent_marksmanship)}))
-Define(beast_cleave_beast_mastery 115939)
+Define(beast_cleave_buff 118455)
 # After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
-  SpellInfo(beast_cleave_beast_mastery gcd=0 offgcd=1 unusable=1)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
+  SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
+  # Melee attacks also strike all other nearby enemy targets.
+  SpellAddBuff(beast_cleave_buff beast_cleave_buff add=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
 Define(bestial_wrath 19574)
 # Sends you and your pet into a rage, instantly dealing <damage> Physical damage to its target, and increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
   SpellInfo(bestial_wrath cd=90 duration=15)
@@ -151,19 +155,17 @@ Define(flayed_shot 324149)
   SpellInfo(flayed_shot focus=10 cd=30 duration=14 tick=2)
   # Bleeding for s1 Shadow damage every t1 sec.
   SpellAddTargetDebuff(flayed_shot flayed_shot add=1)
-Define(flayers_mark 324156)
+Define(flayers_mark_buff 324156)
 # Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 14 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free and usable on any target, regardless of their current health.
-  SpellInfo(flayers_mark duration=12 gcd=0 offgcd=1)
+  SpellInfo(flayers_mark_buff duration=12 gcd=0 offgcd=1)
   # Kill Shot can be used on any target, regardless of their current health, and will not consume any Focus.
-  SpellAddBuff(flayers_mark flayers_mark add=1)
+  SpellAddBuff(flayers_mark_buff flayers_mark_buff add=1)
 Define(freezing_trap 187650)
 # Hurls a frost trap to the target location that incapacitates the first enemy that approaches for 60 seconds. Damage will break the effect. Limit 1. Trap will exist for 60 seconds.
   SpellInfo(freezing_trap cd=30)
-Define(frenzy_pet_buff 272790)
-# Fire a shot that tears through your enemy, causing them to bleed for s1*s2 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
-  SpellInfo(frenzy_pet_buff duration=8 max_stacks=3 gcd=0 offgcd=1)
-  # Attack speed increased by s1.
-  SpellAddBuff(frenzy_pet_buff frenzy_pet_buff add=1)
+Define(frenzy_buff 138895)
+# Haste increased by s1 for 10 seconds.
+  SpellInfo(frenzy_buff duration=10 max_stacks=5 gcd=0 offgcd=1)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
   SpellInfo(harpoon cd=30 duration=3 gcd=0 offgcd=1)
@@ -174,11 +176,11 @@ Define(harpoon 190925)
 Define(harpoon_debuff 186260)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
   SpellInfo(harpoon_debuff gcd=0 offgcd=1)
-Define(internal_bleeding 154953)
-# Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 6 seconds, based on combo points spent.
-  SpellInfo(internal_bleeding duration=6 gcd=0 offgcd=1 tick=1)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(internal_bleeding internal_bleeding add=1)
+Define(internal_bleeding_hunter_debuff 270343)
+# Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
+  SpellInfo(internal_bleeding_hunter_debuff duration=9 max_stacks=3 gcd=0 offgcd=1 tick=3)
+  # Suffering w1 Bleed damage every t1 sec.
+  SpellAddTargetDebuff(internal_bleeding_hunter_debuff internal_bleeding_hunter_debuff add=1)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
   SpellInfo(kill_command focus=30 cd=7.5)
@@ -186,7 +188,7 @@ Define(kill_command_survival 259489)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
   SpellInfo(kill_command_survival cd=6 focus=-15)
   # Your next ?s259387[Mongoose Bite][Raptor Strike] deals s1 increased damage.
-  SpellAddBuff(kill_command_survival tip_of_the_spear add=1)
+  SpellAddBuff(kill_command_survival tip_of_the_spear_buff add=1)
 Define(kill_shot 53351)
 # You attempt to finish off a wounded target, dealing s1 Physical damage. Only usable on enemies with less than s2 health.
   SpellInfo(kill_shot focus=10 cd=10)
@@ -201,11 +203,11 @@ Define(mongoose_bite 259387)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
   SpellInfo(mongoose_bite focus=30)
   SpellRequire(mongoose_bite unusable set=1 enabled=(not hastalent(mongoose_bite_talent)))
-Define(mongoose_fury 259388)
+Define(mongoose_fury_buff 259388)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
-  SpellInfo(mongoose_fury duration=14 max_stacks=5 gcd=0 offgcd=1)
+  SpellInfo(mongoose_fury_buff duration=14 max_stacks=5 gcd=0 offgcd=1)
   # Mongoose Bite damage increased by s1.
-  SpellAddBuff(mongoose_fury mongoose_fury add=1)
+  SpellAddBuff(mongoose_fury_buff mongoose_fury_buff add=1)
 Define(multishot 2643)
 # Fires several missiles, hitting up to I targets within A2 yards of your current target for s2 Physical damage?s115939[ and triggering Beast Cleave][].?s19434[rnrn|cFFFFFFFFGenerates 213363s1 Focus per target hit.|r][]
   SpellInfo(multishot focus=40)
@@ -215,19 +217,19 @@ Define(multishot_marksmanship 257620)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
-Define(nesingwarys_trapping_apparatus 336744)
+Define(nesingwarys_trapping_apparatus_buff 336744)
 # Whenever a trap is triggered, gain 336744s1 Focus and increase all Focus gained by 336744s2 for 5 seconds. 
-  SpellInfo(nesingwarys_trapping_apparatus duration=5 gcd=0 offgcd=1 focus=-45)
+  SpellInfo(nesingwarys_trapping_apparatus_buff duration=5 gcd=0 offgcd=1 focus=-45)
   # Focus Generation increased by s2.
-  SpellAddBuff(nesingwarys_trapping_apparatus nesingwarys_trapping_apparatus add=1)
+  SpellAddBuff(nesingwarys_trapping_apparatus_buff nesingwarys_trapping_apparatus_buff add=1)
 Define(pheromone_bomb 270323)
 # Hurl a bomb at the target, exploding for 270329s1 Fire damage in a cone and coating enemies in pheromones, causing them to suffer 270332o1 Fire damage over 6 seconds.rnrnKill Command has a s2 chance to reset against targets coated with Pheromone Bomb.
   SpellInfo(pheromone_bomb cd=18)
-Define(precise_shots 260242)
+Define(precise_shots_buff 260242)
 # Aimed Shot causes your next 1-260242u ?s342049[Chimaera Shots][Arcane Shots] or Multi-Shots to deal 260242s1 more damage.
-  SpellInfo(precise_shots duration=15 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(precise_shots_buff duration=15 max_stacks=2 gcd=0 offgcd=1)
   # Damage of ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot increased by s1.
-  SpellAddBuff(precise_shots precise_shots add=1)
+  SpellAddBuff(precise_shots_buff precise_shots_buff add=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -262,6 +264,11 @@ Define(serpent_sting_marksmanship 271788)
 Define(shrapnel_bomb 270335)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb cd=18)
+Define(shrapnel_bomb_debuff 270339)
+# Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
+  SpellInfo(shrapnel_bomb_debuff duration=6 gcd=0 offgcd=1 tick=1)
+  # Suffering w1 Fire damage every t1 sec.rn?s259387[Mongoose Bite][Raptor Strike] and Butchery apply a stack of Internal Bleeding.
+  SpellAddTargetDebuff(shrapnel_bomb_debuff shrapnel_bomb_debuff add=1)
 Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=120 duration=12)
@@ -282,9 +289,9 @@ Define(steel_trap 162488)
 Define(tar_trap 187698)
 # Hurls a tar trap to the target location that creates a 187699s1 yd radius pool of tar around itself for 30 seconds when the first enemy approaches. All enemies have 135299s1 reduced movement speed while in the area of effect. Trap will exist for 60 seconds.
   SpellInfo(tar_trap cd=30)
-Define(tip_of_the_spear 260286)
+Define(tip_of_the_spear_buff 260286)
 # Kill Command increases the damage of your next ?s259387[Mongoose Bite][Raptor Strike] by 260286s1, stacking up to 260286u times.
-  SpellInfo(tip_of_the_spear duration=10 max_stacks=3 gcd=0 offgcd=1)
+  SpellInfo(tip_of_the_spear_buff duration=10 max_stacks=3 gcd=0 offgcd=1)
 Define(trick_shots_buff 257622)
 # When Multi-Shot hits s2 or more targets, your next Aimed Shot or Rapid Fire will ricochet and hit up to s1 additional targets for s4 of normal damage.
   SpellInfo(trick_shots_buff duration=20 gcd=0 offgcd=1)

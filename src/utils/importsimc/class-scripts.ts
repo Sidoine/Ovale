@@ -1,4 +1,4 @@
-import { ipairs } from "@wowts/lua";
+import { ipairs, LuaObj } from "@wowts/lua";
 import { format } from "@wowts/string";
 import { ClassId, eventDispatcher } from "@wowts/wow-mock";
 import { readdirSync, readFileSync, writeFileSync } from "fs";
@@ -79,14 +79,6 @@ function getProfileFiles(
     return files;
 }
 
-function getOrSet<T>(map: Map<string, T[]>, className: string) {
-    let result = map.get(className);
-    if (result) return result;
-    result = [];
-    map.set(className, result);
-    return result;
-}
-
 function addId<T>(ids: T[], id?: T) {
     if (id && !ids.includes(id)) {
         ids.push(id);
@@ -95,6 +87,19 @@ function addId<T>(ids: T[], id?: T) {
 
 function isDefined<T>(t: T | undefined): t is T {
     return t !== undefined;
+}
+
+class ClassData {
+    spells: number[] = [];
+    talents: number[] = [];
+    items: number[] = [];
+    spellLists: string[] = [];
+    azeriteTraits: number[] = [];
+    essences: number[] = [];
+    runeforges: number[] = [];
+    conduits: number[] = [];
+    soulbindAbilities: number[] = [];
+    customIds: number[] = [];
 }
 
 export class ClassScripts {
@@ -114,16 +119,7 @@ export class ClassScripts {
         { id: number; identifier: string }
     >;
     private customIdentifiers: Map<string, number>;
-    private spellsByClass = new Map<string, number[]>();
-    private talentsByClass = new Map<string, number[]>();
-    private itemsByClass = new Map<string, number[]>();
-    private spellListsByClass = new Map<string, string[]>();
-    private azeriteTraitByClass = new Map<string, number[]>();
-    private essenceByClass = new Map<string, number[]>();
-    private runeforgeByClass = new Map<string, number[]>();
-    private conduitByClass = new Map<string, number[]>();
-    private soulbindAbilityByClass = new Map<string, number[]>();
-    private customByClass = new Map<string, number[]>();
+    private classData = new Map<string, ClassData>();
     private modifiedFiles = new Map<string, string>();
 
     private importClassScript(filename: string) {
@@ -169,19 +165,21 @@ export class ClassScripts {
         console.log(filename);
         const ioc = new IoC();
         ioc.ovale.playerGUID = "player";
+        const dictionary: LuaObj<number | string> = Object.assign(
+            {},
+            this.spellData.identifiers
+        );
         ioc.ovale.playerClass = <ClassId>className;
         for (const [key] of this.spellData.spellLists) {
             ioc.data.buffSpellList[key] = {};
+            dictionary[key] = key;
         }
         eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
         eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
         registerScripts(ioc.scripts);
-
-        const profile = ioc.simulationCraft.ParseProfile(
-            simc,
-            Object.assign({}, this.spellData.identifiers),
-            { effect: this.spellData.spellEffectById }
-        );
+        const profile = ioc.simulationCraft.ParseProfile(simc, dictionary, {
+            effect: this.spellData.spellEffectById,
+        });
         if (!profile) return;
         const profileName = profile.annotation.name.substring(
             1,
@@ -228,19 +226,23 @@ export class ClassScripts {
         } else {
             this.modifiedFiles.set(outputName, existing + "\n\n" + outputCode);
         }
-        const classSpells = getOrSet(this.spellsByClass, className);
-        const classTalents = getOrSet(this.talentsByClass, className);
-        const classItems = getOrSet(this.itemsByClass, className);
-        const azeriteTraits = getOrSet(this.azeriteTraitByClass, className);
-        const essences = getOrSet(this.essenceByClass, className);
-        const spellLists = getOrSet(this.spellListsByClass, className);
-        const runeforges = getOrSet(this.runeforgeByClass, className);
-        const conduits = getOrSet(this.conduitByClass, className);
-        const soulbindAbilities = getOrSet(
-            this.soulbindAbilityByClass,
-            className
-        );
-        const custom = getOrSet(this.customByClass, className);
+        let classData = this.classData.get(className);
+        if (!classData) {
+            classData = new ClassData();
+            this.classData.set(className, classData);
+        }
+        const {
+            azeriteTraits,
+            conduits,
+            customIds,
+            essences,
+            items,
+            runeforges,
+            soulbindAbilities,
+            spellLists,
+            spells,
+            talents,
+        } = classData;
 
         const identifiers = ipairs(profile.annotation.symbolList)
             .map((x) => x[1])
@@ -250,18 +252,26 @@ export class ClassScripts {
             if (spellList) {
                 for (const spell of spellList) {
                     if (this.customIdentifierById.has(spell.id))
-                        addId(custom, spell.id);
-                    else addId(classSpells, spell.id);
+                        addId(customIds, spell.id);
+                    else if (spell.identifier.match(/_item$/)) {
+                        addId(items, spell.id);
+                    } else {
+                        addId(spells, spell.id);
+                    }
                 }
                 if (spellLists.indexOf(symbol) < 0) spellLists.push(symbol);
                 continue;
             }
             const id = this.spellData.identifiers[symbol];
-            if (this.customIdentifiers.has(symbol)) addId(custom, id);
-            else if (symbol.match(/_talent/)) {
-                addId(classTalents, id);
+            if (this.customIdentifiers.has(symbol)) {
+                addId(customIds, id);
+                if (this.spellData.spellDataById.get(id)) {
+                    addId(spells, id);
+                }
+            } else if (symbol.match(/_talent/)) {
+                addId(talents, id);
             } else if (symbol.match(/_item$/)) {
-                addId(classItems, id);
+                addId(items, id);
             } else if (symbol.match(/_trait$/)) {
                 addId(azeriteTraits, id);
             } else if (symbol.match(/_essence_id$/)) {
@@ -273,9 +283,7 @@ export class ClassScripts {
             } else if (symbol.match(/_soulbind$/)) {
                 addId(soulbindAbilities, id);
             } else {
-                if (id && classSpells.indexOf(id) < 0) {
-                    classSpells.push(id);
-                }
+                addId(spells, id);
             }
         }
     }
@@ -300,9 +308,20 @@ export class ClassScripts {
     }
 
     private writeSpellScripts() {
-        for (const [className, spellIds] of this.spellsByClass) {
+        for (const [className, classData] of this.classData) {
+            const {
+                azeriteTraits,
+                conduits,
+                customIds,
+                essences,
+                items,
+                runeforges,
+                soulbindAbilities,
+                spellLists,
+                spells: spellIds,
+                talents: talentIds,
+            } = classData;
             let output = `    let code = \``;
-            const talentIds = this.talentsByClass.get(className) || [];
             const spells: CustomSpellData[] = [];
             const remainingsSpellIds = spellIds.concat();
             const addSpells = (addedIds: number[]) => {
@@ -358,15 +377,12 @@ export class ClassScripts {
                 );
             }
 
-            const spellLists = this.spellListsByClass.get(className);
-            if (spellLists) {
-                for (const spellList of spellLists) {
-                    const spells = this.spellData.spellLists.get(spellList);
-                    if (spells) {
-                        output += `SpellList(${spellList} ${spells
-                            .map((x) => x.identifier)
-                            .join(" ")})\n`;
-                    }
+            for (const spellList of spellLists) {
+                const spells = this.spellData.spellLists.get(spellList);
+                if (spells) {
+                    output += `SpellList(${spellList} ${spells
+                        .map((x) => x.identifier)
+                        .join(" ")})\n`;
                 }
             }
 
@@ -385,49 +401,34 @@ export class ClassScripts {
             }
 
             const writeIds = <T, U extends { identifier: string }>(
-                idInSimc: Map<string, T[]>,
+                ids: T[],
                 repository: Map<T, U>,
                 idProperty: keyof U,
                 infoHandler?: (item: U) => string | undefined
             ) => {
-                const ids = idInSimc.get(className);
-                if (ids) {
-                    for (const id of ids) {
-                        const item = repository.get(id);
-                        if (!item) continue;
-                        output += `Define(${item.identifier} ${item[idProperty]})\n`;
-                        if (infoHandler) {
-                            const data = infoHandler(item);
-                            if (data) output += data + "\n";
-                        }
+                for (const id of ids) {
+                    const item = repository.get(id);
+                    if (!item) continue;
+                    output += `Define(${item.identifier} ${item[idProperty]})\n`;
+                    if (infoHandler) {
+                        const data = infoHandler(item);
+                        if (data) output += data + "\n";
                     }
                 }
             };
 
-            writeIds(this.customByClass, this.customIdentifierById, "id");
-            writeIds(
-                this.itemsByClass,
-                this.spellData.itemsById,
-                "id",
-                (item) =>
-                    getItemDefinition(
-                        convertFromItemData(item, this.spellData.spellDataById)
-                    )
+            writeIds(customIds, this.customIdentifierById, "id");
+            writeIds(items, this.spellData.itemsById, "id", (item) =>
+                getItemDefinition(
+                    convertFromItemData(item, this.spellData.spellDataById)
+                )
             );
+            writeIds(azeriteTraits, this.spellData.azeriteTraitById, "spellId");
+            writeIds(essences, this.spellData.essenceById, "id");
+            writeIds(runeforges, this.spellData.runeforgeById, "bonus_id");
+            writeIds(conduits, this.spellData.conduitById, "id");
             writeIds(
-                this.azeriteTraitByClass,
-                this.spellData.azeriteTraitById,
-                "spellId"
-            );
-            writeIds(this.essenceByClass, this.spellData.essenceById, "id");
-            writeIds(
-                this.runeforgeByClass,
-                this.spellData.runeforgeById,
-                "bonus_id"
-            );
-            writeIds(this.conduitByClass, this.spellData.conduitById, "id");
-            writeIds(
-                this.soulbindAbilityByClass,
+                soulbindAbilities,
                 this.spellData.soulbindAbilityById,
                 "spell_id"
             );

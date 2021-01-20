@@ -19,12 +19,16 @@ Define(ascended_nova 325020)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
-Define(blood_fury 24571)
-# Instantly increases your rage by 300/10.
-  SpellInfo(blood_fury gcd=0 offgcd=1 rage=-30)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
+Define(blood_fury_int 33702)
+# Increases your Intellect by s1 for 15 seconds.
+  SpellInfo(blood_fury_int cd=120 duration=15 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(blood_fury_int blood_fury_int add=1)
 Define(bloodlust 2825)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
@@ -39,11 +43,11 @@ Define(damnation 341374)
 # Instantly afflicts the target with Shadow Word: Pain, Vampiric Touch and Devouring Plague.
   SpellInfo(damnation cd=45)
   SpellRequire(damnation unusable set=1 enabled=(not hastalent(damnation_talent)))
-Define(dark_thought 341207)
+Define(dark_thought_buff 341207)
 # For each damage over time effects on the target, your Mind Flay and Mind Sear have a m1 chance to trigger a Dark Thought. rnrnDark ThoughtrnIncreases the number of charges of Mind Blast by 1, Mind Blast has no cooldown and can be cast instantly, and can be cast while channelling Mind Flay or Mind Sear.
-  SpellInfo(dark_thought duration=10 max_stacks=1 gcd=0 offgcd=1)
+  SpellInfo(dark_thought_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
   # Maximum number of charges of Mind Blast increased by w1.rnrnMind Blast no longer has a  cooldown, can be cast instantly, and while channelling Mind Flay or Mind Sear.
-  SpellAddBuff(dark_thought dark_thought add=1)
+  SpellAddBuff(dark_thought_buff dark_thought_buff add=1)
 Define(devouring_plague 335467)
 # Afflicts the target with a disease that instantly causes (65 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
   SpellInfo(devouring_plague insanity=50 duration=6 tick=3)
@@ -73,11 +77,11 @@ Define(holy_fire 14914)
 Define(holy_nova 132157)
 # An explosion of holy light around you deals up to (18 of Spell Power) Holy damage to enemies and up to (18 of Spell Power) healing to allies within A1 yds, reduced if there are more than s3 targets.rnrn?s322112[If your Holy Nova deals damage to at least m1 enemies, a second Holy Nova will be cast a moment later at m2 effectiveness at the same location.][]
   SpellInfo(holy_nova)
-Define(hungering_void 345219)
+Define(hungering_void_debuff 345219)
 # Void Bolt causes the target to become vulnerable to the void, increasing their damage taken from you by 345219m2 for 6 seconds. This effect may only be active on one target at a time.rnrnCasting Void Bolt on an enemy that is already vulnerable extends the duration of your Voidform by m3 sec, or m4 sec if Void Bolt critically strikes.
-  SpellInfo(hungering_void duration=6 gcd=0 offgcd=1)
+  SpellInfo(hungering_void_debuff duration=6 gcd=0 offgcd=1)
   # Damage taken from the Priest increased by w1.
-  SpellAddTargetDebuff(hungering_void hungering_void add=1)
+  SpellAddTargetDebuff(hungering_void_debuff hungering_void_debuff add=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -104,10 +108,10 @@ Define(mind_sear 48045)
   # Causing Shadow damage to all targets within 49821a2 yards every t1 sec.
   SpellAddBuff(mind_sear mind_sear add=1)
   # Causing shadow damage to all targets within a2 yards.
-  SpellAddTargetDebuff(mind_sear mind_sear_debuff add=1)
-Define(mind_sear_debuff 49821)
+  SpellAddTargetDebuff(mind_sear mind_sear_unused_0 add=1)
+Define(mind_sear_unused_0 49821)
 # Corrosive shadow energy radiates from the target, dealing (12.6 of Spell Power)*s2 Shadow damage over 4.5 seconds to all enemies within 49821a2 yards of the target.?s137033[rnrn|cFFFFFFFFGenerates s2*208232s1/100 Insanity over the duration per target hit.|r][]
-  SpellInfo(mind_sear_debuff gcd=0 offgcd=1)
+  SpellInfo(mind_sear_unused_0 gcd=0 offgcd=1)
 Define(mindbender 123040)
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
   SpellInfo(mindbender cd=60 duration=12)
@@ -213,12 +217,12 @@ Define(surrender_to_madness 319952)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness add=1)
   # Mind Blast has an additional charge.rn?s193225[Spell damage dealt increased by w16.][Spell damage dealt increased by w1.]rn?s341240[Critical strike chance increased by w4.][]?s193225[ Losing w3/500 Insanity every sec.][]
-  SpellAddBuff(surrender_to_madness voidform add=1)
+  SpellAddBuff(surrender_to_madness voidform_buff add=1)
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddTargetDebuff(surrender_to_madness surrender_to_madness add=1)
-Define(unfurling_darkness 341291)
+Define(unfurling_darkness_buff 341282)
 # After casting Vampiric Touch on a target, your next Vampiric Touch within 8 seconds is instant cast and deals (105.4 of Spell Power) Shadow damage immediately.rnrnThis effect cannot occur more than once every 15 seconds.
-  SpellInfo(unfurling_darkness duration=15 gcd=0 offgcd=1)
+  SpellInfo(unfurling_darkness_buff duration=8 gcd=0 offgcd=1)
 Define(unholy_nova 324724)
 # An explosion of dark energy infects enemies within 325203A1 yds with Unholy Transfusion, and heals allies for up to (150 of Spell Power) based on number of targets.rnrn|TInterfaceICONSSpell_AnimaMaldraxxus_Debuff.blp:24|t |cFFFFFFFFUnholy Tranfusion|rrnDeals up to o1 Shadow damage based on number of targets over 15 seconds. Allies who damage this target are healed for (4 of Spell Power)*<mult>.
   SpellInfo(unholy_nova cd=60)
@@ -247,15 +251,15 @@ Define(void_torrent 263165)
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddBuff(void_torrent void_torrent add=1)
   # |cFFFFFFFFGenerates s1*s2/100 Insanity over d.|r
-  SpellAddBuff(void_torrent void_torrent_buff add=1)
+  SpellAddBuff(void_torrent void_torrent_unused_2 add=1)
   # Dealing s1 Shadow damage to the target every t1 sec.
   SpellAddTargetDebuff(void_torrent void_torrent add=1)
-Define(void_torrent_buff 289577)
+Define(void_torrent_unused_2 289577)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
-  SpellInfo(void_torrent_buff duration=3.9 gcd=0 offgcd=1 tick=0.975)
-Define(voidform 194249)
+  SpellInfo(void_torrent_unused_2 duration=3.9 gcd=0 offgcd=1 tick=0.975)
+Define(voidform_buff 194249)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, granting an additional charge of Mind Blast, and refreshing Mind Blast's cooldown.][.]rnrn?a193225[Your Insanity will drain increasingly fast until it reaches 0 and Voidform ends.][Lasts 15 seconds.]
-  SpellInfo(voidform cd=90 duration=15 gcd=0 offgcd=1 tick=1)
+  SpellInfo(voidform_buff cd=90 duration=15 gcd=0 offgcd=1 tick=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -317,9 +321,9 @@ Define(combat_meditation_soulbind 328266)
     // END
 
     code += `
-SpellRequire(void_bolt unusable set=1 enabled=(not buffpresent(voidform)))
+SpellRequire(void_bolt unusable set=1 enabled=(not buffpresent(voidform_buff)))
 SpellAddTargetDebuff(vampiric_touch shadow_word_pain add=1 enabled=(talent(misery_talent)))
-SpellAddBuff(void_eruption voidform add=1)
+SpellAddBuff(void_eruption voidform_buff add=1)
   `;
 
     OvaleScripts.RegisterScript(

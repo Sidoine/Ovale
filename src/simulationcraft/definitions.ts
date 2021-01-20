@@ -699,12 +699,12 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             in_lunar: {
                 type: MiscOperandModifierType.Replace,
                 name: "buffpresent",
-                extraSymbol: "eclipse_lunar",
+                extraSymbol: "eclipse_lunar_buff",
             },
             in_solar: {
                 type: MiscOperandModifierType.Replace,
                 name: "buffpresent",
-                extraSymbol: "eclipse_solar",
+                extraSymbol: "eclipse_solar_buff",
             },
             solar_in_1: {
                 type: MiscOperandModifierType.Code,
@@ -734,8 +734,11 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
             in_both: {
                 type: MiscOperandModifierType.Code,
                 code:
-                    "buffpresent(eclipse_solar) and buffpresent(eclipse_lunar)",
-                symbolsInCode: { 1: "eclipse_solar", 2: "eclipse_lunar" },
+                    "buffpresent(eclipse_solar_buff) and buffpresent(eclipse_lunar_buff)",
+                symbolsInCode: {
+                    1: "eclipse_solar_buff",
+                    2: "eclipse_lunar_buff",
+                },
             },
         },
     },
@@ -764,7 +767,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["incoming_imps"]: { name: "impsspawnedduring" },
     ["hot_streak_spells_in_flight"]: {
         name: "inflighttotarget",
-        extraSymbol: "hot_streak",
+        extraSymbol: "hot_streak_spells",
     },
     ["interpolated_fight_remains"]: { name: "fightremains" },
     ["insanity"]: { name: "insanity", modifiers: powerModifiers },
@@ -787,8 +790,8 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
     ["remaining_winters_chill"]: {
-        name: "buffstacks",
-        extraSymbol: "winters_chill",
+        name: "debuffstacks",
+        extraSymbol: "winters_chill_debuff",
     },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
     ["runeforge"]: {
@@ -836,7 +839,7 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
                 type: MiscOperandModifierType.Symbol,
             },
             sepsis: {
-                name: "sepsis_buff",
+                name: "sepsis",
                 type: MiscOperandModifierType.Symbol,
             },
         },

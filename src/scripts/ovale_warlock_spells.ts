@@ -14,14 +14,11 @@ Define(backdraft_buff 117828)
   SpellInfo(backdraft_buff duration=10 max_stacks=2 gcd=0 offgcd=1)
   # Incinerate and Chaos Bolt cast times reduced by s1.
   SpellAddBuff(backdraft_buff backdraft_buff add=1)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
-Define(berserking_buff 26297)
+Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
-  SpellInfo(berserking_buff cd=180 duration=12 gcd=0 offgcd=1)
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
-  SpellAddBuff(berserking_buff berserking_buff add=1)
+  SpellAddBuff(berserking berserking add=1)
 Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6)
@@ -31,9 +28,11 @@ Define(blood_fury_int 33702)
   SpellInfo(blood_fury_int cd=120 duration=15 gcd=0 offgcd=1)
   # Intellect increased by w1.
   SpellAddBuff(blood_fury_int blood_fury_int add=1)
-Define(blood_of_the_enemy 297969)
-# Infuse your Heart of Azeroth with Blood of the Enemy.
-  SpellInfo(blood_of_the_enemy)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy add=1)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
@@ -54,14 +53,19 @@ Define(concentrated_flame 295373)
 Define(conflagrate 17962)
 # Triggers an explosion on the target, dealing (100 of Spell Power) Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 10 seconds.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
   SpellInfo(conflagrate cd=12.96)
+Define(conflagrate_debuff 265931)
+# Conflagrate increases your ?s6353[Soul Fire, ][]?s196447[Channel Demonfire, ][]Immolate, Incinerate, and Conflagrate damage to the target by 265931s1 for 8 seconds.
+  SpellInfo(conflagrate_debuff duration=8 gcd=0 offgcd=1)
+  # Fire damage taken increased by s1.
+  SpellAddTargetDebuff(conflagrate_debuff conflagrate_debuff add=1)
 Define(corruption 172)
 # Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
   SpellInfo(corruption)
   # Suffering w1 Shadow damage every t1 sec.
-  SpellAddTargetDebuff(corruption corruption_debuff_affliction add=1)
-Define(corruption_debuff_affliction 146739)
+  SpellAddTargetDebuff(corruption corruption_affliction_debuff add=1)
+Define(corruption_affliction_debuff 146739)
 # Corrupts the target, causing?s334342[ (12 of Spell Power) Shadow damage and an additional][] 146739o1 Shadow damage over 14 seconds.
-  SpellInfo(corruption_debuff_affliction duration=14 gcd=0 offgcd=1 tick=2)
+  SpellInfo(corruption_affliction_debuff duration=14 gcd=0 offgcd=1 tick=2)
 Define(dark_soul_instability 113858)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
   SpellInfo(dark_soul_instability cd=120 duration=20 gcd=0 offgcd=1)
@@ -108,15 +112,9 @@ Define(drain_soul 198590)
   SpellRequire(drain_soul unusable set=1 enabled=(not hastalent(drain_soul_talent)))
   # Suffering w1 Shadow damage every t1 seconds.
   SpellAddTargetDebuff(drain_soul drain_soul add=1)
-Define(eradication 196412)
+Define(eradication_debuff 196414)
 # Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
-  SpellInfo(eradication gcd=0 offgcd=1 unusable=1)
-  SpellRequire(eradication unusable set=1 enabled=(not hastalent(eradication_talent)))
-  # Damage taken from the Warlock increased by s1.
-  SpellAddBuff(eradication eradication_buff add=1)
-Define(eradication_buff 196414)
-# Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
-  SpellInfo(eradication_buff duration=7 gcd=0 offgcd=1)
+  SpellInfo(eradication_debuff duration=7 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -132,10 +130,10 @@ Define(grimoire_of_sacrifice 108503)
   SpellInfo(grimoire_of_sacrifice cd=30)
   SpellRequire(grimoire_of_sacrifice unusable set=1 enabled=(not hastalent(grimoire_of_sacrifice_talent)))
   # Sacrificed your demon pet to gain its command demon ability.rnrnYour spells sometimes deal additional Shadow damage.
-  SpellAddBuff(grimoire_of_sacrifice grimoire_of_sacrifice_buff_trigger add=1)
-Define(grimoire_of_sacrifice_buff_trigger 196099)
+  SpellAddBuff(grimoire_of_sacrifice grimoire_of_sacrifice_buff add=1)
+Define(grimoire_of_sacrifice_buff 196099)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (43.75 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
-  SpellInfo(grimoire_of_sacrifice_buff_trigger duration=3600 gcd=0 offgcd=1)
+  SpellInfo(grimoire_of_sacrifice_buff duration=3600 gcd=0 offgcd=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every s1/10.1 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -156,11 +154,11 @@ Define(havoc 80240)
 Define(immolate 348)
 # Burns the enemy, causing (40 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
   SpellInfo(immolate)
-Define(immolate_debuff 118297)
-# Burns an enemy, then inflicts additional Fire damage every t1 sec. for 21 seconds.
-  SpellInfo(immolate_debuff mana=0.95 cd=10 duration=21 gcd=0 offgcd=1 tick=3)
-  # Fire damage inflicted every t1 sec.
-  SpellAddTargetDebuff(immolate_debuff immolate_debuff add=1)
+Define(immolate_warlock_debuff 157736)
+# Burns the enemy, causing (40 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
+  SpellInfo(immolate_warlock_debuff duration=18 gcd=0 offgcd=1 tick=3)
+  # Suffering w1 Fire damage every t1 sec.?a339892[ rnDamage taken by Chaos Bolt and Incinerate increased by w2.][]
+  SpellAddTargetDebuff(immolate_warlock_debuff immolate_warlock_debuff add=1)
 Define(impending_catastrophe 321792)
 # Call forth a cloud of chaotic anima that travels to the target enemy, dealing (23 of Spell Power) Shadow damage to enemies in its path. When the anima reaches the target it explodes, inflicting either Curse of Weakness or Curse of Tongues, and dealing 322170o1 Shadow damage over 12 seconds to all nearby enemies.
   SpellInfo(impending_catastrophe cd=60 duration=12)
@@ -175,24 +173,22 @@ Define(implosion 196277)
 Define(incinerate 29722)
 # Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
-Define(inevitable_demise 273525)
+Define(inevitable_demise_buff 273525)
 # Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
-  SpellInfo(inevitable_demise duration=20 max_stacks=50 gcd=0 offgcd=1)
+  SpellInfo(inevitable_demise_buff duration=20 max_stacks=50 gcd=0 offgcd=1)
   # Each time your Drain Life deals damage, it deals w1 additional damage and heals for an additional w1.
-  SpellAddBuff(inevitable_demise inevitable_demise add=1)
-Define(infernal_awakening 22703)
+  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff add=1)
+Define(infernal_awakening_debuff 22703)
 # An infernal falls from the sky, dealing (60 of Spell Power) Fire damage to all targets, stunning them for 2 seconds.
-  SpellInfo(infernal_awakening duration=2 gcd=0 offgcd=1)
-Define(inner_demons_demonology 267216)
-# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
-  SpellInfo(inner_demons_demonology gcd=0 offgcd=1 tick=12 unusable=1)
-  SpellRequire(inner_demons_demonology unusable set=1 enabled=(not hastalent(inner_demons_talent)))
+  SpellInfo(infernal_awakening_debuff duration=2 gcd=0 offgcd=1)
 Define(malefic_rapture 324536)
 # Your damaging periodic effects erupt on all targets, causing <damage> Shadow damage per effect.
   SpellInfo(malefic_rapture soulshards=1)
-Define(memory_of_lucid_dreams 299300)
-# Infuse your Heart of Azeroth with Memory of Lucid Dreams.
-  SpellInfo(memory_of_lucid_dreams)
+Define(memory_of_lucid_dreams 298357)
+# Clear your mind and attune yourself with the Heart of Azeroth, ?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137024|a137041|a137039)[Mana]?a137027|a137028[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?a137040[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
+  SpellInfo(memory_of_lucid_dreams cd=120 duration=12)
+  # ?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
+  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams add=1)
 Define(nether_portal 267217)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
   SpellInfo(nether_portal soulshards=1 cd=180 duration=15)
@@ -221,13 +217,11 @@ Define(reaping_flames 310690)
 Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
-Define(roaring_blaze 205184)
-# Conflagrate increases your ?s6353[Soul Fire, ][]?s196447[Channel Demonfire, ][]Immolate, Incinerate, and Conflagrate damage to the target by 265931s1 for 8 seconds.
-  SpellInfo(roaring_blaze gcd=0 offgcd=1 unusable=1)
-  SpellRequire(roaring_blaze unusable set=1 enabled=(not hastalent(roaring_blaze_talent)))
+Define(ripple_in_space 302731)
+# Create an Azerite beacon at a target location. After 4 seconds, the Heart of Azeroth will relocate you to this beacon and deal s2 Fire damage to all nearby enemies.?a302780[rnrnFor 10 seconds after being relocated, you take 302864s1 reduced damage.][]
+  SpellInfo(ripple_in_space cd=60 duration=4)
+  # About to relocate with Ripple in Space.
+  SpellAddBuff(ripple_in_space ripple_in_space add=1)
 Define(scouring_tithe 312321)
 # Deal (54 of Spell Power) Arcane damage instantly, and o2 over 18 seconds. If the enemy dies while affected by Scouring Tithe, you generate ?a137043[s3/10]?a137044[s4/10][s5/10] Soul LShard:Shards;. If they survive, Scouring Tithe's cooldown is refreshed.
   SpellInfo(scouring_tithe cd=40 duration=18 tick=3)
@@ -243,14 +237,9 @@ Define(shadow_bolt 686)
   SpellInfo(shadow_bolt)
   SpellRequire(shadow_bolt replaced_by set=incinerate enabled=(specialization("destruction")))
   SpellRequire(shadow_bolt replaced_by set=drain_soul enabled=(hastalent(drain_soul_talent)))
-Define(shadow_embrace 32388)
+Define(shadow_embrace_debuff 32390)
 # ?s198590[Drain Soul][Shadow Bolt] and Haunt apply Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.
-  SpellInfo(shadow_embrace gcd=0 offgcd=1 unusable=1)
-  # Damage taken increased by s1.1.
-  SpellAddBuff(shadow_embrace shadow_embrace_buff add=1)
-Define(shadow_embrace_buff 32390)
-# ?s198590[Drain Soul][Shadow Bolt] and Haunt apply Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 12 seconds. Stacks up to 32390u times.
-  SpellInfo(shadow_embrace_buff duration=12 max_stacks=3 gcd=0 offgcd=1)
+  SpellInfo(shadow_embrace_debuff duration=12 max_stacks=3 gcd=0 offgcd=1)
 Define(shadowburn 17877)
 # Blasts a target for (130 of Spell Power) Shadowflame damage, gaining s3 critical strike chance on targets that have 20 or less health.rnrn|cFFFFFFFFRestores 245731s1/10 Soul Shard if the target dies within 5 seconds.|r
   SpellInfo(shadowburn soulshards=1 cd=12 duration=5)
@@ -294,14 +283,14 @@ Define(summon_infernal 1122)
 # Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
   SpellInfo(summon_infernal cd=180 duration=0.25)
   # Stunned.
-  SpellAddTargetDebuff(summon_infernal infernal_awakening add=1)
+  SpellAddTargetDebuff(summon_infernal infernal_awakening_debuff add=1)
 Define(summon_vilefiend 264119)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15)
   SpellRequire(summon_vilefiend unusable set=1 enabled=(not hastalent(summon_vilefiend_talent)))
-Define(the_unbound_force 299321)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 tick=0.33)
 Define(unstable_affliction 316099)
 # Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
   SpellInfo(unstable_affliction duration=16 max_stacks=1 tick=2)
@@ -313,9 +302,9 @@ Define(vile_taint 278350)
   SpellRequire(vile_taint unusable set=1 enabled=(not hastalent(vile_taint_talent)))
   # Suffering w1 Shadow damage every t1 sec.rnMovement slowed by s2.
   SpellAddTargetDebuff(vile_taint vile_taint add=1)
-Define(worldvein_resonance 298606)
-# Infuse your Heart of Azeroth with Worldvein Resonance.
-  SpellInfo(worldvein_resonance)
+Define(worldvein_resonance 295186)
+# Concentrate energy into the Heart of Azeroth, immediately causing s1 Lifeblood Shards to erupt from the nearby ground for 12 seconds, and incease the primary stat gained from Lifeblood Shards by 313310s1 for 18 seconds.rnrn@spellicon295078@spellname295114rnGrants you and any other ally using Worldvein Resonance 295078s5 primary stat while within 295078s2 yds of the Lifeblood Shard. You can benefit from a maximum of 295137u Lifeblood Shards at a time.
+  SpellInfo(worldvein_resonance cd=60)
 Define(bilescourge_bombers_talent 22048)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (23 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
 Define(cataclysm_talent 23143)
@@ -348,8 +337,6 @@ Define(haunt_talent 23159)
 # A ghostly soul haunts the target, dealing (68.75 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 18 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
 Define(inferno_talent 22480)
 # Rain of Fire damage is increased by s2 and has a s1 chance to generate a Soul Shard Fragment.
-Define(inner_demons_talent 23146)
-# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
 Define(internal_combustion_talent 21695)
 # Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
 Define(nether_portal_talent 23091)

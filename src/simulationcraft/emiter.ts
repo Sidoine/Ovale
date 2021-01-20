@@ -142,50 +142,98 @@ export class Emiter {
         );
     }
 
-    private Disambiguate(
+    private disambiguateExact(
         annotation: Annotation,
         name: string,
         className: ClassId | "ALL_CLASSES",
         specialization: SpecializationName | "ALL_SPECIALIZATIONS",
         _type?: "spell" | "item"
-    ): [string, string | undefined] {
-        if (
-            specialization &&
-            annotation.dictionary[`${name}_${specialization}`]
-        ) {
-            return [`${name}_${specialization}`, _type];
-        }
-        if (className && annotation.dictionary[`${name}_${lower(className)}`]) {
-            return [`${name}_${lower(className)}`, _type];
-        }
-
+    ): [string | undefined, string | undefined] {
         const [disname, distype] = this.GetPerClassSpecialization(
             this.EMIT_DISAMBIGUATION,
             name,
             className,
             specialization
         );
-        if (!disname) {
-            if (!annotation.dictionary[name]) {
-                const otherName =
-                    (truthy(match(name, "_buff$")) &&
-                        gsub(name, "_buff$", "")) ||
-                    (truthy(match(name, "_debuff$")) &&
-                        gsub(name, "_debuff$", "")) ||
-                    gsub(name, "_item$", "");
-                if (annotation.dictionary[otherName]) {
-                    return [otherName, _type];
-                }
-                const potionName = gsub(name, "potion_of_", "");
-                if (annotation.dictionary[potionName]) {
-                    return [potionName, _type];
-                }
-            }
+        if (disname) {
+            return [disname, distype];
+        }
 
+        if (annotation.dictionary[name]) {
             return [name, _type];
         }
 
-        return [disname, distype];
+        return [undefined, undefined];
+    }
+
+    private Disambiguate(
+        annotation: Annotation,
+        name: string,
+        className: ClassId | "ALL_CLASSES",
+        specialization: SpecializationName | "ALL_SPECIALIZATIONS",
+        _type?: "spell" | "item",
+        suffix?: "buff" | "debuff" | "item"
+    ): [string, string | undefined] {
+        let disname: string | undefined;
+        let distype: string | undefined;
+        if (suffix) {
+            [disname, distype] = this.disambiguateExact(
+                annotation,
+                `${name}_${specialization}_${suffix}`,
+                className,
+                specialization,
+                _type
+            );
+            if (disname) return [disname, distype];
+
+            [disname, distype] = this.disambiguateExact(
+                annotation,
+                `${name}_${lower(className)}_${suffix}`,
+                className,
+                specialization,
+                _type
+            );
+            if (disname) return [disname, distype];
+        }
+
+        [disname, distype] = this.disambiguateExact(
+            annotation,
+            `${name}_${specialization}`,
+            className,
+            specialization,
+            _type
+        );
+        if (disname) return [disname, distype];
+
+        if (suffix) {
+            [disname, distype] = this.disambiguateExact(
+                annotation,
+                `${name}_${suffix}`,
+                className,
+                specialization,
+                _type
+            );
+            if (disname) return [disname, distype];
+        }
+
+        [disname, distype] = this.disambiguateExact(
+            annotation,
+            `${name}_${lower(className)}`,
+            className,
+            specialization,
+            _type
+        );
+        if (disname) return [disname, distype];
+        [disname, distype] = this.disambiguateExact(
+            annotation,
+            name,
+            className,
+            specialization,
+            _type
+        );
+        if (disname) return [disname, distype];
+
+        return [name, _type];
     }
 
     private AddPerClassSpecialization(
@@ -240,6 +288,7 @@ export class Emiter {
     }
 
     public InitializeDisambiguation() {
+        this.AddDisambiguation("exhaustion_buff", "exhaustion_debuff");
         this.AddDisambiguation(
             "inevitable_demise_az_buff",
             "inevitable_demise",
@@ -255,7 +304,7 @@ export class Emiter {
         this.AddDisambiguation("ashvanes_razor_coral", "razor_coral");
         this.AddDisambiguation(
             "bok_proc_buff",
-            "blackout_kick_aura",
+            "blackout_kick_aura_buff",
             "MONK",
             "windwalker"
         );
@@ -290,21 +339,6 @@ export class Emiter {
             "MAGE"
         );
         this.AddDisambiguation(
-            "disciplinary_command_arcane_buff",
-            "disciplinary_command__arcane_aura_dnt",
-            "MAGE"
-        );
-        this.AddDisambiguation(
-            "disciplinary_command_fire_buff",
-            "disciplinary_command__fire_aura_dnt",
-            "MAGE"
-        );
-        this.AddDisambiguation(
-            "disciplinary_command_frost_buff",
-            "disciplinary_command__frost_aura_dnt",
-            "MAGE"
-        );
-        this.AddDisambiguation(
             "hyperthread_wristwraps_300142",
             "hyperthread_wristwraps",
             "MAGE",
@@ -327,6 +361,12 @@ export class Emiter {
             "incarnation_tree_of_life_talent",
             "DRUID",
             "restoration"
+        );
+        this.AddDisambiguation(
+            "lunar_inspiration",
+            "moonfire_cat",
+            "DRUID",
+            "feral"
         );
         this.AddDisambiguation(
             "incarnation_talent",
@@ -397,6 +437,7 @@ export class Emiter {
         this.AddDisambiguation("blood_fury", "blood_fury_ap", "ROGUE");
         this.AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
         this.AddDisambiguation("blood_fury", "blood_fury_int", "MAGE");
+        this.AddDisambiguation("blood_fury", "blood_fury_int", "PRIEST");
         this.AddDisambiguation("blood_fury", "blood_fury_int", "WARLOCK");
         this.AddDisambiguation("blood_fury_buff", "blood_fury_ap_int", "MONK");
         this.AddDisambiguation(
@@ -413,7 +454,36 @@ export class Emiter {
         this.AddDisambiguation("blood_fury_buff", "blood_fury_ap", "ROGUE");
         this.AddDisambiguation("blood_fury_buff", "blood_fury_ap", "WARRIOR");
         this.AddDisambiguation("blood_fury_buff", "blood_fury_int", "MAGE");
+        this.AddDisambiguation("blood_fury_buff", "blood_fury_int", "PRIEST");
         this.AddDisambiguation("blood_fury_buff", "blood_fury_int", "WARLOCK");
+        this.AddDisambiguation(
+            "elemental_equilibrium_debuff",
+            "elemental_equilibrium_buff",
+            "SHAMAN",
+            "elemental"
+        );
+        this.AddDisambiguation("doom_winds_debuff", "doom_winds", "SHAMAN");
+        this.AddDisambiguation(
+            "meat_cleaver",
+            "whirlwind_buff",
+            "WARRIOR",
+            "fury"
+        );
+        this.AddDisambiguation(
+            "roaring_blaze",
+            "conflagrate_debuff",
+            "WARLOCK",
+            "destruction"
+        );
+        this.AddDisambiguation(
+            "chaos_theory_buff",
+            "chaos_blades",
+            "DEMONHUNTER"
+        );
+        this.AddDisambiguation(
+            "phantom_fire_item",
+            "potion_of_phantom_fire_item"
+        );
     }
 
     /** Transform a ParseNode to an AstNode
@@ -709,9 +779,11 @@ export class Emiter {
         } else if (modifier == "max_cycle_targets") {
             const [debuffName] = this.Disambiguate(
                 annotation,
-                `${action}_debuff`,
+                action,
                 className,
-                specialization
+                specialization,
+                undefined,
+                "debuff"
             );
             this.AddSymbol(annotation, debuffName);
             const node = this.Emit(parseNode, nodeList, annotation, action);
@@ -1482,9 +1554,11 @@ export class Emiter {
             ) {
                 const [buffName] = this.Disambiguate(
                     annotation,
-                    `${action}_buff`,
+                    action,
                     className,
-                    specialization
+                    specialization,
+                    undefined,
+                    "buff"
                 );
                 this.AddSymbol(annotation, buffName);
                 conditionCode = format("BuffExpires(%s)", buffName);
@@ -1645,14 +1719,14 @@ export class Emiter {
                     if (spellName) {
                         const [buffName] = this.Disambiguate(
                             annotation,
-                            `${spellName}_buff`,
+                            spellName,
                             className,
                             specialization,
-                            "spell"
+                            "spell",
+                            "buff"
                         );
-                        this.AddSymbol(annotation, spellName);
                         this.AddSymbol(annotation, buffName);
-                        bodyCode = format("Texture(%s text=cancel)", spellName);
+                        bodyCode = format("Texture(%s text=cancel)", buffName);
                         conditionCode = format("BuffPresent(%s)", buffName);
                         isSpellAction = false;
                     }
@@ -1682,9 +1756,10 @@ export class Emiter {
                     }
                     [name] = this.Disambiguate(
                         annotation,
-                        `${name}_item`,
+                        name,
                         className,
                         specialization,
+                        "item",
                         "item"
                     );
                     bodyCode = format("Item(%s usable=1)", name);
@@ -2614,12 +2689,14 @@ export class Emiter {
         ];
         [name] = this.Disambiguate(annotation, name, className, specialization);
         target = (target && `${target}.`) || "";
-        let buffName = `${name}_debuff`;
+        let buffName;
         [buffName] = this.Disambiguate(
             annotation,
-            buffName,
+            name,
             className,
-            specialization
+            specialization,
+            undefined,
+            "debuff"
         );
         const buffSpellId = annotation.dictionary[buffName];
         let prefix;
@@ -2804,12 +2881,14 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let dotName = `${name}_debuff`;
+            let dotName;
             [dotName] = this.Disambiguate(
                 annotation,
-                dotName,
+                name,
                 annotation.classId,
-                annotation.specialization
+                annotation.specialization,
+                undefined,
+                "debuff"
             );
             const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
@@ -2919,13 +2998,15 @@ export class Emiter {
         let node;
         const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
         const token = tokenIterator();
-        if (token == "refreshable") {
-            let buffName = `${action}_debuff`;
+        if (token == "refreshable" && action) {
+            let buffName;
             [buffName] = this.Disambiguate(
                 annotation,
-                buffName,
+                action,
                 annotation.classId,
-                annotation.specialization
+                annotation.specialization,
+                undefined,
+                "debuff"
             );
             let target;
             const prefix =
@@ -3030,21 +3111,16 @@ export class Emiter {
                 } else if (property === "max_stack") {
                     code = "maxarcanecharges()";
                 }
+            } else if (name === "frozen_pulse") {
+                if (property === "up") code = "runecount() < 3";
             } else {
-                // buffname
-                [name] = this.Disambiguate(
+                [buffName] = this.Disambiguate(
                     annotation,
                     name,
                     annotation.classId,
-                    annotation.specialization
-                );
-                buffName =
-                    (token == "debuff" && `${name}_debuff`) || `${name}_buff`;
-                [buffName] = this.Disambiguate(
-                    annotation,
-                    buffName,
-                    annotation.classId,
-                    annotation.specialization
+                    annotation.specialization,
+                    undefined,
+                    token as "buff" | "debuff"
                 );
                 let prefix;
                 if (
@@ -3409,12 +3485,14 @@ export class Emiter {
                 annotation.classId,
                 annotation.specialization
             );
-            let dotName = `${name}_debuff`;
+            let dotName;
             [dotName] = this.Disambiguate(
                 annotation,
-                dotName,
+                name,
                 annotation.classId,
-                annotation.specialization
+                annotation.specialization,
+                undefined,
+                "debuff"
             );
             const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
@@ -3449,24 +3527,17 @@ export class Emiter {
         const token = tokenIterator();
         if (token == "dot") {
             let name = tokenIterator();
+            if (truthy(match(name, "_dot$"))) {
+                name = gsub(name, "_dot$", "");
+            }
             const property = tokenIterator();
-            [name] = this.Disambiguate(
+            let [dotName] = this.Disambiguate(
                 annotation,
                 name,
                 annotation.classId,
-                annotation.specialization
-            );
-            let dotName;
-            if (truthy(match(name, "_dot$"))) {
-                dotName = gsub(name, "_dot$", "_debuff");
-            } else {
-                dotName = `${name}_debuff`;
-            }
-            [dotName] = this.Disambiguate(
-                annotation,
-                dotName,
-                annotation.classId,
-                annotation.specialization
+                annotation.specialization,
+                undefined,
+                "debuff"
             );
             const prefix =
                 (truthy(find(dotName, "_buff$")) && "Buff") || "Debuff";
@@ -4073,17 +4144,15 @@ export class Emiter {
         } else if (className == "DRUID" && truthy(match(operand, "^druid%."))) {
             const tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
             tokenIterator(); // consume "druid."
-            const [name] = this.Disambiguate(
-                annotation,
-                lower(tokenIterator()),
-                annotation.classId,
-                annotation.specialization
-            );
+            let name = lower(tokenIterator());
+
             const [debuffName] = this.Disambiguate(
                 annotation,
-                `${name}_debuff`,
+                name,
                 annotation.classId,
-                annotation.specialization
+                annotation.specialization,
+                undefined,
+                "debuff"
             );
             const property = tokenIterator();
             if (property == "ticks_gained_on_refresh") {
@@ -4268,11 +4337,11 @@ export class Emiter {
             code = "0";
         } else if (className == "ROGUE" && operand == "poisoned_bleeds") {
             code =
-                "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding)";
+                "DebuffCountOnAny(rupture) + DebuffCountOnAny(garrote) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)";
             this.AddSymbol(annotation, "rupture");
             this.AddSymbol(annotation, "garrote");
             this.AddSymbol(annotation, "internal_bleeding_talent");
-            this.AddSymbol(annotation, "internal_bleeding");
+            this.AddSymbol(annotation, "internal_bleeding_debuff");
         } else if (className == "ROGUE" && operand == "exsanguinated") {
             code = "target.DebuffPresent(exsanguinated)";
             this.AddSymbol(annotation, "exsanguinated");
@@ -4292,8 +4361,8 @@ export class Emiter {
             className == "ROGUE" &&
             operand == "master_assassin_remains"
         ) {
-            code = "BuffRemaining(master_assassin)";
-            this.AddSymbol(annotation, "master_assassin");
+            code = "BuffRemaining(master_assassin_buff)";
+            this.AddSymbol(annotation, "master_assassin_buff");
         } else if (
             className == "ROGUE" &&
             operand == "buff.roll_the_bones.remains"

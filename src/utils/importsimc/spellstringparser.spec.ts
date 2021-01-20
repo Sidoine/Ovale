@@ -60,6 +60,9 @@ function createFakeSpell(
         identifier: "",
         identifierScore: 0,
         classFlags: [],
+        baseIdentifier: "",
+        identifiers: [],
+        triggeredIdentifierScore: 0,
     };
 }
 

@@ -56,7 +56,21 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "lunar_empowerment",
         "solar_empowerment"
     );
-    addSpellList("eclipse_any", "eclipse_lunar", "eclipse_solar");
+    addSpellList(
+        "incarnation",
+        "incarnation_tree_of_life",
+        "incarnation_king_of_the_jungle",
+        "incarnation_guardian_of_ursoc",
+        "incarnation_chosen_of_elune"
+    );
+    addSpellList(
+        "blessing_of_the_seasons",
+        "blessing_of_spring",
+        "blessing_of_summer",
+        "blessing_of_autumn",
+        "blessing_of_winter"
+    );
+    addSpellList("eclipse_any", "eclipse_lunar_buff", "eclipse_solar_buff");
     addSpellList(
         "bt_buffs",
         "bt_swipe_buff",
@@ -73,14 +87,25 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "berserk_bear",
         "berserk_cat"
     );
+    addSpellList(
+        "gladiators_badge_item",
+        "dread_gladiators_badge_item",
+        "sinister_gladiators_badge_item",
+        "notorious_gladiators_badge_item",
+        "corrupted_gladiators_badge_item"
+    );
 
     // Fix identifiers
     function fixIdentifier(identifier: string, spellId: number) {
         const spell = spellData.spellDataById.get(spellId);
         if (spell) {
-            delete spellData.identifiers[spell.identifier];
-            spell.identifier = identifier;
-            spellData.identifiers[identifier] = spellId;
+            if (spell.identifier !== identifier) {
+                delete spellData.identifiers[spell.identifier];
+                spell.identifier = identifier;
+                spellData.identifiers[identifier] = spellId;
+            } else {
+                console.log(`Info: ${spell.identifier} fix not necessary`);
+            }
         }
     }
 
@@ -139,9 +164,12 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("steady_focus_buff", 193534);
     fixIdentifier("serpent_sting_marksmanship", 271788);
     fixIdentifier("unstable_affliction_silence_debuff", 196364);
-    fixIdentifier("corruption_debuff_affliction", 146739);
+    fixIdentifier("corruption_affliction_debuff", 146739);
     fixIdentifier("condemn_fury", 317485);
     fixIdentifier("devastator_passive", 236279);
+    fixIdentifier("festering_wound_unholy_debuff", 194310);
+    fixIdentifier("bloodbath", 335096);
+    fixIdentifier("radiant_spark_vulnerability_debuff", 307454);
 
     // Blood fury
     fixIdentifier("blood_fury_ap_int", 33697);

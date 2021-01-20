@@ -35,9 +35,31 @@ Define(blessed_hammer 204019)
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and reducing the next damage they deal to you by <shield>.rnrn|cFFFFFFFFGenerates s2 Holy Power.
   SpellInfo(blessed_hammer cd=6 duration=5 holypower=-1)
   SpellRequire(blessed_hammer unusable set=1 enabled=(not hastalent(blessed_hammer_talent)))
-Define(blessing_of_the_seasons 328278)
-#  
-  SpellInfo(blessing_of_the_seasons gcd=0 offgcd=1)
+Define(blessing_of_autumn 328622)
+# Bless an ally for 30 seconds, causing their cooldowns to recover s1 faster.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Winter after use.
+  SpellInfo(blessing_of_autumn cd=45 duration=30)
+  # Cooldowns recover w1 faster.
+  SpellAddBuff(blessing_of_autumn blessing_of_autumn add=1)
+Define(blessing_of_spring 328282)
+# Bless an ally for 30 seconds, increasing their healing done by s1 and healing received by s2.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Summer after use.
+  SpellInfo(blessing_of_spring cd=45 duration=30)
+  # Healing done increased by w1 and healing received increased by w2.
+  SpellAddBuff(blessing_of_spring blessing_of_spring add=1)
+Define(blessing_of_summer 328620)
+# Bless an ally for 30 seconds, causing their attacks to have a h chance to deal s1 additional damage as Holy.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Autumn after use.
+  SpellInfo(blessing_of_summer cd=45 duration=30)
+  # Attacks have a h chance to deal w1 additional damage as Holy.
+  SpellAddBuff(blessing_of_summer blessing_of_summer add=1)
+Define(blessing_of_winter 328281)
+# Bless an ally for 30 seconds. Their attacks deal <points> Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
+  SpellInfo(blessing_of_winter cd=45 duration=30)
+  # Attack speed reduced by w3.rnMovement speed reduced by w4.
+  SpellAddBuff(blessing_of_winter blessing_of_winter_unused_0 add=1)
+  # Attacks deal <points> Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.
+  SpellAddBuff(blessing_of_winter blessing_of_winter add=1)
+Define(blessing_of_winter_unused_0 328506)
+# Bless an ally for 30 seconds. Their attacks deal <points> Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
+  SpellInfo(blessing_of_winter_unused_0 duration=6 max_stacks=10 gcd=0 offgcd=1)
 Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6)
@@ -67,11 +89,11 @@ Define(devotion_aura 465)
   SpellInfo(devotion_aura)
   # Damage taken reduced by w1.
   SpellAddBuff(devotion_aura devotion_aura add=1)
-Define(divine_purpose 223819)
+Define(divine_purpose_buff 223819)
 # Holy Power abilities have a s1 chance to make your next Holy Power ability free and deal 223819s2 increased damage and healing.
-  SpellInfo(divine_purpose duration=12 gcd=0 offgcd=1)
+  SpellInfo(divine_purpose_buff duration=12 gcd=0 offgcd=1)
   # Your next Holy Power ability is free and deals s2 increased damage and healing.
-  SpellAddBuff(divine_purpose divine_purpose add=1)
+  SpellAddBuff(divine_purpose_buff divine_purpose_buff add=1)
 Define(divine_storm 53385)
 # Unleashes a whirl of divine energy, dealing s1 Holy damage to up to s2 nearby enemies.
   SpellInfo(divine_storm holypower=3)
@@ -139,23 +161,17 @@ Define(judgment_protection 275779)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-Define(memory_of_lucid_dreams 299300)
-# Infuse your Heart of Azeroth with Memory of Lucid Dreams.
-  SpellInfo(memory_of_lucid_dreams)
-Define(memory_of_lucid_dreams_buff 298357)
+Define(memory_of_lucid_dreams 298357)
 # Clear your mind and attune yourself with the Heart of Azeroth, ?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137024|a137041|a137039)[Mana]?a137027|a137028[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?a137040[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams_buff cd=120 duration=12)
+  SpellInfo(memory_of_lucid_dreams cd=120 duration=12)
   # ?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams_buff memory_of_lucid_dreams_buff add=1)
+  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams add=1)
 Define(moment_of_glory 327193)
 # Reset the cooldown of Avenger's Shield. Your next n Avenger's Shields have no cooldown and deal s2 additional damage.
   SpellInfo(moment_of_glory cd=90 duration=15 gcd=0 offgcd=1)
   SpellRequire(moment_of_glory unusable set=1 enabled=(not hastalent(moment_of_glory_talent)))
   # Your next n Avenger's Shields have no cooldown and deal w2 additional damage.
   SpellAddBuff(moment_of_glory moment_of_glory add=1)
-Define(phantom_fire 321937)
-# Deal s1 Shadow Fire damage to your current target.
-  SpellInfo(phantom_fire gcd=0 offgcd=1)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
@@ -165,11 +181,11 @@ Define(rebuke 96231)
 Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 4 seconds.
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
-Define(seething_rage 297126)
+Define(seething_rage_buff 297126)
 # Increases your critical hit damage by 297126m for 5 seconds.
-  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  SpellInfo(seething_rage_buff duration=5 gcd=0 offgcd=1)
   # Critical strike damage increased by w1.
-  SpellAddBuff(seething_rage seething_rage add=1)
+  SpellAddBuff(seething_rage_buff seething_rage_buff add=1)
 Define(seraphim 152262)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
   SpellInfo(seraphim holypower=3 cd=45 duration=15)
@@ -192,9 +208,9 @@ Define(shining_light_free_buff 327510)
 Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266s1 Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
-Define(the_unbound_force 299321)
-# Infuse your Heart of Azeroth with The Unbound Force.
-  SpellInfo(the_unbound_force)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 tick=0.33)
 Define(vanquishers_hammer 328204)
 # Throws a hammer at your target dealing (136 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].
   SpellInfo(vanquishers_hammer cd=30 duration=20)
@@ -213,9 +229,10 @@ Define(war_stomp 20549)
 Define(word_of_glory 85673)
 # Calls down the Light to heal a friendly target for 130551s1.?a315921&!a315924[rnrn|cFFFFFFFFProtection:|r If cast on yourself, healing increased by up to 315921s1 based on your missing health.][]?a315924[rnrn|cFFFFFFFFProtection:|r Healing increased by up to 315921s1 based on the target's missing health.][]
   SpellInfo(word_of_glory holypower=3)
-Define(worldvein_resonance 298606)
-# Infuse your Heart of Azeroth with Worldvein Resonance.
-  SpellInfo(worldvein_resonance)
+Define(worldvein_resonance 295186)
+# Concentrate energy into the Heart of Azeroth, immediately causing s1 Lifeblood Shards to erupt from the nearby ground for 12 seconds, and incease the primary stat gained from Lifeblood Shards by 313310s1 for 18 seconds.rnrn@spellicon295078@spellname295114rnGrants you and any other ally using Worldvein Resonance 295078s5 primary stat while within 295078s2 yds of the Lifeblood Shard. You can benefit from a maximum of 295137u Lifeblood Shards at a time.
+  SpellInfo(worldvein_resonance cd=60)
+SpellList(blessing_of_the_seasons blessing_of_spring blessing_of_summer blessing_of_autumn blessing_of_winter)
 Define(avenging_crusader_talent 22190)
 # You become the ultimate crusader of light, increasing your Crusader Strike, Judgment, and auto-attack damage by s1.rnrnCrusader Strike and Judgment cool down s2 faster and heal up to s6 injured allies for s5 of the damage they deal. Lasts 20 seconds.
 Define(blessed_hammer_talent 23469)
@@ -238,6 +255,8 @@ Define(sanctified_wrath_talent_protection 23457)
 # Avenging Wrath lasts s1 longer and causes Judgment to generate s2 additional Holy Power.
 Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
+Define(potion_of_phantom_fire_item 171349)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
 Define(potion_of_spectral_strength_item 171275)
     ItemInfo(potion_of_spectral_strength_item cd=1 shared_cd="item_cd_4" proc=307164)
     `;
@@ -260,14 +279,14 @@ Define(lay_on_hands 633)
 
     SpellInfo(shield_of_the_righteous holypower=3)
     SpellAddBuff(shield_of_the_righteous shield_of_the_righteous_buff add=1)
-    SpellRequire(shield_of_the_righteous holypower set=0 enabled=(buffpresent(divine_purpose)))
-    SpellAddBuff(shield_of_the_righteous divine_purpose set=0)
+    SpellRequire(shield_of_the_righteous holypower set=0 enabled=(buffpresent(divine_purpose_buff)))
+    SpellAddBuff(shield_of_the_righteous divine_purpose_buff set=0)
 Define(shield_of_the_righteous_buff 132403)
     SpellInfo(shield_of_the_righteous_buff duration=4.5)
 Define(unbreakable_spirit_talent 22433)
-    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose)))
+    SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(divine_purpose_buff)))
     SpellRequire(word_of_glory holypower set=0 enabled=(buffpresent(shining_light_free_buff)))
-    SpellAddBuff(word_of_glory divine_purpose set=0)
+    SpellAddBuff(word_of_glory divine_purpose_buff set=0)
     SpellAddBuff(word_of_glory shining_light_free_buff set=0)
     SpellInfo(shining_light_free_buff duration=30)
     `;
