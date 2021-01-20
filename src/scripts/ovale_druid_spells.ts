@@ -51,19 +51,21 @@ Define(berserk_cat 106951)
   SpellRequire(berserk_cat replaced_by set=incarnation_king_of_the_jungle enabled=(hastalent(incarnation_king_of_the_jungle_talent)))
   # Rake and Shred deal damage as though you were stealthed. rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.
   SpellAddBuff(berserk_cat berserk_cat add=1)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
 Define(bloodlust 2825)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(bloodlust bloodlust add=1)
-Define(bloodtalons 145152)
+Define(bloodtalons_buff 145152)
 # @spelldesc155672
-  SpellInfo(bloodtalons duration=30 gcd=0 offgcd=1)
+  SpellInfo(bloodtalons_buff duration=30 gcd=0 offgcd=1)
   # Your next Rip or Ferocious Bite deals s1 increased damage.
-  SpellAddBuff(bloodtalons bloodtalons add=1)
+  SpellAddBuff(bloodtalons_buff bloodtalons_buff add=1)
 Define(brutal_slash 202028)
 # Strikes up to s3 nearby enemies with a massive slash, inflicting s2 Physical damage.rnrn|cFFFFFFFFAwards s1 combo lpoint:points;.|r
   SpellInfo(brutal_slash energy=25 cd=8 gcd=1 combopoints=-1)
@@ -79,27 +81,27 @@ Define(celestial_alignment 194223)
   SpellRequire(celestial_alignment replaced_by set=incarnation_chosen_of_elune enabled=(hastalent(incarnation_chosen_of_elune_talent)))
   # Both Eclipses active. Haste increased by w1.
   SpellAddBuff(celestial_alignment celestial_alignment add=1)
-Define(clearcasting 16870)
-# Your healing over time from Lifebloom has a (25 of Spell Power) chance to cause a Clearcasting state, making your next ?a155577[155577m1+1 Regrowths][Regrowth] cost no mana.
-  SpellInfo(clearcasting duration=15 max_stacks=1 gcd=0 offgcd=1)
+Define(clearcasting_feral_buff 135700)
+# Your auto attacks have a chance to cause a Clearcasting state, making your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] cost no Energy.
+  SpellInfo(clearcasting_feral_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
 Define(convoke_the_spirits 323764)
 # Call upon the Night Fae for an eruption of energy, channeling a rapid flurry of s2 Druid spells and abilities over 4 seconds.rnrnYou will cast ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake and Thrash on appropriate nearby targets, favoring your current shapeshift form.
   SpellInfo(convoke_the_spirits cd=120 duration=4 channel=4 max_stacks=99 tick=0.25)
   # Every t1.2 sec, casting ?a24858|a197625[Starsurge, Starfall,]?a768[Ferocious Bite, Shred, Tiger's Fury,]?a5487[Mangle, Ironfur,][Wild Growth, Swiftmend,] Moonfire, Wrath, Regrowth, Rejuvenation, Rake or Thrash on appropriate nearby targets.
   SpellAddBuff(convoke_the_spirits convoke_the_spirits add=1)
-Define(dazed 50259)
+Define(dazed_druid_debuff 50259)
 # Leap behind an enemy, dazing them for 3 seconds.
-  SpellInfo(dazed duration=3 gcd=0 offgcd=1)
-Define(eclipse_lunar 48518)
+  SpellInfo(dazed_druid_debuff duration=3 gcd=0 offgcd=1)
+Define(eclipse_lunar_buff 48518)
 # Casting s1 lStarfire:Starfires; empowers Wrath for 15 seconds. Casting s1 lWrath:Wraths; empowers Starfire for 15 seconds. These Eclipses occur in alternation.rnrn@spellicon48517 @spellname48517rnWrath cast time reduced 48517s1 and damage increased 48517s2.rnrn@spellicon48518 @spellname48518rnStarfire cast time reduced 48518s1 and critical strike chance increased 48518s2.
-  SpellInfo(eclipse_lunar duration=15 gcd=0 offgcd=1)
+  SpellInfo(eclipse_lunar_buff duration=15 gcd=0 offgcd=1)
   # Starfire cast time reduced w1?<w5>0>[, area effect damage increased w5,][] and critical strike chance increased w2.
-  SpellAddBuff(eclipse_lunar eclipse_lunar add=1)
-Define(eclipse_solar 48517)
+  SpellAddBuff(eclipse_lunar_buff eclipse_lunar_buff add=1)
+Define(eclipse_solar_buff 48517)
 # Casting s1 lStarfire:Starfires; empowers Wrath for 15 seconds. Casting s1 lWrath:Wraths; empowers Starfire for 15 seconds. These Eclipses occur in alternation.rnrn@spellicon48517 @spellname48517rnWrath cast time reduced 48517s1 and damage increased 48517s2.rnrn@spellicon48518 @spellname48518rnStarfire cast time reduced 48518s1 and critical strike chance increased 48518s2.
-  SpellInfo(eclipse_solar duration=15 gcd=0 offgcd=1)
+  SpellInfo(eclipse_solar_buff duration=15 gcd=0 offgcd=1)
   # Wrath cast time reduced w1?<w5>0>[, Astral Power generation increased w5,][] and damage increased w2.
-  SpellAddBuff(eclipse_solar eclipse_solar add=1)
+  SpellAddBuff(eclipse_solar_buff eclipse_solar_buff add=1)
 Define(empower_bond 326446)
 # Empower the bond for 10 seconds:rnrn?c3[|cFFFFFFFFTank|rrnProtect your bonded partner, redirecting s1 of damage they take to you, unless you fall below s3 health.]?c4[|cFFFFFFFFHealer|rrnFocus on your bonded partner, replicating 327148s1 of all healing you deal onto them.][|cFFFFFFFFDamager|rrnEnergize your bonded partner, granting them 327139s1 of your damage as additional Arcane damage, healing, or absorption.]rnrn|cFFFFFFFFDamager Partner|rrnThey energize you, granting you 327139s1 of their damage as additional Arcane damage, healing, or absorption.
   SpellInfo(empower_bond cd=60 gcd=0 offgcd=1)
@@ -128,11 +130,11 @@ Define(fury_of_elune 202770)
   SpellRequire(fury_of_elune unusable set=1 enabled=(not hastalent(fury_of_elune_talent)))
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune add=1)
-Define(galactic_guardian 213708)
+Define(galactic_guardian_buff 213708)
 # Your damage has a h chance to trigger a free automatic Moonfire on that target. rnrnWhen this occurs, the next Moonfire you cast generates 213708m1/10 Rage, and deals 213708s3 increased direct damage.
-  SpellInfo(galactic_guardian duration=15 gcd=0 offgcd=1)
+  SpellInfo(galactic_guardian_buff duration=15 gcd=0 offgcd=1)
   # Your next Moonfire generates m1/10 Rage, and deals s3 increased direct damage.
-  SpellAddBuff(galactic_guardian galactic_guardian add=1)
+  SpellAddBuff(galactic_guardian_buff galactic_guardian_buff add=1)
 Define(half_moon 202768)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=15 lunarpower=-20)
@@ -142,19 +144,19 @@ Define(heart_of_the_wild 319454)
   SpellRequire(heart_of_the_wild unusable set=1 enabled=(not hastalent(heart_of_the_wild_talent)))
   # Abilities associated with your chosen Affinity are substantially empowered.
   SpellAddBuff(heart_of_the_wild heart_of_the_wild add=1)
-Define(immobilized 45334)
+Define(immobilized_debuff 45334)
 # Charge to an enemy, immobilizing them for 4 seconds.
-  SpellInfo(immobilized duration=4 gcd=0 offgcd=1)
+  SpellInfo(immobilized_debuff duration=4 gcd=0 offgcd=1)
 Define(incapacitating_roar 99)
 # Shift into Bear Form and invoke the spirit of Ursol to let loose a deafening roar, incapacitating all enemies within A1 yards for 3 seconds. Damage will cancel the effect.
   SpellInfo(incapacitating_roar cd=30 duration=3)
   # Incapacitated.
   SpellAddTargetDebuff(incapacitating_roar incapacitating_roar add=1)
-Define(incarnation 117679)
+Define(incarnation_buff 117679)
 # Activates a superior shapeshifting form appropriate to your specialization for 30 seconds.  You may freely shapeshift in and out of this form for its duration.
-  SpellInfo(incarnation duration=30 gcd=0 offgcd=1)
+  SpellInfo(incarnation_buff duration=30 gcd=0 offgcd=1)
   # Incarnation: Tree of Life activated.
-  SpellAddBuff(incarnation incarnation add=1)
+  SpellAddBuff(incarnation_buff incarnation_buff add=1)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that grants the benefits of Celestial Alignment, and s2 critical strike chance.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
   SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 gcd=0 offgcd=1)
@@ -174,15 +176,21 @@ Define(incarnation_king_of_the_jungle 102543)
   # Rake and Shred deal damage as though you were stealthed.rnrnFinishing moves have a w1 chance per combo point spent to refund 343216s1 combo lpoint:points;.rnrnEnergy costs reduced by w2.
   SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle add=1)
   # Allows the use of Prowl even while in combat.
-  SpellAddBuff(incarnation_king_of_the_jungle jungle_stalker add=1)
+  SpellAddBuff(incarnation_king_of_the_jungle jungle_stalker_buff add=1)
+Define(incarnation_tree_of_life 33891)
+# Shapeshift into the Tree of Life, increasing healing done by 5420s1, increasing armor by 5420s3, and granting protection from Polymorph effects.  Functionality of Rejuvenation, Wild Growth, Regrowth, and Entangling Roots is enhanced.rnrnLasts 30 seconds. You may shapeshift in and out of this form for its duration.
+  SpellInfo(incarnation_tree_of_life cd=180 tick=7)
+  SpellRequire(incarnation_tree_of_life unusable set=1 enabled=(not hastalent(incarnation_tree_of_life_talent)))
+  # Healing increased by 5420s1.rnArmor increased by 5420s3.rnSome spells are enhanced.
+  SpellAddBuff(incarnation_tree_of_life incarnation_tree_of_life add=1)
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
   SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
   # Armor increased by w1*AGI/100.
   SpellAddBuff(ironfur ironfur add=1)
-Define(jungle_stalker 252071)
+Define(jungle_stalker_buff 252071)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
-  SpellInfo(jungle_stalker duration=30 gcd=0 offgcd=1)
+  SpellInfo(jungle_stalker_buff duration=30 gcd=0 offgcd=1)
 Define(kindred_empowerment_energize 327139)
 # Energize your bonded partner, granting them 327139s1 of your damage as additional Arcane damage, healing, or absorption.
   SpellInfo(kindred_empowerment_energize duration=10 gcd=0 offgcd=1 tick=0.5)
@@ -193,15 +201,11 @@ Define(kindred_spirits 326434)
   SpellInfo(kindred_spirits duration=3600)
   # Bonded with @auracaster. Every 327097d, they may empower the bond, granting bonuses based on your respective roles.
   SpellAddBuff(kindred_spirits kindred_spirits add=1)
-Define(lunar_inspiration_feral 155580)
-# Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
-  SpellInfo(lunar_inspiration_feral gcd=0 offgcd=1 unusable=1)
-  SpellRequire(lunar_inspiration_feral unusable set=1 enabled=(not hastalent(lunar_inspiration_talent)))
-Define(lycaras_fleeting_glimpse 340060)
+Define(lycaras_fleeting_glimpse_buff 340060)
 # Every s1 sec while in combat, cast a spell based on your form:rnrnNo Form: @spellname48438rnCat Form: @spellname285381rnBear Form: @spellname22812rnMoonkin Form: @spellname191034rnTravel Form: @spellname77764
-  SpellInfo(lycaras_fleeting_glimpse duration=5 gcd=0 offgcd=1 tick=1)
+  SpellInfo(lycaras_fleeting_glimpse_buff duration=5 gcd=0 offgcd=1 tick=1)
   # You feel Lycara's inspiration arriving.
-  SpellAddBuff(lycaras_fleeting_glimpse lycaras_fleeting_glimpse add=1)
+  SpellAddBuff(lycaras_fleeting_glimpse_buff lycaras_fleeting_glimpse_buff add=1)
 Define(maim 22570)
 # Finishing move that causes Physical damage and stuns the target. Damage and duration increased per combo point:rnrn   1 point  : s2*1 damage, 1 secrn   2 points: s2*2 damage, 2 secrn   3 points: s2*3 damage, 3 secrn   4 points: s2*4 damage, 4 secrn   5 points: s2*5 damage, 5 sec
   SpellInfo(maim energy=30 combopoints=1 max_combopoints=4 cd=20 gcd=1)
@@ -241,30 +245,30 @@ Define(new_moon 274281)
 # Deals m1 Astral damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10)
   SpellRequire(new_moon unusable set=1 enabled=(not hastalent(new_moon_talent)))
-Define(oath_of_the_elder_druid 338643)
+Define(oath_of_the_elder_druid_buff 338643)
 # Effects of Thick Hide, Astral Influence, Feline Swiftness, and Ysera's Gift increased by s1.rnrnWhen you shift into your Affinity's form, you gain Heart of the Wild for s2 sec, once every 60 seconds.
-  SpellInfo(oath_of_the_elder_druid duration=60 gcd=0 offgcd=1)
+  SpellInfo(oath_of_the_elder_druid_buff duration=60 gcd=0 offgcd=1)
   # You have recently gained Heart of the Wild from Oath of the Elder Druid.
-  SpellAddBuff(oath_of_the_elder_druid oath_of_the_elder_druid add=1)
-Define(oneths_clear_vision 339797)
+  SpellAddBuff(oath_of_the_elder_druid_buff oath_of_the_elder_druid_buff add=1)
+Define(oneths_clear_vision_buff 339797)
 # Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
-  SpellInfo(oneths_clear_vision duration=30 gcd=0 offgcd=1)
+  SpellInfo(oneths_clear_vision_buff duration=30 gcd=0 offgcd=1)
   # Your next Starsurge costs no Astral Power.
-  SpellAddBuff(oneths_clear_vision oneths_clear_vision add=1)
-Define(oneths_perception 339800)
+  SpellAddBuff(oneths_clear_vision_buff oneths_clear_vision_buff add=1)
+Define(oneths_perception_buff 339800)
 # Starsurge has a s1 chance to make Starfall free. Starfall has a s2 chance to make Starsurge free.
-  SpellInfo(oneths_perception duration=30 gcd=0 offgcd=1)
+  SpellInfo(oneths_perception_buff duration=30 gcd=0 offgcd=1)
   # Your next Starfall costs no Astral Power.
-  SpellAddBuff(oneths_perception oneths_perception add=1)
+  SpellAddBuff(oneths_perception_buff oneths_perception_buff add=1)
 Define(primal_wrath 285381)
 # Finishing move that deals instant damage and applies Rip to all enemies within A1 yards. Lasts longer per combo point.rnrn   1 point  : s1*2 plus Rip for s2*2 secrn   2 points: s1*3 plus Rip for s2*3 secrn   3 points: s1*4 plus Rip for s2*4 secrn   4 points: s1*5 plus Rip for s2*5 secrn   5 points: s1*6 plus Rip for s2*6 sec
   SpellInfo(primal_wrath energy=20 combopoints=1 max_combopoints=4 gcd=1)
   SpellRequire(primal_wrath unusable set=1 enabled=(not hastalent(primal_wrath_talent)))
-Define(primordial_arcanic_pulsar 338825)
+Define(primordial_arcanic_pulsar_buff 338825)
 # Every s1 Astral Power spent grants Celestial Alignment for s2 sec.
-  SpellInfo(primordial_arcanic_pulsar max_stacks=10 gcd=0 offgcd=1)
+  SpellInfo(primordial_arcanic_pulsar_buff max_stacks=10 gcd=0 offgcd=1)
   # w1~ Arcane Power collected by Primordial Arcanic Pulsar.
-  SpellAddBuff(primordial_arcanic_pulsar primordial_arcanic_pulsar add=1)
+  SpellAddBuff(primordial_arcanic_pulsar_buff primordial_arcanic_pulsar_buff add=1)
 Define(prowl 5215)
 # Shift into Cat Form and enter stealth.
   SpellInfo(prowl cd=6 gcd=0 offgcd=1)
@@ -324,10 +328,10 @@ Define(solar_beam 78675)
   # Silenced.
   SpellAddBuff(solar_beam solar_beam add=1)
   # Interrupted.
-  SpellAddTargetDebuff(solar_beam solar_beam_debuff add=1)
-Define(solar_beam_debuff 97547)
+  SpellAddTargetDebuff(solar_beam solar_beam_unused_0 add=1)
+Define(solar_beam_unused_0 97547)
 # You summon a beam of solar light over the enemy target's location, interrupting the enemy target and silencing all enemy targets under the beam while it is active. Solar Beam lasts for 8 seconds.
-  SpellInfo(solar_beam_debuff duration=5 gcd=0 offgcd=1 interrupt=1)
+  SpellInfo(solar_beam_unused_0 duration=5 gcd=0 offgcd=1 interrupt=1)
 Define(solstice_buff 343648)
 # During the first 6 seconds of every Eclipse, Shooting Stars fall 343648s1 more often.
   SpellInfo(solstice_buff duration=6 gcd=0 offgcd=1)
@@ -339,11 +343,11 @@ Define(starfall 191034)
 Define(starfire 194153)
 # Call down a burst of energy, causing (76.5 of Spell Power) Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(starfire lunarpower=-8)
-Define(starlord 279709)
+Define(starlord_buff 279709)
 # Starsurge and Starfall grant you 279709s1 Haste for 15 seconds.rnrnStacks up to 279709u times. Gaining a stack does not refresh the duration.
-  SpellInfo(starlord duration=15 max_stacks=3 gcd=0 offgcd=1)
+  SpellInfo(starlord_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
   # Haste increased by s1.
-  SpellAddBuff(starlord starlord add=1)
+  SpellAddBuff(starlord_buff starlord_buff add=1)
 Define(starsurge 78674)
 # Launch a surge of stellar energies at the target, dealing (206.99999999999997 of Spell Power) Astral damage, and empowering the damage bonus of any active Eclipse for its duration.
   SpellInfo(starsurge lunarpower=30)
@@ -416,14 +420,14 @@ Define(wild_charge_bear 16979)
   # Immobilized.
   SpellAddBuff(wild_charge_bear wild_charge_bear add=1)
   # Immobilized.
-  SpellAddTargetDebuff(wild_charge_bear immobilized add=1)
+  SpellAddTargetDebuff(wild_charge_bear immobilized_debuff add=1)
 Define(wild_charge_cat 49376)
 # Leap behind an enemy, dazing them for 3 seconds.
   SpellInfo(wild_charge_cat cd=15 gcd=0 offgcd=1)
   # Dazed.
   SpellAddBuff(wild_charge_cat wild_charge_cat add=1)
   # Dazed.
-  SpellAddTargetDebuff(wild_charge_cat dazed add=1)
+  SpellAddTargetDebuff(wild_charge_cat dazed_druid_debuff add=1)
 Define(wrath 5176)
 # Hurl a ball of energy at the target, dealing (57.75 of Spell Power) Nature damage.
   SpellInfo(wrath)
@@ -432,7 +436,8 @@ Define(wrath_balance 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath_balance lunarpower=0)
 SpellList(adaptive_swarm adaptive_swarm_damage adaptive_swarm_heal)
-SpellList(eclipse_any eclipse_lunar eclipse_solar)
+SpellList(eclipse_any eclipse_lunar_buff eclipse_solar_buff)
+SpellList(incarnation incarnation_tree_of_life incarnation_king_of_the_jungle incarnation_guardian_of_ursoc incarnation_chosen_of_elune)
 SpellList(berserk berserk_cat berserk_bear)
 SpellList(bs_inc_buff incarnation_king_of_the_jungle incarnation_guardian_of_ursoc berserk_bear berserk_cat)
 SpellList(bt_buffs bt_swipe_buff bt_thrash_buff bt_shred_buff bt_brutal_slash_buff bt_moonfire_buff bt_rake_buff)
@@ -461,8 +466,8 @@ Define(incarnation_guardian_of_ursoc_talent 22388)
 # An improved Bear Form that grants the benefits of Berserk, causes Mangle to hit up to (25 of Spell Power) targets, and increases maximum health by s5.rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
 Define(incarnation_king_of_the_jungle_talent 21704)
 # An improved Cat Form that grants the benefits of Berserk, reduces the Energy cost of all Cat Form abilities by (25 of Spell Power), and allows the use of Prowl once while in combat.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
-Define(lunar_inspiration_talent 22365)
-# Moonfire is usable in Cat Form, costs 155625c energy, and generates 155625s3 combo lpoint:points;.
+Define(incarnation_tree_of_life_talent 22421)
+# Shapeshift into the Tree of Life, increasing healing done by 5420s1, increasing armor by 5420s3, and granting protection from Polymorph effects.  Functionality of Rejuvenation, Wild Growth, Regrowth, and Entangling Roots is enhanced.rnrnLasts 30 seconds. You may shapeshift in and out of this form for its duration.
 Define(mighty_bash_talent 21778)
 # Invokes the spirit of Ursoc to stun the target for 4 seconds. Usable in all shapeshift forms.
 Define(natures_balance_talent 22385)
@@ -578,17 +583,17 @@ Define(guardian_affinity_talent_restoration 22160)
 
 SpellInfo(starfire inccounter="solar" resetcounter="lunar")
 SpellInfo(wrath inccounter="lunar" resetcounter="solar")
-  SpellAddBuff(starfire eclipse_solar set=1 enabled=(counter("solar") == 1))
-  SpellAddBuff(wrath eclipse_lunar set=1 enabled=(counter("lunar") == 1))
+  SpellAddBuff(starfire eclipse_solar_buff set=1 enabled=(counter("solar") == 1))
+  SpellAddBuff(wrath eclipse_lunar_buff set=1 enabled=(counter("lunar") == 1))
 
 Define(starsurge_empowerment_solar_buff -78674)
 SpellInfo(starsurge_empowerment_solar_buff)
-SpellRequire(starsurge_empowerment_solar_buff duration set=(buffexpires(eclipse_solar)))
-SpellAddbuff(starsurge starsurge_empowerment_solar_buff add=1 enabled=(buffpresent(eclipse_solar)))
+SpellRequire(starsurge_empowerment_solar_buff duration set=(buffexpires(eclipse_solar_buff)))
+SpellAddbuff(starsurge starsurge_empowerment_solar_buff add=1 enabled=(buffpresent(eclipse_solar_buff)))
 Define(starsurge_empowerment_lunar_buff -78675)
 SpellInfo(starsurge_empowerment_lunar_buff)
-SpellRequire(starsurge_empowerment_lunar_buff duration set=(buffexpires(eclipse_lunar)))
-SpellAddbuff(starsurge starsurge_empowerment_lunar_buff add=1 enabled=(buffpresent(eclipse_lunar)))
+SpellRequire(starsurge_empowerment_lunar_buff duration set=(buffexpires(eclipse_lunar_buff)))
+SpellAddbuff(starsurge starsurge_empowerment_lunar_buff add=1 enabled=(buffpresent(eclipse_lunar_buff)))
 
 SpellAddBuff(swipe_cat bt_swipe_buff add=1)
   SpellInfo(bt_swipe_buff duration=6)

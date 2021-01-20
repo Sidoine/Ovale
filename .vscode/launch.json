@@ -10,7 +10,7 @@
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/src/utils/importsimc/index.js",
             "protocol": "inspector",
-            "args": ["../../simc/", "T26_Shaman_Enhancement.simc"],
+            "args": ["../../simc/", "T26_Shaman_Elemental.simc"],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {
@@ -20,20 +20,6 @@
             "program": "${workspaceFolder}/src\\Options.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Debug tests",
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ava.cmd",
-            "runtimeArgs": [
-                "--serial",
-                "${workspaceFolder}/dist/${relativeFileDirname}/${fileBasenameNoExtension}.js"
-            ],
-            "outputCapture": "std",
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-            "protocol": "inspector",
-            "skipFiles": ["<node_internals>/**/*.js"]
         }
     ]
 }

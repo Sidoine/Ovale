@@ -24,9 +24,11 @@ Define(avatar 107574)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
 Define(bladestorm 46924)
 # Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
   SpellInfo(bladestorm cd=60 duration=4 tick=1)
@@ -89,9 +91,9 @@ Define(deadly_calm 262228)
   SpellRequire(deadly_calm unusable set=1 enabled=(not hastalent(deadly_calm_talent)))
   # Your abilities cost s1 less Rage.
   SpellAddBuff(deadly_calm deadly_calm add=1)
-Define(deep_wounds 262115)
+Define(deep_wounds_arms_debuff 262115)
 # Mortal Strike, ?s262161[Warbreaker][Colossus Smash], ?s845[Cleave, ][]and ?s152277[Ravager][Bladestorm] inflict Deep Wounds, dealing 262115o1 Bleed damage over 12 seconds and increasing the damage the enemy takes from you by (110.00000000000001 of Spell Power).1.
-  SpellInfo(deep_wounds duration=12 gcd=0 offgcd=1 tick=3)
+  SpellInfo(deep_wounds_arms_debuff duration=12 gcd=0 offgcd=1 tick=3)
 Define(demoralizing_shout 1160)
 # ?s199023[Demoralizes all enemies within A2 yards, reducing the damage they do by s2 for 8 seconds.][Demoralizes all enemies within A2 yards, reducing the damage they deal to you by s1 for 8 seconds.]?s202743[rnrn|cFFFFFFFFGenerates m5/10 Rage.|r][]
   SpellInfo(demoralizing_shout cd=45 duration=8 rage=0)
@@ -119,9 +121,11 @@ Define(execute_fury 5308)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(frenzy 138895)
-# Haste increased by s1 for 10 seconds.
-  SpellInfo(frenzy duration=10 max_stacks=5 gcd=0 offgcd=1)
+Define(frenzy_warrior_buff 335082)
+# Rampage increases your Haste by 335082s1 for 12 seconds, stacking up to 335082u times. This effect is reset if you Rampage a different primary target.
+  SpellInfo(frenzy_warrior_buff duration=12 max_stacks=4 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(frenzy_warrior_buff frenzy_warrior_buff add=1)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?c3[, and resetting the remaining cooldown on Taunt][].
   SpellInfo(heroic_leap cd=45 gcd=0 offgcd=1)
@@ -141,10 +145,6 @@ Define(intimidating_shout 5246)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-Define(meat_cleaver 280392)
-# Whirlwind deals s1 more damage and now affects your next s2+s3 single-target melee attacks, instead of the next s3 attacks.
-  SpellInfo(meat_cleaver gcd=0 offgcd=1 unusable=1)
-  SpellRequire(meat_cleaver unusable set=1 enabled=(not hastalent(meat_cleaver_talent)))
 Define(mortal_strike 12294)
 # A vicious strike that deals s1 Physical damage and reduces the effectiveness of healing on the target by 115804s1 for 10 seconds.
   SpellInfo(mortal_strike rage=30 cd=6)
@@ -267,14 +267,19 @@ Define(whirlwind 1680)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking up to s1 nearby targets for <baseDmg> Physical damage.
   SpellInfo(whirlwind rage=30)
   SpellRequire(whirlwind replaced_by set=whirlwind_fury enabled=(specialization("fury")))
+Define(whirlwind_buff 85739)
+# Causes your next single-target attack to strike up to s1 additional targets for s3 damage.
+  SpellInfo(whirlwind_buff duration=20 max_stacks=2 gcd=0 offgcd=1)
+  # Your next single-target attack strikes up to w1 additional targets for w3 damage.
+  SpellAddBuff(whirlwind_buff whirlwind_buff add=1)
 Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
   SpellInfo(whirlwind_fury rage=30)
-Define(will_of_the_berserker 335597)
+Define(will_of_the_berserker_buff 335597)
 # When Recklessness expires, your Critical Strike is increased by 335597s1 for 8 seconds. Your Raging Blow will refresh the duration of this effect.
-  SpellInfo(will_of_the_berserker duration=8 gcd=0 offgcd=1)
+  SpellInfo(will_of_the_berserker_buff duration=8 gcd=0 offgcd=1)
   # Critical Strike increased by w1. Raging Blow refreshes this duration.
-  SpellAddBuff(will_of_the_berserker will_of_the_berserker add=1)
+  SpellAddBuff(will_of_the_berserker_buff will_of_the_berserker_buff add=1)
 Define(anger_management_talent_fury 22405)
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar and Shield Wall] by 1 sec.
 Define(avatar_talent 22397)
@@ -303,8 +308,6 @@ Define(massacre_talent 22379)
 # ?a317320[Condemn][Execute] is now usable on targets below s2 health, and its cooldown is reduced by s3/1000.1 sec.
 Define(massacre_talent_arms 22380)
 # ?a317320[Condemn][Execute] is now usable on targets below s2 health.
-Define(meat_cleaver_talent 22396)
-# Whirlwind deals s1 more damage and now affects your next s2+s3 single-target melee attacks, instead of the next s3 attacks.
 Define(onslaught_talent 23372)
 # Brutally attack an enemy for s1 Physical damage. Requires Enrage.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(ravager_talent_protection 22401)

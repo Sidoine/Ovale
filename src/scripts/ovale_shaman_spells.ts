@@ -13,9 +13,6 @@ Define(ascendance 114050)
   SpellRequire(ascendance unusable set=1 enabled=(not hastalent(ascendance_talent)))
   # Transformed into a powerful Fire ascendant. Chain Lightning is transformed into Lava Beam.
   SpellAddBuff(ascendance ascendance add=1)
-Define(ascendance_buff 28204)
-# Spell power increases by (100 of Spell Power) with each spell cast.
-  SpellInfo(ascendance_buff max_stacks=5 gcd=0 offgcd=1)
 Define(ascendance_enhancement 114051)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
   SpellInfo(ascendance_enhancement cd=180 duration=15)
@@ -31,9 +28,11 @@ Define(ascendance_restoration 114052)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking add=1)
 Define(blood_fury_ap_int 33697)
 # Increases your attack power and Intellect by s1 for 15 seconds.
   SpellInfo(blood_fury_ap_int cd=120 duration=15 gcd=0 offgcd=1)
@@ -63,6 +62,9 @@ Define(doom_winds 204945)
   SpellInfo(doom_winds cd=60 duration=6 gcd=0 offgcd=1)
   # Chance to proc Windfury weapon on auto attacks increased by 100.rnWindfury damage increased by s2.
   SpellAddBuff(doom_winds doom_winds add=1)
+Define(doom_winds_buff 335903)
+# Dropping Windfury Totem grants you 335903s1 chance to gain Windfury Weapon and increases Windfury Weapon damage by 335903s3 for 12 seconds. rnrnThis can only occur once every 60 seconds.
+  SpellInfo(doom_winds_buff duration=12 gcd=0 offgcd=1)
 Define(earth_elemental 198103)
 # Calls forth a Greater Earth Elemental to protect you and your allies for 60 seconds.
   SpellInfo(earth_elemental cd=300)
@@ -91,10 +93,10 @@ Define(elemental_blast 117014)
 # Harnesses the raw power of the elements, dealing (140 of Spell Power) Elemental damage and increasing your Critical Strike or Haste by 118522s1 or Mastery by 173184s1*168534bc1 for 10 seconds.?a343725[rnrn|cFFFFFFFFGenerates 343725s10 Maelstrom.|r][]
   SpellInfo(elemental_blast cd=12)
   SpellRequire(elemental_blast unusable set=1 enabled=(not {hastalent(elemental_blast_talent) or hastalent(elemental_blast_talent_elemental)}))
-Define(elemental_equilibrium_buff 336731)
+Define(elemental_equilibrium_buff 347348)
 # Dealing direct Fire, Frost, and Nature damage within 10 seconds will increase all damage dealt by 347348s1 for 10 seconds. This can only occur once every 30 seconds.
   SpellInfo(elemental_equilibrium_buff duration=10 gcd=0 offgcd=1)
-  # Damage of your next Frost spell increased by w1.
+  # Damage dealt increased by s1.
   SpellAddBuff(elemental_equilibrium_buff elemental_equilibrium_buff add=1)
 Define(fae_transfusion 328923)
 # Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
@@ -137,11 +139,11 @@ Define(frost_shock 196840)
   SpellInfo(frost_shock duration=6)
   # Movement speed reduced by s2.
   SpellAddTargetDebuff(frost_shock frost_shock add=1)
-Define(hailstorm 334196)
+Define(hailstorm_buff 334196)
 # Each stack of Maelstrom Weapon consumed increases the damage of your next Frost Shock by 334196s1, and causes your next Frost Shock to hit 334196m2 additional target per Maelstrom Weapon stack consumed.
-  SpellInfo(hailstorm duration=20 max_stacks=5 gcd=0 offgcd=1)
+  SpellInfo(hailstorm_buff duration=20 max_stacks=5 gcd=0 offgcd=1)
   # Your next Frost Shock will deal s1 additional damage, and hit m2 additional Ltarget:targets;.
-  SpellAddBuff(hailstorm hailstorm add=1)
+  SpellAddBuff(hailstorm_buff hailstorm_buff add=1)
 Define(heroism 32182)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Exhausted and unable to benefit from Heroism or Time Warp again for 600 seconds.
   SpellInfo(heroism cd=300 duration=40 gcd=0 offgcd=1)
@@ -171,9 +173,9 @@ Define(lava_burst 51505)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.rnrnDamage is increased by s2 if your offhand weapon is imbued with Flametongue Weapon.
   SpellInfo(lava_lash cd=18)
-Define(lava_surge 77762)
+Define(lava_surge_buff 77762)
 # The Shaman's next Lava Burst casts instantly.
-  SpellInfo(lava_surge duration=10 gcd=0 offgcd=1)
+  SpellInfo(lava_surge_buff duration=10 gcd=0 offgcd=1)
 Define(lightning_bolt 188196)
 # Hurls a bolt of lightning at the target, dealing (95 of Spell Power) Nature damage.?a343725[rnrn|cFFFFFFFFGenerates 343725s1 Maelstrom.|r][]
   SpellInfo(lightning_bolt)

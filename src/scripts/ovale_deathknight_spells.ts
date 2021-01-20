@@ -9,12 +9,12 @@ export function registerDeathKnightSpells(OvaleScripts: OvaleScriptsClass) {
 # Sprout an additional limb, dealing 323798s1*13 Shadow damage over 12 seconds to 323798i nearby enemies. Every t1 sec, an enemy is pulled to your location if they are further than 323710s3 yds from you. The same enemy can only be pulled once every 4 seconds.rnrnGain ?a137008[s3 Bone Shield charges][]?a137006[Rime][]?a137007[Runic Corruption][] instantly, and again every s4 sec.
   SpellInfo(abomination_limb cd=120 duration=12 tick=1)
   # Recently pulled  by Abomination Limb and can't be pulled again.
-  SpellAddBuff(abomination_limb abomination_limb_buff add=1)
+  SpellAddBuff(abomination_limb abomination_limb_unused_0 add=1)
   # Pulling enemies to your location and dealing 323798s1 Shadow damage to nearby enemies every t1 sec.
   SpellAddBuff(abomination_limb abomination_limb add=1)
-Define(abomination_limb_buff 323710)
+Define(abomination_limb_unused_0 323710)
 # Sprout an additional limb, dealing 323798s1*13 Shadow damage over 12 seconds to 323798i nearby enemies. Every t1 sec, an enemy is pulled to your location if they are further than 323710s3 yds from you. The same enemy can only be pulled once every 4 seconds.rnrnGain ?a137008[s3 Bone Shield charges][]?a137006[Rime][]?a137007[Runic Corruption][] instantly, and again every s4 sec.
-  SpellInfo(abomination_limb_buff duration=4 gcd=0 offgcd=1)
+  SpellInfo(abomination_limb_unused_0 duration=4 gcd=0 offgcd=1)
 Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -46,14 +46,11 @@ Define(asphyxiate 108194)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
-Define(berserking 59621)
-# Permanently enchant a melee weapon to sometimes increase your attack power by 59620s1, but at the cost of reduced armor. Cannot be applied to items higher than level ecix
-  SpellInfo(berserking gcd=0 offgcd=1)
-Define(berserking_buff 26297)
+Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
-  SpellInfo(berserking_buff cd=180 duration=12 gcd=0 offgcd=1)
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
-  SpellAddBuff(berserking_buff berserking_buff add=1)
+  SpellAddBuff(berserking berserking add=1)
 Define(blinding_sleet 207167)
 # Targets in a cone in front of you are blinded, causing them to wander disoriented for 5 seconds. Damage may cancel the effect.rnrnWhen Blinding Sleet ends, enemies are slowed by 317898s1 for 6 seconds.
   SpellInfo(blinding_sleet cd=60 duration=5)
@@ -68,9 +65,9 @@ Define(blood_fury_ap 20572)
   SpellInfo(blood_fury_ap cd=120 duration=15 gcd=0 offgcd=1)
   # Attack power increased by w1.
   SpellAddBuff(blood_fury_ap blood_fury_ap add=1)
-Define(blood_plague 55078)
+Define(blood_plague_debuff 55078)
 # A shadowy disease that drains o1 health from the target over 24 seconds.  
-  SpellInfo(blood_plague duration=24 gcd=0 offgcd=1 tick=3)
+  SpellInfo(blood_plague_debuff duration=24 gcd=0 offgcd=1 tick=3)
 Define(blood_tap 221699)
 # Consume the essence around you to generate s1 Rune.rnrnRecharge time reduced by s2 sec whenever a Bone Shield charge is consumed.
   SpellInfo(blood_tap cd=60 gcd=0 offgcd=1 runes=-1)
@@ -81,11 +78,11 @@ Define(blooddrinker 206931)
   SpellRequire(blooddrinker unusable set=1 enabled=(not hastalent(blooddrinker_talent)))
   # Draining s1 health from the target every t1 sec.
   SpellAddTargetDebuff(blooddrinker blooddrinker add=1)
-Define(bone_shield 195181)
+Define(bone_shield_buff 195181)
 # Surrounds you with a barrier of whirling bones, increasing Armor by s1*STR/100?s316746[, and your Haste by s4][]. Each melee attack against you consumes a charge. Lasts 30 seconds or until all charges are consumed.
-  SpellInfo(bone_shield duration=30 max_stacks=10 gcd=0 offgcd=1)
+  SpellInfo(bone_shield_buff duration=30 max_stacks=10 gcd=0 offgcd=1)
   # Armor increased by w1*STR/100.rnHaste increased by w4.
-  SpellAddBuff(bone_shield bone_shield add=1)
+  SpellAddBuff(bone_shield_buff bone_shield_buff add=1)
 Define(bonestorm 194844)
 # A whirl of bone and gore batters up to 196528s2 nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
   SpellInfo(bonestorm runicpower=10 max_runicpower=90 cd=60 duration=1 tick=1)
@@ -142,11 +139,9 @@ Define(death_coil 47541)
 Define(death_strike 49998)
 # Focuses dark power into a strike?s137006[ with both weapons, that deals a total of s1+66188s1][ that deals s1] Physical damage and heals you for s2 of all damage taken in the last s4 sec, minimum s3.1 of maximum health.
   SpellInfo(death_strike runicpower=45)
-Define(deaths_due 324165)
+Define(deaths_due 324128)
 # Corrupts the targeted ground, causing 341340m1*11 Shadow damage over 10 seconds to targets within the area.?!c2[rnrnWhile you remain within the area, your ][]?s223829&!c2[Necrotic Strike and ][]?c1[Heart Strike will hit up to 188290m3 additional targets and inflict Death's Due for 12 seconds.]?s207311&!c2[Clawing Shadows will hit up to 55090s4-1 enemies near the target and inflict Death's Due for 12 seconds.]?!c2[Scourge Strike will hit up to 55090s4-1 enemies near the target and inflict Death's Due for 12 seconds.][rnrnWhile you remain within the area, your Obliterate will hit up to 315442s2 additional target and inflict Death's Due for 12 seconds.]rnrnDeath's Due reduces damage enemies deal to you by 324164s1, up to a maximum of 324164s1*-324164u and their power is transferred to you as an equal amount of Strength.
-  SpellInfo(deaths_due duration=12 max_stacks=8 gcd=0 offgcd=1)
-  # Strength increased by s1.
-  SpellAddBuff(deaths_due deaths_due add=1)
+  SpellInfo(deaths_due runes=1 runicpower=-10 cd=30 duration=10 tick=1)
 Define(deaths_due_buff 315442)
 # Learn Death's Due, replacing Death and Decay.rn
   SpellInfo(deaths_due_buff gcd=0 offgcd=1)
@@ -164,25 +159,22 @@ Define(empower_rune_weapon 47568)
 Define(epidemic 207317)
 # Causes each of your Virulent Plagues to flare up, dealing 212739s1 Shadow damage to the infected enemy, and an additional 215969s2 Shadow damage to all other enemies near them.
   SpellInfo(epidemic runicpower=30)
-Define(eradicating_blow 337936)
+Define(eradicating_blow_buff 337936)
 # Obliterate increases the damage of your next Frost Strike by |cFFFFFFFFs1.1|r, stacks up to 337936u times.
-  SpellInfo(eradicating_blow duration=10 max_stacks=2 gcd=0 offgcd=1)
+  SpellInfo(eradicating_blow_buff duration=10 max_stacks=2 gcd=0 offgcd=1)
   # Frost Strike damage increased by w1.
-  SpellAddBuff(eradicating_blow eradicating_blow add=1)
+  SpellAddBuff(eradicating_blow_buff eradicating_blow_buff add=1)
 Define(festering_strike 85948)
 # Strikes for s1 Physical damage and infects the target with m2-M2 Festering Wounds.rnrn|Tinterfaceiconsspell_yorsahj_bloodboil_purpleoil.blp:24|t |cFFFFFFFFFestering Wound|rrnA pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
   SpellInfo(festering_strike runes=2 runicpower=-20)
-Define(festering_wound_unholy 197147)
-# Festering Strike applies a pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.rnrnStacks up to 194310u times on any target.
-  SpellInfo(festering_wound_unholy gcd=0 offgcd=1 unusable=1)
+Define(festering_wound_unholy_debuff 194310)
+# A pustulent lesion that will burst on death or when damaged by Scourge Strike, dealing 194311s1 Shadow damage and generating 195757s1 Runic Power.
+  SpellInfo(festering_wound_unholy_debuff duration=30 max_stacks=6 gcd=0 offgcd=1)
+  # Suffering from a wound that will deal 194311s1/s1 Shadow damage when damaged by Scourge Strike.
+  SpellAddTargetDebuff(festering_wound_unholy_debuff festering_wound_unholy_debuff add=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(fireblood_buff 265226)
-# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
-  SpellInfo(fireblood_buff duration=8 max_stacks=6 gcd=0 offgcd=1)
-  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
-  SpellAddBuff(fireblood_buff fireblood_buff add=1)
 Define(frost_fever_debuff 55095)
 # A disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
   SpellInfo(frost_fever_debuff duration=24 gcd=0 offgcd=1 tick=3)
@@ -198,10 +190,6 @@ Define(frostscythe 207230)
 Define(frostwyrms_fury 279302)
 # Summons a frostwyrm who breathes on all enemies within s1 yd in front of you, dealing 279303s1 Frost damage and slowing movement speed by (25 of Spell Power) for 10 seconds.
   SpellInfo(frostwyrms_fury cd=180 duration=10)
-Define(frozen_pulse_frost 194909)
-# While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
-  SpellInfo(frozen_pulse_frost gcd=0 offgcd=1 unusable=1)
-  SpellRequire(frozen_pulse_frost unusable set=1 enabled=(not hastalent(frozen_pulse_talent)))
 Define(glacial_advance 194913)
 # Summon glacial spikes from the ground that advance forward, each dealing 195975s1*<CAP>/AP Frost damage and applying Razorice to enemies near their eruption point.
   SpellInfo(glacial_advance runicpower=30 cd=6)
@@ -252,7 +240,7 @@ Define(outbreak 77575)
 # Deals s1 Shadow damage to the target and infects all nearby enemies with Virulent Plague.rnrn|Tinterfaceiconsability_creature_disease_02.blp:24|t |cFFFFFFFFVirulent Plague|rrnA disease that deals o Shadow damage over 27 seconds. It erupts when the infected target dies, dealing 191685s1 Shadow damage to nearby enemies.
   SpellInfo(outbreak runes=1 runicpower=-10)
   # Suffering w1 Shadow damage every t1 sec.rnErupts for 191685s1 damage split among all nearby enemies when the infected dies.
-  SpellAddTargetDebuff(outbreak virulent_plague add=1)
+  SpellAddTargetDebuff(outbreak virulent_plague_debuff add=1)
 Define(pillar_of_frost 51271)
 # The power of frost increases your Strength by s1 for 12 seconds.rnrnEach Rune spent while active increases your Strength by an additional s2.
   SpellInfo(pillar_of_frost cd=60 duration=12 gcd=0 offgcd=1)
@@ -267,11 +255,11 @@ Define(raise_dead_unholy 46584)
   SpellInfo(raise_dead_unholy cd=30)
   # A Risen Ally is in your service.
   SpellAddBuff(raise_dead_unholy raise_dead_unholy add=1)
-Define(razorice 51714)
+Define(razorice_debuff 51714)
 # Engrave your weapon with a rune that causes 50401s1 extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 51714s1, stacking up to 51714u times. ?a332944[][rnrnModifying your rune requires a Runeforge in Ebon Hold.]
-  SpellInfo(razorice duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)
+  SpellInfo(razorice_debuff duration=20 max_stacks=5 gcd=0 offgcd=1 tick=1)
   # Frost damage taken from the Death Knight's abilities increased by s1.
-  SpellAddTargetDebuff(razorice razorice add=1)
+  SpellAddTargetDebuff(razorice_debuff razorice_debuff add=1)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
@@ -280,11 +268,11 @@ Define(remorseless_winter 196770)
 Define(rime_buff 59052)
 # Your next Howling Blast will consume no Runes, generate no Runic Power, and deal s2 additional damage.
   SpellInfo(rime_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
-Define(runic_corruption 51460)
+Define(runic_corruption_buff 51460)
 # Increases your rune regeneration rate for 3 seconds.
-  SpellInfo(runic_corruption duration=3 gcd=0 offgcd=1)
+  SpellInfo(runic_corruption_buff duration=3 gcd=0 offgcd=1)
   # Rune regeneration rate increased by w1.
-  SpellAddBuff(runic_corruption runic_corruption add=1)
+  SpellAddBuff(runic_corruption_buff runic_corruption_buff add=1)
 Define(sacrificial_pact 327574)
 # Sacrifice your ghoul to deal 327611s1 Shadow damage to 327611s2 nearby enemies and heal for s1 of your maximum health.
   SpellInfo(sacrificial_pact runicpower=20 cd=120)
@@ -334,21 +322,21 @@ Define(unholy_blight 115989)
   SpellInfo(unholy_blight runes=1 runicpower=-10 cd=45 duration=6 tick=1)
   SpellRequire(unholy_blight unusable set=1 enabled=(not hastalent(unholy_blight_talent)))
   # Suffering sw1 Shadow damage every t1 sec and taking increased damage from @auracaster's minions.
-  SpellAddBuff(unholy_blight unholy_blight_buff add=1)
+  SpellAddBuff(unholy_blight unholy_blight_unused_0 add=1)
   # Surrounded by a vile swarm of insects, infecting enemies within 115994a1 yds with Virulent Plauge and an unholy disease that increases the damage your minions deal to them.
   SpellAddBuff(unholy_blight unholy_blight add=1)
-Define(unholy_blight_buff 115994)
+Define(unholy_blight_unused_0 115994)
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with Virulent Plague and an unholy disease that deals 115994o1 damage over 14 seconds, stacking up to 115994u times.rnrnYour minions deal 115994s2 increased damage per stack to enemies infected by Unholy Blight.
-  SpellInfo(unholy_blight_buff duration=14 max_stacks=4 gcd=0 offgcd=1 tick=2)
-Define(unholy_strength 53365)
+  SpellInfo(unholy_blight_unused_0 duration=14 max_stacks=4 gcd=0 offgcd=1 tick=2)
+Define(unholy_strength_buff 53365)
 # Affixes your rune weapon with a rune that has a chance to heal you for 53365s2 and increase total Strength by 53365s1 for 15 seconds.
-  SpellInfo(unholy_strength duration=15 max_stacks=1 gcd=0 offgcd=1)
+  SpellInfo(unholy_strength_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
 Define(unleashed_frenzy_buff 338501)
 # Frost Strike increases your strength by |cFFFFFFFFs1.1|r for 6 seconds, stacks up to 338501u times.
   SpellInfo(unleashed_frenzy_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
-Define(virulent_plague 191587)
+Define(virulent_plague_debuff 191587)
 # A disease that deals o Shadow damage over 27 seconds. It erupts when the infected target dies, dealing 191685s1 Shadow damage to nearby enemies.
-  SpellInfo(virulent_plague duration=27 gcd=0 offgcd=1 tick=3)
+  SpellInfo(virulent_plague_debuff duration=27 gcd=0 offgcd=1 tick=3)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -437,6 +425,7 @@ Define(lead_by_example_soulbind 342156)
     code += `
 # raise_dead
   SpellInfo(raise_dead totem=1)
+  SpellRequire(raise_dead unusable set=1 enabled=(pet.present()))
 # raise_dead_unholy
   SpellRequire(raise_dead_unholy unusable set=1 enabled=(pet.present()))
 # sacrificial_pact

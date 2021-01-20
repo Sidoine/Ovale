@@ -179,6 +179,21 @@ const specIdToClassId: { [k in keyof typeof specIds]?: ClassId } = {
     WARRIOR_PROTECTION: "WARRIOR",
 };
 
+const classFamily: { [key in number]?: ClassId } = {
+    15: "DEATHKNIGHT",
+    107: "DEMONHUNTER",
+    7: "DRUID",
+    9: "HUNTER",
+    3: "MAGE",
+    53: "MONK",
+    10: "PALADIN",
+    6: "PRIEST",
+    8: "ROGUE",
+    11: "SHAMAN",
+    5: "WARLOCK",
+    4: "WARRIOR",
+};
+
 const specIdToSpecName = new Map<number, SpecializationName>();
 for (const key in specIdToName) {
     const k = key as keyof typeof specIds;
@@ -994,10 +1009,16 @@ export interface SpellData {
     spellEffects?: SpellEffectData[];
     spellPowers?: SpellPowerData[];
     identifier: string;
+    baseIdentifier: string;
+    identifiers: string[];
     identifierScore: number;
+    triggeredIdentifierScore: number;
+    passive?: boolean;
     talent?: TalentData[];
     azeriteTrait?: AzeriteTrait;
     className?: ClassId | "PET";
+    activeClassSpell?: boolean;
+    activeSpecSpell?: boolean;
     specializationName: SpecializationName[];
     nextRank?: SpellData;
     spellAttributes: SpellAttribute[];
@@ -1005,6 +1026,14 @@ export interface SpellData {
     replace_spell_id?: number;
     replaced_by?: number[];
     triggered_by?: number[];
+    isBuff?: boolean;
+    isDebuff?: boolean;
+    isItemEffect?: boolean;
+    runeforge?: Runeforge;
+    conduit?: Conduit;
+    conduitRank?: ConduitRank;
+    souldbind?: SoulbindAbility;
+    item?: ItemData;
 }
 
 export interface SpellEffectData {
@@ -1396,6 +1425,50 @@ function readFile(directory: string, fileName: string, output: AllData) {
     // }
 }
 
+function setBuff(triggeredSpell: SpellData, buff: boolean) {
+    if (triggeredSpell.spellAttributes.includes(SpellAttribute.Hidden)) {
+        if (buff) triggeredSpell.isBuff = true;
+        else triggeredSpell.isDebuff = true;
+        return;
+    }
+
+    if (buff) {
+        triggeredSpell.isBuff = true;
+        triggeredSpell.identifiers.push(
+            `${triggeredSpell.baseIdentifier}_buff`
+        );
+        for (const spec of triggeredSpell.specializationName) {
+            triggeredSpell.identifiers.push(
+                `${triggeredSpell.baseIdentifier}_${spec}_buff`
+            );
+        }
+        if (triggeredSpell.className) {
+            triggeredSpell.identifiers.push(
+                `${
+                    triggeredSpell.baseIdentifier
+                }_${triggeredSpell.className.toLowerCase()}_buff`
+            );
+        }
+    } else {
+        triggeredSpell.isDebuff = true;
+        triggeredSpell.identifiers.push(
+            `${triggeredSpell.baseIdentifier}_debuff`
+        );
+        for (const spec of triggeredSpell.specializationName) {
+            triggeredSpell.identifiers.push(
+                `${triggeredSpell.baseIdentifier}_${spec}_debuff`
+            );
+        }
+        if (triggeredSpell.className) {
+            triggeredSpell.identifiers.push(
+                `${
+                    triggeredSpell.baseIdentifier
+                }_${triggeredSpell.className.toLowerCase()}_debuff`
+            );
+        }
+    }
+}
+
 function getIdentifier(name: string) {
     if (!name) return name;
     if (typeof name !== "string") return name;
@@ -1474,23 +1547,23 @@ function toMap<TKey, TValue>(array: TValue[], key: (v: TValue) => TKey) {
     return map;
 }
 
-function getSpellSpecializations(spell: SpellData) {
-    const specializations: string[] = [];
-    if (spell.specializationName)
-        specializations.push(...spell.specializationName);
-    if (spell.talent) {
-        specializations.push(
-            ...spell.talent
-                .filter((x) => x.spec !== 0)
-                .map((x) => {
-                    const ret = specIdToSpecName.get(x.spec);
-                    if (!ret) throw Error(` can't find spec ${x.spec}`);
-                    return ret;
-                })
-        );
-    }
-    return specializations;
-}
+// function getSpellSpecializations(spell: SpellData) {
+//     const specializations: string[] = [];
+//     if (spell.specializationName)
+//         specializations.push(...spell.specializationName);
+//     if (spell.talent) {
+//         specializations.push(
+//             ...spell.talent
+//                 .filter((x) => x.spec !== 0)
+//                 .map((x) => {
+//                     const ret = specIdToSpecName.get(x.spec);
+//                     if (!ret) throw Error(` can't find spec ${x.spec}`);
+//                     return ret;
+//                 })
+//         );
+//     }
+//     return specializations;
+// }
 
 export function getSpellData(directory: string) {
     const toto = readFileSync(`${directory}/dbc_extract3/SpellShapeshift.csv`, {
@@ -1524,7 +1597,7 @@ export function getSpellData(directory: string) {
     identifierById.set(302917, "reckless_force_counter");
 
     const identifiers: LuaObj<number> = {};
-    const spellListsByIdentifier = new Map<string, SpellData[]>();
+    // const spellListsByIdentifier = new Map<string, SpellData[]>();
     const spellDataById = new Map<number, SpellData>();
     const spellData: SpellData[] = [];
     if (!output.spell_data_t) throw Error("No spell_data_t");
@@ -1588,10 +1661,13 @@ export function getSpellData(directory: string) {
             desc_vars: "",
             rank_str: "",
             identifierScore: 0,
+            triggeredIdentifierScore: 0,
             spellAttributes: [],
             classFlags: [],
             specializationName: [],
             identifier: "",
+            baseIdentifier: "",
+            identifiers: [],
         };
         spell.shapeshifts = spellShapeshiftById.get(spell.id);
 
@@ -1611,36 +1687,26 @@ export function getSpellData(directory: string) {
             }
         }
 
-        const existing = identifierById.get(spell.id);
-        if (existing) {
-            spell.identifier = getIdentifier(existing);
-            spell.identifierScore = 100;
-        } else if (spell.name) {
-            spell.identifier = getIdentifier(spell.name);
-        }
-
-        if (spell.rank_str) {
-            const m = spell.rank_str.match(/Rank (\d+)/);
-            if (m && parseInt(m[1]) > 1) {
-                spell.identifier += `_rank${m[1]}`;
-            }
-        }
+        spell.baseIdentifier = getIdentifier(spell.name);
 
         spellData.push(spell);
         spellDataById.set(spell.id, spell);
-        if (!spell.identifier) continue;
 
-        if (spell.cast_time > 0) spell.identifierScore++;
-        if (spell.spell_level > 0) spell.identifierScore++;
-        if (spell.equipped_class > 0) spell.identifierScore++;
-        if (spell.rank_str === "Racial") spell.identifierScore += 3;
-        if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
-        if (spell.rank_str === "Passive") spell.identifierScore--;
-        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0) {
-            spell.identifierScore--;
+        if (
+            spell.rank_str === "Passive" ||
+            spell.rank_str === "Artifact" ||
+            (spell.gcd === 0 &&
+                !spell.cooldown &&
+                !spell.charge_cooldown &&
+                !spell.cast_time)
+        ) {
+            spell.passive = true;
         }
-        if (spell.spellAttributes.indexOf(SpellAttribute.Hidden) >= 0)
-            spell.identifierScore--;
+
+        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0) {
+            spell.passive = true;
+        }
+        spell.className = classFamily[spell.class_flags_family];
     }
 
     console.log("Import active spells...");
@@ -1659,8 +1725,7 @@ export function getSpellData(directory: string) {
         };
         const spell = spellDataById.get(activeSpell.spell_id);
         if (spell) {
-            if (!spell.spellAttributes.includes(SpellAttribute.Passive))
-                spell.identifierScore += 10;
+            spell.activeClassSpell = true;
             spell.className = classNames[activeSpell.class_id];
         }
     }
@@ -1676,14 +1741,13 @@ export function getSpellData(directory: string) {
         const specIndex = getNumber(specSpell, i++);
         const spell = spellDataById.get(getNumber(specSpell, i++));
         if (spell) {
-            if (!spell.spellAttributes.includes(SpellAttribute.Passive))
-                spell.identifierScore += 10;
             const className = classNames[classIndex];
             spell.className = className;
             if (className !== "PET") {
                 const specName = specIdToSpecName.get(specIndex);
                 if (specName) {
                     spell.specializationName.push(specName);
+                    spell.activeSpecSpell = true;
                 } else if (specIndex !== 1446) {
                     throw Error(
                         `Unknown spec ${specIndex} for class ${classIndex}`
@@ -1697,12 +1761,6 @@ export function getSpellData(directory: string) {
                 if (replaced) {
                     if (!replaced.replaced_by) replaced.replaced_by = [];
                     replaced.replaced_by.push(spell.id);
-                    if (
-                        replaced.identifier === spell.identifier &&
-                        spell.specializationName.length === 1
-                    ) {
-                        spell.identifier += `_${spell.specializationName[0]}`;
-                    }
                 }
             }
         }
@@ -1719,6 +1777,78 @@ export function getSpellData(directory: string) {
             spell.desc = getString(spellText, i++);
             spell.tooltip = getString(spellText, i++);
             spell.rank_str = getString(spellText, i++);
+        }
+    }
+
+    console.log("Import talent data...");
+    if (!output.talent_data_t) throw Error("No talent_data_t");
+    const talentsById = new Map<number, TalentData>();
+    for (const row of output.talent_data_t) {
+        let i = 0;
+        const talent: TalentData = {
+            name: getString(row, i++),
+            id: getNumber(row, i++),
+            flags: getNumber(row, i++),
+            m_class: getNumber(row, i++),
+            spec: getNumber(row, i++),
+            col: getNumber(row, i++),
+            row: getNumber(row, i++),
+            spell_id: getNumber(row, i++),
+            replace_id: getNumber(row, i++),
+            identifier: "",
+            talentId: 0,
+        };
+        (talent.identifier = getIdentifier(talent.name) + "_talent"),
+            (talent.talentId = 3 * talent.row + talent.col + 1);
+        let className =
+            classBitToNumber[talent.m_class] !== undefined
+                ? classBitToNumber[talent.m_class]
+                : undefined;
+        if (!talent.m_class && talent.spec) {
+            className = specIdToClassName.get(talent.spec);
+        }
+        if (identifiers[talent.identifier]) {
+            const other = talentsById.get(identifiers[talent.identifier]);
+            if (talent.spec) {
+                const specName = specIdToSpecName.get(talent.spec);
+                talent.identifier += "_" + specName;
+            } else if (other?.spec) {
+                const specName = specIdToSpecName.get(other.spec);
+                other.identifier += "_" + specName;
+                identifiers[other.identifier] = other.id;
+            } else {
+                if (className) {
+                    talent.identifier += "_" + className.toLowerCase();
+                } else {
+                    talent.identifier += "_unknown";
+                }
+            }
+        }
+        identifiers[talent.identifier] = talent.id;
+        talentsById.set(talent.id, talent);
+        if (talent.spell_id) {
+            const spell = spellDataById.get(talent.spell_id);
+            if (spell) {
+                if (!spell.talent) spell.talent = [];
+                if (!spell.className && className) {
+                    spell.className = className as ClassId;
+                }
+                spell.talent.push(talent);
+
+                if (talent.spec) {
+                    const specName = specIdToSpecName.get(talent.spec);
+                    if (specName) {
+                        spell.specializationName.push(specName);
+                    }
+                }
+                const replacedSpell = spellDataById.get(talent.replace_id);
+                if (replacedSpell) {
+                    if (!replacedSpell.replaced_by)
+                        replacedSpell.replaced_by = [];
+                    replacedSpell.replaced_by.push(talent.spell_id);
+                    spell.replace_spell_id = talent.replace_id;
+                }
+            }
         }
     }
 
@@ -1786,30 +1916,18 @@ export function getSpellData(directory: string) {
                 if (!triggeredSpell.triggered_by)
                     triggeredSpell.triggered_by = [];
                 triggeredSpell.triggered_by.push(spellEffect.spell_id);
+                triggeredSpell.specializationName.push(
+                    ...spell.specializationName
+                );
+                if (!triggeredSpell.className)
+                    triggeredSpell.className = spell.className;
             }
 
-            if (
-                triggeredSpell.name === spell.name &&
-                triggeredSpell.id !== spell.id
-            ) {
-                if (!triggeredSpell.tooltip) triggeredSpell.identifierScore--;
-
-                if (
-                    spell.identifier.endsWith("_buff") ||
-                    spell.identifier.endsWith("_debuff")
-                ) {
-                    spell.identifier += "_trigger";
-                } else if (
-                    !triggeredSpell.identifier.endsWith("_buff") &&
-                    !triggeredSpell.identifier.endsWith("_debuff") &&
-                    triggeredSpell.tooltip
-                ) {
-                    if (isFriendlyTarget(spellEffect.targeting_1)) {
-                        triggeredSpell.identifier += "_buff";
-                    } else {
-                        triggeredSpell.identifier += "_debuff";
-                    }
-                }
+            if (triggeredSpell.tooltip && !spell.passive) {
+                setBuff(
+                    triggeredSpell,
+                    isFriendlyTarget(spellEffect.targeting_1)
+                );
             }
         }
     }
@@ -1819,6 +1937,7 @@ export function getSpellData(directory: string) {
             spell.desc = parseDescription(spell.desc, spell, spellDataById);
     }
 
+    console.log("Import spell power data...");
     if (!output.spellpower_data_t) throw Error("No spellpower_data_t");
 
     for (const row of output.spellpower_data_t) {
@@ -1842,249 +1961,26 @@ export function getSpellData(directory: string) {
         }
     }
 
-    if (!output.talent_data_t) throw Error("No talent_data_t");
-    const talentsById = new Map<number, TalentData>();
-    for (const row of output.talent_data_t) {
-        let i = 0;
-        const talent: TalentData = {
-            name: getString(row, i++),
-            id: getNumber(row, i++),
-            flags: getNumber(row, i++),
-            m_class: getNumber(row, i++),
-            spec: getNumber(row, i++),
-            col: getNumber(row, i++),
-            row: getNumber(row, i++),
-            spell_id: getNumber(row, i++),
-            replace_id: getNumber(row, i++),
-            identifier: "",
-            talentId: 0,
-        };
-        (talent.identifier = getIdentifier(talent.name) + "_talent"),
-            (talent.talentId = 3 * talent.row + talent.col + 1);
-        let className =
-            classBitToNumber[talent.m_class] !== undefined
-                ? classBitToNumber[talent.m_class]
-                : undefined;
-        if (!talent.m_class && talent.spec) {
-            className = specIdToClassName.get(talent.spec);
-        }
-        if (identifiers[talent.identifier]) {
-            const other = talentsById.get(identifiers[talent.identifier]);
-            if (talent.spec) {
-                const specName = specIdToSpecName.get(talent.spec);
-                talent.identifier += "_" + specName;
-            } else if (other?.spec) {
-                const specName = specIdToSpecName.get(other.spec);
-                other.identifier += "_" + specName;
-                identifiers[other.identifier] = other.id;
-            } else {
-                if (className) {
-                    talent.identifier += "_" + className.toLowerCase();
-                } else {
-                    talent.identifier += "_unknown";
-                }
-            }
-        }
-        identifiers[talent.identifier] = talent.id;
-        talentsById.set(talent.id, talent);
-        if (talent.spell_id) {
-            const spell = spellDataById.get(talent.spell_id);
-            if (spell) {
-                if (!spell.talent) spell.talent = [];
-                if (!spell.className) spell.className = className as ClassId;
-                spell.talent.push(talent);
-                if (!spell.spellAttributes.includes(SpellAttribute.Passive))
-                    spell.identifierScore += 10;
-
-                if (talent.spec) {
-                    const specName = specIdToSpecName.get(talent.spec);
-                    if (specName) spell.specializationName.push(specName);
-                }
-                const replacedSpell = spellDataById.get(talent.replace_id);
-                if (replacedSpell) {
-                    if (!replacedSpell.replaced_by)
-                        replacedSpell.replaced_by = [];
-                    replacedSpell.replaced_by.push(talent.spell_id);
-                    spell.replace_spell_id = talent.replace_id;
-                }
-            }
-        }
-    }
-
-    function getRandomIdentifier(spell: SpellData, other: SpellData) {
-        let identifier = spell.identifier;
-        if (spell.tooltip && !other.tooltip) {
-            if (
-                spell.spellEffects &&
-                !identifier.endsWith("_buff") &&
-                !identifier.endsWith("_debuff") // &&
-                //!spell.spellEffects.some((x) => x.trigger_spell_id)
-            ) {
-                if (
-                    spell.spellEffects.some((x) =>
-                        isFriendlyTarget(x.targeting_1)
-                    )
-                ) {
-                    identifier += "_buff";
-                } else {
-                    identifier += "_debuff";
-                }
-
-                const existingBuffId = identifiers[identifier];
-                if (existingBuffId) {
-                    const existingBuff = spellDataById.get(existingBuffId);
-                    if (
-                        existingBuff &&
-                        existingBuff.identifierScore < spell.identifierScore
-                    ) {
-                        let i = 0;
-                        while (identifiers[`${identifier}_unused_${i}`]) {
-                            i++;
-                        }
-                        existingBuff.identifier = `${identifier}_unused_${i}`;
-                        identifiers[existingBuff.identifier] = existingBuffId;
-                        return identifier;
-                    }
-                } else {
-                    return identifier;
-                }
-            }
-        }
-        let i = 0;
-        while (identifiers[`${identifier}_unused_${i}`]) {
-            i++;
-        }
-        return `${identifier}_unused_${i}`;
-    }
-
-    for (const spell of spellData) {
-        if (identifiers[spell.identifier]) {
-            const other = spellDataById.get(identifiers[spell.identifier]);
-            if (other) {
-                if (
-                    other.identifierScore === spell.identifierScore ||
-                    (other.identifierScore >= 10 && spell.identifierScore >= 10)
-                ) {
-                    const otherNames = getSpellSpecializations(other);
-                    const spellNames = getSpellSpecializations(spell);
-                    if (other.tooltip && other.gcd === 0 && !spell.tooltip) {
-                        other.identifier = getRandomIdentifier(other, spell);
-                        identifiers[other.identifier] = other.id;
-                    } else if (
-                        !other.tooltip &&
-                        spell.tooltip &&
-                        spell.gcd === 0
-                    ) {
-                        spell.identifier = getRandomIdentifier(spell, other);
-                    } else if (
-                        otherNames.some((x) => !spellNames.includes(x)) ||
-                        spellNames.some((x) => !otherNames.includes(x))
-                    ) {
-                        if (
-                            otherNames.length === 0 &&
-                            spellNames.length === 0
-                        ) {
-                            spell.identifier = getRandomIdentifier(
-                                spell,
-                                other
-                            );
-                        } else if (spellNames.length > 0) {
-                            let identifier =
-                                spell.identifier +
-                                "_" +
-                                spellNames[0].toLowerCase();
-                            if (identifiers[identifier])
-                                identifier = getRandomIdentifier(spell, other);
-                            spell.identifier = identifier;
-                        } else if (otherNames.length > 0) {
-                            // TODO aliases
-                            let identifier =
-                                other.identifier +
-                                "_" +
-                                otherNames[0].toLowerCase();
-                            if (identifiers[identifier])
-                                identifier = getRandomIdentifier(other, spell);
-                            other.identifier = identifier;
-                            identifiers[other.identifier] = other.id;
-                        }
-                    } else if (
-                        spell.className &&
-                        spell.className !== other.className
-                    ) {
-                        spell.identifier += "_" + spell.className.toLowerCase();
-                    } else {
-                        spell.identifier = getRandomIdentifier(spell, other);
-                    }
-                } else if (other.identifierScore > spell.identifierScore) {
-                    spell.identifier = getRandomIdentifier(spell, other);
-                } else {
-                    other.identifier = getRandomIdentifier(other, spell);
-                    identifiers[other.identifier] = other.id;
-                }
-            }
-        }
-        identifiers[spell.identifier] = spell.id;
-    }
-
-    for (const spell of spellData) {
-        if (!spell.identifier) continue;
-        const existing = spellListsByIdentifier.get(spell.identifier);
-        if (existing) {
-            existing.push(spell);
-        } else {
-            spellListsByIdentifier.set(spell.identifier, [spell]);
-        }
-    }
-
-    const spellLists = new Map<string, { id: number; identifier: string }[]>();
-    for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
-        if (spells.length === 1) continue;
-        const max = spells.reduce(
-            (a, s) => (s.identifierScore > a ? s.identifierScore : a),
-            0
-        );
-        const filtered = spells.filter((x) => x.identifierScore === max);
-        if (filtered.length === 1) continue;
-        for (let i = 0; i < filtered.length; i++) {
-            filtered[i].identifier += `_${i}`;
-        }
-        spellLists.set(identifier, filtered);
-    }
-
-    for (const spell of spellData) {
-        if (isRankSpell(spell)) {
-            const mat = spell.rank_str.match(/Rank (\d+)/);
-            if (mat) {
-                const nextRank = parseInt(mat[1]) + 1;
-                const nextRankId =
-                    identifiers[`${spell.identifier}_rank${nextRank}`];
-                if (nextRankId) {
-                    const nextSpell = spellDataById.get(nextRankId);
-                    spell.nextRank = nextSpell;
-                }
-            }
-        }
-    }
-
     if (!output.azerite_power_entry_t) throw Error("No azerite_power_entry_t");
 
     const azeriteTraitById = new Map<number, AzeriteTrait>();
     for (const row of output.azerite_power_entry_t) {
         let i = 0;
-        const talent: AzeriteTrait = {
+        const trait: AzeriteTrait = {
             id: getNumber(row, i++),
             spellId: getNumber(row, i++),
             bonusId: getNumber(row, i++),
             name: getString(row, i++),
             identifier: "",
         };
-        talent.identifier = getIdentifier(talent.name) + "_trait";
-        identifiers[talent.identifier] = talent.id;
-        azeriteTraitById.set(talent.id, talent);
-        if (talent.spellId) {
-            const spell = spellDataById.get(talent.spellId);
+        trait.identifier = getIdentifier(trait.name) + "_trait";
+        identifiers[trait.identifier] = trait.id;
+        azeriteTraitById.set(trait.id, trait);
+        if (trait.spellId) {
+            const spell = spellDataById.get(trait.spellId);
             if (spell) {
-                spell.azeriteTrait = talent;
+                spell.azeriteTrait = trait;
+                spell.identifiers.push(`${spell.baseIdentifier}_azeriteeffect`);
             }
         }
     }
@@ -2124,6 +2020,12 @@ export function getSpellData(directory: string) {
             name: getString(row, i++),
             identifier: "",
         };
+        const spell = spellDataById.get(runeforge.spell_id);
+        if (spell) {
+            spell.runeforge = runeforge;
+            spell.identifiers.push(`${spell.baseIdentifier}_runeforgeeffect`);
+        }
+
         runeforge.identifier = getIdentifier(runeforge.name + "_runeforge");
         if (
             identifiers[runeforge.identifier] &&
@@ -2152,6 +2054,11 @@ export function getSpellData(directory: string) {
         conduit.identifier = getIdentifier(conduit.name + "_conduit");
         identifiers[conduit.identifier] = conduit.id;
         conduitById.set(conduit.id, conduit);
+        const spell = spellDataById.get(conduit.spell_id);
+        if (spell) {
+            spell.conduit = conduit;
+            spell.identifiers.push(`${spell.baseIdentifier}_conduiteffect`);
+        }
     }
 
     if (!output.conduit_rank_entry_t) throw Error("No conduit_rank_entry_t");
@@ -2166,6 +2073,13 @@ export function getSpellData(directory: string) {
         const conduit = conduitById.get(rank.conduit_id);
         if (conduit) {
             conduit.ranks.push(rank);
+        }
+        const spell = spellDataById.get(rank.spell_id);
+        if (spell) {
+            spell.conduitRank = rank;
+            spell.identifiers.push(
+                `${spell.baseIdentifier}_conduit_rank${rank.rank}`
+            );
         }
     }
 
@@ -2187,6 +2101,11 @@ export function getSpellData(directory: string) {
         );
         identifiers[soulbindAbility.identifier] = soulbindAbility.spell_id;
         soulbindAbilityById.set(soulbindAbility.spell_id, soulbindAbility);
+        const spell = spellDataById.get(soulbindAbility.spell_id);
+        if (spell) {
+            spell.souldbind = soulbindAbility;
+            spell.identifiers.push(`${spell.baseIdentifier}_soulbindability`);
+        }
     }
 
     if (!output.dbc_item_data_t) throw Error("No dbc_item_data_t");
@@ -2247,7 +2166,214 @@ export function getSpellData(directory: string) {
             cooldown_group_duration: getNumber(row, i++),
         };
         const item = itemsById.get(itemEffect.item_id);
-        item?.itemEffects.push(itemEffect);
+        if (item) {
+            item?.itemEffects.push(itemEffect);
+            const spell = spellDataById.get(itemEffect.spell_id);
+            if (spell) {
+                spell.item = item;
+                spell.identifiers.push(`${spell.baseIdentifier}_itemeffect`);
+            }
+        }
+    }
+
+    console.log("Computing score...");
+    for (const spell of spellData) {
+        let identifierScore = 0;
+        if (spell.item) identifierScore += 5;
+        else if (
+            spell.runeforge ||
+            spell.conduit ||
+            spell.conduitRank ||
+            spell.souldbind ||
+            spell.rank_str === "Racial" ||
+            spell.essence_id
+        )
+            identifierScore += 8;
+        else if (spell.activeSpecSpell || spell.talent) identifierScore += 9;
+        else if (spell.activeClassSpell) identifierScore += 10;
+        else identifierScore += 2;
+
+        if (spell.passive) {
+            spell.identifierScore = -1;
+            spell.triggeredIdentifierScore = identifierScore;
+        } else {
+            spell.identifierScore = spell.triggeredIdentifierScore = identifierScore;
+        }
+
+        if (spell.rank_str) {
+            const m = spell.rank_str.match(/Rank (\d+)/);
+            if (m && parseInt(m[1]) > 1) {
+                spell.identifiers.unshift(
+                    `${spell.baseIdentifier}_rank${m[1]}`
+                );
+            }
+        }
+        if (spell.identifierScore > 0) {
+            if (spell.className) {
+                spell.identifiers.unshift(
+                    `${spell.baseIdentifier}_${spell.className.toLowerCase()}`
+                );
+            }
+
+            for (const specializationName of spell.specializationName)
+                spell.identifiers.unshift(
+                    `${spell.baseIdentifier}_${specializationName}`
+                );
+            spell.identifiers.unshift(spell.baseIdentifier);
+        }
+    }
+
+    for (const spell of spellData) {
+        if (spell.triggered_by) {
+            const maxScore = spell.triggered_by
+                .map(
+                    (x) => spellDataById.get(x)?.triggeredIdentifierScore ?? -1
+                )
+                .sort();
+            const newScore = maxScore[maxScore.length - 1];
+            if (newScore > spell.identifierScore) {
+                spell.identifierScore = newScore;
+                spell.identifiers = spell.identifiers.filter((x) =>
+                    x.endsWith("buff")
+                );
+            }
+        } else if (spell.triggeredIdentifierScore > spell.identifierScore) {
+            spell.identifierScore = spell.triggeredIdentifierScore;
+            spell.identifiers = spell.identifiers.filter((x) =>
+                x.endsWith("buff")
+            );
+        }
+    }
+
+    console.log("Computing buff...");
+    for (const spell of spellData) {
+        if (
+            !spell.isBuff &&
+            !spell.isDebuff &&
+            spell.tooltip &&
+            spell.identifierScore >= 0 &&
+            spell.spellEffects
+        ) {
+            const friendly = spell.spellEffects.some((x) =>
+                isFriendlyTarget(x.targeting_1)
+            );
+            setBuff(spell, friendly);
+        }
+    }
+
+    console.log("Compute identifiers...");
+    const identifierLists = new Map<string, SpellData[]>();
+    for (const spell of spellData) {
+        for (const identifier of spell.identifiers) {
+            let identifierList = identifierLists.get(identifier);
+            if (!identifierList) {
+                identifierList = [];
+                identifierLists.set(identifier, identifierList);
+            }
+            identifierList.push(spell);
+        }
+    }
+
+    for (const [, indentifierList] of identifierLists) {
+        indentifierList.sort((a, b) =>
+            a.identifierScore === b.identifierScore
+                ? 0
+                : a.identifierScore < b.identifierScore
+                ? 1
+                : -1
+        );
+    }
+
+    function setIdentifier(spell: SpellData, chosenIdentifier: string) {
+        for (const identifier of spell.identifiers) {
+            if (identifier !== chosenIdentifier) {
+                const identifierList = identifierLists.get(identifier);
+                if (identifierList) {
+                    if (
+                        !identifierList.some(
+                            (x) =>
+                                x.identifierScore >= spell.identifierScore &&
+                                x.id !== spell.id
+                        )
+                    ) {
+                        identifierLists.delete(identifier);
+                    }
+                }
+            }
+        }
+        spell.identifier = chosenIdentifier;
+        identifiers[chosenIdentifier] = spell.id;
+        identifierLists.delete(chosenIdentifier);
+    }
+
+    let changes;
+    do {
+        changes = 0;
+        for (const spell of spellData) {
+            if (spell.identifier) continue;
+            for (const identifier of spell.identifiers) {
+                const identifierList = identifierLists.get(identifier);
+                if (identifierList) {
+                    if (identifierList[0].id === spell.id) {
+                        setIdentifier(spell, identifier);
+                        changes++;
+                        break;
+                    }
+                }
+            }
+        }
+    } while (changes > 0);
+
+    for (const spell of spellData) {
+        if (!spell.identifier) {
+            let identifier;
+            let i = 0;
+            do {
+                identifier = `${spell.baseIdentifier}_unused_${i++}`;
+            } while (identifiers[identifier]);
+            spell.identifier = identifier;
+            identifiers[identifier] = spell.id;
+        }
+    }
+
+    // for (const spell of spellData) {
+    //     if (!spell.identifier) continue;
+    //     const existing = spellListsByIdentifier.get(spell.identifier);
+    //     if (existing) {
+    //         existing.push(spell);
+    //     } else {
+    //         spellListsByIdentifier.set(spell.identifier, [spell]);
+    //     }
+    // }
+
+    const spellLists = new Map<string, { id: number; identifier: string }[]>();
+    // for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
+    //     if (spells.length === 1) continue;
+    //     const max = spells.reduce(
+    //         (a, s) => (s.identifierScore > a ? s.identifierScore : a),
+    //         0
+    //     );
+    //     const filtered = spells.filter((x) => x.identifierScore === max);
+    //     if (filtered.length === 1) continue;
+    //     for (let i = 0; i < filtered.length; i++) {
+    //         filtered[i].identifier += `_${i}`;
+    //     }
+    //     spellLists.set(identifier, filtered);
+    // }
+
+    for (const spell of spellData) {
+        if (isRankSpell(spell)) {
+            const mat = spell.rank_str.match(/Rank (\d+)/);
+            if (mat) {
+                const nextRank = parseInt(mat[1]) + 1;
+                const nextRankId =
+                    identifiers[`${spell.identifier}_rank${nextRank}`];
+                if (nextRankId) {
+                    const nextSpell = spellDataById.get(nextRankId);
+                    spell.nextRank = nextSpell;
+                }
+            }
+        }
     }
 
     console.log("Write files...");
