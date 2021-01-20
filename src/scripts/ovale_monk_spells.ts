@@ -318,7 +318,7 @@ Define(moderate_stagger_debuff 124274)
 SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_stagger_debuff)
 SpellRequire(purifying_brew unusable set=1 enabled=(not debuffpresent(any_stagger_debuff)))
 
-Define(bob_and_weave_talent 13)
+Define(bob_and_weave_talent 20174)
     `;
     OvaleScripts.RegisterScript("MONK", undefined, name, desc, code, "include");
 }

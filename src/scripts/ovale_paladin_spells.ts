@@ -262,7 +262,6 @@ Define(potion_of_spectral_strength_item 171275)
     `;
     // END
     code += `
-Define(blinding_light_talent 9)
 Define(divine_shield 642)
 	SpellInfo(divine_shield cd=300 duration=8)
     SpellRequire(divine_shield cd add=-90 enabled=(hastalent(unbreakable_spirit_talent)))
