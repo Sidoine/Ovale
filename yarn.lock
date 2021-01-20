@@ -1111,16 +1111,16 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.13.3":
-  version "1.13.3"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.13.3.tgz#cc140da9c8b9ba9f67efb59a276ec17b8709a10d"
-  integrity sha512-x/muQffBNhmXCydpMdK8c5IaJSwiZv0bSrGnixmKreK3ft75wGvdmEG49O76ZMqx0Cytiwq+qoxsaecDlLd7GQ==
+"@wowts/tstolua@^1.13.4":
+  version "1.13.4"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.13.4.tgz#ee07f0282575f36e99e4e54df1e0b3ee7682c27b"
+  integrity sha512-4aGc7FvBlugv2hDN4MOMu9Ou0t/I212mRIZBao2mEZCJxPzEM/Zct8UthlbebL68WB5aN1ra+v1JEI0h71WvqQ==
   dependencies:
     "@types/degit" "^2.8.0"
-    commander "^6.2.0"
+    commander "^7.0.0"
     degit "^2.8.0"
-    typescript "^4.1.2"
-    webdav "^3.6.1"
+    typescript "^4.1.3"
+    webdav "^3.6.2"
 
 "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.27.1", "@wowts/wow-mock@^1.6.0":
   version "1.30.0"
@@ -1337,10 +1337,10 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@^0.20.0:
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.20.0.tgz#057ba30f04884694993a8cd07fa394cff11c50bd"
-  integrity sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==
+axios@^0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
+  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
   dependencies:
     follow-redirects "^1.10.0"
 
@@ -1681,10 +1681,10 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^6.2.0:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.1.tgz#0792eb682dfbc325999bb2b84fddddba110ac73c"
-  integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
+commander@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-7.0.0.tgz#3e2bbfd8bb6724760980988fb5b22b7ee6b71ab2"
+  integrity sha512-ovx/7NkTrnPuIV8sqk/GjUIIM1+iUQeqA3ye2VNpq9sVoiZsooObWlQy+OPWGI17GDaEoybuAGJm6U8yC077BA==
 
 commitlint@^11.0.0:
   version "11.0.0"
@@ -5707,10 +5707,10 @@ typemoq@^2.1.0:
     lodash "^4.17.4"
     postinstall-build "^5.0.1"
 
-typescript@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.2.tgz#6369ef22516fe5e10304aae5a5c4862db55380e9"
-  integrity sha512-thGloWsGH3SOxv1SoY7QojKi0tc+8FnOmiarEGMbd/lar7QOEd3hvlx3Fp5y6FlDUGl9L+pd4n2e+oToGMmhRQ==
+typescript@^4.1.3:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.3.tgz#519d582bd94cba0cf8934c7d8e8467e473f53bb7"
+  integrity sha512-B3ZIOf1IKeH2ixgHhj6la6xdwR9QrLC5d1VKeCSY4tvkqhF2eqd9O7txNlS0PO3GrBAFIdr3L1ndNwteUbZLYg==
 
 uglify-js@^3.1.4:
   version "3.12.1"
@@ -5842,12 +5842,12 @@ walker@^1.0.7, walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-webdav@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/webdav/-/webdav-3.6.1.tgz#ab01f8067faf748abe3938720dcaeb39836d78e3"
-  integrity sha512-WRE6M4iePpd4TPJ0l5PCWMuoZS4UOHawtf/fr7FcmTZWsSjx1syywyW3TbgEFHptqyh4mMoLUrv8dAUtmTqbEg==
+webdav@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/webdav/-/webdav-3.6.2.tgz#76e3d8e950e80698a2f1db23ef2496888662cbeb"
+  integrity sha512-HFRiI1jluMSPQMVgxVD6VVYNtaglO53vHG0uf7Zec+wl0A1Mei2z8/IFgAAAJMUuEWAx2AfBD5lcWhAiYA9LUw==
   dependencies:
-    axios "^0.20.0"
+    axios "^0.21.1"
     base-64 "^0.1.0"
     fast-xml-parser "^3.17.4"
     he "^1.2.0"
