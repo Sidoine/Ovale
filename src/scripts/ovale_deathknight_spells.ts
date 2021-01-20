@@ -423,6 +423,12 @@ Define(lead_by_example_soulbind 342156)
     // END
 
     code += `
+# apocalypse
+  SpellRequire(apocalypse unusable set=1 enabled=(target.debuffexpires(festering_wound_unholy_debuff)))
+# festering_wound_unholy_debuff
+  SpellAddTargetDebuff(apocalypse festering_wound_unholy_debuff add=-4)
+  SpellAddTargetDebuff(festering_strike festering_wound_unholy_debuff add=1)
+  SpellAddTargetDebuff(scourge_strike festering_wound_unholy_debuff add=-1)
 # raise_dead
   SpellInfo(raise_dead totem=1)
   SpellRequire(raise_dead unusable set=1 enabled=(pet.present()))
