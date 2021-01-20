@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.42](https://github.com/Sidoine/Ovale/compare/9.0.41...9.0.42) (2021-01-20)
+
+### Bug Fixes
+
+-   **deathknight:** annotate abilities that modify Festering Wound stacks ([#817](https://github.com/Sidoine/Ovale/issues/817)) ([ab20023](https://github.com/Sidoine/Ovale/commit/ab20023c536a9eacf67ff1f62a86f4fae35f7509))
+-   **deathknight:** pets prevent Raise Dead from being used ([#812](https://github.com/Sidoine/Ovale/issues/812)) ([9ba00fb](https://github.com/Sidoine/Ovale/commit/9ba00fbc8656ab9adbde7c37f96c5e2125dfabe3))
+-   **flash:** flash wasn't working if icons were hidden ([b81daf8](https://github.com/Sidoine/Ovale/commit/b81daf84fb8186645456eebac3d69bd2e9816358))
+-   **scripts:** fix incorrect talent IDs in class scripts ([#814](https://github.com/Sidoine/Ovale/issues/814)) ([ae5a9a5](https://github.com/Sidoine/Ovale/commit/ae5a9a5719ee3edc4c32e0c24b4771a23f21c0f1))
+-   **simulationcraft:** cleanup of simulationcraft APL translator ([#816](https://github.com/Sidoine/Ovale/issues/816)) ([e77ca2d](https://github.com/Sidoine/Ovale/commit/e77ca2d15266235af40737a0e9655fc42fde0fa0))
+-   **warlock:** require demon to be present for some spells ([#815](https://github.com/Sidoine/Ovale/issues/815)) ([9c93263](https://github.com/Sidoine/Ovale/commit/9c93263ba0a4af7c27bcf8f1cff4974234b39449))
+-   properly check for known spells in InUsableSpell() ([#811](https://github.com/Sidoine/Ovale/issues/811)) ([305c5bf](https://github.com/Sidoine/Ovale/commit/305c5bfb93dce55792194a85dba92fe6a47093fb))
+-   reimport spells from dbc ([36bb313](https://github.com/Sidoine/Ovale/commit/36bb3138bc45de68a4991b254042a62a4f8a4cef))
+
 ### [9.0.41](https://github.com/Sidoine/Ovale/compare/9.0.40...9.0.41) (2021-01-17)
 
 ### Bug Fixes
