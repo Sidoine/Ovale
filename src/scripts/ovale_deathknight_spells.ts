@@ -425,6 +425,7 @@ Define(lead_by_example_soulbind 342156)
     code += `
 # raise_dead
   SpellInfo(raise_dead totem=1)
+  SpellRequire(raise_dead unusable set=1 enabled=(pet.present()))
 # raise_dead_unholy
   SpellRequire(raise_dead_unholy unusable set=1 enabled=(pet.present()))
 # sacrificial_pact
