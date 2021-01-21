@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.43](https://github.com/Sidoine/Ovale/compare/9.0.42...9.0.43) (2021-01-21)
+
+### Bug Fixes
+
+-   avatar is baseline ([1560dc4](https://github.com/Sidoine/Ovale/commit/1560dc43752a080645da53a4a3ff40c7b58fc6a0)), closes [#819](https://github.com/Sidoine/Ovale/issues/819)
+-   **rogue:** outlaw rogues stun using a different spell ([#818](https://github.com/Sidoine/Ovale/issues/818)) ([438ca71](https://github.com/Sidoine/Ovale/commit/438ca71f2acbe24d9822526c135bf04d3cf00b37))
+
 ### [9.0.42](https://github.com/Sidoine/Ovale/compare/9.0.41...9.0.42) (2021-01-20)
 
 ### Bug Fixes
