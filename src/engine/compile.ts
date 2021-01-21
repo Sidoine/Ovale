@@ -18,7 +18,7 @@ import {
 import { OvaleConditionClass } from "./condition";
 import { OvaleCooldownClass } from "../states/Cooldown";
 import { AuraType, OvaleDataClass, SpellAddAuras, SpellInfo } from "./data";
-import { POWER_TYPES, PowerType } from "../states/Power";
+import { powerTypes, PowerType } from "../states/Power";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { Controls } from "./controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
@@ -38,29 +38,29 @@ import { match, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 import { GetSpellInfo } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleScoreClass } from "../ui/Score";
 import { OvaleScriptsClass } from "./scripts";
 
-const NUMBER_PATTERN = "^%-?%d+%.?%d*$";
+const numberPattern = "^%-?%d+%.?%d*$";
 
-export function RequireValue(
+export function requireValue(
     value: string | number
 ): [string | number, boolean] {
     const required = sub(tostring(value), 1, 1) != "!";
     if (!required) {
         value = sub(<string>value, 2);
-        if (truthy(match(value, NUMBER_PATTERN))) {
+        if (truthy(match(value, numberPattern))) {
             return [tonumber(value), required];
         }
     }
     return [value, required];
 }
 
-export function RequireNumber(value: string | number): [number, boolean] {
+export function requireNumber(value: string | number): [number, boolean] {
     if (isNumber(value)) return [value, true];
     const required = sub(tostring(value), 1, 1) != "!";
     if (!required) {
@@ -88,7 +88,7 @@ export class OvaleCompileClass {
     private serial: number | undefined = undefined;
     private ast: AstScriptNode | undefined = undefined;
 
-    private self_serial = 0;
+    private nextSerial = 0;
     private timesEvaluated = 0;
     private icon: LuaArray<AstIconNode> = {};
     private tracer: Tracer;
@@ -102,7 +102,7 @@ export class OvaleCompileClass {
         private ovaleCooldown: OvaleCooldownClass,
         private ovaleData: OvaleDataClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleDebug: OvaleDebugClass,
+        private ovaleDebug: DebugTools,
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass,
         private ovaleSpellBook: OvaleSpellBookClass,
@@ -113,13 +113,13 @@ export class OvaleCompileClass {
         this.profiler = ovaleProfiler.create("OvaleCompile");
         this.module = ovale.createModule(
             "OvaleCompile",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
     }
 
-    private EvaluateAddCheckBox(node: AstCheckBoxNode) {
+    private evaluateAddCheckBox(node: AstCheckBoxNode) {
         const ok = true;
         const [name, positionalParams, namedParams] = [
             node.name,
@@ -145,22 +145,22 @@ export class OvaleCompileClass {
                 namedParams.enabled
             )
         ) {
-            this.self_serial = this.self_serial + 1;
-            this.tracer.Debug(
+            this.nextSerial = this.nextSerial + 1;
+            this.tracer.debug(
                 "New checkbox '%s': advance age to %d.",
                 name,
-                this.self_serial
+                this.nextSerial
             );
         }
         return ok;
     }
 
-    private EvaluateAddIcon(node: AstIconNode) {
+    private evaluateAddIcon(node: AstIconNode) {
         this.icon[lualength(this.icon) + 1] = node;
         return true;
     }
 
-    private EvaluateAddListItem(node: AstListItemNode) {
+    private evaluateAddListItem(node: AstListItemNode) {
         const ok = true;
         const [name, item, positionalParams, namedParams] = [
             node.name,
@@ -191,22 +191,22 @@ export class OvaleCompileClass {
                     namedParams.enabled
                 )
             ) {
-                this.self_serial = this.self_serial + 1;
-                this.tracer.Debug(
+                this.nextSerial = this.nextSerial + 1;
+                this.tracer.debug(
                     "New list '%s': advance age to %d.",
                     name,
-                    this.self_serial
+                    this.nextSerial
                 );
             }
         }
         return ok;
     }
 
-    private EvaluateItemInfo(node: AstItemInfoNode) {
+    private evaluateItemInfo(node: AstItemInfoNode) {
         let ok = true;
         const [itemId, namedParams] = [node.itemId, node.rawNamedParams];
         if (itemId) {
-            const ii = this.ovaleData.ItemInfo(itemId);
+            const ii = this.ovaleData.getItemInfo(itemId);
             for (const [k, v] of kpairs(namedParams)) {
                 // if (k == "proc") {
                 //     const buff = v;
@@ -233,16 +233,16 @@ export class OvaleCompileClass {
         return ok;
     }
 
-    private EvaluateItemRequire(node: AstItemRequireNode) {
+    private evaluateItemRequire(node: AstItemRequireNode) {
         const property = node.property;
-        const ii = this.ovaleData.ItemInfo(node.itemId);
+        const ii = this.ovaleData.getItemInfo(node.itemId);
         const tbl = ii.require[property] || {};
         insert(tbl, node);
         ii.require[property] = tbl;
         return true;
     }
 
-    private EvaluateList(node: AstListNode) {
+    private evaluateList(node: AstListNode) {
         let ok = true;
         const [name, positionalParams] = [node.name, node.rawPositionalParams];
         let listDB: "itemList" | "buffSpellList";
@@ -256,7 +256,7 @@ export class OvaleCompileClass {
             if (_id.type === "value" && isNumber(_id.value)) {
                 list[_id.value] = true;
             } else {
-                this.tracer.Error(
+                this.tracer.error(
                     "%s is not a number in the '%s' list",
                     _id.asString,
                     name
@@ -269,12 +269,12 @@ export class OvaleCompileClass {
         return ok;
     }
 
-    private EvaluateScoreSpells(node: AstScoreSpellsNode) {
+    private evaluateScoreSpells(node: AstScoreSpellsNode) {
         let ok = true;
         const [positionalParams] = [node.rawPositionalParams];
         for (const [, _spellId] of ipairs(positionalParams)) {
             if (_spellId.type === "value" && isNumber(_spellId.value)) {
-                this.ovaleScore.AddSpell(_spellId.value);
+                this.ovaleScore.addSpell(_spellId.value);
             } else {
                 ok = false;
                 break;
@@ -283,31 +283,31 @@ export class OvaleCompileClass {
         return ok;
     }
 
-    private EvaluateSpellAuraList(node: AstSpellAuraListNode) {
+    private evaluateSpellAuraList(node: AstSpellAuraListNode) {
         const ok = true;
 
         const [spellId] = [node.spellId];
         if (!spellId) {
-            this.tracer.Error("No spellId for name %s", node.name);
+            this.tracer.error("No spellId for name %s", node.name);
             return false;
         }
         const keyword = node.keyword;
-        const si = this.ovaleData.SpellInfo(spellId);
+        const si = this.ovaleData.getSpellInfo(spellId);
         if (si.aura) {
             const auraInfo = auraTableDispatch[keyword];
             const auraTable = si.aura[auraInfo.target];
             const filter = auraInfo.filter;
             const tbl = auraTable[filter] || {};
             tbl[node.buffSpellId] = node;
-            const buff = this.ovaleData.SpellInfo(node.buffSpellId);
+            const buff = this.ovaleData.getSpellInfo(node.buffSpellId);
             buff.effect = auraInfo.filter;
         }
         return ok;
     }
 
-    private EvaluateSpellInfo(node: AstSpellInfoNode) {
+    private evaluateSpellInfo(node: AstSpellInfoNode) {
         const addpower: LuaObj<PowerType> = {};
-        for (const [, powertype] of ipairs(POWER_TYPES)) {
+        for (const [, powertype] of ipairs(powerTypes)) {
             const key = `add${powertype}`;
             addpower[key] = powertype;
         }
@@ -318,7 +318,7 @@ export class OvaleCompileClass {
             node.rawNamedParams,
         ];
         if (spellId) {
-            const si = this.ovaleData.SpellInfo(spellId);
+            const si = this.ovaleData.getSpellInfo(spellId);
             for (const [k, v] of kpairs(namedParams)) {
                 if (k == "add_duration") {
                     if (v.type === "value") {
@@ -329,7 +329,7 @@ export class OvaleCompileClass {
                         ) {
                             realValue =
                                 v.value *
-                                this.ovaleAzerite.TraitRank(
+                                this.ovaleAzerite.traitRank(
                                     namedParams.pertrait.value
                                 );
                         }
@@ -355,14 +355,14 @@ export class OvaleCompileClass {
                 } else if (k == "dummy_replace" && v.type === "string") {
                     let [spellName] = GetSpellInfo(v.value);
                     if (!spellName) spellName = v.value;
-                    this.ovaleSpellBook.AddSpell(spellId, spellName);
+                    this.ovaleSpellBook.addSpell(spellId, spellName);
                 } else if (k == "learn" && v.type === "value" && v.value == 1) {
                     const [spellName] = GetSpellInfo(spellId);
                     if (spellName)
-                        this.ovaleSpellBook.AddSpell(spellId, spellName);
+                        this.ovaleSpellBook.addSpell(spellId, spellName);
                 } else if (k == "shared_cd" && v.type === "string") {
                     si.shared_cd = v.value;
-                    this.ovaleCooldown.AddSharedCooldown(v.value, spellId);
+                    this.ovaleCooldown.addSharedCooldown(v.value, spellId);
                 } else if (addpower[k] != undefined) {
                     if (v.type === "value") {
                         let realValue = v.value;
@@ -372,14 +372,14 @@ export class OvaleCompileClass {
                         ) {
                             realValue =
                                 v.value *
-                                this.ovaleAzerite.TraitRank(
+                                this.ovaleAzerite.traitRank(
                                     namedParams.pertrait.value
                                 );
                         }
                         const power = <number>si[k as keyof SpellInfo] || 0;
                         (<any>si)[k] = power + realValue;
                     } else {
-                        this.tracer.Error(
+                        this.tracer.error(
                             "Unexpected value type %s in a addpower SpellInfo parameter (should be value)",
                             v.type
                         );
@@ -390,7 +390,7 @@ export class OvaleCompileClass {
                     if (v.type === "value" || v.type === "string")
                         (si as any)[k] = v.value;
                     else {
-                        this.tracer.Error(
+                        this.tracer.error(
                             "Unexpected value type %s in a SpellInfo parameter (should be value or string)",
                             v.type
                         );
@@ -403,7 +403,7 @@ export class OvaleCompileClass {
         return ok;
     }
 
-    private EvaluateSpellRequire(node: AstSpellRequireNode) {
+    private evaluateSpellRequire(node: AstSpellRequireNode) {
         const ok = true;
         const [spellId] = [
             node.spellId,
@@ -411,7 +411,7 @@ export class OvaleCompileClass {
             node.rawNamedParams,
         ];
         const property = node.property;
-        const si = this.ovaleData.SpellInfo(spellId);
+        const si = this.ovaleData.getSpellInfo(spellId);
         const tbl = si.require[property] || {};
         insert(tbl, node);
         si.require[property] = tbl;
@@ -421,33 +421,33 @@ export class OvaleCompileClass {
     /** This attempt to replace an unknown spell by a spell with
      * the same name that is known in a Spell function call. In the case of
      * a spell list, it tries to find the one that is known. */
-    private AddMissingVariantSpells(annotation: AstAnnotation) {
+    private addMissingVariantSpells(annotation: AstAnnotation) {
         if (annotation.spellNode) {
             for (const [, spellIdParam] of ipairs(annotation.spellNode)) {
                 if (spellIdParam.type === "value") {
                     const spellId = spellIdParam.value;
                     if (
-                        !this.ovaleSpellBook.IsKnownSpell(spellId) &&
-                        !this.ovaleCooldown.IsSharedCooldown(spellId)
+                        !this.ovaleSpellBook.isKnownSpell(spellId) &&
+                        !this.ovaleCooldown.isSharedCooldown(spellId)
                     ) {
-                        const spellName = this.ovaleSpellBook.GetSpellName(
+                        const spellName = this.ovaleSpellBook.getSpellName(
                             spellId
                         );
                         if (spellName) {
                             const [name] = GetSpellInfo(spellName);
                             if (spellName == name) {
-                                this.tracer.Debug(
+                                this.tracer.debug(
                                     "Learning spell %s with ID %d.",
                                     spellName,
                                     spellId
                                 );
-                                this.ovaleSpellBook.AddSpell(
+                                this.ovaleSpellBook.addSpell(
                                     spellId,
                                     spellName
                                 );
                             }
                         } else if (spellId > 0) {
-                            this.tracer.Error(
+                            this.tracer.error(
                                 "Unknown spell with ID %s.",
                                 spellId
                             );
@@ -455,18 +455,18 @@ export class OvaleCompileClass {
                     }
                 } else if (spellIdParam.type === "string") {
                     if (!this.ovaleData.buffSpellList[spellIdParam.value]) {
-                        this.tracer.Error(
+                        this.tracer.error(
                             "Unknown spell list %s",
                             spellIdParam.value
                         );
                     }
                 } else if (spellIdParam.type === "variable") {
-                    this.tracer.Error(
+                    this.tracer.error(
                         "Spell argument %s must be either a spell id or a spell list name.",
                         spellIdParam.name
                     );
                 } else {
-                    this.tracer.Error(
+                    this.tracer.error(
                         "Spell argument must be either a spell id or a spell list name."
                     );
                 }
@@ -475,7 +475,7 @@ export class OvaleCompileClass {
     }
 
     // private trinket: LuaArray<number> = {};
-    UpdateTrinketInfo() {
+    updateTrinketInfo() {
         // TODO
         // [
         //     this.trinket[1],
@@ -497,42 +497,42 @@ export class OvaleCompileClass {
         // }
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         // TODO Remove these
         this.module.RegisterMessage(
             "Ovale_CheckBoxValueChanged",
-            this.ScriptControlChanged
+            this.handleScriptControlChanged
         );
         this.module.RegisterMessage(
             "Ovale_ListValueChanged",
-            this.ScriptControlChanged
+            this.handleScriptControlChanged
         );
         this.module.RegisterMessage(
             "Ovale_ScriptChanged",
-            this.Ovale_ScriptChanged
+            this.handleScriptChanged
         );
         this.module.RegisterMessage(
             "Ovale_SpecializationChanged",
-            this.Ovale_ScriptChanged
+            this.handleScriptChanged
         );
 
         this.module.SendMessage("Ovale_ScriptChanged");
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_CheckBoxValueChanged");
         this.module.UnregisterMessage("Ovale_ListValueChanged");
         this.module.UnregisterMessage("Ovale_ScriptChanged");
         this.module.UnregisterMessage("Ovale_SpecializationChanged");
     };
-    private Ovale_ScriptChanged = (event: string) => {
-        this.CompileScript(this.script.getCurrentSpecScriptName());
-        this.EventHandler(event);
+    private handleScriptChanged = (event: string) => {
+        this.compileScript(this.script.getCurrentSpecScriptName());
+        this.eventHandler(event);
     };
 
-    private ScriptControlChanged = (event: string, name: string) => {
+    private handleScriptControlChanged = (event: string, name: string) => {
         if (!name) {
-            this.EventHandler(event);
+            this.eventHandler(event);
         } else {
             let control;
             if (event == "Ovale_CheckBoxValueChanged") {
@@ -541,38 +541,38 @@ export class OvaleCompileClass {
                 control = this.controls.listsByName[name];
             }
             if (control && control.triggerEvaluation) {
-                this.EventHandler(event);
+                this.eventHandler(event);
             }
         }
     };
 
-    private EventHandler = (event: string) => {
-        this.self_serial = this.self_serial + 1;
-        this.tracer.Debug("%s: advance age to %d.", event, this.self_serial);
+    private eventHandler = (event: string) => {
+        this.nextSerial = this.nextSerial + 1;
+        this.tracer.debug("%s: advance age to %d.", event, this.nextSerial);
         this.ovale.needRefresh();
     };
-    CompileScript(name: string) {
-        this.ovaleDebug.ResetTrace();
-        this.tracer.Debug("Compiling script '%s'.", name);
+    compileScript(name: string) {
+        this.ovaleDebug.resetTrace();
+        this.tracer.debug("Compiling script '%s'.", name);
         if (this.ast) {
-            this.ovaleAst.Release(this.ast);
+            this.ovaleAst.release(this.ast);
             this.ast = undefined;
         }
-        if (this.ovaleCondition.HasAny()) {
+        if (this.ovaleCondition.hasAny()) {
             this.ast = this.ovaleAst.parseNamedScript(name);
-            this.tracer.Debug(
+            this.tracer.debug(
                 `Compilation result: ${
                     (this.ast !== undefined && "success") || "failed"
                 }`
             );
         } else {
-            this.tracer.Debug("No conditions. No need to compile.");
+            this.tracer.debug("No conditions. No need to compile.");
         }
         this.controls.reset();
         return this.ast;
     }
-    EvaluateScript(ast?: AstScriptNode, forceEvaluation?: boolean) {
-        this.profiler.StartProfiling("OvaleCompile_EvaluateScript");
+    evaluateScript(ast?: AstScriptNode, forceEvaluation?: boolean) {
+        this.profiler.startProfiling("OvaleCompile_EvaluateScript");
         let changed = false;
         ast = ast || this.ast;
         // this.tracer.Debug(
@@ -582,42 +582,42 @@ export class OvaleCompileClass {
         // );
         if (
             ast &&
-            (forceEvaluation || !this.serial || this.serial < this.self_serial)
+            (forceEvaluation || !this.serial || this.serial < this.nextSerial)
         ) {
-            this.tracer.Debug("Script has changed. Evaluating...");
+            this.tracer.debug("Script has changed. Evaluating...");
             changed = true;
             let ok = true;
             wipe(this.icon);
-            this.ovaleData.Reset();
-            this.ovaleCooldown.ResetSharedCooldowns();
+            this.ovaleData.reset();
+            this.ovaleCooldown.resetSharedCooldowns();
             this.timesEvaluated = this.timesEvaluated + 1;
-            this.serial = this.self_serial;
+            this.serial = this.nextSerial;
             for (const [, node] of ipairs(ast.child)) {
                 if (node.type == "checkbox") {
-                    ok = this.EvaluateAddCheckBox(node);
+                    ok = this.evaluateAddCheckBox(node);
                 } else if (node.type == "icon") {
-                    ok = this.EvaluateAddIcon(node);
+                    ok = this.evaluateAddIcon(node);
                 } else if (node.type == "list_item") {
-                    ok = this.EvaluateAddListItem(node);
+                    ok = this.evaluateAddListItem(node);
                 } else if (node.type == "item_info") {
-                    ok = this.EvaluateItemInfo(node);
+                    ok = this.evaluateItemInfo(node);
                 } else if (node.type == "itemrequire") {
-                    ok = this.EvaluateItemRequire(node);
+                    ok = this.evaluateItemRequire(node);
                 } else if (node.type == "list") {
-                    ok = this.EvaluateList(node);
+                    ok = this.evaluateList(node);
                 } else if (node.type == "score_spells") {
-                    ok = this.EvaluateScoreSpells(node);
+                    ok = this.evaluateScoreSpells(node);
                 } else if (node.type == "spell_aura_list") {
-                    ok = this.EvaluateSpellAuraList(node);
+                    ok = this.evaluateSpellAuraList(node);
                 } else if (node.type == "spell_info") {
-                    ok = this.EvaluateSpellInfo(node);
+                    ok = this.evaluateSpellInfo(node);
                 } else if (node.type == "spell_require") {
-                    ok = this.EvaluateSpellRequire(node);
+                    ok = this.evaluateSpellRequire(node);
                 } else if (
                     node.type !== "define" &&
                     node.type !== "add_function"
                 ) {
-                    this.tracer.Error("Unknown node type", node.type);
+                    this.tracer.error("Unknown node type", node.type);
                     ok = false;
                 }
                 if (!ok) {
@@ -626,14 +626,14 @@ export class OvaleCompileClass {
             }
             if (ok) {
                 if (ast.annotation)
-                    this.AddMissingVariantSpells(ast.annotation);
-                this.UpdateTrinketInfo();
+                    this.addMissingVariantSpells(ast.annotation);
+                this.updateTrinketInfo();
             }
         }
-        this.profiler.StopProfiling("OvaleCompile_EvaluateScript");
+        this.profiler.stopProfiling("OvaleCompile_EvaluateScript");
         return changed;
     }
-    GetFunctionNode(name: string) {
+    getFunctionNode(name: string) {
         let node;
         if (
             this.ast &&
@@ -644,11 +644,11 @@ export class OvaleCompileClass {
         }
         return node;
     }
-    GetIconNodes() {
+    getIconNodes() {
         return this.icon;
     }
-    DebugCompile() {
-        this.tracer.Print(
+    debugCompile() {
+        this.tracer.print(
             "Total number of times the script was evaluated: %d",
             this.timesEvaluated
         );

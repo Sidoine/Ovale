@@ -2,16 +2,16 @@ import { States, StateModule } from "../engine/state";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 import { GetTime } from "@wowts/wow-mock";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { LuaArray } from "@wowts/lua";
 import {
     OvaleConditionClass,
     ConditionFunction,
-    ReturnBoolean,
-    ReturnConstant,
-    ReturnValueBetween,
+    returnBoolean,
+    returnConstant,
+    returnValueBetween,
 } from "../engine/condition";
 import { huge as INFINITY } from "@wowts/math";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
@@ -29,7 +29,7 @@ export class OvaleCombatClass
 
     constructor(
         private ovale: OvaleClass,
-        debug: OvaleDebugClass,
+        debug: DebugTools,
         private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(CombatState);
@@ -43,30 +43,30 @@ export class OvaleCombatClass
     }
 
     public registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition("incombat", false, this.InCombat);
-        condition.RegisterCondition("timeincombat", false, this.TimeInCombat);
-        condition.RegisterCondition(
+        condition.registerCondition("incombat", false, this.inCombat);
+        condition.registerCondition("timeincombat", false, this.timeInCombat);
+        condition.registerCondition(
             "expectedcombatlength",
             false,
             this.expectedCombatLength
         );
-        condition.RegisterCondition("fightremains", false, this.fightRemains);
+        condition.registerCondition("fightremains", false, this.fightRemains);
     }
 
     public isInCombat(atTime: number | undefined) {
-        return this.GetState(atTime).inCombat;
+        return this.getState(atTime).inCombat;
     }
 
-    public InitializeState() {}
+    public initializeState() {}
 
-    public ResetState() {
+    public resetState() {
         this.next.inCombat = this.current.inCombat;
         this.next.combatStartTime = this.current.combatStartTime || 0;
     }
 
-    public CleanState() {}
+    public cleanState() {}
 
-    public ApplySpellOnHit = (
+    public applySpellOnHit = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -75,7 +75,7 @@ export class OvaleCombatClass
     ) => {
         if (
             !this.next.inCombat &&
-            this.ovaleSpellBook.IsHarmfulSpell(spellId)
+            this.ovaleSpellBook.isHarmfulSpell(spellId)
         ) {
             this.next.inCombat = true;
             if (channel) {
@@ -103,7 +103,7 @@ export class OvaleCombatClass
     };
 
     private handlePlayerRegenDisabled = (event: string) => {
-        this.tracer.Debug(event, "Entering combat.");
+        this.tracer.debug(event, "Entering combat.");
         const now = GetTime();
         this.current.inCombat = true;
         this.current.combatStartTime = now;
@@ -112,7 +112,7 @@ export class OvaleCombatClass
     };
 
     private handlePlayerRegenEnabled = (event: string) => {
-        this.tracer.Debug(event, "Leaving combat.");
+        this.tracer.debug(event, "Leaving combat.");
         const now = GetTime();
         this.current.inCombat = false;
         this.ovale.needRefresh();
@@ -129,13 +129,13 @@ export class OvaleCombatClass
 	 @usage
 	 if not InCombat() and not Stealthed() Spell(stealth)
      */
-    private InCombat = (
+    private inCombat = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean = this.isInCombat(atTime);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Get the number of seconds elapsed since the player entered combat.
@@ -145,17 +145,17 @@ export class OvaleCombatClass
 	 @usage
 	 if TimeInCombat() > 5 Spell(bloodlust)
      */
-    private TimeInCombat = (
+    private timeInCombat = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         if (this.isInCombat(atTime)) {
-            const state = this.GetState(atTime);
+            const state = this.getState(atTime);
             const start = state.combatStartTime;
-            return ReturnValueBetween(start, INFINITY, 0, start, 1);
+            return returnValueBetween(start, INFINITY, 0, start, 1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     private expectedCombatLength: ConditionFunction = (
@@ -164,11 +164,11 @@ export class OvaleCombatClass
         atTime
     ) => {
         // TODO maybe should depend on the fact that it is a boss fight or not
-        return ReturnConstant(15 * 60);
+        return returnConstant(15 * 60);
     };
 
     private fightRemains: ConditionFunction = () => {
         // TODO use enemies health
-        return ReturnConstant(15 * 60);
+        return returnConstant(15 * 60);
     };
 }

@@ -3,7 +3,7 @@ import { format } from "@wowts/string";
 class BackToFrontIterator<T> {
     public value!: T;
     constructor(private invariant: OvaleDequeue<T>, public control: number) {}
-    Next() {
+    next() {
         this.control = this.control - 1;
         this.value = this.invariant[this.control];
         return this.control >= this.invariant.first;
@@ -13,7 +13,7 @@ class BackToFrontIterator<T> {
 class FrontToBackIterator<T> {
     public value!: T;
     constructor(private invariant: OvaleDequeue<T>, private control: number) {}
-    Next() {
+    next() {
         this.control = this.control + 1;
         this.value = this.invariant[this.control];
         return this.control <= this.invariant.last;
@@ -27,19 +27,19 @@ export class OvaleDequeue<T> {
 
     constructor(public name: string) {}
 
-    InsertFront(element: T) {
+    insertFront(element: T) {
         const first = this.first - 1;
         this.first = first;
         this[first] = element;
     }
 
-    InsertBack(element: T) {
+    insertBack(element: T) {
         const last = this.last + 1;
         this.last = last;
         this[last] = element;
     }
 
-    RemoveFront() {
+    removeFront() {
         const first = this.first;
         const element = this[first];
         if (element) {
@@ -49,7 +49,7 @@ export class OvaleDequeue<T> {
         return element;
     }
 
-    RemoveBack() {
+    removeBack() {
         const last = this.last;
         const element = this[last];
         if (element) {
@@ -59,47 +59,47 @@ export class OvaleDequeue<T> {
         return element;
     }
 
-    At(index: number) {
-        if (index > this.Size()) {
+    at(index: number) {
+        if (index > this.size()) {
             return;
         }
         return this[this.first + index - 1];
     }
 
-    Front() {
+    front() {
         return this[this.first];
     }
 
-    Back() {
+    back() {
         return this[this.last];
     }
 
-    BackToFrontIterator() {
+    backToFrontIterator() {
         return new BackToFrontIterator<T>(this, this.last + 1);
     }
 
-    FrontToBackIterator() {
+    frontToBackIterator() {
         return new FrontToBackIterator<T>(this, this.first - 1);
     }
 
-    Reset() {
-        const iterator = this.BackToFrontIterator();
-        while (iterator.Next()) {
+    reset() {
+        const iterator = this.backToFrontIterator();
+        while (iterator.next()) {
             delete this[iterator.control];
         }
         this.first = 0;
         this.last = -1;
     }
 
-    Size() {
+    size() {
         return this.last - this.first + 1;
     }
 
-    DebuggingInfo() {
+    debuggingInfo() {
         return format(
             "Queue %s has %d item(s), first=%d, last=%d.",
             this.name,
-            this.Size(),
+            this.size(),
             this.first,
             this.last
         );
@@ -108,29 +108,29 @@ export class OvaleDequeue<T> {
 
 // Queue (FIFO) methods
 export class OvaleQueue<T> extends OvaleDequeue<T> {
-    Insert(value: T) {
-        this.InsertBack(value);
+    insert(value: T) {
+        this.insertBack(value);
     }
 
-    Remove() {
-        return this.RemoveFront();
+    remove() {
+        return this.removeFront();
     }
 
-    Iterator() {
-        return this.FrontToBackIterator();
+    iterator() {
+        return this.frontToBackIterator();
     }
 }
 
 export class OvaleStack<T> extends OvaleDequeue<T> {
-    Push(value: T) {
-        this.InsertBack(value);
+    push(value: T) {
+        this.insertBack(value);
     }
 
-    Pop() {
-        return this.RemoveBack();
+    pop() {
+        return this.removeBack();
     }
 
-    Top() {
-        return this.Back();
+    top() {
+        return this.back();
     }
 }

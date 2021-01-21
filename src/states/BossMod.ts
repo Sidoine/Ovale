@@ -1,15 +1,16 @@
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleCombatClass } from "./combat";
-const _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
-const _DBM = _G["DBM"];
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const bigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
+const dbmClass = _G["DBM"];
 export class OvaleBossModClass {
-    EngagedDBM: any = undefined;
-    EngagedBigWigs: any = undefined;
+    engagedDBM: any = undefined;
+    engagedBigWigs: any = undefined;
 
     private module: AceModule;
     private tracer: Tracer;
@@ -17,86 +18,86 @@ export class OvaleBossModClass {
 
     constructor(
         ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass,
         private combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
             "BossMod",
-            this.OnInitialize,
-            this.OnDisable
+            this.handleInitialize,
+            this.handleDisable
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
         this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
-        if (_DBM) {
-            this.tracer.Debug("DBM is loaded");
+    private handleInitialize = () => {
+        if (dbmClass) {
+            this.tracer.debug("DBM is loaded");
             hooksecurefunc(
-                _DBM,
+                dbmClass,
                 "StartCombat",
-                (_DBM, mod, delay, event, ...__args) => {
+                (dbm, mod, delay, event, ...parameters) => {
                     if (event != "TIMER_RECOVERY") {
-                        this.EngagedDBM = mod;
+                        this.engagedDBM = mod;
                     }
                 }
             );
-            hooksecurefunc(_DBM, "EndCombat", (_DBM, mod) => {
-                this.EngagedDBM = undefined;
+            hooksecurefunc(dbmClass, "EndCombat", (dbm, mod) => {
+                this.engagedDBM = undefined;
             });
         }
-        if (_BigWigsLoader) {
-            this.tracer.Debug("BigWigs is loaded");
-            _BigWigsLoader.RegisterMessage(
+        if (bigWigsLoader) {
+            this.tracer.debug("BigWigs is loaded");
+            bigWigsLoader.RegisterMessage(
                 this,
                 "BigWigs_OnBossEngage",
                 (_: any, mod: any, diff: any) => {
-                    this.EngagedBigWigs = mod;
+                    this.engagedBigWigs = mod;
                 }
             );
-            _BigWigsLoader.RegisterMessage(
+            bigWigsLoader.RegisterMessage(
                 this,
                 "BigWigs_OnBossDisable",
                 (_: any, mod: any) => {
-                    this.EngagedBigWigs = undefined;
+                    this.engagedBigWigs = undefined;
                 }
             );
         }
     };
-    OnDisable() {}
-    IsBossEngaged(atTime: number) {
+    handleDisable() {}
+    isBossEngaged(atTime: number) {
         if (!this.combat.isInCombat(atTime)) {
             return false;
         }
         const dbmEngaged =
-            _DBM != undefined &&
-            this.EngagedDBM != undefined &&
-            this.EngagedDBM.inCombat;
+            dbmClass != undefined &&
+            this.engagedDBM != undefined &&
+            this.engagedDBM.inCombat;
         const bigWigsEngaged =
-            _BigWigsLoader != undefined &&
-            this.EngagedBigWigs != undefined &&
-            this.EngagedBigWigs.isEngaged;
+            bigWigsLoader != undefined &&
+            this.engagedBigWigs != undefined &&
+            this.engagedBigWigs.isEngaged;
         const neitherEngaged =
-            _DBM == undefined &&
-            _BigWigsLoader == undefined &&
-            this.ScanTargets();
+            dbmClass == undefined &&
+            bigWigsLoader == undefined &&
+            this.scanTargets();
         if (dbmEngaged) {
-            this.tracer.Debug(
+            this.tracer.debug(
                 "DBM Engaged: [name=%s]",
-                this.EngagedDBM.localization.general.name
+                this.engagedDBM.localization.general.name
             );
         }
         if (bigWigsEngaged) {
-            this.tracer.Debug(
+            this.tracer.debug(
                 "BigWigs Engaged: [name=%s]",
-                this.EngagedBigWigs.displayName
+                this.engagedBigWigs.displayName
             );
         }
         return dbmEngaged || bigWigsEngaged || neitherEngaged;
     }
-    ScanTargets() {
-        this.profiler.StartProfiling("OvaleBossMod:ScanTargets");
+    scanTargets() {
+        this.profiler.startProfiling("OvaleBossMod:ScanTargets");
         let bossEngaged = false;
         if (UnitExists("target")) {
             bossEngaged = UnitClassification("target") == "worldboss" || false;
@@ -135,7 +136,7 @@ export class OvaleBossModClass {
         //         }
         //     }
         // }
-        this.profiler.StopProfiling("OvaleBossMod:ScanTargets");
+        this.profiler.stopProfiling("OvaleBossMod:ScanTargets");
         return bossEngaged;
     }
 }

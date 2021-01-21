@@ -7,7 +7,7 @@ test("HasTime with point to left of interval", () => {
     const timeSpan = newFromArgs(10, 20);
 
     // Act
-    const bool = timeSpan.HasTime(5);
+    const bool = timeSpan.hasTime(5);
 
     // Assert
     expect(bool).toBe(false);
@@ -18,7 +18,7 @@ test("HasTime with point on left endpoint of interval", () => {
     const timeSpan = newFromArgs(10, 20);
 
     // Act
-    const bool = timeSpan.HasTime(10);
+    const bool = timeSpan.hasTime(10);
 
     // Assert
     expect(bool).toBe(true);
@@ -29,7 +29,7 @@ test("HasTime with point inside interval", () => {
     const timeSpan = newFromArgs(10, 20);
 
     // Act
-    const bool = timeSpan.HasTime(15);
+    const bool = timeSpan.hasTime(15);
 
     // Assert
     expect(bool).toBe(true);
@@ -40,7 +40,7 @@ test("HasTime with point on right endpoint of interval", () => {
     const timeSpan = newFromArgs(10, 20);
 
     // Act
-    const bool = timeSpan.HasTime(20);
+    const bool = timeSpan.hasTime(20);
 
     // Assert
     expect(bool).toBe(false);
@@ -51,7 +51,7 @@ test("HasTime with point to right of interval", () => {
     const timeSpan = newFromArgs(10, 20);
 
     // Act
-    const bool = timeSpan.HasTime(25);
+    const bool = timeSpan.hasTime(25);
 
     // Assert
     expect(bool).toBe(false);
@@ -62,7 +62,7 @@ test("intersectInterval with one interval which is within the first", () => {
     const timeSpan = newFromArgs(0, 10);
 
     // Act
-    const result = timeSpan.IntersectInterval(5, 10);
+    const result = timeSpan.intersectInterval(5, 10);
 
     // Assert
     expect(result[1]).toEqual(5);
@@ -74,7 +74,7 @@ test("intersectInterval with one interval which overlaps the first", () => {
     const timeSpan = newFromArgs(0, 10);
 
     // Act
-    const result = timeSpan.IntersectInterval(5, 15);
+    const result = timeSpan.intersectInterval(5, 15);
 
     // Assert
     expect(result[1]).toEqual(5);
@@ -86,7 +86,7 @@ test("intersectInterval with one interval which overlaps the start of the first"
     const timeSpan = newFromArgs(0, 10);
 
     // Act
-    const result = timeSpan.IntersectInterval(-5, 5);
+    const result = timeSpan.intersectInterval(-5, 5);
 
     // Assert
     expect(result[1]).toEqual(0);
@@ -98,7 +98,7 @@ test("intersectInterval with one interval which does not overlap the end", () =>
     const timeSpan = newFromArgs(0, 10);
 
     // Act
-    const result = timeSpan.IntersectInterval(11, 15);
+    const result = timeSpan.intersectInterval(11, 15);
 
     // Assert
     expect(result[1]).toBeUndefined();
@@ -109,7 +109,7 @@ test("intersectInterval with one interval which does not overlap the start", () 
     const timeSpan = newFromArgs(0, 10);
 
     // Act
-    const result = timeSpan.IntersectInterval(-5, -1);
+    const result = timeSpan.intersectInterval(-5, -1);
 
     // Assert
     expect(result[1]).toBeUndefined();
@@ -120,7 +120,7 @@ test("intersectInterval with nothing", () => {
     const timeSpan = newFromArgs();
 
     // Act
-    const result = timeSpan.IntersectInterval(1, huge);
+    const result = timeSpan.intersectInterval(1, huge);
 
     // Assert
     expect(result[1]).toBeUndefined();

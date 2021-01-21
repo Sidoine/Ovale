@@ -11,7 +11,7 @@ import { sort, insert, concat } from "@wowts/table";
 import { C_AzeriteEssence } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
 interface Essence {
@@ -35,7 +35,7 @@ export class OvaleAzeriteEssenceClass {
                     multiline: 25,
                     width: "full",
                     get: (info: LuaArray<string>) => {
-                        return this.DebugEssences();
+                        return this.debugEssences();
                     },
                 },
             },
@@ -45,11 +45,11 @@ export class OvaleAzeriteEssenceClass {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    constructor(ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
+    constructor(ovale: OvaleClass, ovaleDebug: DebugTools) {
         this.module = ovale.createModule(
             "OvaleAzeriteEssence",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create("OvaleAzeriteEssence");
@@ -58,26 +58,29 @@ export class OvaleAzeriteEssenceClass {
         }
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "AZERITE_ESSENCE_CHANGED",
-            this.UpdateEssences
+            this.handleUpdateEssences
         );
         this.module.RegisterEvent(
             "AZERITE_ESSENCE_UPDATE",
-            this.UpdateEssences
+            this.handleUpdateEssences
         );
-        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateEssences);
+        this.module.RegisterEvent(
+            "PLAYER_ENTERING_WORLD",
+            this.handleUpdateEssences
+        );
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("AZERITE_ESSENCE_CHANGED");
         this.module.UnregisterEvent("AZERITE_ESSENCE_UPDATE");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
     };
 
-    private UpdateEssences = (e: string) => {
-        this.tracer.Debug("UpdateEssences after event %s", e);
+    private handleUpdateEssences = (e: string) => {
+        this.tracer.debug("UpdateEssences after event %s", e);
         this.essences = {};
         for (const [, mileStoneInfo] of pairs(
             C_AzeriteEssence.GetMilestones() || {}
@@ -102,7 +105,7 @@ export class OvaleAzeriteEssenceClass {
                         slot: mileStoneInfo.slot,
                     };
                     this.essences[essenceId] = essenceData;
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Found essence {ID: %d, name: %s, rank: %d, slot: %d}",
                         essenceData.ID,
                         essenceData.name,
@@ -114,7 +117,7 @@ export class OvaleAzeriteEssenceClass {
         }
     };
 
-    IsMajorEssence(essenceId: number) {
+    isMajorEssence(essenceId: number) {
         const essence = this.essences[essenceId];
         if (essence) {
             return (essence.slot == 0 && true) || false;
@@ -122,16 +125,16 @@ export class OvaleAzeriteEssenceClass {
         return false;
     }
 
-    IsMinorEssence(essenceId: number) {
+    isMinorEssence(essenceId: number) {
         return (this.essences[essenceId] !== undefined && true) || false;
     }
 
-    EssenceRank(essenceId: number) {
+    essenceRank(essenceId: number) {
         const essence = this.essences[essenceId];
         return (essence !== undefined && essence.rank) || 0;
     }
 
-    DebugEssences() {
+    debugEssences() {
         const output: LuaArray<string> = {};
         const array: LuaArray<string> = {};
         for (const [k, v] of pairs(this.essences)) {

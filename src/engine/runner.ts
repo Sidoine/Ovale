@@ -37,15 +37,15 @@ import {
 import { BaseState } from "../states/BaseState";
 import { ActionType } from "./best-action";
 import { OvaleConditionClass } from "./condition";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
 import {
     newTimeSpan,
     OvaleTimeSpan,
     releaseTimeSpans,
-    UNIVERSE,
+    universe,
 } from "../tools/TimeSpan";
-import { isNumber, isString, OneTimeMessage } from "../tools/tools";
+import { isNumber, isString, oneTimeMessage } from "../tools/tools";
 
 export type ActionInfo = [
     texture?: string,
@@ -78,12 +78,12 @@ type ComputerFunction<T extends AstNode> = (
 export class Runner {
     private profiler: Profiler;
     private tracer: Tracer;
-    public self_serial = 0;
+    public serial = 0;
     private actionHandlers: LuaObj<ActionInfoHandler> = {};
 
     constructor(
         ovaleProfiler: OvaleProfilerClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private baseState: BaseState,
         private ovaleCondition: OvaleConditionClass
     ) {
@@ -92,29 +92,29 @@ export class Runner {
     }
 
     public refresh() {
-        this.self_serial = this.self_serial + 1;
-        this.tracer.Log("Advancing age to %d.", this.self_serial);
+        this.serial = this.serial + 1;
+        this.tracer.log("Advancing age to %d.", this.serial);
     }
 
-    public PostOrderCompute(element: AstNode, atTime: number): AstNodeSnapshot {
-        this.profiler.StartProfiling("OvaleBestAction_PostOrderCompute");
+    public postOrderCompute(element: AstNode, atTime: number): AstNodeSnapshot {
+        this.profiler.startProfiling("OvaleBestAction_PostOrderCompute");
         let result: AstNodeSnapshot | undefined;
         const postOrder = element.postOrder;
-        if (postOrder && element.result.serial !== this.self_serial) {
-            this.tracer.Log(
+        if (postOrder && element.result.serial !== this.serial) {
+            this.tracer.log(
                 "[%d] [[[ Compute '%s' post-order nodes.",
                 element.nodeId,
                 element.type
             );
             let index = 1;
-            const N = lualength(postOrder);
-            while (index < N) {
+            const n = lualength(postOrder);
+            while (index < n) {
                 const [childNode, parentNode] = [
                     postOrder[index],
                     postOrder[index + 1],
                 ];
                 index = index + 2;
-                result = this.PostOrderCompute(childNode, atTime);
+                result = this.postOrderCompute(childNode, atTime);
 
                 let shortCircuit = false;
                 if (
@@ -123,9 +123,9 @@ export class Runner {
                 ) {
                     if (
                         parentNode.type == "if" &&
-                        result.timeSpan.Measure() == 0
+                        result.timeSpan.measure() == 0
                     ) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with zero-measure time span.",
                             element.nodeId,
                             childNode.type,
@@ -136,9 +136,9 @@ export class Runner {
                         shortCircuit = true;
                     } else if (
                         parentNode.type == "unless" &&
-                        result.timeSpan.IsUniverse()
+                        result.timeSpan.isUniverse()
                     ) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with universe as time span.",
                             element.nodeId,
                             childNode.type,
@@ -150,9 +150,9 @@ export class Runner {
                     } else if (
                         parentNode.type == "logical" &&
                         parentNode.operator == "and" &&
-                        result.timeSpan.Measure() == 0
+                        result.timeSpan.measure() == 0
                     ) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with zero measure.",
                             element.nodeId,
                             childNode.type,
@@ -164,9 +164,9 @@ export class Runner {
                     } else if (
                         parentNode.type == "logical" &&
                         parentNode.operator == "or" &&
-                        result.timeSpan.IsUniverse()
+                        result.timeSpan.isUniverse()
                     ) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    '%s' [%d] will trigger short-circuit evaluation of parent node '%s' [%d] with universe as time span.",
                             element.nodeId,
                             childNode.type,
@@ -178,33 +178,33 @@ export class Runner {
                     }
                 }
                 if (shortCircuit) {
-                    while (parentNode != postOrder[index] && index <= N) {
+                    while (parentNode != postOrder[index] && index <= n) {
                         index = index + 2;
                     }
-                    if (index > N) {
-                        this.tracer.Error(
+                    if (index > n) {
+                        this.tracer.error(
                             "Ran off end of postOrder node list for node %d.",
                             element.nodeId
                         );
                     }
                 }
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d] ]]] Compute '%s' post-order nodes: complete.",
                 element.nodeId,
                 element.type
             );
         }
-        this.RecursiveCompute(element, atTime);
-        this.profiler.StopProfiling("OvaleBestAction_PostOrderCompute");
+        this.recursiveCompute(element, atTime);
+        this.profiler.stopProfiling("OvaleBestAction_PostOrderCompute");
         return element.result;
     }
-    private RecursiveCompute(
+    private recursiveCompute(
         element: AstNode,
         atTime: number
     ): AstNodeSnapshot {
-        this.profiler.StartProfiling("OvaleBestAction_RecursiveCompute");
-        this.tracer.Log(
+        this.profiler.startProfiling("OvaleBestAction_RecursiveCompute");
+        this.tracer.log(
             "[%d] >>> Computing '%s' at time=%f",
             element.nodeId,
             element.asString || element.type,
@@ -212,7 +212,7 @@ export class Runner {
         );
         if (element.result.constant) {
             // Constant value
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d] <<< '%s' returns %s with constant %s",
                 element.nodeId,
                 element.asString || element.type,
@@ -221,13 +221,13 @@ export class Runner {
             );
             return element.result;
         } else if (element.result.serial == -1) {
-            OneTimeMessage(
+            oneTimeMessage(
                 "Recursive call is not supported in '%s'. Please fix the script.",
                 element.asString || element.type
             );
             return element.result;
-        } else if (element.result.serial === this.self_serial) {
-            this.tracer.Log(
+        } else if (element.result.serial === this.serial) {
+            this.tracer.log(
                 "[%d] <<< '%s' returns %s with cached %s",
                 element.nodeId,
                 element.asString || element.type,
@@ -237,15 +237,15 @@ export class Runner {
         } else {
             // Set to -1 to prevent recursive call of this same node (see check above)
             element.result.serial = -1;
-            const visitor = this.COMPUTE_VISITOR[
+            const visitor = this.computeVisitors[
                 element.type
             ] as ComputerFunction<typeof element>;
             let result;
             if (visitor) {
                 result = visitor(element, atTime);
-                element.result.serial = this.self_serial;
+                element.result.serial = this.serial;
 
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d] <<< '%s' returns %s with computed %s",
                     element.nodeId,
                     element.asString || element.type,
@@ -253,22 +253,22 @@ export class Runner {
                     this.resultToString(element.result)
                 );
             } else {
-                this.tracer.Error(
+                this.tracer.error(
                     "[%d] Runtime error: unable to compute node of type '%s': %s.",
                     element.nodeId,
                     element.type,
                     element.asString
                 );
                 wipe(element.result.timeSpan);
-                element.result.serial = this.self_serial;
+                element.result.serial = this.serial;
             }
         }
-        this.profiler.StopProfiling("OvaleBestAction_RecursiveCompute");
+        this.profiler.stopProfiling("OvaleBestAction_RecursiveCompute");
         return element.result;
     }
 
-    private ComputeBool(element: AstNode, atTime: number) {
-        const newElement = this.Compute(element, atTime);
+    private computeBool(element: AstNode, atTime: number) {
+        const newElement = this.compute(element, atTime);
         // if (
         //     newElement.type === "value" &&
         //     newElement.value == 0 &&
@@ -285,17 +285,17 @@ export class Runner {
         this.actionHandlers[name] = handler;
     }
 
-    public GetActionInfo(
+    public getActionInfo(
         element: AstActionNode,
         atTime: number,
         namedParameters: NamedParametersOf<AstActionNode>
     ) {
-        if (element.result.serial === this.self_serial) {
-            this.tracer.Log(
+        if (element.result.serial === this.serial) {
+            this.tracer.log(
                 "[%d]    using cached result (age = %d/%d)",
                 element.nodeId,
                 element.result.serial,
-                this.self_serial
+                this.serial
             );
         } else {
             const target =
@@ -313,37 +313,37 @@ export class Runner {
 
     private computeBoolean: ComputerFunction<AstBooleanNode> = (node) => {
         if (node.value) {
-            this.GetTimeSpan(node, UNIVERSE);
+            this.getTimeSpan(node, universe);
         } else {
-            this.GetTimeSpan(node);
+            this.getTimeSpan(node);
         }
         return node.result;
     };
 
-    private ComputeAction: ComputerFunction<AstActionNode> = (
+    private computeAction: ComputerFunction<AstActionNode> = (
         node,
         atTime: number
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeAction");
+        this.profiler.startProfiling("OvaleBestAction_ComputeAction");
         const nodeId = node.nodeId;
-        const timeSpan = this.GetTimeSpan(node);
-        this.tracer.Log("[%d]    evaluating action: %s()", nodeId, node.name);
+        const timeSpan = this.getTimeSpan(node);
+        this.tracer.log("[%d]    evaluating action: %s()", nodeId, node.name);
         const [, namedParameters] = this.computeParameters(node, atTime);
-        const result = this.GetActionInfo(node, atTime, namedParameters);
+        const result = this.getActionInfo(node, atTime, namedParameters);
         if (result.type !== "action") return result;
 
         const action = node.name;
         // element.positionalParams[1];
         if (result.actionTexture === undefined) {
-            this.tracer.Log("[%d]    Action %s not found.", nodeId, action);
+            this.tracer.log("[%d]    Action %s not found.", nodeId, action);
             wipe(timeSpan);
             setResultType(result, "none");
         } else if (!result.actionEnable) {
-            this.tracer.Log("[%d]    Action %s not enabled.", nodeId, action);
+            this.tracer.log("[%d]    Action %s not enabled.", nodeId, action);
             wipe(timeSpan);
             setResultType(result, "none");
         } else if (namedParameters.usable == 1 && !result.actionUsable) {
-            this.tracer.Log("[%d]    Action %s not usable.", nodeId, action);
+            this.tracer.log("[%d]    Action %s not usable.", nodeId, action);
             wipe(timeSpan);
             setResultType(result, "none");
         } else {
@@ -356,7 +356,7 @@ export class Runner {
                 result.actionCooldownStart > 0 &&
                 (result.actionCharges == undefined || result.actionCharges == 0)
             ) {
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    Action %s (actionCharges=%s)",
                     nodeId,
                     action,
@@ -366,7 +366,7 @@ export class Runner {
                     result.actionCooldownDuration !== undefined &&
                     result.actionCooldownDuration > 0
                 ) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s is on cooldown (start=%f, duration=%f).",
                         nodeId,
                         action,
@@ -377,7 +377,7 @@ export class Runner {
                         result.actionCooldownStart +
                         result.actionCooldownDuration;
                 } else {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s is waiting on the GCD (start=%f).",
                         nodeId,
                         action,
@@ -387,7 +387,7 @@ export class Runner {
                 }
             } else {
                 if (result.actionCharges == undefined) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s is off cooldown.",
                         nodeId,
                         action
@@ -397,7 +397,7 @@ export class Runner {
                     result.actionCooldownDuration !== undefined &&
                     result.actionCooldownDuration > 0
                 ) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s still has %f charges and is not on GCD.",
                         nodeId,
                         action,
@@ -405,7 +405,7 @@ export class Runner {
                     );
                     start = atTime;
                 } else {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s still has %f charges but is on GCD (start=%f).",
                         nodeId,
                         action,
@@ -423,13 +423,13 @@ export class Runner {
                     namedParameters.pool_resource !== undefined &&
                     namedParameters.pool_resource == 1
                 ) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s is ignoring resource requirements because it is a pool_resource action.",
                         nodeId,
                         action
                     );
                 } else {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "[%d]    Action %s is waiting on resources (start=%f, extend=%f).",
                         nodeId,
                         action,
@@ -439,61 +439,61 @@ export class Runner {
                     start = start + result.actionResourceExtend;
                 }
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    start=%f atTime=%f",
                 nodeId,
                 start,
                 atTime
             );
             if (result.offgcd) {
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    Action %s is off the global cooldown.",
                     nodeId,
                     action
                 );
             } else if (start < atTime) {
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    Action %s is waiting for the global cooldown.",
                     nodeId,
                     action
                 );
                 start = atTime;
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    Action %s can start at %f.",
                 nodeId,
                 action,
                 start
             );
-            timeSpan.Copy(start, huge);
+            timeSpan.copy(start, huge);
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeAction");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeAction");
         return result;
     };
-    private ComputeArithmetic: ComputerFunction<AstExpressionNode> = (
+    private computeArithmetic: ComputerFunction<AstExpressionNode> = (
         element,
         atTime
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeArithmetic");
-        const timeSpan = this.GetTimeSpan(element);
+        this.profiler.startProfiling("OvaleBestAction_ComputeArithmetic");
+        const timeSpan = this.getTimeSpan(element);
         const result = element.result;
-        const nodeA = this.Compute(element.child[1], atTime);
-        const [a, b, c, timeSpanA] = this.AsValue(atTime, nodeA);
-        const nodeB = this.Compute(element.child[2], atTime);
-        const [x, y, z, timeSpanB] = this.AsValue(atTime, nodeB);
-        timeSpanA.Intersect(timeSpanB, timeSpan);
-        if (timeSpan.Measure() == 0) {
-            this.tracer.Log(
+        const nodeA = this.compute(element.child[1], atTime);
+        const [a, b, c, timeSpanA] = this.asValue(atTime, nodeA);
+        const nodeB = this.compute(element.child[2], atTime);
+        const [x, y, z, timeSpanB] = this.asValue(atTime, nodeB);
+        timeSpanA.intersect(timeSpanB, timeSpan);
+        if (timeSpan.measure() == 0) {
+            this.tracer.log(
                 "[%d]    arithmetic '%s' returns %s with zero measure",
                 element.nodeId,
                 element.operator,
                 timeSpan
             );
-            this.SetValue(element, 0);
+            this.setValue(element, 0);
         } else {
             const operator = element.operator;
             const t = atTime;
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s",
                 element.nodeId,
                 a,
@@ -506,14 +506,14 @@ export class Runner {
             );
             let l, m, n; // The new value, origin, and rate
             if (!isNumber(a) || !isNumber(x)) {
-                this.tracer.Error(
+                this.tracer.error(
                     "[%d] Operands of arithmetic operators must be numbers",
                     element.nodeId
                 );
                 return result;
             }
-            const A = a + (t - b) * c; // the A value at time t
-            let B = x + (t - y) * z; // The B value at time t
+            const at = a + (t - b) * c; // the A value at time t
+            let bt = x + (t - y) * z; // The B value at time t
             /**
              * A(t) = a + (t - b)*c
              *      = a + (t - t0 + t0 - b)*c, for all t0
@@ -526,14 +526,14 @@ export class Runner {
                 /**
                  * A(t) + B(t) = [A(t0) + B(t0)] + (t - t0)*(c + z)
                  */
-                l = A + B;
+                l = at + bt;
                 m = t;
                 n = c + z;
             } else if (operator == "-") {
                 /**
                  * A(t) - B(t) = [A(t0) - B(t0)] + (t - t0)*(c - z)
                  */
-                l = A - B;
+                l = at - bt;
                 m = t;
                 n = c - z;
             } else if (operator == "*") {
@@ -542,9 +542,9 @@ export class Runner {
                  *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + (t - t0)^2*(c*z)
                  *           = [A(t0)*B(t0)] + (t - t0)*[A(t0)*z + B(t0)*c] + O(t^2)
                  */
-                l = A * B;
+                l = at * bt;
                 m = t;
-                n = A * z + B * c;
+                n = at * z + bt * c;
             } else if (operator == "/") {
                 /**
                  *      C(t) = 1/B(t)
@@ -554,39 +554,39 @@ export class Runner {
                  * A(t)/B(t) = A(t0)/B(t0) + (t - t0)*{[B(t0)*c - A(t0)*z]/B(t0)^2} + O(t^2)
                  *           = A(t0)/B(t0) + (t - t0)*{[c/B(t0)] - [A(t0)/B(t0)]*[z/B(t0)]} + O(t^2)
                  */
-                if (B === 0) {
-                    if (A !== 0) {
-                        OneTimeMessage(
+                if (bt === 0) {
+                    if (at !== 0) {
+                        oneTimeMessage(
                             "[%d] Division by 0 in %s",
                             element.nodeId,
                             element.asString
                         );
                     }
-                    B = 0.00001;
+                    bt = 0.00001;
                 }
-                l = A / B;
+                l = at / bt;
                 m = t;
-                n = c / B - (A / B) * (z / B);
+                n = c / bt - (at / bt) * (z / bt);
                 let bound;
                 if (z == 0) {
                     bound = huge;
                 } else {
-                    bound = abs(B / z);
+                    bound = abs(bt / z);
                 }
-                const scratch = timeSpan.IntersectInterval(
+                const scratch = timeSpan.intersectInterval(
                     t - bound,
                     t + bound
                 );
                 timeSpan.copyFromArray(scratch);
-                scratch.Release();
+                scratch.release();
             } else if (operator == "%") {
                 // A % B = A mod B
                 if (c == 0 && z == 0) {
-                    l = A % B;
+                    l = at % bt;
                     m = t;
                     n = 0;
                 } else {
-                    this.tracer.Error(
+                    this.tracer.error(
                         "[%d]    Parameters of modulus operator '%' must be constants.",
                         element.nodeId
                     );
@@ -599,7 +599,7 @@ export class Runner {
                 // A(t) >? B(t) = max(A(t), B(t))
                 if (z === c) {
                     // A(t) and B(t) have the same slope.
-                    l = (operator === "<?" && min(A, B)) || max(A, B);
+                    l = (operator === "<?" && min(at, bt)) || max(at, bt);
                     m = t;
                     n = z;
                 } else {
@@ -610,40 +610,40 @@ export class Runner {
                      *       (t - t0)*(z - c) = B(t0) - A(t0)
                      *                 t - t0 = [B(t0) - A(t0)]/(z - c)
                      */
-                    const C = (B - A) / (z - c);
-                    if (C <= 0) {
+                    const ct = (bt - at) / (z - c);
+                    if (ct <= 0) {
                         // A(t) and B(t) intersect at or to the left of t0.
-                        const scratch = timeSpan.IntersectInterval(
-                            t + C,
+                        const scratch = timeSpan.intersectInterval(
+                            t + ct,
                             INFINITY
                         );
                         timeSpan.copyFromArray(scratch);
-                        scratch.Release();
+                        scratch.release();
                         if (z < c) {
                             // A(t) has a greater slope than B(t).
-                            l = (operator === ">?" && A) || B;
+                            l = (operator === ">?" && at) || bt;
                         } else {
                             // B(t) has a greater slope than A(t).
-                            l = (operator === "<?" && A) || B;
+                            l = (operator === "<?" && at) || bt;
                         }
                     } else {
                         // A(t) and B(t) intersect to the right of t0.
-                        const scratch = timeSpan.IntersectInterval(0, t + C);
+                        const scratch = timeSpan.intersectInterval(0, t + ct);
                         timeSpan.copyFromArray(scratch);
-                        scratch.Release();
+                        scratch.release();
                         if (z < c) {
                             // A(t) has a greater slope than B(t).
-                            l = (operator === "<?" && A) || B;
+                            l = (operator === "<?" && at) || bt;
                         } else {
                             // B(t) has a greater slope than A(t).
-                            l = (operator === ">?" && A) || B;
+                            l = (operator === ">?" && at) || bt;
                         }
                     }
                     m = t;
-                    n = (l === A && c) || z;
+                    n = (l === at && c) || z;
                 }
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    arithmetic '%s' returns %s+(t-%s)*%s",
                 element.nodeId,
                 operator,
@@ -651,25 +651,25 @@ export class Runner {
                 m,
                 n
             );
-            this.SetValue(element, l, m, n);
+            this.setValue(element, l, m, n);
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeArithmetic");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeArithmetic");
         return result;
     };
-    private ComputeCompare: ComputerFunction<AstExpressionNode> = (
+    private computeCompare: ComputerFunction<AstExpressionNode> = (
         element,
         atTime
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeCompare");
-        const timeSpan = this.GetTimeSpan(element);
-        const elementA = this.Compute(element.child[1], atTime);
-        const [a, b, c, timeSpanA] = this.AsValue(atTime, elementA);
-        const elementB = this.Compute(element.child[2], atTime);
-        const [x, y, z, timeSpanB] = this.AsValue(atTime, elementB);
-        timeSpanA.Intersect(timeSpanB, timeSpan);
+        this.profiler.startProfiling("OvaleBestAction_ComputeCompare");
+        const timeSpan = this.getTimeSpan(element);
+        const elementA = this.compute(element.child[1], atTime);
+        const [a, b, c, timeSpanA] = this.asValue(atTime, elementA);
+        const elementB = this.compute(element.child[2], atTime);
+        const [x, y, z, timeSpanB] = this.asValue(atTime, elementB);
+        timeSpanA.intersect(timeSpanB, timeSpan);
 
-        if (timeSpan.Measure() == 0) {
-            this.tracer.Log(
+        if (timeSpan.measure() == 0) {
+            this.tracer.log(
                 "[%d]    compare '%s' returns %s with zero measure",
                 element.nodeId,
                 element.operator,
@@ -677,7 +677,7 @@ export class Runner {
             );
         } else {
             const operator = element.operator;
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s",
                 element.nodeId,
                 a,
@@ -697,23 +697,23 @@ export class Runner {
                 }
                 return element.result;
             }
-            const A = a - b * c;
-            const B = x - y * z;
+            const at = a - b * c;
+            const bt = x - y * z;
             if (c == z) {
                 if (
                     !(
-                        (operator == "==" && A == B) ||
-                        (operator == "!=" && A != B) ||
-                        (operator == "<" && A < B) ||
-                        (operator == "<=" && A <= B) ||
-                        (operator == ">" && A > B) ||
-                        (operator == ">=" && A >= B)
+                        (operator == "==" && at == bt) ||
+                        (operator == "!=" && at != bt) ||
+                        (operator == "<" && at < bt) ||
+                        (operator == "<=" && at <= bt) ||
+                        (operator == ">" && at > bt) ||
+                        (operator == ">=" && at >= bt)
                     )
                 ) {
                     wipe(timeSpan);
                 }
             } else {
-                const diff = B - A;
+                const diff = bt - at;
                 let t;
                 if (diff == huge) {
                     t = huge;
@@ -721,7 +721,7 @@ export class Runner {
                     t = diff / (c - z);
                 }
                 t = (t > 0 && t) || 0;
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    intersection at t = %s",
                     element.nodeId,
                     t
@@ -733,54 +733,54 @@ export class Runner {
                     (c < z && operator == ">") ||
                     (c < z && operator == ">=")
                 ) {
-                    scratch = timeSpan.IntersectInterval(0, t);
+                    scratch = timeSpan.intersectInterval(0, t);
                 } else if (
                     (c < z && operator == "<") ||
                     (c < z && operator == "<=") ||
                     (c > z && operator == ">") ||
                     (c > z && operator == ">=")
                 ) {
-                    scratch = timeSpan.IntersectInterval(t, huge);
+                    scratch = timeSpan.intersectInterval(t, huge);
                 }
                 if (scratch) {
                     timeSpan.copyFromArray(scratch);
-                    scratch.Release();
+                    scratch.release();
                 } else {
                     wipe(timeSpan);
                 }
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    compare '%s' returns %s",
                 element.nodeId,
                 operator,
                 timeSpan
             );
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeCompare");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeCompare");
         return element.result;
     };
-    private ComputeCustomFunction: ComputerFunction<AstFunctionNode> = (
+    private computeCustomFunction: ComputerFunction<AstFunctionNode> = (
         element,
         atTime
     ): AstNodeSnapshot => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeCustomFunction");
-        const timeSpan = this.GetTimeSpan(element);
+        this.profiler.startProfiling("OvaleBestAction_ComputeCustomFunction");
+        const timeSpan = this.getTimeSpan(element);
         const result = element.result;
         const node =
             element.annotation.customFunction &&
             element.annotation.customFunction[element.name];
         if (node) {
-            if (this.tracer.debug.trace)
-                this.tracer.Log(
+            if (this.tracer.debugTools.trace)
+                this.tracer.log(
                     "[%d]: calling custom function [%d] %s",
                     element.nodeId,
                     node.child[1].nodeId,
                     element.name
                 );
-            const elementA = this.Compute(node.child[1], atTime);
+            const elementA = this.compute(node.child[1], atTime);
             timeSpan.copyFromArray(elementA.timeSpan);
-            if (this.tracer.debug.trace)
-                this.tracer.Log(
+            if (this.tracer.debugTools.trace)
+                this.tracer.log(
                     "[%d]: [%d] %s is returning %s with timespan = %s",
                     element.nodeId,
                     node.child[1].nodeId,
@@ -790,10 +790,10 @@ export class Runner {
                 );
             this.copyResult(result, elementA);
         } else {
-            this.tracer.Error(`Unable to find ${element.name}`);
+            this.tracer.error(`Unable to find ${element.name}`);
             wipe(timeSpan);
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeCustomFunction");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeCustomFunction");
         return result;
     };
 
@@ -826,12 +826,12 @@ export class Runner {
         }
     }
 
-    private ComputeFunction: ComputerFunction<AstFunctionNode> = (
+    private computeFunction: ComputerFunction<AstFunctionNode> = (
         element,
         atTime: number
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeFunction");
-        const timeSpan = this.GetTimeSpan(element);
+        this.profiler.startProfiling("OvaleBestAction_ComputeFunction");
+        const timeSpan = this.getTimeSpan(element);
         const [positionalParams, namedParams] = this.computeParameters(
             element,
             atTime
@@ -842,21 +842,21 @@ export class Runner {
             value,
             origin,
             rate,
-        ] = this.ovaleCondition.EvaluateCondition(
+        ] = this.ovaleCondition.evaluateCondition(
             element.name,
             positionalParams,
             namedParams,
             atTime
         );
         if (start !== undefined && ending !== undefined) {
-            timeSpan.Copy(start, ending);
+            timeSpan.copy(start, ending);
         } else {
             wipe(timeSpan);
         }
         if (value !== undefined) {
-            this.SetValue(element, value, origin, rate);
+            this.setValue(element, value, origin, rate);
         }
-        this.tracer.Log(
+        this.tracer.log(
             "[%d]    condition '%s' returns %s, %s, %s, %s, %s",
             element.nodeId,
             element.name,
@@ -866,7 +866,7 @@ export class Runner {
             origin,
             rate
         );
-        this.profiler.StopProfiling("OvaleBestAction_ComputeFunction");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeFunction");
         return element.result;
     };
 
@@ -874,8 +874,8 @@ export class Runner {
         element,
         atTime: number
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeFunction");
-        const timeSpan = this.GetTimeSpan(element);
+        this.profiler.startProfiling("OvaleBestAction_ComputeFunction");
+        const timeSpan = this.getTimeSpan(element);
         const positionalParams = this.computePositionalParameters(
             element,
             atTime
@@ -886,14 +886,14 @@ export class Runner {
             positionalParams
         );
         if (start !== undefined && ending !== undefined) {
-            timeSpan.Copy(start, ending);
+            timeSpan.copy(start, ending);
         } else {
             wipe(timeSpan);
         }
         if (value !== undefined) {
-            this.SetValue(element, value, origin, rate);
+            this.setValue(element, value, origin, rate);
         }
-        this.tracer.Log(
+        this.tracer.log(
             "[%d]    condition '%s' returns %s, %s, %s, %s, %s",
             element.nodeId,
             element.name,
@@ -903,42 +903,42 @@ export class Runner {
             origin,
             rate
         );
-        this.profiler.StopProfiling("OvaleBestAction_ComputeFunction");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeFunction");
         return element.result;
     };
 
-    private ComputeGroup: ComputerFunction<AstGroupNode> = (group, atTime) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeGroup");
+    private computeGroup: ComputerFunction<AstGroupNode> = (group, atTime) => {
+        this.profiler.startProfiling("OvaleBestAction_ComputeGroup");
         let bestTimeSpan, bestElement;
         const best = newTimeSpan();
         const currentTimeSpanAfterTime = newTimeSpan();
         for (const [, child] of ipairs(group.child)) {
             const nodeString = child.asString || child.type;
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    checking child '%s' [%d]",
                 group.nodeId,
                 nodeString,
                 child.nodeId
             );
-            const currentElement = this.Compute(child, atTime);
+            const currentElement = this.compute(child, atTime);
             const currentElementTimeSpan = currentElement.timeSpan;
             wipe(currentTimeSpanAfterTime);
-            currentElementTimeSpan.IntersectInterval(
+            currentElementTimeSpan.intersectInterval(
                 atTime,
                 huge,
                 currentTimeSpanAfterTime
             );
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    child '%s' [%d]: %s",
                 group.nodeId,
                 nodeString,
                 child.nodeId,
                 currentTimeSpanAfterTime
             );
-            if (currentTimeSpanAfterTime.Measure() > 0) {
+            if (currentTimeSpanAfterTime.measure() > 0) {
                 let currentIsBetter = false;
-                if (best.Measure() == 0 || bestElement === undefined) {
-                    this.tracer.Log(
+                if (best.measure() == 0 || bestElement === undefined) {
+                    this.tracer.log(
                         "[%d]    group first best is '%s' [%d]: %s",
                         group.nodeId,
                         nodeString,
@@ -961,7 +961,7 @@ export class Runner {
                             !bestElement.actionUsable &&
                             currentElement.actionUsable)
                     ) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    group new best is '%s' [%d]: %s",
                             group.nodeId,
                             nodeString,
@@ -970,7 +970,7 @@ export class Runner {
                         );
                         currentIsBetter = true;
                     } else {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "[%d]    group best is still %s: %s",
                             group.nodeId,
                             this.resultToString(group.result),
@@ -984,7 +984,7 @@ export class Runner {
                     bestElement = currentElement;
                 }
             } else {
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    child '%s' [%d] has zero measure, skipping",
                     group.nodeId,
                     nodeString,
@@ -993,10 +993,10 @@ export class Runner {
             }
         }
         releaseTimeSpans(best, currentTimeSpanAfterTime);
-        const timeSpan = this.GetTimeSpan(group, bestTimeSpan);
+        const timeSpan = this.getTimeSpan(group, bestTimeSpan);
         if (bestElement) {
             this.copyResult(group.result, bestElement);
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    group best action remains %s at %s",
                 group.nodeId,
                 this.resultToString(group.result),
@@ -1005,14 +1005,14 @@ export class Runner {
         } else {
             setResultType(group.result, "none");
 
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    group no best action returns %s at %s",
                 group.nodeId,
                 this.resultToString(group.result),
                 timeSpan
             );
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeGroup");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeGroup");
         return group.result;
     };
 
@@ -1042,30 +1042,30 @@ export class Runner {
         return "";
     }
 
-    private ComputeIf: ComputerFunction<AstIfNode | AstUnlessNode> = (
+    private computeIf: ComputerFunction<AstIfNode | AstUnlessNode> = (
         element,
         atTime
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeIf");
-        const timeSpan = this.GetTimeSpan(element);
+        this.profiler.startProfiling("OvaleBestAction_ComputeIf");
+        const timeSpan = this.getTimeSpan(element);
         const result = element.result;
-        const timeSpanA = this.ComputeBool(element.child[1], atTime);
+        const timeSpanA = this.computeBool(element.child[1], atTime);
         let conditionTimeSpan = timeSpanA;
         if (element.type == "unless") {
-            conditionTimeSpan = timeSpanA.Complement();
+            conditionTimeSpan = timeSpanA.complement();
         }
-        if (conditionTimeSpan.Measure() == 0) {
+        if (conditionTimeSpan.measure() == 0) {
             timeSpan.copyFromArray(conditionTimeSpan);
-            this.tracer.Log(
+            this.tracer.log(
                 "[%d]    '%s' returns %s with zero measure",
                 element.nodeId,
                 element.type,
                 timeSpan
             );
         } else {
-            const elementB = this.Compute(element.child[2], atTime);
-            conditionTimeSpan.Intersect(elementB.timeSpan, timeSpan);
-            this.tracer.Log(
+            const elementB = this.compute(element.child[2], atTime);
+            conditionTimeSpan.intersect(elementB.timeSpan, timeSpan);
+            this.tracer.log(
                 "[%d]    '%s' returns %s (intersection of %s and %s)",
                 element.nodeId,
                 element.type,
@@ -1076,104 +1076,104 @@ export class Runner {
             this.copyResult(result, elementB);
         }
         if (element.type == "unless") {
-            conditionTimeSpan.Release();
+            conditionTimeSpan.release();
         }
-        this.profiler.StopProfiling("OvaleBestAction_ComputeIf");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeIf");
         return result;
     };
 
-    private ComputeLogical: ComputerFunction<AstExpressionNode> = (
+    private computeLogical: ComputerFunction<AstExpressionNode> = (
         element,
         atTime
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeLogical");
-        const timeSpan = this.GetTimeSpan(element);
-        const timeSpanA = this.ComputeBool(element.child[1], atTime);
+        this.profiler.startProfiling("OvaleBestAction_ComputeLogical");
+        const timeSpan = this.getTimeSpan(element);
+        const timeSpanA = this.computeBool(element.child[1], atTime);
         if (element.operator == "and") {
-            if (timeSpanA.Measure() == 0) {
+            if (timeSpanA.measure() == 0) {
                 timeSpan.copyFromArray(timeSpanA);
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    logical '%s' short-circuits with zero measure left argument",
                     element.nodeId,
                     element.operator
                 );
             } else {
-                const timeSpanB = this.ComputeBool(element.child[2], atTime);
-                timeSpanA.Intersect(timeSpanB, timeSpan);
+                const timeSpanB = this.computeBool(element.child[2], atTime);
+                timeSpanA.intersect(timeSpanB, timeSpan);
             }
         } else if (element.operator == "not") {
-            timeSpanA.Complement(timeSpan);
+            timeSpanA.complement(timeSpan);
         } else if (element.operator == "or") {
-            if (timeSpanA.IsUniverse()) {
+            if (timeSpanA.isUniverse()) {
                 timeSpan.copyFromArray(timeSpanA);
-                this.tracer.Log(
+                this.tracer.log(
                     "[%d]    logical '%s' short-circuits with universe as left argument",
                     element.nodeId,
                     element.operator
                 );
             } else {
-                const timeSpanB = this.ComputeBool(element.child[2], atTime);
-                timeSpanA.Union(timeSpanB, timeSpan);
+                const timeSpanB = this.computeBool(element.child[2], atTime);
+                timeSpanA.union(timeSpanB, timeSpan);
             }
         } else if (element.operator == "xor") {
-            const timeSpanB = this.ComputeBool(element.child[2], atTime);
-            const left = timeSpanA.Union(timeSpanB);
-            const scratch = timeSpanA.Intersect(timeSpanB);
-            const right = scratch.Complement();
-            left.Intersect(right, timeSpan);
+            const timeSpanB = this.computeBool(element.child[2], atTime);
+            const left = timeSpanA.union(timeSpanB);
+            const scratch = timeSpanA.intersect(timeSpanB);
+            const right = scratch.complement();
+            left.intersect(right, timeSpan);
             releaseTimeSpans(left, scratch, right);
         } else {
             wipe(timeSpan);
         }
 
-        this.tracer.Log(
+        this.tracer.log(
             "[%d]    logical '%s' returns %s",
             element.nodeId,
             element.operator,
             timeSpan
         );
-        this.profiler.StopProfiling("OvaleBestAction_ComputeLogical");
+        this.profiler.stopProfiling("OvaleBestAction_ComputeLogical");
         return element.result;
     };
-    private ComputeLua: ComputerFunction<AstLuaNode> = (element) => {
+    private computeLua: ComputerFunction<AstLuaNode> = (element) => {
         if (!element.lua) return element.result;
-        this.profiler.StartProfiling("OvaleBestAction_ComputeLua");
+        this.profiler.startProfiling("OvaleBestAction_ComputeLua");
         const value = loadstring(element.lua)();
-        this.tracer.Log("[%d]    lua returns %s", element.nodeId, value);
+        this.tracer.log("[%d]    lua returns %s", element.nodeId, value);
         if (value !== undefined) {
-            this.SetValue(element, value);
+            this.setValue(element, value);
         }
-        this.GetTimeSpan(element, UNIVERSE);
-        this.profiler.StopProfiling("OvaleBestAction_ComputeLua");
+        this.getTimeSpan(element, universe);
+        this.profiler.stopProfiling("OvaleBestAction_ComputeLua");
         return element.result;
     };
 
-    private ComputeValue: ComputerFunction<AstValueNode> = (element) => {
-        this.profiler.StartProfiling("OvaleBestAction_ComputeValue");
-        this.tracer.Log("[%d]    value is %s", element.nodeId, element.value);
-        this.GetTimeSpan(element, UNIVERSE);
-        this.SetValue(element, element.value, element.origin, element.rate);
-        this.profiler.StopProfiling("OvaleBestAction_ComputeValue");
+    private computeValue: ComputerFunction<AstValueNode> = (element) => {
+        this.profiler.startProfiling("OvaleBestAction_ComputeValue");
+        this.tracer.log("[%d]    value is %s", element.nodeId, element.value);
+        this.getTimeSpan(element, universe);
+        this.setValue(element, element.value, element.origin, element.rate);
+        this.profiler.stopProfiling("OvaleBestAction_ComputeValue");
         return element.result;
     };
 
     private computeString: ComputerFunction<AstStringNode> = (element) => {
-        this.tracer.Log("[%d]    value is %s", element.nodeId, element.value);
-        this.GetTimeSpan(element, UNIVERSE);
-        this.SetValue(element, element.value, undefined, undefined);
+        this.tracer.log("[%d]    value is %s", element.nodeId, element.value);
+        this.getTimeSpan(element, universe);
+        this.setValue(element, element.value, undefined, undefined);
         return element.result;
     };
 
     private computeVariable: ComputerFunction<AstVariableNode> = (element) => {
         // TODO This should not happen but it's to support many old cases where an undefined variable name is used
         // as a string
-        this.tracer.Log("[%d]    value is %s", element.nodeId, element.name);
-        this.GetTimeSpan(element, UNIVERSE);
-        this.SetValue(element, element.name, undefined, undefined);
+        this.tracer.log("[%d]    value is %s", element.nodeId, element.name);
+        this.getTimeSpan(element, universe);
+        this.setValue(element, element.name, undefined, undefined);
         return element.result;
     };
 
-    private SetValue(
+    private setValue(
         node: AstNode,
         value?: number | string,
         origin?: number,
@@ -1197,7 +1197,7 @@ export class Runner {
         }
     }
 
-    private AsValue(
+    private asValue(
         atTime: number,
         node: AstNodeSnapshot
     ): [
@@ -1214,16 +1214,16 @@ export class Runner {
             value = node.value;
             origin = node.origin || 0;
             rate = node.rate || 0;
-            timeSpan = node.timeSpan || UNIVERSE;
-        } else if (node.timeSpan.HasTime(atTime)) {
-            [value, origin, rate, timeSpan] = [1, 0, 0, UNIVERSE];
+            timeSpan = node.timeSpan || universe;
+        } else if (node.timeSpan.hasTime(atTime)) {
+            [value, origin, rate, timeSpan] = [1, 0, 0, universe];
         } else {
-            [value, origin, rate, timeSpan] = [0, 0, 0, UNIVERSE];
+            [value, origin, rate, timeSpan] = [0, 0, 0, universe];
         }
         return [value, origin, rate, timeSpan];
     }
 
-    private GetTimeSpan(node: AstNode, defaultTimeSpan?: OvaleTimeSpan) {
+    private getTimeSpan(node: AstNode, defaultTimeSpan?: OvaleTimeSpan) {
         const timeSpan = node.result.timeSpan;
         if (defaultTimeSpan) {
             timeSpan.copyFromArray(defaultTimeSpan);
@@ -1233,17 +1233,17 @@ export class Runner {
         return timeSpan;
     }
 
-    public Compute(element: AstNode, atTime: number): AstNodeSnapshot {
-        return this.PostOrderCompute(element, atTime);
+    public compute(element: AstNode, atTime: number): AstNodeSnapshot {
+        return this.postOrderCompute(element, atTime);
     }
 
     public computeAsBoolean(element: AstNode, atTime: number) {
-        const result = this.RecursiveCompute(element, atTime);
-        return result.timeSpan.HasTime(atTime);
+        const result = this.recursiveCompute(element, atTime);
+        return result.timeSpan.hasTime(atTime);
     }
 
     public computeAsNumber(element: AstNode, atTime: number) {
-        const result = this.RecursiveCompute(element, atTime);
+        const result = this.recursiveCompute(element, atTime);
         if (result.type === "value" && isNumber(result.value)) {
             if (result.origin !== undefined && result.rate !== undefined)
                 return result.value + result.rate * (atTime - result.origin);
@@ -1253,7 +1253,7 @@ export class Runner {
     }
 
     public computeAsString(element: AstNode, atTime: number) {
-        const result = this.RecursiveCompute(element, atTime);
+        const result = this.recursiveCompute(element, atTime);
         if (result.type === "value" && isString(result.value)) {
             return result.value;
         }
@@ -1261,12 +1261,12 @@ export class Runner {
     }
 
     public computeAsValue(element: AstNode, atTime: number) {
-        const result = this.RecursiveCompute(element, atTime);
+        const result = this.recursiveCompute(element, atTime);
         if (result.type === "value") {
-            if (!result.timeSpan.HasTime(atTime)) return undefined;
+            if (!result.timeSpan.hasTime(atTime)) return undefined;
             return result.value;
         }
-        return result.timeSpan.HasTime(atTime);
+        return result.timeSpan.hasTime(atTime);
     }
 
     public computeParameters<T extends NodeType, P extends string>(
@@ -1275,9 +1275,9 @@ export class Runner {
     ): [PositionalParameters, NamedParameters<P>] {
         if (
             node.cachedParams.serial === undefined ||
-            node.cachedParams.serial < this.self_serial
+            node.cachedParams.serial < this.serial
         ) {
-            node.cachedParams.serial = this.self_serial;
+            node.cachedParams.serial = this.serial;
 
             for (const [k, v] of ipairs(node.rawPositionalParams)) {
                 node.cachedParams.positional[k] =
@@ -1298,10 +1298,10 @@ export class Runner {
     ): PositionalParameters {
         if (
             node.cachedParams.serial === undefined ||
-            node.cachedParams.serial < this.self_serial
+            node.cachedParams.serial < this.serial
         ) {
-            this.tracer.Log("computing positional parameters");
-            node.cachedParams.serial = this.self_serial;
+            this.tracer.log("computing positional parameters");
+            node.cachedParams.serial = this.serial;
             for (const [k, v] of ipairs(node.rawPositionalParams)) {
                 node.cachedParams.positional[k] = this.computeAsValue(
                     v,
@@ -1313,24 +1313,24 @@ export class Runner {
         return node.cachedParams.positional;
     }
 
-    COMPUTE_VISITOR: {
+    computeVisitors: {
         [k in AstNode["type"]]?: ComputerFunction<NodeTypes[k]>;
     } = {
-        ["action"]: this.ComputeAction,
-        ["arithmetic"]: this.ComputeArithmetic,
+        ["action"]: this.computeAction,
+        ["arithmetic"]: this.computeArithmetic,
         ["boolean"]: this.computeBoolean,
-        ["compare"]: this.ComputeCompare,
-        ["custom_function"]: this.ComputeCustomFunction,
-        ["function"]: this.ComputeFunction,
-        ["group"]: this.ComputeGroup,
-        ["if"]: this.ComputeIf,
-        ["logical"]: this.ComputeLogical,
-        ["lua"]: this.ComputeLua,
-        ["state"]: this.ComputeFunction,
+        ["compare"]: this.computeCompare,
+        ["custom_function"]: this.computeCustomFunction,
+        ["function"]: this.computeFunction,
+        ["group"]: this.computeGroup,
+        ["if"]: this.computeIf,
+        ["logical"]: this.computeLogical,
+        ["lua"]: this.computeLua,
+        ["state"]: this.computeFunction,
         ["string"]: this.computeString,
         ["typed_function"]: this.computeTypedFunction,
-        ["unless"]: this.ComputeIf,
-        ["value"]: this.ComputeValue,
+        ["unless"]: this.computeIf,
+        ["value"]: this.computeValue,
         ["variable"]: this.computeVariable,
     };
 }

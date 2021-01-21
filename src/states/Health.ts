@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../engine/guid";
+import { Guids } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { wipe, LuaObj } from "@wowts/lua";
 import {
@@ -13,11 +13,11 @@ import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleOptionsClass } from "../ui/Options";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
-import { OneTimeMessage } from "../tools/tools";
+import { Tracer, DebugTools } from "../engine/debug";
+import { oneTimeMessage } from "../tools/tools";
 
-const INFINITY = huge;
-const CLEU_DAMAGE_EVENT = {
+const infinity = huge;
+const damageEvents = {
     DAMAGE_SHIELD: true,
     DAMAGE_SPLIT: true,
     RANGE_DAMAGE: true,
@@ -27,7 +27,7 @@ const CLEU_DAMAGE_EVENT = {
     SWING_DAMAGE: true,
     ENVIRONMENTAL_DAMAGE: true,
 };
-const CLEU_HEAL_EVENT = {
+const healEvents = {
     SPELL_HEAL: true,
     SPELL_PERIODIC_HEAL: true,
 };
@@ -46,51 +46,51 @@ export class OvaleHealthClass {
     private tracer: Tracer;
 
     constructor(
-        private ovaleGuid: OvaleGUIDClass,
+        private ovaleGuid: Guids,
         ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass
     ) {
         this.module = ovale.createModule(
             "OvaleHealth",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
         this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "PLAYER_REGEN_DISABLED",
-            this.PLAYER_REGEN_DISABLED
+            this.handlePlayerRegenDisabled
         );
         this.module.RegisterEvent(
             "PLAYER_REGEN_ENABLED",
-            this.PLAYER_REGEN_ENABLED
+            this.handlePlayerRegenEnabled
         );
         if (this.ovaleOptions.db.profile.apparence.frequentHealthUpdates) {
-            this.module.RegisterEvent("UNIT_HEALTH", this.UpdateHealth);
+            this.module.RegisterEvent("UNIT_HEALTH", this.handleUpdateHealth);
         } else {
-            this.module.RegisterEvent("UNIT_HEALTH", this.UpdateHealth);
+            this.module.RegisterEvent("UNIT_HEALTH", this.handleUpdateHealth);
         }
-        this.module.RegisterEvent("UNIT_MAXHEALTH", this.UpdateHealth);
+        this.module.RegisterEvent("UNIT_MAXHEALTH", this.handleUpdateHealth);
         this.module.RegisterEvent(
             "UNIT_ABSORB_AMOUNT_CHANGED",
-            this.UpdateAbsorb
+            this.handleUpdateAbsorb
         );
         this.module.RegisterEvent(
             "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
-            this.UpdateAbsorb
+            this.handleUpdateAbsorb
         );
         this.module.RegisterMessage(
             "Ovale_UnitChanged",
-            this.Ovale_UnitChanged
+            this.handleUnitChanged
         );
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_TARGET_CHANGED");
         this.module.UnregisterEvent("UNIT_HEALTH");
@@ -100,7 +100,10 @@ export class OvaleHealthClass {
         this.module.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED");
         this.module.UnregisterMessage("Ovale_UnitChanged");
     };
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         const [
             timestamp,
             cleuEvent,
@@ -118,9 +121,9 @@ export class OvaleHealthClass {
             ,
             arg15,
         ] = CombatLogGetCurrentEventInfo();
-        this.profiler.StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
+        this.profiler.startProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
         let healthUpdate = false;
-        if (CLEU_DAMAGE_EVENT[<keyof typeof CLEU_DAMAGE_EVENT>cleuEvent]) {
+        if (damageEvents[<keyof typeof damageEvents>cleuEvent]) {
             let amount;
             if (cleuEvent == "SWING_DAMAGE") {
                 amount = arg12;
@@ -129,13 +132,13 @@ export class OvaleHealthClass {
             } else {
                 amount = arg15;
             }
-            this.tracer.Debug(cleuEvent, destGUID, amount);
+            this.tracer.debug(cleuEvent, destGUID, amount);
             const total = this.totalDamage[destGUID] || 0;
             this.totalDamage[destGUID] = total + amount;
             healthUpdate = true;
-        } else if (CLEU_HEAL_EVENT[<keyof typeof CLEU_HEAL_EVENT>cleuEvent]) {
+        } else if (healEvents[<keyof typeof healEvents>cleuEvent]) {
             const amount = arg15;
-            this.tracer.Debug(cleuEvent, destGUID, amount);
+            this.tracer.debug(cleuEvent, destGUID, amount);
             const total = this.totalHealing[destGUID] || 0;
             this.totalHealing[destGUID] = total + amount;
             healthUpdate = true;
@@ -146,41 +149,41 @@ export class OvaleHealthClass {
             }
             this.lastUpdated[destGUID] = timestamp;
         }
-        this.profiler.StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
+        this.profiler.stopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
     };
-    private PLAYER_REGEN_DISABLED = (event: string) => {
+    private handlePlayerRegenDisabled = (event: string) => {
         this.module.RegisterEvent(
             "COMBAT_LOG_EVENT_UNFILTERED",
-            this.COMBAT_LOG_EVENT_UNFILTERED
+            this.handleCombatLogEventUnfiltered
         );
     };
-    private PLAYER_REGEN_ENABLED = (event: string) => {
+    private handlePlayerRegenEnabled = (event: string) => {
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         wipe(this.totalDamage);
         wipe(this.totalHealing);
         wipe(this.firstSeen);
         wipe(this.lastUpdated);
     };
-    private Ovale_UnitChanged = (
+    private handleUnitChanged = (
         event: string,
         unitId: string,
         guid: string
     ) => {
-        this.profiler.StartProfiling("Ovale_UnitChanged");
+        this.profiler.startProfiling("Ovale_UnitChanged");
         if (unitId == "target" || unitId == "focus") {
-            this.tracer.Debug(event, unitId, guid);
-            this.UpdateHealth("UNIT_HEALTH", unitId);
-            this.UpdateHealth("UNIT_MAXHEALTH", unitId);
-            this.UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId);
-            this.UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId);
+            this.tracer.debug(event, unitId, guid);
+            this.handleUpdateHealth("UNIT_HEALTH", unitId);
+            this.handleUpdateHealth("UNIT_MAXHEALTH", unitId);
+            this.handleUpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId);
+            this.handleUpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId);
         }
-        this.profiler.StopProfiling("Ovale_UnitChanged");
+        this.profiler.stopProfiling("Ovale_UnitChanged");
     };
-    private UpdateAbsorb = (event: string, unitId: string) => {
+    private handleUpdateAbsorb = (event: string, unitId: string) => {
         if (!unitId) {
             return;
         }
-        this.profiler.StartProfiling("OvaleHealth_UpdateAbsorb");
+        this.profiler.startProfiling("OvaleHealth_UpdateAbsorb");
 
         let func;
         let db;
@@ -192,7 +195,7 @@ export class OvaleHealthClass {
             func = UnitGetTotalHealAbsorbs;
             db = this.absorb;
         } else {
-            OneTimeMessage(
+            oneTimeMessage(
                 "Warning: Invalid event (%s) in UpdateAbsorb.",
                 event
             );
@@ -201,20 +204,20 @@ export class OvaleHealthClass {
 
         const amount = func(unitId);
         if (amount >= 0) {
-            const guid = this.ovaleGuid.UnitGUID(unitId);
-            this.tracer.Debug(event, unitId, guid, amount);
+            const guid = this.ovaleGuid.getUnitGUID(unitId);
+            this.tracer.debug(event, unitId, guid, amount);
             if (guid) {
                 db[guid] = amount;
             }
         }
 
-        this.profiler.StopProfiling("OvaleHealth_UpdateHealth");
+        this.profiler.stopProfiling("OvaleHealth_UpdateHealth");
     };
-    private UpdateHealth = (event: string, unitId: string) => {
+    private handleUpdateHealth = (event: string, unitId: string) => {
         if (!unitId) {
             return;
         }
-        this.profiler.StartProfiling("OvaleHealth_UpdateHealth");
+        this.profiler.startProfiling("OvaleHealth_UpdateHealth");
 
         let func;
         let db;
@@ -226,7 +229,7 @@ export class OvaleHealthClass {
             func = UnitHealthMax;
             db = this.maxHealth;
         } else {
-            OneTimeMessage(
+            oneTimeMessage(
                 "Warning: Invalid event (%s) in UpdateHealth.",
                 event
             );
@@ -235,8 +238,8 @@ export class OvaleHealthClass {
 
         const amount = func(unitId);
         if (amount) {
-            const guid = this.ovaleGuid.UnitGUID(unitId);
-            this.tracer.Debug(event, unitId, guid, amount);
+            const guid = this.ovaleGuid.getUnitGUID(unitId);
+            this.tracer.debug(event, unitId, guid, amount);
             if (guid) {
                 if (amount > 0) {
                     db[guid] = amount;
@@ -247,26 +250,31 @@ export class OvaleHealthClass {
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleHealth_UpdateHealth");
+        this.profiler.stopProfiling("OvaleHealth_UpdateHealth");
     };
-    UnitHealth(unitId: string, guid?: string) {
-        return this.UnitAmount(UnitHealth, this.health, unitId, guid);
+    getUnitHealth(unitId: string, guid?: string) {
+        return this.getUnitAmount(UnitHealth, this.health, unitId, guid);
     }
-    UnitHealthMax(unitId: string, guid?: string) {
-        return this.UnitAmount(UnitHealthMax, this.maxHealth, unitId, guid);
+    getUnitHealthMax(unitId: string, guid?: string) {
+        return this.getUnitAmount(UnitHealthMax, this.maxHealth, unitId, guid);
     }
-    UnitAbsorb(unitId: string, guid?: string) {
-        return this.UnitAmount(UnitGetTotalAbsorbs, this.absorb, unitId, guid);
+    getUnitAbsorb(unitId: string, guid?: string) {
+        return this.getUnitAmount(
+            UnitGetTotalAbsorbs,
+            this.absorb,
+            unitId,
+            guid
+        );
     }
-    UnitHealAbsorb(unitId: string, guid?: string) {
-        return this.UnitAmount(
+    getUnitHealAbsorb(unitId: string, guid?: string) {
+        return this.getUnitAmount(
             UnitGetTotalHealAbsorbs,
             this.healAbsorb,
             unitId,
             guid
         );
     }
-    UnitAmount(
+    getUnitAmount(
         func: (_: string) => number | undefined,
         db: LuaObj<number>,
         unitId: string,
@@ -274,7 +282,7 @@ export class OvaleHealthClass {
     ): number {
         let amount;
         if (unitId) {
-            guid = guid || this.ovaleGuid.UnitGUID(unitId);
+            guid = guid || this.ovaleGuid.getUnitGUID(unitId);
             if (guid) {
                 if (
                     (unitId === "focus" || unitId === "target") &&
@@ -297,19 +305,19 @@ export class OvaleHealthClass {
         }
         return amount;
     }
-    UnitTimeToDie(unitId: string, effectiveHealth?: boolean, guid?: string) {
-        this.profiler.StartProfiling("OvaleHealth_UnitTimeToDie");
-        let timeToDie = INFINITY;
-        guid = guid || this.ovaleGuid.UnitGUID(unitId);
+    getUnitTimeToDie(unitId: string, effectiveHealth?: boolean, guid?: string) {
+        this.profiler.startProfiling("OvaleHealth_UnitTimeToDie");
+        let timeToDie = infinity;
+        guid = guid || this.ovaleGuid.getUnitGUID(unitId);
         if (guid) {
-            let health = this.UnitHealth(unitId, guid) || 0;
+            let health = this.getUnitHealth(unitId, guid) || 0;
             if (effectiveHealth) {
                 health =
                     health +
-                    this.UnitAbsorb(unitId, guid) -
-                    this.UnitHealAbsorb(unitId, guid);
+                    this.getUnitAbsorb(unitId, guid) -
+                    this.getUnitHealAbsorb(unitId, guid);
             }
-            const maxHealth = this.UnitHealthMax(unitId, guid);
+            const maxHealth = this.getUnitHealthMax(unitId, guid);
             if (health && maxHealth > 0) {
                 if (health == 0) {
                     timeToDie = 0;
@@ -335,11 +343,11 @@ export class OvaleHealthClass {
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleHealth_UnitTimeToDie");
+        this.profiler.stopProfiling("OvaleHealth_UnitTimeToDie");
         return timeToDie;
     }
 
-    CleanState(): void {}
-    InitializeState(): void {}
-    ResetState(): void {}
+    cleanState(): void {}
+    initializeState(): void {}
+    resetState(): void {}
 }

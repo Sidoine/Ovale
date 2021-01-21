@@ -6,13 +6,14 @@ import {
     IsSpellInRange,
     IsUsableItem,
     IsUsableSpell,
+    SpellId,
     UnitIsFriend,
 } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { StateModule } from "../engine/state";
@@ -20,8 +21,8 @@ import { NamedParametersOf, AstActionNode } from "../engine/ast";
 import { OvalePowerClass, PowerType } from "./Power";
 import { OvaleRunesClass } from "./Runes";
 
-const WARRIOR_INCERCEPT_SPELLID = 198304;
-const WARRIOR_HEROICTHROW_SPELLID = 57755;
+const warriorInterceptSpellId = SpellId.intercept;
+const warriorHeroicThrowSpellId = SpellId.heroic_throw;
 
 export class OvaleSpellsClass implements StateModule {
     private module: AceModule & AceEvent;
@@ -29,9 +30,9 @@ export class OvaleSpellsClass implements StateModule {
     private profiler: Profiler;
 
     constructor(
-        private OvaleSpellBook: OvaleSpellBookClass,
+        private spellBook: OvaleSpellBookClass,
         ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private power: OvalePowerClass,
@@ -39,21 +40,19 @@ export class OvaleSpellsClass implements StateModule {
     ) {
         this.module = ovale.createModule(
             "OvaleSpells",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
         this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
-    private OnInitialize = (): void => {};
-    private OnDisable = (): void => {};
-    GetCastTime(spellId: number): number | undefined {
+    private handleInitialize = (): void => {};
+    private handleDisable = (): void => {};
+    getCastTime(spellId: number): number | undefined {
         if (spellId) {
-            let [name, , , castTime] = this.OvaleSpellBook.GetSpellInfo(
-                spellId
-            );
+            let [name, , , castTime] = this.spellBook.getSpellInfo(spellId);
             if (name) {
                 if (castTime) {
                     castTime = castTime / 1000;
@@ -67,13 +66,11 @@ export class OvaleSpellsClass implements StateModule {
         }
     }
 
-    GetSpellCount(spellId: number): number {
-        const [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(
-            spellId
-        );
+    getSpellCount(spellId: number): number {
+        const [index, bookType] = this.spellBook.getSpellBookIndex(spellId);
         if (index && bookType) {
             const spellCount = GetSpellCount(index, bookType);
-            this.tracer.Debug(
+            this.tracer.debug(
                 "GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s",
                 index,
                 bookType,
@@ -82,10 +79,10 @@ export class OvaleSpellsClass implements StateModule {
             );
             return spellCount;
         } else {
-            const spellName = this.OvaleSpellBook.GetSpellName(spellId);
+            const spellName = this.spellBook.getSpellName(spellId);
             if (spellName) {
                 const spellCount = GetSpellCount(spellName);
-                this.tracer.Debug(
+                this.tracer.debug(
                     "GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s",
                     spellName,
                     spellId,
@@ -97,21 +94,19 @@ export class OvaleSpellsClass implements StateModule {
         }
     }
 
-    IsSpellInRange(spellId: number, unitId: string): boolean | undefined {
-        const [index, bookType] = this.OvaleSpellBook.GetSpellBookIndex(
-            spellId
-        );
+    isSpellInRange(spellId: number, unitId: string): boolean | undefined {
+        const [index, bookType] = this.spellBook.getSpellBookIndex(spellId);
         let returnValue;
         if (index && bookType) {
             returnValue = IsSpellInRange(index, bookType, unitId);
-        } else if (this.OvaleSpellBook.IsKnownSpell(spellId)) {
-            const name = this.OvaleSpellBook.GetSpellName(spellId);
+        } else if (this.spellBook.isKnownSpell(spellId)) {
+            const name = this.spellBook.getSpellName(spellId);
             if (name) returnValue = IsSpellInRange(name, unitId);
         }
-        if (returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID) {
+        if (returnValue == 1 && spellId == warriorInterceptSpellId) {
             return (
                 UnitIsFriend("player", unitId) ||
-                this.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId)
+                this.isSpellInRange(warriorHeroicThrowSpellId, unitId)
             );
         }
         if (returnValue === 1) return true;
@@ -119,22 +114,22 @@ export class OvaleSpellsClass implements StateModule {
         return undefined;
     }
 
-    CleanState(): void {}
-    InitializeState(): void {}
-    ResetState(): void {}
-    IsUsableItem(itemId: number, atTime: number): boolean {
-        this.profiler.StartProfiling("OvaleSpellBook_state_IsUsableItem");
+    cleanState(): void {}
+    initializeState(): void {}
+    resetState(): void {}
+    isUsableItem(itemId: number, atTime: number): boolean {
+        this.profiler.startProfiling("OvaleSpellBook_state_IsUsableItem");
         let isUsable = IsUsableItem(itemId);
-        const ii = this.ovaleData.ItemInfo(itemId);
+        const ii = this.ovaleData.getItemInfo(itemId);
         if (ii) {
             if (isUsable) {
-                const unusable = this.ovaleData.GetItemInfoProperty(
+                const unusable = this.ovaleData.getItemInfoProperty(
                     itemId,
                     atTime,
                     "unusable"
                 );
                 if (unusable && unusable > 0) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Item ID '%s' is flagged as unusable.",
                         itemId
                     );
@@ -142,49 +137,49 @@ export class OvaleSpellsClass implements StateModule {
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableItem");
+        this.profiler.stopProfiling("OvaleSpellBook_state_IsUsableItem");
         return isUsable;
     }
-    IsUsableSpell(
+    isUsableSpell(
         spellId: number,
         atTime: number,
         targetGUID: string | undefined
     ): [boolean, boolean] {
-        this.profiler.StartProfiling("OvaleSpellBook_state_IsUsableSpell");
+        this.profiler.startProfiling("OvaleSpellBook_state_IsUsableSpell");
         let [isUsable, noMana] = [false, false];
-        const isKnown = this.OvaleSpellBook.IsKnownSpell(spellId);
+        const isKnown = this.spellBook.isKnownSpell(spellId);
         const si = this.ovaleData.spellInfo[spellId];
         if (!isKnown) {
-            this.tracer.Log("Spell ID '%s' is not known.", spellId);
+            this.tracer.log("Spell ID '%s' is not known.", spellId);
             [isUsable, noMana] = [false, false];
         } else if (si !== undefined) {
-            const unusable = this.ovaleData.GetSpellInfoProperty(
+            const unusable = this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 "unusable",
                 targetGUID
             );
             if (unusable !== undefined && tonumber(unusable) > 0) {
-                this.tracer.Log(
+                this.tracer.log(
                     "Spell ID '%s' is flagged as unusable.",
                     spellId
                 );
                 [isUsable, noMana] = [false, false];
             } else {
-                const seconds = this.TimeToPowerForSpell(
+                const seconds = this.timeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,
                     undefined
                 );
                 if (seconds > 0) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Spell ID '%s' does not have enough power.",
                         spellId
                     );
                     [isUsable, noMana] = [false, true];
                 } else {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Spell ID '%s' meets power requirements.",
                         spellId
                     );
@@ -194,11 +189,11 @@ export class OvaleSpellsClass implements StateModule {
         } else {
             [isUsable, noMana] = IsUsableSpell(spellId);
         }
-        this.profiler.StopProfiling("OvaleSpellBook_state_IsUsableSpell");
+        this.profiler.stopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
     }
 
-    TimeToPowerForSpell(
+    timeToPowerForSpell(
         spellId: number,
         atTime: number,
         targetGUID: string | undefined,
@@ -208,10 +203,10 @@ export class OvaleSpellsClass implements StateModule {
         let timeToPower = 0;
         const si = this.ovaleData.spellInfo[spellId];
         if (si) {
-            for (const [, powerInfo] of kpairs(this.power.POWER_INFO)) {
+            for (const [, powerInfo] of kpairs(this.power.powerInfos)) {
                 const pType = powerInfo.type;
                 if (powerType == undefined || powerType == pType) {
-                    let [cost] = this.power.PowerCost(
+                    let [cost] = this.power.powerCost(
                         spellId,
                         pType,
                         atTime,
@@ -226,7 +221,7 @@ export class OvaleSpellsClass implements StateModule {
                                 extraAmount = extraPower.extra_focus;
                             }
                             if (isNumber(extraAmount)) {
-                                this.tracer.Log(
+                                this.tracer.log(
                                     "    Spell ID '%d' has cost of %d (+%d) %s",
                                     spellId,
                                     cost,
@@ -236,7 +231,7 @@ export class OvaleSpellsClass implements StateModule {
                                 cost = cost + <number>extraAmount;
                             }
                         } else {
-                            this.tracer.Log(
+                            this.tracer.log(
                                 "    spell ID '%d' has cost of %d %s",
                                 spellId,
                                 cost,
@@ -249,7 +244,7 @@ export class OvaleSpellsClass implements StateModule {
                             pType,
                             atTime
                         );
-                        this.tracer.Log(
+                        this.tracer.log(
                             "    spell ID '%d' requires %f seconds for %d %s",
                             spellId,
                             seconds,
@@ -260,7 +255,7 @@ export class OvaleSpellsClass implements StateModule {
                             timeToPower = seconds;
                         }
                         if (timeToPower == INFINITY) {
-                            this.tracer.Log(
+                            this.tracer.log(
                                 "    short-circuiting checks for other power requirements"
                             );
                             break;
@@ -270,18 +265,18 @@ export class OvaleSpellsClass implements StateModule {
             }
             if (timeToPower != INFINITY) {
                 // Check runes, implemented as a separate module.
-                const runes = this.ovaleData.GetSpellInfoProperty(
+                const runes = this.ovaleData.getSpellInfoProperty(
                     spellId,
                     atTime,
                     "runes",
                     targetGUID
                 );
                 if (runes) {
-                    const seconds = this.runes.GetRunesCooldown(
+                    const seconds = this.runes.getRunesCooldown(
                         atTime,
                         <number>runes
                     );
-                    this.tracer.Log(
+                    this.tracer.log(
                         "    spell ID '%d' requires %f seconds for %d runes",
                         spellId,
                         seconds,
@@ -293,7 +288,7 @@ export class OvaleSpellsClass implements StateModule {
                 }
             }
         }
-        this.tracer.Log(
+        this.tracer.log(
             "Spell ID '%d' requires %f seconds for power requirements.",
             spellId,
             timeToPower

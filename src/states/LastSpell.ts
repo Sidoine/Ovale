@@ -78,15 +78,15 @@ export interface PaperDollSnapshot extends Powers {
 }
 
 export interface SpellCastModule {
-    CopySpellcastInfo: (spellcast: SpellCast, dest: SpellCast) => void;
-    SaveSpellcastInfo: (
+    copySpellcastInfo: (spellcast: SpellCast, dest: SpellCast) => void;
+    saveSpellcastInfo: (
         spellcast: SpellCast,
         atTime: number,
         future?: PaperDollSnapshot
     ) => void;
 }
 
-export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
+export const lastSpellCastPool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 export class LastSpell {
     lastSpellcast: SpellCast | undefined = undefined;
@@ -94,7 +94,7 @@ export class LastSpell {
     queue: LuaArray<SpellCast> = {};
     modules: LuaObj<SpellCastModule> = {};
 
-    LastInFlightSpell() {
+    lastInFlightSpell() {
         let spellcast: SpellCast | undefined = undefined;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;
@@ -114,22 +114,22 @@ export class LastSpell {
         }
         return spellcast;
     }
-    CopySpellcastInfo(spellcast: SpellCast, dest: SpellCast) {
+    copySpellcastInfo(spellcast: SpellCast, dest: SpellCast) {
         if (spellcast.damageMultiplier) {
             dest.damageMultiplier = spellcast.damageMultiplier;
         }
         for (const [, mod] of pairs(this.modules)) {
-            const func = mod.CopySpellcastInfo;
+            const func = mod.copySpellcastInfo;
             if (func) {
                 func(spellcast, dest);
             }
         }
     }
 
-    RegisterSpellcastInfo(mod: SpellCastModule) {
+    registerSpellcastInfo(mod: SpellCastModule) {
         insert(this.modules, mod);
     }
-    UnregisterSpellcastInfo(mod: SpellCastModule) {
+    unregisterSpellcastInfo(mod: SpellCastModule) {
         for (let i = lualength(this.modules); i >= 1; i += -1) {
             if (this.modules[i] == mod) {
                 remove(this.modules, i);
@@ -137,7 +137,7 @@ export class LastSpell {
         }
     }
 
-    LastSpellSent() {
+    lastSpellSent() {
         let spellcast: SpellCast | undefined = undefined;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;

@@ -8,12 +8,12 @@ export class BaseState implements StateModule {
     /** Cached value of GetTime(), the real current time */
     currentTime = 0;
 
-    InitializeState() {}
+    initializeState() {}
 
-    ResetState() {
+    resetState() {
         this.currentTime = GetTime();
         this.defaultTarget = "target";
     }
 
-    CleanState() {}
+    cleanState() {}
 }

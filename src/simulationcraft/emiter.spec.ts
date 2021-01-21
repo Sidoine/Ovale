@@ -9,13 +9,13 @@ import {
     OvaleASTClass,
 } from "../engine/ast";
 import { OvaleDataClass } from "../engine/data";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { Annotation, OperandParseNode } from "./definitions";
 import { Emiter } from "./emiter";
 import { Unparser } from "./unparser";
 
 interface Context {
-    debug: IMock<OvaleDebugClass>;
+    debug: IMock<DebugTools>;
     ast: IMock<OvaleASTClass>;
     data: IMock<OvaleDataClass>;
     unparser: IMock<Unparser>;
@@ -30,7 +30,7 @@ const context: Context = {} as Context;
 
 beforeEach(() => {
     context.tracer = Mock.ofType<Tracer>();
-    context.debug = Mock.ofType<OvaleDebugClass>();
+    context.debug = Mock.ofType<DebugTools>();
     context.debug
         .setup((x) => x.create("SimulationCraftEmiter"))
         .returns(() => context.tracer.object);
@@ -69,7 +69,7 @@ function testOperand(operand: string, expectedExpression: string) {
     const expected: AstNode = {} as AstNode;
     context.ast
         .setup((x) =>
-            x.ParseCode(
+            x.parseCode(
                 "expression",
                 expectedExpression,
                 nodeList,
@@ -83,7 +83,7 @@ function testOperand(operand: string, expectedExpression: string) {
         ]);
 
     // Act
-    const result = context.emiter.Emit(
+    const result = context.emiter.emit(
         parseNode,
         nodeList,
         context.annotation.object,
@@ -130,7 +130,7 @@ test("emiter unknown function (call one time message instead)", () => {
         .returns(() => expected);
 
     // Act
-    const result = context.emiter.Emit(
+    const result = context.emiter.emit(
         parseNode,
         context.nodeList,
         context.annotation.object,

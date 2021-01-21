@@ -12,7 +12,7 @@ export class OvalePool<T> {
         this.name = name || "OvalePool";
     }
 
-    Get() {
+    get() {
         // OvalePool.StartProfiling(this.name);
         assert(this.pool);
         let item = remove(this.pool);
@@ -25,22 +25,22 @@ export class OvalePool<T> {
         // OvalePool.StopProfiling(this.name);
         return item;
     }
-    Release(item: T): void {
+    release(item: T): void {
         // OvalePool.StartProfiling(this.name);
         assert(this.pool);
-        this.Clean(item);
+        this.clean(item);
         insert(this.pool, item);
         this.unused = this.unused + 1;
         // OvalePool.StopProfiling(this.name);
     }
-    Drain(): void {
+    drain(): void {
         //OvalePool.StartProfiling(this.name);
         this.pool = {};
         this.size = this.size - this.unused;
         this.unused = 0;
         //OvalePool.StopProfiling(this.name);
     }
-    DebuggingInfo(): string {
+    debuggingInfo(): string {
         return format(
             "Pool %s has size %d with %d item(s).",
             tostring(this.name),
@@ -49,7 +49,7 @@ export class OvalePool<T> {
         );
     }
 
-    Clean(item: T): void {
+    clean(item: T): void {
         wipe(item);
     }
 }

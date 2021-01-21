@@ -1,6 +1,6 @@
 import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
-import { L } from "../ui/Localization";
+import { l } from "../ui/Localization";
 import { SpecializationName, OvalePaperDollClass } from "../states/PaperDoll";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { format, gsub, lower } from "@wowts/string";
@@ -11,15 +11,15 @@ import { GetNumSpecializations } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleOptionsClass } from "../ui/Options";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
-export const DEFAULT_NAME = "Ovale";
-const DEFAULT_DESCRIPTION = L["default_script"];
-const CUSTOM_NAME = "custom";
-const CUSTOM_DESCRIPTION = L["custom_script"];
-const DISABLED_NAME = "Disabled";
-const DISABLED_DESCRIPTION = L["disabled"];
+export const defaultScriptName = "Ovale";
+const defaultScriptDescription = l["default_script"];
+const customScriptName = "custom";
+const customScriptDescription = l["custom_script"];
+const disabledScriptName = "Disabled";
+const disabledScriptDescription = l["disabled"];
 
 export type ScriptType = "script" | "include";
 
@@ -41,12 +41,12 @@ export class OvaleScriptsClass {
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         private ovalePaperDoll: OvalePaperDollClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleScripts",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
@@ -58,7 +58,7 @@ export class OvaleScriptsClass {
         };
         const actions: LuaObj<OptionUiAll> = {
             code: {
-                name: L["code"],
+                name: l["code"],
                 type: "execute",
                 func: () => {
                     const appName = this.module.GetName();
@@ -74,44 +74,44 @@ export class OvaleScriptsClass {
         for (const [k, v] of pairs(actions)) {
             ovaleOptions.actions.args[k] = v;
         }
-        ovaleOptions.RegisterOptions();
+        ovaleOptions.registerOptions();
     }
 
-    private OnInitialize = () => {
-        this.CreateOptions();
-        this.RegisterScript(
+    private handleInitialize = () => {
+        this.createOptions();
+        this.registerScript(
             undefined,
             undefined,
-            DEFAULT_NAME,
-            DEFAULT_DESCRIPTION,
+            defaultScriptName,
+            defaultScriptDescription,
             undefined,
             "script"
         );
-        this.RegisterScript(
+        this.registerScript(
             this.ovale.playerClass,
             undefined,
-            CUSTOM_NAME,
-            CUSTOM_DESCRIPTION,
+            customScriptName,
+            customScriptDescription,
             this.ovaleOptions.db.profile.code,
             "script"
         );
-        this.RegisterScript(
+        this.registerScript(
             undefined,
             undefined,
-            DISABLED_NAME,
-            DISABLED_DESCRIPTION,
+            disabledScriptName,
+            disabledScriptDescription,
             undefined,
             "script"
         );
         this.module.RegisterMessage(
             "Ovale_ScriptChanged",
-            this.InitScriptProfiles
+            this.initScriptProfiles
         );
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_ScriptChanged");
     };
-    GetDescriptions(scriptType: ScriptType | undefined) {
+    getDescriptions(scriptType: ScriptType | undefined) {
         const descriptionsTable: LuaObj<string> = {};
         for (const [name, script] of pairs(this.script)) {
             if (
@@ -119,12 +119,12 @@ export class OvaleScriptsClass {
                 (!script.className ||
                     script.className === this.ovale.playerClass) &&
                 (!script.specialization ||
-                    this.ovalePaperDoll.IsSpecialization(script.specialization))
+                    this.ovalePaperDoll.isSpecialization(script.specialization))
             ) {
-                if (name == DEFAULT_NAME) {
+                if (name == defaultScriptName) {
                     descriptionsTable[name] = `${
                         script.desc
-                    } (${this.GetScriptName(name)})`;
+                    } (${this.getScriptName(name)})`;
                 } else {
                     descriptionsTable[name] = script.desc || "No description";
                 }
@@ -132,7 +132,7 @@ export class OvaleScriptsClass {
         }
         return descriptionsTable;
     }
-    RegisterScript(
+    registerScript(
         className: ClassId | undefined,
         specialization: SpecializationName | undefined,
         name: string,
@@ -148,17 +148,17 @@ export class OvaleScriptsClass {
         script.code = code || "";
         script.className = className;
     }
-    UnregisterScript(name: string) {
+    unregisterScript(name: string) {
         delete this.script[name];
     }
-    SetScript(name: string) {
+    setScript(name: string) {
         const oldSource = this.getCurrentSpecScriptName();
         if (oldSource !== name) {
             this.setCurrentSpecScript(name);
             this.module.SendMessage("Ovale_ScriptChanged");
         }
     }
-    GetDefaultScriptName(
+    getDefaultScriptName(
         className: ClassId,
         specialization: SpecializationName
     ) {
@@ -174,38 +174,38 @@ export class OvaleScriptsClass {
         if (specialization) {
             name = format("sc_t26_%s_%s", scClassName, specialization);
             if (!this.script[name]) {
-                this.tracer.Log(`Script ${name} not found`);
-                name = DISABLED_NAME;
+                this.tracer.log(`Script ${name} not found`);
+                name = disabledScriptName;
             }
         } else {
-            return DISABLED_NAME;
+            return disabledScriptName;
         }
         return name;
     }
-    GetScriptName(name: string) {
+    getScriptName(name: string) {
         return (
-            (name == DEFAULT_NAME &&
-                this.GetDefaultScriptName(
+            (name == defaultScriptName &&
+                this.getDefaultScriptName(
                     this.ovale.playerClass,
-                    this.ovalePaperDoll.GetSpecialization()
+                    this.ovalePaperDoll.getSpecialization()
                 )) ||
             name
         );
     }
-    GetScript(name: string) {
-        name = this.GetScriptName(name);
+    getScript(name: string) {
+        name = this.getScriptName(name);
         if (name && this.script[name]) {
             return this.script[name].code;
         }
         return undefined;
     }
-    GetScriptOrDefault(name: string) {
+    getScriptOrDefault(name: string) {
         return (
-            this.GetScript(name) ||
-            this.GetScript(
-                this.GetDefaultScriptName(
+            this.getScript(name) ||
+            this.getScript(
+                this.getDefaultScriptName(
                     this.ovale.playerClass,
-                    this.ovalePaperDoll.GetSpecialization()
+                    this.ovalePaperDoll.getSpecialization()
                 )
             )
         );
@@ -214,7 +214,7 @@ export class OvaleScriptsClass {
     getCurrentSpecScriptId() {
         return `${
             this.ovale.playerClass
-        }_${this.ovalePaperDoll.GetSpecialization()}`;
+        }_${this.ovalePaperDoll.getSpecialization()}`;
     }
 
     getCurrentSpecScriptName() {
@@ -229,51 +229,53 @@ export class OvaleScriptsClass {
         ] = scriptName;
     }
 
-    CreateOptions() {
+    createOptions() {
         const options = {
-            name: `${this.ovale.GetName()} ${L["script"]}`,
+            name: `${this.ovale.GetName()} ${l["script"]}`,
             type: "group",
             args: {
                 source: {
                     order: 10,
                     type: "select",
-                    name: L["script"],
+                    name: l["script"],
                     width: "double",
                     values: (info: any) => {
                         const scriptType =
                             (!this.ovaleOptions.db.profile.showHiddenScripts &&
                                 "script") ||
                             undefined;
-                        return this.GetDescriptions(scriptType);
+                        return this.getDescriptions(scriptType);
                     },
                     get: (info: any) => {
                         return this.getCurrentSpecScriptName();
                     },
                     set: (info: any, v: string) => {
-                        this.SetScript(v);
+                        this.setScript(v);
                     },
                 },
                 script: {
                     order: 20,
                     type: "input",
                     multiline: 25,
-                    name: L["script"],
+                    name: l["script"],
                     width: "full",
                     disabled: () => {
-                        return this.getCurrentSpecScriptName() !== CUSTOM_NAME;
+                        return (
+                            this.getCurrentSpecScriptName() !== customScriptName
+                        );
                     },
                     get: (info: any) => {
                         const code =
-                            this.GetScript(this.getCurrentSpecScriptName()) ||
+                            this.getScript(this.getCurrentSpecScriptName()) ||
                             "";
                         return gsub(code, "\t", "    ");
                     },
                     set: (info: any, v: string) => {
-                        this.RegisterScript(
+                        this.registerScript(
                             this.ovale.playerClass,
                             undefined,
-                            CUSTOM_NAME,
-                            CUSTOM_DESCRIPTION,
+                            customScriptName,
+                            customScriptDescription,
                             v,
                             "script"
                         );
@@ -284,27 +286,29 @@ export class OvaleScriptsClass {
                 copy: {
                     order: 30,
                     type: "execute",
-                    name: L["copy_to_custom_script"],
+                    name: l["copy_to_custom_script"],
                     disabled: () => {
-                        return this.getCurrentSpecScriptName() === CUSTOM_NAME;
+                        return (
+                            this.getCurrentSpecScriptName() === customScriptName
+                        );
                     },
                     confirm: () => {
-                        return L["overwrite_existing_script"];
+                        return l["overwrite_existing_script"];
                     },
                     func: () => {
-                        const code = this.GetScript(
+                        const code = this.getScript(
                             this.getCurrentSpecScriptName()
                         );
-                        this.RegisterScript(
+                        this.registerScript(
                             this.ovale.playerClass,
                             undefined,
-                            CUSTOM_NAME,
-                            CUSTOM_DESCRIPTION,
+                            customScriptName,
+                            customScriptDescription,
                             code,
                             "script"
                         );
-                        this.setCurrentSpecScript(CUSTOM_NAME);
-                        const script = this.GetScript(CUSTOM_NAME);
+                        this.setCurrentSpecScript(customScriptName);
+                        const script = this.getScript(customScriptName);
                         if (script) this.ovaleOptions.db.profile.code = script;
                         this.module.SendMessage("Ovale_ScriptChanged");
                     },
@@ -312,7 +316,7 @@ export class OvaleScriptsClass {
                 showHiddenScripts: {
                     order: 40,
                     type: "toggle",
-                    name: L["show_hidden"],
+                    name: l["show_hidden"],
                     get: (info: any) => {
                         return this.ovaleOptions.db.profile.showHiddenScripts;
                     },
@@ -326,18 +330,18 @@ export class OvaleScriptsClass {
         AceConfig.RegisterOptionsTable(appName, options);
         AceConfigDialog.AddToBlizOptions(
             appName,
-            L["script"],
+            l["script"],
             this.ovale.GetName()
         );
     }
 
-    private InitScriptProfiles = () => {
+    private initScriptProfiles = () => {
         const countSpecializations = GetNumSpecializations(false, false);
         if (!isLuaArray(this.ovaleOptions.db.profile.source)) {
             this.ovaleOptions.db.profile.source = {};
         }
         for (let i = 1; i < countSpecializations; i += 1) {
-            const specName = this.ovalePaperDoll.GetSpecialization(
+            const specName = this.ovalePaperDoll.getSpecialization(
                 i as SpecializationIndex
             );
             if (specName) {
@@ -347,7 +351,7 @@ export class OvaleScriptsClass {
                     this.ovaleOptions.db.profile.source[
                         `${this.ovale.playerClass}_${specName}`
                     ] ||
-                    this.GetDefaultScriptName(this.ovale.playerClass, specName);
+                    this.getDefaultScriptName(this.ovale.playerClass, specName);
             }
         }
     };

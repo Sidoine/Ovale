@@ -6,14 +6,14 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvalePaperDollClass } from "./PaperDoll";
 
-const SOUL_FRAGMENTS_BUFF_ID = 203981;
-const METAMORPHOSIS_BUFF_ID = 187827;
-const SOUL_FRAGMENT_SPELLS: LuaArray<number> = {
+const soulFragmentsBuffId = 203981;
+const metamorphosisBuffId = 187827;
+const soulFragmentSpells: LuaArray<number> = {
     [225919]: 2, // Fracture
     [203782]: 1, // Shear
     [228477]: -2, // Soul Cleave
 };
-const SOUL_FRAGMENT_FINISHERS: LuaArray<boolean> = {
+const soulFragmentFinishers: LuaArray<boolean> = {
     [247454]: true, // Spirit Bomb
     [263648]: true, // Soul Barrier
 };
@@ -31,28 +31,31 @@ export class OvaleDemonHunterSoulFragmentsClass {
     ) {
         this.module = ovale.createModule(
             "OvaleDemonHunterSoulFragments",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
             this.module.RegisterEvent(
                 "COMBAT_LOG_EVENT_UNFILTERED",
-                this.COMBAT_LOG_EVENT_UNFILTERED
+                this.handleCombatLogEventUnfiltered
             );
         }
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
             this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     };
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
-        if (!this.ovalePaperDoll.IsSpecialization("vengeance")) {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
+        if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
             return;
         }
         const [
@@ -73,35 +76,35 @@ export class OvaleDemonHunterSoulFragmentsClass {
         if (sourceGUID == me) {
             if (
                 subtype == "SPELL_CAST_SUCCESS" &&
-                SOUL_FRAGMENT_SPELLS[spellID]
+                soulFragmentSpells[spellID]
             ) {
                 const getTime = GetTime();
-                let fragments = SOUL_FRAGMENT_SPELLS[spellID];
-                if (fragments > 0 && this.HasMetamorphosis(getTime)) {
+                let fragments = soulFragmentSpells[spellID];
+                if (fragments > 0 && this.hasMetamorphosis(getTime)) {
                     fragments = fragments + 1;
                 }
-                this.AddPredictedSoulFragments(getTime, fragments);
+                this.addPredictedSoulFragments(getTime, fragments);
             }
             if (
                 subtype == "SPELL_CAST_SUCCESS" &&
-                SOUL_FRAGMENT_FINISHERS[spellID]
+                soulFragmentFinishers[spellID]
             ) {
-                this.SetPredictedSoulFragment(GetTime(), 0);
+                this.setPredictedSoulFragment(GetTime(), 0);
             }
         }
     };
-    AddPredictedSoulFragments(atTime: number, added: number) {
-        const currentCount = this.GetSoulFragmentsBuffStacks(atTime) || 0;
-        this.SetPredictedSoulFragment(atTime, currentCount + added);
+    addPredictedSoulFragments(atTime: number, added: number) {
+        const currentCount = this.getSoulFragmentsBuffStacks(atTime) || 0;
+        this.setPredictedSoulFragment(atTime, currentCount + added);
     }
-    SetPredictedSoulFragment(atTime: number, count: number) {
+    setPredictedSoulFragment(atTime: number, count: number) {
         this.estimatedCount = (count < 0 && 0) || (count > 5 && 5) || count;
         this.atTime = atTime;
         this.estimated = true;
     }
-    SoulFragments(atTime: number) {
+    soulFragments(atTime: number) {
         // TODO Need to add parameters greater and demon
-        let stacks = this.GetSoulFragmentsBuffStacks(atTime);
+        let stacks = this.getSoulFragmentsBuffStacks(atTime);
         if (this.estimated) {
             if (atTime - (this.atTime || 0) < 1.2) {
                 stacks = this.estimatedCount;
@@ -111,29 +114,29 @@ export class OvaleDemonHunterSoulFragmentsClass {
         }
         return stacks;
     }
-    GetSoulFragmentsBuffStacks(atTime: number) {
-        const aura = this.ovaleAura.GetAura(
+    getSoulFragmentsBuffStacks(atTime: number) {
+        const aura = this.ovaleAura.getAura(
             "player",
-            SOUL_FRAGMENTS_BUFF_ID,
+            soulFragmentsBuffId,
             atTime,
             "HELPFUL",
             true
         );
         const stacks =
             (aura &&
-                this.ovaleAura.IsActiveAura(aura, atTime) &&
+                this.ovaleAura.isActiveAura(aura, atTime) &&
                 aura.stacks) ||
             0;
         return stacks;
     }
-    HasMetamorphosis(atTime: number) {
-        const aura = this.ovaleAura.GetAura(
+    hasMetamorphosis(atTime: number) {
+        const aura = this.ovaleAura.getAura(
             "player",
-            METAMORPHOSIS_BUFF_ID,
+            metamorphosisBuffId,
             atTime,
             "HELPFUL",
             true
         );
-        return (aura && this.ovaleAura.IsActiveAura(aura, atTime)) || false;
+        return (aura && this.ovaleAura.isActiveAura(aura, atTime)) || false;
     }
 }

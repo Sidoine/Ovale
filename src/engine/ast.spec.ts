@@ -2,7 +2,7 @@ import { test, expect } from "@jest/globals";
 import { Mock, It } from "typemoq";
 import { OvaleASTClass } from "./ast";
 import { OvaleConditionClass } from "./condition";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleScriptsClass } from "./scripts";
 import { OvaleSpellBookClass } from "../states/SpellBook";
@@ -12,7 +12,7 @@ import { assertDefined, assertIs } from "../tests/helpers";
 function makeContext() {
     const context = {
         ovaleConditionMock: Mock.ofType<OvaleConditionClass>(),
-        ovaleDebugMock: Mock.ofType<OvaleDebugClass>(),
+        ovaleDebugMock: Mock.ofType<DebugTools>(),
         ovaleProfilerMock: Mock.ofType<OvaleProfilerClass>(),
         ovaleScriptsMock: Mock.ofType<OvaleScriptsClass>(),
         ovaleSpellbookMock: Mock.ofType<OvaleSpellBookClass>(),
@@ -20,22 +20,22 @@ function makeContext() {
     };
     const tracer = context.tracerMock;
     tracer
-        .setup((x) => x.Warning(It.isAnyString()))
+        .setup((x) => x.warning(It.isAnyString()))
         .callback((x) => {
             expect(format(x)).toBeUndefined();
         });
     tracer
-        .setup((x) => x.Warning(It.isAnyString(), It.isAny()))
+        .setup((x) => x.warning(It.isAnyString(), It.isAny()))
         .callback((x, y) => {
             expect(format(x, y)).toBeUndefined();
         });
     tracer
-        .setup((x) => x.Warning(It.isAnyString(), It.isAny(), It.isAny()))
+        .setup((x) => x.warning(It.isAnyString(), It.isAny(), It.isAny()))
         .callback((x, y, z) => {
             expect(format(x, y, z)).toBeUndefined();
         });
     tracer
-        .setup((x) => x.Error(It.isAny()))
+        .setup((x) => x.error(It.isAny()))
         .callback((x) => expect(x).toBeUndefined());
     context.ovaleDebugMock
         .setup((x) => x.create(It.isAnyString()))
@@ -64,7 +64,7 @@ function makeAst() {
 test("ast: parse Define", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const [astNode, nodeList, annotation] = ast.ParseCode(
+    const [astNode, nodeList, annotation] = ast.parseCode(
         "script",
         `Define(test 18)`,
         {},
@@ -82,7 +82,7 @@ test("ast: parse Define", () => {
 test("ast: parse SpellInfo", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const [astNode, nodeList, annotation] = ast.ParseCode(
+    const [astNode, nodeList, annotation] = ast.parseCode(
         "script",
         "SpellInfo(123 cd=30 rage=10)",
         {},
@@ -110,7 +110,7 @@ test("ast: parse SpellInfo", () => {
 test("ast: parse expression with a if with SpellInfo", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const [astNode, nodeList, annotation] = ast.ParseCode(
+    const [astNode, nodeList, annotation] = ast.parseCode(
         "icon",
         "AddIcon { if Talent(12) Spell(115) }",
         {},
@@ -163,7 +163,7 @@ test("ast: dedupe nodes", () => {
 test("ast: itemrequire", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const [astNode, nodeList, annotation] = ast.ParseCode(
+    const [astNode, nodeList, annotation] = ast.parseCode(
         "script",
         "ItemRequire(coagulated_nightwell_residue unusable buff set=1 enabled=(not buffpresent(nightwell_energy_buff)))",
         {},
@@ -183,7 +183,7 @@ test("ast: itemrequire", () => {
 test("ast: addcheckbox", () => {
     // Act
     const { ast, astAnnotation } = makeAst();
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "script",
         "AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(blood)))",
         {},
@@ -199,7 +199,7 @@ test("ast: spellaura", () => {
     const { ast, astAnnotation } = makeAst();
 
     // Act
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "script",
         "SpellAddBuff(bloodthirst bloodthirst_buff set=1)",
         {},
@@ -212,7 +212,7 @@ test("ast: spellaura", () => {
 
 test("if in {}", () => {
     const { ast, astAnnotation } = makeAst();
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "expression",
         `if { if 0 == 30 and equippedruneforge(disciplinary_command_runeforge) 50 } == 30 10`,
         {},
@@ -239,7 +239,7 @@ test("typed condition with only position parameters", () => {
         }));
 
     // Act
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "expression",
         `test("example" 12)`,
         {},
@@ -274,7 +274,7 @@ test("typed condition with only named parameters", () => {
         }));
 
     // Act
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "expression",
         `test(b=12 a="example")`,
         {},
@@ -331,7 +331,7 @@ test("typed condition with parameters with default values", () => {
         }));
 
     // Act
-    const [astNode] = ast.ParseCode("expression", `test()`, {}, astAnnotation);
+    const [astNode] = ast.parseCode("expression", `test()`, {}, astAnnotation);
 
     // Assert
     assertDefined(astNode);
@@ -354,7 +354,7 @@ test("boolean node", () => {
     const { ast, astAnnotation } = makeAst();
 
     // Act
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "expression",
         `if true or false 18`,
         {},
@@ -409,7 +409,7 @@ test("unparse typed function with optional parameters", () => {
         }));
 
     // Act
-    const [astNode] = ast.ParseCode(
+    const [astNode] = ast.parseCode(
         "expression",
         `test(b=15)`,
         {},

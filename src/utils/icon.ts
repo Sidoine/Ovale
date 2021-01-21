@@ -37,12 +37,12 @@ export function executeDump(
     registerScripts(ioc.scripts);
     ioc.options.db = { global: { debug: {}, profiler: {} } } as AceDatabase &
         OvaleDb;
-    const script = ioc.compile.CompileScript(iconDump.script);
-    ioc.baseState.ResetState = () => {};
-    ioc.debug.DoTrace(false);
+    const script = ioc.compile.compileScript(iconDump.script);
+    ioc.baseState.resetState = () => {};
+    ioc.debug.doTrace(false);
     assertDefined(script);
-    ioc.compile.EvaluateScript();
-    const iconNodes = ioc.compile.GetIconNodes();
+    ioc.compile.evaluateScript();
+    const iconNodes = ioc.compile.getIconNodes();
     const iconNode = iconNodes[iconDump.index];
     assertDefined(iconNode);
     ioc.baseState.currentTime = iconDump.atTime;
@@ -63,7 +63,7 @@ export function executeDump(
             nodeResult.serial = 0;
         }
     }
-    ioc.runner.self_serial = iconDump.serial - 1;
+    ioc.runner.serial = iconDump.serial - 1;
     const [result] = ioc.frame.frame.getIconAction(iconNode);
     fixSnapshot(iconDump.result);
     const log = (ioc.debug.traceLog as any).lines

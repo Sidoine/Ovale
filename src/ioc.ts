@@ -16,7 +16,7 @@ import { OvaleCooldownClass } from "./states/Cooldown";
 import { OvaleDamageTakenClass } from "./states/DamageTaken";
 import { OvaleDataClass } from "./engine/data";
 import { OvaleDataBrokerClass } from "./ui/DataBroker";
-import { OvaleDebugClass } from "./engine/debug";
+import { DebugTools } from "./engine/debug";
 import { OvaleDemonHunterDemonicClass } from "./states/DemonHunterDemonic";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./states/DemonHunterSigils";
@@ -24,7 +24,7 @@ import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleEquipmentClass } from "./states/Equipment";
 import { OvaleFrameModuleClass } from "./ui/Frame";
 import { OvaleFutureClass } from "./states/Future";
-import { OvaleGUIDClass } from "./engine/guid";
+import { Guids } from "./engine/guid";
 import { OvaleHealthClass } from "./states/Health";
 import { LastSpell } from "./states/LastSpell";
 import { OvaleLossOfControlClass } from "./states/LossOfControl";
@@ -75,7 +75,7 @@ export class IoC {
     public damageTaken: OvaleDamageTakenClass;
     public data: OvaleDataClass;
     public dataBroker: OvaleDataBrokerClass;
-    public debug: OvaleDebugClass;
+    public debug: DebugTools;
     public demonHunterDemonic: OvaleDemonHunterDemonicClass;
     public demonHunterSigils: OvaleSigilClass;
     public demonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
@@ -83,7 +83,7 @@ export class IoC {
     public equipment: OvaleEquipmentClass;
     public frame: OvaleFrameModuleClass;
     public future: OvaleFutureClass;
-    public guid: OvaleGUIDClass;
+    public guid: Guids;
     public health: OvaleHealthClass;
     public lastSpell: LastSpell;
     public lossOfControl: OvaleLossOfControlClass;
@@ -119,7 +119,7 @@ export class IoC {
         // TODO créer configuration avec la partie GUI et rajouter une méthode register à appeler ici comme pour les states
         this.ovale = new OvaleClass();
         this.options = new OvaleOptionsClass(this.ovale);
-        this.debug = new OvaleDebugClass(this.ovale, this.options);
+        this.debug = new DebugTools(this.ovale, this.options);
         this.profiler = new OvaleProfilerClass(this.options, this.ovale);
         this.lastSpell = new LastSpell();
         this.baseState = new BaseState();
@@ -145,7 +145,7 @@ export class IoC {
             this.profiler,
             this.lastSpell
         );
-        this.guid = new OvaleGUIDClass(this.ovale, this.debug, this.condition);
+        this.guid = new Guids(this.ovale, this.debug, this.condition);
         this.spellBook = new OvaleSpellBookClass(
             this.ovale,
             this.debug,
@@ -457,22 +457,22 @@ export class IoC {
         this.runner = runner;
 
         // States
-        this.state.RegisterState(this.cooldown);
-        this.state.RegisterState(this.paperDoll);
-        this.state.RegisterState(this.baseState);
-        this.state.RegisterState(this.demonHunterSigils);
-        this.state.RegisterState(this.enemies);
-        this.state.RegisterState(this.future);
-        this.state.RegisterState(this.health);
-        this.state.RegisterState(this.lossOfControl);
-        this.state.RegisterState(this.power);
-        this.state.RegisterState(this.stagger);
-        this.state.RegisterState(this.stance);
-        this.state.RegisterState(this.totem);
-        this.state.RegisterState(this.variables);
-        this.state.RegisterState(this.warlock);
-        this.state.RegisterState(this.runes);
-        this.state.RegisterState(combat);
+        this.state.registerState(this.cooldown);
+        this.state.registerState(this.paperDoll);
+        this.state.registerState(this.baseState);
+        this.state.registerState(this.demonHunterSigils);
+        this.state.registerState(this.enemies);
+        this.state.registerState(this.future);
+        this.state.registerState(this.health);
+        this.state.registerState(this.lossOfControl);
+        this.state.registerState(this.power);
+        this.state.registerState(this.stagger);
+        this.state.registerState(this.stance);
+        this.state.registerState(this.totem);
+        this.state.registerState(this.variables);
+        this.state.registerState(this.warlock);
+        this.state.registerState(this.runes);
+        this.state.registerState(combat);
 
         // Conditions
         runeforge.registerConditions(this.condition);

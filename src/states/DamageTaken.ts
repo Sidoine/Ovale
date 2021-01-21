@@ -16,16 +16,16 @@ import {
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 
 interface Event {
     timestamp: number;
     damage: number;
     magic: boolean;
 }
-const self_pool = new OvalePool<Event>("OvaleDamageTaken_pool");
-const DAMAGE_TAKEN_WINDOW = 20;
-const SCHOOL_MASK_MAGIC = bor(
+const pool = new OvalePool<Event>("OvaleDamageTaken_pool");
+const damageTakenWindow = 20;
+const schoolMaskMagic = bor(
     SCHOOL_MASK_ARCANE,
     SCHOOL_MASK_FIRE,
     SCHOOL_MASK_FROST,
@@ -43,36 +43,39 @@ export class OvaleDamageTakenClass {
     constructor(
         private ovale: OvaleClass,
         profiler: OvaleProfilerClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleDamageTaken",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = profiler.create(this.module.GetName());
         this.tracer = ovaleDebug.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "COMBAT_LOG_EVENT_UNFILTERED",
-            this.COMBAT_LOG_EVENT_UNFILTERED
+            this.handleCombatLogEventUnfiltered
         );
         this.module.RegisterEvent(
             "PLAYER_REGEN_ENABLED",
-            this.PLAYER_REGEN_ENABLED
+            this.handlePlayerRegenEnabled
         );
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
-        self_pool.Drain();
+        pool.drain();
     };
 
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         const [
             ,
             cleuEvent,
@@ -94,67 +97,67 @@ export class OvaleDamageTakenClass {
             destGUID == this.ovale.playerGUID &&
             sub(cleuEvent, -7) == "_DAMAGE"
         ) {
-            this.profiler.StartProfiling(
+            this.profiler.startProfiling(
                 "OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED"
             );
             const now = GetTime();
             const eventPrefix = sub(cleuEvent, 1, 6);
             if (eventPrefix == "SWING_") {
                 const amount = arg12;
-                this.tracer.Debug("%s caused %d damage.", cleuEvent, amount);
-                this.AddDamageTaken(now, amount);
+                this.tracer.debug("%s caused %d damage.", cleuEvent, amount);
+                this.addDamageTaken(now, amount);
             } else if (eventPrefix == "RANGE_" || eventPrefix == "SPELL_") {
                 const [spellName, spellSchool, amount] = [arg13, arg14, arg15];
-                const isMagicDamage = band(spellSchool, SCHOOL_MASK_MAGIC) > 0;
+                const isMagicDamage = band(spellSchool, schoolMaskMagic) > 0;
                 if (isMagicDamage) {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "%s (%s) caused %d magic damage.",
                         cleuEvent,
                         spellName,
                         amount
                     );
                 } else {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "%s (%s) caused %d damage.",
                         cleuEvent,
                         spellName,
                         amount
                     );
                 }
-                this.AddDamageTaken(now, amount, isMagicDamage);
+                this.addDamageTaken(now, amount, isMagicDamage);
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED"
             );
         }
     };
-    private PLAYER_REGEN_ENABLED = (event: string) => {
-        self_pool.Drain();
+    private handlePlayerRegenEnabled = (event: string) => {
+        pool.drain();
     };
 
-    private AddDamageTaken(
+    private addDamageTaken(
         timestamp: number,
         damage: number,
         isMagicDamage?: boolean
     ) {
-        this.profiler.StartProfiling("OvaleDamageTaken_AddDamageTaken");
-        const event = self_pool.Get();
+        this.profiler.startProfiling("OvaleDamageTaken_AddDamageTaken");
+        const event = pool.get();
         event.timestamp = timestamp;
         event.damage = damage;
         event.magic = isMagicDamage || false;
-        this.damageEvent.InsertFront(event);
-        this.RemoveExpiredEvents(timestamp);
+        this.damageEvent.insertFront(event);
+        this.removeExpiredEvents(timestamp);
         this.ovale.needRefresh();
-        this.profiler.StopProfiling("OvaleDamageTaken_AddDamageTaken");
+        this.profiler.stopProfiling("OvaleDamageTaken_AddDamageTaken");
     }
 
-    GetRecentDamage(interval: number) {
+    getRecentDamage(interval: number) {
         const now = GetTime();
         const lowerBound = now - interval;
-        this.RemoveExpiredEvents(now);
+        this.removeExpiredEvents(now);
         let [total, totalMagic] = [0, 0];
-        const iterator = this.damageEvent.FrontToBackIterator();
-        while (iterator.Next()) {
+        const iterator = this.damageEvent.frontToBackIterator();
+        while (iterator.next()) {
             const event = iterator.value;
             if (event.timestamp < lowerBound) {
                 break;
@@ -166,30 +169,30 @@ export class OvaleDamageTakenClass {
         }
         return [total, totalMagic];
     }
-    RemoveExpiredEvents(timestamp: number) {
-        this.profiler.StartProfiling("OvaleDamageTaken_RemoveExpiredEvents");
+    removeExpiredEvents(timestamp: number) {
+        this.profiler.startProfiling("OvaleDamageTaken_RemoveExpiredEvents");
         while (true) {
-            const event = this.damageEvent.Back();
+            const event = this.damageEvent.back();
             if (!event) {
                 break;
             }
             if (event) {
-                if (timestamp - event.timestamp < DAMAGE_TAKEN_WINDOW) {
+                if (timestamp - event.timestamp < damageTakenWindow) {
                     break;
                 }
-                this.damageEvent.RemoveBack();
-                self_pool.Release(event);
+                this.damageEvent.removeBack();
+                pool.release(event);
                 this.ovale.needRefresh();
             }
         }
-        this.profiler.StopProfiling("OvaleDamageTaken_RemoveExpiredEvents");
+        this.profiler.stopProfiling("OvaleDamageTaken_RemoveExpiredEvents");
     }
-    DebugDamageTaken() {
-        this.tracer.Print(this.damageEvent.DebuggingInfo());
-        const iterator = this.damageEvent.BackToFrontIterator();
-        while (iterator.Next()) {
+    debugDamageTaken() {
+        this.tracer.print(this.damageEvent.debuggingInfo());
+        const iterator = this.damageEvent.backToFrontIterator();
+        while (iterator.next()) {
             const event = iterator.value;
-            this.tracer.Print("%d: %d damage", event.timestamp, event.damage);
+            this.tracer.print("%d: %d damage", event.timestamp, event.damage);
         }
     }
 }

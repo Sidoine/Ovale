@@ -11,10 +11,10 @@ import {
     OperatorType,
     OvaleASTClass,
 } from "../engine/ast";
-import { Annotation, TagPriority } from "./definitions";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { Annotation, getTagPriority } from "./definitions";
+import { DebugTools, Tracer } from "../engine/debug";
 import { OvaleDataClass } from "../engine/data";
-import { OvaleTaggedFunctionName } from "./text-tools";
+import { toOvaleTaggedFunctionName } from "./text-tools";
 import { find, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 
@@ -30,13 +30,13 @@ export class Splitter {
 
     constructor(
         private ovaleAst: OvaleASTClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private ovaleData: OvaleDataClass
     ) {
         this.tracer = ovaleDebug.create("SimulationCraftSplitter");
     }
 
-    private NewLogicalNode(
+    private newLogicalNode(
         operator: OperatorType,
         lhsNode: AstNode,
         rhsNode: AstNode | undefined,
@@ -55,7 +55,7 @@ export class Splitter {
         return node;
     }
 
-    private ConcatenatedConditionNode(
+    private concatenatedConditionNode(
         conditionList: LuaArray<AstNode>,
         nodeList: LuaArray<AstNode>,
         annotation: Annotation
@@ -67,7 +67,7 @@ export class Splitter {
             } else if (lualength(conditionList) > 1) {
                 let lhsNode = conditionList[1];
                 let rhsNode = conditionList[2];
-                conditionNode = this.NewLogicalNode(
+                conditionNode = this.newLogicalNode(
                     "or",
                     lhsNode,
                     rhsNode,
@@ -76,7 +76,7 @@ export class Splitter {
                 for (let k = 3; k <= lualength(conditionList); k += 1) {
                     lhsNode = conditionNode;
                     rhsNode = conditionList[k];
-                    conditionNode = this.NewLogicalNode(
+                    conditionNode = this.newLogicalNode(
                         "or",
                         lhsNode,
                         rhsNode,
@@ -88,7 +88,7 @@ export class Splitter {
         return conditionNode;
     }
 
-    private ConcatenatedBodyNode(
+    private concatenatedBodyNode(
         bodyList: LuaArray<AstNode>,
         nodeList: LuaArray<AstNode>,
         annotation: Annotation
@@ -106,15 +106,15 @@ export class Splitter {
         return bodyNode;
     }
 
-    public SplitByTag: SplitterFunction<AstNode> = (
+    public splitByTag: SplitterFunction<AstNode> = (
         tag,
         node,
         nodeList,
         annotation
     ) => {
-        const visitor = this.SPLIT_BY_TAG_VISITOR[node.type];
+        const visitor = this.splitByTagVisitors[node.type];
         if (!visitor) {
-            this.tracer.Error(
+            this.tracer.error(
                 "Unable to split-by-tag node of type '%s'.",
                 node.type
             );
@@ -124,7 +124,7 @@ export class Splitter {
         }
     };
 
-    private SplitByTagAction: SplitterFunction<AstFunctionNode> = (
+    private splitByTagAction: SplitterFunction<AstFunctionNode> = (
         tag,
         node,
         nodeList,
@@ -146,14 +146,14 @@ export class Splitter {
             }
             if (id) {
                 if (actionType == "item") {
-                    [actionTag, invokesGCD] = this.ovaleData.GetItemTagInfo(id);
+                    [actionTag, invokesGCD] = this.ovaleData.getItemTagInfo(id);
                 } else if (actionType == "spell") {
-                    [actionTag, invokesGCD] = this.ovaleData.GetSpellTagInfo(
+                    [actionTag, invokesGCD] = this.ovaleData.getSpellTagInfo(
                         id
                     );
                 }
             } else {
-                this.tracer.Print(
+                this.tracer.print(
                     "Warning: Unable to find %s '%s'",
                     actionType,
                     name
@@ -170,9 +170,9 @@ export class Splitter {
                 id = <number>name;
             }
             if (id) {
-                [actionTag, invokesGCD] = this.ovaleData.GetSpellTagInfo(id);
+                [actionTag, invokesGCD] = this.ovaleData.getSpellTagInfo(id);
                 if (actionTag == undefined) {
-                    [actionTag, invokesGCD] = this.ovaleData.GetItemTagInfo(id);
+                    [actionTag, invokesGCD] = this.ovaleData.getItemTagInfo(id);
                 }
             }
             if (actionTag == undefined) {
@@ -180,12 +180,12 @@ export class Splitter {
                 invokesGCD = true;
             }
         } else {
-            this.tracer.Print("Warning: Unknown action type '%'", actionType);
+            this.tracer.print("Warning: Unknown action type '%'", actionType);
         }
         if (!actionTag) {
             actionTag = "main";
             invokesGCD = true;
-            this.tracer.Print(
+            this.tracer.print(
                 "Warning: Unable to determine tag for '%s', assuming '%s' (actionType: %s).",
                 name,
                 actionTag,
@@ -194,24 +194,27 @@ export class Splitter {
         }
         if (actionTag == tag) {
             bodyNode = node;
-        } else if (invokesGCD && TagPriority(actionTag) < TagPriority(tag)) {
+        } else if (
+            invokesGCD &&
+            getTagPriority(actionTag) < getTagPriority(tag)
+        ) {
             conditionNode = node;
         }
         return [bodyNode, conditionNode];
     };
 
-    private SplitByTagAddFunction: SplitterFunction<AstAddFunctionNode> = (
+    private splitByTagAddFunction: SplitterFunction<AstAddFunctionNode> = (
         tag,
         node,
         nodeList,
         annotation
     ) => {
-        const [bodyName, conditionName] = OvaleTaggedFunctionName(
+        const [bodyName, conditionName] = toOvaleTaggedFunctionName(
             node.name,
             tag
         );
         if (!bodyName || !conditionName) return [];
-        let [bodyNode, conditionNode] = this.SplitByTag(
+        let [bodyNode, conditionNode] = this.splitByTag(
             tag,
             node.child[1],
             nodeList,
@@ -248,7 +251,7 @@ export class Splitter {
         return [bodyFunctionNode, conditionFunctionNode];
     };
 
-    private SplitByTagCustomFunction: SplitterFunction<AstFunctionNode> = (
+    private splitByTagCustomFunction: SplitterFunction<AstFunctionNode> = (
         tag,
         node,
         nodeList,
@@ -257,7 +260,7 @@ export class Splitter {
         let bodyNode, conditionNode;
         const functionName = node.name;
         if (annotation.taggedFunctionName[functionName]) {
-            const [bodyName, conditionName] = OvaleTaggedFunctionName(
+            const [bodyName, conditionName] = toOvaleTaggedFunctionName(
                 functionName,
                 tag
             );
@@ -299,7 +302,7 @@ export class Splitter {
                     bodyNode = node;
                 }
             } else {
-                this.tracer.Print(
+                this.tracer.print(
                     "Warning: Unable to determine tag for '%s()'.",
                     node.name
                 );
@@ -309,7 +312,7 @@ export class Splitter {
         return [bodyNode, conditionNode];
     };
 
-    private SplitByTagGroup: SplitterFunction<AstGroupNode> = (
+    private splitByTagGroup: SplitterFunction<AstGroupNode> = (
         tag,
         node,
         nodeList,
@@ -323,7 +326,7 @@ export class Splitter {
             let childNode = node.child[index];
             index = index - 1;
             if (childNode.type != "comment") {
-                let [bodyNode, conditionNode] = this.SplitByTag(
+                let [bodyNode, conditionNode] = this.splitByTag(
                     tag,
                     childNode,
                     nodeList,
@@ -344,12 +347,12 @@ export class Splitter {
                             "unless",
                             annotation.astAnnotation
                         );
-                        const condition = this.ConcatenatedConditionNode(
+                        const condition = this.concatenatedConditionNode(
                             conditionList,
                             nodeList,
                             annotation
                         );
-                        const body = this.ConcatenatedBodyNode(
+                        const body = this.concatenatedBodyNode(
                             bodyList,
                             nodeList,
                             annotation
@@ -361,7 +364,7 @@ export class Splitter {
                         wipe(bodyList);
                         wipe(conditionList);
                         insert(bodyList, 1, unlessNode);
-                        const commentNode = this.ovaleAst.NewNode(
+                        const commentNode = this.ovaleAst.newNode(
                             "comment",
                             annotation.astAnnotation
                         );
@@ -371,7 +374,7 @@ export class Splitter {
                     if (index > 0) {
                         childNode = node.child[index];
                         if (childNode.type != "comment") {
-                            [bodyNode, conditionNode] = this.SplitByTag(
+                            [bodyNode, conditionNode] = this.splitByTag(
                                 tag,
                                 childNode,
                                 nodeList,
@@ -419,17 +422,17 @@ export class Splitter {
                 }
             }
         }
-        let bodyNode = this.ConcatenatedBodyNode(
+        let bodyNode = this.concatenatedBodyNode(
             bodyList,
             nodeList,
             annotation
         );
-        let conditionNode = this.ConcatenatedConditionNode(
+        let conditionNode = this.concatenatedConditionNode(
             conditionList,
             nodeList,
             annotation
         );
-        const remainderNode = this.ConcatenatedConditionNode(
+        const remainderNode = this.concatenatedConditionNode(
             remainderList,
             nodeList,
             annotation
@@ -454,13 +457,13 @@ export class Splitter {
         return [bodyNode, conditionNode];
     };
 
-    private SplitByTagIf: SplitterFunction<AstIfNode | AstUnlessNode> = (
+    private splitByTagIf: SplitterFunction<AstIfNode | AstUnlessNode> = (
         tag,
         node,
         nodeList,
         annotation
     ) => {
-        let [bodyNode, conditionNode] = this.SplitByTag(
+        let [bodyNode, conditionNode] = this.splitByTag(
             tag,
             node.child[2],
             nodeList,
@@ -470,14 +473,14 @@ export class Splitter {
             let lhsNode = node.child[1];
             const rhsNode = conditionNode;
             if (node.type == "unless") {
-                lhsNode = this.NewLogicalNode(
+                lhsNode = this.newLogicalNode(
                     "not",
                     lhsNode,
                     undefined,
                     annotation.astAnnotation
                 );
             }
-            const andNode = this.NewLogicalNode(
+            const andNode = this.newLogicalNode(
                 "and",
                 lhsNode,
                 rhsNode,
@@ -498,7 +501,7 @@ export class Splitter {
         return [bodyNode, conditionNode];
     };
 
-    private SplitByTagState: SplitterFunction<AstFunctionNode> = (
+    private splitByTagState: SplitterFunction<AstFunctionNode> = (
         tag,
         node,
         nodeList,
@@ -507,13 +510,13 @@ export class Splitter {
         return [node, undefined];
     };
 
-    private SPLIT_BY_TAG_VISITOR: LuaObj<SplitterFunction<any>> = {
-        ["action"]: this.SplitByTagAction,
-        ["add_function"]: this.SplitByTagAddFunction,
-        ["custom_function"]: this.SplitByTagCustomFunction,
-        ["group"]: this.SplitByTagGroup,
-        ["if"]: this.SplitByTagIf,
-        ["state"]: this.SplitByTagState,
-        ["unless"]: this.SplitByTagIf,
+    private splitByTagVisitors: LuaObj<SplitterFunction<any>> = {
+        ["action"]: this.splitByTagAction,
+        ["add_function"]: this.splitByTagAddFunction,
+        ["custom_function"]: this.splitByTagCustomFunction,
+        ["group"]: this.splitByTagGroup,
+        ["if"]: this.splitByTagIf,
+        ["state"]: this.splitByTagState,
+        ["unless"]: this.splitByTagIf,
     };
 }

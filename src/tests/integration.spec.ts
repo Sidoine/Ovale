@@ -8,7 +8,7 @@ import {
     setMockOptions,
 } from "@wowts/wow-mock";
 import { registerScripts } from "../scripts/index";
-import { OVALE_SPECIALIZATION_NAME } from "../states/PaperDoll";
+import { ovaleSpecializationName } from "../states/PaperDoll";
 
 const mainIoC = new IoC();
 registerScripts(mainIoC.scripts);
@@ -54,7 +54,7 @@ function integrationTest(name: string) {
     ioc.debug.bug = undefined;
     fakePlayer.classId = className;
     if (specialization) {
-        const specializations = OVALE_SPECIALIZATION_NAME[className];
+        const specializations = ovaleSpecializationName[className];
         if (specializations[1] === specialization) {
             fakePlayer.specializationIndex = 1;
         } else if (specializations[2] === specialization) {
@@ -69,20 +69,20 @@ function integrationTest(name: string) {
     eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
     eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
     eventDispatcher.DispatchEvent("SPELLS_CHANGED", "Ovale");
-    expect(ioc.condition.HasAny()).toBeTruthy();
-    const ast = ioc.compile.CompileScript(name);
+    expect(ioc.condition.hasAny()).toBeTruthy();
+    const ast = ioc.compile.compileScript(name);
     checkNoMessage();
     expect(ast).toBeDefined();
-    ioc.compile.EvaluateScript(ast, true);
+    ioc.compile.evaluateScript(ast, true);
     checkNoMessage();
-    const icons = ioc.compile.GetIconNodes();
+    const icons = ioc.compile.getIconNodes();
     expect(icons).toBeDefined();
-    ioc.state.InitializeState();
-    ioc.bestAction.StartNewAction();
+    ioc.state.initializeState();
+    ioc.bestAction.startNewAction();
     expect(lualength(icons)).toBeGreaterThan(0);
 
     for (const [, icon] of ipairs(icons)) {
-        const result = ioc.bestAction.GetAction(
+        const result = ioc.bestAction.getAction(
             icon,
             ioc.baseState.currentTime
         );

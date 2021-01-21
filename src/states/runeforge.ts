@@ -5,10 +5,10 @@ import { OptionUiGroup } from "../ui/acegui-helpers";
 import {
     ConditionFunction,
     OvaleConditionClass,
-    ReturnBoolean,
+    returnBoolean,
 } from "../engine/condition";
-import { OvaleDebugClass } from "../engine/debug";
-import { isNumber, OneTimeMessage } from "../tools/tools";
+import { DebugTools } from "../engine/debug";
+import { isNumber, oneTimeMessage } from "../tools/tools";
 
 export class Runeforge {
     private debugOptions: OptionUiGroup = {
@@ -39,29 +39,29 @@ export class Runeforge {
         },
     };
 
-    constructor(debug: OvaleDebugClass) {
+    constructor(debug: DebugTools) {
         debug.defaultOptions.args["runeforge"] = this.debugOptions;
     }
 
     registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition(
+        condition.registerCondition(
             "equippedruneforge",
             false,
             this.equippedRuneforge
         );
-        condition.RegisterCondition("runeforge", false, this.equippedRuneforge);
+        condition.registerCondition("runeforge", false, this.equippedRuneforge);
     }
 
     private equippedRuneforge: ConditionFunction = (positionalParameters) => {
         const [powerId] = unpack(positionalParameters);
         if (!isNumber(powerId)) {
-            OneTimeMessage(`${powerId} is not defined in EquippedRuneforge`);
+            oneTimeMessage(`${powerId} is not defined in EquippedRuneforge`);
             return [];
         }
         const runeforgePower = C_LegendaryCrafting.GetRuneforgePowerInfo(
             tonumber(powerId)
         );
-        return ReturnBoolean(
+        return returnBoolean(
             runeforgePower.state === RuneforgePowerState.Available
         );
     };

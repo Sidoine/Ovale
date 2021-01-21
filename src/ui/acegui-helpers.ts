@@ -8,7 +8,9 @@ export class Widget<T extends UIFrame> extends AceGUI.WidgetBase {
     base = AceGUI.WidgetBase;
     frame: T & { obj?: Widget<T> };
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     protected OnWidthSet?: (width: number) => void;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     protected OnHeightSet?: (height: number) => void;
 
     constructor(frame: T) {
@@ -40,7 +42,9 @@ export class WidgetContainer<
     width = 0;
     height = 0;
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     protected OnWidthSet?: (width: number) => void;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     protected OnHeightSet?: (height: number) => void;
 
     constructor(frame: T) {

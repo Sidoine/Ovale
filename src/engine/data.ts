@@ -20,9 +20,9 @@ import {
 import { Runner } from "./runner";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import { concat, insert } from "@wowts/table";
-import { OvaleDebugClass } from "./debug";
+import { DebugTools } from "./debug";
 
-const BLOODELF_CLASSES: LuaObj<boolean> = {
+const bloodelfClasses: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
     ["DEMONHUNTER"]: true,
     ["DRUID"]: false,
@@ -36,7 +36,7 @@ const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: true,
     ["WARRIOR"]: true,
 };
-const PANDAREN_CLASSES: LuaObj<boolean> = {
+const pandarenClasses: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: false,
     ["DEMONHUNTER"]: false,
     ["DRUID"]: false,
@@ -50,7 +50,7 @@ const PANDAREN_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: false,
     ["WARRIOR"]: true,
 };
-const TAUREN_CLASSES: LuaObj<boolean> = {
+const taurenClasses: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
     ["DEMONHUNTER"]: false,
     ["DRUID"]: true,
@@ -64,7 +64,7 @@ const TAUREN_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: false,
     ["WARRIOR"]: true,
 };
-const STAT_NAMES: LuaArray<string> = {
+const statNames: LuaArray<string> = {
     1: "agility",
     2: "bonus_armor",
     3: "critical_strike",
@@ -76,14 +76,14 @@ const STAT_NAMES: LuaArray<string> = {
     9: "strength",
     10: "versatility",
 };
-const STAT_SHORTNAME: LuaObj<string> = {
+const startShortNames: LuaObj<string> = {
     agility: "agi",
     critical_strike: "crit",
     intellect: "int",
     strength: "str",
     spirit: "spi",
 };
-const STAT_USE_NAMES: LuaArray<string> = {
+const statUseNames: LuaArray<string> = {
     1: "trinket_proc",
     2: "trinket_stacking_proc",
     3: "trinket_stacking_stat",
@@ -233,12 +233,12 @@ interface SpellDebug {
 }
 
 export class OvaleDataClass {
-    STAT_NAMES = STAT_NAMES;
-    STAT_SHORTNAME = STAT_SHORTNAME;
-    STAT_USE_NAMES = STAT_USE_NAMES;
-    BLOODELF_CLASSES = BLOODELF_CLASSES;
-    PANDAREN_CLASSES = PANDAREN_CLASSES;
-    TAUREN_CLASSES = TAUREN_CLASSES;
+    statNames = statNames;
+    shortNames = startShortNames;
+    statUseNames = statUseNames;
+    bloodElfClasses = bloodelfClasses;
+    pandarenClasses = pandarenClasses;
+    taurenClasses = taurenClasses;
     itemInfo: LuaArray<SpellInfo> = {};
     itemList: LuaObj<LuaArray<number>> = {};
     spellInfo: LuaObj<SpellInfo> = {};
@@ -462,13 +462,13 @@ export class OvaleDataClass {
             [315584]: true,
         },
     };
-    constructor(private runner: Runner, ovaleDebug: OvaleDebugClass) {
-        for (const [, useName] of pairs(STAT_USE_NAMES)) {
+    constructor(private runner: Runner, ovaleDebug: DebugTools) {
+        for (const [, useName] of pairs(statUseNames)) {
             let name;
-            for (const [, statName] of pairs(STAT_NAMES)) {
+            for (const [, statName] of pairs(statNames)) {
                 name = `${useName}_${statName}_buff`;
                 this.buffSpellList[name] = {};
-                const shortName = STAT_SHORTNAME[statName];
+                const shortName = startShortNames[statName];
                 if (shortName) {
                     name = `${useName}_${shortName}_buff`;
                     this.buffSpellList[name] = {};
@@ -480,7 +480,7 @@ export class OvaleDataClass {
 
         {
             for (const [name] of pairs(this.buffSpellList)) {
-                this.DEFAULT_SPELL_LIST[name] = true;
+                this.defaultSpellLists[name] = true;
             }
         }
 
@@ -522,13 +522,13 @@ export class OvaleDataClass {
         this.getSpellDebug(spellId).spellAsked = true;
     }
 
-    DEFAULT_SPELL_LIST: LuaObj<boolean> = {};
+    defaultSpellLists: LuaObj<boolean> = {};
 
-    Reset() {
+    reset() {
         wipe(this.itemInfo);
         wipe(this.spellInfo);
         for (const [k, v] of pairs(this.buffSpellList)) {
-            if (!this.DEFAULT_SPELL_LIST[k]) {
+            if (!this.defaultSpellLists[k]) {
                 wipe(v);
                 delete this.buffSpellList[k];
             } else if (truthy(find(k, "^trinket_"))) {
@@ -536,7 +536,7 @@ export class OvaleDataClass {
             }
         }
     }
-    SpellInfo(spellId: number) {
+    getSpellInfo(spellId: number) {
         let si = this.spellInfo[spellId];
         if (!si) {
             si = {
@@ -564,7 +564,7 @@ export class OvaleDataClass {
         }
         return si;
     }
-    GetSpellInfo(spellId: number) {
+    getSpellOrListInfo(spellId: number | string) {
         if (type(spellId) == "number") {
             return this.spellInfo[spellId];
         } else if (this.buffSpellList[spellId]) {
@@ -575,7 +575,7 @@ export class OvaleDataClass {
             }
         }
     }
-    ItemInfo(itemId: number) {
+    getItemInfo(itemId: number) {
         let ii = this.itemInfo[itemId];
         if (!ii) {
             ii = {
@@ -585,10 +585,10 @@ export class OvaleDataClass {
         }
         return ii;
     }
-    GetItemTagInfo(spellId: number | string): [string, boolean] {
+    getItemTagInfo(spellId: number | string): [string, boolean] {
         return ["cd", false];
     }
-    GetSpellTagInfo(spellId: number | string): [string, boolean] {
+    getSpellTagInfo(spellId: number | string): [string, boolean] {
         let tag: string | undefined = "main";
         let invokesGCD = true;
         const si = this.spellInfo[spellId];
@@ -613,7 +613,7 @@ export class OvaleDataClass {
         return [tag, invokesGCD];
     }
 
-    CheckSpellAuraData(
+    checkSpellAuraData(
         auraId: number | string,
         spellData: SpellAuraInfo,
         atTime: number,
@@ -670,14 +670,14 @@ export class OvaleDataClass {
     //     }
     //     return [verified, requirement];
     // }
-    GetItemInfoProperty(
+    getItemInfoProperty(
         itemId: number,
         atTime: number,
         property: SpellInfoProperty
     ) {
-        const ii = this.ItemInfo(itemId);
+        const ii = this.getItemInfo(itemId);
         if (ii) {
-            return this.getSpellInfoProperty(ii, atTime, property);
+            return this.getProperty(ii, atTime, property);
         }
         return undefined;
     }
@@ -691,7 +691,7 @@ export class OvaleDataClass {
      * @param noCalculation Checks only SpellInfo and SpellRequire for the property itself.  No `add_${property}` or `${property}_percent`
      * @returns value or [value, ratio]
      */
-    GetSpellInfoProperty<T extends SpellInfoProperty>(
+    getSpellInfoProperty<T extends SpellInfoProperty>(
         spellId: number,
         atTime: number | undefined,
         property: T,
@@ -699,13 +699,13 @@ export class OvaleDataClass {
     ): SpellInfo[T] {
         const si = this.spellInfo[spellId];
         if (si) {
-            return this.getSpellInfoProperty(si, atTime, property);
+            return this.getProperty(si, atTime, property);
         }
 
         return undefined;
     }
 
-    public getSpellInfoProperty<T extends SpellInfoProperty>(
+    public getProperty<T extends SpellInfoProperty>(
         si: SpellInfo,
         atTime: number | undefined,
         property: T
@@ -757,7 +757,7 @@ export class OvaleDataClass {
      * @param splitRatio Split the value and ratio into separate return values instead of multiplying them together
      * @returns value or [value, ratio]
      */
-    GetSpellInfoPropertyNumber(
+    getSpellInfoPropertyNumber(
         spellId: number,
         atTime: number | undefined,
         property: SpellInfoNumberProperty,
@@ -768,18 +768,18 @@ export class OvaleDataClass {
         if (!si) return [];
 
         const ratioParam = `${property}_percent` as SpellInfoNumberProperty; // TODO TS 4.1
-        let ratio = this.getSpellInfoProperty(si, atTime, ratioParam);
+        let ratio = this.getProperty(si, atTime, ratioParam);
         if (ratio !== undefined) {
             ratio = ratio / 100;
         } else {
             ratio = 1;
         }
 
-        let value = this.getSpellInfoProperty(si, atTime, property);
+        let value = this.getProperty(si, atTime, property);
 
         if (ratio != 0 && value !== undefined) {
             const addParam = `add_${property}` as SpellInfoNumberProperty; // TODO TS 4.1
-            const addProperty = this.getSpellInfoProperty(si, atTime, addParam);
+            const addProperty = this.getProperty(si, atTime, addParam);
             if (addProperty) {
                 value = value + addProperty;
             }
@@ -793,7 +793,7 @@ export class OvaleDataClass {
         return [value * ratio];
     }
 
-    GetDamage(
+    getDamage(
         spellId: number,
         attackpower: number,
         spellpower: number,

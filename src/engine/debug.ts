@@ -1,6 +1,6 @@
 import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
-import { L } from "../ui/Localization";
+import { l } from "../ui/Localization";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
 import { OvaleOptionsClass } from "../ui/Options";
 import { OvaleClass } from "../Ovale";
@@ -9,95 +9,97 @@ import { format } from "@wowts/string";
 import { pairs, lualength, LuaArray, LuaObj } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
-import { MakeString } from "../tools/tools";
+import { makeString } from "../tools/tools";
 import { OptionUiExecute, OptionUiGroup } from "../ui/acegui-helpers";
 
-const OVALE_TRACELOG_MAXLINES = 4096;
+const traceLogMaxLines = 4096;
 
 export class Tracer {
     constructor(
         private options: OvaleOptionsClass,
-        public debug: OvaleDebugClass,
+        public debugTools: DebugTools,
         private name: string
     ) {
-        const toggles = debug.defaultOptions.args.toggles as OptionUiGroup;
+        const toggles = debugTools.defaultOptions.args.toggles as OptionUiGroup;
         toggles.args[name] = {
             name: name,
-            desc: format(L["enable_debug_messages"], name),
+            desc: format(l["enable_debug_messages"], name),
             type: "toggle",
         };
     }
 
-    Debug(pattern: string, ...__args: unknown[]) {
+    debug(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
         if (this.options.db.global.debug[name]) {
             DEFAULT_CHAT_FRAME.AddMessage(
                 format(
                     "|cff33ff99%s|r: %s",
                     name,
-                    MakeString(pattern, ...__args)
+                    makeString(pattern, ...parameters)
                 )
             );
         }
     }
-    DebugTimestamp(pattern: string, ...__args: unknown[]) {
+    debugTimestamp(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
         if (this.options.db.global.debug[name]) {
             const now = GetTime();
             const s = format(
                 "|cffffff00%f|r %s",
                 now,
-                MakeString(pattern, ...__args)
+                makeString(pattern, ...parameters)
             );
             DEFAULT_CHAT_FRAME.AddMessage(
                 format("|cff33ff99%s|r: %s", name, s)
             );
         }
     }
-    Log(pattern: string, ...__args: unknown[]) {
-        if (this.debug.trace) {
-            const N = this.debug.traceLog.Lines();
-            if (N < OVALE_TRACELOG_MAXLINES - 1) {
-                this.debug.traceLog.AddLine(MakeString(pattern, ...__args));
-            } else if (N == OVALE_TRACELOG_MAXLINES - 1) {
-                this.debug.traceLog.AddLine(
+    log(pattern: string, ...parameters: unknown[]) {
+        if (this.debugTools.trace) {
+            const numberOfLines = this.debugTools.traceLog.Lines();
+            if (numberOfLines < traceLogMaxLines - 1) {
+                this.debugTools.traceLog.AddLine(
+                    makeString(pattern, ...parameters)
+                );
+            } else if (numberOfLines == traceLogMaxLines - 1) {
+                this.debugTools.traceLog.AddLine(
                     "WARNING: Maximum length of trace log has been reached."
                 );
             }
         }
     }
-    Error(pattern: string, ...__args: unknown[]) {
+    error(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
-        const s = MakeString(pattern, ...__args);
+        const s = makeString(pattern, ...parameters);
         DEFAULT_CHAT_FRAME.AddMessage(
             format("|cff33ff99%s|r:|cffff3333 Error:|r %s", name, s)
         );
-        this.debug.bug = s;
+        this.debugTools.bug = s;
     }
-    Warning(pattern: string, ...__args: unknown[]) {
+    warning(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
-        const s = MakeString(pattern, ...__args);
+        const s = makeString(pattern, ...parameters);
         DEFAULT_CHAT_FRAME.AddMessage(
             format("|cff33ff99%s|r: |cff999933Warning:|r %s", name, s)
         );
-        this.debug.warning = s;
+        this.debugTools.warning = s;
     }
-    Print(pattern: string, ...__args: unknown[]) {
+    print(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
-        const s = MakeString(pattern, ...__args);
+        const s = makeString(pattern, ...parameters);
         DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
     }
 }
 
-export class OvaleDebugClass {
-    self_traced = false;
+export class DebugTools {
+    traced = false;
 
     defaultOptions: OptionUiGroup = {
-        name: `Ovale ${L["debug"]}`,
+        name: `Ovale ${l["debug"]}`,
         type: "group",
         args: {
             toggles: {
-                name: L["options"],
+                name: l["options"],
                 type: "group",
                 order: 10,
                 args: {},
@@ -120,25 +122,25 @@ export class OvaleDebugClass {
                 },
             },
             trace: {
-                name: L["trace"],
+                name: l["trace"],
                 type: "group",
                 order: 20,
                 args: {
                     trace: {
                         order: 10,
                         type: "execute",
-                        name: L["trace"],
-                        desc: L["trace_next_frame"],
+                        name: l["trace"],
+                        desc: l["trace_next_frame"],
                         func: () => {
-                            this.DoTrace(true);
+                            this.doTrace(true);
                         },
                     },
                     traceLog: {
                         order: 20,
                         type: "execute",
-                        name: L["show_trace_log"],
+                        name: l["show_trace_log"],
                         func: () => {
-                            this.DisplayTraceLog();
+                            this.displayTraceLog();
                         },
                     },
                 },
@@ -155,19 +157,19 @@ export class OvaleDebugClass {
     constructor(private ovale: OvaleClass, private options: OvaleOptionsClass) {
         this.module = ovale.createModule(
             "OvaleDebug",
-            this.OnInitialize,
-            this.OnDisable,
+            this.onInitialize,
+            this.onDisable,
             aceTimer
         );
         this.traceLog = LibTextDump.New(
-            `${this.ovale.GetName()} - ${L["trace_log"]}`,
+            `${this.ovale.GetName()} - ${l["trace_log"]}`,
             750,
             500
         );
 
         const actions: LuaObj<OptionUiExecute> = {
             debug: {
-                name: L["debug"],
+                name: l["debug"],
                 type: "execute",
                 func: () => {
                     const appName = this.module.GetName();
@@ -182,54 +184,55 @@ export class OvaleDebugClass {
         }
         options.defaultDB.global = options.defaultDB.global || {};
         options.defaultDB.global.debug = {};
-        options.RegisterOptions();
+        options.registerOptions();
     }
 
     create(name: string) {
         return new Tracer(this.options, this, name);
     }
 
-    private OnInitialize = () => {
+    private onInitialize = () => {
         const appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, this.defaultOptions);
         AceConfigDialog.AddToBlizOptions(
             appName,
-            L["debug"],
+            l["debug"],
             this.ovale.GetName()
         );
     };
-    private OnDisable = () => {};
+    private onDisable = () => {};
 
-    DoTrace(displayLog: boolean) {
+    doTrace(displayLog: boolean) {
         this.traceLog.Clear();
         this.trace = true;
         DEFAULT_CHAT_FRAME.AddMessage(format("=== Trace @%f", GetTime()));
         if (displayLog) {
             this.module.ScheduleTimer(() => {
-                this.DisplayTraceLog();
+                this.displayTraceLog();
             }, 0.5);
         }
     }
 
-    ResetTrace() {
+    resetTrace() {
         this.bug = undefined;
         this.trace = false;
-        this.self_traced = false;
+        this.traced = false;
     }
-    UpdateTrace() {
+
+    updateTrace() {
         if (this.trace) {
-            this.self_traced = true;
+            this.traced = true;
         }
         if (this.bug) {
             this.trace = true;
         }
-        if (this.trace && this.self_traced) {
-            this.self_traced = false;
+        if (this.trace && this.traced) {
+            this.traced = false;
             this.trace = false;
         }
     }
 
-    DisplayTraceLog() {
+    displayTraceLog() {
         if (this.traceLog.Lines() == 0) {
             this.traceLog.AddLine("Trace log is empty.");
         }

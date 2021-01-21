@@ -11,45 +11,45 @@ import {
     next,
 } from "@wowts/lua";
 import { remove, insert, sort, concat } from "@wowts/table";
-import { Annotation, OPTIONAL_SKILLS, Profile } from "./definitions";
+import { Annotation, optionalSkills, Profile } from "./definitions";
 import {
-    LowerSpecialization,
-    OvaleFunctionName,
-    OvaleTaggedFunctionName,
-    self_outputPool,
+    toLowerSpecialization,
+    toOvaleFunctionName,
+    toOvaleTaggedFunctionName,
+    outputPool,
 } from "./text-tools";
 import { format } from "@wowts/string";
 import { OvaleDataClass } from "../engine/data";
 
-const MAX_DESIRED_TARGETS = 3;
+const maxDesiredTargets = 3;
 
-const self_functionDefined: LuaObj<boolean> = {};
-const self_functionUsed: LuaObj<boolean> = {};
+const definedFunctions: LuaObj<boolean> = {};
+const usedFunctions: LuaObj<boolean> = {};
 
 function isNode(n: any): n is AstNode {
     return type(n) == "table";
 }
 
-function PreOrderTraversalMark(node: AstNode) {
+function preOrderTraversalMark(node: AstNode) {
     if (node.type == "custom_function") {
-        self_functionUsed[node.name] = true;
+        usedFunctions[node.name] = true;
     } else {
         if (node.type == "add_function") {
-            self_functionDefined[node.name] = true;
+            definedFunctions[node.name] = true;
         }
         if (isAstNodeWithChildren(node)) {
             for (const [, childNode] of ipairs(node.child)) {
-                PreOrderTraversalMark(childNode);
+                preOrderTraversalMark(childNode);
             }
         }
     }
 }
-export function Mark(node: AstNode) {
-    wipe(self_functionDefined);
-    wipe(self_functionUsed);
-    PreOrderTraversalMark(node);
+export function markNode(node: AstNode) {
+    wipe(definedFunctions);
+    wipe(usedFunctions);
+    preOrderTraversalMark(node);
 }
-function SweepComments(childNodes: LuaArray<AstNode>, index: number) {
+function sweepComments(childNodes: LuaArray<AstNode>, index: number) {
     let count = 0;
     for (let k = index - 1; k >= 1; k += -1) {
         if (childNodes[k].type == "comment") {
@@ -63,18 +63,18 @@ function SweepComments(childNodes: LuaArray<AstNode>, index: number) {
 }
 
 // Sweep (remove) all usages of functions that are empty or unused.
-export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
+export function sweepNode(node: AstNode): [boolean, boolean | AstNode] {
     let isChanged: boolean;
     let isSwept: boolean | AstNode;
     [isChanged, isSwept] = [false, false];
-    if (node.type == "custom_function" && !self_functionDefined[node.name]) {
+    if (node.type == "custom_function" && !definedFunctions[node.name]) {
         [isChanged, isSwept] = [true, true];
     } else if (node.type == "group" || node.type == "script") {
         const child = node.child;
         let index = lualength(child);
         while (index > 0) {
             const childNode = child[index];
-            const [changed, swept] = Sweep(childNode);
+            const [changed, swept] = sweepNode(childNode);
             if (isNode(swept)) {
                 if (swept.type == "group") {
                     // Directly insert a replacement group's statements in place of the replaced node.
@@ -83,7 +83,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
                         insert(child, index, swept.child[k]);
                     }
                     if (node.type == "group") {
-                        const count = SweepComments(child, index);
+                        const count = sweepComments(child, index);
                         index = index - count;
                     }
                 } else {
@@ -92,7 +92,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
             } else if (swept) {
                 remove(child, index);
                 if (node.type == "group") {
-                    const count = SweepComments(child, index);
+                    const count = sweepComments(child, index);
                     index = index - count;
                 }
             }
@@ -115,14 +115,14 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
         isSwept = isSwept || lualength(child) == 0;
         isChanged = isChanged || !!isSwept;
     } else if (node.type == "icon") {
-        [isChanged, isSwept] = Sweep(node.child[1]);
+        [isChanged, isSwept] = sweepNode(node.child[1]);
     } else if (node.type == "if") {
-        [isChanged, isSwept] = Sweep(node.child[2]);
+        [isChanged, isSwept] = sweepNode(node.child[2]);
     } else if (node.type == "logical") {
         if (node.expressionType == "binary") {
             const [lhsNode, rhsNode] = [node.child[1], node.child[2]];
             for (const [index, childNode] of ipairs(node.child)) {
-                const [changed, swept] = Sweep(childNode);
+                const [changed, swept] = sweepNode(childNode);
                 if (isNode(swept)) {
                     node.child[index] = swept;
                 } else if (swept) {
@@ -141,14 +141,14 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
             isChanged = isChanged || !!isSwept;
         }
     } else if (node.type == "unless") {
-        let [changed, swept] = Sweep(node.child[2]);
+        let [changed, swept] = sweepNode(node.child[2]);
         if (isNode(swept)) {
             node.child[2] = swept;
             isSwept = false;
         } else if (swept) {
             isSwept = swept;
         } else {
-            [changed, swept] = Sweep(node.child[1]);
+            [changed, swept] = sweepNode(node.child[1]);
             if (isNode(swept)) {
                 node.child[1] = swept;
                 isSwept = false;
@@ -158,7 +158,7 @@ export function Sweep(node: AstNode): [boolean, boolean | AstNode] {
         }
         isChanged = isChanged || changed || !!isSwept;
     } else if (node.type == "simc_wait") {
-        [isChanged, isSwept] = Sweep(node.child[1]);
+        [isChanged, isSwept] = sweepNode(node.child[1]);
     }
     return [isChanged, isSwept];
 }
@@ -180,23 +180,23 @@ export class Generator {
         private ovaleData: OvaleDataClass
     ) {}
 
-    private InsertInterruptFunction(
+    private insertInterruptFunction(
         child: LuaArray<AstNode>,
         annotation: Annotation,
         interrupts: LuaArray<Spell>
     ) {
         const nodeList = annotation.astAnnotation.nodeList;
-        const camelSpecialization = LowerSpecialization(annotation);
+        const camelSpecialization = toLowerSpecialization(annotation);
         const spells = interrupts || {};
         sort(spells, function (a, b) {
             return tonumber(a.order || 0) >= tonumber(b.order || 0);
         });
         const lines: LuaArray<string> = {};
         for (const [, spell] of pairs(spells)) {
-            annotation.AddSymbol(spell.name);
+            annotation.addSymbol(spell.name);
             if (spell.addSymbol != undefined) {
                 for (const [, v] of pairs(spell.addSymbol)) {
-                    annotation.AddSymbol(v);
+                    annotation.addSymbol(v);
                 }
             }
             const conditions: LuaArray<string> = {};
@@ -231,7 +231,7 @@ export class Generator {
             }
         `;
         const code = format(fmt, camelSpecialization, concat(lines, "\n"));
-        const [node] = this.ovaleAst.ParseCode(
+        const [node] = this.ovaleAst.parseCode(
             "add_function",
             code,
             nodeList,
@@ -243,21 +243,21 @@ export class Generator {
         }
     }
 
-    public InsertInterruptFunctions(
+    public insertInterruptFunctions(
         child: LuaArray<AstNode>,
         annotation: Annotation
     ) {
         const interrupts = {};
         const className = annotation.classId;
 
-        if (this.ovaleData.PANDAREN_CLASSES[className]) {
+        if (this.ovaleData.pandarenClasses[className]) {
             insert(interrupts, {
                 name: "quaking_palm",
                 stun: 1,
                 order: 98,
             });
         }
-        if (this.ovaleData.TAUREN_CLASSES[className]) {
+        if (this.ovaleData.taurenClasses[className]) {
             insert(interrupts, {
                 name: "war_stomp",
                 stun: 1,
@@ -562,21 +562,21 @@ export class Generator {
             });
         }
         if (lualength(interrupts) > 0) {
-            this.InsertInterruptFunction(child, annotation, interrupts);
+            this.insertInterruptFunction(child, annotation, interrupts);
         }
         return lualength(interrupts);
     }
-    public InsertSupportingFunctions(
+    public insertSupportingFunctions(
         child: LuaArray<AstNode>,
         annotation: Annotation
     ) {
         let count = 0;
         const nodeList = annotation.astAnnotation.nodeList;
-        const camelSpecialization = LowerSpecialization(annotation);
-        const lowerSpecialization = LowerSpecialization(annotation);
+        const camelSpecialization = toLowerSpecialization(annotation);
+        const lowerSpecialization = toLowerSpecialization(annotation);
         if (annotation.desired_targets) {
             const lines: LuaArray<string> = {};
-            for (let k = MAX_DESIRED_TARGETS; k > 1; k += -1) {
+            for (let k = maxDesiredTargets; k > 1; k += -1) {
                 insert(
                     lines,
                     `if List(opt_${lowerSpecialization}_desired_targets desired_targets_${k}) ${k}`
@@ -590,7 +590,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization, concat(lines, "\n"));
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -609,7 +609,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -618,7 +618,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("death_strike");
+                annotation.addSymbol("death_strike");
                 count = count + 1;
             }
         }
@@ -637,7 +637,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -646,7 +646,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("chaos_strike");
+                annotation.addSymbol("chaos_strike");
                 count = count + 1;
             }
         }
@@ -661,7 +661,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -670,7 +670,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("shear");
+                annotation.addSymbol("shear");
                 count = count + 1;
             }
         }
@@ -686,7 +686,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -695,11 +695,11 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("mangle");
-                annotation.AddSymbol("shred");
-                annotation.AddSymbol("wild_charge");
-                annotation.AddSymbol("wild_charge_bear");
-                annotation.AddSymbol("wild_charge_cat");
+                annotation.addSymbol("mangle");
+                annotation.addSymbol("shred");
+                annotation.addSymbol("wild_charge");
+                annotation.addSymbol("wild_charge_bear");
+                annotation.addSymbol("wild_charge_cat");
                 count = count + 1;
             }
         }
@@ -714,7 +714,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -723,7 +723,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("raptor_strike");
+                annotation.addSymbol("raptor_strike");
                 count = count + 1;
             }
         }
@@ -736,7 +736,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -745,7 +745,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("revive_pet");
+                annotation.addSymbol("revive_pet");
                 count = count + 1;
             }
         }
@@ -757,7 +757,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -766,7 +766,7 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("tiger_palm");
+                annotation.addSymbol("tiger_palm");
                 count = count + 1;
             }
         }
@@ -777,7 +777,7 @@ export class Generator {
                     SpellCooldown(crusader_strike holy_shock judgment)
                 }
             `;
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -785,9 +785,9 @@ export class Generator {
             );
             if (node) {
                 insert(child, 1, node);
-                annotation.AddSymbol("crusader_strike");
-                annotation.AddSymbol("holy_shock");
-                annotation.AddSymbol("judgment");
+                annotation.addSymbol("crusader_strike");
+                annotation.addSymbol("holy_shock");
+                annotation.addSymbol("judgment");
                 count = count + 1;
             }
         }
@@ -798,7 +798,7 @@ export class Generator {
                     SpellCooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
                 }
             `;
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -806,9 +806,9 @@ export class Generator {
             );
             if (node) {
                 insert(child, 1, node);
-                annotation.AddSymbol("crusader_strike");
-                annotation.AddSymbol("hammer_of_wrath");
-                annotation.AddSymbol("judgment");
+                annotation.addSymbol("crusader_strike");
+                annotation.addSymbol("hammer_of_wrath");
+                annotation.addSymbol("judgment");
                 count = count + 1;
             }
         }
@@ -820,17 +820,17 @@ export class Generator {
                     if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
                 }
             `;
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
                 annotation.astAnnotation
             );
             insert(child, 1, node);
-            annotation.AddSymbol("crusader_strike");
-            annotation.AddSymbol("holy_wrath");
-            annotation.AddSymbol("judgment");
-            annotation.AddSymbol("sanctified_wrath_talent");
+            annotation.addSymbol("crusader_strike");
+            annotation.addSymbol("holy_wrath");
+            annotation.addSymbol("judgment");
+            annotation.addSymbol("sanctified_wrath_talent");
             count = count + 1;
         }
         if (annotation.melee == "PALADIN") {
@@ -841,7 +841,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -850,7 +850,7 @@ export class Generator {
             if (node && node.type == "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("rebuke");
+                annotation.addSymbol("rebuke");
                 count = count + 1;
             }
         }
@@ -866,7 +866,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -875,8 +875,8 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("kick");
-                annotation.AddSymbol("shadowstep");
+                annotation.addSymbol("kick");
+                annotation.addSymbol("shadowstep");
                 count = count + 1;
             }
         }
@@ -892,7 +892,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -901,8 +901,8 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol("feral_lunge");
-                annotation.AddSymbol("stormstrike");
+                annotation.addSymbol("feral_lunge");
+                annotation.addSymbol("stormstrike");
                 count = count + 1;
             }
         }
@@ -918,7 +918,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -927,8 +927,8 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "cd";
-                annotation.AddSymbol("bloodlust");
-                annotation.AddSymbol("heroism");
+                annotation.addSymbol("bloodlust");
+                annotation.addSymbol("heroism");
                 count = count + 1;
             }
         }
@@ -956,7 +956,7 @@ export class Generator {
                 charge,
                 charge
             );
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -965,9 +965,9 @@ export class Generator {
             if (node && node.type === "add_function") {
                 insert(child, 1, node);
                 annotation.functionTag[node.name] = "shortcd";
-                annotation.AddSymbol(charge);
-                annotation.AddSymbol("heroic_leap");
-                annotation.AddSymbol("pummel");
+                annotation.addSymbol(charge);
+                annotation.addSymbol("heroic_leap");
+                annotation.addSymbol("pummel");
                 count = count + 1;
             }
         }
@@ -980,7 +980,7 @@ export class Generator {
                 }
             `;
             const code = format(fmt, camelSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "add_function",
                 code,
                 nodeList,
@@ -995,7 +995,7 @@ export class Generator {
         return count;
     }
 
-    private AddOptionalSkillCheckBox(
+    private addOptionalSkillCheckBox(
         child: LuaArray<AstNode>,
         annotation: Annotation,
         data: any,
@@ -1021,34 +1021,34 @@ export class Generator {
             defaultText,
             annotation.specialization
         );
-        const [node] = this.ovaleAst.ParseCode(
+        const [node] = this.ovaleAst.parseCode(
             "checkbox",
             code,
             nodeList,
             annotation.astAnnotation
         );
         insert(child, 1, node);
-        annotation.AddSymbol(skill);
+        annotation.addSymbol(skill);
         return 1;
     }
 
-    public InsertSupportingControls(
+    public insertSupportingControls(
         child: LuaArray<AstNode>,
         annotation: Annotation
     ) {
         let count = 0;
-        for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
+        for (const [skill, data] of pairs(optionalSkills)) {
             count =
                 count +
-                this.AddOptionalSkillCheckBox(
+                this.addOptionalSkillCheckBox(
                     child,
                     annotation,
                     data,
-                    <keyof typeof OPTIONAL_SKILLS>skill
+                    <keyof typeof optionalSkills>skill
                 );
         }
         const nodeList = annotation.astAnnotation.nodeList;
-        const lowerSpecialization = LowerSpecialization(annotation);
+        const lowerSpecialization = toLowerSpecialization(annotation);
         const ifSpecialization = `enabled=(specialization(${annotation.specialization}))`;
         if (annotation.using_apl && next(annotation.using_apl)) {
             for (const [name] of pairs(annotation.using_apl)) {
@@ -1057,7 +1057,7 @@ export class Generator {
                         AddListItem(opt_using_apl %s "%s APL")
                     `;
                     const code = format(fmt, name, name);
-                    const [node] = this.ovaleAst.ParseCode(
+                    const [node] = this.ovaleAst.parseCode(
                         "list_item",
                         code,
                         nodeList,
@@ -1070,7 +1070,7 @@ export class Generator {
                 const code = `
                     AddListItem(opt_using_apl normal L(normal_apl) default)
                 `;
-                const [node] = this.ovaleAst.ParseCode(
+                const [node] = this.ovaleAst.parseCode(
                     "list_item",
                     code,
                     nodeList,
@@ -1080,7 +1080,7 @@ export class Generator {
             }
         }
         if (annotation.desired_targets) {
-            for (let k = MAX_DESIRED_TARGETS; k > 0; k += -1) {
+            for (let k = maxDesiredTargets; k > 0; k += -1) {
                 const fmt = "AddListItem(%s %s %s %s%s)";
                 const code = format(
                     fmt,
@@ -1090,7 +1090,7 @@ export class Generator {
                     (k == 1 && "default ") || "",
                     ifSpecialization
                 );
-                const [node] = this.ovaleAst.ParseCode(
+                const [node] = this.ovaleAst.parseCode(
                     "list_item",
                     code,
                     nodeList,
@@ -1106,7 +1106,7 @@ export class Generator {
                     AddCheckBox(${v} L(${v}) default %s)
                 `;
                 const code = format(fmt, ifSpecialization);
-                const [node] = this.ovaleAst.ParseCode(
+                const [node] = this.ovaleAst.parseCode(
                     "checkbox",
                     code,
                     nodeList,
@@ -1127,14 +1127,14 @@ export class Generator {
                 legendaryRing,
                 ifSpecialization
             );
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "checkbox",
                 code,
                 nodeList,
                 annotation.astAnnotation
             );
             insert(child, 1, node);
-            annotation.AddSymbol(legendaryRing);
+            annotation.addSymbol(legendaryRing);
             count = count + 1;
         }
         if (annotation.opt_use_consumables) {
@@ -1142,7 +1142,7 @@ export class Generator {
                 AddCheckBox(opt_use_consumables L(opt_use_consumables) default %s)
             `;
             const code = format(fmt, ifSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1156,7 +1156,7 @@ export class Generator {
                 AddCheckBox(opt_melee_range L(not_in_melee_range) %s)
             `;
             const code = format(fmt, ifSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1170,7 +1170,7 @@ export class Generator {
                 AddCheckBox(opt_interrupt L(interrupt) default %s)
             `;
             const code = format(fmt, ifSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1184,7 +1184,7 @@ export class Generator {
                 AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
             `;
             const code = format(fmt, ifSpecialization);
-            const [node] = this.ovaleAst.ParseCode(
+            const [node] = this.ovaleAst.parseCode(
                 "checkbox",
                 code,
                 nodeList,
@@ -1195,27 +1195,30 @@ export class Generator {
         }
         return count;
     }
-    public InsertVariables(child: LuaArray<AstNode>, annotation: Annotation) {
+    public insertVariables(child: LuaArray<AstNode>, annotation: Annotation) {
         for (const [, v] of pairs(annotation.variable)) {
             insert(child, 1, v);
         }
     }
-    public GenerateIconBody(tag: string, profile: Profile) {
+    public generateIconBody(tag: string, profile: Profile) {
         const annotation = profile.annotation;
-        const precombatName = OvaleFunctionName("precombat", annotation);
-        const defaultName = OvaleFunctionName("_default", annotation);
-        const [precombatBodyName] = OvaleTaggedFunctionName(precombatName, tag);
-        const [defaultBodyName] = OvaleTaggedFunctionName(defaultName, tag);
+        const precombatName = toOvaleFunctionName("precombat", annotation);
+        const defaultName = toOvaleFunctionName("_default", annotation);
+        const [precombatBodyName] = toOvaleTaggedFunctionName(
+            precombatName,
+            tag
+        );
+        const [defaultBodyName] = toOvaleTaggedFunctionName(defaultName, tag);
         let mainBodyCode;
         if (annotation.using_apl && next(annotation.using_apl)) {
-            const output = self_outputPool.Get();
+            const output = outputPool.get();
             output[lualength(output) + 1] = format(
                 "if List(opt_using_apl normal) %s()",
                 defaultBodyName
             );
             for (const [name] of pairs(annotation.using_apl)) {
-                const aplName = OvaleFunctionName(<string>name, annotation);
-                const [aplBodyName] = OvaleTaggedFunctionName(aplName, tag);
+                const aplName = toOvaleFunctionName(<string>name, annotation);
+                const [aplBodyName] = toOvaleTaggedFunctionName(aplName, tag);
                 output[lualength(output) + 1] = format(
                     "if List(opt_using_apl %s) %s()",
                     name,
@@ -1223,7 +1226,7 @@ export class Generator {
                 );
             }
             mainBodyCode = concat(output, "\n");
-            self_outputPool.Release(output);
+            outputPool.release(output);
         } else {
             mainBodyCode = `${defaultBodyName}()`;
         }

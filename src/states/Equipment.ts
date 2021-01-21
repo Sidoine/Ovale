@@ -44,7 +44,7 @@ import { concat, insert } from "@wowts/table";
 import { isNumber, KeyCheck } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/debug";
+import { DebugTools } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import {
@@ -52,15 +52,15 @@ import {
     ConditionResult,
     OvaleConditionClass,
     ParameterInfo,
-    ReturnBoolean,
-    ReturnConstant,
-    ReturnValueBetween,
+    returnBoolean,
+    returnConstant,
+    returnValueBetween,
 } from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
 import { huge } from "@wowts/math";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const OVALE_SLOTID_BY_SLOTNAME = {
+const slotIdBySlotNames = {
     ammoslot: INVSLOT_AMMO,
     headslot: INVSLOT_HEAD,
     neckslot: INVSLOT_NECK,
@@ -81,8 +81,8 @@ const OVALE_SLOTID_BY_SLOTNAME = {
     secondaryhandslot: INVSLOT_OFFHAND,
     tabardslot: INVSLOT_TABARD,
 };
-export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
-const OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {};
+export type SlotName = keyof typeof slotIdBySlotNames;
+const slotNameBySlotIds: LuaArray<SlotName> = {};
 
 const checkSlotName: KeyCheck<SlotName> = {
     ammoslot: true,
@@ -116,13 +116,13 @@ type WeaponType =
     | "INVTYPE_RANGED";
 type WeaponMap = { [key in WeaponType]?: boolean };
 
-const OVALE_ONE_HANDED_WEAPON: WeaponMap = {
+const oneHandedWeapons: WeaponMap = {
     INVTYPE_WEAPON: true,
     INVTYPE_WEAPONOFFHAND: true,
     INVTYPE_WEAPONMAINHAND: true,
 };
 
-const OVALE_RANGED_WEAPON: WeaponMap = {
+const rangedWeapons: WeaponMap = {
     INVTYPE_RANGEDRIGHT: true,
     INVTYPE_RANGED: true,
 };
@@ -154,7 +154,7 @@ export class OvaleEquipmentClass {
                     multiline: 25,
                     width: "full",
                     get: (info: LuaArray<string>) => {
-                        return this.DebugEquipment();
+                        return this.debugEquipment();
                     },
                 },
             },
@@ -165,33 +165,41 @@ export class OvaleEquipmentClass {
 
     constructor(
         private ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass,
-        private OvaleData: OvaleDataClass
+        private data: OvaleDataClass
     ) {
         this.module = ovale.createModule(
             "OvaleEquipment",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
         }
-        for (const [slotName, invSlotId] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
-            OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
+        for (const [slotName, invSlotId] of kpairs(slotIdBySlotNames)) {
+            slotNameBySlotIds[invSlotId] = slotName;
         }
     }
 
     registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "hasequippeditem",
             false,
-            this.hasEquippedItem
+            this.hasItemEquipped
         );
-        ovaleCondition.RegisterCondition("hasshield", false, this.hasShield);
-        ovaleCondition.RegisterCondition("hastrinket", false, this.hasTrinket);
+        ovaleCondition.registerCondition(
+            "hasshield",
+            false,
+            this.hasShieldCondition
+        );
+        ovaleCondition.registerCondition(
+            "hastrinket",
+            false,
+            this.hasTrinketCondition
+        );
         const slotParameter: ParameterInfo<SlotName> = {
             type: "string",
             name: "slot",
@@ -206,7 +214,7 @@ export class OvaleEquipmentClass {
         };
         ovaleCondition.register(
             "itemcooldown",
-            this.ItemCooldown,
+            this.itemCooldown,
             { type: "number" },
             itemParameter,
             slotParameter,
@@ -231,12 +239,12 @@ export class OvaleEquipmentClass {
             itemParameter,
             slotParameter
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "weaponenchantexpires",
             false,
-            this.WeaponEnchantExpires
+            this.weaponEnchantExpires
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "weaponenchantpresent",
             false,
             this.weaponEnchantPresent
@@ -254,38 +262,38 @@ export class OvaleEquipmentClass {
         );
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "PLAYER_ENTERING_WORLD",
-            this.UpdateEquippedItems
+            this.updateEquippedItems
         );
         this.module.RegisterEvent(
             "PLAYER_EQUIPMENT_CHANGED",
-            this.PLAYER_EQUIPMENT_CHANGED
+            this.handlePlayerEquipmentChanged
         );
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
     };
 
-    private PLAYER_EQUIPMENT_CHANGED = (
+    private handlePlayerEquipmentChanged = (
         event: string,
         slotId: number,
         hasItem: number
     ) => {
-        this.profiler.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-        const changed = this.UpdateItemBySlot(slotId);
+        this.profiler.startProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
+        const changed = this.updateItemBySlot(slotId);
         if (changed) {
             this.lastChangedSlot = slotId;
             //this.UpdateArmorSetCount();
             this.ovale.needRefresh();
             this.module.SendMessage("Ovale_EquipmentChanged");
         }
-        this.profiler.StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
+        this.profiler.stopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
     };
     // Armor sets are retiring after Legion; for now, return 0
-    GetArmorSetCount(name: string) {
+    getArmorSetCount(name: string) {
         /*
         let count = this.armorSetCount[name];
         if (!count) {
@@ -298,13 +306,11 @@ export class OvaleEquipmentClass {
         */
         return 0;
     }
-    GetEquippedItemBySlotName(slotName: SlotName): number | undefined {
+    getEquippedItemBySlotName(slotName: SlotName): number | undefined {
         if (slotName) {
-            const slotId = OVALE_SLOTID_BY_SLOTNAME[slotName];
+            const slotId = slotIdBySlotNames[slotName];
             if (slotId != undefined) {
-                return this.equippedItemBySlot[
-                    OVALE_SLOTID_BY_SLOTNAME[slotName]
-                ];
+                return this.equippedItemBySlot[slotIdBySlotNames[slotName]];
             }
         }
         return undefined;
@@ -338,93 +344,88 @@ export class OvaleEquipmentClass {
         }
     }
     */
-    GetEquippedTrinkets() {
+    getEquippedTrinkets() {
         return [
-            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket0slot"]],
-            this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["trinket1slot"]],
+            this.equippedItemBySlot[slotIdBySlotNames["trinket0slot"]],
+            this.equippedItemBySlot[slotIdBySlotNames["trinket1slot"]],
         ];
     }
-    HasEquippedItem(itemId: number) {
+    isItemEquipped(itemId: number) {
         return (this.equippedItemById[itemId] && true) || false;
     }
-    HasMainHandWeapon(handedness?: number) {
+    hasMainHandWeapon(handedness?: number) {
         if (!this.mainHandItemType) return false;
         if (handedness) {
             if (handedness == 1) {
-                return OVALE_ONE_HANDED_WEAPON[this.mainHandItemType];
+                return oneHandedWeapons[this.mainHandItemType];
             } else if (handedness == 2) {
                 return this.mainHandItemType == "INVTYPE_2HWEAPON";
             }
         } else {
             return (
-                OVALE_ONE_HANDED_WEAPON[this.mainHandItemType] ||
+                oneHandedWeapons[this.mainHandItemType] ||
                 this.mainHandItemType == "INVTYPE_2HWEAPON"
             );
         }
         return false;
     }
-    HasOffHandWeapon(handedness?: number) {
+    hasOffHandWeapon(handedness?: number) {
         if (!this.offHandItemType) return false;
         if (handedness) {
             if (handedness == 1) {
-                return OVALE_ONE_HANDED_WEAPON[this.offHandItemType];
+                return oneHandedWeapons[this.offHandItemType];
             } else if (handedness == 2) {
                 return this.offHandItemType == "INVTYPE_2HWEAPON";
             }
         } else {
             return (
-                OVALE_ONE_HANDED_WEAPON[this.offHandItemType] ||
+                oneHandedWeapons[this.offHandItemType] ||
                 this.offHandItemType == "INVTYPE_2HWEAPON"
             );
         }
         return false;
     }
-    HasShield() {
+    hasShield() {
         return this.offHandItemType == "INVTYPE_SHIELD";
     }
-    HasRangedWeapon() {
-        return (
-            this.mainHandItemType && OVALE_RANGED_WEAPON[this.mainHandItemType]
-        );
+    hasRangedWeapon() {
+        return this.mainHandItemType && rangedWeapons[this.mainHandItemType];
     }
-    HasTrinket(itemId: number) {
-        return this.HasEquippedItem(itemId);
+    hasTrinket(itemId: number) {
+        return this.isItemEquipped(itemId);
     }
-    HasTwoHandedWeapon() {
+    hasTwoHandedWeapon() {
         return (
             this.mainHandItemType == "INVTYPE_2HWEAPON" ||
             this.offHandItemType == "INVTYPE_2HWEAPON"
         );
     }
-    HasOneHandedWeapon(slotId?: number | SlotName) {
+    hasOneHandedWeapon(slotId?: number | SlotName) {
         if (slotId && !isNumber(slotId)) {
-            slotId = OVALE_SLOTID_BY_SLOTNAME[slotId];
+            slotId = slotIdBySlotNames[slotId];
         }
         if (slotId) {
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
+            if (slotId == slotIdBySlotNames["mainhandslot"]) {
                 return (
                     this.mainHandItemType &&
-                    OVALE_ONE_HANDED_WEAPON[this.mainHandItemType]
+                    oneHandedWeapons[this.mainHandItemType]
                 );
-            } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
-            ) {
+            } else if (slotId == slotIdBySlotNames["secondaryhandslot"]) {
                 return (
                     this.offHandItemType &&
-                    OVALE_ONE_HANDED_WEAPON[this.offHandItemType]
+                    oneHandedWeapons[this.offHandItemType]
                 );
             }
         } else {
             return (
                 (this.mainHandItemType &&
-                    OVALE_ONE_HANDED_WEAPON[this.mainHandItemType]) ||
-                (this.offHandItemType &&
-                    OVALE_ONE_HANDED_WEAPON[this.offHandItemType])
+                    oneHandedWeapons[this.mainHandItemType]) ||
+                (this.offHandItemType && oneHandedWeapons[this.offHandItemType])
             );
         }
         return false;
     }
-    UpdateItemBySlot(slotId: number) {
+    updateItemBySlot(slotId: number) {
         const prevItemId = this.equippedItemBySlot[slotId];
         if (prevItemId) {
             delete this.equippedItemById[prevItemId];
@@ -435,24 +436,22 @@ export class OvaleEquipmentClass {
             this.equippedItemById[newItemId] = slotId;
             this.equippedItemBySlot[slotId] = newItemId;
             //this.equippedItemLevels[newItemId] = GetDetailedItemLevelInfo(newItemId);
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
-                const [itemEquipLoc, dps] = this.UpdateWeapons(
+            if (slotId == slotIdBySlotNames["mainhandslot"]) {
+                const [itemEquipLoc, dps] = this.updateWeapons(
                     slotId,
                     newItemId
                 );
                 this.mainHandItemType = itemEquipLoc;
                 this.mainHandDPS = dps;
-            } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
-            ) {
-                const [itemEquipLoc, dps] = this.UpdateWeapons(
+            } else if (slotId == slotIdBySlotNames["secondaryhandslot"]) {
+                const [itemEquipLoc, dps] = this.updateWeapons(
                     slotId,
                     newItemId
                 );
                 this.offHandItemType = itemEquipLoc;
                 this.offHandDPS = dps;
             }
-            const itemInfo = this.OvaleData.itemInfo[newItemId];
+            const itemInfo = this.data.itemInfo[newItemId];
             if (itemInfo) {
                 if (itemInfo.shared_cd) {
                     this.equippedItemBySharedCooldown[
@@ -463,12 +462,10 @@ export class OvaleEquipmentClass {
         } else {
             delete this.equippedItemBySlot[slotId];
 
-            if (slotId == OVALE_SLOTID_BY_SLOTNAME["mainhandslot"]) {
+            if (slotId == slotIdBySlotNames["mainhandslot"]) {
                 this.mainHandItemType = undefined;
                 this.mainHandDPS = 0;
-            } else if (
-                slotId == OVALE_SLOTID_BY_SLOTNAME["secondaryhandslot"]
-            ) {
+            } else if (slotId == slotIdBySlotNames["secondaryhandslot"]) {
                 this.offHandItemType = undefined;
                 this.offHandDPS = 0;
             }
@@ -478,7 +475,7 @@ export class OvaleEquipmentClass {
         }
         return false;
     }
-    UpdateWeapons(slotId: number, itemId: number): [WeaponType, number] {
+    updateWeapons(slotId: number, itemId: number): [WeaponType, number] {
         const [, , , itemEquipLoc] = GetItemInfoInstant(itemId);
         let dps = 0;
         const itemLink = GetInventoryItemLink("player", slotId);
@@ -490,18 +487,15 @@ export class OvaleEquipmentClass {
         }
         return [<WeaponType>itemEquipLoc, dps];
     }
-    private UpdateEquippedItems = () => {
-        this.profiler.StartProfiling("OvaleEquipment_UpdateEquippedItems");
+    private updateEquippedItems = () => {
+        this.profiler.startProfiling("OvaleEquipment_UpdateEquippedItems");
         let changed = false;
         for (
             let slotId = INVSLOT_FIRST_EQUIPPED;
             slotId <= INVSLOT_LAST_EQUIPPED;
             slotId += 1
         ) {
-            if (
-                OVALE_SLOTNAME_BY_SLOTID[slotId] &&
-                this.UpdateItemBySlot(slotId)
-            ) {
+            if (slotNameBySlotIds[slotId] && this.updateItemBySlot(slotId)) {
                 changed = true;
             }
         }
@@ -510,10 +504,10 @@ export class OvaleEquipmentClass {
             this.module.SendMessage("Ovale_EquipmentChanged");
         }
         this.ready = true;
-        this.profiler.StopProfiling("OvaleEquipment_UpdateEquippedItems");
+        this.profiler.stopProfiling("OvaleEquipment_UpdateEquippedItems");
     };
 
-    DebugEquipment() {
+    debugEquipment() {
         wipe(this.output);
         const array: LuaArray<string> = {};
         /*
@@ -523,14 +517,14 @@ export class OvaleEquipmentClass {
 
             tinsert(array, `${slot}: ${itemid}`)
         }*/
-        for (const [slotId, slotName] of ipairs(OVALE_SLOTNAME_BY_SLOTID)) {
+        for (const [slotId, slotName] of ipairs(slotNameBySlotIds)) {
             const itemId = this.equippedItemBySlot[slotId] || "";
             const shortSlotName = sub(slotName, 1, -5);
             insert(array, `${shortSlotName}: ${itemId}`);
         }
         insert(array, `\n`);
         insert(array, `Main Hand DPS = ${this.mainHandDPS}`);
-        if (this.HasOffHandWeapon()) {
+        if (this.hasOffHandWeapon()) {
             insert(array, `Off hand DPS = ${this.offHandDPS}`);
         }
         /*
@@ -549,7 +543,7 @@ export class OvaleEquipmentClass {
 	 @paramsig boolean
 	 @param item Item to be checked whether it is equipped.
      */
-    private hasEquippedItem = (
+    private hasItemEquipped = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -558,20 +552,20 @@ export class OvaleEquipmentClass {
         let boolean = false;
         let slotId;
         if (type(itemId) == "number") {
-            slotId = this.HasEquippedItem(itemId);
+            slotId = this.isItemEquipped(itemId);
             if (slotId) {
                 boolean = true;
             }
-        } else if (this.OvaleData.itemList[itemId]) {
-            for (const [, v] of pairs(this.OvaleData.itemList[itemId])) {
-                slotId = this.HasEquippedItem(v);
+        } else if (this.data.itemList[itemId]) {
+            for (const [, v] of pairs(this.data.itemList[itemId])) {
+                slotId = this.isItemEquipped(v);
                 if (slotId) {
                     boolean = true;
                     break;
                 }
             }
         }
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test if the player has a shield equipped.
@@ -581,13 +575,13 @@ export class OvaleEquipmentClass {
 	 @usage
 	 if HasShield() Spell(shield_wall)
      */
-    private hasShield = (
+    private hasShieldCondition = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const boolean = this.HasShield();
-        return ReturnBoolean(boolean);
+        const boolean = this.hasShield();
+        return returnBoolean(boolean);
     };
 
     /** Test if the player has a particular trinket equipped.
@@ -599,7 +593,7 @@ export class OvaleEquipmentClass {
 	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
 	     Spell(rake)
      */
-    private hasTrinket = (
+    private hasTrinketCondition = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -607,16 +601,16 @@ export class OvaleEquipmentClass {
         const trinketId = positionalParams[1];
         let boolean: boolean | undefined = undefined;
         if (type(trinketId) == "number") {
-            boolean = this.HasTrinket(trinketId);
-        } else if (this.OvaleData.itemList[trinketId]) {
-            for (const [, v] of pairs(this.OvaleData.itemList[trinketId])) {
-                boolean = this.HasTrinket(v);
+            boolean = this.hasTrinket(trinketId);
+        } else if (this.data.itemList[trinketId]) {
+            for (const [, v] of pairs(this.data.itemList[trinketId])) {
+                boolean = this.hasTrinket(v);
                 if (boolean) {
                     break;
                 }
             }
         }
-        return ReturnBoolean(boolean !== undefined);
+        return returnBoolean(boolean !== undefined);
     };
 
     /** Get the cooldown time in seconds of an item, e.g., trinket.
@@ -630,7 +624,7 @@ export class OvaleEquipmentClass {
 	 if not ItemCooldown(Trinket0Slot) > 0
 	     Spell(berserk_cat)
      */
-    private ItemCooldown = (
+    private itemCooldown = (
         atTime: number,
         itemId: number | undefined,
         slot: SlotName | undefined,
@@ -640,16 +634,16 @@ export class OvaleEquipmentClass {
             itemId = this.getEquippedItemBySharedCooldown(sharedCooldown);
         }
         if (slot) {
-            itemId = this.GetEquippedItemBySlotName(slot);
+            itemId = this.getEquippedItemBySlotName(slot);
         }
         if (itemId) {
             const [start, duration] = GetItemCooldown(itemId);
             if (start > 0 && duration > 0) {
                 const ending = start + duration;
-                return ReturnValueBetween(start, ending, duration, start, -1);
+                return returnValueBetween(start, ending, duration, start, -1);
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     private itemCooldownDuration = (
@@ -658,29 +652,29 @@ export class OvaleEquipmentClass {
         slot: SlotName | undefined
     ) => {
         if (slot !== undefined) {
-            itemId = this.GetEquippedItemBySlotName(slot);
+            itemId = this.getEquippedItemBySlotName(slot);
         }
-        if (!itemId) return ReturnConstant(0);
+        if (!itemId) return returnConstant(0);
 
         let [, duration] = GetItemCooldown(itemId);
         if (duration <= 0) {
             duration =
-                (this.OvaleData.GetItemInfoProperty(
+                (this.data.getItemInfoProperty(
                     itemId,
                     atTime,
                     "cd"
                 ) as number) || 0;
         }
-        return ReturnConstant(duration);
+        return returnConstant(duration);
     };
 
     private itemInSlot = (atTime: number, slot: SlotName) => {
-        return ReturnConstant(this.GetEquippedItemBySlotName(slot));
+        return returnConstant(this.getEquippedItemBySlotName(slot));
     };
 
     /** Get the number of seconds since the enchantment has expired
      */
-    private WeaponEnchantExpires: ConditionFunction = (
+    private weaponEnchantExpires: ConditionFunction = (
         positionalParams
     ): ConditionResult => {
         const expectedEnchantmentId = positionalParams[1];
@@ -739,10 +733,10 @@ export class OvaleEquipmentClass {
         itemId: number | undefined,
         slot: SlotName | undefined
     ): ConditionResult => {
-        if (slot) itemId = this.GetEquippedItemBySlotName(slot);
+        if (slot) itemId = this.getEquippedItemBySlotName(slot);
         if (itemId)
-            return ReturnConstant(
-                this.OvaleData.GetItemInfoProperty(itemId, atTime, "rppm")
+            return returnConstant(
+                this.data.getItemInfoProperty(itemId, atTime, "rppm")
             );
         return [];
     };

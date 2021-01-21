@@ -9,7 +9,7 @@ test("Test scripts", () => {
     const scriptsMock = Mock.ofType<OvaleScriptsClass>();
     scriptsMock
         .setup((x) =>
-            x.RegisterScript(
+            x.registerScript(
                 It.isAny(),
                 It.isAny(),
                 It.isAnyString(),

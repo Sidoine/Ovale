@@ -1,4 +1,4 @@
-import { L } from "../ui/Localization";
+import { l } from "../ui/Localization";
 import { SpellCast } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
@@ -16,8 +16,8 @@ import {
     MAX_COMBO_POINTS,
     ClassId,
 } from "@wowts/wow-mock";
-import { isNumber, OneTimeMessage } from "../tools/tools";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { isNumber, oneTimeMessage } from "../tools/tools";
+import { DebugTools, Tracer } from "../engine/debug";
 import { BaseState } from "./BaseState";
 import { OvaleDataClass } from "../engine/data";
 import { OvaleClass } from "../Ovale";
@@ -30,7 +30,7 @@ import { OptionUiAll } from "../ui/acegui-helpers";
 
 const strlower = lower;
 
-const self_SpellcastInfoPowerTypes: LuaArray<PowerType> = {
+const spellcastInfoPowerTypes: LuaArray<PowerType> = {
     1: "chi",
     2: "holypower",
 };
@@ -52,7 +52,7 @@ class PowerState {
     power: Powers = {};
 }
 
-const POWERS = {
+const powers = {
     mana: true,
     rage: true,
     focus: true,
@@ -71,37 +71,37 @@ const POWERS = {
     fury: true,
 };
 
-export type PowerType = keyof typeof POWERS;
+export type PowerType = keyof typeof powers;
 
 export type Powers = {
     [K in PowerType]?: number;
 };
 
-export const POWER_TYPES: LuaArray<PowerType> = {};
+export const powerTypes: LuaArray<PowerType> = {};
 
-export const POOLED_RESOURCE: { [key in ClassId]?: PowerType } = {
+export const pooledResources: { [key in ClassId]?: PowerType } = {
     ["DRUID"]: "energy",
     ["HUNTER"]: "focus",
     ["MONK"]: "energy",
     ["ROGUE"]: "energy",
 };
 
-export const PRIMARY_POWER: { [key in PowerType]?: boolean } = {
+export const primaryPowers: { [key in PowerType]?: boolean } = {
     energy: true,
     focus: true,
     mana: true,
 };
 
 export class OvalePowerClass extends States<PowerState> implements StateModule {
-    POWER_INFO: { [k in PowerType]?: PowerInfo } = {};
-    POWER_TYPE: LuaObj<PowerType> = {};
+    powerInfos: { [k in PowerType]?: PowerInfo } = {};
+    powerTypes: LuaObj<PowerType> = {};
 
     private module: AceModule & AceEvent;
     private tracer: Tracer;
     private profiler: Profiler;
 
     constructor(
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
@@ -112,24 +112,24 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         super(PowerState);
         this.module = ovale.createModule(
             "OvalePower",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
         this.profiler = ovaleProfiler.create(this.module.GetName());
         const debugOptions: LuaObj<OptionUiAll> = {
             power: {
-                name: L["power"],
+                name: l["power"],
                 type: "group",
                 args: {
                     power: {
-                        name: L["power"],
+                        name: l["power"],
                         type: "input",
                         multiline: 25,
                         width: "full",
                         get: (info: any) => {
-                            return this.DebugPower();
+                            return this.debugPower();
                         },
                     },
                 },
@@ -140,21 +140,42 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
     }
 
-    private OnInitialize = () => {
-        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.EventHandler);
-        this.module.RegisterEvent("PLAYER_LEVEL_UP", this.EventHandler);
-        this.module.RegisterEvent("UNIT_DISPLAYPOWER", this.UNIT_DISPLAYPOWER);
-        this.module.RegisterEvent("UNIT_LEVEL", this.UNIT_LEVEL);
-        this.module.RegisterEvent("UNIT_MAXPOWER", this.UNIT_MAXPOWER);
-        this.module.RegisterEvent("UNIT_POWER_UPDATE", this.UNIT_POWER_UPDATE);
+    private handleInitialize = () => {
+        this.module.RegisterEvent(
+            "PLAYER_ENTERING_WORLD",
+            this.handleEventHandler
+        );
+        this.module.RegisterEvent("PLAYER_LEVEL_UP", this.handleEventHandler);
+        this.module.RegisterEvent(
+            "UNIT_DISPLAYPOWER",
+            this.handleUnitDisplayPower
+        );
+        this.module.RegisterEvent("UNIT_LEVEL", this.handleUnitLevel);
+        this.module.RegisterEvent("UNIT_MAXPOWER", this.handleUnitMaxPower);
+        this.module.RegisterEvent(
+            "UNIT_POWER_UPDATE",
+            this.handleUnitPowerUpdate
+        );
         this.module.RegisterEvent(
             "UNIT_POWER_FREQUENT",
-            this.UNIT_POWER_UPDATE
+            this.handleUnitPowerUpdate
         );
-        this.module.RegisterEvent("UNIT_RANGEDDAMAGE", this.UNIT_RANGEDDAMAGE);
-        this.module.RegisterEvent("UNIT_SPELL_HASTE", this.UNIT_RANGEDDAMAGE);
-        this.module.RegisterMessage("Ovale_StanceChanged", this.EventHandler);
-        this.module.RegisterMessage("Ovale_TalentsChanged", this.EventHandler);
+        this.module.RegisterEvent(
+            "UNIT_RANGEDDAMAGE",
+            this.handleUnitRangedDamage
+        );
+        this.module.RegisterEvent(
+            "UNIT_SPELL_HASTE",
+            this.handleUnitRangedDamage
+        );
+        this.module.RegisterMessage(
+            "Ovale_StanceChanged",
+            this.handleEventHandler
+        );
+        this.module.RegisterMessage(
+            "Ovale_TalentsChanged",
+            this.handleEventHandler
+        );
         this.initializePower();
     };
 
@@ -219,9 +240,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 this.ovale.playerClass != undefined &&
                 possiblePowerTypes[this.ovale.playerClass][powerTypeLower];
             if (powerToken) {
-                this.POWER_TYPE[powerId] = powerTypeLower;
-                this.POWER_TYPE[powerToken] = powerTypeLower;
-                this.POWER_INFO[powerTypeLower] = {
+                this.powerTypes[powerId] = powerTypeLower;
+                this.powerTypes[powerToken] = powerTypeLower;
+                this.powerInfos[powerTypeLower] = {
                     id: powerId,
                     token: powerToken,
                     mini: 0,
@@ -230,11 +251,11 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                         (powerTypeLower == "combopoints" && MAX_COMBO_POINTS) ||
                         0, // Not currently used.
                 };
-                insert(POWER_TYPES, powerTypeLower);
+                insert(powerTypes, powerTypeLower);
             }
         }
     }
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_LEVEL_UP");
         this.module.UnregisterEvent("UNIT_DISPLAYPOWER");
@@ -247,60 +268,60 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         this.module.UnregisterMessage("Ovale_StanceChanged");
         this.module.UnregisterMessage("Ovale_TalentsChanged");
     };
-    private EventHandler = (event: string) => {
-        this.UpdatePowerType(event);
-        this.UpdateMaxPower(event);
-        this.UpdatePower(event);
-        this.UpdatePowerRegen(event);
+    private handleEventHandler = (event: string) => {
+        this.updatePowerType(event);
+        this.updateMaxPower(event);
+        this.updatePower(event);
+        this.updatePowerRegen(event);
     };
-    private UNIT_DISPLAYPOWER = (event: string, unitId: string) => {
+    private handleUnitDisplayPower = (event: string, unitId: string) => {
         if (unitId == "player") {
-            this.UpdatePowerType(event);
-            this.UpdatePowerRegen(event);
+            this.updatePowerType(event);
+            this.updatePowerRegen(event);
         }
     };
-    private UNIT_LEVEL = (event: string, unitId: string) => {
+    private handleUnitLevel = (event: string, unitId: string) => {
         if (unitId == "player") {
-            this.EventHandler(event);
+            this.handleEventHandler(event);
         }
     };
 
-    private UNIT_MAXPOWER = (
+    private handleUnitMaxPower = (
         event: string,
         unitId: string,
         powerToken: string
     ) => {
         if (unitId == "player") {
-            const powerType = this.POWER_TYPE[powerToken];
+            const powerType = this.powerTypes[powerToken];
             if (powerType) {
-                this.UpdateMaxPower(event, powerType);
+                this.updateMaxPower(event, powerType);
             }
         }
     };
 
-    private UNIT_POWER_UPDATE = (
+    private handleUnitPowerUpdate = (
         event: string,
         unitId: string,
         powerToken: string
     ) => {
         if (unitId == "player") {
-            const powerType = this.POWER_TYPE[powerToken];
+            const powerType = this.powerTypes[powerToken];
             if (powerType) {
-                this.UpdatePower(event, powerType);
+                this.updatePower(event, powerType);
             }
         }
     };
 
-    private UNIT_RANGEDDAMAGE = (event: string, unitId: string) => {
+    private handleUnitRangedDamage = (event: string, unitId: string) => {
         if (unitId == "player") {
-            this.UpdatePowerRegen(event);
+            this.updatePowerRegen(event);
         }
     };
 
-    private UpdateMaxPower(event: string, powerType?: PowerType) {
-        this.profiler.StartProfiling("OvalePower_UpdateMaxPower");
+    private updateMaxPower(event: string, powerType?: PowerType) {
+        this.profiler.startProfiling("OvalePower_UpdateMaxPower");
         if (powerType) {
-            const powerInfo = this.POWER_INFO[powerType];
+            const powerInfo = this.powerInfos[powerType];
             if (powerInfo) {
                 const maxPower = UnitPowerMax(
                     "player",
@@ -313,7 +334,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
+            for (const [powerType, powerInfo] of pairs(this.powerInfos)) {
                 const maxPower = UnitPowerMax(
                     "player",
                     powerInfo.id,
@@ -325,19 +346,19 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         }
-        this.profiler.StopProfiling("OvalePower_UpdateMaxPower");
+        this.profiler.stopProfiling("OvalePower_UpdateMaxPower");
     }
-    private UpdatePower(event: string, powerType?: PowerType) {
-        this.profiler.StartProfiling("OvalePower_UpdatePower");
+    private updatePower(event: string, powerType?: PowerType) {
+        this.profiler.startProfiling("OvalePower_UpdatePower");
         if (powerType) {
-            const powerInfo = this.POWER_INFO[powerType];
+            const powerInfo = this.powerInfos[powerType];
             if (powerInfo) {
                 const power = UnitPower(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
                 );
-                this.tracer.DebugTimestamp(
+                this.tracer.debugTimestamp(
                     "%s: %d -> %d (%s).",
                     event,
                     this.current.power[powerType],
@@ -349,13 +370,13 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
+            for (const [powerType, powerInfo] of kpairs(this.powerInfos)) {
                 const power = UnitPower(
                     "player",
                     powerInfo.id,
                     powerInfo.segments
                 );
-                this.tracer.DebugTimestamp(
+                this.tracer.debugTimestamp(
                     "%s: %d -> %d (%s).",
                     event,
                     this.current.power[powerType],
@@ -370,11 +391,11 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         if (event == "UNIT_POWER_UPDATE") {
             this.ovale.needRefresh();
         }
-        this.profiler.StopProfiling("OvalePower_UpdatePower");
+        this.profiler.stopProfiling("OvalePower_UpdatePower");
     }
-    private UpdatePowerRegen(event: string) {
-        this.profiler.StartProfiling("OvalePower_UpdatePowerRegen");
-        for (const [powerType] of pairs(this.POWER_INFO)) {
+    private updatePowerRegen(event: string) {
+        this.profiler.startProfiling("OvalePower_UpdatePowerRegen");
+        for (const [powerType] of pairs(this.powerInfos)) {
             const currentType = this.current.powerType;
             if (powerType == currentType) {
                 const [inactiveRegen, activeRegen] = GetPowerRegen();
@@ -402,19 +423,19 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 this.ovale.needRefresh();
             }
         }
-        this.profiler.StopProfiling("OvalePower_UpdatePowerRegen");
+        this.profiler.stopProfiling("OvalePower_UpdatePowerRegen");
     }
-    private UpdatePowerType(event: string) {
-        this.profiler.StartProfiling("OvalePower_UpdatePowerType");
+    private updatePowerType(event: string) {
+        this.profiler.startProfiling("OvalePower_UpdatePowerType");
         const [powerId] = UnitPowerType("player");
-        const powerType = this.POWER_TYPE[powerId];
+        const powerType = this.powerTypes[powerId];
         if (this.current.powerType != powerType) {
             this.current.powerType = powerType;
             this.ovale.needRefresh();
         }
-        this.profiler.StopProfiling("OvalePower_UpdatePowerType");
+        this.profiler.stopProfiling("OvalePower_UpdatePowerType");
     }
-    GetSpellCost(
+    getSpellCost(
         spell: number | string,
         powerType?: PowerType
     ): [number, PowerType] | [undefined, undefined] {
@@ -425,7 +446,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             if (spellPowerCost) {
                 const cost = spellPowerCost.cost;
                 const typeId = spellPowerCost.type;
-                for (const [pt, p] of pairs(this.POWER_INFO)) {
+                for (const [pt, p] of pairs(this.powerInfos)) {
                     if (
                         p.id == typeId &&
                         (powerType == undefined || pt == powerType)
@@ -435,12 +456,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            OneTimeMessage(`No spell cost for ${spell}`);
+            oneTimeMessage(`No spell cost for ${spell}`);
         }
         return [undefined, undefined];
     }
 
-    DebugPower() {
+    debugPower() {
         const array = {};
         insert(array, `Current Power Type: ${this.current.powerType}`);
         for (const [powerType, v] of pairs(this.current.power)) {
@@ -457,16 +478,16 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         return concat(array, "\n");
     }
-    CopySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
-        for (const [, powerType] of pairs(self_SpellcastInfoPowerTypes)) {
+    copySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
+        for (const [, powerType] of pairs(spellcastInfoPowerTypes)) {
             if (spellcast[powerType]) {
                 dest[powerType] = spellcast[powerType];
             }
         }
     };
 
-    InitializeState() {
-        for (const [powerType] of kpairs(this.POWER_INFO)) {
+    initializeState() {
+        for (const [powerType] of kpairs(this.powerInfos)) {
             this.next.power[powerType] = 0;
             [
                 this.next.inactiveRegen[powerType],
@@ -474,9 +495,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             ] = [0, 0];
         }
     }
-    ResetState() {
-        this.profiler.StartProfiling("OvalePower_ResetState");
-        for (const [powerType] of kpairs(this.POWER_INFO)) {
+    resetState() {
+        this.profiler.startProfiling("OvalePower_ResetState");
+        for (const [powerType] of kpairs(this.powerInfos)) {
             this.next.power[powerType] = this.current.power[powerType] || 0;
             this.next.maxPower[powerType] =
                 this.current.maxPower[powerType] || 0;
@@ -485,14 +506,14 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             this.next.inactiveRegen[powerType] =
                 this.current.inactiveRegen[powerType] || 0;
         }
-        this.profiler.StopProfiling("OvalePower_ResetState");
+        this.profiler.stopProfiling("OvalePower_ResetState");
     }
-    CleanState() {
-        for (const [powerType] of kpairs(this.POWER_INFO)) {
+    cleanState() {
+        for (const [powerType] of kpairs(this.powerInfos)) {
             this.next.power[powerType] = undefined;
         }
     }
-    ApplySpellStartCast = (
+    applySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -500,13 +521,13 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvalePower_ApplySpellStartCast");
+        this.profiler.startProfiling("OvalePower_ApplySpellStartCast");
         if (isChanneled) {
-            this.ApplyPowerCost(spellId, targetGUID, startCast, spellcast);
+            this.applyPowerCost(spellId, targetGUID, startCast, spellcast);
         }
-        this.profiler.StopProfiling("OvalePower_ApplySpellStartCast");
+        this.profiler.stopProfiling("OvalePower_ApplySpellStartCast");
     };
-    ApplySpellAfterCast = (
+    applySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -514,23 +535,23 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvalePower_ApplySpellAfterCast");
+        this.profiler.startProfiling("OvalePower_ApplySpellAfterCast");
         if (!isChanneled) {
-            this.ApplyPowerCost(spellId, targetGUID, endCast, spellcast);
+            this.applyPowerCost(spellId, targetGUID, endCast, spellcast);
         }
-        this.profiler.StopProfiling("OvalePower_ApplySpellAfterCast");
+        this.profiler.stopProfiling("OvalePower_ApplySpellAfterCast");
     };
 
-    ApplyPowerCost(
+    applyPowerCost(
         spellId: number,
         targetGUID: string,
         atTime: number,
         spellcast: SpellCast
     ) {
-        this.profiler.StartProfiling("OvalePower_state_ApplyPowerCost");
+        this.profiler.startProfiling("OvalePower_state_ApplyPowerCost");
         const si = this.ovaleData.spellInfo[spellId];
         {
-            const [cost, powerType] = this.GetSpellCost(spellId);
+            const [cost, powerType] = this.getSpellCost(spellId);
             if (
                 cost &&
                 powerType &&
@@ -542,7 +563,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
             }
         }
         if (si) {
-            for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
+            for (const [powerType, powerInfo] of kpairs(this.powerInfos)) {
                 let [cost, refund] = this.getPowerCostAt(
                     this.next,
                     spellId,
@@ -563,10 +584,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 this.next.power[powerType] = power;
             }
         }
-        this.profiler.StopProfiling("OvalePower_state_ApplyPowerCost");
+        this.profiler.stopProfiling("OvalePower_state_ApplyPowerCost");
     }
 
-    PowerCost(
+    powerCost(
         spellId: number,
         powerType: PowerType,
         atTime: number,
@@ -574,7 +595,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         maximumCost?: boolean
     ) {
         return this.getPowerCostAt(
-            this.GetState(atTime),
+            this.getState(atTime),
             spellId,
             powerType,
             atTime,
@@ -598,10 +619,10 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         } else {
             rate = state.inactiveRegen[powerType] || 0;
         }
-        const REGEN_RATE_MIN_THRESHOLD = 0.05;
+        const regenRateMinThreshold = 0.05;
         if (
-            (rate > 0 && rate < REGEN_RATE_MIN_THRESHOLD) ||
-            (rate < 0 && rate > -1 * REGEN_RATE_MIN_THRESHOLD)
+            (rate > 0 && rate < regenRateMinThreshold) ||
+            (rate < 0 && rate > -1 * regenRateMinThreshold)
         ) {
             rate = 0;
         }
@@ -636,9 +657,9 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         state: PowerState,
         powerLevel: number,
         powerType: PowerType,
-        atTime: number,
+        atTime: number
     ): number {
-        const power = this.getPowerAt(state, powerType, atTime)
+        const power = this.getPowerAt(state, powerType, atTime);
         if (power < powerLevel) {
             let seconds = INFINITY;
             const powerRate = this.getPowerRateAt(state, powerType, atTime);
@@ -667,12 +688,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         targetGUID: string | undefined,
         maximumCost?: boolean
     ): [number, number] {
-        this.profiler.StartProfiling("OvalePower_PowerCost");
+        this.profiler.startProfiling("OvalePower_PowerCost");
         let spellCost = 0;
         let spellRefund = 0;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si[powerType]) {
-            const setPowerValue = this.ovaleData.GetSpellInfoProperty(
+            const setPowerValue = this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 `set_${powerType}` as `set_${PowerType}`,
@@ -683,7 +704,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 return [power - setPowerValue, 0];
             }
 
-            let [cost, ratio] = this.ovaleData.GetSpellInfoPropertyNumber(
+            let [cost, ratio] = this.ovaleData.getSpellInfoPropertyNumber(
                 spellId,
                 atTime,
                 powerType,
@@ -706,7 +727,7 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                     (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
 
                 const parameter = `refund_${powerType}` as `refund_${PowerType}`;
-                const refund = this.ovaleData.getSpellInfoProperty(
+                const refund = this.ovaleData.getProperty(
                     si,
                     atTime,
                     parameter
@@ -719,12 +740,12 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 }
             }
         } else {
-            const [cost] = this.GetSpellCost(spellId, powerType);
+            const [cost] = this.getSpellCost(spellId, powerType);
             if (cost) {
                 spellCost = cost;
             }
         }
-        this.profiler.StopProfiling("OvalePower_PowerCost");
+        this.profiler.stopProfiling("OvalePower_PowerCost");
         return [spellCost, spellRefund];
     }
 }

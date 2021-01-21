@@ -11,7 +11,7 @@ import {
 import { AuraType } from "./data";
 import { isString, KeyCheck } from "../tools/tools";
 import { insert } from "@wowts/table";
-const INFINITY = huge;
+const infinity = huge;
 
 export type ConditionResult = [
     /** If defined, the value is defined only after this time in seconds */
@@ -146,7 +146,7 @@ export class OvaleConditionClass {
      * @param isSpellBookCondition Is the first argument a spell id from the spell book or a spell list name
      * @param func The function to register
      */
-    RegisterCondition(
+    registerCondition(
         name: string,
         isSpellBookCondition: boolean,
         func: ConditionFunction
@@ -215,7 +215,7 @@ export class OvaleConditionClass {
         this.actions[name] = func;
     }
 
-    UnregisterCondition(name: string) {
+    unregisterCondition(name: string) {
         delete this.conditions[name];
     }
 
@@ -223,13 +223,13 @@ export class OvaleConditionClass {
         return this.typedConditions[name];
     }
 
-    IsCondition(name: string) {
+    isCondition(name: string) {
         return this.conditions[name] != undefined;
     }
-    IsSpellBookCondition(name: string) {
+    isSpellBookCondition(name: string) {
         return this.spellBookConditions[name] != undefined;
     }
-    EvaluateCondition(
+    evaluateCondition(
         name: string,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
@@ -237,12 +237,12 @@ export class OvaleConditionClass {
     ) {
         return this.conditions[name](positionalParams, namedParams, atTime);
     }
-    HasAny() {
+    hasAny() {
         return next(this.conditions) !== undefined;
     }
 }
 
-export function ParseCondition(
+export function parseCondition(
     namedParams: NamedParametersOf<AstFunctionNode>,
     baseState: BaseState,
     defaultTarget?: string
@@ -271,15 +271,15 @@ export function ParseCondition(
     return [target, filter, mine];
 }
 
-export function ReturnValue(
+export function returnValue(
     value: number,
     origin: number,
     rate: number
 ): ConditionResult {
-    return [0, INFINITY, value, origin, rate];
+    return [0, infinity, value, origin, rate];
 }
 
-export function ReturnValueBetween(
+export function returnValueBetween(
     start: number,
     ending: number,
     value: number,
@@ -290,13 +290,13 @@ export function ReturnValueBetween(
     return [start, ending, value, origin, rate];
 }
 
-export function ReturnConstant(
+export function returnConstant(
     value: number | string | undefined
 ): ConditionResult {
-    return [0, INFINITY, value, 0, 0];
+    return [0, infinity, value, 0, 0];
 }
 
-export function ReturnBoolean(value: boolean): ConditionResult {
-    if (value) return [0, INFINITY];
+export function returnBoolean(value: boolean): ConditionResult {
+    if (value) return [0, infinity];
     return [];
 }

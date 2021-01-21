@@ -11,28 +11,28 @@ export type SpellCastEventHandler = (
 ) => void;
 
 export interface StateModule {
-    CleanState(): void;
+    cleanState(): void;
 
     /** Called each time the script is executed.
      * Should clear the values that computes the engine state
      * TODO: I don't see the point of this method, it should be removed
      * and its code should be in ResetState
      */
-    InitializeState(): void;
+    initializeState(): void;
 
     /** Called after InitializeState and after any script
      * recompilation. Anything that depends on the script should
      * be done instead of InitializeState
      */
-    ResetState(): void;
+    resetState(): void;
 
     /**
      * These three methods are called after ResetState for each spell cast that
      * is in flight or that currently cast
      */
-    ApplySpellStartCast?: SpellCastEventHandler;
-    ApplySpellAfterCast?: SpellCastEventHandler;
-    ApplySpellOnHit?: SpellCastEventHandler;
+    applySpellStartCast?: SpellCastEventHandler;
+    applySpellAfterCast?: SpellCastEventHandler;
+    applySpellOnHit?: SpellCastEventHandler;
 }
 
 export class States<T> {
@@ -44,51 +44,49 @@ export class States<T> {
         this.next = new c();
     }
 
-    GetState(atTime: number | undefined) {
+    getState(atTime: number | undefined) {
         if (!atTime) return this.current;
         return this.next;
     }
 }
 
 export class OvaleStateClass {
-    private self_stateAddons = new OvaleQueue<StateModule>(
-        "OvaleState_stateAddons"
-    );
+    private stateAddons = new OvaleQueue<StateModule>("OvaleState_stateAddons");
 
-    RegisterState(stateAddon: StateModule) {
-        this.self_stateAddons.Insert(stateAddon);
+    registerState(stateAddon: StateModule) {
+        this.stateAddons.insert(stateAddon);
     }
-    UnregisterState(stateAddon: StateModule) {
+    unregisterState(stateAddon: StateModule) {
         const stateModules = new OvaleQueue<StateModule>(
             "OvaleState_stateModules"
         );
-        while (this.self_stateAddons.Size() > 0) {
-            const addon = this.self_stateAddons.Remove();
+        while (this.stateAddons.size() > 0) {
+            const addon = this.stateAddons.remove();
             if (stateAddon != addon) {
-                stateModules.Insert(addon);
+                stateModules.insert(addon);
             }
         }
-        this.self_stateAddons = stateModules;
-        stateAddon.CleanState();
+        this.stateAddons = stateModules;
+        stateAddon.cleanState();
     }
 
     /** Called each time the script is executed */
-    InitializeState() {
-        const iterator = this.self_stateAddons.Iterator();
-        while (iterator.Next()) {
-            iterator.value.InitializeState();
+    initializeState() {
+        const iterator = this.stateAddons.iterator();
+        while (iterator.next()) {
+            iterator.value.initializeState();
         }
     }
 
     /** Called at the start of each AddIcon command */
-    ResetState() {
-        const iterator = this.self_stateAddons.Iterator();
-        while (iterator.Next()) {
-            iterator.value.ResetState();
+    resetState() {
+        const iterator = this.stateAddons.iterator();
+        while (iterator.next()) {
+            iterator.value.resetState();
         }
     }
 
-    ApplySpellStartCast(
+    applySpellStartCast(
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -96,10 +94,10 @@ export class OvaleStateClass {
         channel: boolean,
         spellcast: SpellCast
     ) {
-        const iterator = this.self_stateAddons.Iterator();
-        while (iterator.Next()) {
-            if (iterator.value.ApplySpellStartCast) {
-                iterator.value.ApplySpellStartCast(
+        const iterator = this.stateAddons.iterator();
+        while (iterator.next()) {
+            if (iterator.value.applySpellStartCast) {
+                iterator.value.applySpellStartCast(
                     spellId,
                     targetGUID,
                     startCast,
@@ -111,7 +109,7 @@ export class OvaleStateClass {
         }
     }
 
-    ApplySpellAfterCast(
+    applySpellAfterCast(
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -119,10 +117,10 @@ export class OvaleStateClass {
         channel: boolean,
         spellcast: SpellCast
     ) {
-        const iterator = this.self_stateAddons.Iterator();
-        while (iterator.Next()) {
-            if (iterator.value.ApplySpellAfterCast) {
-                iterator.value.ApplySpellAfterCast(
+        const iterator = this.stateAddons.iterator();
+        while (iterator.next()) {
+            if (iterator.value.applySpellAfterCast) {
+                iterator.value.applySpellAfterCast(
                     spellId,
                     targetGUID,
                     startCast,
@@ -134,7 +132,7 @@ export class OvaleStateClass {
         }
     }
 
-    ApplySpellOnHit(
+    applySpellOnHit(
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -142,10 +140,10 @@ export class OvaleStateClass {
         channel: boolean,
         spellcast: SpellCast
     ) {
-        const iterator = this.self_stateAddons.Iterator();
-        while (iterator.Next()) {
-            if (iterator.value.ApplySpellOnHit) {
-                iterator.value.ApplySpellOnHit(
+        const iterator = this.stateAddons.iterator();
+        while (iterator.next()) {
+            if (iterator.value.applySpellOnHit) {
+                iterator.value.applySpellOnHit(
                     spellId,
                     targetGUID,
                     startCast,

@@ -11,27 +11,27 @@ import { setRURU } from "./localization/ru-RU";
 import { setZHCN } from "./localization/zh-CN";
 import { setZHTW } from "./localization/zh-TW";
 
-export const L = getENUS();
+export const l = getENUS();
 
 const locale = GetLocale();
 if (locale == "deDE") {
-    setDEDE(L);
+    setDEDE(l);
 } else if (locale == "esES") {
-    setESES(L);
+    setESES(l);
 } else if (locale == "esMX") {
-    setESMX(L);
+    setESMX(l);
 } else if (locale == "frFR") {
-    setFRFR(L);
+    setFRFR(l);
 } else if (locale == "itIT") {
-    setITIT(L);
+    setITIT(l);
 } else if (locale == "koKR") {
-    setKOKR(L);
+    setKOKR(l);
 } else if (locale == "ptBR") {
-    setPTBR(L);
+    setPTBR(l);
 } else if (locale == "ruRU") {
-    setRURU(L);
+    setRURU(l);
 } else if (locale == "zhCN") {
-    setZHCN(L);
+    setZHCN(l);
 } else if (locale == "zhTW") {
-    setZHTW(L);
+    setZHTW(l);
 }

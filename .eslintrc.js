@@ -27,6 +27,29 @@ module.exports = {
 
         // Stylistics
         "quote-props": ["error", "as-needed"],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            { selector: "typeLike", format: ["PascalCase"] },
+            {
+                selector: "typeProperty",
+                format: ["UPPER_CASE", "camelCase", "snake_case"],
+            },
+            {
+                selector: "objectLiteralProperty",
+                format: ["UPPER_CASE", "camelCase", "snake_case"],
+            },
+            { selector: "method", format: ["camelCase"] },
+            {
+                selector: "property",
+                format: ["camelCase"],
+            },
+            { selector: "parameterProperty", format: ["camelCase"] },
+            {
+                selector: "variableLike",
+                format: ["camelCase"],
+                leadingUnderscore: "allow",
+            },
+        ],
 
         // TODO enable these
         "@typescript-eslint/no-unused-vars": "off",

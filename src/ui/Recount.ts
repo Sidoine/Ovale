@@ -6,22 +6,23 @@ import { OvaleClass } from "../Ovale";
 import { OvaleScoreClass } from "./Score";
 
 interface FightData {
-    Ovale?: number;
-    OvaleMax?: number;
+    ovale?: number;
+    ovaleMax?: number;
 }
 
 interface Data {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Fights: LuaObj<FightData>;
 }
 
-const DataModes = function (self: never, data: Data, num: number) {
+const dataModes = function (self: never, data: Data, num: number) {
     if (!data) {
         return [0, 0];
     }
     const fight = data.Fights[Recount.db.profile.CurDataSet];
     let score;
-    if (fight && fight.Ovale && fight.OvaleMax) {
-        score = (fight.Ovale * 1000) / fight.OvaleMax;
+    if (fight && fight.ovale && fight.ovaleMax) {
+        score = (fight.ovale * 1000) / fight.ovaleMax;
     } else {
         score = 0;
     }
@@ -30,7 +31,7 @@ const DataModes = function (self: never, data: Data, num: number) {
     }
     return [score, undefined];
 };
-const TooltipFuncs = function (self: never, name: string) {
+const tooltipFuncs = function (self: never, name: string) {
     GameTooltip.ClearLines();
     GameTooltip.AddLine(name);
 };
@@ -39,16 +40,21 @@ export class OvaleRecountClass {
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass
     ) {
-        ovale.createModule("OvaleRecount", this.OnInitialize, this.OnDisable);
+        ovale.createModule(
+            "OvaleRecount",
+            this.handleInitialize,
+            this.handleDisable
+        );
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         if (Recount) {
             let aceLocale = AceLocale && AceLocale.GetLocale("Recount", true);
             if (!aceLocale) {
                 aceLocale = setmetatable<LuaObj<string>>(
                     {},
                     {
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
                         __index: function (t, k) {
                             t[k] = k;
                             return k;
@@ -58,24 +64,24 @@ export class OvaleRecountClass {
             }
             Recount.AddModeTooltip(
                 this.ovale.GetName(),
-                DataModes,
-                TooltipFuncs,
+                dataModes,
+                tooltipFuncs,
                 undefined,
                 undefined,
                 undefined,
                 undefined
             );
 
-            this.ovaleScore.RegisterDamageMeter(
+            this.ovaleScore.registerDamageMeter(
                 "OvaleRecount",
-                this.ReceiveScore
+                this.receiveScore
             );
         }
     };
-    private OnDisable = () => {
-        this.ovaleScore.UnregisterDamageMeter("OvaleRecount");
+    private handleDisable = () => {
+        this.ovaleScore.unregisterDamageMeter("OvaleRecount");
     };
-    private ReceiveScore = (
+    private receiveScore = (
         name: string,
         guid: string,
         scored: number,
@@ -84,12 +90,8 @@ export class OvaleRecountClass {
         if (Recount) {
             const source = Recount.db2.combatants[name];
             if (source) {
-                Recount.AddAmount(source, this.ovale.GetName(), scored);
-                Recount.AddAmount(
-                    source,
-                    `${this.ovale.GetName()}Max`,
-                    scoreMax
-                );
+                Recount.AddAmount(source, "ovale", scored);
+                Recount.AddAmount(source, "ovaleMax", scoreMax);
             }
         }
     };

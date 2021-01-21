@@ -3,12 +3,12 @@ import { format } from "@wowts/string";
 import { concat, insert, remove } from "@wowts/table";
 import { huge } from "@wowts/math";
 
-const INFINITY = huge;
-const self_pool: LuaArray<OvaleTimeSpan> = {};
-let self_poolSize = 0;
-let self_poolUnused = 0;
+const infinity = huge;
+const timeSpanPool: LuaArray<OvaleTimeSpan> = {};
+let poolSize = 0;
+let poolUnused = 0;
 
-const CompareIntervals = function (
+const compareIntervals = function (
     startA: number,
     endA: number,
     startB: number,
@@ -41,18 +41,18 @@ const CompareIntervals = function (
 };
 
 export function newTimeSpan() {
-    let obj = remove(self_pool);
+    let obj = remove(timeSpanPool);
     if (obj) {
-        self_poolUnused = self_poolUnused - 1;
+        poolUnused = poolUnused - 1;
     } else {
         obj = new OvaleTimeSpan();
-        self_poolSize = self_poolSize + 1;
+        poolSize = poolSize + 1;
     }
     return obj;
 }
 
-export function newFromArgs(...__args: number[]) {
-    return newTimeSpan().Copy(...__args);
+export function newFromArgs(...parameters: number[]) {
+    return newTimeSpan().copy(...parameters);
 }
 
 export function newTimeSpanFromArray(a?: OvaleTimeSpan) {
@@ -63,29 +63,30 @@ export function newTimeSpanFromArray(a?: OvaleTimeSpan) {
     }
 }
 
-export function releaseTimeSpans(...__args: OvaleTimeSpan[]) {
-    const argc = select("#", __args);
+export function releaseTimeSpans(...parameters: OvaleTimeSpan[]) {
+    const argc = select("#", parameters);
     for (let i = 1; i <= argc; i += 1) {
-        const a = select(i, __args);
+        const a = select(i, parameters);
         wipe(a);
-        insert(self_pool, a);
+        insert(timeSpanPool, a);
     }
-    self_poolUnused = self_poolUnused + argc;
+    poolUnused = poolUnused + argc;
 }
 
-export function GetPoolInfo() {
-    return [self_poolSize, self_poolUnused];
+export function getPoolInfo() {
+    return [poolSize, poolUnused];
 }
 
 export class OvaleTimeSpan implements LuaArray<number | undefined> {
     [key: number]: number;
 
-    Release() {
+    release() {
         wipe(this);
-        insert(self_pool, this);
-        self_poolUnused = self_poolUnused + 1;
+        insert(timeSpanPool, this);
+        poolUnused = poolUnused + 1;
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __tostring() {
         if (lualength(this) == 0) {
             return "empty set";
@@ -98,10 +99,10 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         return this.__tostring();
     }
 
-    copyFromArray(A: OvaleTimeSpan) {
-        const count = lualength(A);
+    copyFromArray(a: OvaleTimeSpan) {
+        const count = lualength(a);
         for (let i = 1; i <= count; i += 1) {
-            this[i] = A[i];
+            this[i] = a[i];
         }
         const length = lualength(this);
         for (let i = count + 1; i <= length; i += 1) {
@@ -110,10 +111,10 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         return this;
     }
 
-    Copy(...__args: number[]) {
-        const count = select("#", __args);
+    copy(...parameters: number[]) {
+        const count = select("#", parameters);
         for (let i = 1; i <= count; i += 1) {
-            this[i] = select(i, __args);
+            this[i] = select(i, parameters);
         }
         const length = lualength(this);
         for (let i = count + 1; i <= length; i += 1) {
@@ -121,67 +122,74 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
         return this;
     }
-    IsEmpty() {
+
+    isEmpty() {
         return lualength(this) == 0;
     }
-    IsUniverse() {
-        return this[1] == 0 && this[2] == INFINITY;
+
+    isUniverse() {
+        return this[1] == 0 && this[2] == infinity;
     }
-    Equals(B: OvaleTimeSpan) {
-        const A = this;
-        const countA = lualength(A);
-        const countB = (B && lualength(B)) || 0;
+
+    equals(b: OvaleTimeSpan) {
+        const a = this;
+        const countA = lualength(a);
+        const countB = (b && lualength(b)) || 0;
         if (countA != countB) {
             return false;
         }
         for (let k = 1; k <= countA; k += 1) {
-            if (A[k] != B[k]) {
+            if (a[k] != b[k]) {
                 return false;
             }
         }
         return true;
     }
-    HasTime(atTime: number) {
-        const A = this;
-        for (let i = 1; i <= lualength(A); i += 2) {
-            if (A[i] <= atTime && atTime < A[i + 1]) {
+
+    hasTime(atTime: number) {
+        const a = this;
+        for (let i = 1; i <= lualength(a); i += 2) {
+            if (a[i] <= atTime && atTime < a[i + 1]) {
                 return true;
             }
         }
         return false;
     }
-    NextTime(atTime: number): number | undefined {
-        const A = this;
-        for (let i = 1; i <= lualength(A); i += 2) {
-            if (atTime < A[i]) {
-                return A[i];
-            } else if (A[i] <= atTime && atTime <= A[i + 1]) {
+
+    nextTime(atTime: number): number | undefined {
+        const a = this;
+        for (let i = 1; i <= lualength(a); i += 2) {
+            if (atTime < a[i]) {
+                return a[i];
+            } else if (a[i] <= atTime && atTime <= a[i + 1]) {
                 return atTime;
             }
         }
     }
-    Measure() {
-        const A = this;
+
+    measure() {
+        const a = this;
         let measure = 0;
-        for (let i = 1; i <= lualength(A); i += 2) {
-            measure = measure + (A[i + 1] - A[i]);
+        for (let i = 1; i <= lualength(a); i += 2) {
+            measure = measure + (a[i + 1] - a[i]);
         }
         return measure;
     }
-    Complement(result?: OvaleTimeSpan) {
-        const A = this;
-        const countA = lualength(A);
+
+    complement(result?: OvaleTimeSpan) {
+        const a = this;
+        const countA = lualength(a);
         if (countA == 0) {
             if (result) {
-                result.copyFromArray(UNIVERSE);
+                result.copyFromArray(universe);
             } else {
-                result = newTimeSpanFromArray(UNIVERSE);
+                result = newTimeSpanFromArray(universe);
             }
         } else {
             result = result || newTimeSpan();
             let countResult = 0;
             let [i, k] = [1, 1];
-            if (A[i] == 0) {
+            if (a[i] == 0) {
                 i = i + 1;
             } else {
                 result[k] = 0;
@@ -189,12 +197,12 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
                 k = k + 1;
             }
             while (i < countA) {
-                result[k] = A[i];
+                result[k] = a[i];
                 countResult = k;
                 [i, k] = [i + 1, k + 1];
             }
-            if (A[i] < INFINITY) {
-                [result[k], result[k + 1]] = [A[i], INFINITY];
+            if (a[i] < infinity) {
+                [result[k], result[k + 1]] = [a[i], infinity];
                 countResult = k + 1;
             }
             for (let j = countResult + 1; j <= lualength(result); j += 1) {
@@ -203,9 +211,10 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
         return result;
     }
-    IntersectInterval(startB: number, endB: number, result?: OvaleTimeSpan) {
-        const A = this;
-        const countA = lualength(A);
+
+    intersectInterval(startB: number, endB: number, result?: OvaleTimeSpan) {
+        const a = this;
+        const countA = lualength(a);
         result = result || newTimeSpan();
         if (countA > 0) {
             let countResult = 0;
@@ -214,8 +223,8 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
                 if (i > countA) {
                     break;
                 }
-                const [startA, endA] = [A[i], A[i + 1]];
-                const compare = CompareIntervals(startA, endA, startB, endB);
+                const [startA, endA] = [a[i], a[i + 1]];
+                const compare = compareIntervals(startA, endA, startB, endB);
                 if (compare == 0) {
                     [result[k], result[k + 1]] = [startA, endA];
                     countResult = k + 1;
@@ -254,10 +263,11 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
         return result;
     }
-    Intersect(B: OvaleTimeSpan, result?: OvaleTimeSpan) {
-        const A = this;
-        const countA = lualength(A);
-        const countB = (B && lualength(B)) || 0;
+
+    intersect(b: OvaleTimeSpan, result?: OvaleTimeSpan) {
+        const a = this;
+        const countA = lualength(a);
+        const countB = (b && lualength(b)) || 0;
         result = result || newTimeSpan();
         let countResult = 0;
         if (countA > 0 && countB > 0) {
@@ -266,9 +276,9 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
                 if (i > countA || j > countB) {
                     break;
                 }
-                const [startA, endA] = [A[i], A[i + 1]];
-                const [startB, endB] = [B[j], B[j + 1]];
-                const compare = CompareIntervals(startA, endA, startB, endB);
+                const [startA, endA] = [a[i], a[i + 1]];
+                const [startB, endB] = [b[j], b[j + 1]];
+                const compare = compareIntervals(startA, endA, startB, endB);
                 if (compare == 0) {
                     [result[k], result[k + 1]] = [startA, endA];
                     countResult = k + 1;
@@ -312,31 +322,32 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
         }
         return result;
     }
-    Union(B: OvaleTimeSpan, result?: OvaleTimeSpan): OvaleTimeSpan {
-        const A = this;
-        const countA = lualength(A);
-        const countB = (B && lualength(B)) || 0;
+
+    union(b: OvaleTimeSpan, result?: OvaleTimeSpan): OvaleTimeSpan {
+        const a = this;
+        const countA = lualength(a);
+        const countB = (b && lualength(b)) || 0;
         if (countA == 0) {
-            if (B) {
+            if (b) {
                 if (result) {
-                    result.copyFromArray(B);
+                    result.copyFromArray(b);
                 } else {
-                    result = newTimeSpanFromArray(B);
+                    result = newTimeSpanFromArray(b);
                 }
             } else {
-                result = EMPTY_SET;
+                result = emptySet;
             }
         } else if (countB == 0) {
             if (result) {
-                result.copyFromArray(A);
+                result.copyFromArray(a);
             } else {
-                result = newTimeSpanFromArray(A);
+                result = newTimeSpanFromArray(a);
             }
         } else {
             result = result || newTimeSpan();
             let countResult = 0;
             let [i, j, k] = [1, 1, 1];
-            let [startTemp, endTemp] = [A[i], A[i + 1]];
+            let [startTemp, endTemp] = [a[i], a[i + 1]];
             let holdingA = true;
             let scanningA = false;
             while (true) {
@@ -354,17 +365,17 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
                     holdingA = !holdingA;
                     scanningA = !scanningA;
                 } else {
-                    [startA, endA] = [A[i], A[i + 1]];
+                    [startA, endA] = [a[i], a[i + 1]];
                 }
                 if (!scanningA && j > countB) {
                     holdingA = !holdingA;
                     scanningA = !scanningA;
                 } else {
-                    [startB, endB] = [B[j], B[j + 1]];
+                    [startB, endB] = [b[j], b[j + 1]];
                 }
                 const startCurrent = (scanningA && startA) || startB || 0;
                 const endCurrent = (scanningA && endA) || endB || 0;
-                const compare = CompareIntervals(
+                const compare = compareIntervals(
                     startTemp,
                     endTemp,
                     startCurrent,
@@ -437,5 +448,5 @@ export class OvaleTimeSpan implements LuaArray<number | undefined> {
     }
 }
 
-export const UNIVERSE = newFromArgs(0, INFINITY);
-export const EMPTY_SET = newTimeSpan();
+export const universe = newFromArgs(0, infinity);
+export const emptySet = newTimeSpan();

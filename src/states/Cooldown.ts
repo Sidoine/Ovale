@@ -8,12 +8,12 @@ import { StateModule, States } from "../engine/state";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { isNumber } from "../tools/tools";
 
-const GLOBAL_COOLDOWN = 61304;
-const COOLDOWN_THRESHOLD = 0.1;
+const globalCooldown = 61304;
+const cooldownThreshold = 0.1;
 // "Spell Haste" affects cast speed and spell GCD (spells, not melee abilities), but not hasted cooldowns (cd_haste in Ovale's SpellInfo)
 // "Melee Haste" is in game as "Attack Speed" and affects white swing speed only, not the GCD
 // "Ranged Haste" looks to be no longer used and matches "Melee Haste" usually, DK talent Icy Talons for example;  Suppression Aura in BWL does not affect Ranged Haste but does Melee Haste as of 7/29/18
@@ -23,7 +23,7 @@ interface GcdInfo {
     [2]: HasteType;
 }
 
-const BASE_GCD = {
+const baseGcds = {
     ["DEATHKNIGHT"]: <GcdInfo>{
         1: 1.5,
         2: "base",
@@ -108,40 +108,40 @@ export class OvaleCooldownClass
         private ovaleData: OvaleDataClass,
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass
     ) {
         super(CooldownData);
         this.module = ovale.createModule(
             "OvaleCooldown",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create("OvaleCooldown");
         this.profiler = ovaleProfiler.create("OvaleCooldown");
     }
 
-    private OnInitialize = () => {
-        this.module.RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", this.Update);
-        this.module.RegisterEvent("BAG_UPDATE_COOLDOWN", this.Update);
-        this.module.RegisterEvent("PET_BAR_UPDATE_COOLDOWN", this.Update);
-        this.module.RegisterEvent("SPELL_UPDATE_CHARGES", this.Update);
-        this.module.RegisterEvent("SPELL_UPDATE_USABLE", this.Update);
-        this.module.RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", this.Update);
-        this.module.RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", this.Update);
+    private handleInitialize = () => {
+        this.module.RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", this.update);
+        this.module.RegisterEvent("BAG_UPDATE_COOLDOWN", this.update);
+        this.module.RegisterEvent("PET_BAR_UPDATE_COOLDOWN", this.update);
+        this.module.RegisterEvent("SPELL_UPDATE_CHARGES", this.update);
+        this.module.RegisterEvent("SPELL_UPDATE_USABLE", this.update);
+        this.module.RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", this.update);
+        this.module.RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", this.update);
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_INTERRUPTED",
-            this.UNIT_SPELLCAST_INTERRUPTED
+            this.handleUnitSpellCastInterrupted
         );
-        this.module.RegisterEvent("UNIT_SPELLCAST_START", this.Update);
-        this.module.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", this.Update);
-        this.module.RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", this.Update);
-        this.lastSpell.RegisterSpellcastInfo(this);
+        this.module.RegisterEvent("UNIT_SPELLCAST_START", this.update);
+        this.module.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", this.update);
+        this.module.RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", this.update);
+        this.lastSpell.registerSpellcastInfo(this);
     };
 
-    private OnDisable = () => {
-        this.lastSpell.UnregisterSpellcastInfo(this);
+    private handleDisable = () => {
+        this.lastSpell.unregisterSpellcastInfo(this);
         this.module.UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("BAG_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("PET_BAR_UPDATE_COOLDOWN");
@@ -155,63 +155,63 @@ export class OvaleCooldownClass
         this.module.UnregisterEvent("UPDATE_SHAPESHIFT_COOLDOWN");
     };
 
-    private UNIT_SPELLCAST_INTERRUPTED = (event: string, unit: string) => {
+    private handleUnitSpellCastInterrupted = (event: string, unit: string) => {
         if (unit == "player" || unit == "pet") {
-            this.Update(event, unit);
-            this.tracer.Debug("Resetting global cooldown.");
+            this.update(event, unit);
+            this.tracer.debug("Resetting global cooldown.");
             const cd = this.gcd;
             cd.start = 0;
             cd.duration = 0;
         }
     };
 
-    private Update = (event: string, unit: string) => {
+    private update = (event: string, unit: string) => {
         if (!unit || unit == "player" || unit == "pet") {
             // Increments the serial: cooldowns stored in this.next.cd will be refreshed
             // TODO as ACTIONBAR_UPDATE_COOLDOWN is sent some time before UNIT_SPELLCAST_SUCCEEDED
             // it refreshes the cooldown before power updates
             this.serial = this.serial + 1;
             this.ovale.needRefresh();
-            this.tracer.Debug(event, this.serial);
+            this.tracer.debug(event, this.serial);
         }
     };
-    ResetSharedCooldowns() {
+    resetSharedCooldowns() {
         for (const [, spellTable] of pairs(this.sharedCooldown)) {
             for (const [spellId] of pairs(spellTable)) {
                 delete spellTable[spellId];
             }
         }
     }
-    IsSharedCooldown(name: string | number) {
+    isSharedCooldown(name: string | number) {
         const spellTable = this.sharedCooldown[name];
         return spellTable && next(spellTable) != undefined;
     }
-    AddSharedCooldown(name: string, spellId: number) {
+    addSharedCooldown(name: string, spellId: number) {
         this.sharedCooldown[name] = this.sharedCooldown[name] || {};
         this.sharedCooldown[name][spellId] = true;
     }
-    GetGlobalCooldown(now?: number): [number, number] {
+    getGlobalCooldown(now?: number): [number, number] {
         const cd = this.gcd;
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
             now = now || GetTime();
             if (now >= cd.start + cd.duration) {
-                [cd.start, cd.duration] = GetSpellCooldown(GLOBAL_COOLDOWN);
+                [cd.start, cd.duration] = GetSpellCooldown(globalCooldown);
             }
         }
         return [cd.start, cd.duration];
     }
-    GetSpellCooldown(
+    getSpellCooldown(
         spellId: number | string,
         atTime: number | undefined
     ): [number, number, boolean] {
         if (atTime) {
-            const cd = this.GetCD(spellId, atTime);
+            const cd = this.getCD(spellId, atTime);
             return [cd.start, cd.duration, cd.enable];
         }
         let [cdStart, cdDuration, cdEnable] = [0, 0, true];
         if (this.sharedCooldown[spellId]) {
             for (const [id] of pairs(this.sharedCooldown[spellId])) {
-                const [start, duration, enable] = this.GetSpellCooldown(
+                const [start, duration, enable] = this.getSpellCooldown(
                     id,
                     atTime
                 );
@@ -222,15 +222,15 @@ export class OvaleCooldownClass
             }
         } else {
             let [start, duration, enable] = GetSpellCooldown(spellId);
-            this.tracer.Log(
+            this.tracer.log(
                 "Call GetSpellCooldown which returned %f, %f, %d",
                 start,
                 duration,
                 enable
             );
             if (start !== undefined && start > 0) {
-                const [gcdStart, gcdDuration] = this.GetGlobalCooldown();
-                this.tracer.Log(
+                const [gcdStart, gcdDuration] = this.getGlobalCooldown();
+                this.tracer.log(
                     "GlobalCooldown is %d, %d",
                     gcdStart,
                     gcdDuration
@@ -250,11 +250,11 @@ export class OvaleCooldownClass
                 ];
             }
         }
-        return [cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable];
+        return [cdStart - cooldownThreshold, cdDuration, cdEnable];
     }
-    GetBaseGCD(): [number, HasteType] {
+    getBaseGCD(): [number, HasteType] {
         let gcd: number, haste: HasteType;
-        const baseGCD = BASE_GCD[this.ovale.playerClass];
+        const baseGCD = baseGcds[this.ovale.playerClass];
         if (baseGCD) {
             [gcd, haste] = [baseGCD[1], baseGCD[2]];
         } else {
@@ -262,15 +262,15 @@ export class OvaleCooldownClass
         }
         return [gcd, haste];
     }
-    CopySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
+    copySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
         if (spellcast.offgcd) {
             dest.offgcd = spellcast.offgcd;
         }
     };
-    SaveSpellcastInfo = (spellcast: SpellCast) => {
+    saveSpellcastInfo = (spellcast: SpellCast) => {
         const spellId = spellcast.spellId;
         if (spellId) {
-            const gcd = this.ovaleData.GetSpellInfoProperty(
+            const gcd = this.ovaleData.getSpellInfoProperty(
                 spellId,
                 spellcast.start,
                 "gcd",
@@ -282,8 +282,8 @@ export class OvaleCooldownClass
         }
     };
 
-    GetCD(spellId: number | string, atTime: number) {
-        this.profiler.StartProfiling("OvaleCooldown_state_GetCD");
+    getCD(spellId: number | string, atTime: number) {
+        this.profiler.startProfiling("OvaleCooldown_state_GetCD");
         let cdName: string | number = spellId;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.shared_cd) {
@@ -302,22 +302,22 @@ export class OvaleCooldownClass
         }
         const cd = this.next.cd[cdName];
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
-            this.tracer.Log(
+            this.tracer.log(
                 "Didn't find an existing cd in next, look for one in current"
             );
-            let [start, duration, enable] = this.GetSpellCooldown(
+            let [start, duration, enable] = this.getSpellCooldown(
                 spellId,
                 undefined
             );
             if (si && si.forcecd) {
-                [start, duration] = this.GetSpellCooldown(
+                [start, duration] = this.getSpellCooldown(
                     si.forcecd,
                     undefined
                 );
             }
-            this.tracer.Log("It returned %f, %f", start, duration);
+            this.tracer.log("It returned %f, %f", start, duration);
             cd.serial = this.serial;
-            cd.start = start - COOLDOWN_THRESHOLD;
+            cd.start = start - cooldownThreshold;
             cd.duration = duration;
             cd.enable = enable;
             if (isNumber(spellId)) {
@@ -338,7 +338,7 @@ export class OvaleCooldownClass
         const now = atTime;
         if (cd.start) {
             if (cd.start + cd.duration <= now) {
-                this.tracer.Log("Spell cooldown is in the past");
+                this.tracer.log("Spell cooldown is in the past");
                 cd.start = 0;
                 cd.duration = 0;
             }
@@ -358,31 +358,31 @@ export class OvaleCooldownClass
             cd.charges = charges;
             cd.chargeStart = chargeStart;
         }
-        this.tracer.Log(
+        this.tracer.log(
             "Cooldown of spell %d is %f + %f",
             spellId,
             cd.start,
             cd.duration
         );
-        this.profiler.StopProfiling("OvaleCooldown_state_GetCD");
+        this.profiler.stopProfiling("OvaleCooldown_state_GetCD");
         return cd;
     }
 
-    GetSpellCooldownDuration(
+    getSpellCooldownDuration(
         spellId: number,
         atTime: number,
         targetGUID: string
     ) {
-        let [start, duration] = this.GetSpellCooldown(spellId, atTime);
+        let [start, duration] = this.getSpellCooldown(spellId, atTime);
         if (duration > 0 && start + duration > atTime) {
-            this.tracer.Log(
+            this.tracer.log(
                 "Spell %d is on cooldown for %fs starting at %s.",
                 spellId,
                 duration,
                 start
             );
         } else {
-            [duration] = this.ovaleData.GetSpellInfoPropertyNumber(
+            [duration] = this.ovaleData.getSpellInfoPropertyNumber(
                 spellId,
                 atTime,
                 "cd",
@@ -395,20 +395,20 @@ export class OvaleCooldownClass
             } else {
                 duration = 0;
             }
-            this.tracer.Log(
+            this.tracer.log(
                 "Spell %d has a base cooldown of %fs.",
                 spellId,
                 duration
             );
             if (duration > 0) {
-                const haste = this.ovaleData.GetSpellInfoProperty(
+                const haste = this.ovaleData.getSpellInfoProperty(
                     spellId,
                     atTime,
                     "cd_haste",
                     targetGUID
                 );
                 if (haste) {
-                    const multiplier = this.ovalePaperDoll.GetBaseHasteMultiplier(
+                    const multiplier = this.ovalePaperDoll.getBaseHasteMultiplier(
                         this.ovalePaperDoll.next
                     );
                     duration = duration / multiplier;
@@ -418,11 +418,11 @@ export class OvaleCooldownClass
         return duration;
     }
 
-    GetSpellCharges(
+    getSpellCharges(
         spellId: number,
         atTime: number
     ): [number, number, number, number] {
-        const cd = this.GetCD(spellId, atTime);
+        const cd = this.getCD(spellId, atTime);
         let charges = cd.charges;
         const maxCharges = cd.maxCharges;
         let chargeStart = cd.chargeStart;
@@ -439,7 +439,7 @@ export class OvaleCooldownClass
         return [charges, maxCharges, chargeStart, chargeDuration];
     }
 
-    ApplySpellStartCast = (
+    applySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -447,13 +447,13 @@ export class OvaleCooldownClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleCooldown_ApplySpellStartCast");
+        this.profiler.startProfiling("OvaleCooldown_ApplySpellStartCast");
         if (isChanneled) {
-            this.ApplyCooldown(spellId, targetGUID, startCast);
+            this.applyCooldown(spellId, targetGUID, startCast);
         }
-        this.profiler.StopProfiling("OvaleCooldown_ApplySpellStartCast");
+        this.profiler.stopProfiling("OvaleCooldown_ApplySpellStartCast");
     };
-    ApplySpellAfterCast = (
+    applySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -461,22 +461,22 @@ export class OvaleCooldownClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleCooldown_ApplySpellAfterCast");
+        this.profiler.startProfiling("OvaleCooldown_ApplySpellAfterCast");
         if (!isChanneled) {
-            this.ApplyCooldown(spellId, targetGUID, endCast);
+            this.applyCooldown(spellId, targetGUID, endCast);
         }
-        this.profiler.StopProfiling("OvaleCooldown_ApplySpellAfterCast");
+        this.profiler.stopProfiling("OvaleCooldown_ApplySpellAfterCast");
     };
 
-    InitializeState() {
+    initializeState() {
         this.next.cd = {};
     }
-    ResetState() {
+    resetState() {
         for (const [, cd] of pairs(this.next.cd)) {
             cd.serial = undefined;
         }
     }
-    CleanState() {
+    cleanState() {
         for (const [spellId, cd] of pairs(this.next.cd)) {
             for (const [k] of kpairs(cd)) {
                 delete cd[k];
@@ -485,10 +485,10 @@ export class OvaleCooldownClass
         }
     }
 
-    private ApplyCooldown(spellId: number, targetGUID: string, atTime: number) {
-        this.profiler.StartProfiling("OvaleCooldown_state_ApplyCooldown");
-        const cd = this.GetCD(spellId, atTime);
-        const duration = this.GetSpellCooldownDuration(
+    private applyCooldown(spellId: number, targetGUID: string, atTime: number) {
+        this.profiler.startProfiling("OvaleCooldown_state_ApplyCooldown");
+        const cd = this.getCD(spellId, atTime);
+        const duration = this.getSpellCooldownDuration(
             spellId,
             atTime,
             targetGUID
@@ -509,20 +509,20 @@ export class OvaleCooldownClass
                 cd.duration = cd.chargeDuration;
             }
         }
-        this.tracer.Log(
+        this.tracer.log(
             "Spell %d cooldown info: start=%f, duration=%f, charges=%s",
             spellId,
             cd.start,
             cd.duration,
             cd.charges || "(nil)"
         );
-        this.profiler.StopProfiling("OvaleCooldown_state_ApplyCooldown");
+        this.profiler.stopProfiling("OvaleCooldown_state_ApplyCooldown");
     }
-    DebugCooldown() {
+    debugCooldown() {
         for (const [spellId, cd] of pairs(this.next.cd)) {
             if (cd.start) {
                 if (cd.charges) {
-                    this.tracer.Print(
+                    this.tracer.print(
                         "Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f",
                         spellId,
                         cd.start,
@@ -533,7 +533,7 @@ export class OvaleCooldownClass
                         cd.chargeDuration
                     );
                 } else {
-                    this.tracer.Print(
+                    this.tracer.print(
                         "Spell %s cooldown: start=%f, duration=%f",
                         spellId,
                         cd.start,

@@ -11,10 +11,11 @@ import { format, gsub, upper, lower, match } from "@wowts/string";
 import { Annotation } from "./definitions";
 import { OvalePool } from "../tools/Pool";
 
-export const INDENT: LuaArray<string> = {};
+export const indentations: LuaArray<string> = {};
 {
-    INDENT[0] = "";
+    indentations[0] = "";
     const metatable = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         __index: function (tbl: LuaArray<string>, key: string) {
             const _key = tonumber(key);
             if (_key > 0) {
@@ -22,13 +23,13 @@ export const INDENT: LuaArray<string> = {};
                 rawset(tbl, key, s);
                 return s;
             }
-            return INDENT[0];
+            return indentations[0];
         },
     };
-    setmetatable(INDENT, metatable);
+    setmetatable(indentations, metatable);
 }
 
-export function print_r(data: any) {
+export function printRepeat(data: any) {
     let buffer = "";
     const padder = "  ";
     const max = 10;
@@ -66,32 +67,32 @@ export function print_r(data: any) {
     return buffer;
 }
 
-export const self_outputPool = new OvalePool<LuaArray<string>>(
+export const outputPool = new OvalePool<LuaArray<string>>(
     "OvaleSimulationCraft_outputPool"
 );
 
-function CamelCaseHelper(first: string, rest: string) {
+function camelCaseHelper(first: string, rest: string) {
     return `${upper(first)}${lower(rest)}`;
 }
 
-export function CamelCase(s: string) {
-    const tc = gsub(s, "(%a)(%w*)", CamelCaseHelper);
+export function toCamelCase(s: string) {
+    const tc = gsub(s, "(%a)(%w*)", camelCaseHelper);
     return gsub(tc, "[%s_]", "");
 }
 
-export function LowerSpecialization(annotation: Annotation) {
+export function toLowerSpecialization(annotation: Annotation) {
     return lower(annotation.specialization);
 }
 
-export function OvaleFunctionName(name: string, annotation: Annotation) {
+export function toOvaleFunctionName(name: string, annotation: Annotation) {
     let functionName = lower(`${name}actions`);
     if (annotation.specialization) {
-        functionName = `${LowerSpecialization(annotation)}${functionName}`;
+        functionName = `${toLowerSpecialization(annotation)}${functionName}`;
     }
     return functionName;
 }
 
-export function OvaleTaggedFunctionName(
+export function toOvaleTaggedFunctionName(
     name: string,
     tag: string
 ): [string?, string?] {

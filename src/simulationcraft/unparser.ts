@@ -1,7 +1,7 @@
 import {
-    UNARY_OPERATOR,
+    unaryOperators,
     SimcUnaryOperatorType,
-    BINARY_OPERATOR,
+    binaryOperators,
     SimcBinaryOperatorType,
     ParseNode,
     ActionParseNode,
@@ -12,11 +12,11 @@ import {
     OperandParseNode,
 } from "./definitions";
 import { tostring, lualength, pairs, tonumber, kpairs } from "@wowts/lua";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
-import { self_outputPool } from "./text-tools";
+import { DebugTools, Tracer } from "../engine/debug";
+import { outputPool } from "./text-tools";
 import { concat } from "@wowts/table";
 
-function GetPrecedence(node: ParseNode) {
+function getPrecedence(node: ParseNode) {
     if (node.type !== "operator") return 0;
     let precedence = node.precedence;
     if (!precedence) {
@@ -24,16 +24,16 @@ function GetPrecedence(node: ParseNode) {
         if (operator) {
             if (
                 node.expressionType == "unary" &&
-                UNARY_OPERATOR[operator as SimcUnaryOperatorType]
+                unaryOperators[operator as SimcUnaryOperatorType]
             ) {
                 precedence =
-                    UNARY_OPERATOR[operator as SimcUnaryOperatorType][2];
+                    unaryOperators[operator as SimcUnaryOperatorType][2];
             } else if (
                 node.expressionType == "binary" &&
-                BINARY_OPERATOR[operator as SimcBinaryOperatorType]
+                binaryOperators[operator as SimcBinaryOperatorType]
             ) {
                 precedence =
-                    BINARY_OPERATOR[operator as SimcBinaryOperatorType][2];
+                    binaryOperators[operator as SimcBinaryOperatorType][2];
             }
         }
     }
@@ -45,17 +45,17 @@ type UnparseFunction<T extends ParseNode> = (node: T) => string;
 export class Unparser {
     private tracer: Tracer;
 
-    constructor(ovaleDebug: OvaleDebugClass) {
+    constructor(ovaleDebug: DebugTools) {
         this.tracer = ovaleDebug.create("SimulationCraftUnparser");
     }
 
-    public Unparse(node: ParseNode) {
+    public unparse(node: ParseNode) {
         // TODO
-        const visitor = this.UNPARSE_VISITOR[
+        const visitor = this.unparseVisitors[
             node.type
         ] as UnparseFunction<ParseNode>;
         if (!visitor) {
-            this.tracer.Error(
+            this.tracer.error(
                 "Unable to unparse node of type '%s'.",
                 node.type
             );
@@ -63,22 +63,22 @@ export class Unparser {
             return visitor(node);
         }
     }
-    private UnparseAction: UnparseFunction<ActionParseNode> = (node) => {
-        const output = self_outputPool.Get();
+    private unparseAction: UnparseFunction<ActionParseNode> = (node) => {
+        const output = outputPool.get();
         output[lualength(output) + 1] = node.name;
         for (const [modifier, expressionNode] of kpairs(node.modifiers)) {
-            output[lualength(output) + 1] = `${modifier}=${this.Unparse(
+            output[lualength(output) + 1] = `${modifier}=${this.unparse(
                 expressionNode
             )}`;
         }
         const s = concat(output, ",");
-        self_outputPool.Release(output);
+        outputPool.release(output);
         return s;
     };
-    private UnparseActionList: UnparseFunction<ActionListParseNode> = (
+    private unparseActionList: UnparseFunction<ActionListParseNode> = (
         node
     ) => {
-        const output = self_outputPool.Get();
+        const output = outputPool.get();
         let listName;
         if (node.name == "_default") {
             listName = "action";
@@ -90,52 +90,52 @@ export class Unparser {
             const operator = (tonumber(i) == 1 && "=") || "+=/";
             output[
                 lualength(output) + 1
-            ] = `${listName}${operator}${this.Unparse(actionNode)}`;
+            ] = `${listName}${operator}${this.unparse(actionNode)}`;
         }
         const s = concat(output, "\n");
-        self_outputPool.Release(output);
+        outputPool.release(output);
         return s;
     };
-    private UnparseExpression: UnparseFunction<OperatorParseNode> = (node) => {
+    private unparseExpression: UnparseFunction<OperatorParseNode> = (node) => {
         let expression;
-        const precedence = GetPrecedence(node);
+        const precedence = getPrecedence(node);
         if (node.expressionType == "unary") {
             let rhsExpression;
             const rhsNode = node.child[1];
-            const rhsPrecedence = GetPrecedence(rhsNode);
+            const rhsPrecedence = getPrecedence(rhsNode);
             if (rhsPrecedence && precedence >= rhsPrecedence) {
-                rhsExpression = `(${this.Unparse(rhsNode)})`;
+                rhsExpression = `(${this.unparse(rhsNode)})`;
             } else {
-                rhsExpression = this.Unparse(rhsNode);
+                rhsExpression = this.unparse(rhsNode);
             }
             expression = `${node.operator}${rhsExpression}`;
         } else if (node.expressionType == "binary") {
             let lhsExpression, rhsExpression;
             const lhsNode = node.child[1];
-            const lhsPrecedence = GetPrecedence(lhsNode);
+            const lhsPrecedence = getPrecedence(lhsNode);
             if (lhsPrecedence && lhsPrecedence < precedence) {
-                lhsExpression = `(${this.Unparse(lhsNode)})`;
+                lhsExpression = `(${this.unparse(lhsNode)})`;
             } else {
-                lhsExpression = this.Unparse(lhsNode);
+                lhsExpression = this.unparse(lhsNode);
             }
             const rhsNode = node.child[2];
-            const rhsPrecedence = GetPrecedence(rhsNode);
+            const rhsPrecedence = getPrecedence(rhsNode);
             if (rhsPrecedence && precedence > rhsPrecedence) {
-                rhsExpression = `(${this.Unparse(rhsNode)})`;
+                rhsExpression = `(${this.unparse(rhsNode)})`;
             } else if (rhsPrecedence && precedence == rhsPrecedence) {
                 if (
                     rhsNode.type === "operator" &&
-                    BINARY_OPERATOR[
+                    binaryOperators[
                         node.operator as SimcBinaryOperatorType
                     ][3] == "associative" &&
                     node.operator == rhsNode.operator
                 ) {
-                    rhsExpression = this.Unparse(rhsNode);
+                    rhsExpression = this.unparse(rhsNode);
                 } else {
-                    rhsExpression = `(${this.Unparse(rhsNode)})`;
+                    rhsExpression = `(${this.unparse(rhsNode)})`;
                 }
             } else {
-                rhsExpression = this.Unparse(rhsNode);
+                rhsExpression = this.unparse(rhsNode);
             }
             expression = `${lhsExpression}${node.operator}${rhsExpression}`;
         } else {
@@ -143,22 +143,22 @@ export class Unparser {
         }
         return expression;
     };
-    private UnparseFunction: UnparseFunction<FunctionParseNode> = (node) => {
-        return `${node.name}(${this.Unparse(node.child[1])})`;
+    private unparseFunction: UnparseFunction<FunctionParseNode> = (node) => {
+        return `${node.name}(${this.unparse(node.child[1])})`;
     };
-    private UnparseNumber: UnparseFunction<NumberParseNode> = (node) => {
+    private unparseNumber: UnparseFunction<NumberParseNode> = (node) => {
         return tostring(node.value);
     };
-    private UnparseOperand: UnparseFunction<OperandParseNode> = (node) => {
+    private unparseOperand: UnparseFunction<OperandParseNode> = (node) => {
         return node.name;
     };
 
-    UNPARSE_VISITOR = {
-        ["action"]: this.UnparseAction,
-        ["action_list"]: this.UnparseActionList,
-        ["operator"]: this.UnparseExpression,
-        ["function"]: this.UnparseFunction,
-        ["number"]: this.UnparseNumber,
-        ["operand"]: this.UnparseOperand,
+    unparseVisitors = {
+        ["action"]: this.unparseAction,
+        ["action_list"]: this.unparseActionList,
+        ["operator"]: this.unparseExpression,
+        ["function"]: this.unparseFunction,
+        ["number"]: this.unparseNumber,
+        ["operand"]: this.unparseOperand,
     };
 }

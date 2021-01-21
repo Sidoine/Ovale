@@ -13,68 +13,70 @@ import { insert, remove } from "@wowts/table";
 import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Tracer, OvaleDebugClass } from "./debug";
+import { Tracer, DebugTools } from "./debug";
 import {
     ConditionFunction,
     OvaleConditionClass,
-    ReturnConstant,
+    returnConstant,
 } from "./condition";
 import { isString } from "../tools/tools";
 
-const PET_UNIT: LuaObj<string> = {};
+const petUnits: LuaObj<string> = {};
 {
-    PET_UNIT["player"] = "pet";
+    petUnits["player"] = "pet";
     for (let i = 1; i <= 5; i += 1) {
-        PET_UNIT[`arena${i}`] = `arenapet${i}`;
+        petUnits[`arena${i}`] = `arenapet${i}`;
     }
     for (let i = 1; i <= 4; i += 1) {
-        PET_UNIT[`party${i}`] = `partypet${i}`;
+        petUnits[`party${i}`] = `partypet${i}`;
     }
     for (let i = 1; i <= 40; i += 1) {
-        PET_UNIT[`raid${i}`] = `raidpet${i}`;
+        petUnits[`raid${i}`] = `raidpet${i}`;
     }
-    setmetatable(PET_UNIT, {
+    setmetatable(petUnits, {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         __index: function (t, unitId) {
             return `${unitId}pet`;
         },
     });
 }
-const UNIT_AURA_UNITS: LuaArray<string> = {};
+const unitAuraUnits: LuaArray<string> = {};
 {
-    insert(UNIT_AURA_UNITS, "player");
-    insert(UNIT_AURA_UNITS, "pet");
-    insert(UNIT_AURA_UNITS, "vehicle");
-    insert(UNIT_AURA_UNITS, "target");
-    insert(UNIT_AURA_UNITS, "focus");
+    insert(unitAuraUnits, "player");
+    insert(unitAuraUnits, "pet");
+    insert(unitAuraUnits, "vehicle");
+    insert(unitAuraUnits, "target");
+    insert(unitAuraUnits, "focus");
     for (let i = 1; i <= 40; i += 1) {
         const unitId = `raid${i}`;
-        insert(UNIT_AURA_UNITS, unitId);
-        insert(UNIT_AURA_UNITS, PET_UNIT[unitId]);
+        insert(unitAuraUnits, unitId);
+        insert(unitAuraUnits, petUnits[unitId]);
     }
     for (let i = 1; i <= 4; i += 1) {
         const unitId = `party${i}`;
-        insert(UNIT_AURA_UNITS, unitId);
-        insert(UNIT_AURA_UNITS, PET_UNIT[unitId]);
+        insert(unitAuraUnits, unitId);
+        insert(unitAuraUnits, petUnits[unitId]);
     }
     for (let i = 1; i <= 4; i += 1) {
-        insert(UNIT_AURA_UNITS, `boss${i}`);
+        insert(unitAuraUnits, `boss${i}`);
     }
     for (let i = 1; i <= 5; i += 1) {
         const unitId = `arena${i}`;
-        insert(UNIT_AURA_UNITS, unitId);
-        insert(UNIT_AURA_UNITS, PET_UNIT[unitId]);
+        insert(unitAuraUnits, unitId);
+        insert(unitAuraUnits, petUnits[unitId]);
     }
-    insert(UNIT_AURA_UNITS, "npc");
+    insert(unitAuraUnits, "npc");
 }
 
-const UNIT_AURA_UNIT: LuaObj<number> = {};
+const unitAuraUnit: LuaObj<number> = {};
 
-for (const [i, unitId] of ipairs(UNIT_AURA_UNITS)) {
-    UNIT_AURA_UNIT[unitId] = i;
+for (const [i, unitId] of ipairs(unitAuraUnits)) {
+    unitAuraUnit[unitId] = i;
 }
-setmetatable(UNIT_AURA_UNIT, {
+setmetatable(unitAuraUnit, {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __index: function (t, unitId) {
-        return lualength(UNIT_AURA_UNITS) + 1;
+        return lualength(unitAuraUnits) + 1;
     },
 });
 
@@ -88,7 +90,7 @@ function isCompareFunction<T>(a: any): a is CompareFunction<T> {
     return type(a) === "function";
 }
 
-function BinaryInsert<T>(
+function binaryInsert<T>(
     t: LuaArray<T>,
     value: T,
     unique: boolean | CompareFunction<T>,
@@ -112,7 +114,7 @@ function BinaryInsert<T>(
     insert(t, low, value);
     return low;
 }
-function BinarySearch<T>(
+function binarySearch<T>(
     t: LuaArray<T>,
     value: T,
     compare: CompareFunction<T>
@@ -132,21 +134,21 @@ function BinarySearch<T>(
     return undefined;
 }
 
-function BinaryRemove<T>(
+function binaryRemove<T>(
     t: LuaArray<T>,
     value: T,
     compare: CompareFunction<T>
 ) {
-    const index = BinarySearch(t, value, compare);
+    const index = binarySearch(t, value, compare);
     if (index) {
         remove(t, index);
     }
     return index;
 }
-const CompareUnit = function (a: string, b: string) {
-    return UNIT_AURA_UNIT[a] < UNIT_AURA_UNIT[b];
+const compareUnit = function (a: string, b: string) {
+    return unitAuraUnit[a] < unitAuraUnit[b];
 };
-export class OvaleGUIDClass {
+export class Guids {
     unitGUID: LuaObj<string> = {};
     guidUnit: LuaObj<LuaArray<string>> = {};
     unitName: LuaObj<string> = {};
@@ -154,69 +156,72 @@ export class OvaleGUIDClass {
     guidName: LuaObj<string> = {};
     nameGUID: LuaObj<LuaArray<string>> = {};
     petGUID: LuaObj<number> = {};
-    UNIT_AURA_UNIT = UNIT_AURA_UNIT;
+    unitAuraUnits = unitAuraUnit;
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
     constructor(
         private ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         condition: OvaleConditionClass
     ) {
         this.module = ovale.createModule(
             "OvaleGUID",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
-        condition.RegisterCondition("guid", false, this.getGuid);
-        condition.RegisterCondition("targetguid", false, this.getTargetGuid);
+        condition.registerCondition("guid", false, this.getGuid);
+        condition.registerCondition("targetguid", false, this.getTargetGuid);
     }
 
     private getGuid: ConditionFunction = (_, namedParameters) => {
         const target =
             (isString(namedParameters.target) && namedParameters.target) ||
             "target";
-        return ReturnConstant(this.UnitGUID(target));
+        return returnConstant(this.getUnitGUID(target));
     };
 
     private getTargetGuid: ConditionFunction = (_, namedParameters) => {
         const target =
             (isString(namedParameters.target) && namedParameters.target) ||
             "target";
-        return ReturnConstant(this.UnitGUID(target + "target"));
+        return returnConstant(this.getUnitGUID(target + "target"));
     };
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "ARENA_OPPONENT_UPDATE",
-            this.ARENA_OPPONENT_UPDATE
+            this.handleArenaOpponentUpdated
         );
         this.module.RegisterEvent(
             "GROUP_ROSTER_UPDATE",
-            this.GROUP_ROSTER_UPDATE
+            this.handleGroupRosterUpdated
         );
         this.module.RegisterEvent(
             "INSTANCE_ENCOUNTER_ENGAGE_UNIT",
-            this.INSTANCE_ENCOUNTER_ENGAGE_UNIT
+            this.handleInstanceEncounterEngageUnit
         );
         this.module.RegisterEvent("PLAYER_ENTERING_WORLD", (event) =>
-            this.UpdateAllUnits()
+            this.updateAllUnits()
         );
         this.module.RegisterEvent(
             "PLAYER_FOCUS_CHANGED",
-            this.PLAYER_FOCUS_CHANGED
+            this.handlePlayerFocusChanged
         );
         this.module.RegisterEvent(
             "PLAYER_TARGET_CHANGED",
-            this.PLAYER_TARGET_CHANGED
+            this.handlePlayerTargetChanged
         );
-        this.module.RegisterEvent("UNIT_NAME_UPDATE", this.UNIT_NAME_UPDATE);
-        this.module.RegisterEvent("UNIT_PET", this.UNIT_PET);
-        this.module.RegisterEvent("UNIT_TARGET", this.UNIT_TARGET);
+        this.module.RegisterEvent(
+            "UNIT_NAME_UPDATE",
+            this.handleUnitNameUpdate
+        );
+        this.module.RegisterEvent("UNIT_PET", this.handleUnitPet);
+        this.module.RegisterEvent("UNIT_TARGET", this.handleUnitTarget);
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("ARENA_OPPONENT_UPDATE");
         this.module.UnregisterEvent("GROUP_ROSTER_UPDATE");
         this.module.UnregisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT");
@@ -227,45 +232,45 @@ export class OvaleGUIDClass {
         this.module.UnregisterEvent("UNIT_PET");
         this.module.UnregisterEvent("UNIT_TARGET");
     };
-    private ARENA_OPPONENT_UPDATE = (
+    private handleArenaOpponentUpdated = (
         event: string,
         unitId: string,
         eventType: string
     ) => {
         if (eventType != "cleared" || this.unitGUID[unitId]) {
-            this.tracer.Debug(event, unitId, eventType);
-            this.UpdateUnitWithTarget(unitId);
+            this.tracer.debug(event, unitId, eventType);
+            this.updateUnitWithTarget(unitId);
         }
     };
-    private GROUP_ROSTER_UPDATE = (event: string) => {
-        this.tracer.Debug(event);
-        this.UpdateAllUnits();
+    private handleGroupRosterUpdated = (event: string) => {
+        this.tracer.debug(event);
+        this.updateAllUnits();
         this.module.SendMessage("Ovale_GroupChanged");
     };
-    private INSTANCE_ENCOUNTER_ENGAGE_UNIT = (event: string) => {
-        this.tracer.Debug(event);
+    private handleInstanceEncounterEngageUnit = (event: string) => {
+        this.tracer.debug(event);
         for (let i = 1; i <= 4; i += 1) {
-            this.UpdateUnitWithTarget(`boss${i}`);
+            this.updateUnitWithTarget(`boss${i}`);
         }
     };
-    private PLAYER_FOCUS_CHANGED = (event: string) => {
-        this.tracer.Debug(event);
-        this.UpdateUnitWithTarget("focus");
+    private handlePlayerFocusChanged = (event: string) => {
+        this.tracer.debug(event);
+        this.updateUnitWithTarget("focus");
     };
-    private PLAYER_TARGET_CHANGED = (event: string, cause: string) => {
-        this.tracer.Debug(event, cause);
-        this.UpdateUnit("target");
+    private handlePlayerTargetChanged = (event: string, cause: string) => {
+        this.tracer.debug(event, cause);
+        this.updateUnit("target");
     };
-    private UNIT_NAME_UPDATE = (event: string, unitId: string) => {
-        this.tracer.Debug(event, unitId);
-        this.UpdateUnit(unitId);
+    private handleUnitNameUpdate = (event: string, unitId: string) => {
+        this.tracer.debug(event, unitId);
+        this.updateUnit(unitId);
     };
-    private UNIT_PET = (event: string, unitId: string) => {
-        this.tracer.Debug(event, unitId);
-        const pet = PET_UNIT[unitId];
-        this.UpdateUnitWithTarget(pet);
+    private handleUnitPet = (event: string, unitId: string) => {
+        this.tracer.debug(event, unitId);
+        const pet = petUnits[unitId];
+        this.updateUnitWithTarget(pet);
         if (unitId == "player") {
-            const guid = this.UnitGUID("pet");
+            const guid = this.getUnitGUID("pet");
             if (guid) {
                 this.petGUID[guid] = GetTime();
             }
@@ -273,19 +278,19 @@ export class OvaleGUIDClass {
         }
         this.module.SendMessage("Ovale_GroupChanged");
     };
-    private UNIT_TARGET = (event: string, unitId: string) => {
+    private handleUnitTarget = (event: string, unitId: string) => {
         if (unitId != "player") {
-            this.tracer.Debug(event, unitId);
+            this.tracer.debug(event, unitId);
             const target = `${unitId}target`;
-            this.UpdateUnit(target);
+            this.updateUnit(target);
         }
     };
-    UpdateAllUnits() {
-        for (const [, unitId] of ipairs(UNIT_AURA_UNITS)) {
-            this.UpdateUnitWithTarget(unitId);
+    updateAllUnits() {
+        for (const [, unitId] of ipairs(unitAuraUnits)) {
+            this.updateUnitWithTarget(unitId);
         }
     }
-    UpdateUnit(unitId: string) {
+    updateUnit(unitId: string) {
         const guid = UnitGUID(unitId);
         const name = UnitName(unitId);
         const previousGUID = this.unitGUID[unitId];
@@ -294,10 +299,10 @@ export class OvaleGUIDClass {
             delete this.unitGUID[unitId];
             if (previousGUID) {
                 if (this.guidUnit[previousGUID]) {
-                    BinaryRemove(
+                    binaryRemove(
                         this.guidUnit[previousGUID],
                         unitId,
-                        CompareUnit
+                        compareUnit
                     );
                 }
                 this.ovale.refreshNeeded[previousGUID] = true;
@@ -306,49 +311,49 @@ export class OvaleGUIDClass {
         if (!name || name != previousName) {
             delete this.unitName[unitId];
             if (previousName && this.nameUnit[previousName]) {
-                BinaryRemove(this.nameUnit[previousName], unitId, CompareUnit);
+                binaryRemove(this.nameUnit[previousName], unitId, compareUnit);
             }
         }
         if (guid && guid == previousGUID && name && name != previousName) {
             delete this.guidName[guid];
             if (previousName && this.nameGUID[previousName]) {
-                BinaryRemove(this.nameGUID[previousName], guid, CompareUnit);
+                binaryRemove(this.nameGUID[previousName], guid, compareUnit);
             }
         }
         if (guid && guid != previousGUID) {
             this.unitGUID[unitId] = guid;
             {
                 const list = this.guidUnit[guid] || {};
-                BinaryInsert(list, unitId, true, CompareUnit);
+                binaryInsert(list, unitId, true, compareUnit);
                 this.guidUnit[guid] = list;
             }
-            this.tracer.Debug("'%s' is '%s'.", unitId, guid);
+            this.tracer.debug("'%s' is '%s'.", unitId, guid);
             this.ovale.refreshNeeded[guid] = true;
         }
         if (name && name != previousName) {
             this.unitName[unitId] = name;
             {
                 const list = this.nameUnit[name] || {};
-                BinaryInsert(list, unitId, true, CompareUnit);
+                binaryInsert(list, unitId, true, compareUnit);
                 this.nameUnit[name] = list;
             }
-            this.tracer.Debug("'%s' is '%s'.", unitId, name);
+            this.tracer.debug("'%s' is '%s'.", unitId, name);
         }
         if (guid && name) {
             const previousNameFromGUID = this.guidName[guid];
             this.guidName[guid] = name;
             if (name != previousNameFromGUID) {
                 const list = this.nameGUID[name] || {};
-                BinaryInsert(list, guid, true);
+                binaryInsert(list, guid, true);
                 this.nameGUID[name] = list;
                 if (guid == previousGUID) {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "'%s' changed names to '%s'.",
                         guid,
                         name
                     );
                 } else {
-                    this.tracer.Debug("'%s' is '%s'.", guid, name);
+                    this.tracer.debug("'%s' is '%s'.", guid, name);
                 }
             }
         }
@@ -356,42 +361,42 @@ export class OvaleGUIDClass {
             this.module.SendMessage("Ovale_UnitChanged", unitId, guid);
         }
     }
-    UpdateUnitWithTarget(unitId: string) {
-        this.UpdateUnit(unitId);
-        this.UpdateUnit(`${unitId}target`);
+    updateUnitWithTarget(unitId: string) {
+        this.updateUnit(unitId);
+        this.updateUnit(`${unitId}target`);
     }
-    IsPlayerPet(guid: string): [boolean, number] {
+    isPlayerPet(guid: string): [boolean, number] {
         const atTime = this.petGUID[guid];
         return [!!atTime, atTime];
     }
-    UnitGUID(unitId: string): string | undefined {
+    getUnitGUID(unitId: string): string | undefined {
         return this.unitGUID[unitId] || UnitGUID(unitId);
     }
-    GUIDUnit(guid: string) {
+    getUnitByGuid(guid: string) {
         if (guid && this.guidUnit[guid]) {
             return unpack(this.guidUnit[guid]);
         }
         return [undefined];
     }
-    UnitName(unitId: string) {
+    getUnitName(unitId: string) {
         if (unitId) {
             return this.unitName[unitId] || UnitName(unitId);
         }
         return undefined;
     }
-    NameUnit(name: string) {
+    getUnitByName(name: string) {
         if (name && this.nameUnit[name]) {
             return unpack(this.nameUnit[name]);
         }
         return undefined;
     }
-    GUIDName(guid: string) {
+    getNameByGuid(guid: string) {
         if (guid) {
             return this.guidName[guid];
         }
         return undefined;
     }
-    NameGUID(name: string) {
+    getGuidByName(name: string) {
         if (name && this.nameGUID[name]) {
             return unpack(this.nameGUID[name]);
         }

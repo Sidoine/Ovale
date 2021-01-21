@@ -5,7 +5,7 @@ import { insert } from "@wowts/table";
 import { upper, format } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { StateModule } from "../engine/state";
 
 interface LossOfControlEventInfo {
@@ -20,30 +20,30 @@ export class OvaleLossOfControlClass implements StateModule {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    constructor(ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
+    constructor(ovale: OvaleClass, ovaleDebug: DebugTools) {
         this.module = ovale.createModule(
             "OvaleLossOfControl",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
-        this.tracer.Debug("Enabled LossOfControl module");
+    private handleInitialize = () => {
+        this.tracer.debug("Enabled LossOfControl module");
         this.module.RegisterEvent(
             "LOSS_OF_CONTROL_ADDED",
-            this.LOSS_OF_CONTROL_ADDED
+            this.handleLossOfControlAdded
         );
     };
-    private OnDisable = () => {
-        this.tracer.Debug("Disabled LossOfControl module");
+    private handleDisable = () => {
+        this.tracer.debug("Disabled LossOfControl module");
         this.lossOfControlHistory = {};
         this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
     };
-    private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
-        this.tracer.Debug(
+    private handleLossOfControlAdded = (event: string, eventIndex: number) => {
+        this.tracer.debug(
             "LOSS_OF_CONTROL_ADDED",
             format(
                 "C_LossOfControl.GetActiveLossOfControlData(%d)",
@@ -64,7 +64,7 @@ export class OvaleLossOfControlClass implements StateModule {
             insert(this.lossOfControlHistory, data);
         }
     };
-    HasLossOfControl = (locType: string, atTime: number) => {
+    hasLossOfControl = (locType: string, atTime: number) => {
         let lowestStartTime: number | undefined = undefined;
         let highestEndTime: number | undefined = undefined;
         for (const [, data] of pairs<LossOfControlEventInfo>(
@@ -91,7 +91,7 @@ export class OvaleLossOfControlClass implements StateModule {
         }
         return lowestStartTime != undefined && highestEndTime != undefined;
     };
-    CleanState(): void {}
-    InitializeState(): void {}
-    ResetState(): void {}
+    cleanState(): void {}
+    initializeState(): void {}
+    resetState(): void {}
 }

@@ -1,4 +1,4 @@
-import { L } from "./Localization";
+import { l } from "./Localization";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { lualength, _G, LuaArray } from "@wowts/lua";
 import {
@@ -103,8 +103,8 @@ export class OvaleSpellFlashClass {
     ) {
         this.module = ovale.createModule(
             "OvaleSpellFlash",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.ovaleOptions.apparence.args.spellFlash = this.getSpellFlashOptions();
@@ -132,14 +132,14 @@ export class OvaleSpellFlashClass {
                 enabled: {
                     order: 10,
                     type: "toggle",
-                    name: L["enabled"],
-                    desc: L["flash_spells_help"],
+                    name: l["enabled"],
+                    desc: l["flash_spells_help"],
                     width: "full",
                 },
                 inCombat: {
                     order: 10,
                     type: "toggle",
-                    name: L["combat_only"],
+                    name: l["combat_only"],
                     disabled: () => {
                         return !this.ovaleOptions.db.profile.apparence
                             .spellFlash.enabled;
@@ -148,7 +148,7 @@ export class OvaleSpellFlashClass {
                 hasTarget: {
                     order: 20,
                     type: "toggle",
-                    name: L["if_target"],
+                    name: l["if_target"],
                     disabled: () => {
                         return !this.ovaleOptions.db.profile.apparence
                             .spellFlash.enabled;
@@ -157,7 +157,7 @@ export class OvaleSpellFlashClass {
                 hasHostileTarget: {
                     order: 30,
                     type: "toggle",
-                    name: L["hide_if_dead_or_friendly_target"],
+                    name: l["hide_if_dead_or_friendly_target"],
                     disabled: () => {
                         return !this.ovaleOptions.db.profile.apparence
                             .spellFlash.enabled;
@@ -166,7 +166,7 @@ export class OvaleSpellFlashClass {
                 hideInVehicle: {
                     order: 40,
                     type: "toggle",
-                    name: L["hide_in_vehicles"],
+                    name: l["hide_in_vehicles"],
                     disabled: () => {
                         return !this.ovaleOptions.db.profile.apparence
                             .spellFlash.enabled;
@@ -201,8 +201,8 @@ export class OvaleSpellFlashClass {
                 threshold: {
                     order: 70,
                     type: "range",
-                    name: L["flash_threshold"],
-                    desc: L["flash_time"],
+                    name: l["flash_threshold"],
+                    desc: l["flash_time"],
                     min: 0,
                     max: 1000,
                     step: 1,
@@ -282,17 +282,19 @@ export class OvaleSpellFlashClass {
         };
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterMessage(
             "Ovale_OptionChanged",
-            this.Ovale_OptionChanged
+            this.handleOptionChanged
         );
-        this.Ovale_OptionChanged();
+        this.handleOptionChanged();
     };
-    private OnDisable = () => {
+
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_OptionChanged");
     };
-    private Ovale_OptionChanged = () => {
+
+    private handleOptionChanged = () => {
         const db = this.ovaleOptions.db.profile.apparence.spellFlash;
         colorMain.r = db.colors.colorMain.r;
         colorMain.g = db.colors.colorMain.g;
@@ -307,7 +309,8 @@ export class OvaleSpellFlashClass {
         colorInterrupt.g = db.colors.colorInterrupt.g;
         colorInterrupt.b = db.colors.colorInterrupt.b;
     };
-    IsSpellFlashEnabled() {
+
+    isSpellFlashEnabled() {
         let enabled = true;
         const db = this.ovaleOptions.db.profile.apparence.spellFlash;
         if (enabled && !db.enabled) {
@@ -339,7 +342,7 @@ export class OvaleSpellFlashClass {
         }
     }
 
-    Flash(
+    flash(
         iconFlash: string | undefined,
         iconHelp: string | undefined,
         element: AstNodeSnapshot,
@@ -349,7 +352,7 @@ export class OvaleSpellFlashClass {
         const db = this.ovaleOptions.db.profile.apparence.spellFlash;
         const now = GetTime();
         if (
-            this.IsSpellFlashEnabled() &&
+            this.isSpellFlashEnabled() &&
             start &&
             start - now <= db.threshold / 1000
         ) {

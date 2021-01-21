@@ -12,7 +12,7 @@ actions=/potion,if=buff.test.stack>=0.1`;
     const simulationcraft = ioc.simulationCraft;
 
     // Act
-    const result = simulationcraft.ParseProfile(code);
+    const result = simulationcraft.parseProfile(code);
 
     // Assert
     assertDefined(result);
@@ -39,7 +39,7 @@ actions=/sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.
     const simulationcraft = ioc.simulationCraft;
 
     // Act
-    const result = simulationcraft.ParseProfile(code);
+    const result = simulationcraft.parseProfile(code);
 
     // Assert
     expect(ioc.debug.warning).toBeUndefined();

@@ -14,7 +14,7 @@ import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleConditionClass, ReturnConstant } from "../engine/condition";
+import { OvaleConditionClass, returnConstant } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
@@ -26,7 +26,7 @@ interface CustomAura {
     auraName: string;
 }
 
-const CUSTOM_AURAS: LuaArray<CustomAura> = {
+const customAuras: LuaArray<CustomAura> = {
     [SpellId.havoc]: {
         customId: -SpellId.havoc,
         duration: 10,
@@ -98,40 +98,43 @@ export class OvaleWarlockClass implements StateModule {
     ) {
         this.module = ovale.createModule(
             "OvaleWarlock",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
     }
 
     public registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition("timetoshard", false, this.timeToShard);
-        condition.RegisterCondition("demons", false, this.getDemonsCount);
-        condition.RegisterCondition("demonduration", false, this.demonDuration);
-        condition.RegisterCondition(
+        condition.registerCondition("timetoshard", false, this.timeToShard);
+        condition.registerCondition("demons", false, this.getDemonsCount);
+        condition.registerCondition("demonduration", false, this.demonDuration);
+        condition.registerCondition(
             "impsspawnedduring",
             false,
             this.impsSpawnedDuring
         );
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         if (this.ovale.playerClass == "WARLOCK") {
             this.module.RegisterEvent(
                 "COMBAT_LOG_EVENT_UNFILTERED",
-                this.COMBAT_LOG_EVENT_UNFILTERED
+                this.handleCombatLogEventUnfiltered
             );
             this.demonsCount = {};
         }
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         if (this.ovale.playerClass == "WARLOCK") {
             this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     };
 
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         const [
             ,
             cleuEvent,
@@ -188,7 +191,7 @@ export class OvaleWarlockClass implements StateModule {
                 this.ovale.needRefresh();
             }
 
-            const aura = CUSTOM_AURAS[spellId];
+            const aura = customAuras[spellId];
             if (aura) {
                 this.addCustomAura(
                     aura.customId,
@@ -200,9 +203,9 @@ export class OvaleWarlockClass implements StateModule {
         }
     };
 
-    CleanState(): void {}
-    InitializeState(): void {}
-    ResetState(): void {}
+    cleanState(): void {}
+    initializeState(): void {}
+    resetState(): void {}
 
     private impsSpawnedDuring = (
         positionalParams: LuaArray<any>,
@@ -223,7 +226,7 @@ export class OvaleWarlockClass implements StateModule {
 
         // inner demons talent
         const talented =
-            this.ovaleSpellBook.GetTalentPoints(TalentId.inner_demons_talent) >
+            this.ovaleSpellBook.getTalentPoints(TalentId.inner_demons_talent) >
             0;
         if (talented) {
             const value = this.getRemainingDemonDuration(
@@ -234,7 +237,7 @@ export class OvaleWarlockClass implements StateModule {
                 impsSpawned = impsSpawned + 1;
             }
         }
-        return ReturnConstant(impsSpawned);
+        return returnConstant(impsSpawned);
     };
 
     private getDemonsCount = (
@@ -249,7 +252,7 @@ export class OvaleWarlockClass implements StateModule {
                 count = count + 1;
             }
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     private demonDuration = (
@@ -259,7 +262,7 @@ export class OvaleWarlockClass implements StateModule {
     ) => {
         const creatureId = positionalParams[1];
         const value = this.getRemainingDemonDuration(creatureId, atTime);
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     private getRemainingDemonDuration(creatureId: number, atTime: number) {
@@ -283,7 +286,7 @@ export class OvaleWarlockClass implements StateModule {
     ) {
         const now = GetTime();
         const expire = now + duration;
-        this.ovaleAura.GainedAuraOnGUID(
+        this.ovaleAura.gainedAuraOnGUID(
             this.ovale.playerGUID,
             now,
             customId,
@@ -311,11 +314,11 @@ export class OvaleWarlockClass implements StateModule {
         let value = 3600;
         const tickTime =
             2 /
-            this.ovalePaperDoll.GetHasteMultiplier(
+            this.ovalePaperDoll.getHasteMultiplier(
                 "spell",
                 this.ovalePaperDoll.next
             );
-        const [activeAgonies] = this.ovaleAura.AuraCount(
+        const [activeAgonies] = this.ovaleAura.auraCount(
             SpellId.agony,
             "HARMFUL",
             true,
@@ -328,7 +331,7 @@ export class OvaleWarlockClass implements StateModule {
                 ((1 / (0.184 * pow(activeAgonies, -2 / 3))) * tickTime) /
                 activeAgonies;
             if (
-                this.ovaleSpellBook.IsKnownTalent(
+                this.ovaleSpellBook.isKnownTalent(
                     TalentId.creeping_death_talent
                 )
             ) {
@@ -344,6 +347,6 @@ export class OvaleWarlockClass implements StateModule {
         atTime: number
     ) => {
         const value = this.getTimeToShard(atTime);
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 }

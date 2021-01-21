@@ -1,24 +1,24 @@
-import { L } from "./ui/Localization";
+import { l } from "./ui/Localization";
 import { NewAddon, AceModule } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, wipe, LuaArray, LuaObj, _G } from "@wowts/lua";
 import { UnitClass, UnitGUID, ClassId } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { Library } from "@wowts/tslib";
-import { ClearOneTimeMessages } from "./tools/tools";
+import { clearOneTimeMessages } from "./tools/tools";
 
-const MAX_REFRESH_INTERVALS = 500;
-const self_refreshIntervals: LuaArray<number> = {};
-let self_refreshIndex = 1;
+const maxRefreshIntervals = 500;
+const refreshIntervals: LuaArray<number> = {};
+let refreshIndex = 1;
 
 export type Constructor<T> = new (...args: any[]) => T;
 
 const name = "Ovale";
 
-const OvaleBase = NewAddon(name, aceEvent);
-export const MSG_PREFIX = name;
+const ovaleBase = NewAddon(name, aceEvent);
+export const messagePrefix = name;
 
-export class OvaleClass extends OvaleBase {
+export class OvaleClass extends ovaleBase {
     playerClass: ClassId = "WARRIOR";
     playerGUID = "";
     refreshNeeded: LuaObj<boolean> = {};
@@ -26,7 +26,7 @@ export class OvaleClass extends OvaleBase {
     constructor() {
         super();
         _G["BINDING_HEADER_OVALE"] = "Ovale";
-        const toggleCheckBox = L["check_box_tooltip"];
+        const toggleCheckBox = l["check_box_tooltip"];
         _G["BINDING_NAME_OVALE_CHECKBOX0"] = `${toggleCheckBox}(1)`;
         _G["BINDING_NAME_OVALE_CHECKBOX1"] = `${toggleCheckBox}(2)`;
         _G["BINDING_NAME_OVALE_CHECKBOX2"] = `${toggleCheckBox}(3)`;
@@ -41,13 +41,13 @@ export class OvaleClass extends OvaleBase {
     //     this.UnregisterMessage("Ovale_OptionChanged");
     //     this.frame.Hide();
     // }
-    OnInitialize() {
+    handleInitialize() {
         this.playerGUID = UnitGUID("player") || "error";
         const [, classId] = UnitClass("player");
         this.playerClass = classId || "WARRIOR";
-        wipe(self_refreshIntervals);
-        self_refreshIndex = 1;
-        ClearOneTimeMessages();
+        wipe(refreshIntervals);
+        refreshIndex = 1;
+        clearOneTimeMessages();
     }
 
     needRefresh() {
@@ -56,18 +56,16 @@ export class OvaleClass extends OvaleBase {
         }
     }
 
-    AddRefreshInterval(milliseconds: number) {
+    addRefreshInterval(milliseconds: number) {
         if (milliseconds < huge) {
-            self_refreshIntervals[self_refreshIndex] = milliseconds;
-            self_refreshIndex =
-                (self_refreshIndex < MAX_REFRESH_INTERVALS &&
-                    self_refreshIndex + 1) ||
-                1;
+            refreshIntervals[refreshIndex] = milliseconds;
+            refreshIndex =
+                (refreshIndex < maxRefreshIntervals && refreshIndex + 1) || 1;
         }
     }
-    GetRefreshIntervalStatistics() {
+    getRefreshIntervalStatistics() {
         let [sumRefresh, minRefresh, maxRefresh, count] = [0, huge, 0, 0];
-        for (const [, v] of ipairs(self_refreshIntervals)) {
+        for (const [, v] of ipairs(refreshIntervals)) {
             if (v > 0) {
                 if (minRefresh > v) {
                     minRefresh = v;

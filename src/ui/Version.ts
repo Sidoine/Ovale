@@ -1,7 +1,7 @@
-import { L } from "./Localization";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { l } from "./Localization";
+import { Tracer, DebugTools } from "../engine/debug";
 import { OvaleOptionsClass } from "./Options";
-import { OvaleClass, MSG_PREFIX } from "../Ovale";
+import { OvaleClass, messagePrefix } from "../Ovale";
 import aceComm, { AceComm } from "@wowts/ace_comm-3.0";
 import aceSerializer, { AceSerializer } from "@wowts/ace_serializer-3.0";
 import aceTimer, { Timer, AceTimer } from "@wowts/ace_timer-3.0";
@@ -17,9 +17,9 @@ import {
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "./acegui-helpers";
 
-const self_printTable: LuaObj<string> = {};
-const self_userVersion: LuaObj<string> = {};
-let self_timer: Timer | undefined;
+const printTable: LuaObj<string> = {};
+const userVersions: LuaObj<string> = {};
+let timer: Timer | undefined;
 
 export class OvaleVersionClass {
     warned = false;
@@ -29,7 +29,7 @@ export class OvaleVersionClass {
     constructor(
         ovale: OvaleClass,
         ovaleOptions: OvaleOptionsClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleVersion",
@@ -42,56 +42,56 @@ export class OvaleVersionClass {
         this.tracer = ovaleDebug.create(this.module.GetName());
         const actions: LuaObj<OptionUiAll> = {
             ping: {
-                name: L["ping_users"],
+                name: l["ping_users"],
                 type: "execute",
                 func: () => {
-                    this.VersionCheck();
+                    this.versionCheck();
                 },
             },
             version: {
-                name: L["show_version_number"],
+                name: l["show_version_number"],
                 type: "execute",
                 func: () => {
-                    this.tracer.Print(version);
+                    this.tracer.print(version);
                 },
             },
         };
         for (const [k, v] of pairs(actions)) {
             ovaleOptions.actions.args[k] = v;
         }
-        ovaleOptions.RegisterOptions();
+        ovaleOptions.registerOptions();
     }
 
     private handleInitialize = () => {
-        this.module.RegisterComm(MSG_PREFIX, this.OnCommReceived);
+        this.module.RegisterComm(messagePrefix, this.handleCommReceived);
     };
 
     private handleDisable = () => {};
 
-    private OnCommReceived = (
+    private handleCommReceived = (
         prefix: string,
         message: string,
         channel: string,
         sender: string
     ) => {
-        if (prefix == MSG_PREFIX) {
+        if (prefix == messagePrefix) {
             const [ok, msgType, senderVersion] = this.module.Deserialize(
                 message
             );
             if (ok) {
-                this.tracer.Debug(msgType, senderVersion, channel, sender);
+                this.tracer.debug(msgType, senderVersion, channel, sender);
                 if (msgType == "V") {
                     const msg = this.module.Serialize("VR", version);
-                    this.module.SendCommMessage(MSG_PREFIX, msg, channel);
+                    this.module.SendCommMessage(messagePrefix, msg, channel);
                 } else if (msgType == "VR") {
-                    self_userVersion[sender] = senderVersion;
+                    userVersions[sender] = senderVersion;
                 }
             }
         }
     };
-    VersionCheck() {
-        if (!self_timer) {
-            wipe(self_userVersion);
+    versionCheck() {
+        if (!timer) {
+            wipe(userVersions);
             const message = this.module.Serialize("V", version);
             let channel;
             if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE)) {
@@ -104,28 +104,28 @@ export class OvaleVersionClass {
                 channel = "GUILD";
             }
             if (channel) {
-                this.module.SendCommMessage(MSG_PREFIX, message, channel);
+                this.module.SendCommMessage(messagePrefix, message, channel);
             }
-            self_timer = this.module.ScheduleTimer(this.printVersionCheck, 3);
+            timer = this.module.ScheduleTimer(this.printVersionCheck, 3);
         }
     }
 
     private printVersionCheck = () => {
-        if (next(self_userVersion)) {
-            wipe(self_printTable);
-            for (const [sender, userVersion] of pairs(self_userVersion)) {
+        if (next(userVersions)) {
+            wipe(printTable);
+            for (const [sender, userVersion] of pairs(userVersions)) {
                 insert(
-                    self_printTable,
+                    printTable,
                     format(">>> %s is using Ovale %s", sender, userVersion)
                 );
             }
-            sort(self_printTable);
-            for (const [, v] of ipairs(self_printTable)) {
-                this.tracer.Print(v);
+            sort(printTable);
+            for (const [, v] of ipairs(printTable)) {
+                this.tracer.print(v);
             }
         } else {
-            this.tracer.Print(">>> No other Ovale users present.");
+            this.tracer.print(">>> No other Ovale users present.");
         }
-        self_timer = undefined;
+        timer = undefined;
     };
 }

@@ -5,7 +5,7 @@ import { assertIs } from "../tests/helpers";
 import { newTimeSpan } from "../tools/TimeSpan";
 import { AstAnnotation, AstTypedFunctionNode } from "./ast";
 import { OvaleConditionClass } from "./condition";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { OvaleProfilerClass, Profiler } from "./profiler";
 import { Runner } from "./runner";
 
@@ -15,7 +15,7 @@ function makeRunner() {
     profilerFactoryMock
         .setup((x) => x.create(It.isAny()))
         .returns(() => profilerMock.object);
-    const debugMock = Mock.ofType<OvaleDebugClass>();
+    const debugMock = Mock.ofType<DebugTools>();
     const trackerMock = Mock.ofType<Tracer>();
     debugMock
         .setup((x) => x.create(It.isAny()))
@@ -68,7 +68,7 @@ test("compute a typed_function", () => {
     };
 
     // Act
-    const result = runner.Compute(typedFunction, 0);
+    const result = runner.compute(typedFunction, 0);
 
     // Assert
     assertIs(result.type, "value");

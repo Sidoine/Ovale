@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const simc_path = "../../simc";
-const dbc_extract3 = `${simc_path}/dbc_extract3`;
+const simcPath = "../../simc";
+const dbcExtract3 = `${simcPath}/dbc_extract3`;
 const version = "9.0.2.36165";
-const json = readFileSync(`${dbc_extract3}/formats/${version}.json`, {
+const json = readFileSync(`${dbcExtract3}/formats/${version}.json`, {
     encoding: "utf8",
 });
 

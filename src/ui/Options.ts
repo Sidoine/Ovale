@@ -1,6 +1,6 @@
 import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
-import { L } from "./Localization";
+import { l } from "./Localization";
 import AceDB, { AceDatabase } from "@wowts/ace_db-3.0";
 import AceDBOptions from "@wowts/ace_db_options-3.0";
 import aceConsole, { AceConsole } from "@wowts/ace_console-3.0";
@@ -11,14 +11,14 @@ import { huge } from "@wowts/math";
 import { Color } from "./SpellFlash";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Print } from "../tools/tools";
+import { printFormat } from "../tools/tools";
 import { OptionUiGroup } from "./acegui-helpers";
 
 interface OptionModule {
-    UpgradeSavedVariables(): void;
+    upgradeSavedVariables(): void;
 }
 
-const self_register: LuaObj<OptionModule> = {};
+const optionModules: LuaObj<OptionModule> = {};
 
 export interface SpellFlashOptions {
     enabled: boolean;
@@ -197,7 +197,7 @@ export class OvaleOptionsClass {
         args: {
             show: {
                 type: "execute",
-                name: L["show_frame"],
+                name: l["show_frame"],
                 guiHidden: true,
                 func: () => {
                     this.db.profile.apparence.enableIcons = true;
@@ -209,7 +209,7 @@ export class OvaleOptionsClass {
             },
             hide: {
                 type: "execute",
-                name: L["hide_frame"],
+                name: l["hide_frame"],
                 guiHidden: true,
                 func: () => {
                     this.db.profile.apparence.enableIcons = false;
@@ -223,11 +223,11 @@ export class OvaleOptionsClass {
                 name: "Configuration",
                 type: "execute",
                 func: () => {
-                    this.ToggleConfig();
+                    this.toggleConfig();
                 },
             },
             refresh: {
-                name: L["display_refresh_statistics"],
+                name: l["display_refresh_statistics"],
                 type: "execute",
                 func: () => {
                     let [
@@ -235,7 +235,7 @@ export class OvaleOptionsClass {
                         minRefresh,
                         maxRefresh,
                         count,
-                    ] = this.ovale.GetRefreshIntervalStatistics();
+                    ] = this.ovale.getRefreshIntervalStatistics();
                     if (minRefresh == huge) {
                         [avgRefresh, minRefresh, maxRefresh, count] = [
                             0,
@@ -244,7 +244,7 @@ export class OvaleOptionsClass {
                             0,
                         ];
                     }
-                    Print(
+                    printFormat(
                         "Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)",
                         count,
                         avgRefresh,
@@ -274,8 +274,8 @@ export class OvaleOptionsClass {
         args: {
             standaloneOptions: {
                 order: 30,
-                name: L["standalone_options"],
-                desc: L["movable_configuration_pannel"],
+                name: l["standalone_options"],
+                desc: l["movable_configuration_pannel"],
                 type: "toggle",
                 get: () => {
                     return this.db.profile.standaloneOptions;
@@ -287,12 +287,12 @@ export class OvaleOptionsClass {
             iconGroupAppearance: {
                 order: 40,
                 type: "group",
-                name: L["icon_group"],
+                name: l["icon_group"],
                 args: {
                     enableIcons: {
                         order: 10,
                         type: "toggle",
-                        name: L["enabled"],
+                        name: l["enabled"],
                         width: "full",
                         set: (info: LuaArray<string>, value: boolean) => {
                             this.db.profile.apparence.enableIcons = value;
@@ -305,7 +305,7 @@ export class OvaleOptionsClass {
                     verrouille: {
                         order: 10,
                         type: "toggle",
-                        name: L["lock_position"],
+                        name: l["lock_position"],
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
                         },
@@ -313,7 +313,7 @@ export class OvaleOptionsClass {
                     clickThru: {
                         order: 20,
                         type: "toggle",
-                        name: L["ignore_mouse_clicks"],
+                        name: l["ignore_mouse_clicks"],
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
                         },
@@ -321,7 +321,7 @@ export class OvaleOptionsClass {
                     visibility: {
                         order: 20,
                         type: "group",
-                        name: L["visibility"],
+                        name: l["visibility"],
                         inline: true,
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
@@ -330,34 +330,34 @@ export class OvaleOptionsClass {
                             enCombat: {
                                 order: 10,
                                 type: "toggle",
-                                name: L["combat_only"],
+                                name: l["combat_only"],
                             },
                             avecCible: {
                                 order: 20,
                                 type: "toggle",
-                                name: L["if_target"],
+                                name: l["if_target"],
                             },
                             targetHostileOnly: {
                                 order: 30,
                                 type: "toggle",
-                                name: L["hide_if_dead_or_friendly_target"],
+                                name: l["hide_if_dead_or_friendly_target"],
                             },
                             hideVehicule: {
                                 order: 40,
                                 type: "toggle",
-                                name: L["hide_in_vehicles"],
+                                name: l["hide_in_vehicles"],
                             },
                             hideEmpty: {
                                 order: 50,
                                 type: "toggle",
-                                name: L["hide_empty_buttons"],
+                                name: l["hide_empty_buttons"],
                             },
                         },
                     },
                     layout: {
                         order: 30,
                         type: "group",
-                        name: L["layout"],
+                        name: l["layout"],
                         inline: true,
                         disabled: () => {
                             return !this.db.profile.apparence.enableIcons;
@@ -366,19 +366,19 @@ export class OvaleOptionsClass {
                             moving: {
                                 order: 10,
                                 type: "toggle",
-                                name: L["scrolling"],
-                                desc: L["scrolling_help"],
+                                name: l["scrolling"],
+                                desc: l["scrolling_help"],
                             },
                             vertical: {
                                 order: 20,
                                 type: "toggle",
-                                name: L["vertical"],
+                                name: l["vertical"],
                             },
                             offsetX: {
                                 order: 30,
                                 type: "range",
-                                name: L["horizontal_offset"],
-                                desc: L["horizontal_offset_help"],
+                                name: l["horizontal_offset"],
+                                desc: l["horizontal_offset_help"],
                                 min: -1000,
                                 max: 1000,
                                 softMin: -500,
@@ -388,8 +388,8 @@ export class OvaleOptionsClass {
                             offsetY: {
                                 order: 40,
                                 type: "range",
-                                name: L["vertical_offset"],
-                                desc: L["vertical_offset_help"],
+                                name: l["vertical_offset"],
+                                desc: l["vertical_offset_help"],
                                 min: -1000,
                                 max: 1000,
                                 softMin: -500,
@@ -399,7 +399,7 @@ export class OvaleOptionsClass {
                             margin: {
                                 order: 50,
                                 type: "range",
-                                name: L["margin_between_icons"],
+                                name: l["margin_between_icons"],
                                 min: -16,
                                 max: 64,
                                 step: 1,
@@ -411,13 +411,13 @@ export class OvaleOptionsClass {
             iconAppearance: {
                 order: 50,
                 type: "group",
-                name: L["icon"],
+                name: l["icon"],
                 args: {
                     iconScale: {
                         order: 10,
                         type: "range",
-                        name: L["icon_scale"],
-                        desc: L["icon_scale"],
+                        name: l["icon_scale"],
+                        desc: l["icon_scale"],
                         min: 0.5,
                         max: 3,
                         bigStep: 0.01,
@@ -426,8 +426,8 @@ export class OvaleOptionsClass {
                     smallIconScale: {
                         order: 20,
                         type: "range",
-                        name: L["small_icon_scale"],
-                        desc: L["small_icon_scale_help"],
+                        name: l["small_icon_scale"],
+                        desc: l["small_icon_scale_help"],
                         min: 0.5,
                         max: 3,
                         bigStep: 0.01,
@@ -436,7 +436,7 @@ export class OvaleOptionsClass {
                     remainsFontColor: {
                         type: "color",
                         order: 25,
-                        name: L["remaining_time_font_color"],
+                        name: l["remaining_time_font_color"],
                         get: () => {
                             const t = this.db.profile.apparence
                                 .remainsFontColor;
@@ -457,8 +457,8 @@ export class OvaleOptionsClass {
                     fontScale: {
                         order: 30,
                         type: "range",
-                        name: L["font_scale"],
-                        desc: L["font_scale_help"],
+                        name: l["font_scale"],
+                        desc: l["font_scale_help"],
                         min: 0.2,
                         max: 2,
                         bigStep: 0.01,
@@ -467,7 +467,7 @@ export class OvaleOptionsClass {
                     alpha: {
                         order: 40,
                         type: "range",
-                        name: L["icon_opacity"],
+                        name: l["icon_opacity"],
                         min: 0,
                         max: 1,
                         bigStep: 0.01,
@@ -476,43 +476,43 @@ export class OvaleOptionsClass {
                     raccourcis: {
                         order: 50,
                         type: "toggle",
-                        name: L["keyboard_shortcuts"],
-                        desc: L["show_keyboard_shortcuts"],
+                        name: l["keyboard_shortcuts"],
+                        desc: l["show_keyboard_shortcuts"],
                     },
                     numeric: {
                         order: 60,
                         type: "toggle",
-                        name: L["show_cooldown"],
-                        desc: L["show_cooldown_help"],
+                        name: l["show_cooldown"],
+                        desc: l["show_cooldown_help"],
                     },
                     highlightIcon: {
                         order: 70,
                         type: "toggle",
-                        name: L["highlight_icon"],
-                        desc: L["highlight_icon_help"],
+                        name: l["highlight_icon"],
+                        desc: l["highlight_icon_help"],
                     },
                     flashIcon: {
                         order: 80,
                         type: "toggle",
-                        name: L["highlight_icon_on_cd"],
+                        name: l["highlight_icon_on_cd"],
                     },
                     targetText: {
                         order: 90,
                         type: "input",
-                        name: L["range_indicator"],
-                        desc: L["range_indicator_help"],
+                        name: l["range_indicator"],
+                        desc: l["range_indicator_help"],
                     },
                 },
             },
             optionsAppearance: {
                 order: 60,
                 type: "group",
-                name: L["options"],
+                name: l["options"],
                 args: {
                     iconShiftX: {
                         order: 10,
                         type: "range",
-                        name: L["options_horizontal_shift"],
+                        name: l["options_horizontal_shift"],
                         min: -256,
                         max: 256,
                         step: 1,
@@ -520,7 +520,7 @@ export class OvaleOptionsClass {
                     iconShiftY: {
                         order: 20,
                         type: "range",
-                        name: L["options_vertical_shift"],
+                        name: l["options_vertical_shift"],
                         min: -256,
                         max: 256,
                         step: 1,
@@ -528,7 +528,7 @@ export class OvaleOptionsClass {
                     optionsAlpha: {
                         order: 30,
                         type: "range",
-                        name: L["option_opacity"],
+                        name: l["option_opacity"],
                         min: 0,
                         max: 1,
                         bigStep: 0.01,
@@ -566,14 +566,14 @@ export class OvaleOptionsClass {
                     taggedEnemies: {
                         order: 10,
                         type: "toggle",
-                        name: L["only_tagged"],
-                        desc: L["only_tagged_help"],
+                        name: l["only_tagged"],
+                        desc: l["only_tagged_help"],
                     },
                     auraLag: {
                         order: 20,
                         type: "range",
-                        name: L["aura_lag"],
-                        desc: L["lag_threshold"],
+                        name: l["aura_lag"],
+                        desc: l["lag_threshold"],
                         min: 100,
                         max: 700,
                         step: 10,
@@ -581,8 +581,8 @@ export class OvaleOptionsClass {
                     minFrameRefresh: {
                         order: 30,
                         type: "range",
-                        name: L["min_refresh"],
-                        desc: L["min_refresh_help"],
+                        name: l["min_refresh"],
+                        desc: l["min_refresh_help"],
                         min: 50,
                         max: 100,
                         step: 5,
@@ -590,8 +590,8 @@ export class OvaleOptionsClass {
                     maxFrameRefresh: {
                         order: 40,
                         type: "range",
-                        name: L["max_refresh"],
-                        desc: L["min_refresh_help"],
+                        name: l["max_refresh"],
+                        desc: l["min_refresh_help"],
                         min: 100,
                         max: 400,
                         step: 10,
@@ -600,15 +600,15 @@ export class OvaleOptionsClass {
                         order: 50,
                         width: "full",
                         type: "toggle",
-                        name: L["scan_all_auras"],
-                        desc: L.scan_all_auras_help,
+                        name: l["scan_all_auras"],
+                        desc: l.scan_all_auras_help,
                     },
                     frequentHealthUpdates: {
                         order: 60,
                         width: "full",
                         type: "toggle",
-                        name: L["frequent_health_updates"],
-                        desc: L["frequent_health_updates_help"],
+                        name: l["frequent_health_updates"],
+                        desc: l["frequent_health_updates_help"],
                     },
                 },
             },
@@ -628,14 +628,14 @@ export class OvaleOptionsClass {
     constructor(private ovale: OvaleClass) {
         this.module = ovale.createModule(
             "OvaleOptions",
-            this.OnInitialize,
+            this.handleInitialize,
             this.handleDisable,
             aceConsole,
             aceEvent
         );
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         const ovale = this.ovale.GetName();
         this.db = AceDB.New("OvaleDB", this.defaultDB);
         const db = this.db;
@@ -645,15 +645,15 @@ export class OvaleOptionsClass {
         //     LibDualSpec.EnhanceDatabase(db, "Ovale");
         //     LibDualSpec.EnhanceOptions(this.options.args.profile, db);
         // }
-        db.RegisterCallback(this, "OnNewProfile", this.HandleProfileChanges);
-        db.RegisterCallback(this, "OnProfileReset", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnNewProfile", this.handleProfileChanges);
+        db.RegisterCallback(this, "OnProfileReset", this.handleProfileChanges);
         db.RegisterCallback(
             this,
             "OnProfileChanged",
-            this.HandleProfileChanges
+            this.handleProfileChanges
         );
-        db.RegisterCallback(this, "OnProfileCopied", this.HandleProfileChanges);
-        this.UpgradeSavedVariables();
+        db.RegisterCallback(this, "OnProfileCopied", this.handleProfileChanges);
+        this.upgradeSavedVariables();
         AceConfig.RegisterOptionsTable(ovale, this.options.args.apparence);
         AceConfig.RegisterOptionsTable(
             `${ovale} Profiles`,
@@ -670,15 +670,15 @@ export class OvaleOptionsClass {
             "Profiles",
             ovale
         );
-        this.HandleProfileChanges();
+        this.handleProfileChanges();
     };
 
     private handleDisable = () => {};
 
-    RegisterOptions() {
+    registerOptions() {
         // tinsert(self_register, addon);
     }
-    UpgradeSavedVariables() {
+    upgradeSavedVariables() {
         // const profile = Ovale.db.profile;
         // if (profile.display != undefined && _type(profile.display) == "boolean") {
         //     profile.apparence.enableIcons = profile.display;
@@ -689,20 +689,20 @@ export class OvaleOptionsClass {
         //     profile.top = undefined;
         //     Ovale.OneTimeMessage("The Ovale icon frames position has been reset.");
         // }
-        for (const [, addon] of ipairs(self_register)) {
-            if (addon.UpgradeSavedVariables) {
-                addon.UpgradeSavedVariables();
+        for (const [, addon] of ipairs(optionModules)) {
+            if (addon.upgradeSavedVariables) {
+                addon.upgradeSavedVariables();
             }
         }
         this.db.RegisterDefaults(this.defaultDB);
     }
-    private HandleProfileChanges = () => {
+    private handleProfileChanges = () => {
         this.module.SendMessage("Ovale_ProfileChanged");
         this.module.SendMessage("Ovale_ScriptChanged");
         this.module.SendMessage("Ovale_OptionChanged", "layout");
         this.module.SendMessage("Ovale_OptionChanged", "visibility");
     };
-    ToggleConfig() {
+    toggleConfig() {
         const appName = this.ovale.GetName();
         if (this.db.profile.standaloneOptions) {
             if (AceConfigDialog.OpenFrames[appName]) {

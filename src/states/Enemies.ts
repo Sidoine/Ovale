@@ -1,4 +1,4 @@
-import { OvaleGUIDClass } from "../engine/guid";
+import { Guids } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer, Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
@@ -16,14 +16,14 @@ import { States } from "../engine/state";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 
-const GROUP_MEMBER = bor(
+const groupMembers = bor(
     COMBATLOG_OBJECT_AFFILIATION_MINE,
     COMBATLOG_OBJECT_AFFILIATION_PARTY,
     COMBATLOG_OBJECT_AFFILIATION_RAID
 );
-const CLEU_TAG_SUFFIXES = {
+const eventTagSuffixes = {
     1: "_DAMAGE",
     2: "_MISSED",
     3: "_AURA_APPLIED",
@@ -37,28 +37,28 @@ const CLEU_TAG_SUFFIXES = {
     11: "_DRAIN",
     12: "_LEECH",
 };
-const CLEU_AUTOATTACK: LuaObj<boolean> = {
+const autoAttackEvents: LuaObj<boolean> = {
     RANGED_DAMAGE: true,
     RANGED_MISSED: true,
     SWING_DAMAGE: true,
     SWING_MISSED: true,
 };
-const CLEU_UNIT_REMOVED: LuaObj<boolean> = {
+const unitRemovedEvents: LuaObj<boolean> = {
     UNIT_DESTROYED: true,
     UNIT_DIED: true,
     UNIT_DISSIPATES: true,
 };
-const self_enemyName: LuaObj<string> = {};
-const self_enemyLastSeen: LuaObj<number> = {};
-const self_taggedEnemyLastSeen: LuaObj<number> = {};
-let self_reaperTimer: Timer | undefined = undefined;
-const REAP_INTERVAL = 3;
-const IsTagEvent = function (cleuEvent: string) {
+const enemyNames: LuaObj<string> = {};
+const lastSeenEnemies: LuaObj<number> = {};
+const taggedEnemyLastSeens: LuaObj<number> = {};
+let reaperTimer: Timer | undefined = undefined;
+const reapInterval = 3;
+const isTagEvent = function (cleuEvent: string) {
     let isTagEvent = false;
-    if (CLEU_AUTOATTACK[cleuEvent]) {
+    if (autoAttackEvents[cleuEvent]) {
         isTagEvent = true;
     } else {
-        for (const [, suffix] of ipairs(CLEU_TAG_SUFFIXES)) {
+        for (const [, suffix] of ipairs(eventTagSuffixes)) {
             if (truthy(find(cleuEvent, `${suffix}$`))) {
                 isTagEvent = true;
                 break;
@@ -67,10 +67,10 @@ const IsTagEvent = function (cleuEvent: string) {
     }
     return isTagEvent;
 };
-const IsFriendly = function (unitFlags: number, isGroupMember?: boolean) {
+const isFriendly = function (unitFlags: number, isGroupMember?: boolean) {
     return (
         band(unitFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 &&
-        (!isGroupMember || band(unitFlags, GROUP_MEMBER) > 0)
+        (!isGroupMember || band(unitFlags, groupMembers) > 0)
     );
 };
 
@@ -86,16 +86,16 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
     private tracer: Tracer;
 
     constructor(
-        private ovaleGuid: OvaleGUIDClass,
+        private ovaleGuid: Guids,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         super(EnemiesData);
         this.module = ovale.createModule(
             "OvaleEnemies",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent,
             aceTimer
         );
@@ -103,33 +103,36 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
         this.tracer = ovaleDebug.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
-        if (!self_reaperTimer) {
-            self_reaperTimer = this.module.ScheduleRepeatingTimer(
-                this.RemoveInactiveEnemies,
-                REAP_INTERVAL
+    private handleInitialize = () => {
+        if (!reaperTimer) {
+            reaperTimer = this.module.ScheduleRepeatingTimer(
+                this.removeInactiveEnemies,
+                reapInterval
             );
         }
         this.module.RegisterEvent(
             "COMBAT_LOG_EVENT_UNFILTERED",
-            this.COMBAT_LOG_EVENT_UNFILTERED
+            this.handleCombatLogEventUnfiltered
         );
         this.module.RegisterEvent(
             "PLAYER_REGEN_DISABLED",
-            this.PLAYER_REGEN_DISABLED
+            this.handlePlayerRegenDisabled
         );
     };
 
-    private OnDisable = () => {
-        if (self_reaperTimer) {
-            this.module.CancelTimer(self_reaperTimer);
-            self_reaperTimer = undefined;
+    private handleDisable = () => {
+        if (reaperTimer) {
+            this.module.CancelTimer(reaperTimer);
+            reaperTimer = undefined;
         }
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
     };
 
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         const [
             ,
             cleuEvent,
@@ -142,9 +145,9 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             destName,
             destFlags,
         ] = CombatLogGetCurrentEventInfo();
-        if (CLEU_UNIT_REMOVED[cleuEvent]) {
+        if (unitRemovedEvents[cleuEvent]) {
             const now = GetTime();
-            this.RemoveEnemy(cleuEvent, destGUID, now, true);
+            this.removeEnemy(cleuEvent, destGUID, now, true);
         } else if (
             sourceGUID &&
             sourceGUID != "" &&
@@ -155,81 +158,81 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             destName &&
             destFlags
         ) {
-            if (!IsFriendly(sourceFlags) && IsFriendly(destFlags, true)) {
+            if (!isFriendly(sourceFlags) && isFriendly(destFlags, true)) {
                 if (
                     !(
                         cleuEvent == "SPELL_PERIODIC_DAMAGE" &&
-                        IsTagEvent(cleuEvent)
+                        isTagEvent(cleuEvent)
                     )
                 ) {
                     const now = GetTime();
-                    this.AddEnemy(cleuEvent, sourceGUID, sourceName, now);
+                    this.addEnemy(cleuEvent, sourceGUID, sourceName, now);
                 }
             } else if (
-                IsFriendly(sourceFlags, true) &&
-                !IsFriendly(destFlags) &&
-                IsTagEvent(cleuEvent)
+                isFriendly(sourceFlags, true) &&
+                !isFriendly(destFlags) &&
+                isTagEvent(cleuEvent)
             ) {
                 const now = GetTime();
                 let isPlayerTag;
                 if (sourceGUID == this.ovale.playerGUID) {
                     isPlayerTag = true;
                 } else {
-                    [isPlayerTag] = this.ovaleGuid.IsPlayerPet(sourceGUID);
+                    [isPlayerTag] = this.ovaleGuid.isPlayerPet(sourceGUID);
                 }
-                this.AddEnemy(cleuEvent, destGUID, destName, now, isPlayerTag);
+                this.addEnemy(cleuEvent, destGUID, destName, now, isPlayerTag);
             }
         }
     };
-    private PLAYER_REGEN_DISABLED = () => {
-        wipe(self_enemyName);
-        wipe(self_enemyLastSeen);
-        wipe(self_taggedEnemyLastSeen);
+    private handlePlayerRegenDisabled = () => {
+        wipe(enemyNames);
+        wipe(lastSeenEnemies);
+        wipe(taggedEnemyLastSeens);
         this.current.activeEnemies = 0;
         this.current.taggedEnemies = 0;
     };
-    private RemoveInactiveEnemies = () => {
-        this.profiler.StartProfiling("OvaleEnemies_RemoveInactiveEnemies");
+    private removeInactiveEnemies = () => {
+        this.profiler.startProfiling("OvaleEnemies_RemoveInactiveEnemies");
         const now = GetTime();
-        for (const [guid, timestamp] of pairs(self_enemyLastSeen)) {
-            if (now - timestamp > REAP_INTERVAL) {
-                this.RemoveEnemy("REAPED", guid, now);
+        for (const [guid, timestamp] of pairs(lastSeenEnemies)) {
+            if (now - timestamp > reapInterval) {
+                this.removeEnemy("REAPED", guid, now);
             }
         }
-        for (const [guid, timestamp] of pairs(self_taggedEnemyLastSeen)) {
-            if (now - timestamp > REAP_INTERVAL) {
-                this.RemoveTaggedEnemy("REAPED", guid, now);
+        for (const [guid, timestamp] of pairs(taggedEnemyLastSeens)) {
+            if (now - timestamp > reapInterval) {
+                this.removeTaggedEnemy("REAPED", guid, now);
             }
         }
-        this.profiler.StopProfiling("OvaleEnemies_RemoveInactiveEnemies");
+        this.profiler.stopProfiling("OvaleEnemies_RemoveInactiveEnemies");
     };
-    private AddEnemy(
+    private addEnemy(
         cleuEvent: string,
         guid: string,
         name: string,
         timestamp: number,
         isTagged?: boolean
     ) {
-        this.profiler.StartProfiling("OvaleEnemies_AddEnemy");
+        this.profiler.startProfiling("OvaleEnemies_AddEnemy");
         if (guid) {
-            self_enemyName[guid] = name;
+            enemyNames[guid] = name;
             let changed = false;
             {
-                if (!self_enemyLastSeen[guid]) {
+                if (!lastSeenEnemies[guid]) {
                     this.current.activeEnemies = this.current.activeEnemies + 1;
                     changed = true;
                 }
-                self_enemyLastSeen[guid] = timestamp;
+                lastSeenEnemies[guid] = timestamp;
             }
             if (isTagged) {
-                if (!self_taggedEnemyLastSeen[guid]) {
+                if (!taggedEnemyLastSeens[guid]) {
                     this.current.taggedEnemies = this.current.taggedEnemies + 1;
                     changed = true;
                 }
-                self_taggedEnemyLastSeen[guid] = timestamp;
+                taggedEnemyLastSeens[guid] = timestamp;
             }
             if (changed) {
-                this.tracer.DebugTimestamp(
+                this.tracer.debugTimestamp(
                     "%s: %d/%d enemy seen: %s (%s)",
                     cleuEvent,
                     this.current.taggedEnemies,
@@ -240,34 +243,34 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 this.ovale.needRefresh();
             }
         }
-        this.profiler.StopProfiling("OvaleEnemies_AddEnemy");
+        this.profiler.stopProfiling("OvaleEnemies_AddEnemy");
     }
-    private RemoveEnemy(
+    private removeEnemy(
         cleuEvent: string,
         guid: string,
         timestamp: number,
         isDead?: boolean
     ) {
-        this.profiler.StartProfiling("OvaleEnemies_RemoveEnemy");
+        this.profiler.startProfiling("OvaleEnemies_RemoveEnemy");
         if (guid) {
-            const name = self_enemyName[guid];
+            const name = enemyNames[guid];
             let changed = false;
-            if (self_enemyLastSeen[guid]) {
-                delete self_enemyLastSeen[guid];
+            if (lastSeenEnemies[guid]) {
+                delete lastSeenEnemies[guid];
                 if (this.current.activeEnemies > 0) {
                     this.current.activeEnemies = this.current.activeEnemies - 1;
                     changed = true;
                 }
             }
-            if (self_taggedEnemyLastSeen[guid]) {
-                delete self_taggedEnemyLastSeen[guid];
+            if (taggedEnemyLastSeens[guid]) {
+                delete taggedEnemyLastSeens[guid];
                 if (this.current.taggedEnemies > 0) {
                     this.current.taggedEnemies = this.current.taggedEnemies - 1;
                     changed = true;
                 }
             }
             if (changed) {
-                this.tracer.DebugTimestamp(
+                this.tracer.debugTimestamp(
                     "%s: %d/%d enemy %s: %s (%s)",
                     cleuEvent,
                     this.current.taggedEnemies,
@@ -280,23 +283,23 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 this.module.SendMessage("Ovale_InactiveUnit", guid, isDead);
             }
         }
-        this.profiler.StopProfiling("OvaleEnemies_RemoveEnemy");
+        this.profiler.stopProfiling("OvaleEnemies_RemoveEnemy");
     }
-    private RemoveTaggedEnemy(
+    private removeTaggedEnemy(
         cleuEvent: string,
         guid: string,
         timestamp: number
     ) {
-        this.profiler.StartProfiling("OvaleEnemies_RemoveTaggedEnemy");
+        this.profiler.startProfiling("OvaleEnemies_RemoveTaggedEnemy");
         if (guid) {
-            const name = self_enemyName[guid];
-            const tagged = self_taggedEnemyLastSeen[guid];
+            const name = enemyNames[guid];
+            const tagged = taggedEnemyLastSeens[guid];
             if (tagged) {
-                delete self_taggedEnemyLastSeen[guid];
+                delete taggedEnemyLastSeens[guid];
                 if (this.current.taggedEnemies > 0) {
                     this.current.taggedEnemies = this.current.taggedEnemies - 1;
                 }
-                this.tracer.DebugTimestamp(
+                this.tracer.debugTimestamp(
                     "%s: %d/%d enemy removed: %s (%s), last tagged at %f",
                     cleuEvent,
                     this.current.taggedEnemies,
@@ -308,21 +311,21 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 this.ovale.needRefresh();
             }
         }
-        this.profiler.StopProfiling("OvaleEnemies_RemoveTaggedEnemy");
+        this.profiler.stopProfiling("OvaleEnemies_RemoveTaggedEnemy");
     }
-    DebugEnemies() {
-        for (const [guid, seen] of pairs(self_enemyLastSeen)) {
-            const name = self_enemyName[guid];
-            const tagged = self_taggedEnemyLastSeen[guid];
+    debugEnemies() {
+        for (const [guid, seen] of pairs(lastSeenEnemies)) {
+            const name = enemyNames[guid];
+            const tagged = taggedEnemyLastSeens[guid];
             if (tagged) {
-                this.tracer.Print(
+                this.tracer.print(
                     "Tagged enemy %s (%s) last seen at %f",
                     guid,
                     name,
                     tagged
                 );
             } else {
-                this.tracer.Print(
+                this.tracer.print(
                     "Enemy %s (%s) last seen at %f",
                     guid,
                     name,
@@ -330,23 +333,23 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 );
             }
         }
-        this.tracer.Print("Total enemies: %d", this.current.activeEnemies);
-        this.tracer.Print(
+        this.tracer.print("Total enemies: %d", this.current.activeEnemies);
+        this.tracer.print(
             "Total tagged enemies: %d",
             this.current.taggedEnemies
         );
     }
 
-    InitializeState() {
+    initializeState() {
         this.next.enemies = undefined;
     }
-    ResetState() {
-        this.profiler.StartProfiling("OvaleEnemies_ResetState");
+    resetState() {
+        this.profiler.startProfiling("OvaleEnemies_ResetState");
         this.next.activeEnemies = this.current.activeEnemies;
         this.next.taggedEnemies = this.current.taggedEnemies;
-        this.profiler.StopProfiling("OvaleEnemies_ResetState");
+        this.profiler.stopProfiling("OvaleEnemies_ResetState");
     }
-    CleanState() {
+    cleanState() {
         this.next.activeEnemies = 0;
         this.next.taggedEnemies = 0;
         this.next.enemies = undefined;

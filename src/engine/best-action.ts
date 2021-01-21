@@ -28,11 +28,11 @@ import { OvaleSpellsClass } from "../states/Spells";
 import { isNumber, isString } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleGUIDClass } from "./guid";
+import { Guids } from "./guid";
 import { OvaleFutureClass } from "../states/Future";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { Profiler, OvaleProfilerClass } from "./profiler";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { Variables } from "../states/Variables";
 import { ActionInfoHandler, Runner } from "./runner";
 
@@ -54,48 +54,48 @@ export class OvaleBestActionClass {
         private ovaleActionBar: OvaleActionBarClass,
         private ovaleData: OvaleDataClass,
         private ovaleCooldown: OvaleCooldownClass,
-        Ovale: OvaleClass,
-        private OvaleGUID: OvaleGUIDClass,
-        private OvaleFuture: OvaleFutureClass,
-        private OvaleSpellBook: OvaleSpellBookClass,
+        ovale: OvaleClass,
+        private guids: Guids,
+        private future: OvaleFutureClass,
+        private spellBook: OvaleSpellBookClass,
         ovaleProfiler: OvaleProfilerClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private variables: Variables,
-        private OvaleSpells: OvaleSpellsClass,
+        private spells: OvaleSpellsClass,
         private runner: Runner
     ) {
-        this.module = Ovale.createModule(
+        this.module = ovale.createModule(
             "BestAction",
             this.onInitialize,
-            this.OnDisable,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
         this.tracer = ovaleDebug.create(this.module.GetName());
-        runner.registerActionInfoHandler("item", this.GetActionItemInfo);
-        runner.registerActionInfoHandler("macro", this.GetActionMacroInfo);
-        runner.registerActionInfoHandler("spell", this.GetActionSpellInfo);
-        runner.registerActionInfoHandler("texture", this.GetActionTextureInfo);
+        runner.registerActionInfoHandler("item", this.getActionItemInfo);
+        runner.registerActionInfoHandler("macro", this.getActionMacroInfo);
+        runner.registerActionInfoHandler("spell", this.getActionSpellInfo);
+        runner.registerActionInfoHandler("texture", this.getActionTextureInfo);
     }
 
     private onInitialize = () => {};
 
-    private GetActionItemInfo: ActionInfoHandler = (node, atTime, target) => {
-        this.profiler.StartProfiling("OvaleBestAction_GetActionItemInfo");
+    private getActionItemInfo: ActionInfoHandler = (node, atTime, target) => {
+        this.profiler.startProfiling("OvaleBestAction_GetActionItemInfo");
         let itemId = node.cachedParams.positional[1];
         const result = node.result;
         setResultType(result, "action");
         if (!isNumber(itemId)) {
-            const itemIdFromSlot = this.ovaleEquipment.GetEquippedItemBySlotName(
+            const itemIdFromSlot = this.ovaleEquipment.getEquippedItemBySlotName(
                 <SlotName>itemId
             );
             if (!itemIdFromSlot) {
-                this.tracer.Log("Unknown item '%s'.", itemId);
+                this.tracer.log("Unknown item '%s'.", itemId);
                 return result;
             }
             itemId = itemIdFromSlot;
         }
-        this.tracer.Log("Item ID '%s'", itemId);
+        this.tracer.log("Item ID '%s'", itemId);
         const actionSlot = this.ovaleActionBar.getItemActionSlot(itemId);
         const [spellName] = GetItemSpell(itemId);
         if (node.cachedParams.named.texture) {
@@ -112,29 +112,29 @@ export class OvaleBestActionClass {
         result.actionUsable =
             (spellName &&
                 IsUsableItem(itemId) &&
-                this.OvaleSpells.IsUsableItem(itemId, atTime)) ||
+                this.spells.isUsableItem(itemId, atTime)) ||
             false;
         result.actionSlot = actionSlot;
         result.actionType = "item";
         result.actionId = itemId;
         result.actionTarget = target;
-        result.castTime = this.OvaleFuture.GetGCD(atTime);
-        this.profiler.StopProfiling("OvaleBestAction_GetActionItemInfo");
+        result.castTime = this.future.getGCD(atTime);
+        this.profiler.stopProfiling("OvaleBestAction_GetActionItemInfo");
         return result;
     };
 
-    private GetActionMacroInfo: ActionInfoHandler = (
+    private getActionMacroInfo: ActionInfoHandler = (
         element,
         atTime,
         target
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_GetActionMacroInfo");
+        this.profiler.startProfiling("OvaleBestAction_GetActionMacroInfo");
         const result = element.result;
         const macro = <string>element.cachedParams.positional[1];
         const actionSlot = this.ovaleActionBar.getMacroActionSlot(macro);
         setResultType(result, "action");
         if (!actionSlot) {
-            this.tracer.Log("Unknown macro '%s'.", macro);
+            this.tracer.log("Unknown macro '%s'.", macro);
             return result;
         }
         if (element.cachedParams.named.texture) {
@@ -152,17 +152,17 @@ export class OvaleBestActionClass {
         result.actionSlot = actionSlot;
         result.actionType = "macro";
         result.actionId = macro;
-        result.castTime = this.OvaleFuture.GetGCD(atTime);
-        this.profiler.StopProfiling("OvaleBestAction_GetActionMacroInfo");
+        result.castTime = this.future.getGCD(atTime);
+        this.profiler.stopProfiling("OvaleBestAction_GetActionMacroInfo");
         return result;
     };
 
-    private GetActionSpellInfo: ActionInfoHandler = (
+    private getActionSpellInfo: ActionInfoHandler = (
         element,
         atTime,
         target
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_GetActionSpellInfo");
+        this.profiler.startProfiling("OvaleBestAction_GetActionSpellInfo");
         const spell = element.cachedParams.positional[1];
         if (isNumber(spell)) {
             return this.getSpellActionInfo(spell, element, atTime, target);
@@ -170,7 +170,7 @@ export class OvaleBestActionClass {
             const spellList = this.ovaleData.buffSpellList[spell];
             if (spellList) {
                 for (const [spellId] of pairs(spellList)) {
-                    if (this.OvaleSpellBook.IsKnownSpell(spellId)) {
+                    if (this.spellBook.isKnownSpell(spellId)) {
                         return this.getSpellActionInfo(
                             spellId,
                             element,
@@ -191,13 +191,13 @@ export class OvaleBestActionClass {
         atTime: number,
         target: string
     ): NodeActionResult | NodeNoResult {
-        const targetGUID = this.OvaleGUID.UnitGUID(target);
+        const targetGUID = this.guids.getUnitGUID(target);
         const result = element.result;
         this.ovaleData.registerSpellAsked(spellId);
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
         if (si) {
-            const replacement = this.ovaleData.GetSpellInfoProperty(
+            const replacement = this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 "replaced_by",
@@ -207,7 +207,7 @@ export class OvaleBestActionClass {
                 replacedSpellId = spellId;
                 spellId = replacement;
                 si = this.ovaleData.spellInfo[spellId];
-                this.tracer.Log(
+                this.tracer.log(
                     "Spell ID '%s' is replaced by spell ID '%s'.",
                     replacedSpellId,
                     spellId
@@ -216,7 +216,7 @@ export class OvaleBestActionClass {
         }
         let actionSlot = this.ovaleActionBar.getSpellActionSlot(spellId);
         if (!actionSlot && replacedSpellId) {
-            this.tracer.Log(
+            this.tracer.log(
                 "Action not found for spell ID '%s'; checking for replaced spell ID '%s'.",
                 spellId,
                 replacedSpellId
@@ -226,27 +226,27 @@ export class OvaleBestActionClass {
             );
             if (actionSlot) spellId = replacedSpellId;
         }
-        let isKnownSpell = this.OvaleSpellBook.IsKnownSpell(spellId);
+        let isKnownSpell = this.spellBook.isKnownSpell(spellId);
         if (!isKnownSpell && replacedSpellId) {
-            this.tracer.Log(
+            this.tracer.log(
                 "Spell ID '%s' is not known; checking for replaced spell ID '%s'.",
                 spellId,
                 replacedSpellId
             );
-            isKnownSpell = this.OvaleSpellBook.IsKnownSpell(replacedSpellId);
+            isKnownSpell = this.spellBook.isKnownSpell(replacedSpellId);
             if (isKnownSpell) spellId = replacedSpellId;
         }
         if (!isKnownSpell && !actionSlot) {
             setResultType(result, "none");
-            this.tracer.Log("Unknown spell ID '%s'.", spellId);
+            this.tracer.log("Unknown spell ID '%s'.", spellId);
             return result;
         }
-        const [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(
+        const [isUsable, noMana] = this.spells.isUsableSpell(
             spellId,
             atTime,
             targetGUID
         );
-        this.tracer.Log(
+        this.tracer.log(
             "OvaleSpells:IsUsableSpell(%d, %f, %s) returned %s, %s",
             spellId,
             atTime,
@@ -264,19 +264,19 @@ export class OvaleBestActionClass {
         } else {
             result.actionTexture = GetSpellTexture(spellId);
         }
-        result.actionInRange = this.OvaleSpells.IsSpellInRange(spellId, target);
+        result.actionInRange = this.spells.isSpellInRange(spellId, target);
         [
             result.actionCooldownStart,
             result.actionCooldownDuration,
             result.actionEnable,
-        ] = this.ovaleCooldown.GetSpellCooldown(spellId, atTime);
+        ] = this.ovaleCooldown.getSpellCooldown(spellId, atTime);
 
-        this.tracer.Log(
+        this.tracer.log(
             "GetSpellCooldown returned %f, %f",
             result.actionCooldownStart,
             result.actionCooldownDuration
         );
-        [result.actionCharges] = this.ovaleCooldown.GetSpellCharges(
+        [result.actionCharges] = this.ovaleCooldown.getSpellCharges(
             spellId,
             atTime
         );
@@ -297,7 +297,7 @@ export class OvaleBestActionClass {
                             result.actionCooldownDuration -
                             atTime) ||
                     0;
-                const timeToPower = this.OvaleSpells.TimeToPowerForSpell(
+                const timeToPower = this.spells.timeToPowerForSpell(
                     spellId,
                     atTime,
                     targetGUID,
@@ -306,7 +306,7 @@ export class OvaleBestActionClass {
                 );
                 if (timeToPower > timeToCd) {
                     result.actionResourceExtend = timeToPower - timeToCd;
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Spell ID '%s' requires an extra %f seconds for power requirements.",
                         spellId,
                         result.actionResourceExtend
@@ -319,12 +319,12 @@ export class OvaleBestActionClass {
         }
 
         if (!si || !si.casttime) {
-            result.castTime = this.OvaleSpellBook.GetCastTime(spellId);
+            result.castTime = this.spellBook.getCastTime(spellId);
         }
         result.actionTarget = target;
         const offgcd =
             element.cachedParams.named.offgcd ||
-            this.ovaleData.GetSpellInfoProperty(
+            this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 "offgcd",
@@ -333,16 +333,16 @@ export class OvaleBestActionClass {
             0;
         result.offgcd = (offgcd == 1 && true) || undefined;
         if (result.timeSpan)
-            this.profiler.StopProfiling("OvaleBestAction_GetActionSpellInfo");
+            this.profiler.stopProfiling("OvaleBestAction_GetActionSpellInfo");
         return result;
     }
 
-    private GetActionTextureInfo: ActionInfoHandler = (
+    private getActionTextureInfo: ActionInfoHandler = (
         element: AstActionNode,
         atTime: number,
         target: string
     ) => {
-        this.profiler.StartProfiling("OvaleBestAction_GetActionTextureInfo");
+        this.profiler.startProfiling("OvaleBestAction_GetActionTextureInfo");
         const result = element.result;
         setResultType(result, "action");
         result.actionTarget = target;
@@ -365,31 +365,31 @@ export class OvaleBestActionClass {
         result.actionSlot = undefined;
         result.actionType = "texture";
         result.actionId = actionTexture;
-        result.castTime = this.OvaleFuture.GetGCD(atTime);
+        result.castTime = this.future.getGCD(atTime);
 
-        this.profiler.StopProfiling("OvaleBestAction_GetActionTextureInfo");
+        this.profiler.stopProfiling("OvaleBestAction_GetActionTextureInfo");
         return result;
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_ScriptChanged");
     };
 
-    public StartNewAction() {
+    public startNewAction() {
         this.runner.refresh();
     }
 
-    public GetAction(node: AstIconNode, atTime: number): AstNodeSnapshot {
-        this.profiler.StartProfiling("OvaleBestAction_GetAction");
+    public getAction(node: AstIconNode, atTime: number): AstNodeSnapshot {
+        this.profiler.startProfiling("OvaleBestAction_GetAction");
         const groupNode = node.child[1];
-        const element = this.runner.PostOrderCompute(groupNode, atTime);
-        if (element.type == "state" && element.timeSpan.HasTime(atTime)) {
+        const element = this.runner.postOrderCompute(groupNode, atTime);
+        if (element.type == "state" && element.timeSpan.hasTime(atTime)) {
             const [variable, value] = [element.name, element.value];
-            const isFuture = !element.timeSpan.HasTime(atTime);
+            const isFuture = !element.timeSpan.hasTime(atTime);
             if (variable !== undefined && value !== undefined)
-                this.variables.PutState(variable, value, isFuture, atTime);
+                this.variables.putState(variable, value, isFuture, atTime);
         }
-        this.profiler.StopProfiling("OvaleBestAction_GetAction");
+        this.profiler.stopProfiling("OvaleBestAction_GetAction");
         return element;
     }
 }

@@ -1,4 +1,4 @@
-import { OvaleClass, MSG_PREFIX } from "../Ovale";
+import { OvaleClass, messagePrefix } from "../Ovale";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceSerializer, { AceSerializer } from "@wowts/ace_serializer-3.0";
 import { pairs, LuaObj, LuaArray } from "@wowts/lua";
@@ -13,7 +13,7 @@ import {
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "../states/Future";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 import { OvaleCombatClass } from "../states/combat";
 
 export type ScoreCallback = (
@@ -34,53 +34,53 @@ export class OvaleScoreClass {
     constructor(
         private ovale: OvaleClass,
         private ovaleFuture: OvaleFutureClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private ovaleSpellBook: OvaleSpellBookClass,
         private combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
             "OvaleScore",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent,
             aceSerializer
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
-        this.module.RegisterEvent("CHAT_MSG_ADDON", this.CHAT_MSG_ADDON);
+    private handleInitialize = () => {
+        this.module.RegisterEvent("CHAT_MSG_ADDON", this.handleChatMsgAddon);
         this.module.RegisterEvent(
             "PLAYER_REGEN_ENABLED",
-            this.PLAYER_REGEN_ENABLED
+            this.handlePlayerRegenEnabled
         );
         this.module.RegisterEvent(
             "PLAYER_REGEN_DISABLED",
-            this.PLAYER_REGEN_DISABLED
+            this.handlePlayerRegenDisabled
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_CHANNEL_START",
-            this.UNIT_SPELLCAST_CHANNEL_START
+            this.handleUnitSpellCastChannelStart
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_START",
-            this.UNIT_SPELLCAST_START
+            this.handleUnitSpellCastStart
         );
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("CHAT_MSG_ADDON");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
         this.module.UnregisterEvent("UNIT_SPELLCAST_START");
     };
-    private CHAT_MSG_ADDON = (
+    private handleChatMsgAddon = (
         event: string,
         prefix: string,
         message: string,
         _: unknown,
         sender: string
     ) => {
-        if (prefix == MSG_PREFIX) {
+        if (prefix == messagePrefix) {
             const [
                 ok,
                 msgType,
@@ -89,11 +89,11 @@ export class OvaleScoreClass {
                 guid,
             ] = this.module.Deserialize(message);
             if (ok && msgType == "S") {
-                this.SendScore(sender, guid, scored, scoreMax);
+                this.sendScore(sender, guid, scored, scoreMax);
             }
         }
     };
-    private PLAYER_REGEN_ENABLED = () => {
+    private handlePlayerRegenEnabled = () => {
         if (this.maxScore > 0 && IsInGroup()) {
             const message = this.module.Serialize(
                 "score",
@@ -104,30 +104,30 @@ export class OvaleScoreClass {
             const channel =
                 (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) && "INSTANCE_CHAT") ||
                 "RAID";
-            SendAddonMessage(MSG_PREFIX, message, channel);
+            SendAddonMessage(messagePrefix, message, channel);
         }
     };
-    private PLAYER_REGEN_DISABLED = () => {
+    private handlePlayerRegenDisabled = () => {
         this.score = 0;
         this.maxScore = 0;
     };
-    RegisterDamageMeter(moduleName: string, func: ScoreCallback) {
+    registerDamageMeter(moduleName: string, func: ScoreCallback) {
         this.damageMeterMethod[moduleName] = func;
     }
-    UnregisterDamageMeter(moduleName: string) {
+    unregisterDamageMeter(moduleName: string) {
         delete this.damageMeterMethod[moduleName];
     }
-    AddSpell(spellId: number) {
+    addSpell(spellId: number) {
         this.scoredSpell[spellId] = true;
     }
-    ScoreSpell(spellId: number) {
+    scoreSpell(spellId: number) {
         if (this.combat.isInCombat(undefined) && this.scoredSpell[spellId]) {
             const scored = 0; // this.frame.GetScore(spellId)
-            this.tracer.DebugTimestamp("Scored %s for %d.", scored, spellId);
+            this.tracer.debugTimestamp("Scored %s for %d.", scored, spellId);
             if (scored) {
                 this.score = this.score + scored;
                 this.maxScore = this.maxScore + 1;
-                this.SendScore(
+                this.sendScore(
                     this.module.GetName(),
                     this.ovale.playerGUID,
                     scored,
@@ -136,13 +136,13 @@ export class OvaleScoreClass {
             }
         }
     }
-    SendScore(name: string, guid: string, scored: number, scoreMax: number) {
+    sendScore(name: string, guid: string, scored: number, scoreMax: number) {
         for (const [, method] of pairs(this.damageMeterMethod)) {
             method(name, guid, scored, scoreMax);
         }
     }
 
-    UNIT_SPELLCAST_CHANNEL_START = (
+    handleUnitSpellCastChannelStart = (
         event: string,
         unitId: string,
         lineId: number,
@@ -150,9 +150,9 @@ export class OvaleScoreClass {
     ) => {
         if (unitId == "player" || unitId == "pet") {
             const now = GetTime();
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
             if (spell) {
-                const [spellcast] = this.ovaleFuture.GetSpellcast(
+                const [spellcast] = this.ovaleFuture.getSpellcast(
                     spell,
                     spellId,
                     undefined,
@@ -161,24 +161,24 @@ export class OvaleScoreClass {
                 if (spellcast) {
                     const [name] = UnitChannelInfo(unitId);
                     if (name == spell) {
-                        this.ScoreSpell(spellId);
+                        this.scoreSpell(spellId);
                     }
                 }
             }
         }
     };
 
-    UNIT_SPELLCAST_START = (
+    handleUnitSpellCastStart = (
         event: string,
         unitId: string,
         lineId: string,
         spellId: number
     ) => {
         if (unitId == "player" || unitId == "pet") {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
             if (spell) {
                 const now = GetTime();
-                const [spellcast] = this.ovaleFuture.GetSpellcast(
+                const [spellcast] = this.ovaleFuture.getSpellcast(
                     spell,
                     spellId,
                     lineId,
@@ -187,43 +187,43 @@ export class OvaleScoreClass {
                 if (spellcast) {
                     const [name, , , , , , castId] = UnitCastingInfo(unitId);
                     if (lineId == castId && name == spell) {
-                        this.ScoreSpell(spellId);
+                        this.scoreSpell(spellId);
                     }
                 }
             }
         }
     };
 
-    UNIT_SPELLCAST_SUCCEEDED = (
-        event: string,
-        unitId: string,
-        lineId: string,
-        spellId: number
-    ) => {
-        if (unitId == "player" || unitId == "pet") {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            if (spell) {
-                const now = GetTime();
-                const [spellcast] = this.ovaleFuture.GetSpellcast(
-                    spell,
-                    spellId,
-                    lineId,
-                    now
-                );
-                if (spellcast) {
-                    if (
-                        spellcast.success ||
-                        !spellcast.start ||
-                        !spellcast.stop ||
-                        spellcast.channel
-                    ) {
-                        const name = UnitChannelInfo(unitId);
-                        if (!name) {
-                            this.ScoreSpell(spellId);
-                        }
-                    }
-                }
-            }
-        }
-    };
+    // UNIT_SPELLCAST_SUCCEEDED = (
+    //     event: string,
+    //     unitId: string,
+    //     lineId: string,
+    //     spellId: number
+    // ) => {
+    //     if (unitId == "player" || unitId == "pet") {
+    //         const spell = this.ovaleSpellBook.GetSpellName(spellId);
+    //         if (spell) {
+    //             const now = GetTime();
+    //             const [spellcast] = this.ovaleFuture.getSpellcast(
+    //                 spell,
+    //                 spellId,
+    //                 lineId,
+    //                 now
+    //             );
+    //             if (spellcast) {
+    //                 if (
+    //                     spellcast.success ||
+    //                     !spellcast.start ||
+    //                     !spellcast.stop ||
+    //                     spellcast.channel
+    //                 ) {
+    //                     const name = UnitChannelInfo(unitId);
+    //                     if (!name) {
+    //                         this.scoreSpell(spellId);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // };
 }

@@ -5,7 +5,7 @@ import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 
-const CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
+const combatLogDamageEvents: LuaObj<boolean> = {
     SPELL_DAMAGE: true,
     SPELL_PERIODIC_AURA: true,
 };
@@ -18,25 +18,28 @@ export class OvaleSpellDamageClass {
     constructor(private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass) {
         this.module = ovale.createModule(
             "OvaleSpellDamage",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "COMBAT_LOG_EVENT_UNFILTERED",
-            this.COMBAT_LOG_EVENT_UNFILTERED
+            this.handleCombatLogEventUnfiltered
         );
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     };
 
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         const [
             ,
             cleuEvent,
@@ -55,20 +58,20 @@ export class OvaleSpellDamageClass {
             arg15,
         ] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == this.ovale.playerGUID) {
-            this.profiler.StartProfiling(
+            this.profiler.startProfiling(
                 "OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED"
             );
-            if (CLEU_DAMAGE_EVENT[cleuEvent]) {
+            if (combatLogDamageEvents[cleuEvent]) {
                 const [spellId, amount] = [arg12, arg15];
                 this.value[spellId] = amount;
                 this.ovale.needRefresh();
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED"
             );
         }
     };
-    Get(spellId: number) {
+    getSpellDamage(spellId: number) {
         return this.value[spellId];
     }
 }

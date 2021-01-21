@@ -1,4 +1,4 @@
-import { L } from "./Localization";
+import { l } from "./Localization";
 import { format } from "@wowts/string";
 import { LuaObj, next, tostring, _G } from "@wowts/lua";
 import {
@@ -22,14 +22,14 @@ import { isNumber, isString } from "../tools/tools";
 import { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
 import { LocalizationStrings } from "./localization/definition";
 import { OvaleActionBarClass } from "../engine/action-bar";
-const INFINITY = huge;
-const COOLDOWN_THRESHOLD = 0.1;
+const infinity = huge;
+const cooldownThreshold = 0.1;
 
 export interface IconParent {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox>;
     listWidget: LuaObj<AceGUIWidgetDropDown>;
     iconsFrame: UIFrame;
-    ToggleOptions(): void;
+    toggleOptions(): void;
     debugIcon(index: number): void;
 }
 
@@ -61,7 +61,7 @@ export class OvaleIcon {
     icon: UITexture;
     frame: UICheckButton;
 
-    HasScriptControls() {
+    hasScriptControls() {
         return (
             next(this.parent.checkBoxWidget) != undefined ||
             next(this.parent.listWidget) != undefined
@@ -118,14 +118,14 @@ export class OvaleIcon {
         this.focusText.SetFontObject("GameFontNormalSmall");
         this.focusText.SetAllPoints(this.frame);
         this.focusText.SetTextColor(1, 1, 1);
-        this.focusText.SetText(L["focus"]);
+        this.focusText.SetText(l["focus"]);
         this.frame.RegisterForClicks("AnyUp");
         if (profile.apparence.clickThru) {
             this.frame.EnableMouse(false);
         }
     }
 
-    SetValue(value: number | undefined, actionTexture: string | undefined) {
+    setValue(value: number | undefined, actionTexture: string | undefined) {
         this.icon.Show();
         this.icon.SetTexture(actionTexture);
         this.icon.SetAlpha(this.ovaleOptions.db.profile.apparence.alpha);
@@ -139,7 +139,7 @@ export class OvaleIcon {
             this.value = value;
             if (value < 10) {
                 this.remains.SetFormattedText("%.1f", value);
-            } else if (value == INFINITY) {
+            } else if (value == infinity) {
                 this.remains.SetFormattedText("inf");
             } else {
                 this.remains.SetFormattedText("%d", value);
@@ -150,7 +150,7 @@ export class OvaleIcon {
         }
         this.frame.Show();
     }
-    Update(element: NodeActionResult, startTime?: number) {
+    update(element: NodeActionResult, startTime?: number) {
         this.actionType = element.actionType;
         this.actionId = element.actionId;
         this.value = undefined;
@@ -178,8 +178,8 @@ export class OvaleIcon {
                     this.cooldownEnd = startTime;
                     resetCooldown = true;
                 } else if (
-                    startTime < this.cooldownEnd - COOLDOWN_THRESHOLD ||
-                    startTime > this.cooldownEnd + COOLDOWN_THRESHOLD
+                    startTime < this.cooldownEnd - cooldownThreshold ||
+                    startTime > this.cooldownEnd + cooldownThreshold
                 ) {
                     if (
                         startTime - this.cooldownEnd > 0.25 ||
@@ -210,7 +210,7 @@ export class OvaleIcon {
             ) {
                 const [start, ending] = [this.cooldownStart, this.cooldownEnd];
                 const duration = ending - start;
-                if (resetCooldown && duration > COOLDOWN_THRESHOLD) {
+                if (resetCooldown && duration > cooldownThreshold) {
                     cd.SetDrawEdge(false);
                     cd.SetSwipeColor(0, 0, 0, 0.8);
                     cd.SetCooldown(start, duration);
@@ -335,10 +335,10 @@ export class OvaleIcon {
         }
         return [startTime, element];
     }
-    SetHelp(help: string | undefined) {
+    setHelp(help: string | undefined) {
         this.help = help as keyof Required<LocalizationStrings>;
     }
-    SetParams(
+    setParams(
         positionalParams: AstIconNode["rawPositionalParams"],
         namedParams: AstIconNode["rawNamedParams"]
         // secure?: boolean
@@ -367,12 +367,12 @@ export class OvaleIcon {
         //     }
         // }
     }
-    SetRemainsFont(color: { r: number; g: number; b: number }) {
+    setRemainsFont(color: { r: number; g: number; b: number }) {
         this.remains.SetTextColor(color.r, color.g, color.b, 1.0);
         this.remains.SetJustifyH("left");
         this.remains.SetPoint("BOTTOMLEFT", 2, 2);
     }
-    SetFontScale(scale: number) {
+    setFontScale(scale: number) {
         this.fontScale = scale;
         this.remains.SetFont(
             this.fontName,
@@ -395,7 +395,7 @@ export class OvaleIcon {
             this.fontFlags
         );
     }
-    SetRangeIndicator(text: string) {
+    setRangeIndicator(text: string) {
         this.rangeIndicator.SetText(text);
     }
     onMouseUp = (
@@ -408,7 +408,7 @@ export class OvaleIcon {
             | "Button5"
     ) => {
         if (!this.actionButton) {
-            if (button === "LeftButton") this.parent.ToggleOptions();
+            if (button === "LeftButton") this.parent.toggleOptions();
             else if (button === "MiddleButton") {
                 this.parent.debugIcon(this.index);
             }
@@ -416,10 +416,10 @@ export class OvaleIcon {
         this.frame.SetChecked(true);
     };
     onEnter = () => {
-        if (this.help || this.actionType || this.HasScriptControls()) {
+        if (this.help || this.actionType || this.hasScriptControls()) {
             GameTooltip.SetOwner(this.frame, "ANCHOR_BOTTOMLEFT");
             if (this.help) {
-                GameTooltip.SetText(L[this.help] || this.help);
+                GameTooltip.SetText(l[this.help] || this.help);
             }
             if (this.actionType) {
                 let actionHelp: string;
@@ -428,14 +428,14 @@ export class OvaleIcon {
                 } else {
                     if (this.actionType == "spell" && isNumber(this.actionId)) {
                         actionHelp =
-                            this.ovaleSpellBook.GetSpellName(this.actionId) ||
+                            this.ovaleSpellBook.getSpellName(this.actionId) ||
                             "Unknown spell";
                     } else if (
                         this.actionType == "value" &&
                         isNumber(this.value)
                     ) {
                         actionHelp =
-                            (this.value < INFINITY && tostring(this.value)) ||
+                            (this.value < infinity && tostring(this.value)) ||
                             "infinity";
                     } else {
                         actionHelp = format(
@@ -447,18 +447,18 @@ export class OvaleIcon {
                 }
                 GameTooltip.AddLine(actionHelp, 0.5, 1, 0.75);
             }
-            if (this.HasScriptControls()) {
-                GameTooltip.AddLine(L["options_tooltip"], 1, 1, 1);
+            if (this.hasScriptControls()) {
+                GameTooltip.AddLine(l["options_tooltip"], 1, 1, 1);
             }
             GameTooltip.Show();
         }
     };
     onLeave = () => {
-        if (this.help || this.HasScriptControls()) {
+        if (this.help || this.hasScriptControls()) {
             GameTooltip.Hide();
         }
     };
-    SetPoint(
+    setPoint(
         anchor: UIPosition,
         reference: UIFrame,
         refAnchor: UIPosition,
@@ -468,19 +468,21 @@ export class OvaleIcon {
         this.frame.SetPoint(anchor, reference, refAnchor, x, y);
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Show() {
         this.frame.Show();
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Hide() {
         this.frame.Hide();
     }
 
-    SetScale(scale: number) {
+    setScale(scale: number) {
         this.frame.SetScale(scale);
     }
 
-    EnableMouse(enabled: boolean) {
+    enableMouse(enabled: boolean) {
         this.frame.EnableMouse(enabled);
     }
 }

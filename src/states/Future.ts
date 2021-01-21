@@ -1,8 +1,13 @@
 import { OvaleAuraClass } from "./Aura";
 import { OvaleDataClass } from "../engine/data";
-import { OvaleGUIDClass } from "../engine/guid";
+import { Guids } from "../engine/guid";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
-import { LastSpell, SpellCast, self_pool, createSpellCast } from "./LastSpell";
+import {
+    LastSpell,
+    SpellCast,
+    lastSpellCastPool,
+    createSpellCast,
+} from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     ipairs,
@@ -32,24 +37,24 @@ import { BaseState } from "./BaseState";
 import { isNumber } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { Tracer, OvaleDebugClass } from "../engine/debug";
+import { Tracer, DebugTools } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
 import {
     ConditionFunction,
     OvaleConditionClass,
-    ReturnValueBetween,
+    returnValueBetween,
 } from "../engine/condition";
 import { Runner } from "../engine/runner";
 
 const strsub = sub;
 const tremove = remove;
-let self_timeAuraAdded: undefined | number = undefined;
+let timeAuraAdded: undefined | number = undefined;
 
 // let SIMULATOR_LAG = 0.005;
 
-const CLEU_AURA_EVENT: LuaObj<"hit"> = {
+const spellAuraEvents: LuaObj<"hit"> = {
     SPELL_AURA_APPLIED: "hit",
     SPELL_AURA_APPLIED_DOSE: "hit",
     SPELL_AURA_BROKEN: "hit",
@@ -58,7 +63,7 @@ const CLEU_AURA_EVENT: LuaObj<"hit"> = {
     SPELL_AURA_REMOVED: "hit",
     SPELL_AURA_REMOVED_DOSE: "hit",
 };
-const CLEU_SPELLCAST_FINISH_EVENT: LuaObj<"hit" | "miss"> = {
+const spellCastFinishEvents: LuaObj<"hit" | "miss"> = {
     SPELL_DAMAGE: "hit",
     SPELL_DISPEL: "hit",
     SPELL_DISPEL_FAILED: "miss",
@@ -67,39 +72,39 @@ const CLEU_SPELLCAST_FINISH_EVENT: LuaObj<"hit" | "miss"> = {
     SPELL_MISSED: "miss",
     SPELL_STOLEN: "hit",
 };
-const CLEU_SPELLCAST_EVENT: LuaObj<boolean> = {
+const spellCastEvents: LuaObj<boolean> = {
     SPELL_CAST_FAILED: true,
     SPELL_CAST_START: true,
     SPELL_CAST_SUCCESS: true,
 };
 {
-    for (const [cleuEvent, v] of pairs(CLEU_AURA_EVENT)) {
-        CLEU_SPELLCAST_FINISH_EVENT[cleuEvent] = v;
+    for (const [cleuEvent, v] of pairs(spellAuraEvents)) {
+        spellCastFinishEvents[cleuEvent] = v;
     }
-    for (const [cleuEvent] of pairs(CLEU_SPELLCAST_FINISH_EVENT)) {
-        CLEU_SPELLCAST_EVENT[cleuEvent] = true;
+    for (const [cleuEvent] of pairs(spellCastFinishEvents)) {
+        spellCastEvents[cleuEvent] = true;
     }
 }
-const SPELLCAST_AURA_ORDER: LuaArray<"target" | "pet"> = {
+const spellCastAurOrder: LuaArray<"target" | "pet"> = {
     1: "target",
     2: "pet",
 };
-const WHITE_ATTACK: LuaArray<boolean> = {
+const whiteAttackIds: LuaArray<boolean> = {
     [75]: true,
     [5019]: true,
     [6603]: true,
 };
-const WHITE_ATTACK_NAME: LuaObj<boolean> = {};
+const whitAttackNames: LuaObj<boolean> = {};
 {
-    for (const [spellId] of pairs(WHITE_ATTACK)) {
+    for (const [spellId] of pairs(whiteAttackIds)) {
         const [name] = GetSpellInfo(spellId);
         if (name) {
-            WHITE_ATTACK_NAME[name] = true;
+            whitAttackNames[name] = true;
         }
     }
 }
 
-const IsSameSpellcast = function (a: SpellCast, b: SpellCast) {
+const isSameSpellcast = function (a: SpellCast, b: SpellCast) {
     let boolean = a.spellId == b.spellId && a.queued == b.queued;
     if (boolean) {
         if (a.channel || b.channel) {
@@ -129,7 +134,7 @@ export class OvaleFutureData {
      */
     nextCast = 0;
 
-    PushGCDSpellId(spellId: number) {
+    pushGCDSpellId(spellId: number) {
         if (this.lastGCDSpellId) {
             insert(this.lastGCDSpellIds, this.lastGCDSpellId);
             if (lualength(this.lastGCDSpellIds) > 5) {
@@ -139,10 +144,10 @@ export class OvaleFutureData {
         this.lastGCDSpellId = spellId;
     }
 
-    GetCounter(id: number) {
+    getCounter(id: number) {
         return this.counter[id] || 0;
     }
-    IsChanneling(atTime: number) {
+    isChanneling(atTime: number) {
         return this.currentCast.channel && atTime < this.currentCast.stop;
     }
 }
@@ -160,10 +165,10 @@ export class OvaleFutureClass
         private baseState: BaseState,
         private ovaleCooldown: OvaleCooldownClass,
         private ovaleState: OvaleStateClass,
-        private ovaleGuid: OvaleGUIDClass,
+        private ovaleGuid: Guids,
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleStance: OvaleStanceClass,
         private ovaleSpellBook: OvaleSpellBookClass,
@@ -175,14 +180,14 @@ export class OvaleFutureClass
         this.profiler = ovaleProfiler.create(name);
         this.module = ovale.createModule(
             name,
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
     }
 
     public registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition("channeling", true, this.isChanneling);
+        condition.registerCondition("channeling", true, this.isChanneling);
     }
 
     private isChanneling: ConditionFunction = (
@@ -191,10 +196,10 @@ export class OvaleFutureClass
         atTime
     ) => {
         const [spellId] = unpack(positionalParameters);
-        const state = this.GetState(atTime);
+        const state = this.getState(atTime);
         if (state.currentCast.spellId !== spellId || !state.currentCast.channel)
             return [];
-        return ReturnValueBetween(
+        return returnValueBetween(
             state.currentCast.start,
             state.currentCast.stop,
             1,
@@ -203,13 +208,13 @@ export class OvaleFutureClass
         );
     };
 
-    UpdateStateCounters(
+    updateStateCounters(
         state: OvaleFutureData,
         spellId: number,
         atTime: number,
         targetGUID: string
     ) {
-        const inccounter = this.ovaleData.GetSpellInfoProperty(
+        const inccounter = this.ovaleData.getSpellInfoProperty(
             spellId,
             atTime,
             "inccounter",
@@ -220,7 +225,7 @@ export class OvaleFutureClass
                 (state.counter[inccounter] && state.counter[inccounter]) || 0;
             state.counter[inccounter] = value + 1;
         }
-        const resetcounter = this.ovaleData.GetSpellInfoProperty(
+        const resetcounter = this.ovaleData.getSpellInfoProperty(
             spellId,
             atTime,
             "resetcounter",
@@ -231,67 +236,67 @@ export class OvaleFutureClass
         }
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterEvent(
             "COMBAT_LOG_EVENT_UNFILTERED",
-            this.COMBAT_LOG_EVENT_UNFILTERED
+            this.handleCombatLogEventUnfiltered
         );
         this.module.RegisterEvent(
             "PLAYER_ENTERING_WORLD",
-            this.PLAYER_ENTERING_WORLD
+            this.handlePlayerEnteringWorld
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_CHANNEL_START",
-            this.UNIT_SPELLCAST_CHANNEL_START
+            this.handleUnitSpellCastChannelStart
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_CHANNEL_STOP",
-            this.UNIT_SPELLCAST_CHANNEL_STOP
+            this.handleSpellCastChannelStop
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_CHANNEL_UPDATE",
-            this.UNIT_SPELLCAST_CHANNEL_UPDATE
+            this.handleSpellCastChannelUpdate
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_DELAYED",
-            this.UNIT_SPELLCAST_DELAYED
+            this.handleUnitSpellCastDelayed
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_FAILED",
-            this.UnitSpellcastEnded
+            this.handleUnitSpellcastEnded
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_FAILED_QUIET",
-            this.UnitSpellcastEnded
+            this.handleUnitSpellcastEnded
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_INTERRUPTED",
-            this.UnitSpellcastEnded
+            this.handleUnitSpellcastEnded
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_SENT",
-            this.UNIT_SPELLCAST_SENT
+            this.handleUnitSpellCastSent
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_START",
-            this.UNIT_SPELLCAST_START
+            this.handleUnitSpellCastStart
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_STOP",
-            this.UnitSpellcastEnded
+            this.handleUnitSpellcastEnded
         );
         this.module.RegisterEvent(
             "UNIT_SPELLCAST_SUCCEEDED",
-            this.UNIT_SPELLCAST_SUCCEEDED
+            this.handleUnitSpellCastSucceeded
         );
-        this.module.RegisterMessage("Ovale_AuraAdded", this.Ovale_AuraAdded);
+        this.module.RegisterMessage("Ovale_AuraAdded", this.handleAuraAdded);
         this.module.RegisterMessage(
             "Ovale_AuraChanged",
-            this.Ovale_AuraChanged
+            this.handleAuraChanged
         );
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
@@ -309,7 +314,10 @@ export class OvaleFutureClass
         this.module.UnregisterMessage("Ovale_AuraChanged");
     };
 
-    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
+    private handleCombatLogEventUnfiltered = (
+        event: string,
+        ...parameters: any[]
+    ) => {
         // this.tracer.DebugTimestamp(
         //     "COMBAT_LOG_EVENT_UNFILTERED",
         //     CombatLogGetCurrentEventInfo()
@@ -342,19 +350,19 @@ export class OvaleFutureClass
         ] = CombatLogGetCurrentEventInfo();
         if (
             sourceGUID == this.ovale.playerGUID ||
-            this.ovaleGuid.IsPlayerPet(sourceGUID)
+            this.ovaleGuid.isPlayerPet(sourceGUID)
         ) {
-            this.profiler.StartProfiling(
+            this.profiler.startProfiling(
                 "OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED"
             );
-            if (CLEU_SPELLCAST_EVENT[cleuEvent]) {
+            if (spellCastEvents[cleuEvent]) {
                 const now = GetTime();
                 if (
                     strsub(cleuEvent, 1, 11) == "SPELL_CAST_" &&
                     destName &&
                     destName != ""
                 ) {
-                    this.tracer.DebugTimestamp(
+                    this.tracer.debugTimestamp(
                         "CLEU",
                         cleuEvent,
                         sourceName,
@@ -364,7 +372,7 @@ export class OvaleFutureClass
                         spellId,
                         spellName
                     );
-                    const [spellcast] = this.GetSpellcast(
+                    const [spellcast] = this.getSpellcast(
                         spellName,
                         spellId,
                         undefined,
@@ -376,7 +384,7 @@ export class OvaleFutureClass
                         spellcast.targetName == destName &&
                         spellcast.target != destGUID
                     ) {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Disambiguating target of spell %s (%d) to %s (%s).",
                             spellName,
                             spellId,
@@ -386,9 +394,9 @@ export class OvaleFutureClass
                         spellcast.target = destGUID;
                     }
                 }
-                this.tracer.DebugTimestamp("CLUE", cleuEvent);
+                this.tracer.debugTimestamp("CLUE", cleuEvent);
                 let finish: "hit" | "miss" | undefined =
-                    CLEU_SPELLCAST_FINISH_EVENT[cleuEvent];
+                    spellCastFinishEvents[cleuEvent];
                 if (cleuEvent == "SPELL_DAMAGE" || cleuEvent == "SPELL_HEAL") {
                     if (isOffHand) {
                         finish = undefined;
@@ -408,7 +416,7 @@ export class OvaleFutureClass
                                 spellcast.auraId == spellId)
                         ) {
                             if (
-                                this.FinishSpell(
+                                this.finishSpell(
                                     spellcast,
                                     cleuEvent,
                                     sourceName,
@@ -426,7 +434,7 @@ export class OvaleFutureClass
                         }
                     }
                     if (!anyFinished) {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Found no spell to finish for %s (%d)",
                             spellName,
                             spellId
@@ -442,7 +450,7 @@ export class OvaleFutureClass
                                 spellcast.spellName == spellName
                             ) {
                                 if (
-                                    this.FinishSpell(
+                                    this.finishSpell(
                                         spellcast,
                                         cleuEvent,
                                         sourceName,
@@ -460,7 +468,7 @@ export class OvaleFutureClass
                             }
                         }
                         if (!anyFinished) {
-                            this.tracer.Debug(
+                            this.tracer.debug(
                                 "No spell found for %s",
                                 spellName,
                                 spellId
@@ -469,12 +477,13 @@ export class OvaleFutureClass
                     }
                 }
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED"
             );
         }
     };
-    FinishSpell(
+
+    finishSpell(
         spellcast: SpellCast,
         cleuEvent: string,
         sourceName: string,
@@ -488,7 +497,7 @@ export class OvaleFutureClass
     ) {
         let finished = false;
         if (!spellcast.auraId) {
-            this.tracer.DebugTimestamp(
+            this.tracer.debugTimestamp(
                 "CLEU",
                 cleuEvent,
                 sourceName,
@@ -499,7 +508,7 @@ export class OvaleFutureClass
                 spellName
             );
             if (!spellcast.channel) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Finished (%s) spell %s (%d) queued at %s due to %s.",
                     finish,
                     spellName,
@@ -510,11 +519,11 @@ export class OvaleFutureClass
                 finished = true;
             }
         } else if (
-            CLEU_AURA_EVENT[cleuEvent] &&
+            spellAuraEvents[cleuEvent] &&
             spellcast.auraGUID &&
             destGUID == spellcast.auraGUID
         ) {
-            this.tracer.DebugTimestamp(
+            this.tracer.debugTimestamp(
                 "CLEU",
                 cleuEvent,
                 sourceName,
@@ -524,7 +533,7 @@ export class OvaleFutureClass
                 spellId,
                 spellName
             );
-            this.tracer.Debug(
+            this.tracer.debug(
                 "Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.",
                 finish,
                 spellName,
@@ -539,7 +548,7 @@ export class OvaleFutureClass
             spellcast.auraGUID &&
             destGUID == spellcast.auraGUID
         ) {
-            this.tracer.Debug(
+            this.tracer.debug(
                 "Finished (%s) spell %s (%d) queued at %s after Ovale_AuraChanged was called for aura %d on %s.",
                 finish,
                 spellName,
@@ -552,34 +561,34 @@ export class OvaleFutureClass
         }
         if (finished) {
             const now = GetTime();
-            if (self_timeAuraAdded) {
+            if (timeAuraAdded) {
                 if (
-                    IsSameSpellcast(spellcast, this.lastSpell.lastGCDSpellcast)
+                    isSameSpellcast(spellcast, this.lastSpell.lastGCDSpellcast)
                 ) {
-                    this.UpdateSpellcastSnapshot(
+                    this.updateSpellcastSnapshot(
                         this.lastSpell.lastGCDSpellcast,
-                        self_timeAuraAdded
+                        timeAuraAdded
                     );
                 }
                 if (
-                    IsSameSpellcast(spellcast, this.current.lastOffGCDSpellcast)
+                    isSameSpellcast(spellcast, this.current.lastOffGCDSpellcast)
                 ) {
-                    this.UpdateSpellcastSnapshot(
+                    this.updateSpellcastSnapshot(
                         this.current.lastOffGCDSpellcast,
-                        self_timeAuraAdded
+                        timeAuraAdded
                     );
                 }
             }
             const delta = now - spellcast.stop;
             const targetGUID = spellcast.target;
-            this.tracer.Debug(
+            this.tracer.debug(
                 "Spell %s (%d) was in flight for %f seconds.",
                 spellName,
                 spellId,
                 delta
             );
             tremove(this.lastSpell.queue, i);
-            self_pool.Release(spellcast);
+            lastSpellCastPool.release(spellcast);
             this.ovale.needRefresh();
             this.module.SendMessage(
                 "Ovale_SpellFinished",
@@ -591,25 +600,28 @@ export class OvaleFutureClass
         }
         return finished;
     }
-    private PLAYER_ENTERING_WORLD = (event: string) => {
-        this.profiler.StartProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
-        this.tracer.Debug(event);
-        this.profiler.StopProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
+    private handlePlayerEnteringWorld = (event: string) => {
+        this.profiler.startProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
+        this.tracer.debug(event);
+        this.profiler.stopProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
     };
-    private UNIT_SPELLCAST_CHANNEL_START = (
+    private handleUnitSpellCastChannelStart = (
         event: string,
         unitId: string,
         lineId: number,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling(
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_START"
             );
-            this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
+            this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
-            const [spellcast] = this.GetSpellcast(
+            const [spellcast] = this.getSpellcast(
                 spell,
                 spellId,
                 undefined,
@@ -626,7 +638,7 @@ export class OvaleFutureClass
                     spellcast.start = startTime;
                     spellcast.stop = endTime;
                     const delta = now - spellcast.queued;
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Channelling spell %s (%d): start = %s (+%s), ending = %s",
                         spell,
                         spellId,
@@ -634,65 +646,68 @@ export class OvaleFutureClass
                         delta,
                         endTime
                     );
-                    this.SaveSpellcastInfo(spellcast, now);
-                    this.UpdateLastSpellcast(now, spellcast);
-                    this.UpdateCounters(
+                    this.saveSpellcastInfo(spellcast, now);
+                    this.updateLastSpellcast(now, spellcast);
+                    this.updateCounters(
                         spellId,
                         spellcast.start,
                         spellcast.target
                     );
                     this.ovale.needRefresh();
                 } else if (!name) {
-                    this.tracer.Debug("Warning: not channelling a spell.");
+                    this.tracer.debug("Warning: not channelling a spell.");
                 } else {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Warning: channelling unexpected spell %s",
                         name
                     );
                 }
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: channelling spell %s (%d) without previous UNIT_SPELLCAST_SENT.",
                     spell,
                     spellId
                 );
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_START"
             );
         }
     };
-    private UNIT_SPELLCAST_CHANNEL_STOP = (
+    private handleSpellCastChannelStop = (
         event: string,
         unitId: string,
         lineId: number,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling(
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP"
             );
-            this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
+            this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
-            const [spellcast, index] = this.GetSpellcast(
+            const [spellcast, index] = this.getSpellcast(
                 spell,
                 spellId,
                 undefined,
                 now
             );
             if (spellcast && spellcast.channel) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Finished channelling spell %s (%d) queued at %s.",
                     spell,
                     spellId,
                     spellcast.queued
                 );
                 spellcast.stop = now;
-                this.UpdateLastSpellcast(now, spellcast);
+                this.updateLastSpellcast(now, spellcast);
                 const targetGUID = spellcast.target;
                 tremove(this.lastSpell.queue, index);
-                self_pool.Release(spellcast);
+                lastSpellCastPool.release(spellcast);
                 this.ovale.needRefresh();
                 this.module.SendMessage(
                     "Ovale_SpellFinished",
@@ -702,25 +717,28 @@ export class OvaleFutureClass
                     "hit"
                 );
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP"
             );
         }
     };
-    private UNIT_SPELLCAST_CHANNEL_UPDATE = (
+    private handleSpellCastChannelUpdate = (
         event: string,
         unitId: string,
         lineId: number,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling(
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE"
             );
-            this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
+            this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
-            const [spellcast] = this.GetSpellcast(
+            const [spellcast] = this.getSpellcast(
                 spell,
                 spellId,
                 undefined,
@@ -734,7 +752,7 @@ export class OvaleFutureClass
                     const delta = endTime - spellcast.stop;
                     spellcast.start = startTime;
                     spellcast.stop = endTime;
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Updating channelled spell %s (%d) to ending = %s (+%s).",
                         spell,
                         spellId,
@@ -743,37 +761,40 @@ export class OvaleFutureClass
                     );
                     this.ovale.needRefresh();
                 } else if (!name) {
-                    this.tracer.Debug("Warning: not channelling a spell.");
+                    this.tracer.debug("Warning: not channelling a spell.");
                 } else {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Warning: delaying unexpected channelled spell %s.",
                         name
                     );
                 }
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: no queued, channelled spell %s (%d) found to update.",
                     spell,
                     spellId
                 );
             }
-            this.profiler.StopProfiling(
+            this.profiler.stopProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE"
             );
         }
     };
-    private UNIT_SPELLCAST_DELAYED = (
+    private handleUnitSpellCastDelayed = (
         event: string,
         unitId: string,
         lineId: string,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
-            this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
+            this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
-            const [spellcast] = this.GetSpellcast(spell, spellId, lineId, now);
+            const [spellcast] = this.getSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
                 let [name, , , startTime, endTime, , castId] = UnitCastingInfo(
                     unitId
@@ -784,7 +805,7 @@ export class OvaleFutureClass
                     const delta = endTime - spellcast.stop;
                     spellcast.start = startTime;
                     spellcast.stop = endTime;
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Delaying spell %s (%d) to ending = %s (+%s).",
                         spell,
                         spellId,
@@ -793,21 +814,21 @@ export class OvaleFutureClass
                     );
                     this.ovale.needRefresh();
                 } else if (!name) {
-                    this.tracer.Debug("Warning: not casting a spell.");
+                    this.tracer.debug("Warning: not casting a spell.");
                 } else {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Warning: delaying unexpected spell %s.",
                         name
                     );
                 }
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: no queued spell %s (%d) found to delay.",
                     spell,
                     spellId
                 );
             }
-            this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
+            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
         }
     };
 
@@ -818,10 +839,10 @@ export class OvaleFutureClass
         spellId: number,
         targetName: string | undefined
     ): SpellCast {
-        this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
+        this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         const now = GetTime();
-        const caster = this.ovaleGuid.UnitGUID(unitId);
-        const spellcast = self_pool.Get();
+        const caster = this.ovaleGuid.getUnitGUID(unitId);
+        const spellcast = lastSpellCastPool.get();
         spellcast.lineId = lineId;
         spellcast.caster = caster;
         spellcast.castByPlayer = caster === this.ovale.playerGUID;
@@ -830,22 +851,24 @@ export class OvaleFutureClass
         spellcast.queued = now;
         insert(this.lastSpell.queue, spellcast);
         if (targetName == "" || targetName == undefined) {
-            this.tracer.Debug(
+            this.tracer.debug(
                 "Queueing (%d) spell %s with no target.",
                 lualength(this.lastSpell.queue),
                 spellName
             );
         } else {
             spellcast.targetName = targetName;
-            let [targetGUID, nextGUID] = this.ovaleGuid.NameGUID(targetName);
+            let [targetGUID, nextGUID] = this.ovaleGuid.getGuidByName(
+                targetName
+            );
             if (nextGUID) {
-                let name = this.ovaleGuid.UnitName("target");
+                let name = this.ovaleGuid.getUnitName("target");
                 if (name == targetName) {
-                    targetGUID = this.ovaleGuid.UnitGUID("target");
+                    targetGUID = this.ovaleGuid.getUnitGUID("target");
                 } else {
-                    name = this.ovaleGuid.UnitName("focus");
+                    name = this.ovaleGuid.getUnitName("focus");
                     if (name == targetName) {
-                        targetGUID = this.ovaleGuid.UnitGUID("focus");
+                        targetGUID = this.ovaleGuid.getUnitGUID("focus");
                     } else if (UnitExists("mouseover")) {
                         name = UnitName("mouseover");
                         if (name == targetName) {
@@ -854,7 +877,7 @@ export class OvaleFutureClass
                     }
                 }
                 spellcast.target = targetGUID || "unknown";
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Queueing (%d) spell %s to %s (possibly %s).",
                     lualength(this.lastSpell.queue),
                     spellName,
@@ -863,7 +886,7 @@ export class OvaleFutureClass
                 );
             } else {
                 spellcast.target = targetGUID || "unknown";
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Queueing (%d) spell %s to %s (%s).",
                     lualength(this.lastSpell.queue),
                     spellName,
@@ -872,20 +895,23 @@ export class OvaleFutureClass
                 );
             }
         }
-        this.SaveSpellcastInfo(spellcast, now);
+        this.saveSpellcastInfo(spellcast, now);
         return spellcast;
     }
 
-    private UNIT_SPELLCAST_SENT = (
+    private handleUnitSpellCastSent = (
         event: string,
         unitId: string,
         targetName: string,
         lineId: string,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            const spellName = this.ovaleSpellBook.GetSpellName(spellId);
-            this.tracer.DebugTimestamp(
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
+            const spellName = this.ovaleSpellBook.getSpellName(spellId);
+            this.tracer.debugTimestamp(
                 event,
                 unitId,
                 spellName,
@@ -893,20 +919,23 @@ export class OvaleFutureClass
                 lineId
             );
             this.addSpellCast(lineId, unitId, spellName, spellId, targetName);
-            this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
+            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         }
     };
-    private UNIT_SPELLCAST_START = (
+    private handleUnitSpellCastStart = (
         event: string,
         unitId: string,
         lineId: string,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
             this.ovaleData.registerSpellCast(spellId);
-            const spellName = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
-            this.tracer.DebugTimestamp(
+            const spellName = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_START");
+            this.tracer.debugTimestamp(
                 event,
                 unitId,
                 spellName,
@@ -914,14 +943,14 @@ export class OvaleFutureClass
                 spellId
             );
             const now = GetTime();
-            let [spellcast] = this.GetSpellcast(
+            let [spellcast] = this.getSpellcast(
                 spellName,
                 spellId,
                 lineId,
                 now
             );
             if (!spellcast) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: casting spell %s (%d) without previous sent data.",
                     spellName,
                     spellId
@@ -945,7 +974,7 @@ export class OvaleFutureClass
                 spellcast.stop = endTime;
                 spellcast.channel = false;
                 const delta = now - spellcast.queued;
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Casting spell %s (%d): start = %s (+%s), ending = %s.",
                     spellName,
                     spellId,
@@ -953,7 +982,7 @@ export class OvaleFutureClass
                     delta,
                     endTime
                 );
-                const [auraId, auraGUID] = this.GetAuraFinish(
+                const [auraId, auraGUID] = this.getAuraFinish(
                     spellId,
                     spellcast.target,
                     now
@@ -961,7 +990,7 @@ export class OvaleFutureClass
                 if (auraId && auraGUID) {
                     spellcast.auraId = auraId;
                     spellcast.auraGUID = auraGUID;
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Spell %s (%d) will finish after updating aura %d on %s.",
                         spellName,
                         spellId,
@@ -969,35 +998,38 @@ export class OvaleFutureClass
                         auraGUID
                     );
                 }
-                this.SaveSpellcastInfo(spellcast, now);
-                this.UpdateLastSpellcast(now, spellcast);
+                this.saveSpellcastInfo(spellcast, now);
+                this.updateLastSpellcast(now, spellcast);
                 this.ovale.needRefresh();
             } else if (!name) {
-                this.tracer.Debug("Warning: not casting a spell.");
+                this.tracer.debug("Warning: not casting a spell.");
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: casting unexpected spell %s.",
                     name
                 );
             }
-            this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_START");
+            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_START");
         }
     };
-    private UNIT_SPELLCAST_SUCCEEDED = (
+    private handleUnitSpellCastSucceeded = (
         event: string,
         unitId: string,
         lineId: string,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
             this.ovaleData.registerSpellCast(spellId);
-            const spell = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling(
+            const spell = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling(
                 "OvaleFuture_UNIT_SPELLCAST_SUCCEEDED"
             );
-            this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
+            this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
-            const [spellcast, index] = this.GetSpellcast(
+            const [spellcast, index] = this.getSpellcast(
                 spell,
                 spellId,
                 lineId,
@@ -1011,14 +1043,14 @@ export class OvaleFutureClass
                     spellcast.stop &&
                     !spellcast.channel
                 ) {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Succeeded casting spell %s (%d) at %s, now in flight.",
                         spell,
                         spellId,
                         spellcast.stop
                     );
                     spellcast.success = now;
-                    this.UpdateSpellcastSnapshot(spellcast, now);
+                    this.updateSpellcastSnapshot(spellcast, now);
                     success = true;
                 } else {
                     const name = UnitChannelInfo(unitId);
@@ -1030,14 +1062,14 @@ export class OvaleFutureClass
                         spellcast.channel = false;
                         spellcast.success = now;
                         const delta = now - spellcast.queued;
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Instant-cast spell %s (%d): start = %s (+%s).",
                             spell,
                             spellId,
                             now,
                             delta
                         );
-                        const [auraId, auraGUID] = this.GetAuraFinish(
+                        const [auraId, auraGUID] = this.getAuraFinish(
                             spellId,
                             spellcast.target,
                             now
@@ -1045,7 +1077,7 @@ export class OvaleFutureClass
                         if (auraId && auraGUID) {
                             spellcast.auraId = auraId;
                             spellcast.auraGUID = auraGUID;
-                            this.tracer.Debug(
+                            this.tracer.debug(
                                 "Spell %s (%d) will finish after updating aura %d on %s.",
                                 spell,
                                 spellId,
@@ -1053,10 +1085,10 @@ export class OvaleFutureClass
                                 auraGUID
                             );
                         }
-                        this.SaveSpellcastInfo(spellcast, now);
+                        this.saveSpellcastInfo(spellcast, now);
                         success = true;
                     } else {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Succeeded casting spell %s (%d) but it is channelled.",
                             spell,
                             spellId
@@ -1065,14 +1097,14 @@ export class OvaleFutureClass
                 }
                 if (success) {
                     const targetGUID = spellcast.target;
-                    this.UpdateLastSpellcast(now, spellcast);
+                    this.updateLastSpellcast(now, spellcast);
                     if (!spellcast.offgcd)
-                        this.next.PushGCDSpellId(spellcast.spellId);
-                    this.UpdateCounters(spellId, spellcast.stop, targetGUID);
+                        this.next.pushGCDSpellId(spellcast.spellId);
+                    this.updateCounters(spellId, spellcast.stop, targetGUID);
                     let finished = false;
                     let finish = "miss";
                     if (!spellcast.targetName) {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Finished spell %s (%d) with no target queued at %s.",
                             spell,
                             spellId,
@@ -1082,9 +1114,9 @@ export class OvaleFutureClass
                         finish = "hit";
                     } else if (
                         targetGUID == this.ovale.playerGUID &&
-                        this.ovaleSpellBook.IsHelpfulSpell(spellId)
+                        this.ovaleSpellBook.isHelpfulSpell(spellId)
                     ) {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Finished helpful spell %s (%d) cast on player queued at %s.",
                             spell,
                             spellId,
@@ -1095,7 +1127,7 @@ export class OvaleFutureClass
                     }
                     if (finished) {
                         tremove(this.lastSpell.queue, index);
-                        self_pool.Release(spellcast);
+                        lastSpellCastPool.release(spellcast);
                         this.ovale.needRefresh();
                         this.module.SendMessage(
                             "Ovale_SpellFinished",
@@ -1107,16 +1139,17 @@ export class OvaleFutureClass
                     }
                 }
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: no queued spell %s (%d) found to successfully complete casting.",
                     spell,
                     spellId
                 );
             }
-            this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
+            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
         }
     };
-    private Ovale_AuraAdded = (
+
+    private handleAuraAdded = (
         event: string,
         atTime: number,
         guid: string,
@@ -1124,25 +1157,26 @@ export class OvaleFutureClass
         caster: string
     ) => {
         if (guid == this.ovale.playerGUID) {
-            self_timeAuraAdded = atTime;
-            this.UpdateSpellcastSnapshot(
+            timeAuraAdded = atTime;
+            this.updateSpellcastSnapshot(
                 this.lastSpell.lastGCDSpellcast,
                 atTime
             );
-            this.UpdateSpellcastSnapshot(
+            this.updateSpellcastSnapshot(
                 this.current.lastOffGCDSpellcast,
                 atTime
             );
         }
     };
-    private Ovale_AuraChanged = (
+
+    private handleAuraChanged = (
         event: string,
         atTime: number,
         guid: string,
         auraId: string,
         caster: string
     ) => {
-        this.tracer.DebugTimestamp(
+        this.tracer.debugTimestamp(
             "Ovale_AuraChanged",
             event,
             atTime,
@@ -1157,7 +1191,7 @@ export class OvaleFutureClass
                 const spellcast = this.lastSpell.queue[i];
                 if (spellcast.success && spellcast.auraId == auraId) {
                     if (
-                        this.FinishSpell(
+                        this.finishSpell(
                             spellcast,
                             "Ovale_AuraChanged",
                             caster,
@@ -1175,26 +1209,29 @@ export class OvaleFutureClass
                 }
             }
             if (!anyFinished) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "No spell found to finish for auraId %d",
                     auraId
                 );
             }
         }
     };
-    private UnitSpellcastEnded = (
+    private handleUnitSpellcastEnded = (
         event: string,
         unitId: string,
         lineId: string,
         spellId: number
     ) => {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+        if (
+            (unitId == "player" || unitId == "pet") &&
+            !whiteAttackIds[spellId]
+        ) {
             if (event == "UNIT_SPELLCAST_INTERRUPTED") {
                 this.next.lastGCDSpellId = 0;
             }
-            const spellName = this.ovaleSpellBook.GetSpellName(spellId);
-            this.profiler.StartProfiling("OvaleFuture_UnitSpellcastEnded");
-            this.tracer.DebugTimestamp(
+            const spellName = this.ovaleSpellBook.getSpellName(spellId);
+            this.profiler.startProfiling("OvaleFuture_UnitSpellcastEnded");
+            this.tracer.debugTimestamp(
                 event,
                 unitId,
                 spellName,
@@ -1202,14 +1239,14 @@ export class OvaleFutureClass
                 spellId
             );
             const now = GetTime();
-            const [spellcast, index] = this.GetSpellcast(
+            const [spellcast, index] = this.getSpellcast(
                 spellName,
                 spellId,
                 lineId,
                 now
             );
             if (spellcast) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "End casting spell %s (%d) queued at %s due to %s.",
                     spellName,
                     spellId,
@@ -1217,30 +1254,31 @@ export class OvaleFutureClass
                     event
                 );
                 if (!spellcast.success) {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "Remove spell from queue because there was no success before"
                     );
                     tremove(this.lastSpell.queue, index);
-                    self_pool.Release(spellcast);
+                    lastSpellCastPool.release(spellcast);
                     this.ovale.needRefresh();
                 }
             } else if (lineId) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Warning: no queued spell %s (%d) found to end casting.",
                     spellName,
                     spellId
                 );
             }
-            this.profiler.StopProfiling("OvaleFuture_UnitSpellcastEnded");
+            this.profiler.stopProfiling("OvaleFuture_UnitSpellcastEnded");
         }
     };
-    GetSpellcast(
+
+    getSpellcast(
         spellName: string | undefined,
         spellId: number,
         lineId: undefined | string,
         atTime: number
     ): [SpellCast | undefined, number] {
-        this.profiler.StartProfiling("OvaleFuture_GetSpellcast");
+        this.profiler.startProfiling("OvaleFuture_GetSpellcast");
         let spellcast: SpellCast | undefined = undefined;
         let index = 0;
         if (!lineId || lineId != "") {
@@ -1253,7 +1291,7 @@ export class OvaleFutureClass
                     } else if (spellName) {
                         const spellName =
                             sc.spellName ||
-                            this.ovaleSpellBook.GetSpellName(spellId);
+                            this.ovaleSpellBook.getSpellName(spellId);
                         if (spellName == spellName) {
                             spellcast = sc;
                             index = i;
@@ -1267,38 +1305,39 @@ export class OvaleFutureClass
             spellName =
                 spellName ||
                 spellcast.spellName ||
-                this.ovaleSpellBook.GetSpellName(spellId);
+                this.ovaleSpellBook.getSpellName(spellId);
             if (spellcast.targetName) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Found spellcast for %s to %s queued at %f.",
                     spellName,
                     spellcast.targetName,
                     spellcast.queued
                 );
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "Found spellcast for %s with no target queued at %f.",
                     spellName,
                     spellcast.queued
                 );
             }
         }
-        this.profiler.StopProfiling("OvaleFuture_GetSpellcast");
+        this.profiler.stopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
-    GetAuraFinish(
+
+    getAuraFinish(
         spellId: number,
         targetGUID: string,
         atTime: number
     ): [string | number | undefined, string | undefined] {
-        this.profiler.StartProfiling("OvaleFuture_GetAuraFinish");
+        this.profiler.startProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.aura) {
-            for (const [, unitId] of ipairs(SPELLCAST_AURA_ORDER)) {
+            for (const [, unitId] of ipairs(spellCastAurOrder)) {
                 for (const [, auraList] of kpairs(si.aura[unitId])) {
                     for (const [id, spellData] of kpairs(auraList)) {
-                        const value = this.ovaleData.CheckSpellAuraData(
+                        const value = this.ovaleData.checkSpellAuraData(
                             id,
                             spellData,
                             atTime,
@@ -1310,7 +1349,7 @@ export class OvaleFutureClass
                             value.add > 0
                         ) {
                             auraId = id;
-                            auraGUID = this.ovaleGuid.UnitGUID(unitId);
+                            auraGUID = this.ovaleGuid.getUnitGUID(unitId);
                             break;
                         }
                     }
@@ -1323,33 +1362,34 @@ export class OvaleFutureClass
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleFuture_GetAuraFinish");
+        this.profiler.stopProfiling("OvaleFuture_GetAuraFinish");
         return [auraId, auraGUID];
     }
 
-    SaveSpellcastInfo(spellcast: SpellCast, atTime: number) {
-        this.profiler.StartProfiling("OvaleFuture_SaveSpellcastInfo");
-        this.tracer.Debug(
+    saveSpellcastInfo(spellcast: SpellCast, atTime: number) {
+        this.profiler.startProfiling("OvaleFuture_SaveSpellcastInfo");
+        this.tracer.debug(
             "    Saving information from %s to the spellcast for %s.",
             atTime,
             spellcast.spellName
         );
         if (spellcast.spellId) {
-            spellcast.damageMultiplier = this.GetDamageMultiplier(
+            spellcast.damageMultiplier = this.getDamageMultiplier(
                 spellcast.spellId,
                 spellcast.target,
                 atTime
             );
         }
         for (const [, mod] of pairs(this.lastSpell.modules)) {
-            const func = mod.SaveSpellcastInfo;
+            const func = mod.saveSpellcastInfo;
             if (func) {
                 func(spellcast, atTime);
             }
         }
-        this.profiler.StopProfiling("OvaleFuture_SaveSpellcastInfo");
+        this.profiler.stopProfiling("OvaleFuture_SaveSpellcastInfo");
     }
-    GetDamageMultiplier(spellId: number, targetGUID: string, atTime: number) {
+
+    getDamageMultiplier(spellId: number, targetGUID: string, atTime: number) {
         let damageMultiplier = 1;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.aura && si.aura.damage) {
@@ -1378,14 +1418,14 @@ export class OvaleFutureClass
                         namedParameters.enabled;
                     // }
                     if (verified) {
-                        const aura = this.ovaleAura.GetAuraByGUID(
+                        const aura = this.ovaleAura.getAuraByGUID(
                             this.ovale.playerGUID,
                             auraId,
                             filter,
                             false,
                             atTime
                         );
-                        if (aura && this.ovaleAura.IsActiveAura(aura, atTime)) {
+                        if (aura && this.ovaleAura.isActiveAura(aura, atTime)) {
                             const siAura = this.ovaleData.spellInfo[auraId];
                             if (
                                 siAura &&
@@ -1402,16 +1442,17 @@ export class OvaleFutureClass
         }
         return damageMultiplier;
     }
-    UpdateCounters(spellId: number, atTime: number, targetGUID: string) {
-        return this.UpdateStateCounters(
-            this.GetState(atTime),
+
+    updateCounters(spellId: number, atTime: number, targetGUID: string) {
+        return this.updateStateCounters(
+            this.getState(atTime),
             spellId,
             atTime,
             targetGUID
         );
     }
 
-    IsActive(spellId: number) {
+    isActive(spellId: number) {
         for (const [, spellcast] of ipairs(this.lastSpell.queue)) {
             if (spellcast.spellId == spellId && spellcast.start) {
                 return true;
@@ -1420,16 +1461,16 @@ export class OvaleFutureClass
         return false;
     }
 
-    InFlight(spellId: number) {
-        return this.IsActive(spellId);
+    isInFlight(spellId: number) {
+        return this.isActive(spellId);
     }
 
-    UpdateLastSpellcast(atTime: number, spellcast: SpellCast) {
-        this.profiler.StartProfiling("OvaleFuture_UpdateLastSpellcast");
+    updateLastSpellcast(atTime: number, spellcast: SpellCast) {
+        this.profiler.startProfiling("OvaleFuture_UpdateLastSpellcast");
         this.current.lastCastTime[spellcast.spellId] = atTime;
         if (spellcast.castByPlayer) {
             if (spellcast.offgcd) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "    Caching spell %s (%d) as most recent off-GCD spellcast.",
                     spellcast.spellName,
                     spellcast.spellId
@@ -1440,7 +1481,7 @@ export class OvaleFutureClass
                 this.lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
                 this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast;
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "    Caching spell %s (%d) as most recent GCD spellcast.",
                     spellcast.spellName,
                     spellcast.spellId
@@ -1452,9 +1493,10 @@ export class OvaleFutureClass
                 this.next.lastGCDSpellId = this.lastSpell.lastGCDSpellcast.spellId;
             }
         }
-        this.profiler.StopProfiling("OvaleFuture_UpdateLastSpellcast");
+        this.profiler.stopProfiling("OvaleFuture_UpdateLastSpellcast");
     }
-    UpdateSpellcastSnapshot(spellcast: SpellCast, atTime: number) {
+
+    updateSpellcastSnapshot(spellcast: SpellCast, atTime: number) {
         if (
             spellcast.queued &&
             (!spellcast.snapshotTime ||
@@ -1462,7 +1504,7 @@ export class OvaleFutureClass
                     atTime < spellcast.stop + 1))
         ) {
             if (spellcast.targetName) {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "    Updating to snapshot from %s for spell %s to %s (%s) queued at %s.",
                     atTime,
                     spellcast.spellName,
@@ -1471,7 +1513,7 @@ export class OvaleFutureClass
                     spellcast.queued
                 );
             } else {
-                this.tracer.Debug(
+                this.tracer.debug(
                     "    Updating to snapshot from %s for spell %s with no target queued at %s.",
                     atTime,
                     spellcast.spellName,
@@ -1479,19 +1521,19 @@ export class OvaleFutureClass
                 );
             }
             // TODO strange, why current?
-            this.ovalePaperDoll.UpdateSnapshot(
+            this.ovalePaperDoll.updateSnapshot(
                 spellcast,
                 this.ovalePaperDoll.current,
                 true
             );
             if (spellcast.spellId) {
-                spellcast.damageMultiplier = this.GetDamageMultiplier(
+                spellcast.damageMultiplier = this.getDamageMultiplier(
                     spellcast.spellId,
                     spellcast.target,
                     atTime
                 );
                 if (spellcast.damageMultiplier != 1) {
-                    this.tracer.Debug(
+                    this.tracer.debug(
                         "        persistent multiplier = %f",
                         spellcast.damageMultiplier
                     );
@@ -1500,11 +1542,11 @@ export class OvaleFutureClass
         }
     }
 
-    GetCounter(id: number, atTime: number) {
-        return this.GetState(atTime).counter[id] || 0;
+    getCounter(id: number, atTime: number) {
+        return this.getState(atTime).counter[id] || 0;
     }
 
-    TimeOfLastCast(spellId: number, atTime: number) {
+    getTimeOfLastCast(spellId: number, atTime: number) {
         if (!atTime) return this.current.lastCastTime[spellId];
         return (
             this.next.lastCastTime[spellId] ||
@@ -1513,11 +1555,11 @@ export class OvaleFutureClass
         );
     }
 
-    IsChanneling(atTime: number) {
-        return this.GetState(atTime).IsChanneling(atTime);
+    isChannelingAtTime(atTime: number) {
+        return this.getState(atTime).isChanneling(atTime);
     }
 
-    GetCurrentCast(atTime: number) {
+    getCurrentCast(atTime: number) {
         if (
             atTime &&
             this.next.currentCast &&
@@ -1538,13 +1580,14 @@ export class OvaleFutureClass
         }
     }
 
-    GetGCD(atTime: number, spellId?: number, targetGUID?: string) {
+    getGCD(atTime: number, spellId?: number, targetGUID?: string) {
         spellId = spellId || this.next.currentCast.spellId;
         targetGUID =
-            targetGUID || this.ovaleGuid.UnitGUID(this.baseState.defaultTarget);
+            targetGUID ||
+            this.ovaleGuid.getUnitGUID(this.baseState.defaultTarget);
         let gcd =
             spellId &&
-            this.ovaleData.GetSpellInfoProperty(
+            this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 "gcd",
@@ -1552,22 +1595,22 @@ export class OvaleFutureClass
             );
         if (!gcd) {
             let haste: HasteType;
-            [gcd, haste] = this.ovaleCooldown.GetBaseGCD();
+            [gcd, haste] = this.ovaleCooldown.getBaseGCD();
             if (
                 this.ovale.playerClass == "MONK" &&
-                this.ovalePaperDoll.IsSpecialization("mistweaver")
+                this.ovalePaperDoll.isSpecialization("mistweaver")
             ) {
                 gcd = 1.5;
                 haste = "spell";
             } else if (this.ovale.playerClass == "DRUID") {
-                if (this.ovaleStance.IsStance("druid_cat_form", atTime)) {
+                if (this.ovaleStance.isStance("druid_cat_form", atTime)) {
                     gcd = 1.0;
                     haste = "none";
                 }
             }
             const gcdHaste =
                 spellId &&
-                this.ovaleData.GetSpellInfoProperty(
+                this.ovaleData.getSpellInfoProperty(
                     spellId,
                     atTime,
                     "gcd_haste",
@@ -1578,7 +1621,7 @@ export class OvaleFutureClass
             } else {
                 const siHaste =
                     spellId &&
-                    this.ovaleData.GetSpellInfoProperty(
+                    this.ovaleData.getSpellInfoProperty(
                         spellId,
                         atTime,
                         "haste",
@@ -1588,7 +1631,7 @@ export class OvaleFutureClass
                     haste = siHaste;
                 }
             }
-            const multiplier = this.ovalePaperDoll.GetHasteMultiplier(
+            const multiplier = this.ovalePaperDoll.getHasteMultiplier(
                 haste,
                 this.ovalePaperDoll.next
             );
@@ -1598,20 +1641,21 @@ export class OvaleFutureClass
         return gcd;
     }
 
-    InitializeState() {
+    initializeState() {
         this.next.lastCast = {};
         this.next.counter = {};
     }
-    ResetState() {
-        this.profiler.StartProfiling("OvaleFuture_ResetState");
+
+    resetState() {
+        this.profiler.startProfiling("OvaleFuture_ResetState");
         const now = this.baseState.currentTime;
-        this.tracer.Log("Reset state with current time = %f", now);
+        this.tracer.log("Reset state with current time = %f", now);
         this.next.nextCast = now;
         wipe(this.next.lastCast);
         wipe(OvaleFutureClass.staticSpellcast);
         this.next.currentCast = OvaleFutureClass.staticSpellcast;
         let reason = "";
-        const [start, duration] = this.ovaleCooldown.GetGlobalCooldown(now);
+        const [start, duration] = this.ovaleCooldown.getGlobalCooldown(now);
         if (start && start > 0) {
             const ending = start + duration;
             if (this.next.nextCast < ending) {
@@ -1623,7 +1667,7 @@ export class OvaleFutureClass
         for (let i = lualength(this.lastSpell.queue); i >= 1; i += -1) {
             const spellcast = this.lastSpell.queue[i];
             if (spellcast.spellId && spellcast.start) {
-                this.tracer.Log(
+                this.tracer.log(
                     "    Found cast %d of spell %s (%d), start = %s, stop = %s.",
                     i,
                     spellcast.spellName,
@@ -1696,13 +1740,14 @@ export class OvaleFutureClass
             this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast;
         }
         // OvaleFuture.Log("    lastSpellId = %s, lastGCDSpellId = %s, lastOffGCDSpellId = %s", this.next.lastSpellId, this.lastGCDSpellId, this.lastOffGCDSpellId);
-        this.tracer.Log("    nextCast = %f%s", this.next.nextCast, reason);
+        this.tracer.log("    nextCast = %f%s", this.next.nextCast, reason);
         for (const [k, v] of pairs(this.current.counter)) {
             this.next.counter[k] = v;
         }
-        this.profiler.StopProfiling("OvaleFuture_ResetState");
+        this.profiler.stopProfiling("OvaleFuture_ResetState");
     }
-    CleanState() {
+
+    cleanState() {
         for (const [k] of pairs(this.next.lastCast)) {
             delete this.next.lastCast[k];
         }
@@ -1710,7 +1755,8 @@ export class OvaleFutureClass
             delete this.next.counter[k];
         }
     }
-    ApplySpellStartCast = (
+
+    applySpellStartCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -1718,13 +1764,14 @@ export class OvaleFutureClass
         channel: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleFuture_ApplySpellStartCast");
+        this.profiler.startProfiling("OvaleFuture_ApplySpellStartCast");
         if (channel) {
-            this.UpdateCounters(spellId, startCast, targetGUID);
+            this.updateCounters(spellId, startCast, targetGUID);
         }
-        this.profiler.StopProfiling("OvaleFuture_ApplySpellStartCast");
+        this.profiler.stopProfiling("OvaleFuture_ApplySpellStartCast");
     };
-    ApplySpellAfterCast = (
+
+    applySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -1732,16 +1779,16 @@ export class OvaleFutureClass
         channel: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleFuture_ApplySpellAfterCast");
+        this.profiler.startProfiling("OvaleFuture_ApplySpellAfterCast");
         if (!channel) {
-            this.UpdateCounters(spellId, endCast, targetGUID);
+            this.updateCounters(spellId, endCast, targetGUID);
         }
-        this.profiler.StopProfiling("OvaleFuture_ApplySpellAfterCast");
+        this.profiler.stopProfiling("OvaleFuture_ApplySpellAfterCast");
     };
 
     static staticSpellcast: SpellCast = createSpellCast();
 
-    ApplySpell(
+    applySpell(
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -1750,7 +1797,7 @@ export class OvaleFutureClass
         spellcast?: SpellCast
     ) {
         channel = channel || false;
-        this.profiler.StartProfiling("OvaleFuture_state_ApplySpell");
+        this.profiler.startProfiling("OvaleFuture_state_ApplySpell");
         if (spellId) {
             if (!targetGUID) {
                 targetGUID = this.ovale.playerGUID;
@@ -1759,7 +1806,7 @@ export class OvaleFutureClass
             if (startCast && endCast) {
                 castTime = endCast - startCast;
             } else {
-                castTime = this.ovaleSpellBook.GetCastTime(spellId) || 0;
+                castTime = this.ovaleSpellBook.getCastTime(spellId) || 0;
                 startCast = startCast || this.next.nextCast;
                 endCast = endCast || startCast + castTime;
             }
@@ -1770,21 +1817,21 @@ export class OvaleFutureClass
                 spellcast.castByPlayer = true;
                 spellcast.spellId = spellId;
                 spellcast.spellName =
-                    this.ovaleSpellBook.GetSpellName(spellId) ||
+                    this.ovaleSpellBook.getSpellName(spellId) ||
                     "unknown spell";
                 spellcast.target = targetGUID;
                 spellcast.targetName =
-                    this.ovaleGuid.GUIDName(targetGUID) || "target";
+                    this.ovaleGuid.getNameByGuid(targetGUID) || "target";
                 spellcast.start = startCast;
                 spellcast.stop = endCast;
                 spellcast.channel = channel;
-                this.ovalePaperDoll.UpdateSnapshot(
+                this.ovalePaperDoll.updateSnapshot(
                     spellcast,
                     this.ovalePaperDoll.next
                 );
                 const atTime = (channel && startCast) || endCast;
                 for (const [, mod] of pairs(this.lastSpell.modules)) {
-                    const func = mod.SaveSpellcastInfo;
+                    const func = mod.saveSpellcastInfo;
                     if (func) {
                         func(spellcast, atTime, this.ovalePaperDoll.next);
                     }
@@ -1794,13 +1841,13 @@ export class OvaleFutureClass
             if (spellcast.castByPlayer) {
                 this.next.currentCast = spellcast;
                 this.next.lastCast[spellId] = endCast;
-                const gcd = this.GetGCD(spellId, startCast, targetGUID);
+                const gcd = this.getGCD(spellId, startCast, targetGUID);
                 const nextCast = (castTime > gcd && endCast) || startCast + gcd;
                 if (this.next.nextCast < nextCast) {
                     this.next.nextCast = nextCast;
                 }
 
-                this.tracer.Log(
+                this.tracer.log(
                     "Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s",
                     spellId,
                     startCast,
@@ -1824,7 +1871,7 @@ export class OvaleFutureClass
             // }
 
             if (startCast > this.baseState.currentTime) {
-                this.ovaleState.ApplySpellStartCast(
+                this.ovaleState.applySpellStartCast(
                     spellId,
                     targetGUID,
                     startCast,
@@ -1834,7 +1881,7 @@ export class OvaleFutureClass
                 );
             }
             if (endCast > this.baseState.currentTime) {
-                this.ovaleState.ApplySpellAfterCast(
+                this.ovaleState.applySpellAfterCast(
                     spellId,
                     targetGUID,
                     startCast,
@@ -1843,7 +1890,7 @@ export class OvaleFutureClass
                     spellcast
                 );
             }
-            this.ovaleState.ApplySpellOnHit(
+            this.ovaleState.applySpellOnHit(
                 spellId,
                 targetGUID,
                 startCast,
@@ -1852,16 +1899,16 @@ export class OvaleFutureClass
                 spellcast
             );
         }
-        this.profiler.StopProfiling("OvaleFuture_state_ApplySpell");
+        this.profiler.stopProfiling("OvaleFuture_state_ApplySpell");
     }
 
-    ApplyInFlightSpells() {
-        this.profiler.StartProfiling("OvaleFuture_ApplyInFlightSpells");
+    applyInFlightSpells() {
+        this.profiler.startProfiling("OvaleFuture_ApplyInFlightSpells");
         const now = GetTime();
         let index = 1;
         while (index <= lualength(this.lastSpell.queue)) {
             const spellcast = this.lastSpell.queue[index];
-            this.tracer.Log(
+            this.tracer.log(
                 "Spell cast %s %d %d",
                 spellcast.spellName,
                 spellcast.spellId,
@@ -1880,7 +1927,7 @@ export class OvaleFutureClass
                 }
                 if (isValid) {
                     if (spellcast.target) {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f, start=%f",
                             spellcast.spellName,
                             spellcast.spellId,
@@ -1892,7 +1939,7 @@ export class OvaleFutureClass
                             spellcast.start
                         );
                     } else {
-                        this.tracer.Log(
+                        this.tracer.log(
                             "Active spell %s (%d) is %s, now=%f, endCast=%f, start=%f",
                             spellcast.spellName,
                             spellcast.spellId,
@@ -1902,7 +1949,7 @@ export class OvaleFutureClass
                             spellcast.start
                         );
                     }
-                    this.ApplySpell(
+                    this.applySpell(
                         spellcast.spellId,
                         spellcast.target,
                         spellcast.start,
@@ -1912,7 +1959,7 @@ export class OvaleFutureClass
                     );
                 } else {
                     if (spellcast.target) {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Warning: removing active spell %s (%d) to %s (%s) that should have finished.",
                             spellcast.spellName,
                             spellcast.spellId,
@@ -1920,19 +1967,19 @@ export class OvaleFutureClass
                             spellcast.target
                         );
                     } else {
-                        this.tracer.Debug(
+                        this.tracer.debug(
                             "Warning: removing active spell %s (%d) that should have finished.",
                             spellcast.spellName,
                             spellcast.spellId
                         );
                     }
                     remove(this.lastSpell.queue, index);
-                    self_pool.Release(spellcast);
+                    lastSpellCastPool.release(spellcast);
                     index = index - 1;
                 }
             }
             index = index + 1;
         }
-        this.profiler.StopProfiling("OvaleFuture_ApplyInFlightSpells");
+        this.profiler.stopProfiling("OvaleFuture_ApplyInFlightSpells");
     }
 }

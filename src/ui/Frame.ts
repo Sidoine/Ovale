@@ -34,25 +34,24 @@ import { AstIconNode, AstNodeSnapshot } from "../engine/ast";
 import { OvaleClass } from "../Ovale";
 import { OvaleOptionsClass } from "./Options";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { OvaleCombatClass } from "../states/combat";
 import {
     isNumber,
-    OneTimeMessage,
-    PrintOneTimeMessages,
+    oneTimeMessage,
+    printOneTimeMessages,
     stringify,
 } from "../tools/tools";
 import { Runner } from "../engine/runner";
 import { insert } from "@wowts/table";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
-import { L } from "./Localization";
+import { l } from "./Localization";
 import { OvaleScriptsClass } from "../engine/scripts";
 import { OvaleActionBarClass } from "../engine/action-bar";
 
-const strmatch = match;
-const INFINITY = huge;
-const DRAG_HANDLER_HEIGHT = 8;
+const infinity = huge;
+const dragHandlerHeight = 8;
 
 interface Action {
     icons: OvaleIcon;
@@ -71,7 +70,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     visible = true;
     private traceLog: TextDump;
 
-    ToggleOptions() {
+    toggleOptions() {
         if (this.content.IsShown()) {
             this.content.Hide();
         } else {
@@ -79,20 +78,25 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Hide() {
         this.frame.Hide();
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Show() {
         this.frame.Show();
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     OnAcquire() {
         this.frame.SetParent(UIParent);
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     OnRelease() {}
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     OnWidthSet = (width: number) => {
         const content = this.content;
         let contentwidth = width;
@@ -102,6 +106,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         content.SetWidth(contentwidth);
     };
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     OnHeightSet = (height: number) => {
         const content = this.content;
         let contentheight = height;
@@ -120,7 +125,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     // }
 
     // TODO need to be moved elsewhere
-    public GetScore(spellId: number) {
+    public getScore(spellId: number) {
         for (const [, action] of pairs(this.actions)) {
             if (action.spellId == spellId) {
                 if (!action.waitStart) {
@@ -170,7 +175,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         return [left, top, maxWidth, maxHeight];
     }
 
-    UpdateVisibility() {
+    updateVisibility() {
         this.visible = true;
         const profile = this.ovaleOptions.db.profile;
         if (!profile.apparence.enableIcons) {
@@ -204,14 +209,14 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
     }
 
-    OnUpdate(elapsed: number) {
+    handleUpdate(elapsed: number) {
         this.ovaleFrameModule.module.SendMessage("Ovale_OnUpdate");
         this.timeSinceLastUpdate = this.timeSinceLastUpdate + elapsed;
         let refresh = false;
         if (this.ovaleDebug.trace) {
             // Always refresh if we are tracing the execution.
             refresh = true;
-        } else if (this.visible || this.ovaleSpellFlash.IsSpellFlashEnabled()) {
+        } else if (this.visible || this.ovaleSpellFlash.isSpellFlashEnabled()) {
             /* Require that the Ovale frame be visible or that SpellFlash is
                enabled so Ovale is still triggering flashing buttons on the
                action bar. */
@@ -231,16 +236,16 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             }
         }
         if (refresh) {
-            this.ovale.AddRefreshInterval(this.timeSinceLastUpdate * 1000);
-            this.ovaleState.InitializeState();
-            if (this.ovaleCompile.EvaluateScript()) {
-                this.UpdateFrame();
+            this.ovale.addRefreshInterval(this.timeSinceLastUpdate * 1000);
+            this.ovaleState.initializeState();
+            if (this.ovaleCompile.evaluateScript()) {
+                this.updateFrame();
             }
-            this.ovaleState.ResetState();
-            this.ovaleFuture.ApplyInFlightSpells();
+            this.ovaleState.resetState();
+            this.ovaleFuture.applyInFlightSpells();
 
             const profile = this.ovaleOptions.db.profile;
-            const iconNodes = this.ovaleCompile.GetIconNodes();
+            const iconNodes = this.ovaleCompile.getIconNodes();
             let left = 0;
             let top = 0;
             let maxHeight = 0;
@@ -249,7 +254,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             for (const [k, node] of ipairs(iconNodes)) {
                 const icon = this.actions[k];
 
-                this.tracer.Log("+++ Icon %d", k);
+                this.tracer.log("+++ Icon %d", k);
                 const [element, atTime] = this.getIconAction(node);
 
                 if (element && atTime) {
@@ -263,17 +268,17 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     icon.icons.Show();
                     let start;
                     if (element.type === "action" && element.offgcd) {
-                        start = element.timeSpan.NextTime(
+                        start = element.timeSpan.nextTime(
                             this.baseState.currentTime
                         );
                     } else {
-                        start = element.timeSpan.NextTime(atTime);
+                        start = element.timeSpan.nextTime(atTime);
                     }
                     if (profile.apparence.enableIcons) {
                         this.updateActionIcon(icon, element, start || 0);
                     }
                     if (profile.apparence.spellFlash.enabled) {
-                        this.ovaleSpellFlash.Flash(
+                        this.ovaleSpellFlash.flash(
                             node.cachedParams.named.flash as string | undefined,
                             node.cachedParams.named.help as string | undefined,
                             element,
@@ -288,8 +293,8 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             }
             this.updateDragHandle(maxWidth, maxHeight);
             wipe(this.ovale.refreshNeeded);
-            this.ovaleDebug.UpdateTrace();
-            PrintOneTimeMessages();
+            this.ovaleDebug.updateTrace();
+            printOneTimeMessages();
             this.timeSinceLastUpdate = 0;
         }
     }
@@ -308,10 +313,10 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             if (isNumber(element.value) && element.origin && element.rate) {
                 value = element.value + (now - element.origin) * element.rate;
             }
-            this.tracer.Log("GetAction: start=%s, value=%f", start, value);
-            icons.SetValue(value, undefined);
+            this.tracer.log("GetAction: start=%s, value=%f", start, value);
+            icons.setValue(value, undefined);
         } else if (element.type === "none") {
-            icons.SetValue(undefined, undefined);
+            icons.setValue(undefined, undefined);
         } else if (element.type === "action") {
             if (
                 element.actionResourceExtend &&
@@ -321,7 +326,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     element.actionCooldownDuration &&
                     element.actionCooldownDuration > 0
                 ) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Extending cooldown of spell ID '%s' for primary resource by %fs.",
                         element.actionId,
                         element.actionResourceExtend
@@ -333,7 +338,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     element.options &&
                     element.options.pool_resource == 1
                 ) {
-                    this.tracer.Log(
+                    this.tracer.log(
                         "Delaying spell ID '%s' for primary resource by %fs.",
                         element.actionId,
                         element.actionResourceExtend
@@ -342,7 +347,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 }
             }
 
-            this.tracer.Log(
+            this.tracer.log(
                 "GetAction: start=%s, id=%s",
                 start,
                 element.actionId
@@ -356,7 +361,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             ) {
                 start = this.ovaleFuture.next.nextCast;
             }
-            icons.Update(element, start);
+            icons.update(element, start);
             if (element.actionType == "spell") {
                 action.spellId = element.actionId;
             } else {
@@ -381,7 +386,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 } else if (ratio > 1) {
                     ratio = 1;
                 }
-                icons.SetPoint(
+                icons.setPoint(
                     "TOPLEFT",
                     this.iconsFrame,
                     "TOPLEFT",
@@ -392,19 +397,19 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
 
         if (!profile.apparence.moving) {
-            icons.SetPoint(
+            icons.setPoint(
                 "TOPLEFT",
                 this.iconsFrame,
                 "TOPLEFT",
                 action.left / action.scale,
                 action.top / action.scale -
-                    DRAG_HANDLER_HEIGHT -
+                    dragHandlerHeight -
                     profile.apparence.margin
             );
         }
     }
 
-    UpdateFrame() {
+    updateFrame() {
         const profile = this.ovaleOptions.db.profile;
         if (this.petFrame.IsVisible()) {
             this.frame.ClearAllPoints();
@@ -418,12 +423,12 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             this.frame.EnableMouse(!profile.apparence.clickThru);
         }
         this.ReleaseChildren();
-        this.UpdateIcons();
-        this.UpdateControls();
-        this.UpdateVisibility();
+        this.updateIcons();
+        this.updateControls();
+        this.updateVisibility();
     }
 
-    GetCheckBox(name: number | string) {
+    getCheckBox(name: number | string) {
         let widget;
         if (type(name) == "string") {
             widget = this.checkBoxWidget[name];
@@ -439,34 +444,34 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
         return widget;
     }
-    IsChecked(name: string) {
-        const widget = this.GetCheckBox(name);
+    isChecked(name: string) {
+        const widget = this.getCheckBox(name);
         return widget && widget.GetValue();
     }
-    GetListValue(name: string) {
+    getListValue(name: string) {
         const widget = this.listWidget[name];
         return widget && widget.GetValue();
     }
-    SetCheckBox(name: string, on: boolean) {
-        const widget = this.GetCheckBox(name);
+    setCheckBox(name: string, on: boolean) {
+        const widget = this.getCheckBox(name);
         if (widget) {
             const oldValue = widget.GetValue();
             if (oldValue != on) {
                 widget.SetValue(on);
-                this.OnCheckBoxValueChanged(widget);
+                this.handleCheckBoxValueChanged(widget);
             }
         }
     }
-    ToggleCheckBox(name: string) {
-        const widget = this.GetCheckBox(name);
+    toggleCheckBox(name: string) {
+        const widget = this.getCheckBox(name);
         if (widget) {
             const on = !widget.GetValue();
             widget.SetValue(on);
-            this.OnCheckBoxValueChanged(widget);
+            this.handleCheckBoxValueChanged(widget);
         }
     }
 
-    OnCheckBoxValueChanged = (widget: AceGUIWidgetCheckBox) => {
+    handleCheckBoxValueChanged = (widget: AceGUIWidgetCheckBox) => {
         const name = widget.GetUserData<string>("name");
         this.ovaleOptions.db.profile.check[name] = widget.GetValue();
         this.ovaleFrameModule.module.SendMessage(
@@ -475,7 +480,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         );
     };
 
-    OnDropDownValueChanged = (widget: AceGUIWidgetDropDown) => {
+    handleDropDownValueChanged = (widget: AceGUIWidgetDropDown) => {
         const name = widget.GetUserData<string>("name");
         this.ovaleOptions.db.profile.list[name] = widget.GetValue();
         this.ovaleFrameModule.module.SendMessage(
@@ -483,15 +488,15 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             name
         );
     };
-    FinalizeString(s: string) {
-        const [item, id] = strmatch(s, "^(item:)(.+)");
+    finalizeString(s: string) {
+        const [item, id] = match(s, "^(item:)(.+)");
         if (item) {
             [s] = GetItemInfo(id);
         }
         return s;
     }
 
-    UpdateControls() {
+    updateControls() {
         const profile = this.ovaleOptions.db.profile;
         wipe(this.checkBoxWidget);
         const atTime = this.ovaleFuture.next.nextCast;
@@ -503,7 +508,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             ) {
                 const name = checkBox.name;
                 const widget = AceGUI.Create("CheckBox");
-                const text = this.FinalizeString(checkBox.text);
+                const text = this.finalizeString(checkBox.text);
                 widget.SetLabel(text);
                 if (profile.check[name] == undefined) {
                     profile.check[name] = checkBox.defaultValue;
@@ -514,7 +519,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 widget.SetUserData("name", name);
                 widget.SetCallback(
                     "OnValueChanged",
-                    this.OnCheckBoxValueChanged
+                    this.handleCheckBoxValueChanged
                 );
                 this.AddChild(widget);
                 this.checkBoxWidget[name] = widget;
@@ -546,12 +551,12 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 widget.SetUserData("name", name);
                 widget.SetCallback(
                     "OnValueChanged",
-                    this.OnDropDownValueChanged
+                    this.handleDropDownValueChanged
                 );
                 this.AddChild(widget);
                 this.listWidget[name] = widget;
             } else {
-                OneTimeMessage(
+                oneTimeMessage(
                     "Warning: list '%s' is used but has no items.",
                     list.name
                 );
@@ -559,7 +564,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         }
     }
 
-    UpdateIcons() {
+    updateIcons() {
         for (const [, action] of pairs(this.actions)) {
             action.icons.Hide();
             action.icons.Hide();
@@ -567,7 +572,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         const profile = this.ovaleOptions.db.profile;
         this.frame.EnableMouse(!profile.apparence.clickThru);
 
-        const iconNodes = this.ovaleCompile.GetIconNodes();
+        const iconNodes = this.ovaleCompile.getIconNodes();
         for (const [k, node] of ipairs(iconNodes)) {
             if (!this.actions[k]) {
                 this.actions[k] = {
@@ -604,18 +609,18 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             let icon: OvaleIcon;
             icon = action.icons;
             let scale = action.scale;
-            icon.SetScale(scale);
-            icon.SetRemainsFont(profile.apparence.remainsFontColor);
-            icon.SetFontScale(profile.apparence.fontScale);
-            icon.SetParams(node.rawPositionalParams, node.rawNamedParams);
-            icon.SetHelp(
+            icon.setScale(scale);
+            icon.setRemainsFont(profile.apparence.remainsFontColor);
+            icon.setFontScale(profile.apparence.fontScale);
+            icon.setParams(node.rawPositionalParams, node.rawNamedParams);
+            icon.setHelp(
                 (node.rawNamedParams.help != undefined &&
                     node.rawNamedParams.help.type === "string" &&
                     node.rawNamedParams.help.value) ||
                     undefined
             );
-            icon.SetRangeIndicator(profile.apparence.targetText);
-            icon.EnableMouse(!profile.apparence.clickThru);
+            icon.setRangeIndicator(profile.apparence.targetText);
+            icon.enableMouse(!profile.apparence.clickThru);
             icon.frame.SetAlpha(profile.apparence.alpha);
             icon.cdShown = true;
             if (this.skinGroup) {
@@ -631,13 +636,13 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         const profile = this.ovaleOptions.db.profile;
         const margin = profile.apparence.margin;
         this.dragHandleTexture.SetWidth(maxWidth - margin);
-        this.dragHandleTexture.SetHeight(DRAG_HANDLER_HEIGHT);
+        this.dragHandleTexture.SetHeight(dragHandlerHeight);
         this.frame.SetWidth(maxWidth);
-        this.frame.SetHeight(maxHeight + DRAG_HANDLER_HEIGHT + margin);
+        this.frame.SetHeight(maxHeight + dragHandlerHeight + margin);
         this.content.SetPoint(
             "TOPLEFT",
             maxWidth + profile.apparence.iconShiftX,
-            profile.apparence.iconShiftY - DRAG_HANDLER_HEIGHT
+            profile.apparence.iconShiftY - dragHandlerHeight
         );
     }
 
@@ -649,7 +654,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     iconsFrame: UIFrame;
 
     /** Only used to know the update interval, must be visible */
-    updateFrame: UIFrame;
+    updateIntervalFrame: UIFrame;
 
     timeSinceLastUpdate: number;
 
@@ -668,7 +673,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         private ovaleEnemies: OvaleEnemiesClass,
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
-        private ovaleDebug: OvaleDebugClass,
+        private ovaleDebug: DebugTools,
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
@@ -681,7 +686,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     ) {
         super(CreateFrame("Frame", "OvaleIcons", petFrame));
 
-        this.traceLog = LibTextDump.New(`Ovale - ${L.icon_snapshot}`, 750, 500);
+        this.traceLog = LibTextDump.New(`Ovale - ${l.icon_snapshot}`, 750, 500);
 
         // const hider = CreateFrame(
         //     "Frame",
@@ -694,19 +699,19 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         this.tracer = ovaleDebug.create("OvaleFrame");
         // this.frame = newFrame;
         // this.hider = hider;
-        this.updateFrame = CreateFrame(
+        this.updateIntervalFrame = CreateFrame(
             "Frame",
             `${ovale.GetName()}UpdateFrame`
         );
-        this.updateFrame.SetAllPoints(this.frame);
-        this.updateFrame.Show();
+        this.updateIntervalFrame.SetAllPoints(this.frame);
+        this.updateIntervalFrame.Show();
         this.iconsFrame = CreateFrame("Frame", undefined, this.frame);
         this.iconsFrame.SetAllPoints(this.frame);
         this.dragHandleTexture = this.frame.CreateTexture();
         if (Masque) {
             this.skinGroup = Masque.Group(ovale.GetName());
         }
-        this.timeSinceLastUpdate = INFINITY;
+        this.timeSinceLastUpdate = infinity;
         const frame = this.frame;
         frame.SetWidth(100);
         frame.SetHeight(100);
@@ -741,8 +746,8 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             this.dragHandleTexture.Hide();
         });
         frame.SetScript("OnHide", () => this.Hide());
-        this.updateFrame.SetScript("OnUpdate", (updateFrame, elapsed) =>
-            this.OnUpdate(elapsed)
+        this.updateIntervalFrame.SetScript("OnUpdate", (updateFrame, elapsed) =>
+            this.handleUpdate(elapsed)
         );
         this.dragHandleTexture.SetColorTexture(0.8, 0.8, 0.8, 0.5);
         this.dragHandleTexture.SetPoint("TOPLEFT", 0, 0);
@@ -763,15 +768,15 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
     }
 
     debugIcon(index: number): void {
-        const iconNodes = this.ovaleCompile.GetIconNodes();
-        this.tracer.Print("%d", index);
+        const iconNodes = this.ovaleCompile.getIconNodes();
+        this.tracer.print("%d", index);
         const [result, atTime] = this.getIconAction(iconNodes[index]);
         if (result && atTime) {
             const traceLog = this.traceLog;
             traceLog.Clear();
             const serial = result.serial;
             traceLog.AddLine(
-                `{ "atTime": ${atTime}, "serial": ${serial}, "index": ${index}, "script": "${this.scripts.GetScriptName(
+                `{ "atTime": ${atTime}, "serial": ${serial}, "index": ${index}, "script": "${this.scripts.getScriptName(
                     this.scripts.getCurrentSpecScriptName()
                 )}", "nodes": {`
             );
@@ -803,11 +808,11 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
             this.ovaleDebug.trace = true;
             this.ovaleDebug.traceLog.Clear();
-            this.ovaleState.ResetState();
-            this.ovaleFuture.ApplyInFlightSpells();
+            this.ovaleState.resetState();
+            this.ovaleFuture.applyInFlightSpells();
             this.getIconAction(iconNodes[index]);
             this.ovaleDebug.trace = false;
-            this.ovaleDebug.DisplayTraceLog();
+            this.ovaleDebug.displayTraceLog();
         }
     }
 
@@ -816,7 +821,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             node.rawNamedParams.target &&
             node.rawNamedParams.target.type === "string"
         ) {
-            this.tracer.Debug(
+            this.tracer.debug(
                 `Default target is ${node.rawNamedParams.target.value}`
             );
             this.baseState.defaultTarget = node.rawNamedParams.target.value;
@@ -834,13 +839,13 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
         // This needs to be done here for each icon because
         // some node values depends on the defaultTarget and enemies values
-        this.ovaleBestAction.StartNewAction();
+        this.ovaleBestAction.startNewAction();
         let atTime = this.ovaleFuture.next.nextCast;
         if (
             this.ovaleFuture.next.currentCast.spellId == undefined ||
             this.ovaleFuture.next.currentCast.spellId !==
                 this.ovaleFuture.next.lastGCDSpellId ||
-            this.ovaleFuture.IsChanneling(this.baseState.currentTime)
+            this.ovaleFuture.isChannelingAtTime(this.baseState.currentTime)
         ) {
             atTime = this.baseState.currentTime;
         }
@@ -848,7 +853,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         const [, namedParameters] = this.runner.computeParameters(node, atTime);
 
         if (namedParameters.enabled === undefined || namedParameters.enabled) {
-            return [this.ovaleBestAction.GetAction(node, atTime), atTime];
+            return [this.ovaleBestAction.getAction(node, atTime), atTime];
         }
         return [];
     }
@@ -857,24 +862,24 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 export class OvaleFrameModuleClass {
     frame: OvaleFrame;
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.module.RegisterMessage(
             "Ovale_OptionChanged",
-            this.Ovale_OptionChanged
+            this.handleOptionChanged
         );
         this.module.RegisterMessage(
             "Ovale_CombatStarted",
-            this.Ovale_CombatStarted
+            this.handleCombatStarted
         );
         this.module.RegisterMessage(
             "Ovale_CombatEnded",
-            this.Ovale_CombatEnded
+            this.handleCombatEnded
         );
         this.module.RegisterEvent(
             "PLAYER_TARGET_CHANGED",
-            this.PLAYER_TARGET_CHANGED
+            this.handlePlayerTargetChanged
         );
-        this.frame.UpdateFrame();
+        this.frame.updateFrame();
     };
 
     private handleDisable = () => {
@@ -884,26 +889,26 @@ export class OvaleFrameModuleClass {
         this.module.UnregisterEvent("PLAYER_TARGET_CHANGED");
     };
 
-    private Ovale_OptionChanged = (event: string, eventType: string) => {
+    private handleOptionChanged = (event: string, eventType: string) => {
         if (!this.frame) return;
         if (eventType == "visibility") {
-            this.frame.UpdateVisibility();
+            this.frame.updateVisibility();
         } else {
             // if (eventType == "layout") {
             //     this.frame.UpdateFrame(); // TODO
             // }
-            this.frame.UpdateFrame();
+            this.frame.updateFrame();
         }
     };
 
-    private PLAYER_TARGET_CHANGED = () => {
-        this.frame.UpdateVisibility();
+    private handlePlayerTargetChanged = () => {
+        this.frame.updateVisibility();
     };
-    private Ovale_CombatStarted = () => {
-        this.frame.UpdateVisibility();
+    private handleCombatStarted = () => {
+        this.frame.updateVisibility();
     };
-    private Ovale_CombatEnded = () => {
-        this.frame.UpdateVisibility();
+    private handleCombatEnded = () => {
+        this.frame.updateVisibility();
     };
 
     public module: AceModule & AceEvent;
@@ -916,7 +921,7 @@ export class OvaleFrameModuleClass {
         private ovaleEnemies: OvaleEnemiesClass,
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
-        private ovaleDebug: OvaleDebugClass,
+        private ovaleDebug: DebugTools,
         private ovaleSpellFlash: OvaleSpellFlashClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovaleBestAction: OvaleBestActionClass,
@@ -936,7 +941,7 @@ export class OvaleFrameModuleClass {
         petFrame.SetAllPoints(UIParent);
         this.module = ovale.createModule(
             "OvaleFrame",
-            this.OnInitialize,
+            this.handleInitialize,
             this.handleDisable,
             aceEvent
         );

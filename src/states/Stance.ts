@@ -1,4 +1,4 @@
-import { L } from "../ui/Localization";
+import { l } from "../ui/Localization";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
@@ -7,26 +7,27 @@ import {
     GetShapeshiftForm,
     GetShapeshiftFormInfo,
     GetSpellInfo,
+    SpellId,
 } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
 import { States, StateModule } from "../engine/state";
-import { OvaleDebugClass } from "../engine/debug";
+import { DebugTools } from "../engine/debug";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { OvaleConditionClass, ReturnBoolean } from "../engine/condition";
+import { OvaleConditionClass, returnBoolean } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const [druidCatForm] = GetSpellInfo(768);
-const [druidTravelForm] = GetSpellInfo(783);
+const [druidCatForm] = GetSpellInfo(SpellId.cat_form);
+const [druidTravelForm] = GetSpellInfo(SpellId.travel_form);
 const [druidAquaticForm] = GetSpellInfo(1066);
-const [druidBearForm] = GetSpellInfo(5487);
-const [druidMoonkinForm] = GetSpellInfo(24858);
-const [druid_flight_form] = GetSpellInfo(33943);
-const [druid_swift_flight_form] = GetSpellInfo(40120);
-const [rogue_stealth] = GetSpellInfo(1784);
+const [druidBearForm] = GetSpellInfo(SpellId.bear_form);
+const [druidMoonkinForm] = GetSpellInfo(SpellId.moonkin_form);
+const [druidFlightForm] = GetSpellInfo(33943);
+const [druidSwiftFlightForm] = GetSpellInfo(40120);
+const [rogueStealth] = GetSpellInfo(1784);
 
 type Stance =
     | "druid_cat_form"
@@ -38,23 +39,21 @@ type Stance =
     | "druid_swift_flight_form"
     | "rogue_stealth";
 
-const SPELL_NAME_TO_STANCE: LuaObj<Stance> = {};
+const spellNameToStance: LuaObj<Stance> = {};
 
-if (druidCatForm) SPELL_NAME_TO_STANCE[druidCatForm] = "druid_cat_form";
-if (druidTravelForm)
-    SPELL_NAME_TO_STANCE[druidTravelForm] = "druid_travel_form";
+if (druidCatForm) spellNameToStance[druidCatForm] = "druid_cat_form";
+if (druidTravelForm) spellNameToStance[druidTravelForm] = "druid_travel_form";
 if (druidAquaticForm)
-    SPELL_NAME_TO_STANCE[druidAquaticForm] = "druid_aquatic_form";
-if (druidBearForm) SPELL_NAME_TO_STANCE[druidBearForm] = "druid_bear_form";
+    spellNameToStance[druidAquaticForm] = "druid_aquatic_form";
+if (druidBearForm) spellNameToStance[druidBearForm] = "druid_bear_form";
 if (druidMoonkinForm)
-    SPELL_NAME_TO_STANCE[druidMoonkinForm] = "druid_moonkin_form";
-if (druid_flight_form)
-    SPELL_NAME_TO_STANCE[druid_flight_form] = "druid_flight_form";
-if (druid_swift_flight_form)
-    SPELL_NAME_TO_STANCE[druid_swift_flight_form] = "druid_swift_flight_form";
-if (rogue_stealth) SPELL_NAME_TO_STANCE[rogue_stealth] = "rogue_stealth";
+    spellNameToStance[druidMoonkinForm] = "druid_moonkin_form";
+if (druidFlightForm) spellNameToStance[druidFlightForm] = "druid_flight_form";
+if (druidSwiftFlightForm)
+    spellNameToStance[druidSwiftFlightForm] = "druid_swift_flight_form";
+if (rogueStealth) spellNameToStance[rogueStealth] = "rogue_stealth";
 
-export const STANCE_NAME: { [key in Stance]: boolean } = {
+export const stanceName: { [key in Stance]: boolean } = {
     druid_aquatic_form: true,
     druid_bear_form: true,
     druid_cat_form: true,
@@ -81,7 +80,7 @@ export class OvaleStanceClass
     private profiler: Profiler;
 
     constructor(
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass
@@ -89,23 +88,23 @@ export class OvaleStanceClass
         super(StanceData);
         this.module = ovale.createModule(
             "OvaleStance",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
         const debugOptions: LuaObj<OptionUiAll> = {
             stance: {
-                name: L["stances"],
+                name: l["stances"],
                 type: "group",
                 args: {
                     stance: {
-                        name: L["stances"],
+                        name: l["stances"],
                         type: "input",
                         multiline: 25,
                         width: "full",
                         get: (info: any) => {
-                            return this.DebugStances();
+                            return this.debugStances();
                         },
                     },
                 },
@@ -117,7 +116,7 @@ export class OvaleStanceClass
     }
 
     public registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.RegisterCondition("stance", false, this.Stance);
+        ovaleCondition.registerCondition("stance", false, this.stance);
     }
 
     /** Test if the player is in a given stance.
@@ -128,30 +127,30 @@ export class OvaleStanceClass
 	 @usage
 	 unless Stance(druid_bear_form) Spell(bear_form)
      */
-    private Stance = (
+    private stance = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const stance = positionalParams[1];
-        const boolean = this.IsStance(stance, atTime);
-        return ReturnBoolean(boolean);
+        const boolean = this.isStance(stance, atTime);
+        return returnBoolean(boolean);
     };
 
-    private OnInitialize = () => {
-        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateStances);
+    private handleInitialize = () => {
+        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.updateStances);
         this.module.RegisterEvent(
             "UPDATE_SHAPESHIFT_FORM",
-            this.UPDATE_SHAPESHIFT_FORM
+            this.handleUpdateShapeshiftForm
         );
         this.module.RegisterEvent(
             "UPDATE_SHAPESHIFT_FORMS",
-            this.UPDATE_SHAPESHIFT_FORMS
+            this.handleUpdateShapeshiftForms
         );
-        this.module.RegisterMessage("Ovale_SpellsChanged", this.UpdateStances);
-        this.module.RegisterMessage("Ovale_TalentsChanged", this.UpdateStances);
+        this.module.RegisterMessage("Ovale_SpellsChanged", this.updateStances);
+        this.module.RegisterMessage("Ovale_TalentsChanged", this.updateStances);
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_ALIVE");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
@@ -160,15 +159,15 @@ export class OvaleStanceClass
         this.module.UnregisterMessage("Ovale_TalentsChanged");
     };
 
-    private UPDATE_SHAPESHIFT_FORM = (event: string) => {
-        this.ShapeshiftEventHandler();
+    private handleUpdateShapeshiftForm = (event: string) => {
+        this.shapeshiftEventHandler();
     };
-    private UPDATE_SHAPESHIFT_FORMS = (event: string) => {
-        this.ShapeshiftEventHandler();
+    private handleUpdateShapeshiftForms = (event: string) => {
+        this.shapeshiftEventHandler();
     };
 
-    CreateStanceList() {
-        this.profiler.StartProfiling("OvaleStance_CreateStanceList");
+    createStanceList() {
+        this.profiler.startProfiling("OvaleStance_CreateStanceList");
         wipe(this.stanceList);
         wipe(this.stanceId);
         let name, stanceName, spellId;
@@ -176,16 +175,17 @@ export class OvaleStanceClass
             [, , , spellId] = GetShapeshiftFormInfo(i);
             [name] = GetSpellInfo(spellId);
             if (name) {
-                stanceName = SPELL_NAME_TO_STANCE[name];
+                stanceName = spellNameToStance[name];
                 if (stanceName) {
                     this.stanceList[i] = stanceName;
                     this.stanceId[stanceName] = i;
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleStance_CreateStanceList");
+        this.profiler.stopProfiling("OvaleStance_CreateStanceList");
     }
-    DebugStances() {
+
+    debugStances() {
         wipe(array);
         for (const [k, v] of pairs(this.stanceList)) {
             if (this.current.stance == k) {
@@ -198,27 +198,30 @@ export class OvaleStanceClass
         return concat(array, "\n");
     }
 
-    GetStance(stanceId?: number) {
+    getStance(stanceId?: number) {
         stanceId = stanceId || this.current.stance;
         return this.stanceList[stanceId];
     }
-    IsStance(name: string | number, atTime: number | undefined) {
-        const state = this.GetState(atTime);
+
+    isStance(name: string | number, atTime: number | undefined) {
+        const state = this.getState(atTime);
         if (name && state.stance) {
             if (type(name) == "number") {
                 return name == state.stance;
             } else {
-                return name == this.GetStance(state.stance);
+                return name == this.getStance(state.stance);
             }
         }
         return false;
     }
-    IsStanceSpell(spellId: number) {
+
+    isStanceSpell(spellId: number) {
         const [name] = GetSpellInfo(spellId);
-        return !!(name && SPELL_NAME_TO_STANCE[name]);
+        return !!(name && spellNameToStance[name]);
     }
-    ShapeshiftEventHandler() {
-        this.profiler.StartProfiling("OvaleStance_ShapeshiftEventHandler");
+
+    shapeshiftEventHandler() {
+        this.profiler.startProfiling("OvaleStance_ShapeshiftEventHandler");
         const oldStance = this.current.stance;
         const newStance = GetShapeshiftForm();
         if (oldStance != newStance) {
@@ -226,27 +229,27 @@ export class OvaleStanceClass
             this.ovale.needRefresh();
             this.module.SendMessage(
                 "Ovale_StanceChanged",
-                this.GetStance(newStance),
-                this.GetStance(oldStance)
+                this.getStance(newStance),
+                this.getStance(oldStance)
             );
         }
-        this.profiler.StopProfiling("OvaleStance_ShapeshiftEventHandler");
+        this.profiler.stopProfiling("OvaleStance_ShapeshiftEventHandler");
     }
-    UpdateStances = () => {
-        this.CreateStanceList();
-        this.ShapeshiftEventHandler();
+    updateStances = () => {
+        this.createStanceList();
+        this.shapeshiftEventHandler();
         this.ready = true;
     };
-    InitializeState() {
+    initializeState() {
         this.next.stance = 0;
     }
-    CleanState(): void {}
-    ResetState() {
-        this.profiler.StartProfiling("OvaleStance_ResetState");
+    cleanState(): void {}
+    resetState() {
+        this.profiler.startProfiling("OvaleStance_ResetState");
         this.next.stance = this.current.stance;
-        this.profiler.StopProfiling("OvaleStance_ResetState");
+        this.profiler.stopProfiling("OvaleStance_ResetState");
     }
-    ApplySpellAfterCast = (
+    applySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -254,8 +257,8 @@ export class OvaleStanceClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleStance_ApplySpellAfterCast");
-        let stance = this.ovaleData.GetSpellInfoProperty(
+        this.profiler.startProfiling("OvaleStance_ApplySpellAfterCast");
+        let stance = this.ovaleData.getSpellInfoProperty(
             spellId,
             endCast,
             "to_stance",
@@ -267,6 +270,6 @@ export class OvaleStanceClass
             }
             this.next.stance = stance;
         }
-        this.profiler.StopProfiling("OvaleStance_ApplySpellAfterCast");
+        this.profiler.stopProfiling("OvaleStance_ApplySpellAfterCast");
     };
 }

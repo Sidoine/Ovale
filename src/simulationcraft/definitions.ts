@@ -107,7 +107,7 @@ export const classInfos: { [key in ClassId]: ClassInfo } = {
     },
 };
 
-export const CHARACTER_PROPERTY: LuaObj<string> = {
+export const characterProperties: LuaObj<string> = {
     // ["active_enemies"]: "Enemies()",
     // ["astral_power"]: "AstralPower()",
     // ["astral_power.deficit"]: "AstralPowerDeficit()",
@@ -436,8 +436,8 @@ export interface Profile extends ProfileStrings, ProfileLists {
     annotation: Annotation;
 }
 
-export const KEYWORD: LuaObj<boolean> = {};
-export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
+export const keywords: LuaObj<boolean> = {};
+export const modifierKeywords: TypeCheck<Modifiers> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
     ["attack_speed"]: true,
@@ -501,14 +501,14 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["wait_on_ready"]: true,
     ["weapon"]: true,
 };
-export const LITTERAL_MODIFIER: LuaObj<boolean> = {
+export const litteralModifiers: LuaObj<boolean> = {
     ["name"]: true,
 };
-export const FUNCTION_KEYWORD: LuaObj<boolean> = {
+export const functionKeywords: LuaObj<boolean> = {
     ["ceil"]: true,
     ["floor"]: true,
 };
-export const SPECIAL_ACTION: LuaObj<boolean> = {
+export const specialActions: LuaObj<boolean> = {
     ["apply_poison"]: true,
     ["auto_attack"]: true,
     ["call_action_list"]: true,
@@ -592,7 +592,7 @@ export interface MiscOperand {
     symbolsInCode?: LuaArray<string>;
 }
 
-export const MISC_OPERAND: LuaObj<MiscOperand> = {
+export const miscOperands: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
     ["active_bt_triggers"]: { name: "buffcount", extraSymbol: "bt_buffs" },
     ["animacharged_cp"]: { name: "maxcombopoints" },
@@ -861,27 +861,27 @@ export const MISC_OPERAND: LuaObj<MiscOperand> = {
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },
 };
-export const RUNE_OPERAND: LuaObj<string> = {
+export const runeOperands: LuaObj<string> = {
     ["rune"]: "rune",
 };
-export const CONSUMABLE_ITEMS: LuaObj<boolean> = {
+export const consumableItems: LuaObj<boolean> = {
     ["potion"]: true,
     ["food"]: true,
     ["flask"]: true,
     ["augmentation"]: true,
 };
 {
-    for (const [keyword, value] of kpairs(MODIFIER_KEYWORD)) {
-        KEYWORD[keyword] = value;
+    for (const [keyword, value] of kpairs(modifierKeywords)) {
+        keywords[keyword] = value;
     }
-    for (const [keyword, value] of pairs(FUNCTION_KEYWORD)) {
-        KEYWORD[keyword] = value;
+    for (const [keyword, value] of pairs(functionKeywords)) {
+        keywords[keyword] = value;
     }
-    for (const [keyword, value] of pairs(SPECIAL_ACTION)) {
-        KEYWORD[keyword] = value;
+    for (const [keyword, value] of pairs(specialActions)) {
+        keywords[keyword] = value;
     }
 }
-export const UNARY_OPERATOR: {
+export const unaryOperators: {
     [k in SimcUnaryOperatorType]: { 1: "logical" | "arithmetic"; 2: number };
 } = {
     ["!"]: {
@@ -897,7 +897,7 @@ export const UNARY_OPERATOR: {
         2: 50,
     },
 };
-export const BINARY_OPERATOR: {
+export const binaryOperators: {
     [k in SimcBinaryOperatorType]: {
         1: "logical" | "compare" | "arithmetic";
         2: number;
@@ -995,7 +995,7 @@ export interface OptionalSkill {
     specialization?: string;
 }
 
-export const OPTIONAL_SKILLS = {
+export const optionalSkills = {
     ["fel_rush"]: <OptionalSkill>{
         class: "DEMONHUNTER",
         default: true,
@@ -1060,8 +1060,8 @@ export function checkOptionalSkill(
     action: string,
     className: string,
     specialization: string
-): action is keyof typeof OPTIONAL_SKILLS {
-    const data = OPTIONAL_SKILLS[<keyof typeof OPTIONAL_SKILLS>action];
+): action is keyof typeof optionalSkills {
+    const data = optionalSkills[<keyof typeof optionalSkills>action];
     if (!data) {
         return false;
     }
@@ -1085,19 +1085,26 @@ export interface DbcData {
 }
 
 export class Annotation implements InterruptAnnotation {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     mind_freeze?: ClassId;
     pummel?: ClassId;
     disrupt?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     skull_bash?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     solar_beam?: ClassId;
     rebuke?: ClassId;
     silence?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     mind_bomb?: ClassId;
     kick?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     wind_shear?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     counter_shot?: ClassId;
     muzzle?: ClassId;
     counterspell?: ClassId;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     spear_hand_strike?: ClassId;
 
     level?: string;
@@ -1123,37 +1130,59 @@ export class Annotation implements InterruptAnnotation {
 
     sync?: LuaObj<ActionParseNode>;
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     desired_targets?: boolean;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     using_apl?: LuaObj<boolean>;
     currentVariable?: AstAddFunctionNode;
     variable: LuaObj<AstAddFunctionNode> = {};
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     trap_launcher?: string;
     interrupt?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     wild_charge?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     use_legendary_ring?: string;
     options?: LuaObj<boolean>;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     opt_priority_rotation?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     time_to_hpg_heal?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     time_to_hpg_melee?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     time_to_hpg_tank?: string;
     bloodlust?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     use_item?: boolean;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     summon_pet?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     storm_earth_and_fire?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     touch_of_death?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     flying_serpent_kick?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     opt_use_consumables?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     blade_flurry?: string;
     blink?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     time_warp?: string;
     vanish?: string;
     volley?: string;
     harpoon?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     chi_burst?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     touch_of_karma?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     fel_rush?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     vengeful_retreat?: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     shield_of_vengeance?: string;
     symbolList: LuaArray<string> = {};
     dbc?: DbcData;
@@ -1167,13 +1196,10 @@ export class Annotation implements InterruptAnnotation {
         this.astAnnotation = { nodeList: {}, definition: this.dictionary };
     }
 
-    public AddSymbol(symbol: string) {
+    public addSymbol(symbol: string) {
         const symbolTable = this.symbolTable || {};
         const symbolList = this.symbolList;
-        if (
-            !symbolTable[symbol] &&
-            !this.ovaleData.DEFAULT_SPELL_LIST[symbol]
-        ) {
+        if (!symbolTable[symbol] && !this.ovaleData.defaultSpellLists[symbol]) {
             symbolTable[symbol] = true;
             symbolList[lualength(symbolList) + 1] = symbol;
         }
@@ -1182,16 +1208,16 @@ export class Annotation implements InterruptAnnotation {
     }
 }
 
-export const OVALE_TAGS: LuaArray<string> = {
+export const ovaleIconTags: LuaArray<string> = {
     1: "main",
     2: "shortcd",
     3: "cd",
 };
-const OVALE_TAG_PRIORITY: LuaObj<number> = {};
-for (const [i, tag] of ipairs(OVALE_TAGS)) {
-    OVALE_TAG_PRIORITY[tag] = i * 10;
+const ovaleIconTagPriorities: LuaObj<number> = {};
+for (const [i, tag] of ipairs(ovaleIconTags)) {
+    ovaleIconTagPriorities[tag] = i * 10;
 }
 
-export function TagPriority(tag: string) {
-    return OVALE_TAG_PRIORITY[tag] || 10;
+export function getTagPriority(tag: string) {
+    return ovaleIconTagPriorities[tag] || 10;
 }

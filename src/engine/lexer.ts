@@ -69,17 +69,17 @@ export class OvaleLexer {
         return wrap(lex);
     }
 
-    Release() {
+    release() {
         for (const [key] of kpairs(this)) {
             delete this[key];
         }
     }
-    Consume(index?: number): [string | undefined, string | undefined] {
+    consume(index?: number): [string | undefined, string | undefined] {
         index = index || 1;
         let tokenType, token;
-        while (index > 0 && this.typeQueue.Size() > 0) {
-            tokenType = this.typeQueue.RemoveFront();
-            token = this.tokenQueue.RemoveFront();
+        while (index > 0 && this.typeQueue.size() > 0) {
+            tokenType = this.typeQueue.removeFront();
+            token = this.tokenQueue.removeFront();
             if (!tokenType) {
                 break;
             }
@@ -94,10 +94,10 @@ export class OvaleLexer {
         }
         return [tokenType, token];
     }
-    Peek(index?: number): [string | undefined, string | undefined] {
+    peek(index?: number): [string | undefined, string | undefined] {
         index = index || 1;
         let tokenType, token;
-        while (index > this.typeQueue.Size()) {
+        while (index > this.typeQueue.size()) {
             if (this.endOfStream) {
                 break;
             } else {
@@ -106,13 +106,13 @@ export class OvaleLexer {
                     this.endOfStream = true;
                     break;
                 }
-                this.typeQueue.InsertBack(tokenType);
-                this.tokenQueue.InsertBack(token);
+                this.typeQueue.insertBack(tokenType);
+                this.tokenQueue.insertBack(token);
             }
         }
-        if (index <= this.typeQueue.Size()) {
-            tokenType = this.typeQueue.At(index);
-            token = this.tokenQueue.At(index);
+        if (index <= this.typeQueue.size()) {
+            tokenType = this.typeQueue.at(index);
+            token = this.tokenQueue.at(index);
         }
         return [tokenType, token];
     }

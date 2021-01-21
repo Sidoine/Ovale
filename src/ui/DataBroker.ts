@@ -1,8 +1,8 @@
-import { L } from "./Localization";
+import { l } from "./Localization";
 import LibDataBroker from "@wowts/lib_data_broker-1.1";
 import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
 import { OvaleOptionsClass } from "./Options";
-import { DEFAULT_NAME, OvaleScriptsClass } from "../engine/scripts";
+import { defaultScriptName, OvaleScriptsClass } from "../engine/scripts";
 import { OvaleFrameModuleClass } from "./Frame";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, LuaArray, LuaObj, kpairs, version } from "@wowts/lua";
@@ -18,10 +18,10 @@ import {
 import { OvalePaperDollClass } from "../states/PaperDoll";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/debug";
+import { DebugTools } from "../engine/debug";
 import { OptionUiAll } from "./acegui-helpers";
 
-const CLASS_ICONS = {
+const classIcons = {
     ["DEATHKNIGHT"]: "Interface\\Icons\\ClassIcon_DeathKnight",
     ["DEMONHUNTER"]: "Interface\\Icons\\ClassIcon_DemonHunter",
     ["DRUID"]: "Interface\\Icons\\ClassIcon_Druid",
@@ -57,26 +57,26 @@ export class OvaleDataBrokerClass {
         private ovaleFrameModule: OvaleFrameModuleClass,
         private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
-        private ovaleDebug: OvaleDebugClass,
+        private ovaleDebug: DebugTools,
         private ovaleScripts: OvaleScriptsClass
     ) {
         this.module = ovale.createModule(
             "OvaleDataBroker",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         const options: LuaObj<OptionUiAll> = {
             minimap: {
                 order: 25,
                 type: "toggle",
-                name: L["show_minimap_icon"],
+                name: l["show_minimap_icon"],
                 get: () => {
                     return !this.ovaleOptions.db.profile.apparence.minimap.hide;
                 },
                 set: (info: unknown, value: boolean) => {
                     this.ovaleOptions.db.profile.apparence.minimap.hide = !value;
-                    this.UpdateIcon();
+                    this.updateIcon();
                 },
             },
         };
@@ -86,36 +86,36 @@ export class OvaleDataBrokerClass {
         for (const [k, v] of pairs(options)) {
             this.ovaleOptions.apparence.args[k] = v;
         }
-        this.ovaleOptions.RegisterOptions();
+        this.ovaleOptions.registerOptions();
     }
 
-    private OnTooltipShow = (tooltip: UIGameTooltip) => {
+    private handleTooltipShow = (tooltip: UIGameTooltip) => {
         this.tooltipTitle =
             this.tooltipTitle || `${this.ovale.GetName()} ${version}`;
         tooltip.SetText(this.tooltipTitle, 1, 1, 1);
-        tooltip.AddLine(L["script_tooltip"]);
-        tooltip.AddLine(L["middle_click_help"]);
-        tooltip.AddLine(L["right_click_help"]);
-        tooltip.AddLine(L["shift_right_click_help"]);
+        tooltip.AddLine(l["script_tooltip"]);
+        tooltip.AddLine(l["middle_click_help"]);
+        tooltip.AddLine(l["right_click_help"]);
+        tooltip.AddLine(l["shift_right_click_help"]);
     };
 
-    private OnClick = (fr: UIFrame, button: "LeftButton") => {
+    private handleClick = (fr: UIFrame, button: "LeftButton") => {
         if (button == "LeftButton") {
             const menu: LuaArray<MenuItem> = {
                 1: {
-                    text: L["script"],
+                    text: l["script"],
                     isTitle: true,
                 },
             };
             const scriptType =
                 (!this.ovaleOptions.db.profile.showHiddenScripts && "script") ||
                 undefined;
-            const descriptions = this.ovaleScripts.GetDescriptions(scriptType);
+            const descriptions = this.ovaleScripts.getDescriptions(scriptType);
             for (const [name, description] of pairs(descriptions)) {
                 const menuItem = {
                     text: description,
                     func: () => {
-                        this.ovaleScripts.SetScript(name);
+                        this.ovaleScripts.setScript(name);
                     },
                 };
                 insert(menu, menuItem);
@@ -130,24 +130,26 @@ export class OvaleDataBrokerClass {
                 );
             EasyMenu(menu, this.menuFrame, "cursor", 0, 0, "MENU");
         } else if (button == "MiddleButton") {
-            this.ovaleFrameModule.frame.ToggleOptions();
+            this.ovaleFrameModule.frame.toggleOptions();
         } else if (button == "RightButton") {
             if (IsShiftKeyDown()) {
-                this.ovaleDebug.DoTrace(true);
+                this.ovaleDebug.doTrace(true);
             } else {
-                this.ovaleOptions.ToggleConfig();
+                this.ovaleOptions.toggleConfig();
             }
         }
     };
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         if (LibDataBroker) {
             const broker = {
                 type: "data source",
                 text: "",
-                icon: CLASS_ICONS[this.ovale.playerClass],
-                OnClick: this.OnClick,
-                OnTooltipShow: this.OnTooltipShow,
+                icon: classIcons[this.ovale.playerClass],
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                OnClick: this.handleClick,
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                OnTooltipShow: this.handleTooltipShow,
             };
             this.broker = LibDataBroker.NewDataObject(
                 this.ovale.GetName(),
@@ -165,26 +167,26 @@ export class OvaleDataBrokerClass {
         if (this.broker) {
             this.module.RegisterMessage(
                 "Ovale_ProfileChanged",
-                this.UpdateIcon
+                this.updateIcon
             );
             this.module.RegisterMessage(
                 "Ovale_ScriptChanged",
-                this.Ovale_ScriptChanged
+                this.handleScriptChanged
             );
             this.module.RegisterMessage(
                 "Ovale_SpecializationChanged",
-                this.Ovale_ScriptChanged
+                this.handleScriptChanged
             );
             this.module.RegisterEvent(
                 "PLAYER_ENTERING_WORLD",
-                this.Ovale_ScriptChanged
+                this.handleScriptChanged
             );
-            this.Ovale_ScriptChanged();
-            this.UpdateIcon();
+            this.handleScriptChanged();
+            this.updateIcon();
         }
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         if (this.broker) {
             this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
             this.module.UnregisterMessage("Ovale_SpecializationChanged");
@@ -192,7 +194,7 @@ export class OvaleDataBrokerClass {
             this.module.UnregisterMessage("Ovale_ScriptChanged");
         }
     };
-    private UpdateIcon = () => {
+    private updateIcon = () => {
         if (LibDBIcon && this.broker) {
             const minimap = this.ovaleOptions.db.profile.apparence.minimap;
             LibDBIcon.Refresh(this.ovale.GetName(), minimap);
@@ -203,17 +205,17 @@ export class OvaleDataBrokerClass {
             }
         }
     };
-    private Ovale_ScriptChanged = () => {
+    private handleScriptChanged = () => {
         const script = this.ovaleOptions.db.profile.source[
             `${
                 this.ovale.playerClass
-            }_${this.ovalePaperDoll.GetSpecialization()}`
+            }_${this.ovalePaperDoll.getSpecialization()}`
         ];
         this.broker.text =
-            (script == DEFAULT_NAME &&
-                this.ovaleScripts.GetDefaultScriptName(
+            (script == defaultScriptName &&
+                this.ovaleScripts.getDefaultScriptName(
                     this.ovale.playerClass,
-                    this.ovalePaperDoll.GetSpecialization()
+                    this.ovalePaperDoll.getSpecialization()
                 )) ||
             script ||
             "Disabled";

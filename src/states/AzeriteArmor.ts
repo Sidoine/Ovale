@@ -20,13 +20,13 @@ import {
 import { OvaleEquipmentClass } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleDebugClass } from "../engine/debug";
+import { DebugTools } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import {
     OvaleConditionClass,
-    ReturnBoolean,
-    ReturnConstant,
+    returnBoolean,
+    returnConstant,
 } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
@@ -42,7 +42,7 @@ interface Trait {
 }
 
 export class OvaleAzeriteArmor {
-    self_traits: LuaObj<Trait> = {};
+    traits: LuaObj<Trait> = {};
     output: LuaArray<string> = {};
 
     debugOptions: LuaObj<OptionUiAll> = {
@@ -56,7 +56,7 @@ export class OvaleAzeriteArmor {
                     multiline: 25,
                     width: "full",
                     get: (info: LuaArray<string>) => {
-                        return this.DebugTraits();
+                        return this.debugTraits();
                     },
                 },
             },
@@ -66,14 +66,14 @@ export class OvaleAzeriteArmor {
     private module: AceModule & AceEvent;
 
     constructor(
-        private OvaleEquipment: OvaleEquipmentClass,
+        private equipments: OvaleEquipmentClass,
         ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleAzeriteArmor",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         for (const [k, v] of pairs(this.debugOptions)) {
@@ -82,53 +82,53 @@ export class OvaleAzeriteArmor {
     }
 
     public registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "hasazeritetrait",
             false,
-            this.HasAzeriteTrait
+            this.hasAzeriteTrait
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "azeritetraitrank",
             false,
-            this.AzeriteTraitRank
+            this.azeriteTraitRank
         );
     }
 
-    private OnInitialize = () => {
-        this.module.RegisterMessage("Ovale_EquipmentChanged", this.ItemChanged);
+    private handleInitialize = () => {
+        this.module.RegisterMessage("Ovale_EquipmentChanged", this.itemChanged);
         this.module.RegisterEvent(
             "AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED",
-            this.AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED
+            this.handleAzeriteEmpoweredItemSelectionUpdated
         );
         this.module.RegisterEvent(
             "PLAYER_ENTERING_WORLD",
-            this.PLAYER_ENTERING_WORLD
+            this.handlePlayerEnteringWorld
         );
     };
 
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_EquipmentChanged");
         this.module.UnregisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
     };
 
-    private ItemChanged = () => {
-        const slotId = this.OvaleEquipment.lastChangedSlot;
+    private itemChanged = () => {
+        const slotId = this.equipments.lastChangedSlot;
         if (slotId != undefined && azeriteSlots[slotId]) {
-            this.UpdateTraits();
+            this.updateTraits();
         }
     };
 
-    private AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED: AceEventHandler<AzeriteEmpoweredItemSelectionUpdatedEvent> = () => {
-        this.UpdateTraits();
+    private handleAzeriteEmpoweredItemSelectionUpdated: AceEventHandler<AzeriteEmpoweredItemSelectionUpdatedEvent> = () => {
+        this.updateTraits();
     };
 
-    private PLAYER_ENTERING_WORLD: AceEventHandler<PlayerEnteringWorldEvent> = () => {
-        this.UpdateTraits();
+    private handlePlayerEnteringWorld: AceEventHandler<PlayerEnteringWorldEvent> = () => {
+        this.updateTraits();
     };
 
-    UpdateTraits() {
-        this.self_traits = {};
+    updateTraits() {
+        this.traits = {};
         for (const [slotId] of pairs(azeriteSlots)) {
             const itemSlot = ItemLocation.CreateFromEquipmentSlot(slotId);
             if (
@@ -151,13 +151,12 @@ export class OvaleAzeriteArmor {
                                 powerId
                             );
                             const [name] = GetSpellInfo(powerInfo.spellID);
-                            if (this.self_traits[powerInfo.spellID]) {
-                                const rank = this.self_traits[powerInfo.spellID]
+                            if (this.traits[powerInfo.spellID]) {
+                                const rank = this.traits[powerInfo.spellID]
                                     .rank;
-                                this.self_traits[powerInfo.spellID].rank =
-                                    rank + 1;
+                                this.traits[powerInfo.spellID].rank = rank + 1;
                             } else {
-                                this.self_traits[powerInfo.spellID] = {
+                                this.traits[powerInfo.spellID] = {
                                     spellID: powerInfo.spellID,
                                     name: name,
                                     rank: 1,
@@ -171,21 +170,21 @@ export class OvaleAzeriteArmor {
         }
     }
 
-    HasTrait(spellId: number) {
-        return (this.self_traits[spellId] && true) || false;
+    hasTrait(spellId: number) {
+        return (this.traits[spellId] && true) || false;
     }
 
-    TraitRank(spellId: number) {
-        if (!this.self_traits[spellId]) {
+    traitRank(spellId: number) {
+        if (!this.traits[spellId]) {
             return 0;
         }
-        return this.self_traits[spellId].rank;
+        return this.traits[spellId].rank;
     }
 
-    DebugTraits() {
+    debugTraits() {
         wipe(this.output);
         const array: LuaArray<string> = {};
-        for (const [k, v] of pairs(this.self_traits)) {
+        for (const [k, v] of pairs(this.traits)) {
             insert(array, `${tostring(v.name)}: ${tostring(k)} (${v.rank})`);
         }
         sort(array);
@@ -195,22 +194,22 @@ export class OvaleAzeriteArmor {
         return concat(this.output, "\n");
     }
 
-    private AzeriteTraitRank = (
+    private azeriteTraitRank = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const value = this.TraitRank(spellId);
-        return ReturnConstant(value);
+        const value = this.traitRank(spellId);
+        return returnConstant(value);
     };
-    private HasAzeriteTrait = (
+    private hasAzeriteTrait = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const value = this.HasTrait(spellId);
-        return ReturnBoolean(value);
+        const value = this.hasTrait(spellId);
+        return returnBoolean(value);
     };
 }

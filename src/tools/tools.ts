@@ -44,13 +44,13 @@ export function checkToken<T extends string>(
 export const oneTimeMessages: LuaObj<boolean | "printed"> = {};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function MakeString(s?: string, ...__args: any[]) {
+export function makeString(s?: string, ...parameters: any[]) {
     if (s && len(s) > 0) {
-        if (truthy(__args) && select("#", __args) > 0) {
+        if (truthy(parameters) && select("#", parameters) > 0) {
             if (truthy(find(s, "%%%.%d")) || truthy(find(s, "%%[%w]"))) {
-                s = format(s, ...tostringall(...__args));
+                s = format(s, ...tostringall(...parameters));
             } else {
-                s = strjoin(" ", s, ...tostringall(...__args));
+                s = strjoin(" ", s, ...tostringall(...parameters));
             }
         } else {
             return s;
@@ -61,26 +61,26 @@ export function MakeString(s?: string, ...__args: any[]) {
     return s;
 }
 
-export function Print(pattern: string, ...__args: unknown[]) {
-    const s = MakeString(pattern, ...__args);
+export function printFormat(pattern: string, ...parameters: unknown[]) {
+    const s = makeString(pattern, ...parameters);
     DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99Ovale|r: %s", s));
 }
 
-export function OneTimeMessage(pattern: string, ...__args: unknown[]) {
-    const s = MakeString(pattern, ...__args);
+export function oneTimeMessage(pattern: string, ...parameters: unknown[]) {
+    const s = makeString(pattern, ...parameters);
     if (!oneTimeMessages[s]) {
         oneTimeMessages[s] = true;
     }
 }
 
-export function ClearOneTimeMessages() {
+export function clearOneTimeMessages() {
     wipe(oneTimeMessages);
 }
 
-export function PrintOneTimeMessages() {
+export function printOneTimeMessages() {
     for (const [s] of pairs(oneTimeMessages)) {
         if (oneTimeMessages[s] != "printed") {
-            Print(s);
+            printFormat(s);
             oneTimeMessages[s] = "printed";
         }
     }

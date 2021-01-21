@@ -4,12 +4,12 @@ import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
-    ParseCondition,
+    parseCondition,
     ParameterInfo,
-    ReturnBoolean,
-    ReturnConstant,
-    ReturnValue,
-    ReturnValueBetween,
+    returnBoolean,
+    returnConstant,
+    returnValue,
+    returnValueBetween,
 } from "../engine/condition";
 import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
@@ -58,7 +58,7 @@ import { BaseState } from "./BaseState";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "../ui/Frame";
-import { OvaleGUIDClass } from "../engine/guid";
+import { Guids } from "../engine/guid";
 import { OvaleDamageTakenClass } from "./DamageTaken";
 import { OvaleEnemiesClass } from "./Enemies";
 import { OvaleCooldownClass } from "./Cooldown";
@@ -72,22 +72,22 @@ import { OvaleDemonHunterSoulFragmentsClass } from "./DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./DemonHunterSigils";
 import { OvaleRunesClass } from "./Runes";
 import { OvaleBossModClass } from "./BossMod";
-import { isNumber, KeyCheck, OneTimeMessage } from "../tools/tools";
+import { isNumber, KeyCheck, oneTimeMessage } from "../tools/tools";
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
-function BossArmorDamageReduction(target: string) {
+function bossArmorDamageReduction(target: string) {
     return 0.3;
 }
 // Return a Capitalized word
-function Capitalize(word: string): string {
+function capitalize(word: string): string {
     if (!word) return word;
     return upper(sub(word, 1, 1)) + lower(sub(word, 2));
 }
 
-const AMPLIFICATION = 146051;
-const INCREASED_CRIT_EFFECT_3_PERCENT = 44797;
-const IMBUED_BUFF_ID = 214336;
-const STEADY_FOCUS = 177668;
+const amplification = 146051;
+const increasedCritEffect3Percents = 44797;
+const imbuedBuffId = 214336;
+const steadyFocus = 177668;
 
 type Target =
     | "player"
@@ -121,7 +121,7 @@ export class OvaleConditions {
      * @param paramName The name of the parameter
      * @param atTime The time
      */
-    ComputeParameter<T extends SpellInfoProperty>(
+    computeParameter<T extends SpellInfoProperty>(
         spellId: number,
         paramName: T,
         atTime: number
@@ -143,7 +143,7 @@ export class OvaleConditions {
         //     }
         // }
         // return undefined;
-        return this.OvaleData.GetSpellInfoProperty(
+        return this.data.getSpellInfoProperty(
             spellId,
             atTime,
             paramName,
@@ -152,11 +152,11 @@ export class OvaleConditions {
     }
 
     /** Return the time in seconds, adjusted by the named haste effect. */
-    GetHastedTime(seconds: number, haste: HasteType | undefined) {
+    getHastedTime(seconds: number, haste: HasteType | undefined) {
         seconds = seconds || 0;
-        const multiplier = this.OvalePaperDoll.GetHasteMultiplier(
+        const multiplier = this.paperDoll.getHasteMultiplier(
             haste,
-            this.OvalePaperDoll.next
+            this.paperDoll.next
         );
         return seconds / multiplier;
     }
@@ -171,12 +171,12 @@ export class OvaleConditions {
 	@return 1 if the set bonus is active, or 0 otherwise.
 	@usage
 	if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements) */
-    private ArmorSetBonus = (
+    private getArmorSetBonus = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
+        oneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         const value = 0;
         return [0, INFINITY, value, 0, 0];
     };
@@ -191,53 +191,53 @@ export class OvaleConditions {
 	@usage
 	if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 	    Spell(ferocious_bite) */
-    private ArmorSetParts = (
+    private getArmorSetParts = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const value = 0;
-        OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
-        return ReturnConstant(value);
+        oneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
+        return returnConstant(value);
     };
 
-    private AzeriteEssenceIsMajor = (
+    private azeriteEssenceIsMajor = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const essenceId = positionalParams[1];
-        const value = this.OvaleAzeriteEssence.IsMajorEssence(essenceId);
-        return ReturnBoolean(value);
+        const value = this.azeriteEssence.isMajorEssence(essenceId);
+        return returnBoolean(value);
     };
-    private AzeriteEssenceIsMinor = (
+    private azeriteEssenceIsMinor = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const essenceId = positionalParams[1];
-        const value = this.OvaleAzeriteEssence.IsMinorEssence(essenceId);
-        return ReturnBoolean(value);
+        const value = this.azeriteEssence.isMinorEssence(essenceId);
+        return returnBoolean(value);
     };
-    private AzeriteEssenceIsEnabled = (
+    private azeriteEssenceIsEnabled = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const essenceId = positionalParams[1];
         const value =
-            this.OvaleAzeriteEssence.IsMajorEssence(essenceId) ||
-            this.OvaleAzeriteEssence.IsMinorEssence(essenceId);
-        return ReturnBoolean(value);
+            this.azeriteEssence.isMajorEssence(essenceId) ||
+            this.azeriteEssence.isMinorEssence(essenceId);
+        return returnBoolean(value);
     };
-    private AzeriteEssenceRank = (
+    private azeriteEssenceRank = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const essenceId = positionalParams[1];
-        const value = this.OvaleAzeriteEssence.EssenceRank(essenceId);
-        return ReturnConstant(value);
+        const value = this.azeriteEssence.essenceRank(essenceId);
+        return returnConstant(value);
     };
 
     /** Get the base duration of the aura in seconds if it is applied at the current time.
@@ -250,35 +250,35 @@ export class OvaleConditions {
 	if BaseDuration(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
 	    Spell(slice_and_dice) */
 
-    private BaseDuration = (
+    private baseDuration = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
         let value = 0;
-        if (this.OvaleData.buffSpellList[auraId]) {
-            const spellList = this.OvaleData.buffSpellList[auraId];
+        if (this.data.buffSpellList[auraId]) {
+            const spellList = this.data.buffSpellList[auraId];
             for (const [id] of pairs(spellList)) {
-                value = this.OvaleAura.GetBaseDuration(
+                value = this.auras.getBaseDuration(
                     id,
                     undefined,
                     atTime,
-                    this.OvalePaperDoll.next
+                    this.paperDoll.next
                 );
                 if (value != INFINITY) {
                     break;
                 }
             }
         } else {
-            value = this.OvaleAura.GetBaseDuration(
+            value = this.auras.getBaseDuration(
                 auraId,
                 undefined,
                 atTime,
-                this.OvalePaperDoll.next
+                this.paperDoll.next
             );
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the value of a buff as a number.  Not all buffs return an amount.
@@ -299,13 +299,13 @@ export class OvaleConditions {
 	 @see TickValue
 	 @usage
 	 if DebuffAmount(stagger) >10000 Spell(purifying_brew) */
-    private BuffAmount = (
+    private buffAmount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
@@ -318,16 +318,10 @@ export class OvaleConditions {
         } else if (value == 3) {
             statName = "value3";
         }
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const value = aura[statName] || 0;
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 aura.ending,
                 value,
@@ -335,7 +329,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the player's combo points for the given aura at the time the aura was applied on the target.
@@ -349,26 +343,20 @@ export class OvaleConditions {
 	 @see DebuffComboPoints
 	 @usage
 	 if target.DebuffComboPoints(rip) <5 Spell(rip) */
-    private BuffComboPoints = (
+    private buffComboPoints = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const value = (aura && aura.combopoints) || 0;
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 aura.ending,
                 value,
@@ -376,7 +364,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the number of seconds before a buff can be gained again.
@@ -389,7 +377,7 @@ export class OvaleConditions {
 	 if BuffCooldown(trinket_stat_agility_buff) > 45
 	     Spell(tigers_fury)
     */
-    private BuffCooldown: ConditionFunction = (
+    private buffCooldown: ConditionFunction = (
         positionalParams,
         namedParams,
         atTime
@@ -397,23 +385,17 @@ export class OvaleConditions {
         const auraId = positionalParams[1];
 
         if (!isNumber(auraId)) return [];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const gain = aura.gain;
             const cooldownEnding = aura.cooldownEnding || 0;
-            return ReturnValueBetween(gain, INFINITY, 0, cooldownEnding, -1);
+            return returnValueBetween(gain, INFINITY, 0, cooldownEnding, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /**  Get the number of buff if the given spell list
@@ -422,31 +404,25 @@ export class OvaleConditions {
 	 @param id the spell list ID	
 	 @return The number of buffs
 	 */
-    private BuffCount = (
+    private buffCount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const spellList = this.OvaleData.buffSpellList[auraId];
+        const spellList = this.data.buffSpellList[auraId];
         let count = 0;
         for (const [id] of pairs(spellList)) {
-            const aura = this.OvaleAura.GetAura(
-                target,
-                id,
-                atTime,
-                filter,
-                mine
-            );
-            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+            const aura = this.auras.getAura(target, id, atTime, filter, mine);
+            if (aura && this.auras.isActiveAura(aura, atTime)) {
                 count = count + 1;
             }
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     /** Get the duration in seconds of the cooldown before a buff can be gained again.
@@ -459,16 +435,16 @@ export class OvaleConditions {
 	 if target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff)
 	     Item(Trinket0Slot)
      */
-    private BuffCooldownDuration = (
+    private buffCooldownDuration = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
         let minCooldown = INFINITY;
-        if (this.OvaleData.buffSpellList[auraId]) {
-            for (const [id] of pairs(this.OvaleData.buffSpellList[auraId])) {
-                const si = this.OvaleData.spellInfo[id];
+        if (this.data.buffSpellList[auraId]) {
+            for (const [id] of pairs(this.data.buffSpellList[auraId])) {
+                const si = this.data.spellInfo[id];
                 const cd = si && si.buff_cd;
                 if (cd && minCooldown > cd) {
                     minCooldown = cd;
@@ -477,7 +453,7 @@ export class OvaleConditions {
         } else {
             minCooldown = 0;
         }
-        return ReturnConstant(minCooldown);
+        return returnConstant(minCooldown);
     };
 
     /** /** Get the total count of the given aura across all targets.
@@ -499,13 +475,13 @@ export class OvaleConditions {
 	 @return The total aura count.
 	 @see DebuffCountOnAny
      */
-    private BuffCountOnAny = (
+    private buffCountOnAny = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [, filter, mine] = this.ParseCondition(
+        const [, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
@@ -520,7 +496,7 @@ export class OvaleConditions {
             endingChangeCount,
             startFirst,
             endingLast,
-        ] = this.OvaleAura.AuraCount(
+        ] = this.auras.auraCount(
             auraId,
             filter,
             mine,
@@ -530,7 +506,7 @@ export class OvaleConditions {
         );
         if (count > 0 && startChangeCount < INFINITY && fractional) {
             const rate = -1 / (endingChangeCount - startChangeCount);
-            return ReturnValueBetween(
+            return returnValueBetween(
                 startFirst,
                 endingLast,
                 count,
@@ -538,7 +514,7 @@ export class OvaleConditions {
                 rate
             );
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     /** Get the current direction of an aura's stack count.
@@ -556,25 +532,19 @@ export class OvaleConditions {
 	 @return The current direction.
 	 @see DebuffDirection
      */
-    private BuffDirection = (
+    private buffDirection = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 INFINITY,
                 aura.direction,
@@ -582,7 +552,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the total duration of the aura from when it was first applied to when it ended.
@@ -595,26 +565,20 @@ export class OvaleConditions {
 	 @return The total duration of the aura.
 	 @see DebuffDuration
      */
-    private BuffDuration = (
+    private buffDuration = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const duration = aura.ending - aura.start;
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 aura.ending,
                 duration,
@@ -622,7 +586,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Test if an aura is expired, or will expire after a given number of seconds.
@@ -648,7 +612,7 @@ export class OvaleConditions {
 	 if target.DebuffExpires(rake 2)
 	     Spell(rake)
      */
-    private BuffExpires: ConditionFunction = (
+    private buffExpires: ConditionFunction = (
         positionalParams,
         namedParams,
         atTime
@@ -657,21 +621,15 @@ export class OvaleConditions {
             positionalParams[1],
             positionalParams[2] || 0,
         ];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
         if (!isNumber(auraId) || !isNumber(seconds)) return [];
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            const hastedSeconds = this.GetHastedTime(
+            const hastedSeconds = this.getHastedTime(
                 seconds,
                 namedParams.haste as HasteType
             );
@@ -707,7 +665,7 @@ export class OvaleConditions {
       if not target.DebuffPresent(rake 2)
           Spell(rake)
       */
-    private BuffPresent = (
+    private buffPresent = (
         atTime: number,
         auraId: number,
         target: Target,
@@ -716,16 +674,10 @@ export class OvaleConditions {
         seconds: number,
         haste: HasteType
     ): ConditionResult => {
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            seconds = this.GetHastedTime(seconds, haste);
+            seconds = this.getHastedTime(seconds, haste);
             if (ending - seconds <= gain) {
                 return [];
             } else {
@@ -746,38 +698,32 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
 	 @see DebuffGain */
-    private BuffGain = (
+    private buffGain = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const gain = aura.gain || 0;
-            return ReturnValueBetween(gain, INFINITY, 0, gain, 1);
+            return returnValueBetween(gain, INFINITY, 0, gain, 1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
-    private BuffImproved = (
+    private buffImproved = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        let [, ,] = this.ParseCondition(positionalParams, namedParams);
+        let [, ,] = this.parseCondition(positionalParams, namedParams);
         // TODO Not implemented
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the player's persistent multiplier for the given aura at the time the aura was applied on the target.
@@ -793,26 +739,20 @@ export class OvaleConditions {
 	 @usage
 	 if target.DebuffPersistentMultiplier(rake) < 1 Spell(rake)
      */
-    private BuffPersistentMultiplier = (
+    private buffPersistentMultiplier = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const value = aura.damageMultiplier || 1;
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 aura.ending,
                 value,
@@ -820,7 +760,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(1);
+        return returnConstant(1);
     };
 
     /** Get the remaining time in seconds on an aura.
@@ -839,27 +779,21 @@ export class OvaleConditions {
 	 if BuffRemaining(slice_and_dice) <2
 	     Spell(slice_and_dice)
      */
-    private BuffRemaining = (
+    private buffRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura && aura.ending >= atTime) {
-            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
+            return returnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the remaining time in seconds before the aura expires across all targets.
@@ -878,20 +812,20 @@ export class OvaleConditions {
 	 @return The number of seconds.
 	 @see DebuffRemainingOnAny
      */
-    private BuffRemainingOnAny = (
+    private buffRemainingOnAny = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [, filter, mine] = this.ParseCondition(
+        const [, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
         const excludeUnitId =
             (namedParams.excludeTarget == 1 && this.baseState.defaultTarget) ||
             undefined;
-        const [count, , , , startFirst, endingLast] = this.OvaleAura.AuraCount(
+        const [count, , , , startFirst, endingLast] = this.auras.auraCount(
             auraId,
             filter,
             mine,
@@ -900,9 +834,9 @@ export class OvaleConditions {
             excludeUnitId
         );
         if (count > 0) {
-            return ReturnValueBetween(startFirst, INFINITY, 0, endingLast, -1);
+            return returnValueBetween(startFirst, INFINITY, 0, endingLast, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the number of stacks of an aura on the target.
@@ -923,26 +857,20 @@ export class OvaleConditions {
 	 if target.DebuffStacks(weakened_armor) <3
 	     Spell(faerie_fire)
      */
-    private BuffStacks = (
+    private buffStacks = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const value = aura.stacks || 0;
-            return ReturnValueBetween(
+            return returnValueBetween(
                 aura.gain,
                 aura.ending,
                 value,
@@ -950,7 +878,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     private maxStacks = (
@@ -959,9 +887,9 @@ export class OvaleConditions {
         atTime: number
     ) => {
         const auraId = positionalParams[1] as number;
-        const spellInfo = this.OvaleData.GetSpellInfo(auraId);
+        const spellInfo = this.data.getSpellOrListInfo(auraId);
         const maxStacks = (spellInfo && spellInfo.max_stacks) || 0;
-        return ReturnConstant(maxStacks);
+        return returnConstant(maxStacks);
     };
 
     /** Get the total number of stacks of the given aura across all targets.
@@ -977,13 +905,13 @@ export class OvaleConditions {
 	 @return The total number of stacks.
 	 @see DebuffStacksOnAny
      */
-    private BuffStacksOnAny = (
+    private buffStacksOnAny = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [, filter, mine] = this.ParseCondition(
+        const [, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
@@ -996,7 +924,7 @@ export class OvaleConditions {
             ,
             endingChangeCount,
             startFirst,
-        ] = this.OvaleAura.AuraCount(
+        ] = this.auras.auraCount(
             auraId,
             filter,
             mine,
@@ -1005,7 +933,7 @@ export class OvaleConditions {
             excludeUnitId
         );
         if (count > 0) {
-            return ReturnValueBetween(
+            return returnValueBetween(
                 startFirst,
                 endingChangeCount,
                 stacks,
@@ -1013,7 +941,7 @@ export class OvaleConditions {
                 0
             );
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     /** Test if there is a stealable buff on the target.
@@ -1027,13 +955,13 @@ export class OvaleConditions {
 	 if target.BuffStealable()
 	     Spell(spellsteal)
      */
-    private BuffStealable = (
+    private buffStealable = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        return this.OvaleAura.GetAuraWithProperty(
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        return this.auras.getAuraWithProperty(
             target,
             "stealable",
             "HELPFUL",
@@ -1047,13 +975,13 @@ export class OvaleConditions {
 	 @param id The spell ID to check.
 	 @return True if the spell cast be cast; otherwise, false.
      */
-    private CanCast = (
+    private canCast = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = positionalParams[1];
-        const [start, duration] = this.OvaleCooldown.GetSpellCooldown(
+        const [start, duration] = this.cooldown.getSpellCooldown(
             spellId,
             atTime
         );
@@ -1070,14 +998,14 @@ export class OvaleConditions {
 	 if target.DebuffRemaining(flame_shock) < CastTime(lava_burst)
 	     Spell(lava_burst)
      */
-    private CastTime = (
+    private castTime = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        return ReturnConstant(castTime);
+        const castTime = this.spellBook.getCastTime(spellId) || 0;
+        return returnConstant(castTime);
     };
 
     /** Get the cast time in seconds of the spell for the player or the GCD for the player, whichever is greater.
@@ -1090,16 +1018,16 @@ export class OvaleConditions {
 	 if target.DebuffRemaining(flame_shock) < ExecuteTime(lava_burst)
 	     Spell(lava_burst)
      */
-    private ExecuteTime = (
+    private executeTime = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        const gcd = this.OvaleFuture.GetGCD(atTime);
+        const castTime = this.spellBook.getCastTime(spellId) || 0;
+        const gcd = this.future.getGCD(atTime);
         const t = (castTime > gcd && castTime) || gcd;
-        return ReturnConstant(t);
+        return returnConstant(t);
     };
 
     /** Test if the target is casting the given spell.
@@ -1118,19 +1046,19 @@ export class OvaleConditions {
 	 if target.Casting(maloriak_release_aberrations)
 	     Spell(pummel)
      */
-    private Casting = (
+    private casting = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let start, ending, castSpellId, castSpellName;
         if (target == "player") {
-            start = this.OvaleFuture.next.currentCast.start;
-            ending = this.OvaleFuture.next.currentCast.stop;
-            castSpellId = this.OvaleFuture.next.currentCast.spellId;
-            castSpellName = this.OvaleSpellBook.GetSpellName(castSpellId);
+            start = this.future.next.currentCast.start;
+            ending = this.future.next.currentCast.stop;
+            castSpellId = this.future.next.currentCast.spellId;
+            castSpellName = this.spellBook.getSpellName(castSpellId);
         } else {
             let [spellName, , , startTime, endTime] = UnitCastingInfo(target);
             if (!spellName) {
@@ -1145,29 +1073,27 @@ export class OvaleConditions {
         if ((castSpellId || castSpellName) && start && ending) {
             if (!spellId) {
                 return [start, ending];
-            } else if (this.OvaleData.buffSpellList[spellId]) {
-                for (const [id] of pairs(
-                    this.OvaleData.buffSpellList[spellId]
-                )) {
+            } else if (this.data.buffSpellList[spellId]) {
+                for (const [id] of pairs(this.data.buffSpellList[spellId])) {
                     if (
                         id == castSpellId ||
-                        this.OvaleSpellBook.GetSpellName(id) == castSpellName
+                        this.spellBook.getSpellName(id) == castSpellName
                     ) {
                         return [start, ending];
                     }
                 }
             } else if (
                 spellId == "harmful" &&
-                this.OvaleSpellBook.IsHarmfulSpell(spellId)
+                this.spellBook.isHarmfulSpell(spellId)
             ) {
                 return [start, ending];
             } else if (
                 spellId == "helpful" &&
-                this.OvaleSpellBook.IsHelpfulSpell(spellId)
+                this.spellBook.isHelpfulSpell(spellId)
             ) {
                 return [start, ending];
             } else if (spellId == castSpellId) {
-                OneTimeMessage(
+                oneTimeMessage(
                     "%f %f %d %s => %d (%f)",
                     start,
                     ending,
@@ -1179,7 +1105,7 @@ export class OvaleConditions {
                 return [start, ending];
             } else if (
                 type(spellId) == "number" &&
-                this.OvaleSpellBook.GetSpellName(spellId) == castSpellName
+                this.spellBook.getSpellName(spellId) == castSpellName
             ) {
                 return [start, ending];
             }
@@ -1199,15 +1125,15 @@ export class OvaleConditions {
 	 if CheckBoxOff(opt_black_arrow) Spell(explosive_trap)
 
 	 */
-    private CheckBoxOff = (
+    private checkBoxOff = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
             if (
-                this.OvaleFrameModule.frame &&
-                this.OvaleFrameModule.frame.IsChecked(id)
+                this.frameModule.frame &&
+                this.frameModule.frame.isChecked(id)
             ) {
                 return [];
             }
@@ -1226,15 +1152,15 @@ export class OvaleConditions {
 	 AddCheckBox(opt_black_arrow "Black Arrow" default)
 	 if CheckBoxOn(opt_black_arrow) Spell(black_arrow)
      */
-    private CheckBoxOn = (
+    private checkBoxOn = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         for (const [, id] of ipairs(positionalParams)) {
             if (
-                this.OvaleFrameModule.frame &&
-                !this.OvaleFrameModule.frame.IsChecked(id)
+                this.frameModule.frame &&
+                !this.frameModule.frame.isChecked(id)
             ) {
                 return [];
             }
@@ -1254,22 +1180,22 @@ export class OvaleConditions {
 	 @usage
 	 if target.Class(PRIEST) Spell(cheap_shot)
      */
-    private Class = (
+    private getClass = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const className = positionalParams[1];
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
 
         let classToken;
         if (target == "player") {
-            classToken = this.OvalePaperDoll.class;
+            classToken = this.paperDoll.class;
         } else {
             [, classToken] = UnitClass(target);
         }
         const boolean = classToken == upper(className);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test whether the target's classification matches the given classification.
@@ -1284,30 +1210,30 @@ export class OvaleConditions {
 	 @usage
 	 if target.Classification(worldboss) Item(virmens_bite_potion)
      */
-    private Classification = (
+    private classification = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const classification = positionalParams[1];
         let targetClassification;
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         if (UnitLevel(target) < 0) {
             targetClassification = "worldboss";
         } else if (
             UnitExists("boss1") &&
-            this.OvaleGUID.UnitGUID(target) == this.OvaleGUID.UnitGUID("boss1")
+            this.guids.getUnitGUID(target) == this.guids.getUnitGUID("boss1")
         ) {
             targetClassification = "worldboss";
         } else {
-            const aura = this.OvaleAura.GetAura(
+            const aura = this.auras.getAura(
                 target,
-                IMBUED_BUFF_ID,
+                imbuedBuffId,
                 atTime,
                 "HARMFUL",
                 false
             );
-            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+            if (aura && this.auras.isActiveAura(aura, atTime)) {
                 targetClassification = "worldboss";
             } else {
                 targetClassification = UnitClassification(target);
@@ -1319,7 +1245,7 @@ export class OvaleConditions {
             }
         }
         const boolean = targetClassification == classification;
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /**  Get the current value of a script counter.
@@ -1328,14 +1254,14 @@ export class OvaleConditions {
 	 @param id The name of the counter. It should match one that's defined by inccounter=xxx in SpellInfo(...).
 	 @return The current value the counter.
      */
-    private Counter = (
+    private counter = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const counter = positionalParams[1];
-        const value = this.OvaleFuture.GetCounter(counter, atTime);
-        return ReturnConstant(value);
+        const value = this.future.getCounter(counter, atTime);
+        return returnConstant(value);
     };
 
     /** Test whether the target's creature family matches the given name.
@@ -1356,12 +1282,12 @@ export class OvaleConditions {
 	 if target.CreatureFamily(Dragonkin)
 	     Spell(hibernate)
      */
-    private CreatureFamily = (_: number, name: string, target: string) => {
-        name = Capitalize(name);
+    private creatureFamily = (_: number, name: string, target: string) => {
+        name = capitalize(name);
         const family = UnitCreatureFamily(target);
         const lookupTable =
             LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
-        return ReturnBoolean(lookupTable && family == lookupTable[name]);
+        return returnBoolean(lookupTable && family == lookupTable[name]);
     };
 
     /**  Test if the target is any of the listed creature types.
@@ -1378,18 +1304,18 @@ export class OvaleConditions {
 	 if target.CreatureType(Humanoid Critter)
 	     Spell(polymorph)
      */
-    private CreatureType = (
+    private creatureType = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const creatureType = UnitCreatureType(target);
         const lookupTable =
             LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
         if (lookupTable) {
             for (const [, name] of ipairs<string>(positionalParams)) {
-                const capitalizedName: string = Capitalize(name);
+                const capitalizedName: string = capitalize(name);
                 if (creatureType == lookupTable[capitalizedName]) {
                     return [0, INFINITY];
                 }
@@ -1408,47 +1334,47 @@ export class OvaleConditions {
 	 @return The estimated critical strike damage of the given spell.
 	 @see Damage
      */
-    private CritDamage = (
+    private critDamage = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        let value = this.ComputeParameter(spellId, "damage", atTime) || 0;
-        const si = this.OvaleData.spellInfo[spellId];
+        let value = this.computeParameter(spellId, "damage", atTime) || 0;
+        const si = this.data.spellInfo[spellId];
         if (si && si.physical == 1) {
-            value = value * (1 - BossArmorDamageReduction(target));
+            value = value * (1 - bossArmorDamageReduction(target));
         }
         let critMultiplier = 2;
         {
-            const aura = this.OvaleAura.GetAura(
+            const aura = this.auras.getAura(
                 "player",
-                AMPLIFICATION,
+                amplification,
                 atTime,
                 "HELPFUL"
             );
-            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+            if (aura && this.auras.isActiveAura(aura, atTime)) {
                 critMultiplier = critMultiplier + (aura.value1 || 0);
             }
         }
         {
-            const aura = this.OvaleAura.GetAura(
+            const aura = this.auras.getAura(
                 "player",
-                INCREASED_CRIT_EFFECT_3_PERCENT,
+                increasedCritEffect3Percents,
                 atTime,
                 "HELPFUL"
             );
-            if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+            if (aura && this.auras.isActiveAura(aura, atTime)) {
                 critMultiplier = critMultiplier * (aura.value1 || 0);
             }
         }
         value = critMultiplier * value;
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /**  Get the current estimated damage of a spell on the target.
@@ -1465,23 +1391,23 @@ export class OvaleConditions {
 	 if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 	     Spell(rake)
      */
-    private Damage = (
+    private damage = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        let value = this.ComputeParameter(spellId, "damage", atTime) || 0;
-        const si = this.OvaleData.spellInfo[spellId];
+        let value = this.computeParameter(spellId, "damage", atTime) || 0;
+        const si = this.data.spellInfo[spellId];
         if (si && si.physical == 1) {
-            value = value * (1 - BossArmorDamageReduction(target));
+            value = value * (1 - bossArmorDamageReduction(target));
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /**  Get the total damage taken by the player in the previous time interval.
@@ -1493,7 +1419,7 @@ export class OvaleConditions {
 	 @usage
 	 if DamageTaken(5) > 50000 Spell(death_strike)
      */
-    private DamageTaken = (
+    private getDamageTaken = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -1501,10 +1427,10 @@ export class OvaleConditions {
         const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
-            const [total] = this.OvaleDamageTaken.GetRecentDamage(interval);
+            const [total] = this.damageTaken.getRecentDamage(interval);
             value = total;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /**  Get the magic damage taken by the player in the previous time interval.
@@ -1516,7 +1442,7 @@ export class OvaleConditions {
 	 @usage
 	 if MagicDamageTaken(1.5) > 0 Spell(antimagic_shell)
      */
-    private MagicDamageTaken = (
+    private magicDamageTaken = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -1524,12 +1450,10 @@ export class OvaleConditions {
         const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
-            const [, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
-                interval
-            );
+            const [, totalMagic] = this.damageTaken.getRecentDamage(interval);
             value = totalMagic;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /**  Get the physical damage taken by the player in the previous time interval.
@@ -1541,7 +1465,7 @@ export class OvaleConditions {
 	 @usage
 	 if PhysicalDamageTaken(1.5) > 0 Spell(shield_block)
      */
-    private PhysicalDamageTaken = (
+    private physicalDamageTaken = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -1549,26 +1473,26 @@ export class OvaleConditions {
         const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
-            const [total, totalMagic] = this.OvaleDamageTaken.GetRecentDamage(
+            const [total, totalMagic] = this.damageTaken.getRecentDamage(
                 interval
             );
             value = total - totalMagic;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
-    GetDiseases(
+    getDiseases(
         target: string,
         atTime: number
     ): [Aura | undefined, Aura | undefined] {
-        const bpAura = this.OvaleAura.GetAura(
+        const bpAura = this.auras.getAura(
             target,
             SpellId.blood_plague,
             atTime,
             "HARMFUL",
             true
         );
-        const ffAura = this.OvaleAura.GetAura(
+        const ffAura = this.auras.getAura(
             target,
             SpellId.frost_fever,
             atTime,
@@ -1586,26 +1510,26 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
      */
-    private DiseasesRemaining = (
+    private diseasesRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
+        const [target, ,] = this.parseCondition(positionalParams, namedParams);
+        const [bpAura, ffAura] = this.getDiseases(target, atTime);
         let aura;
         if (
             bpAura &&
-            this.OvaleAura.IsActiveAura(bpAura, atTime) &&
+            this.auras.isActiveAura(bpAura, atTime) &&
             ffAura &&
-            this.OvaleAura.IsActiveAura(ffAura, atTime)
+            this.auras.isActiveAura(ffAura, atTime)
         ) {
             aura = (bpAura.ending < ffAura.ending && bpAura) || ffAura;
         }
         if (aura) {
-            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
+            return returnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /**  Test if all diseases applied by the death knight are present on the target.
@@ -1616,13 +1540,13 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    private DiseasesTicking = (
+    private diseasesTicking = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
+        const [target, ,] = this.parseCondition(positionalParams, namedParams);
+        const [bpAura, ffAura] = this.getDiseases(target, atTime);
         let gain, ending;
         if (bpAura && ffAura) {
             gain = (bpAura.gain > ffAura.gain && bpAura.gain) || ffAura.gain;
@@ -1645,13 +1569,13 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    private DiseasesAnyTicking = (
+    private diseasesAnyTicking = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target, ,] = this.ParseCondition(positionalParams, namedParams);
-        const [bpAura, ffAura] = this.GetDiseases(target, atTime);
+        const [target, ,] = this.parseCondition(positionalParams, namedParams);
+        const [bpAura, ffAura] = this.getDiseases(target, atTime);
         let aura;
         if (bpAura || ffAura) {
             aura = bpAura || ffAura;
@@ -1681,14 +1605,14 @@ export class OvaleConditions {
 	 if target.Distance() < 25
 	     Texture(ability_rogue_sprint)
      */
-    private Distance = (
+    private distance = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const value = (LibRangeCheck && LibRangeCheck.GetRange(target)) || 0;
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /**  Get the number of hostile enemies on the battlefield.
@@ -1702,12 +1626,12 @@ export class OvaleConditions {
 	 @usage
 	 if Enemies() > 4 Spell(fan_of_knives)
      */
-    private Enemies = (
+    private getEnemies = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        let value = this.OvaleEnemies.next.enemies;
+        let value = this.enemies.next.enemies;
         if (!value) {
             let useTagged = this.ovaleOptions.db.profile.apparence
                 .taggedEnemies;
@@ -1717,13 +1641,13 @@ export class OvaleConditions {
                 useTagged = true;
             }
             value =
-                (useTagged && this.OvaleEnemies.next.taggedEnemies) ||
-                this.OvaleEnemies.next.activeEnemies;
+                (useTagged && this.enemies.next.taggedEnemies) ||
+                this.enemies.next.activeEnemies;
         }
         if (value < 1) {
             value = 1;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
@@ -1733,17 +1657,17 @@ export class OvaleConditions {
 	 @usage
 	 if EnergyRegenRage() >11 Spell(stance_of_the_sturdy_ox)
      */
-    private EnergyRegenRate = (
+    private energyRegenRate = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const value = this.OvalePower.getPowerRateAt(
-            this.OvalePower.next,
+        const value = this.powers.getPowerRateAt(
+            this.powers.next,
             "energy",
             atTime
         );
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the remaining time in seconds the target is Enraged.
@@ -1757,13 +1681,13 @@ export class OvaleConditions {
 	 @usage
 	 if EnrageRemaining() < 3 Spell(berserker_rage)
      */
-    private EnrageRemaining = (
+    private enrageRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const aura = this.OvaleAura.GetAura(
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const aura = this.auras.getAura(
             target,
             "enrage",
             atTime,
@@ -1771,9 +1695,9 @@ export class OvaleConditions {
             false
         );
         if (aura && aura.ending >= atTime) {
-            return ReturnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
+            return returnValueBetween(aura.gain, INFINITY, 0, aura.ending, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Test if the target exists. The target may be alive or dead.
@@ -1787,14 +1711,14 @@ export class OvaleConditions {
 	 @usage
 	 if not pet.Exists() Spell(summon_imp)
      */
-    private Exists = (
+    private exists = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitExists(target);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** A condition that always returns false.
@@ -1802,7 +1726,7 @@ export class OvaleConditions {
 	 @paramsig boolean
 	 @return A boolean value.
      */
-    False: ConditionFunction = (
+    private getFalse: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -1817,17 +1741,17 @@ export class OvaleConditions {
 	 @usage
 	 if FocusRegenRate() > 20 Spell(arcane_shot)
      */
-    private FocusRegenRate = (
+    private focusRegenRate = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const value = this.OvalePower.getPowerRateAt(
-            this.OvalePower.next,
+        const value = this.powers.getPowerRateAt(
+            this.powers.next,
             "focus",
             atTime
         );
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the amount of focus that would be regenerated during the cast time of the given spell for hunters.
@@ -1836,25 +1760,25 @@ export class OvaleConditions {
 	 @param id The spell ID.
 	 @return The amount of focus.
      */
-    private FocusCastingRegen = (
+    private focusCastingRegen = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const regenRate = this.OvalePower.getPowerRateAt(
-            this.OvalePower.next,
+        const regenRate = this.powers.getPowerRateAt(
+            this.powers.next,
             "focus",
             atTime
         );
         let power = 0;
-        const castTime = this.OvaleSpellBook.GetCastTime(spellId) || 0;
-        const gcd = this.OvaleFuture.GetGCD(atTime);
+        const castTime = this.spellBook.getCastTime(spellId) || 0;
+        const gcd = this.future.getGCD(atTime);
         const castSeconds = (castTime > gcd && castTime) || gcd;
         power = power + regenRate * castSeconds;
-        const aura = this.OvaleAura.GetAura(
+        const aura = this.auras.getAura(
             "player",
-            STEADY_FOCUS,
+            steadyFocus,
             atTime,
             "HELPFUL",
             true
@@ -1868,7 +1792,7 @@ export class OvaleConditions {
             }
             power = power + regenRate * 1.5 * seconds;
         }
-        return ReturnConstant(power);
+        return returnConstant(power);
     };
 
     /** Get the player's global cooldown in seconds.
@@ -1878,13 +1802,13 @@ export class OvaleConditions {
 	 @usage
 	 if GCD() < 1.1 Spell(frostfire_bolt)
      */
-    private GCD = (
+    private getGCD = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const value = this.OvaleFuture.GetGCD(atTime);
-        return ReturnConstant(value);
+        const value = this.future.getGCD(atTime);
+        return returnConstant(value);
     };
 
     /** Get the number of seconds before the player's global cooldown expires.
@@ -1897,38 +1821,38 @@ export class OvaleConditions {
 	 @usage
 	 unless SpellCooldown(seraphim) < GCDRemaining() Spell(judgment)
      */
-    private GCDRemaining = (
+    private getGCDRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        if (this.OvaleFuture.next.lastGCDSpellId) {
-            const duration = this.OvaleFuture.GetGCD(
-                this.OvaleFuture.next.lastGCDSpellId,
+        if (this.future.next.lastGCDSpellId) {
+            const duration = this.future.getGCD(
+                this.future.next.lastGCDSpellId,
                 atTime,
-                this.OvaleGUID.UnitGUID(target)
+                this.guids.getUnitGUID(target)
             );
-            const spellcast = this.lastSpell.LastInFlightSpell();
+            const spellcast = this.lastSpell.lastInFlightSpell();
             const start = (spellcast && spellcast.start) || 0;
             const ending = start + duration;
             if (atTime < ending) {
-                return ReturnValueBetween(start, INFINITY, 0, ending, -1);
+                return returnValueBetween(start, INFINITY, 0, ending, -1);
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
-    private Glyph = (
+    private glyph = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return ReturnBoolean(false);
+        return returnBoolean(false);
     };
 
     /** Test if the player has full control, i.e., isn't feared, charmed, etc.
@@ -1938,13 +1862,13 @@ export class OvaleConditions {
 	 @usage
 	 if not HasFullControl() Spell(barkskin)
      */
-    private HasFullControlCondition = (
+    private hasFullControlCondition = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean = HasFullControl();
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Get the current amount of health points of the target.
@@ -1958,20 +1882,20 @@ export class OvaleConditions {
 	 @usage
 	 if Health() < 10000 Spell(last_stand)
      */
-    private Health = (
+    private getHealth = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const health = this.OvaleHealth.UnitHealth(target) || 0;
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const health = this.health.getUnitHealth(target) || 0;
         if (health > 0) {
             const now = this.baseState.currentTime;
-            const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+            const timeToDie = this.health.getUnitTimeToDie(target);
             const rate = (-1 * health) / timeToDie;
-            return ReturnValueBetween(now, INFINITY, health, now, rate);
+            return returnValueBetween(now, INFINITY, health, now, rate);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the current amount of health points of the target including absorbs.
@@ -1985,21 +1909,21 @@ export class OvaleConditions {
 	 @usage
 	 if EffectiveHealth() < 10000 Spell(last_stand)
      */
-    private EffectiveHealth = (
+    private effectiveHealth = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const health =
-            this.OvaleHealth.UnitHealth(target) +
-                this.OvaleHealth.UnitAbsorb(target) -
-                this.OvaleHealth.UnitHealAbsorb(target) || 0;
+            this.health.getUnitHealth(target) +
+                this.health.getUnitAbsorb(target) -
+                this.health.getUnitHealAbsorb(target) || 0;
 
         const now = this.baseState.currentTime;
-        const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+        const timeToDie = this.health.getUnitTimeToDie(target);
         const rate = (-1 * health) / timeToDie;
-        return ReturnValueBetween(now, INFINITY, health, now, rate);
+        return returnValueBetween(now, INFINITY, health, now, rate);
     };
 
     /** Get the number of health points away from full health of the target.
@@ -2013,22 +1937,22 @@ export class OvaleConditions {
 	 @usage
 	 if HealthMissing() < 20000 Item(healthstone)
      */
-    private HealthMissing = (
+    private healthMissing = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const health = this.OvaleHealth.UnitHealth(target) || 0;
-        const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const health = this.health.getUnitHealth(target) || 0;
+        const maxHealth = this.health.getUnitHealthMax(target) || 1;
         if (health > 0) {
             const now = this.baseState.currentTime;
             const missing = maxHealth - health;
-            const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+            const timeToDie = this.health.getUnitTimeToDie(target);
             const rate = health / timeToDie;
-            return ReturnValueBetween(now, INFINITY, missing, now, rate);
+            return returnValueBetween(now, INFINITY, missing, now, rate);
         }
-        return ReturnConstant(maxHealth);
+        return returnConstant(maxHealth);
     };
 
     /** Get the current percent level of health of the target.
@@ -2043,22 +1967,22 @@ export class OvaleConditions {
 	 if HealthPercent() < 20 Spell(last_stand)
 	 if target.HealthPercent() < 25 Spell(kill_shot)
      */
-    private HealthPercent = (
+    private healthPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const health = this.OvaleHealth.UnitHealth(target) || 0;
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const health = this.health.getUnitHealth(target) || 0;
         if (health > 0) {
             const now = this.baseState.currentTime;
-            const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
+            const maxHealth = this.health.getUnitHealthMax(target) || 1;
             const healthPct = (health / maxHealth) * 100;
-            const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+            const timeToDie = this.health.getUnitTimeToDie(target);
             const rate = (-1 * healthPct) / timeToDie;
-            return ReturnValueBetween(now, INFINITY, healthPct, now, rate);
+            return returnValueBetween(now, INFINITY, healthPct, now, rate);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the current effective percent level of health of the target (including absorbs).
@@ -2072,23 +1996,23 @@ export class OvaleConditions {
 	 if EffectiveHealthPercent() < 20 Spell(last_stand)
 	 if target.EffectiveHealthPercent() < 25 Spell(kill_shot)
      */
-    private EffectiveHealthPercent = (
+    private effectiveHealthPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const health =
-            this.OvaleHealth.UnitHealth(target) +
-                this.OvaleHealth.UnitAbsorb(target) -
-                this.OvaleHealth.UnitHealAbsorb(target) || 0;
+            this.health.getUnitHealth(target) +
+                this.health.getUnitAbsorb(target) -
+                this.health.getUnitHealAbsorb(target) || 0;
 
         const now = this.baseState.currentTime;
-        const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
+        const maxHealth = this.health.getUnitHealthMax(target) || 1;
         const healthPct = (health / maxHealth) * 100;
-        const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+        const timeToDie = this.health.getUnitTimeToDie(target);
         const rate = (-1 * healthPct) / timeToDie;
-        return ReturnValueBetween(now, INFINITY, healthPct, now, rate);
+        return returnValueBetween(now, INFINITY, healthPct, now, rate);
     };
 
     /** Get the amount of health points of the target when it is at full health.
@@ -2101,14 +2025,14 @@ export class OvaleConditions {
 	 @usage
 	 if target.MaxHealth() > 10000000 Item(mogu_power_potion)
      */
-    private MaxHealth = (
+    private maxHealth = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const value = this.OvaleHealth.UnitHealthMax(target);
-        return ReturnConstant(value);
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const value = this.health.getUnitHealthMax(target);
+        return returnConstant(value);
     };
 
     /**  Get the estimated number of seconds remaining before the target is dead.
@@ -2122,15 +2046,15 @@ export class OvaleConditions {
 	 @usage
 	 if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
      */
-    private TimeToDie = (
+    private timeToDie = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const now = this.baseState.currentTime;
-        const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
-        return ReturnValueBetween(now, INFINITY, timeToDie, now, -1);
+        const timeToDie = this.health.getUnitTimeToDie(target);
+        return returnValueBetween(now, INFINITY, timeToDie, now, -1);
     };
 
     /** Get the estimated number of seconds remaining before the target reaches the given percent of max health.
@@ -2145,25 +2069,25 @@ export class OvaleConditions {
 	 @usage
 	 if target.TimeToHealthPercent(25) <15 Item(virmens_bite_potion)
      */
-    private TimeToHealthPercent = (
+    private timeToHealthPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const percent = positionalParams[1];
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const health = this.OvaleHealth.UnitHealth(target) || 0;
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const health = this.health.getUnitHealth(target) || 0;
         if (health > 0) {
-            const maxHealth = this.OvaleHealth.UnitHealthMax(target) || 1;
+            const maxHealth = this.health.getUnitHealthMax(target) || 1;
             const healthPct = (health / maxHealth) * 100;
             if (healthPct >= percent) {
                 const now = this.baseState.currentTime;
-                const timeToDie = this.OvaleHealth.UnitTimeToDie(target);
+                const timeToDie = this.health.getUnitTimeToDie(target);
                 const t = (timeToDie * (healthPct - percent)) / healthPct;
-                return ReturnValueBetween(now, now + t, t, now, -1);
+                return returnValueBetween(now, now + t, t, now, -1);
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
@@ -2175,16 +2099,16 @@ export class OvaleConditions {
 	 if target.DebuffRemaining(haunt) <3 and not InFlightToTarget(haunt)
 	     Spell(haunt)
      */
-    private InFlightToTarget = (
+    private inFlightToTarget = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
         const boolean =
-            this.OvaleFuture.next.currentCast.spellId == spellId ||
-            this.OvaleFuture.InFlight(spellId);
-        return ReturnBoolean(boolean);
+            this.future.next.currentCast.spellId == spellId ||
+            this.future.isInFlight(spellId);
+        return returnBoolean(boolean);
     };
 
     /** Test if the distance from the player to the target is within the spell's range.
@@ -2196,15 +2120,15 @@ export class OvaleConditions {
 	 if target.IsInterruptible() and target.InRange(kick)
 	     Spell(kick)
      */
-    private InRange = (
+    private inRange = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const boolean = this.OvaleSpells.IsSpellInRange(spellId, target);
-        return ReturnBoolean(boolean || false);
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const boolean = this.spells.isSpellInRange(spellId, target);
+        return returnBoolean(boolean || false);
     };
 
     /** Test if the target's primary aggro is on the player.
@@ -2219,14 +2143,14 @@ export class OvaleConditions {
 	 @usage
 	 if target.IsAggroed() Spell(feign_death)
      */
-    private IsAggroed = (
+    private isAggroed = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const [boolean] = UnitDetailedThreatSituation("player", target);
-        return ReturnBoolean(boolean || false);
+        return returnBoolean(boolean || false);
     };
 
     /**  Test if the target is dead.
@@ -2239,14 +2163,14 @@ export class OvaleConditions {
 	 @usage
 	 if pet.IsDead() Spell(revive_pet)
      */
-    private IsDead = (
+    private isDead = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitIsDead(target);
-        return ReturnBoolean(boolean || false);
+        return returnBoolean(boolean || false);
     };
 
     /** Test if the target is enraged.
@@ -2259,13 +2183,13 @@ export class OvaleConditions {
 	 @usage
 	 if target.IsEnraged() Spell(soothe)
      */
-    private IsEnraged = (
+    private isEnraged = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
-        const aura = this.OvaleAura.GetAura(
+        const [target] = this.parseCondition(positionalParams, namedParams);
+        const aura = this.auras.getAura(
             target,
             "enrage",
             atTime,
@@ -2286,15 +2210,15 @@ export class OvaleConditions {
 	 @usage
 	 if IsFeared() Spell(every_man_for_himself)
      */
-    private IsFeared = (
+    private isFeared = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean =
             !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("FEAR", atTime);
-        return ReturnBoolean(boolean);
+            this.lossOfControl.hasLossOfControl("FEAR", atTime);
+        return returnBoolean(boolean);
     };
 
     /** Test if the target is friendly to the player.
@@ -2307,14 +2231,14 @@ export class OvaleConditions {
 	 @usage
 	 if target.IsFriend() Spell(healing_touch)
      */
-    private IsFriend = (
+    private isFriend = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitIsFriend("player", target);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test if the player is incapacitated.
@@ -2324,15 +2248,15 @@ export class OvaleConditions {
 	 @usage
 	 if IsIncapacitated() Spell(every_man_for_himself)
      */
-    private IsIncapacitated = (
+    private isIncapacitated = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean =
             !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime);
-        return ReturnBoolean(boolean);
+            this.lossOfControl.hasLossOfControl("CONFUSE", atTime);
+        return returnBoolean(boolean);
     };
 
     /**  Test if the target is currently casting an interruptible spell.
@@ -2345,18 +2269,18 @@ export class OvaleConditions {
 	 @usage
 	 if target.IsInterruptible() Spell(kick)
      */
-    private IsInterruptible = (
+    private isInterruptible = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let [name, , , , , , , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
             [name, , , , , , notInterruptible] = UnitChannelInfo(target);
         }
         const boolean = notInterruptible != undefined && !notInterruptible;
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /**  Test if the target is flagged for PvP activity.
@@ -2369,14 +2293,14 @@ export class OvaleConditions {
 	 @usage
 	 if not target.IsFriend() and target.IsPVP() Spell(sap)
      */
-    private IsPVP = (
+    private isPVP = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitIsPVP(target);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
     /** Test if the player is rooted.
 	 @name IsRooted
@@ -2385,16 +2309,13 @@ export class OvaleConditions {
 	 @usage
 	 if IsRooted() Item(Trinket0Slot usable=1)
      */
-    private IsRooted = (
+    private isRooted = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const boolean = this.OvaleLossOfControl.HasLossOfControl(
-            "ROOT",
-            atTime
-        );
-        return ReturnBoolean(boolean);
+        const boolean = this.lossOfControl.hasLossOfControl("ROOT", atTime);
+        return returnBoolean(boolean);
     };
 
     /** Test if the player is stunned.
@@ -2404,15 +2325,15 @@ export class OvaleConditions {
 	 @usage
 	 if IsStunned() Item(Trinket0Slot usable=1)
      */
-    private IsStunned = (
+    private isStunned = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean =
             !HasFullControl() &&
-            this.OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime);
-        return ReturnBoolean(boolean);
+            this.lossOfControl.hasLossOfControl("STUN_MECHANIC", atTime);
+        return returnBoolean(boolean);
     };
     /**  Get the current number of charges of the given item in the player's inventory.
 	 @name ItemCharges
@@ -2422,14 +2343,14 @@ export class OvaleConditions {
 	 if ItemCount(mana_gem) ==0 or ItemCharges(mana_gem) <3
 	     Spell(conjure_mana_gem)
      */
-    private ItemCharges = (
+    private itemCharges = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const itemId = positionalParams[1];
         const value = GetItemCount(itemId, false, true);
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the current number of the given item in the player's inventory.
@@ -2440,14 +2361,14 @@ export class OvaleConditions {
 	 @usage
 	 if ItemCount(mana_gem) == 0 Spell(conjure_mana_gem)
      */
-    private ItemCount = (
+    private itemCount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const itemId = positionalParams[1];
         const value = GetItemCount(itemId);
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the damage done by the most recent damage event for the given spell.
@@ -2460,15 +2381,15 @@ export class OvaleConditions {
 	 @usage
 	 if LastDamage(ignite) > 10000 Spell(combustion)
      */
-    private LastDamage = (
+    private lastDamage = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const spellId = positionalParams[1];
-        const value = this.OvaleSpellDamage.Get(spellId);
+        const value = this.spellDamage.getSpellDamage(spellId);
         if (value) {
-            return ReturnConstant(value);
+            return returnConstant(value);
         }
         return [];
     };
@@ -2483,19 +2404,19 @@ export class OvaleConditions {
 	 @usage
 	 if Level() >= 34 Spell(tiger_palm)
      */
-    private Level = (
+    private level = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let value;
         if (target == "player") {
-            value = this.OvalePaperDoll.level;
+            value = this.paperDoll.level;
         } else {
             value = UnitLevel(target);
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
     /** Test if a list is currently set to the given value.
 	 @name List
@@ -2508,7 +2429,7 @@ export class OvaleConditions {
 	 AddListItem(opt_curse cot "Curse of Tongues")
 	 if List(opt_curse coe) Spell(curse_of_the_elements)
      */
-    private List = (
+    private list = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -2516,8 +2437,8 @@ export class OvaleConditions {
         const [name, value] = [positionalParams[1], positionalParams[2]];
         if (
             name &&
-            this.OvaleFrameModule.frame &&
-            this.OvaleFrameModule.frame.GetListValue(name) == value
+            this.frameModule.frame &&
+            this.frameModule.frame.getListValue(name) == value
         ) {
             return [0, INFINITY];
         }
@@ -2533,8 +2454,8 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    private Name = (atTime: number, target: string) => {
-        return ReturnConstant(UnitName(target));
+    private name = (atTime: number, target: string) => {
+        return returnConstant(UnitName(target));
     };
 
     /** Test if the game is on a PTR server
@@ -2544,14 +2465,14 @@ export class OvaleConditions {
 	 @usage
 	 if PTR() > 0 Spell(wacky_new_spell)
      */
-    private PTR = (
+    private isPtr = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const [version, , , uiVersion] = GetBuildInfo();
         const value = ((version > "9.0.2" || uiVersion > 90002) && 1) || 0;
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the persistent multiplier to the given aura if applied.
@@ -2567,25 +2488,25 @@ export class OvaleConditions {
 	 if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff)
 	     Spell(rake)
      */
-    private PersistentMultiplier: ConditionFunction = (
+    private persistentMultiplier: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        const targetGuid = this.guids.getUnitGUID(target);
         if (!targetGuid) return [];
-        const value = this.OvaleFuture.GetDamageMultiplier(
+        const value = this.future.getDamageMultiplier(
             spellId,
             targetGuid,
             atTime
         );
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Test if the pet exists and is alive.
@@ -2601,7 +2522,7 @@ export class OvaleConditions {
 	     Spell(provoke_pet)
 
      */
-    private PetPresent = (
+    private petPresent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -2612,72 +2533,72 @@ export class OvaleConditions {
             UnitExists(target) &&
             !UnitIsDead(target) &&
             (name == undefined || name == UnitName(target));
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /**  Return the maximum power of the given power type on the target.
      */
-    private MaxPower(
+    private maxPower(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let value;
         if (target == "player") {
-            value = this.OvalePower.current.maxPower[powerType];
+            value = this.powers.current.maxPower[powerType];
         } else {
-            const powerInfo = this.OvalePower.POWER_INFO[powerType];
+            const powerInfo = this.powers.powerInfos[powerType];
             value =
                 (powerInfo &&
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
                 0;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     }
     /** Return the amount of power of the given power type on the target.
      */
-    private Power(
+    private power(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         if (target == "player") {
-            const value = this.OvalePower.next.power[powerType] || 0;
-            const rate = this.OvalePower.getPowerRateAt(
-                this.OvalePower.next,
+            const value = this.powers.next.power[powerType] || 0;
+            const rate = this.powers.getPowerRateAt(
+                this.powers.next,
                 powerType,
                 atTime
             );
-            return ReturnValueBetween(atTime, INFINITY, value, atTime, rate);
+            return returnValueBetween(atTime, INFINITY, value, atTime, rate);
         } else {
-            const powerInfo = this.OvalePower.POWER_INFO[powerType];
+            const powerInfo = this.powers.powerInfos[powerType];
             const value = (powerInfo && UnitPower(target, powerInfo.id)) || 0;
-            return ReturnConstant(value);
+            return returnConstant(value);
         }
     }
     /**Return the current deficit of power from max power on the target.
      */
-    private PowerDeficit(
+    private powerDeficit(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         if (target == "player") {
-            const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
+            const powerMax = this.powers.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
-                const power = this.OvalePower.next.power[powerType] || 0;
-                const rate = this.OvalePower.getPowerRateAt(
-                    this.OvalePower.next,
+                const power = this.powers.next.power[powerType] || 0;
+                const rate = this.powers.getPowerRateAt(
+                    this.powers.next,
                     powerType,
                     atTime
                 );
-                return ReturnValueBetween(
+                return returnValueBetween(
                     atTime,
                     INFINITY,
                     powerMax - power,
@@ -2686,7 +2607,7 @@ export class OvaleConditions {
                 );
             }
         } else {
-            const powerInfo = this.OvalePower.POWER_INFO[powerType];
+            const powerInfo = this.powers.powerInfos[powerType];
             const powerMax =
                 (powerInfo &&
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
@@ -2695,30 +2616,30 @@ export class OvaleConditions {
                 const power =
                     (powerInfo && UnitPower(target, powerInfo.id)) || 0;
                 const value = powerMax - power;
-                return ReturnConstant(value);
+                return returnConstant(value);
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     }
 
     /**Return the current percent level of power (between 0 and 100) on the target.
      */
-    private PowerPercent(
+    private powerPercent(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         if (target == "player") {
-            const powerMax = this.OvalePower.current.maxPower[powerType] || 0;
+            const powerMax = this.powers.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
                 const ratio = 100 / powerMax;
-                const power = this.OvalePower.next.power[powerType] || 0;
+                const power = this.powers.next.power[powerType] || 0;
                 let rate =
                     ratio *
-                    this.OvalePower.getPowerRateAt(
-                        this.OvalePower.next,
+                    this.powers.getPowerRateAt(
+                        this.powers.next,
                         powerType,
                         atTime
                     );
@@ -2728,7 +2649,7 @@ export class OvaleConditions {
                 ) {
                     rate = 0;
                 }
-                return ReturnValueBetween(
+                return returnValueBetween(
                     atTime,
                     INFINITY,
                     power * ratio,
@@ -2737,7 +2658,7 @@ export class OvaleConditions {
                 );
             }
         } else {
-            const powerInfo = this.OvalePower.POWER_INFO[powerType];
+            const powerInfo = this.powers.powerInfos[powerType];
             const powerMax =
                 (powerInfo &&
                     UnitPowerMax(target, powerInfo.id, powerInfo.segments)) ||
@@ -2746,10 +2667,10 @@ export class OvaleConditions {
                 const ratio = 100 / powerMax;
                 const value =
                     (powerInfo && ratio * UnitPower(target, powerInfo.id)) || 0;
-                return ReturnConstant(value);
+                return returnConstant(value);
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     }
 
     /**
@@ -2758,12 +2679,12 @@ export class OvaleConditions {
 	 @paramsig number or boolean
 	 @return The current alternate power.
      */
-    private AlternatePower = (
+    private alternatePower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("alternate", positionalParams, namedParams, atTime);
+        return this.power("alternate", positionalParams, namedParams, atTime);
     };
     /** Get the current amount of astral power for balance druids.
 	 @name AstralPower
@@ -2772,12 +2693,12 @@ export class OvaleConditions {
 	 @usage
 	 if AstraPower() > 70 Spell(frost_strike)
      */
-    private AstralPower = (
+    private astralPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("lunarpower", positionalParams, namedParams, atTime);
+        return this.power("lunarpower", positionalParams, namedParams, atTime);
     };
 
     /**Get the current amount of stored Chi for monks.
@@ -2787,12 +2708,12 @@ export class OvaleConditions {
 	 @usage
 	 if Chi() == 4 Spell(chi_burst)
      */
-    private Chi = (
+    private chi = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("chi", positionalParams, namedParams, atTime);
+        return this.power("chi", positionalParams, namedParams, atTime);
     };
     /**  Get the number of combo points for a feral druid or a rogue.
      @name ComboPoints
@@ -2801,12 +2722,12 @@ export class OvaleConditions {
      @usage
      if ComboPoints() >=1 Spell(savage_roar)
      */
-    private ComboPoints = (
+    private comboPoints = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("combopoints", positionalParams, namedParams, atTime);
+        return this.power("combopoints", positionalParams, namedParams, atTime);
     };
     /**Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
 	 @name Energy
@@ -2815,12 +2736,12 @@ export class OvaleConditions {
 	 @usage
 	 if Energy() > 70 Spell(vanish)
      */
-    private Energy = (
+    private energy = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("energy", positionalParams, namedParams, atTime);
+        return this.power("energy", positionalParams, namedParams, atTime);
     };
 
     /**Get the current amount of focus for hunters.
@@ -2830,12 +2751,12 @@ export class OvaleConditions {
 	 @usage
 	 if Focus() > 70 Spell(arcane_shot)
      */
-    private Focus = (
+    private focus = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("focus", positionalParams, namedParams, atTime);
+        return this.power("focus", positionalParams, namedParams, atTime);
     };
 
     /**
@@ -2845,12 +2766,12 @@ export class OvaleConditions {
      * @param state
      * @param atTime
      */
-    private Fury = (
+    private fury = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("fury", positionalParams, namedParams, atTime);
+        return this.power("fury", positionalParams, namedParams, atTime);
     };
 
     /** Get the current amount of holy power for a paladin.
@@ -2860,12 +2781,12 @@ export class OvaleConditions {
 	 @usage
 	 if HolyPower() >= 3 Spell(word_of_glory)
      */
-    private HolyPower = (
+    private holyPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("holypower", positionalParams, namedParams, atTime);
+        return this.power("holypower", positionalParams, namedParams, atTime);
     };
 
     /**
@@ -2875,12 +2796,12 @@ export class OvaleConditions {
      * @param state
      * @param atTime
      */
-    private Insanity = (
+    private insanity = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("insanity", positionalParams, namedParams, atTime);
+        return this.power("insanity", positionalParams, namedParams, atTime);
     };
 
     /**  Get the current level of mana of the target.
@@ -2893,12 +2814,12 @@ export class OvaleConditions {
 	 @usage
 	 if {MaxMana() - Mana()} > 12500 Item(mana_gem)
         */
-    private Mana = (
+    private mana = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("mana", positionalParams, namedParams, atTime);
+        return this.power("mana", positionalParams, namedParams, atTime);
     };
 
     /**
@@ -2908,12 +2829,12 @@ export class OvaleConditions {
      * @param state
      * @param atTime
      */
-    private Maelstrom = (
+    private maelstrom = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("maelstrom", positionalParams, namedParams, atTime);
+        return this.power("maelstrom", positionalParams, namedParams, atTime);
     };
 
     /**
@@ -2923,12 +2844,12 @@ export class OvaleConditions {
      * @param state
      * @param atTime
      */
-    private Pain = (
+    private pain = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("pain", positionalParams, namedParams, atTime);
+        return this.power("pain", positionalParams, namedParams, atTime);
     };
 
     /** Get the current amount of rage for guardian druids and warriors.
@@ -2938,12 +2859,12 @@ export class OvaleConditions {
 	 @usage
 	 if Rage() > 70 Spell(heroic_strike)
      */
-    private Rage = (
+    private rage = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("rage", positionalParams, namedParams, atTime);
+        return this.power("rage", positionalParams, namedParams, atTime);
     };
 
     /** Get the current amount of runic power for death knights.
@@ -2953,12 +2874,12 @@ export class OvaleConditions {
 	 @usage
 	 if RunicPower() > 70 Spell(frost_strike)
      */
-    private RunicPower = (
+    private runicPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("runicpower", positionalParams, namedParams, atTime);
+        return this.power("runicpower", positionalParams, namedParams, atTime);
     };
 
     /** Get the current number of Soul Shards for warlocks.
@@ -2968,19 +2889,19 @@ export class OvaleConditions {
 	 @usage
 	 if SoulShards() > 0 Spell(summon_felhunter)
      */
-    private SoulShards = (
+    private soulShards = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power("soulshards", positionalParams, namedParams, atTime);
+        return this.power("soulshards", positionalParams, namedParams, atTime);
     };
-    private ArcaneCharges = (
+    private arcaneCharges = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Power(
+        return this.power(
             "arcanecharges",
             positionalParams,
             namedParams,
@@ -2996,12 +2917,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current alternate power deficit.
      */
-    private AlternatePowerDeficit = (
+    private alternatePowerDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "alternate",
             positionalParams,
             namedParams,
@@ -3017,12 +2938,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current runic power deficit.
      */
-    private AstralPowerDeficit = (
+    private astralPowerDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "lunarpower",
             positionalParams,
             namedParams,
@@ -3040,12 +2961,12 @@ export class OvaleConditions {
 	 @usage
 	 if ChiDeficit() >= 2 Spell(keg_smash)
      */
-    private ChiDeficit = (
+    private chiDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit("chi", positionalParams, namedParams, atTime);
+        return this.powerDeficit("chi", positionalParams, namedParams, atTime);
     };
     /**
      * @name ComboPointsDeficit
@@ -3054,12 +2975,12 @@ export class OvaleConditions {
      * @param state
      * @param atTime
      */
-    private ComboPointsDeficit = (
+    private comboPointsDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "combopoints",
             positionalParams,
             namedParams,
@@ -3077,12 +2998,12 @@ export class OvaleConditions {
 	 @usage
 	 if EnergyDeficit() > 60 Spell(tigers_fury)
      */
-    private EnergyDeficit = (
+    private energyDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "energy",
             positionalParams,
             namedParams,
@@ -3098,24 +3019,24 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current focus deficit.
      */
-    private FocusDeficit = (
+    private focusDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "focus",
             positionalParams,
             namedParams,
             atTime
         );
     };
-    private FuryDeficit = (
+    private furyDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit("fury", positionalParams, namedParams, atTime);
+        return this.powerDeficit("fury", positionalParams, namedParams, atTime);
     };
 
     /** Get the number of lacking resource points for full holy power, between 0 and maximum holy power, of the target.
@@ -3126,12 +3047,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current holy power deficit.
      */
-    private HolyPowerDeficit = (
+    private holyPowerDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "holypower",
             positionalParams,
             namedParams,
@@ -3149,19 +3070,19 @@ export class OvaleConditions {
 	 @usage
 	 if ManaDeficit() > 30000 Item(mana_gem)
      */
-    private ManaDeficit = (
+    private manaDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit("mana", positionalParams, namedParams, atTime);
+        return this.powerDeficit("mana", positionalParams, namedParams, atTime);
     };
-    private PainDeficit = (
+    private painDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit("pain", positionalParams, namedParams, atTime);
+        return this.powerDeficit("pain", positionalParams, namedParams, atTime);
     };
 
     /** Get the number of lacking resource points for a full rage bar, between 0 and maximum rage, of the target.
@@ -3172,12 +3093,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current rage deficit.
      */
-    private RageDeficit = (
+    private rageDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit("rage", positionalParams, namedParams, atTime);
+        return this.powerDeficit("rage", positionalParams, namedParams, atTime);
     };
 
     /** Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
@@ -3188,12 +3109,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current runic power deficit.
      */
-    private RunicPowerDeficit = (
+    private runicPowerDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "runicpower",
             positionalParams,
             namedParams,
@@ -3209,12 +3130,12 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The current soul shards deficit.
      */
-    private SoulShardsDeficit = (
+    private soulShardsDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerDeficit(
+        return this.powerDeficit(
             "soulshards",
             positionalParams,
             namedParams,
@@ -3232,12 +3153,12 @@ export class OvaleConditions {
 	 @usage
 	 if ManaPercent() > 90 Spell(arcane_blast)
      */
-    private ManaPercent = (
+    private manaPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerPercent("mana", positionalParams, namedParams, atTime);
+        return this.powerPercent("mana", positionalParams, namedParams, atTime);
     };
 
     /** Get the maximum amount of alternate power of the target.
@@ -3249,24 +3170,24 @@ export class OvaleConditions {
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxAlternatePower = (
+    private maxAlternatePower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "alternate",
             positionalParams,
             namedParams,
             atTime
         );
     };
-    private MaxChi = (
+    private maxChi = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("chi", positionalParams, namedParams, atTime);
+        return this.maxPower("chi", positionalParams, namedParams, atTime);
     };
 
     /** Get the maximum amount of Chi of the target.
@@ -3278,12 +3199,12 @@ export class OvaleConditions {
 	 @return The maximum value.
 
 l    */
-    private MaxComboPoints = (
+    private maxComboPoints = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "combopoints",
             positionalParams,
             namedParams,
@@ -3299,12 +3220,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxEnergy = (
+    private maxEnergy = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("energy", positionalParams, namedParams, atTime);
+        return this.maxPower("energy", positionalParams, namedParams, atTime);
     };
 
     /**  Get the maximum amount of focus of the target.
@@ -3315,19 +3236,19 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxFocus = (
+    private maxFocus = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("focus", positionalParams, namedParams, atTime);
+        return this.maxPower("focus", positionalParams, namedParams, atTime);
     };
-    private MaxFury = (
+    private maxFury = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("fury", positionalParams, namedParams, atTime);
+        return this.maxPower("fury", positionalParams, namedParams, atTime);
     };
 
     /** Get the maximum amount of Holy Power of the target.
@@ -3338,12 +3259,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxHolyPower = (
+    private maxHolyPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "holypower",
             positionalParams,
             namedParams,
@@ -3361,19 +3282,19 @@ l    */
 	 @usage
 	 if {MaxMana() - Mana()} > 12500 Item(mana_gem)
      */
-    private MaxMana = (
+    private maxMana = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("mana", positionalParams, namedParams, atTime);
+        return this.maxPower("mana", positionalParams, namedParams, atTime);
     };
-    private MaxPain = (
+    private maxPain = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("pain", positionalParams, namedParams, atTime);
+        return this.maxPower("pain", positionalParams, namedParams, atTime);
     };
 
     /** Get the maximum amount of rage of the target.
@@ -3384,12 +3305,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxRage = (
+    private maxRage = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower("rage", positionalParams, namedParams, atTime);
+        return this.maxPower("rage", positionalParams, namedParams, atTime);
     };
 
     /**  Get the maximum amount of Runic Power of the target.
@@ -3400,12 +3321,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxRunicPower = (
+    private maxRunicPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "runicpower",
             positionalParams,
             namedParams,
@@ -3421,12 +3342,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxSoulShards = (
+    private maxSoulShards = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "soulshards",
             positionalParams,
             namedParams,
@@ -3442,12 +3363,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The maximum value.
      */
-    private MaxArcaneCharges = (
+    private maxArcaneCharges = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.MaxPower(
+        return this.maxPower(
             "arcanecharges",
             positionalParams,
             namedParams,
@@ -3457,29 +3378,29 @@ l    */
 
     /**  Return the amount of power of the given power type required to cast the given spell.
      */
-    private PowerCost(
+    private powerCost(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
         const spell = <number>positionalParams[1];
-        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
-        const [target] = this.ParseCondition(
+        const spellId = this.spellBook.getKnownSpellId(spell);
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
         const maxCost = namedParams.max == 1;
         const [value] = (spellId &&
-            this.OvalePower.PowerCost(
+            this.powers.powerCost(
                 spellId,
                 powerType,
                 atTime,
                 target,
                 maxCost
             )) || [0];
-        return ReturnConstant(value);
+        return returnConstant(value);
     }
 
     /** Get the amount of energy required to cast the given spell.
@@ -3495,12 +3416,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The amount of energy.
      */
-    private EnergyCost = (
+    private energyCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost("energy", positionalParams, namedParams, atTime);
+        return this.powerCost("energy", positionalParams, namedParams, atTime);
     };
 
     /** Get the amount of focus required to cast the given spell.
@@ -3515,12 +3436,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The amount of focus.
      */
-    private FocusCost = (
+    private focusCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost("focus", positionalParams, namedParams, atTime);
+        return this.powerCost("focus", positionalParams, namedParams, atTime);
     };
 
     /**  Get the amount of mana required to cast the given spell.
@@ -3536,12 +3457,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The amount of mana.
      */
-    private ManaCost = (
+    private manaCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost("mana", positionalParams, namedParams, atTime);
+        return this.powerCost("mana", positionalParams, namedParams, atTime);
     };
 
     /** Get the amount of rage required to cast the given spell.
@@ -3556,12 +3477,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The amount of rage.
      */
-    private RageCost = (
+    private rageCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost("rage", positionalParams, namedParams, atTime);
+        return this.powerCost("rage", positionalParams, namedParams, atTime);
     };
 
     /** Get the amount of runic power required to cast the given spell.
@@ -3576,12 +3497,12 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The amount of runic power.
      */
-    private RunicPowerCost = (
+    private runicPowerCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost(
+        return this.powerCost(
             "runicpower",
             positionalParams,
             namedParams,
@@ -3596,12 +3517,12 @@ l    */
      * @param state
      * @param atTime
      */
-    private AstralPowerCost = (
+    private astralPowerCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost(
+        return this.powerCost(
             "lunarpower",
             positionalParams,
             namedParams,
@@ -3616,13 +3537,13 @@ l    */
      * @param state
      * @param atTime
      */
-    private MainPowerCost = (
+    private mainPowerCost = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.PowerCost(
-            this.OvalePower.current.powerType,
+        return this.powerCost(
+            this.powers.current.powerType,
             positionalParams,
             namedParams,
             atTime
@@ -3640,14 +3561,14 @@ l    */
 	 if target.IsInterruptible() and pet.Present(yes)
 	     Spell(pet_pummel)
      */
-    private Present = (
+    private present = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitExists(target) && !UnitIsDead(target);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test if the previous spell cast that invoked the GCD matches the given spell.
@@ -3656,25 +3577,25 @@ l    */
 	 @param id The spell ID.
 	 @return A boolean value.
      */
-    private PreviousGCDSpell = (
+    private previousGCDSpell = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spell = positionalParams[1];
-        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
+        const spellId = this.spellBook.getKnownSpellId(spell);
         const count = namedParams.count as number | undefined;
         let boolean;
         if (count && count > 1) {
             boolean =
                 spellId ==
-                this.OvaleFuture.next.lastGCDSpellIds[
-                    lualength(this.OvaleFuture.next.lastGCDSpellIds) - count + 2
+                this.future.next.lastGCDSpellIds[
+                    lualength(this.future.next.lastGCDSpellIds) - count + 2
                 ];
         } else {
-            boolean = spellId == this.OvaleFuture.next.lastGCDSpellId;
+            boolean = spellId == this.future.next.lastGCDSpellId;
         }
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test if the previous spell cast that did not trigger the GCD matches the given spell.
@@ -3683,16 +3604,15 @@ l    */
 	 @param id The spell ID.
 	 @return A boolean value.
      */
-    private PreviousOffGCDSpell = (
+    private previousOffGCDSpell = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spell = positionalParams[1];
-        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
-        const boolean =
-            spellId == this.OvaleFuture.next.lastOffGCDSpellcast.spellId;
-        return ReturnBoolean(boolean);
+        const spellId = this.spellBook.getKnownSpellId(spell);
+        const boolean = spellId == this.future.next.lastOffGCDSpellcast.spellId;
+        return returnBoolean(boolean);
     };
 
     /**  Test if the previous spell cast matches the given spell.
@@ -3701,15 +3621,15 @@ l    */
 	 @param id The spell ID.
 	 @return A boolean value.
      */
-    private PreviousSpell = (
+    private previousSpell = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spell = positionalParams[1];
-        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
-        const boolean = spellId == this.OvaleFuture.next.lastGCDSpellId;
-        return ReturnBoolean(boolean);
+        const spellId = this.spellBook.getKnownSpellId(spell);
+        const boolean = spellId == this.future.next.lastGCDSpellId;
+        return returnBoolean(boolean);
     };
 
     /**  Get the result of the target's level minus the player's level. This number may be negative.
@@ -3723,45 +3643,39 @@ l    */
 	 if target.RelativeLevel() > 3
 	     Texture(ability_rogue_sprint)
      */
-    private RelativeLevel = (
+    private relativeLevel = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let value, level;
         if (target == "player") {
-            level = this.OvalePaperDoll.level;
+            level = this.paperDoll.level;
         } else {
             level = UnitLevel(target);
         }
         if (level < 0) {
             value = 3;
         } else {
-            value = level - this.OvalePaperDoll.level;
+            value = level - this.paperDoll.level;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
-    private Refreshable = (
+    private refreshable = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
-            let baseDuration = this.OvaleAura.GetBaseDuration(
+            let baseDuration = this.auras.getBaseDuration(
                 auraId,
                 undefined,
                 atTime
@@ -3787,17 +3701,17 @@ l    */
 	 if target.Casting(hour_of_twilight) and target.RemainingCastTime() <2
 	     Spell(cloak_of_shadows)
      */
-    private RemainingCastTime: ConditionFunction = (
+    private remainingCastTime: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         let [, , , startTime, endTime] = UnitCastingInfo(target);
         if (startTime && endTime) {
             startTime = startTime / 1000;
             endTime = endTime / 1000;
-            return ReturnValueBetween(startTime, endTime, 0, endTime, -1);
+            return returnValueBetween(startTime, endTime, 0, endTime, -1);
         }
         return [];
     };
@@ -3810,17 +3724,17 @@ l    */
 	 @usage
 	 if Rune() > 1 Spell(blood_tap)
      */
-    private Rune = (
+    private rune = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneCount(
+        const [count, startCooldown, endCooldown] = this.runes.runeCount(
             atTime
         );
         if (startCooldown < INFINITY) {
             const rate = 1 / (endCooldown - startCooldown);
-            return ReturnValueBetween(
+            return returnValueBetween(
                 startCooldown,
                 INFINITY,
                 count,
@@ -3828,20 +3742,20 @@ l    */
                 rate
             );
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
-    private RuneDeficit = (
+    private runeDeficit = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneDeficit(
+        const [count, startCooldown, endCooldown] = this.runes.runeDeficit(
             atTime
         );
         if (startCooldown < INFINITY) {
             const rate = -1 / (endCooldown - startCooldown);
-            return ReturnValueBetween(
+            return returnValueBetween(
                 startCooldown,
                 INFINITY,
                 count,
@@ -3849,7 +3763,7 @@ l    */
                 rate
             );
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     /**  Get the current number of active runes of the given type for death knights.
@@ -3864,16 +3778,16 @@ l    */
 	 if RuneCount() ==2
 	     Spell(obliterate)
      */
-    private RuneCount = (
+    private runeCount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.OvaleRunes.RuneCount(
+        const [count, startCooldown, endCooldown] = this.runes.runeCount(
             atTime
         );
         if (startCooldown < INFINITY) {
-            return ReturnValueBetween(
+            return returnValueBetween(
                 startCooldown,
                 endCooldown,
                 count,
@@ -3881,7 +3795,7 @@ l    */
                 0
             );
         }
-        return ReturnConstant(count);
+        return returnConstant(count);
     };
 
     /**  Get the number of seconds before the player reaches the given amount of runes.
@@ -3892,48 +3806,46 @@ l    */
 	 @usage
 	 if TimeToRunes(2) > 5 Spell(horn_of_winter)
      */
-    private TimeToRunes = (
+    private timeToRunes = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const runes = positionalParams[1];
-        let seconds = this.OvaleRunes.GetRunesCooldown(atTime, runes);
+        let seconds = this.runes.getRunesCooldown(atTime, runes);
         if (seconds < 0) {
             seconds = 0;
         }
-        return ReturnValue(seconds, atTime, -1);
+        return returnValue(seconds, atTime, -1);
     };
 
     /**  Returns the value of the given snapshot stat.
      */
-    private Snapshot(
+    private snapshot(
         statName: keyof PaperDollData,
         defaultValue: number,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        const value =
-            this.OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
-        return ReturnConstant(value);
+        const value = this.paperDoll.getState(atTime)[statName] || defaultValue;
+        return returnConstant(value);
     }
 
     /**  Returns the critical strike chance of the given snapshot stat.
      */
-    private SnapshotCritChance(
+    private snapshotCritChance(
         statName: keyof PaperDollData,
         defaultValue: number,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) {
-        let value =
-            this.OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
+        let value = this.paperDoll.getState(atTime)[statName] || defaultValue;
         if (namedParams.unlimited != 1 && value > 100) {
             value = 100;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     }
 
     /** Get the current agility of the player.
@@ -3941,12 +3853,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current agility.
      */
-    private Agility = (
+    private agility = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "agility",
             0,
             positionalParams,
@@ -3960,12 +3872,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current attack power.
      */
-    private AttackPower = (
+    private attackPower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "attackPower",
             0,
             positionalParams,
@@ -3979,12 +3891,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current critical strike rating.
      */
-    private CritRating = (
+    private critRating = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "critRating",
             0,
             positionalParams,
@@ -3998,12 +3910,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current haste rating.
      */
-    private HasteRating = (
+    private hasteRating = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "hasteRating",
             0,
             positionalParams,
@@ -4017,12 +3929,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current intellect.
      */
-    private Intellect = (
+    private intellect = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "intellect",
             0,
             positionalParams,
@@ -4038,12 +3950,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current mastery effect.
      */
-    private MasteryEffect = (
+    private masteryEffect = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "masteryEffect",
             0,
             positionalParams,
@@ -4057,12 +3969,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current mastery rating.
      */
-    private MasteryRating = (
+    private masteryRating = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "masteryRating",
             0,
             positionalParams,
@@ -4079,12 +3991,12 @@ l    */
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
      */
-    private MeleeCritChance = (
+    private meleeCritChance = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.SnapshotCritChance(
+        return this.snapshotCritChance(
             "meleeCrit",
             0,
             positionalParams,
@@ -4098,12 +4010,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current percent increase to melee haste.
      */
-    private MeleeAttackSpeedPercent = (
+    private meleeAttackSpeedPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "meleeAttackSpeedPercent",
             0,
             positionalParams,
@@ -4120,12 +4032,12 @@ l    */
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
      */
-    private RangedCritChance = (
+    private rangedCritChance = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.SnapshotCritChance(
+        return this.snapshotCritChance(
             "rangedCrit",
             0,
             positionalParams,
@@ -4142,12 +4054,12 @@ l    */
 	     Valid values: 0, 1
 	 @return The current critical strike chance (in percent).
      */
-    private SpellCritChance = (
+    private spellCritChance = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.SnapshotCritChance(
+        return this.snapshotCritChance(
             "spellCrit",
             0,
             positionalParams,
@@ -4161,12 +4073,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current percent increase to spell haste.
      */
-    private SpellCastSpeedPercent = (
+    private spellCastSpeedPercent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "spellCastSpeedPercent",
             0,
             positionalParams,
@@ -4180,12 +4092,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current spellpower.
      */
-    private Spellpower = (
+    private spellpower = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "spellPower",
             0,
             positionalParams,
@@ -4199,12 +4111,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current stamina.
      */
-    private Stamina = (
+    private stamina = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "stamina",
             0,
             positionalParams,
@@ -4218,12 +4130,12 @@ l    */
 	 @paramsig number or boolean
 	 @return The current strength.
      */
-    private Strength = (
+    private strength = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "strength",
             0,
             positionalParams,
@@ -4232,12 +4144,12 @@ l    */
         );
     };
 
-    private Versatility = (
+    private versatility = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "versatility",
             0,
             positionalParams,
@@ -4246,12 +4158,12 @@ l    */
         );
     };
 
-    private VersatilityRating = (
+    private versatilityRating = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.Snapshot(
+        return this.snapshot(
             "versatilityRating",
             0,
             positionalParams,
@@ -4273,14 +4185,14 @@ l    */
 	 if Speed() > 0 and not BuffPresent(aspect_of_the_fox)
 	     Spell(aspect_of_the_fox)
      */
-    private Speed = (
+    private speed = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const value = (GetUnitSpeed(target) * 100) / 7;
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the cooldown in seconds on a spell before it gains another charge.
@@ -4293,7 +4205,7 @@ l    */
 	 if SpellChargeCooldown(roll) <2
 	     Spell(roll usable=1)
      */
-    private SpellChargeCooldown = (
+    private spellChargeCooldown = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -4304,12 +4216,12 @@ l    */
             maxCharges,
             start,
             duration,
-        ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
+        ] = this.cooldown.getSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
             const ending = start + duration;
-            return ReturnValueBetween(start, ending, duration, start, -1);
+            return returnValueBetween(start, ending, duration, start, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the number of charges of the spell.
@@ -4325,7 +4237,7 @@ l    */
 	 if SpellCharges(savage_defense) >1
 	     Spell(savage_defense)
      */
-    private SpellCharges: ConditionFunction = (
+    private spellCharges: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -4336,9 +4248,9 @@ l    */
             maxCharges,
             start,
             duration,
-        ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
+        ] = this.cooldown.getSpellCharges(spellId, atTime);
         if (namedParams.count == 0 && charges < maxCharges) {
-            return ReturnValueBetween(
+            return returnValueBetween(
                 atTime,
                 INFINITY,
                 charges + 1,
@@ -4346,7 +4258,7 @@ l    */
                 1 / duration
             );
         }
-        return ReturnConstant(charges);
+        return returnConstant(charges);
     };
 
     /** Get the number of seconds for a full recharge of the spell.
@@ -4356,7 +4268,7 @@ l    */
      * @usage
      * if SpellFullRecharge(dire_frenzy) < GCD()
      *     Spell(dire_frenzy) */
-    private SpellFullRecharge = (
+    private spellFullRecharge = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -4367,13 +4279,13 @@ l    */
             maxCharges,
             start,
             chargeDuration,
-        ] = this.OvaleCooldown.GetSpellCharges(spellId, atTime);
+        ] = this.cooldown.getSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
             const duration = (maxCharges - charges) * chargeDuration;
             const ending = start + duration;
-            return ReturnValueBetween(start, ending, duration, start, -1);
+            return returnValueBetween(start, ending, duration, start, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the number of seconds before any of the listed spells are ready for use.
@@ -4387,26 +4299,26 @@ l    */
 	 if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
 	     Spell(devouring_plague)
      */
-    private SpellCooldown: ConditionFunction = (
+    private spellCooldown: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const usable = namedParams.usable == 1;
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        const targetGuid = this.guids.getUnitGUID(target);
         if (!targetGuid) return [];
         let earliest = INFINITY;
         for (const [, spellId] of ipairs(positionalParams)) {
             if (
                 !usable ||
-                this.OvaleSpells.IsUsableSpell(spellId, atTime, targetGuid)
+                this.spells.isUsableSpell(spellId, atTime, targetGuid)
             ) {
-                const [start, duration] = this.OvaleCooldown.GetSpellCooldown(
+                const [start, duration] = this.cooldown.getSpellCooldown(
                     spellId,
                     atTime
                 );
@@ -4420,11 +4332,11 @@ l    */
             }
         }
         if (earliest == INFINITY) {
-            return ReturnConstant(0);
+            return returnConstant(0);
         } else if (earliest > 0) {
-            return ReturnValue(0, earliest, -1);
+            return returnValue(0, earliest, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the cooldown duration in seconds for a given spell.
@@ -4436,23 +4348,23 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
      */
-    private SpellCooldownDuration = (
+    private spellCooldownDuration = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const duration = this.OvaleCooldown.GetSpellCooldownDuration(
+        const duration = this.cooldown.getSpellCooldownDuration(
             spellId,
             atTime,
             target
         );
-        return ReturnConstant(duration);
+        return returnConstant(duration);
     };
 
     /** Get the recharge duration in seconds for a given spell.
@@ -4464,26 +4376,22 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
      */
-    private SpellRechargeDuration = (
+    private spellRechargeDuration = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const cd = this.OvaleCooldown.GetCD(spellId, atTime);
+        const cd = this.cooldown.getCD(spellId, atTime);
         const duration =
             cd.chargeDuration ||
-            this.OvaleCooldown.GetSpellCooldownDuration(
-                spellId,
-                atTime,
-                target
-            );
-        return ReturnConstant(duration);
+            this.cooldown.getSpellCooldownDuration(spellId, atTime, target);
+        return returnConstant(duration);
     };
 
     /** Get data for the given spell defined by SpellInfo(...)
@@ -4497,7 +4405,7 @@ l    */
 	 if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	     Spell(shadow_blades)
      */
-    private SpellData: ConditionFunction = (
+    private spellData: ConditionFunction = (
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -4506,11 +4414,11 @@ l    */
             <number>positionalParams[1],
             <keyof SpellInfo>positionalParams[2],
         ];
-        const si = this.OvaleData.spellInfo[spellId];
+        const si = this.data.spellInfo[spellId];
         if (si) {
             const value = si[key];
             if (value) {
-                return ReturnConstant(<number>value);
+                return returnConstant(<number>value);
             }
         }
         return [];
@@ -4527,7 +4435,7 @@ l    */
 	 if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
 	     Spell(mind_blast)
      */
-    private SpellInfoProperty: ConditionFunction = (
+    private spellInfoProperty: ConditionFunction = (
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -4536,14 +4444,14 @@ l    */
             <number>positionalParams[1],
             <SpellInfoProperty>positionalParams[2],
         ];
-        const value = this.OvaleData.GetSpellInfoProperty(
+        const value = this.data.getSpellInfoProperty(
             spellId,
             atTime,
             key,
             undefined
         );
         if (value) {
-            return ReturnConstant(<number>value);
+            return returnConstant(<number>value);
         }
         return [];
     };
@@ -4557,14 +4465,14 @@ l    */
 	 if SpellCount(expel_harm) > 1
          Spell(expel_harm)  
      */
-    private SpellCount = (
+    private spellCount = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const spellCount = this.OvaleSpells.GetSpellCount(spellId);
-        return ReturnConstant(spellCount);
+        const spellCount = this.spells.getSpellCount(spellId);
+        return returnConstant(spellCount);
     };
 
     /** Test if the given spell is in the spellbook.
@@ -4575,14 +4483,14 @@ l    */
 	 @return A boolean value.
 	 @see SpellUsable
      */
-    private SpellKnown = (
+    private spellKnown = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const boolean = this.OvaleSpellBook.IsKnownSpell(spellId);
-        return ReturnBoolean(boolean);
+        const boolean = this.spellBook.isKnownSpell(spellId);
+        return returnBoolean(boolean);
     };
 
     /** Get the maximum number of charges of the spell.
@@ -4598,21 +4506,18 @@ l    */
 	 if SpellCharges(savage_defense) >1
 	     Spell(savage_defense)
      */
-    private SpellMaxCharges: ConditionFunction = (
+    private spellMaxCharges: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        let [, maxCharges, ,] = this.OvaleCooldown.GetSpellCharges(
-            spellId,
-            atTime
-        );
+        let [, maxCharges, ,] = this.cooldown.getSpellCharges(spellId, atTime);
         if (!maxCharges) {
             return [];
         }
         maxCharges = maxCharges || 1;
-        return ReturnConstant(maxCharges);
+        return returnConstant(maxCharges);
     };
 
     /** Test if the given spell is usable.
@@ -4624,26 +4529,26 @@ l    */
 	 @return A boolean value.
 	 @see SpellKnown
      */
-    private SpellUsable: ConditionFunction = (
+    private spellUsable: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        const targetGuid = this.guids.getUnitGUID(target);
         if (!targetGuid) return [];
-        const [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(
+        const [isUsable, noMana] = this.spells.isUsableSpell(
             spellId,
             atTime,
             targetGuid
         );
         const boolean = isUsable || noMana;
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Test if the player is currently stealthed.
@@ -4655,19 +4560,19 @@ l    */
 	 if Stealthed() or BuffPresent(shadow_dance)
 	     Spell(ambush)
      */
-    private Stealthed = (
+    private stealthed = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const boolean =
-            this.OvaleAura.GetAura(
+            this.auras.getAura(
                 "player",
                 "stealthed_buff",
                 atTime,
                 "HELPFUL"
             ) !== undefined || IsStealthed();
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Get the time elapsed in seconds since the player's previous melee swing (white attack).
@@ -4679,15 +4584,15 @@ l    */
 	 @return The number of seconds.
 	 @see NextSwing
      */
-    private LastSwing = (
+    private lastSwing = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         //const swing = positionalParams[1];
         const start = 0;
-        OneTimeMessage("Warning: 'LastSwing()' is not implemented.");
-        return ReturnValueBetween(start, INFINITY, 0, start, 1);
+        oneTimeMessage("Warning: 'LastSwing()' is not implemented.");
+        return returnValueBetween(start, INFINITY, 0, start, 1);
     };
 
     /** Get the time in seconds until the player's next melee swing (white attack).
@@ -4699,15 +4604,15 @@ l    */
 	 @return The number of seconds
 	 @see LastSwing
      */
-    private NextSwing = (
+    private nextSwing = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         //const swing = positionalParams[1];
         const ending = 0;
-        OneTimeMessage("Warning: 'NextSwing()' is not implemented.");
-        return ReturnValueBetween(0, ending, 0, ending, -1);
+        oneTimeMessage("Warning: 'NextSwing()' is not implemented.");
+        return returnValueBetween(0, ending, 0, ending, -1);
     };
 
     /** Test if the given talent is active.
@@ -4718,14 +4623,14 @@ l    */
 	 @usage
 	 if Talent(blood_tap_talent) Spell(blood_tap)
      */
-    private Talent = (
+    private talent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const talentId = positionalParams[1];
-        const boolean = this.OvaleSpellBook.GetTalentPoints(talentId) > 0;
-        return ReturnBoolean(boolean);
+        const boolean = this.spellBook.getTalentPoints(talentId) > 0;
+        return returnBoolean(boolean);
     };
 
     /** Get the number of points spent in a talent (0 or 1)
@@ -4736,14 +4641,14 @@ l    */
 	 @usage
 	 if TalentPoints(blood_tap_talent) Spell(blood_tap)
      */
-    private TalentPoints = (
+    private talentPoints = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const talent = positionalParams[1];
-        const value = this.OvaleSpellBook.GetTalentPoints(talent);
-        return ReturnConstant(value);
+        const value = this.spellBook.getTalentPoints(talent);
+        return returnConstant(value);
     };
 
     /** Test if the player is the in-game target of the target.
@@ -4756,14 +4661,14 @@ l    */
 	 @usage
 	 if target.TargetIsPlayer() Spell(feign_death)
      */
-    private TargetIsPlayer = (
+    private targetIsPlayer = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         const boolean = UnitIsUnit("player", `${target}target`);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** Get the amount of threat on the current target relative to the its primary aggro target, scaled to between 0 (zero) and 100.
@@ -4777,18 +4682,18 @@ l    */
 	 @usage
 	 if Threat() > 90 Spell(fade)
      */
-    private Threat = (
+    private threat = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
         const [, , value] = UnitDetailedThreatSituation("player", target);
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Get the number of seconds between ticks of a periodic aura on a target.
@@ -4804,62 +4709,47 @@ l    */
 	 @return The number of seconds.
 	 @see TicksRemaining
      */
-    private TickTime = (
+    private tickTime = (
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = <number>positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         let tickTime;
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             tickTime = aura.tick;
         } else {
-            tickTime = this.OvaleAura.GetTickLength(
-                auraId,
-                this.OvalePaperDoll.next
-            );
+            tickTime = this.auras.getTickLength(auraId, this.paperDoll.next);
         }
         if (tickTime && tickTime > 0) {
-            return ReturnConstant(tickTime);
+            return returnConstant(tickTime);
         }
-        return ReturnConstant(INFINITY);
+        return returnConstant(INFINITY);
     };
 
-    private CurrentTickTime = (
+    private currentTickTime = (
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = <number>positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         let tickTime;
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             tickTime = aura.tick || 0;
         } else {
             tickTime = 0;
         }
-        return ReturnConstant(tickTime);
+        return returnConstant(tickTime);
     };
 
     /** Get the remaining number of ticks of a periodic aura on a target.
@@ -4878,27 +4768,21 @@ l    */
 	 if target.TicksRemaining(shadow_word_pain) <2
 	     Spell(shadow_word_pain)
      */
-    private TicksRemaining = (
+    private ticksRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const tick = aura.tick;
             if (tick && tick > 0) {
-                return ReturnValueBetween(
+                return returnValueBetween(
                     aura.gain,
                     INFINITY,
                     1,
@@ -4907,35 +4791,29 @@ l    */
                 );
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Gets the remaining time until the next tick */
-    private TickTimeRemaining = (
+    private tickTimeRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const auraId = positionalParams[1];
-        const [target, filter, mine] = this.ParseCondition(
+        const [target, filter, mine] = this.parseCondition(
             positionalParams,
             namedParams
         );
-        const aura = this.OvaleAura.GetAura(
-            target,
-            auraId,
-            atTime,
-            filter,
-            mine
-        );
-        if (aura && this.OvaleAura.IsActiveAura(aura, atTime)) {
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
             const lastTickTime = aura.lastTickTime || aura.start;
             const tick =
                 aura.tick ||
-                this.OvaleAura.GetTickLength(auraId, this.OvalePaperDoll.next);
+                this.auras.getTickLength(auraId, this.paperDoll.next);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
-                return ReturnValueBetween(
+                return returnValueBetween(
                     aura.gain,
                     INFINITY,
                     tick,
@@ -4944,7 +4822,7 @@ l    */
                 );
             }
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Get the number of seconds elapsed since the player cast the given spell.
@@ -4955,16 +4833,16 @@ l    */
 	 @usage
 	 if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
      */
-    private TimeSincePreviousSpell: ConditionFunction = (
+    private timeSincePreviousSpell: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spell = positionalParams[1];
-        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
+        const spellId = this.spellBook.getKnownSpellId(spell);
         if (!spellId) return [];
-        const t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
-        return ReturnValue(0, t, 1);
+        const t = this.future.getTimeOfLastCast(spellId, atTime);
+        return returnValue(0, t, 1);
     };
 
     /** Get the time in seconds until the next scheduled Bloodlust cast.
@@ -4973,42 +4851,42 @@ l    */
 	 @paramsig number or boolean
 	 @return The number of seconds.
      */
-    private TimeToBloodlust = (
+    private timeToBloodlust = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const value = 3600;
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
-    private TimeToEclipse = (
+    private timeToEclipse = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const value = 3600 * 24 * 7;
-        OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.");
-        return ReturnValue(value, atTime, -1);
+        oneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.");
+        return returnValue(value, atTime, -1);
     };
 
     /** Get the number of seconds before the player reaches the given power level.
      */
-    private TimeToPower(powerType: PowerType, level: number, atTime: number) {
+    private timeToPower(powerType: PowerType, level: number, atTime: number) {
         level = level || 0;
-        const seconds = this.OvalePower.getTimeToPowerAt(
-            this.OvalePower.next,
+        const seconds = this.powers.getTimeToPowerAt(
+            this.powers.next,
             level,
             powerType,
             atTime
         );
         if (seconds == 0) {
-            return ReturnConstant(0);
+            return returnConstant(0);
         } else if (seconds < INFINITY) {
             // XXX Why isn't this (atTime, atTime + seconds)?
-            return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
+            return returnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return ReturnConstant(INFINITY);
+            return returnConstant(INFINITY);
         }
     }
 
@@ -5021,13 +4899,13 @@ l    */
 	 @usage
 	 if TimeToEnergy(100) < 1.2 Spell(sinister_strike)
      */
-    private TimeToEnergy = (
+    private timeToEnergy = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const level = positionalParams[1];
-        return this.TimeToPower("energy", level, atTime);
+        return this.timeToPower("energy", level, atTime);
     };
 
     /** Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
@@ -5038,14 +4916,14 @@ l    */
 	 @usage
 	 if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
      */
-    private TimeToMaxEnergy = (
+    private timeToMaxEnergy = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType = "energy";
-        const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, atTime);
+        const level = this.powers.current.maxPower[powerType] || 0;
+        return this.timeToPower(powerType, level, atTime);
     };
 
     /** Get the number of seconds before the player reaches the given focus level for hunters.
@@ -5057,13 +4935,13 @@ l    */
 	 @usage
 	 if TimeToFocus(100) < 1.2 Spell(cobra_shot)
      */
-    private TimeToFocus = (
+    private timeToFocus = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const level = positionalParams[1];
-        return this.TimeToPower("focus", level, atTime);
+        return this.timeToPower("focus", level, atTime);
     };
 
     /** Get the number of seconds before the player reaches maximum focus for hunters.
@@ -5074,53 +4952,53 @@ l    */
 	 @usage
 	 if TimeToMaxFocus() < 1.2 Spell(cobra_shot)
      */
-    private TimeToMaxFocus = (
+    private timeToMaxFocus = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType: PowerType = "focus";
-        const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, atTime);
+        const level = this.powers.current.maxPower[powerType] || 0;
+        return this.timeToPower(powerType, level, atTime);
     };
 
-    private TimeToMaxMana = (
+    private timeToMaxMana = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const powerType: PowerType = "mana";
-        const level = this.OvalePower.current.maxPower[powerType] || 0;
-        return this.TimeToPower(powerType, level, atTime);
+        const level = this.powers.current.maxPower[powerType] || 0;
+        return this.timeToPower(powerType, level, atTime);
     };
 
-    private TimeToPowerFor(
+    private timeToPowerFor(
         powerType: PowerType,
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult {
         const spellId = <number>positionalParams[1];
-        const [target] = this.ParseCondition(
+        const [target] = this.parseCondition(
             positionalParams,
             namedParams,
             "target"
         );
-        const targetGuid = this.OvaleGUID.UnitGUID(target);
+        const targetGuid = this.guids.getUnitGUID(target);
         if (!targetGuid) return [];
-        const seconds = this.OvaleSpells.TimeToPowerForSpell(
+        const seconds = this.spells.timeToPowerForSpell(
             spellId,
             atTime,
             targetGuid,
             powerType
         );
         if (seconds == 0) {
-            return ReturnConstant(0);
+            return returnConstant(0);
         } else if (seconds < INFINITY) {
             // XXX Why isn't this (atTime, atTime + seconds)?
-            return ReturnValueBetween(0, atTime + seconds, seconds, atTime, -1);
+            return returnValueBetween(0, atTime + seconds, seconds, atTime, -1);
         } else {
-            return ReturnConstant(INFINITY);
+            return returnConstant(INFINITY);
         }
     }
     /** Get the number of seconds before the player has enough energy to cast the given spell.
@@ -5133,12 +5011,12 @@ l    */
 	 @return The number of seconds.
 	 @see TimeToEnergyFor, TimeToMaxEnergy
      */
-    private TimeToEnergyFor: ConditionFunction = (
+    private timeToEnergyFor: ConditionFunction = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.TimeToPowerFor(
+        return this.timeToPowerFor(
             "energy",
             positionalParams,
             namedParams,
@@ -5153,12 +5031,12 @@ l    */
 	 @return The number of seconds.
 	 @see TimeToFocusFor
      */
-    private TimeToFocusFor = (
+    private timeToFocusFor = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        return this.TimeToPowerFor(
+        return this.timeToPowerFor(
             "focus",
             positionalParams,
             namedParams,
@@ -5175,7 +5053,7 @@ l    */
 	     Valid values: player, target, focus, pet.
 	 @return The number of seconds.
      */
-    private TimeToSpell = (
+    private timeToSpell = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -5191,8 +5069,8 @@ l    */
             return ReturnConstant(INFINITY);
         }
         */
-        OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
-        return ReturnValue(0, atTime, -1);
+        oneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
+        return returnValue(0, atTime, -1);
     };
     /** Get the time scaled by the specified haste type, defaulting to spell haste.
 	 For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
@@ -5207,15 +5085,15 @@ l    */
 	 if target.DebuffRemaining(flame_shock) < TimeWithHaste(3)
 	     Spell(flame_shock)
      */
-    private TimeWithHaste = (
+    private timeWithHaste = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const seconds = positionalParams[1];
         const haste = (namedParams.haste as HasteType) || "spell";
-        const value = this.GetHastedTime(seconds, haste);
-        return ReturnConstant(value);
+        const value = this.getHastedTime(seconds, haste);
+        return returnConstant(value);
     };
 
     /** Test if the totem has expired.
@@ -5230,7 +5108,7 @@ l    */
 	 if TotemExpires(fire) Spell(searing_totem)
 	 if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
      */
-    private TotemExpires = (
+    private totemExpires = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -5238,7 +5116,7 @@ l    */
         const id = positionalParams[1];
         let seconds = positionalParams[2];
         seconds = seconds || 0;
-        const [count, , ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
+        const [count, , ending] = this.totem.getTotemInfo(id, atTime);
         if (count !== undefined && ending !== undefined && count > 0) {
             return [ending - seconds, INFINITY];
         }
@@ -5255,13 +5133,13 @@ l    */
 	 if not TotemPresent(fire) Spell(searing_totem)
 	 if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
      */
-    private TotemPresent = (
+    private totemPresent = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
         const id = positionalParams[1];
-        const [count, start, ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
+        const [count, start, ending] = this.totem.getTotemInfo(id, atTime);
         if (
             count !== undefined &&
             ending !== undefined &&
@@ -5282,35 +5160,35 @@ l    */
 	 @usage
 	 if TotemRemaining(healing_stream_totem) <2 Spell(totemic_recall)
      */
-    private TotemRemaining = (
+    private totemRemaining = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const id = positionalParams[1];
-        const [count, start, ending] = this.OvaleTotem.GetTotemInfo(id, atTime);
+        const [count, start, ending] = this.totem.getTotemInfo(id, atTime);
         if (
             count !== undefined &&
             start !== undefined &&
             ending !== undefined &&
             count > 0
         ) {
-            return ReturnValueBetween(start, ending, 0, ending, -1);
+            return returnValueBetween(start, ending, 0, ending, -1);
         }
-        return ReturnConstant(0);
+        return returnConstant(0);
     };
 
     /** Check if a tracking is enabled
 	@param spellId the spell id
 	@return bool
      */
-    private Tracking = (
+    private tracking = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const spellName = this.OvaleSpellBook.GetSpellName(spellId);
+        const spellName = this.spellBook.getSpellName(spellId);
         const numTrackingTypes = GetNumTrackingTypes();
         let boolean = false;
         for (let i = 1; i <= numTrackingTypes; i += 1) {
@@ -5320,7 +5198,7 @@ l    */
                 break;
             }
         }
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /** The travel time of a spell to the target in seconds.
@@ -5335,14 +5213,14 @@ l    */
 	 if target.DebuffPresent(shadowflame_debuff) < TravelTime(hand_of_guldan) + GCD()
 	     Spell(hand_of_guldan)
      */
-    private TravelTime = (
+    private travelTime = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const spellId = positionalParams[1];
         //let target = private ParseCondition = (positionalParams, namedParams, "target");
-        const si = spellId && this.OvaleData.spellInfo[spellId];
+        const si = spellId && this.data.spellInfo[spellId];
         let travelTime = 0;
         if (si) {
             travelTime = si.travel_time || si.max_travel_time || 0;
@@ -5353,7 +5231,7 @@ l    */
                 travelTime = estimatedTravelTime;
             }
         }
-        return ReturnConstant(travelTime);
+        return returnConstant(travelTime);
     };
 
     /**  A condition that always returns true.
@@ -5361,7 +5239,7 @@ l    */
 	 @paramsig boolean
 	 @return A boolean value.
      */
-    private True = (
+    private getTrue = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -5381,7 +5259,7 @@ l    */
 	    (AttackPower() + WeaponDPS() * 7)
 	 }
      */
-    private WeaponDPS = (
+    private weaponDPS = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -5389,13 +5267,13 @@ l    */
         const hand = positionalParams[1];
         let value = 0;
         if (hand == "offhand" || hand == "off") {
-            value = this.OvalePaperDoll.current.offHandWeaponDPS || 0;
+            value = this.paperDoll.current.offHandWeaponDPS || 0;
         } else if (hand == "mainhand" || hand == "main") {
-            value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
+            value = this.paperDoll.current.mainHandWeaponDPS || 0;
         } else {
-            value = this.OvalePaperDoll.current.mainHandWeaponDPS || 0;
+            value = this.paperDoll.current.mainHandWeaponDPS || 0;
         }
-        return ReturnConstant(value);
+        return returnConstant(value);
     };
 
     /** Test if a sigil is charging
@@ -5406,16 +5284,16 @@ l    */
 	 @usage
 	 if not SigilCharging(flame) Spell(sigil_of_flame)
         */
-    private SigilCharging = (
+    private sigilCharging = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         let charging = false;
         for (const [, v] of ipairs(positionalParams)) {
-            charging = charging || this.OvaleSigil.IsSigilCharging(v, atTime);
+            charging = charging || this.sigil.isSigilCharging(v, atTime);
         }
-        return ReturnBoolean(charging);
+        return returnBoolean(charging);
     };
 
     /** Test with DBM or BigWigs (if available) whether a boss is currently engaged
@@ -5425,13 +5303,13 @@ l    */
 	 @usage
 	 if IsBossFight() Spell(metamorphosis_havoc)
      */
-    private IsBossFight = (
+    private isBossFight = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const bossEngaged = this.OvaleBossMod.IsBossEngaged(atTime);
-        return ReturnBoolean(bossEngaged);
+        const bossEngaged = this.bossMod.isBossEngaged(atTime);
+        return returnBoolean(bossEngaged);
     };
 
     /** Check for the target's race
@@ -5443,7 +5321,7 @@ l    */
 	 @usage
 	 if Race(BloodElf) Spell(arcane_torrent)
      */
-    private Race = (
+    private race = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
@@ -5454,7 +5332,7 @@ l    */
         for (const [, v] of ipairs(positionalParams)) {
             isRace = isRace || v == targetRaceId;
         }
-        return ReturnBoolean(isRace);
+        return returnBoolean(isRace);
     };
 
     /**  Check if the unit is in a party
@@ -5465,14 +5343,14 @@ l    */
 	 @usage
 	 if not UnitInParty() Spell(maul)
      */
-    private UnitInPartyCond = (
+    private unitInPartyCond = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const target = (namedParams.target as string | undefined) || "player";
         const boolean = UnitInParty(target);
-        return ReturnBoolean(boolean);
+        return returnBoolean(boolean);
     };
 
     /**  Check if the unit is in raid
@@ -5483,27 +5361,27 @@ l    */
 	 @usage
 	 if UnitInRaid() Spell(bloodlust)
      */
-    private UnitInRaidCond = (
+    private unitInRaidCond = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
         const target = (namedParams.target as string | undefined) || "player";
         const raidIndex = UnitInRaid(target);
-        return ReturnBoolean(raidIndex != undefined);
+        return returnBoolean(raidIndex != undefined);
     };
 
     /** Check the amount of Soul Fragments for Vengeance DH
 	 @usage
 	 if SoulFragments() > 3 Spell(spirit_bomb)
 	 */
-    private SoulFragments = (
+    private soulFragments = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const value = this.OvaleDemonHunterSoulFragments.SoulFragments(atTime);
-        return ReturnConstant(value);
+        const value = this.demonHunterSoulFragments.soulFragments(atTime);
+        return returnConstant(value);
     };
 
     /** Test if a specific dispel type is present.
@@ -5516,14 +5394,14 @@ l    */
 	 @usage
 	 if player.HasDebuffType(magic) Spell(dispel)
      */
-    private HasDebuffType = (
+    private hasDebuffType = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ): ConditionResult => {
-        const [target] = this.ParseCondition(positionalParams, namedParams);
+        const [target] = this.parseCondition(positionalParams, namedParams);
         for (const [, debuffType] of ipairs(positionalParams)) {
-            const aura = this.OvaleAura.GetAura(
+            const aura = this.auras.getAura(
                 target,
                 lower(debuffType),
                 atTime,
@@ -5546,7 +5424,7 @@ l    */
         const spellId = <number>positionalParams[1];
         const stacks = <number>positionalParams[2];
         const direction = <string>positionalParams[3];
-        const incantersFlowBuff = this.OvaleData.GetSpellInfo(spellId);
+        const incantersFlowBuff = this.data.getSpellOrListInfo(spellId);
         const tickCycle =
             (incantersFlowBuff && (incantersFlowBuff.max_stacks || 5) * 2) || 0;
         let posLo: number;
@@ -5561,12 +5439,7 @@ l    */
             posLo = stacks;
             posHi = tickCycle - stacks + 1;
         }
-        const aura = this.OvaleAura.GetAura(
-            "player",
-            spellId,
-            atTime,
-            "HELPFUL"
-        );
+        const aura = this.auras.getAura("player", spellId, atTime, "HELPFUL");
         if (
             !aura ||
             aura.tick === undefined ||
@@ -5581,185 +5454,185 @@ l    */
         } else {
             buffPos = buffStacks;
         }
-        if (posLo === buffPos || posHi === buffPos) return ReturnValue(0, 0, 0);
+        if (posLo === buffPos || posHi === buffPos) return returnValue(0, 0, 0);
         const ticksLo = (tickCycle + posLo - buffPos) % tickCycle;
         const ticksHi = (tickCycle + posHi - buffPos) % tickCycle;
         const tickTime = aura.tick;
         const tickRem = tickTime - (atTime - aura.lastTickTime);
         const value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1);
-        return ReturnValue(value, atTime, -1);
+        return returnValue(value, atTime, -1);
     };
 
     private message: ConditionFunction = (positionalParameters) => {
-        OneTimeMessage(positionalParameters[1] as string);
-        return ReturnConstant(0);
+        oneTimeMessage(positionalParameters[1] as string);
+        return returnConstant(0);
     };
 
-    private ParseCondition(
+    private parseCondition(
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
         defaultTarget?: string
     ) {
-        return ParseCondition(namedParams, this.baseState, defaultTarget);
+        return parseCondition(namedParams, this.baseState, defaultTarget);
     }
 
     constructor(
         ovaleCondition: OvaleConditionClass,
-        private OvaleData: OvaleDataClass,
-        private OvalePaperDoll: OvalePaperDollClass,
-        private OvaleAzeriteEssence: OvaleAzeriteEssenceClass,
-        private OvaleAura: OvaleAuraClass,
+        private data: OvaleDataClass,
+        private paperDoll: OvalePaperDollClass,
+        private azeriteEssence: OvaleAzeriteEssenceClass,
+        private auras: OvaleAuraClass,
         private baseState: BaseState,
-        private OvaleCooldown: OvaleCooldownClass,
-        private OvaleFuture: OvaleFutureClass,
-        private OvaleSpellBook: OvaleSpellBookClass,
-        private OvaleFrameModule: OvaleFrameModuleClass,
-        private OvaleGUID: OvaleGUIDClass,
-        private OvaleDamageTaken: OvaleDamageTakenClass,
-        private OvalePower: OvalePowerClass,
-        private OvaleEnemies: OvaleEnemiesClass,
+        private cooldown: OvaleCooldownClass,
+        private future: OvaleFutureClass,
+        private spellBook: OvaleSpellBookClass,
+        private frameModule: OvaleFrameModuleClass,
+        private guids: Guids,
+        private damageTaken: OvaleDamageTakenClass,
+        private powers: OvalePowerClass,
+        private enemies: OvaleEnemiesClass,
         private lastSpell: LastSpell,
-        private OvaleHealth: OvaleHealthClass,
+        private health: OvaleHealthClass,
         private ovaleOptions: OvaleOptionsClass,
-        private OvaleLossOfControl: OvaleLossOfControlClass,
-        private OvaleSpellDamage: OvaleSpellDamageClass,
-        private OvaleTotem: OvaleTotemClass,
-        private OvaleSigil: OvaleSigilClass,
-        private OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass,
-        private OvaleRunes: OvaleRunesClass,
-        private OvaleBossMod: OvaleBossModClass,
-        private OvaleSpells: OvaleSpellsClass
+        private lossOfControl: OvaleLossOfControlClass,
+        private spellDamage: OvaleSpellDamageClass,
+        private totem: OvaleTotemClass,
+        private sigil: OvaleSigilClass,
+        private demonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass,
+        private runes: OvaleRunesClass,
+        private bossMod: OvaleBossModClass,
+        private spells: OvaleSpellsClass
     ) {
-        ovaleCondition.RegisterCondition("message", false, this.message);
+        ovaleCondition.registerCondition("message", false, this.message);
 
-        ovaleCondition.RegisterCondition("present", false, this.Present);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("present", false, this.present);
+        ovaleCondition.registerCondition(
             "stacktimeto",
             false,
             this.stackTimeTo
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "armorsetbonus",
             false,
-            this.ArmorSetBonus
+            this.getArmorSetBonus
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "armorsetparts",
             false,
-            this.ArmorSetParts
+            this.getArmorSetParts
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "azeriteessenceismajor",
             false,
-            this.AzeriteEssenceIsMajor
+            this.azeriteEssenceIsMajor
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "azeriteessenceisminor",
             false,
-            this.AzeriteEssenceIsMinor
+            this.azeriteEssenceIsMinor
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "azeriteessenceisenabled",
             false,
-            this.AzeriteEssenceIsEnabled
+            this.azeriteEssenceIsEnabled
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "azeriteessencerank",
             false,
-            this.AzeriteEssenceRank
+            this.azeriteEssenceRank
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "baseduration",
             false,
-            this.BaseDuration
+            this.baseDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffdurationifapplied",
             false,
-            this.BaseDuration
+            this.baseDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffdurationifapplied",
             false,
-            this.BaseDuration
+            this.baseDuration
         );
-        ovaleCondition.RegisterCondition("buffamount", false, this.BuffAmount);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("buffamount", false, this.buffAmount);
+        ovaleCondition.registerCondition(
             "debuffamount",
             false,
-            this.BuffAmount
+            this.buffAmount
         );
-        ovaleCondition.RegisterCondition("tickvalue", false, this.BuffAmount);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("tickvalue", false, this.buffAmount);
+        ovaleCondition.registerCondition(
             "buffcombopoints",
             false,
-            this.BuffComboPoints
+            this.buffComboPoints
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffcombopoints",
             false,
-            this.BuffComboPoints
+            this.buffComboPoints
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffcooldown",
             false,
-            this.BuffCooldown
+            this.buffCooldown
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffcooldown",
             false,
-            this.BuffCooldown
+            this.buffCooldown
         );
-        ovaleCondition.RegisterCondition("buffcount", false, this.BuffCount);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("buffcount", false, this.buffCount);
+        ovaleCondition.registerCondition(
             "buffcooldownduration",
             false,
-            this.BuffCooldownDuration
+            this.buffCooldownDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffcooldownduration",
             false,
-            this.BuffCooldownDuration
+            this.buffCooldownDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffcountonany",
             false,
-            this.BuffCountOnAny
+            this.buffCountOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffcountonany",
             false,
-            this.BuffCountOnAny
+            this.buffCountOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffdirection",
             false,
-            this.BuffDirection
+            this.buffDirection
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffdirection",
             false,
-            this.BuffDirection
+            this.buffDirection
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffduration",
             false,
-            this.BuffDuration
+            this.buffDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffduration",
             false,
-            this.BuffDuration
+            this.buffDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffexpires",
             false,
-            this.BuffExpires
+            this.buffExpires
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffexpires",
             false,
-            this.BuffExpires
+            this.buffExpires
         );
 
         const targetParameter: ParameterInfo<Target> = {
@@ -5787,7 +5660,7 @@ l    */
         // TODO remove buff/debuff from the name
         ovaleCondition.register(
             "buffpresent",
-            this.BuffPresent,
+            this.buffPresent,
             { type: "number" },
             { name: "aura", type: "number", isSpell: true, optional: false },
             targetParameter,
@@ -5808,776 +5681,776 @@ l    */
             }
         );
         ovaleCondition.registerAlias("buffpresent", "debuffpresent");
-        ovaleCondition.RegisterCondition("buffgain", false, this.BuffGain);
-        ovaleCondition.RegisterCondition("debuffgain", false, this.BuffGain);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("buffgain", false, this.buffGain);
+        ovaleCondition.registerCondition("debuffgain", false, this.buffGain);
+        ovaleCondition.registerCondition(
             "buffimproved",
             false,
-            this.BuffImproved
+            this.buffImproved
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffimproved",
             false,
-            this.BuffImproved
+            this.buffImproved
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffpersistentmultiplier",
             false,
-            this.BuffPersistentMultiplier
+            this.buffPersistentMultiplier
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffpersistentmultiplier",
             false,
-            this.BuffPersistentMultiplier
+            this.buffPersistentMultiplier
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffremaining",
             false,
-            this.BuffRemaining
+            this.buffRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffremaining",
             false,
-            this.BuffRemaining
+            this.buffRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffremains",
             false,
-            this.BuffRemaining
+            this.buffRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffremains",
             false,
-            this.BuffRemaining
+            this.buffRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffremainingonany",
             false,
-            this.BuffRemainingOnAny
+            this.buffRemainingOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffremainingonany",
             false,
-            this.BuffRemainingOnAny
+            this.buffRemainingOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffremainsonany",
             false,
-            this.BuffRemainingOnAny
+            this.buffRemainingOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffremainsonany",
             false,
-            this.BuffRemainingOnAny
+            this.buffRemainingOnAny
         );
-        ovaleCondition.RegisterCondition("buffstacks", false, this.BuffStacks);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("buffstacks", false, this.buffStacks);
+        ovaleCondition.registerCondition(
             "debuffstacks",
             false,
-            this.BuffStacks
+            this.buffStacks
         );
-        ovaleCondition.RegisterCondition("maxstacks", true, this.maxStacks);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("maxstacks", true, this.maxStacks);
+        ovaleCondition.registerCondition(
             "buffstacksonany",
             false,
-            this.BuffStacksOnAny
+            this.buffStacksOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffstacksonany",
             false,
-            this.BuffStacksOnAny
+            this.buffStacksOnAny
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffstealable",
             false,
-            this.BuffStealable
+            this.buffStealable
         );
-        ovaleCondition.RegisterCondition("cancast", true, this.CanCast);
-        ovaleCondition.RegisterCondition("casttime", true, this.CastTime);
-        ovaleCondition.RegisterCondition("executetime", true, this.ExecuteTime);
-        ovaleCondition.RegisterCondition("casting", false, this.Casting);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("cancast", true, this.canCast);
+        ovaleCondition.registerCondition("casttime", true, this.castTime);
+        ovaleCondition.registerCondition("executetime", true, this.executeTime);
+        ovaleCondition.registerCondition("casting", false, this.casting);
+        ovaleCondition.registerCondition(
             "checkboxoff",
             false,
-            this.CheckBoxOff
+            this.checkBoxOff
         );
-        ovaleCondition.RegisterCondition("checkboxon", false, this.CheckBoxOn);
-        ovaleCondition.RegisterCondition("class", false, this.Class);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("checkboxon", false, this.checkBoxOn);
+        ovaleCondition.registerCondition("class", false, this.getClass);
+        ovaleCondition.registerCondition(
             "classification",
             false,
-            this.Classification
+            this.classification
         );
-        ovaleCondition.RegisterCondition("counter", false, this.Counter);
+        ovaleCondition.registerCondition("counter", false, this.counter);
         ovaleCondition.register(
             "creaturefamily",
-            this.CreatureFamily,
+            this.creatureFamily,
             { type: "none" },
             { name: "name", type: "string", optional: false },
             targetParameter
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "creaturetype",
             false,
-            this.CreatureType
+            this.creatureType
         );
-        ovaleCondition.RegisterCondition("critdamage", false, this.CritDamage);
-        ovaleCondition.RegisterCondition("damage", false, this.Damage);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("critdamage", false, this.critDamage);
+        ovaleCondition.registerCondition("damage", false, this.damage);
+        ovaleCondition.registerCondition(
             "damagetaken",
             false,
-            this.DamageTaken
+            this.getDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "incomingdamage",
             false,
-            this.DamageTaken
+            this.getDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "magicdamagetaken",
             false,
-            this.MagicDamageTaken
+            this.magicDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "incomingmagicdamage",
             false,
-            this.MagicDamageTaken
+            this.magicDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "physicaldamagetaken",
             false,
-            this.PhysicalDamageTaken
+            this.physicalDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "incomingphysicaldamage",
             false,
-            this.PhysicalDamageTaken
+            this.physicalDamageTaken
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "diseasesremaining",
             false,
-            this.DiseasesRemaining
+            this.diseasesRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "diseasesticking",
             false,
-            this.DiseasesTicking
+            this.diseasesTicking
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "diseasesanyticking",
             false,
-            this.DiseasesAnyTicking
+            this.diseasesAnyTicking
         );
-        ovaleCondition.RegisterCondition("distance", false, this.Distance);
-        ovaleCondition.RegisterCondition("enemies", false, this.Enemies);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("distance", false, this.distance);
+        ovaleCondition.registerCondition("enemies", false, this.getEnemies);
+        ovaleCondition.registerCondition(
             "energyregen",
             false,
-            this.EnergyRegenRate
+            this.energyRegenRate
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "energyregenrate",
             false,
-            this.EnergyRegenRate
+            this.energyRegenRate
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "enrageremaining",
             false,
-            this.EnrageRemaining
+            this.enrageRemaining
         );
-        ovaleCondition.RegisterCondition("exists", false, this.Exists);
-        ovaleCondition.RegisterCondition("never", false, this.False);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("exists", false, this.exists);
+        ovaleCondition.registerCondition("never", false, this.getFalse);
+        ovaleCondition.registerCondition(
             "focusregen",
             false,
-            this.FocusRegenRate
+            this.focusRegenRate
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "focusregenrate",
             false,
-            this.FocusRegenRate
+            this.focusRegenRate
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "focuscastingregen",
             false,
-            this.FocusCastingRegen
+            this.focusCastingRegen
         );
-        ovaleCondition.RegisterCondition("gcd", false, this.GCD);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("gcd", false, this.getGCD);
+        ovaleCondition.registerCondition(
             "gcdremaining",
             false,
-            this.GCDRemaining
+            this.getGCDRemaining
         );
-        ovaleCondition.RegisterCondition("glyph", false, this.Glyph);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("glyph", false, this.glyph);
+        ovaleCondition.registerCondition(
             "hasfullcontrol",
             false,
-            this.HasFullControlCondition
+            this.hasFullControlCondition
         );
-        ovaleCondition.RegisterCondition("health", false, this.Health);
-        ovaleCondition.RegisterCondition("life", false, this.Health);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("health", false, this.getHealth);
+        ovaleCondition.registerCondition("life", false, this.getHealth);
+        ovaleCondition.registerCondition(
             "effectivehealth",
             false,
-            this.EffectiveHealth
+            this.effectiveHealth
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "healthmissing",
             false,
-            this.HealthMissing
+            this.healthMissing
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "lifemissing",
             false,
-            this.HealthMissing
+            this.healthMissing
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "healthpercent",
             false,
-            this.HealthPercent
+            this.healthPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "lifepercent",
             false,
-            this.HealthPercent
+            this.healthPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "effectivehealthpercent",
             false,
-            this.EffectiveHealthPercent
+            this.effectiveHealthPercent
         );
-        ovaleCondition.RegisterCondition("maxhealth", false, this.MaxHealth);
-        ovaleCondition.RegisterCondition("deadin", false, this.TimeToDie);
-        ovaleCondition.RegisterCondition("timetodie", false, this.TimeToDie);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("maxhealth", false, this.maxHealth);
+        ovaleCondition.registerCondition("deadin", false, this.timeToDie);
+        ovaleCondition.registerCondition("timetodie", false, this.timeToDie);
+        ovaleCondition.registerCondition(
             "timetohealthpercent",
             false,
-            this.TimeToHealthPercent
+            this.timeToHealthPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetolifepercent",
             false,
-            this.TimeToHealthPercent
+            this.timeToHealthPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "inflighttotarget",
             false,
-            this.InFlightToTarget
+            this.inFlightToTarget
         );
-        ovaleCondition.RegisterCondition("inrange", false, this.InRange);
-        ovaleCondition.RegisterCondition("isaggroed", false, this.IsAggroed);
-        ovaleCondition.RegisterCondition("isdead", false, this.IsDead);
-        ovaleCondition.RegisterCondition("isenraged", false, this.IsEnraged);
-        ovaleCondition.RegisterCondition("isfeared", false, this.IsFeared);
-        ovaleCondition.RegisterCondition("isfriend", false, this.IsFriend);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("inrange", false, this.inRange);
+        ovaleCondition.registerCondition("isaggroed", false, this.isAggroed);
+        ovaleCondition.registerCondition("isdead", false, this.isDead);
+        ovaleCondition.registerCondition("isenraged", false, this.isEnraged);
+        ovaleCondition.registerCondition("isfeared", false, this.isFeared);
+        ovaleCondition.registerCondition("isfriend", false, this.isFriend);
+        ovaleCondition.registerCondition(
             "isincapacitated",
             false,
-            this.IsIncapacitated
+            this.isIncapacitated
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "isinterruptible",
             false,
-            this.IsInterruptible
+            this.isInterruptible
         );
-        ovaleCondition.RegisterCondition("ispvp", false, this.IsPVP);
-        ovaleCondition.RegisterCondition("isrooted", false, this.IsRooted);
-        ovaleCondition.RegisterCondition("isstunned", false, this.IsStunned);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("ispvp", false, this.isPVP);
+        ovaleCondition.registerCondition("isrooted", false, this.isRooted);
+        ovaleCondition.registerCondition("isstunned", false, this.isStunned);
+        ovaleCondition.registerCondition(
             "itemcharges",
             false,
-            this.ItemCharges
+            this.itemCharges
         );
-        ovaleCondition.RegisterCondition("itemcount", false, this.ItemCount);
-        ovaleCondition.RegisterCondition("lastdamage", false, this.LastDamage);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("itemcount", false, this.itemCount);
+        ovaleCondition.registerCondition("lastdamage", false, this.lastDamage);
+        ovaleCondition.registerCondition(
             "lastspelldamage",
             false,
-            this.LastDamage
+            this.lastDamage
         );
-        ovaleCondition.RegisterCondition("level", false, this.Level);
-        ovaleCondition.RegisterCondition("list", false, this.List);
+        ovaleCondition.registerCondition("level", false, this.level);
+        ovaleCondition.registerCondition("list", false, this.list);
         ovaleCondition.register(
             "name",
-            this.Name,
+            this.name,
             { type: "string" },
             targetParameter
         );
-        ovaleCondition.RegisterCondition("ptr", false, this.PTR);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("ptr", false, this.isPtr);
+        ovaleCondition.registerCondition(
             "persistentmultiplier",
             false,
-            this.PersistentMultiplier
+            this.persistentMultiplier
         );
-        ovaleCondition.RegisterCondition("petpresent", false, this.PetPresent);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("petpresent", false, this.petPresent);
+        ovaleCondition.registerCondition(
             "alternatepower",
             false,
-            this.AlternatePower
+            this.alternatePower
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "arcanecharges",
             false,
-            this.ArcaneCharges
+            this.arcaneCharges
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "astralpower",
             false,
-            this.AstralPower
+            this.astralPower
         );
-        ovaleCondition.RegisterCondition("chi", false, this.Chi);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("chi", false, this.chi);
+        ovaleCondition.registerCondition(
             "combopoints",
             false,
-            this.ComboPoints
+            this.comboPoints
         );
-        ovaleCondition.RegisterCondition("energy", false, this.Energy);
-        ovaleCondition.RegisterCondition("focus", false, this.Focus);
-        ovaleCondition.RegisterCondition("fury", false, this.Fury);
-        ovaleCondition.RegisterCondition("holypower", false, this.HolyPower);
-        ovaleCondition.RegisterCondition("insanity", false, this.Insanity);
-        ovaleCondition.RegisterCondition("maelstrom", false, this.Maelstrom);
-        ovaleCondition.RegisterCondition("mana", false, this.Mana);
-        ovaleCondition.RegisterCondition("pain", false, this.Pain);
-        ovaleCondition.RegisterCondition("rage", false, this.Rage);
-        ovaleCondition.RegisterCondition("runicpower", false, this.RunicPower);
-        ovaleCondition.RegisterCondition("soulshards", false, this.SoulShards);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("energy", false, this.energy);
+        ovaleCondition.registerCondition("focus", false, this.focus);
+        ovaleCondition.registerCondition("fury", false, this.fury);
+        ovaleCondition.registerCondition("holypower", false, this.holyPower);
+        ovaleCondition.registerCondition("insanity", false, this.insanity);
+        ovaleCondition.registerCondition("maelstrom", false, this.maelstrom);
+        ovaleCondition.registerCondition("mana", false, this.mana);
+        ovaleCondition.registerCondition("pain", false, this.pain);
+        ovaleCondition.registerCondition("rage", false, this.rage);
+        ovaleCondition.registerCondition("runicpower", false, this.runicPower);
+        ovaleCondition.registerCondition("soulshards", false, this.soulShards);
+        ovaleCondition.registerCondition(
             "alternatepowerdeficit",
             false,
-            this.AlternatePowerDeficit
+            this.alternatePowerDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "astralpowerdeficit",
             false,
-            this.AstralPowerDeficit
+            this.astralPowerDeficit
         );
-        ovaleCondition.RegisterCondition("chideficit", false, this.ChiDeficit);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("chideficit", false, this.chiDeficit);
+        ovaleCondition.registerCondition(
             "combopointsdeficit",
             false,
-            this.ComboPointsDeficit
+            this.comboPointsDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "energydeficit",
             false,
-            this.EnergyDeficit
+            this.energyDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "focusdeficit",
             false,
-            this.FocusDeficit
+            this.focusDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "furydeficit",
             false,
-            this.FuryDeficit
+            this.furyDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "holypowerdeficit",
             false,
-            this.HolyPowerDeficit
+            this.holyPowerDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "manadeficit",
             false,
-            this.ManaDeficit
+            this.manaDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "paindeficit",
             false,
-            this.PainDeficit
+            this.painDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "ragedeficit",
             false,
-            this.RageDeficit
+            this.rageDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "runicpowerdeficit",
             false,
-            this.RunicPowerDeficit
+            this.runicPowerDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "soulshardsdeficit",
             false,
-            this.SoulShardsDeficit
+            this.soulShardsDeficit
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "manapercent",
             false,
-            this.ManaPercent
+            this.manaPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "maxalternatepower",
             false,
-            this.MaxAlternatePower
+            this.maxAlternatePower
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "maxarcanecharges",
             false,
-            this.MaxArcaneCharges
+            this.maxArcaneCharges
         );
-        ovaleCondition.RegisterCondition("maxchi", false, this.MaxChi);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("maxchi", false, this.maxChi);
+        ovaleCondition.registerCondition(
             "maxcombopoints",
             false,
-            this.MaxComboPoints
+            this.maxComboPoints
         );
-        ovaleCondition.RegisterCondition("maxenergy", false, this.MaxEnergy);
-        ovaleCondition.RegisterCondition("maxfocus", false, this.MaxFocus);
-        ovaleCondition.RegisterCondition("maxfury", false, this.MaxFury);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("maxenergy", false, this.maxEnergy);
+        ovaleCondition.registerCondition("maxfocus", false, this.maxFocus);
+        ovaleCondition.registerCondition("maxfury", false, this.maxFury);
+        ovaleCondition.registerCondition(
             "maxholypower",
             false,
-            this.MaxHolyPower
+            this.maxHolyPower
         );
-        ovaleCondition.RegisterCondition("maxmana", false, this.MaxMana);
-        ovaleCondition.RegisterCondition("maxpain", false, this.MaxPain);
-        ovaleCondition.RegisterCondition("maxrage", false, this.MaxRage);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("maxmana", false, this.maxMana);
+        ovaleCondition.registerCondition("maxpain", false, this.maxPain);
+        ovaleCondition.registerCondition("maxrage", false, this.maxRage);
+        ovaleCondition.registerCondition(
             "maxrunicpower",
             false,
-            this.MaxRunicPower
+            this.maxRunicPower
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "maxsoulshards",
             false,
-            this.MaxSoulShards
+            this.maxSoulShards
         );
-        ovaleCondition.RegisterCondition("powercost", true, this.MainPowerCost);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("powercost", true, this.mainPowerCost);
+        ovaleCondition.registerCondition(
             "astralpowercost",
             true,
-            this.AstralPowerCost
+            this.astralPowerCost
         );
-        ovaleCondition.RegisterCondition("energycost", true, this.EnergyCost);
-        ovaleCondition.RegisterCondition("focuscost", true, this.FocusCost);
-        ovaleCondition.RegisterCondition("manacost", true, this.ManaCost);
-        ovaleCondition.RegisterCondition("ragecost", true, this.RageCost);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("energycost", true, this.energyCost);
+        ovaleCondition.registerCondition("focuscost", true, this.focusCost);
+        ovaleCondition.registerCondition("manacost", true, this.manaCost);
+        ovaleCondition.registerCondition("ragecost", true, this.rageCost);
+        ovaleCondition.registerCondition(
             "runicpowercost",
             true,
-            this.RunicPowerCost
+            this.runicPowerCost
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "previousgcdspell",
             true,
-            this.PreviousGCDSpell
+            this.previousGCDSpell
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "previousoffgcdspell",
             true,
-            this.PreviousOffGCDSpell
+            this.previousOffGCDSpell
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "previousspell",
             true,
-            this.PreviousSpell
+            this.previousSpell
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "relativelevel",
             false,
-            this.RelativeLevel
+            this.relativeLevel
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "refreshable",
             false,
-            this.Refreshable
+            this.refreshable
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "debuffrefreshable",
             false,
-            this.Refreshable
+            this.refreshable
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "buffrefreshable",
             false,
-            this.Refreshable
+            this.refreshable
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "remainingcasttime",
             false,
-            this.RemainingCastTime
+            this.remainingCastTime
         );
-        ovaleCondition.RegisterCondition("rune", false, this.Rune);
-        ovaleCondition.RegisterCondition("runecount", false, this.RuneCount);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("rune", false, this.rune);
+        ovaleCondition.registerCondition("runecount", false, this.runeCount);
+        ovaleCondition.registerCondition(
             "timetorunes",
             false,
-            this.TimeToRunes
+            this.timeToRunes
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "runedeficit",
             false,
-            this.RuneDeficit
+            this.runeDeficit
         );
-        ovaleCondition.RegisterCondition("agility", false, this.Agility);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("agility", false, this.agility);
+        ovaleCondition.registerCondition(
             "attackpower",
             false,
-            this.AttackPower
+            this.attackPower
         );
-        ovaleCondition.RegisterCondition("critrating", false, this.CritRating);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("critrating", false, this.critRating);
+        ovaleCondition.registerCondition(
             "hasterating",
             false,
-            this.HasteRating
+            this.hasteRating
         );
-        ovaleCondition.RegisterCondition("intellect", false, this.Intellect);
-        ovaleCondition.RegisterCondition("mastery", false, this.MasteryEffect);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("intellect", false, this.intellect);
+        ovaleCondition.registerCondition("mastery", false, this.masteryEffect);
+        ovaleCondition.registerCondition(
             "masteryeffect",
             false,
-            this.MasteryEffect
+            this.masteryEffect
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "masteryrating",
             false,
-            this.MasteryRating
+            this.masteryRating
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "meleecritchance",
             false,
-            this.MeleeCritChance
+            this.meleeCritChance
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "meleeattackspeedpercent",
             false,
-            this.MeleeAttackSpeedPercent
+            this.meleeAttackSpeedPercent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "rangedcritchance",
             false,
-            this.RangedCritChance
+            this.rangedCritChance
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellcritchance",
             false,
-            this.SpellCritChance
+            this.spellCritChance
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellcastspeedpercent",
             false,
-            this.SpellCastSpeedPercent
+            this.spellCastSpeedPercent
         );
-        ovaleCondition.RegisterCondition("spellpower", false, this.Spellpower);
-        ovaleCondition.RegisterCondition("stamina", false, this.Stamina);
-        ovaleCondition.RegisterCondition("strength", false, this.Strength);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("spellpower", false, this.spellpower);
+        ovaleCondition.registerCondition("stamina", false, this.stamina);
+        ovaleCondition.registerCondition("strength", false, this.strength);
+        ovaleCondition.registerCondition(
             "versatility",
             false,
-            this.Versatility
+            this.versatility
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "versatilityRating",
             false,
-            this.VersatilityRating
+            this.versatilityRating
         );
-        ovaleCondition.RegisterCondition("speed", false, this.Speed);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("speed", false, this.speed);
+        ovaleCondition.registerCondition(
             "spellchargecooldown",
             true,
-            this.SpellChargeCooldown
+            this.spellChargeCooldown
         );
-        ovaleCondition.RegisterCondition("charges", true, this.SpellCharges);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("charges", true, this.spellCharges);
+        ovaleCondition.registerCondition(
             "spellcharges",
             true,
-            this.SpellCharges
+            this.spellCharges
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellfullrecharge",
             true,
-            this.SpellFullRecharge
+            this.spellFullRecharge
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellcooldown",
             true,
-            this.SpellCooldown
+            this.spellCooldown
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellcooldownduration",
             true,
-            this.SpellCooldownDuration
+            this.spellCooldownDuration
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "spellrechargeduration",
             true,
-            this.SpellRechargeDuration
+            this.spellRechargeDuration
         );
-        ovaleCondition.RegisterCondition("spelldata", false, this.SpellData);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("spelldata", false, this.spellData);
+        ovaleCondition.registerCondition(
             "spellinfoproperty",
             false,
-            this.SpellInfoProperty
+            this.spellInfoProperty
         );
-        ovaleCondition.RegisterCondition("spellcount", true, this.SpellCount);
-        ovaleCondition.RegisterCondition("spellknown", true, this.SpellKnown);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("spellcount", true, this.spellCount);
+        ovaleCondition.registerCondition("spellknown", true, this.spellKnown);
+        ovaleCondition.registerCondition(
             "spellmaxcharges",
             true,
-            this.SpellMaxCharges
+            this.spellMaxCharges
         );
-        ovaleCondition.RegisterCondition("spellusable", true, this.SpellUsable);
-        ovaleCondition.RegisterCondition("isstealthed", false, this.Stealthed);
-        ovaleCondition.RegisterCondition("stealthed", false, this.Stealthed);
-        ovaleCondition.RegisterCondition("lastswing", false, this.LastSwing);
-        ovaleCondition.RegisterCondition("nextswing", false, this.NextSwing);
-        ovaleCondition.RegisterCondition("talent", false, this.Talent);
-        ovaleCondition.RegisterCondition("hastalent", false, this.Talent);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("spellusable", true, this.spellUsable);
+        ovaleCondition.registerCondition("isstealthed", false, this.stealthed);
+        ovaleCondition.registerCondition("stealthed", false, this.stealthed);
+        ovaleCondition.registerCondition("lastswing", false, this.lastSwing);
+        ovaleCondition.registerCondition("nextswing", false, this.nextSwing);
+        ovaleCondition.registerCondition("talent", false, this.talent);
+        ovaleCondition.registerCondition("hastalent", false, this.talent);
+        ovaleCondition.registerCondition(
             "talentpoints",
             false,
-            this.TalentPoints
+            this.talentPoints
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "istargetingplayer",
             false,
-            this.TargetIsPlayer
+            this.targetIsPlayer
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "targetisplayer",
             false,
-            this.TargetIsPlayer
+            this.targetIsPlayer
         );
-        ovaleCondition.RegisterCondition("threat", false, this.Threat);
-        ovaleCondition.RegisterCondition("ticktime", false, this.TickTime);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("threat", false, this.threat);
+        ovaleCondition.registerCondition("ticktime", false, this.tickTime);
+        ovaleCondition.registerCondition(
             "currentticktime",
             false,
-            this.CurrentTickTime
+            this.currentTickTime
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "ticksremaining",
             false,
-            this.TicksRemaining
+            this.ticksRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "ticksremain",
             false,
-            this.TicksRemaining
+            this.ticksRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "ticktimeremaining",
             false,
-            this.TickTimeRemaining
+            this.tickTimeRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timesincepreviousspell",
             false,
-            this.TimeSincePreviousSpell
+            this.timeSincePreviousSpell
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetobloodlust",
             false,
-            this.TimeToBloodlust
+            this.timeToBloodlust
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetoeclipse",
             false,
-            this.TimeToEclipse
+            this.timeToEclipse
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetoenergy",
             false,
-            this.TimeToEnergy
+            this.timeToEnergy
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetofocus",
             false,
-            this.TimeToFocus
+            this.timeToFocus
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetomaxenergy",
             false,
-            this.TimeToMaxEnergy
+            this.timeToMaxEnergy
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetomaxfocus",
             false,
-            this.TimeToMaxFocus
+            this.timeToMaxFocus
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetomaxmana",
             false,
-            this.TimeToMaxMana
+            this.timeToMaxMana
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetoenergyfor",
             true,
-            this.TimeToEnergyFor
+            this.timeToEnergyFor
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "timetofocusfor",
             true,
-            this.TimeToFocusFor
+            this.timeToFocusFor
         );
-        ovaleCondition.RegisterCondition("timetospell", true, this.TimeToSpell);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("timetospell", true, this.timeToSpell);
+        ovaleCondition.registerCondition(
             "timewithhaste",
             false,
-            this.TimeWithHaste
+            this.timeWithHaste
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "totemexpires",
             false,
-            this.TotemExpires
+            this.totemExpires
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "totempresent",
             false,
-            this.TotemPresent
+            this.totemPresent
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "totemremaining",
             false,
-            this.TotemRemaining
+            this.totemRemaining
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "totemremains",
             false,
-            this.TotemRemaining
+            this.totemRemaining
         );
-        ovaleCondition.RegisterCondition("tracking", false, this.Tracking);
-        ovaleCondition.RegisterCondition("traveltime", true, this.TravelTime);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("tracking", false, this.tracking);
+        ovaleCondition.registerCondition("traveltime", true, this.travelTime);
+        ovaleCondition.registerCondition(
             "maxtraveltime",
             true,
-            this.TravelTime
+            this.travelTime
         );
-        ovaleCondition.RegisterCondition("always", false, this.True);
-        ovaleCondition.RegisterCondition("weapondps", false, this.WeaponDPS);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("always", false, this.getTrue);
+        ovaleCondition.registerCondition("weapondps", false, this.weaponDPS);
+        ovaleCondition.registerCondition(
             "sigilcharging",
             false,
-            this.SigilCharging
+            this.sigilCharging
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "isbossfight",
             false,
-            this.IsBossFight
+            this.isBossFight
         );
-        ovaleCondition.RegisterCondition("race", false, this.Race);
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition("race", false, this.race);
+        ovaleCondition.registerCondition(
             "unitinparty",
             false,
-            this.UnitInPartyCond
+            this.unitInPartyCond
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "unitinraid",
             false,
-            this.UnitInRaidCond
+            this.unitInRaidCond
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "soulfragments",
             false,
-            this.SoulFragments
+            this.soulFragments
         );
-        ovaleCondition.RegisterCondition(
+        ovaleCondition.registerCondition(
             "hasdebufftype",
             false,
-            this.HasDebuffType
+            this.hasDebuffType
         );
     }
 }

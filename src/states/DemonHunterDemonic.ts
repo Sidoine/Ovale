@@ -11,16 +11,16 @@ import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 
-const INFINITY = huge;
-const HAVOC_DEMONIC_TALENT_ID = 22547;
-const HAVOC_SPEC_ID = 577;
-const HAVOC_EYE_BEAM_SPELL_ID = 198013;
-const HAVOC_META_BUFF_ID = 162264;
-const HIDDEN_BUFF_ID = -HAVOC_DEMONIC_TALENT_ID;
-const HIDDEN_BUFF_DURATION = INFINITY;
-const HIDDEN_BUFF_EXTENDED_BY_DEMONIC = "Extended by Demonic";
+const infinity = huge;
+const havocDemonicTalentId = 22547;
+const havocSpecId = 577;
+const havocEyeBeamSpellId = 198013;
+const havocMetaBuffId = 162264;
+const hiddenBuffId = -havocDemonicTalentId;
+const hiddenBuffDuration = infinity;
+const hiddenBuffExtendedByDemonic = "Extended by Demonic";
 
 export class OvaleDemonHunterDemonicClass {
     playerGUID: string;
@@ -34,12 +34,12 @@ export class OvaleDemonHunterDemonicClass {
     constructor(
         private ovaleAura: OvaleAuraClass,
         private ovale: OvaleClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleDemonHunterDemonic",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.debug = ovaleDebug.create(this.module.GetName());
@@ -48,48 +48,48 @@ export class OvaleDemonHunterDemonicClass {
         this.hasDemonic = false;
     }
 
-    private OnInitialize = () => {
+    private handleInitialize = () => {
         this.isDemonHunter =
             (this.ovale.playerClass == "DEMONHUNTER" && true) || false;
         if (this.isDemonHunter) {
-            this.debug.Debug("playerGUID: (%s)", this.ovale.playerGUID);
+            this.debug.debug("playerGUID: (%s)", this.ovale.playerGUID);
             this.module.RegisterMessage(
                 "Ovale_TalentsChanged",
-                this.Ovale_TalentsChanged
+                this.handleTalentsChanged
             );
         }
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterMessage("Ovale_TalentsChanged");
     };
-    private Ovale_TalentsChanged = (event: string) => {
+    private handleTalentsChanged = (event: string) => {
         this.isHavoc =
             (this.isDemonHunter &&
-                GetSpecializationInfo(GetSpecialization()) == HAVOC_SPEC_ID &&
+                GetSpecializationInfo(GetSpecialization()) == havocSpecId &&
                 true) ||
             false;
         this.hasDemonic =
             (this.isHavoc &&
                 select(
                     10,
-                    GetTalentInfoByID(HAVOC_DEMONIC_TALENT_ID, HAVOC_SPEC_ID)
+                    GetTalentInfoByID(havocDemonicTalentId, havocSpecId)
                 ) &&
                 true) ||
             false;
         if (this.isHavoc && this.hasDemonic) {
-            this.debug.Debug("We are a havoc DH with Demonic.");
+            this.debug.debug("We are a havoc DH with Demonic.");
             this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         } else {
             if (!this.isHavoc) {
-                this.debug.Debug("We are not a havoc DH.");
+                this.debug.debug("We are not a havoc DH.");
             } else if (!this.hasDemonic) {
-                this.debug.Debug("We don't have the Demonic talent.");
+                this.debug.debug("We don't have the Demonic talent.");
             }
-            this.DropAura();
+            this.dropAura();
             this.module.UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED");
         }
     };
-    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+    handleCombatLogEventUnfiltered(event: string, ...parameters: any[]) {
         const [
             ,
             cleuEvent,
@@ -110,13 +110,13 @@ export class OvaleDemonHunterDemonicClass {
             cleuEvent == "SPELL_CAST_SUCCESS"
         ) {
             const [spellId, spellName] = [arg12, arg13];
-            if (HAVOC_EYE_BEAM_SPELL_ID == spellId) {
-                this.debug.Debug(
+            if (havocEyeBeamSpellId == spellId) {
+                this.debug.debug(
                     "Spell %d (%s) has successfully been cast. Gaining Aura (only during meta).",
                     spellId,
                     spellName
                 );
-                this.GainAura();
+                this.gainAura();
             }
         }
         if (
@@ -124,38 +124,38 @@ export class OvaleDemonHunterDemonicClass {
             cleuEvent == "SPELL_AURA_REMOVED"
         ) {
             const [spellId, spellName] = [arg12, arg13];
-            if (HAVOC_META_BUFF_ID == spellId) {
-                this.debug.Debug(
+            if (havocMetaBuffId == spellId) {
+                this.debug.debug(
                     "Aura %d (%s) is removed. Dropping Aura.",
                     spellId,
                     spellName
                 );
-                this.DropAura();
+                this.dropAura();
             }
         }
     }
-    GainAura() {
+    gainAura() {
         const now = GetTime();
-        const aura_meta = this.ovaleAura.GetAura(
+        const auraMeta = this.ovaleAura.getAura(
             "player",
-            HAVOC_META_BUFF_ID,
+            havocMetaBuffId,
             now,
             "HELPFUL",
             true
         );
-        if (aura_meta && this.ovaleAura.IsActiveAura(aura_meta, now)) {
-            this.debug.Debug(
+        if (auraMeta && this.ovaleAura.isActiveAura(auraMeta, now)) {
+            this.debug.debug(
                 "Adding '%s' (%d) buff to player %s.",
-                HIDDEN_BUFF_EXTENDED_BY_DEMONIC,
-                HIDDEN_BUFF_ID,
+                hiddenBuffExtendedByDemonic,
+                hiddenBuffId,
                 this.playerGUID
             );
-            const duration = HIDDEN_BUFF_DURATION;
-            const ending = now + HIDDEN_BUFF_DURATION;
-            this.ovaleAura.GainedAuraOnGUID(
+            const duration = hiddenBuffDuration;
+            const ending = now + hiddenBuffDuration;
+            this.ovaleAura.gainedAuraOnGUID(
                 this.playerGUID,
                 now,
-                HIDDEN_BUFF_ID,
+                hiddenBuffId,
                 this.playerGUID,
                 "HELPFUL",
                 false,
@@ -165,30 +165,30 @@ export class OvaleDemonHunterDemonicClass {
                 duration,
                 ending,
                 false,
-                HIDDEN_BUFF_EXTENDED_BY_DEMONIC,
+                hiddenBuffExtendedByDemonic,
                 undefined,
                 undefined,
                 undefined
             );
         } else {
-            this.debug.Debug(
+            this.debug.debug(
                 "Aura 'Metamorphosis' (%d) is not present.",
-                HAVOC_META_BUFF_ID
+                havocMetaBuffId
             );
         }
     }
-    DropAura() {
+    dropAura() {
         const now = GetTime();
-        this.debug.Debug(
+        this.debug.debug(
             "Removing '%s' (%d) buff on player %s.",
-            HIDDEN_BUFF_EXTENDED_BY_DEMONIC,
-            HIDDEN_BUFF_ID,
+            hiddenBuffExtendedByDemonic,
+            hiddenBuffId,
             this.playerGUID
         );
-        this.ovaleAura.LostAuraOnGUID(
+        this.ovaleAura.lostAuraOnGUID(
             this.playerGUID,
             now,
-            HIDDEN_BUFF_ID,
+            hiddenBuffId,
             this.playerGUID
         );
     }

@@ -1,7 +1,7 @@
-import { L } from "../ui/Localization";
+import { l } from "../ui/Localization";
 import { OvalePool } from "../tools/Pool";
 import { OvaleProfilerClass, Profiler } from "./profiler";
-import { OvaleDebugClass, Tracer } from "./debug";
+import { DebugTools, Tracer } from "./debug";
 import { Tokenizer, TokenizerDefinition } from "./lexer";
 import {
     FunctionInfos,
@@ -31,16 +31,16 @@ import { checkToken, isNumber, KeyCheck, TypeCheck } from "../tools/tools";
 import { SpellInfoProperty, SpellInfoValues } from "./data";
 import { Result } from "../simulationcraft/definitions";
 import {
-    EMPTY_SET,
+    emptySet,
     newTimeSpan,
     OvaleTimeSpan,
-    UNIVERSE,
+    universe,
 } from "../tools/TimeSpan";
 import { ActionType } from "./best-action";
 import { PowerType } from "../states/Power";
 import { LocalizationStrings } from "../ui/localization/definition";
 
-const KEYWORD: LuaObj<boolean> = {
+const keywords: LuaObj<boolean> = {
     ["and"]: true,
     ["if"]: true,
     ["not"]: true,
@@ -50,7 +50,7 @@ const KEYWORD: LuaObj<boolean> = {
     ["false"]: true,
 };
 
-const DECLARATION_KEYWORD: LuaObj<boolean> = {
+const declarationKeywords: LuaObj<boolean> = {
     ["addactionicon"]: true,
     ["addcheckbox"]: true,
     ["addfunction"]: true,
@@ -77,7 +77,7 @@ export type SpellAuraKeyWord =
     | "spelldamagebuff"
     | "spelldamagedebuff";
 
-const SPELL_AURA_KEYWORD: KeyCheck<SpellAuraKeyWord> = {
+const spellAuraKewords: KeyCheck<SpellAuraKeyWord> = {
     ["spelladdbuff"]: true,
     ["spelladddebuff"]: true,
     ["spelladdpetbuff"]: true,
@@ -212,11 +212,11 @@ export const checkSpellInfo: TypeCheck<SpellInfoValues> = {
 };
 
 {
-    for (const [keyword, value] of pairs(SPELL_AURA_KEYWORD)) {
-        DECLARATION_KEYWORD[keyword] = value;
+    for (const [keyword, value] of pairs(spellAuraKewords)) {
+        declarationKeywords[keyword] = value;
     }
-    for (const [keyword, value] of pairs(DECLARATION_KEYWORD)) {
-        KEYWORD[keyword] = value;
+    for (const [keyword, value] of pairs(declarationKeywords)) {
+        keywords[keyword] = value;
     }
 }
 
@@ -229,7 +229,7 @@ const checkActionType: KeyCheck<ActionType> = {
     value: true,
 };
 
-const ACTION_PARAMETER_COUNT: Record<ActionType, number> = {
+const actionParameterCounts: Record<ActionType, number> = {
     ["item"]: 1,
     ["macro"]: 1,
     ["spell"]: 1,
@@ -237,10 +237,10 @@ const ACTION_PARAMETER_COUNT: Record<ActionType, number> = {
     ["setstate"]: 2,
     value: 1,
 };
-const STATE_ACTION: LuaObj<boolean> = {
+const stateActions: LuaObj<boolean> = {
     ["setstate"]: true,
 };
-const STRING_LOOKUP_FUNCTION: LuaObj<boolean> = {
+const stringLookupFunctions: LuaObj<boolean> = {
     ["itemname"]: true,
     ["l"]: true,
     ["spellname"]: true,
@@ -269,7 +269,7 @@ export type OperatorType =
     | ">?"
     | "<?";
 
-const UNARY_OPERATOR: {
+const unaryOperators: {
     [key in OperatorType]?: { 1: "logical" | "arithmetic"; 2: number };
 } = {
     ["not"]: {
@@ -281,7 +281,7 @@ const UNARY_OPERATOR: {
         2: 50,
     },
 };
-const BINARY_OPERATOR: {
+const binaryOperators: {
     [key in OperatorType]?: {
         1: "logical" | "compare" | "arithmetic";
         2: number;
@@ -365,10 +365,10 @@ const BINARY_OPERATOR: {
 
 const indent: LuaArray<string> = {};
 indent[0] = "";
-function INDENT(key: number) {
+function indentation(key: number) {
     let ret = indent[key];
     if (ret == undefined) {
-        ret = `${INDENT(key - 1)} `;
+        ret = `${indentation(key - 1)} `;
         indent[key] = ret;
     }
     return ret;
@@ -966,7 +966,7 @@ type AstUndefinedNode = AstBaseNode<"undefined">;
 //     powerType: string;
 // }
 
-const TokenizeComment: Tokenizer = function (token) {
+const tokenizeComment: Tokenizer = function (token) {
     return ["comment", token];
 };
 
@@ -975,100 +975,100 @@ const TokenizeComment: Tokenizer = function (token) {
 //     return ["lua", token];
 // }
 
-const TokenizeName: Tokenizer = function (token) {
+const tokenizeName: Tokenizer = function (token) {
     token = lower(token);
-    if (KEYWORD[token]) {
+    if (keywords[token]) {
         return ["keyword", token];
     } else {
         return ["name", token];
     }
 };
 
-const TokenizeNumber: Tokenizer = function (token) {
+const tokenizeNumber: Tokenizer = function (token) {
     return ["number", token];
 };
 
-const TokenizeString: Tokenizer = function (token) {
+const tokenizeString: Tokenizer = function (token) {
     token = sub(token, 2, -2);
     return ["string", token];
 };
-const TokenizeWhitespace: Tokenizer = function (token) {
+const tokenizeWhitespace: Tokenizer = function (token) {
     return ["space", token];
 };
 
-const Tokenize: Tokenizer = function (token) {
+const tokenize: Tokenizer = function (token) {
     return [token, token];
 };
-const NoToken: Tokenizer = function () {
+const noToken: Tokenizer = function () {
     return [undefined, undefined];
 };
 
-const MATCHES: LuaArray<TokenizerDefinition> = {
+const tokenMatches: LuaArray<TokenizerDefinition> = {
     1: {
         1: "^%s+",
-        2: TokenizeWhitespace,
+        2: tokenizeWhitespace,
     },
     2: {
         1: "^%d+%.?%d*",
-        2: TokenizeNumber,
+        2: tokenizeNumber,
     },
     3: {
         1: "^[%a_][%w_]*",
-        2: TokenizeName,
+        2: tokenizeName,
     },
     4: {
         1: "^((['\"])%2)",
-        2: TokenizeString,
+        2: tokenizeString,
     },
     5: {
         1: `^(['"]).-\\%1`,
-        2: TokenizeString,
+        2: tokenizeString,
     },
     6: {
         1: `^(['\\"]).-[^\\]%1`,
-        2: TokenizeString,
+        2: tokenizeString,
     },
     7: {
         1: "^#.-\n",
-        2: TokenizeComment,
+        2: tokenizeComment,
     },
     8: {
         1: "^!=",
-        2: Tokenize,
+        2: tokenize,
     },
     9: {
         1: "^==",
-        2: Tokenize,
+        2: tokenize,
     },
     10: {
         1: "^<=",
-        2: Tokenize,
+        2: tokenize,
     },
     11: {
         1: "^>=",
-        2: Tokenize,
+        2: tokenize,
     },
     12: {
         1: "^>%?",
-        2: Tokenize,
+        2: tokenize,
     },
     13: {
         1: "^<%?",
-        2: Tokenize,
+        2: tokenize,
     },
     14: {
         1: "^.",
-        2: Tokenize,
+        2: tokenize,
     },
     15: {
         1: "^$",
-        2: NoToken,
+        2: noToken,
     },
 };
 
-const FILTERS: LexerFilter = {
-    comments: TokenizeComment,
-    space: TokenizeWhitespace,
+const lexerFilters: LexerFilter = {
+    comments: tokenizeComment,
+    space: tokenizeWhitespace,
 };
 
 class SelfPool extends OvalePool<AstNode> {
@@ -1076,12 +1076,12 @@ class SelfPool extends OvalePool<AstNode> {
         super("OvaleAST_pool");
     }
 
-    Clean(node: AstNode): void {
+    clean(node: AstNode): void {
         if (isAstNodeWithChildren(node)) {
-            this.ovaleAst.childrenPool.Release(node.child);
+            this.ovaleAst.childrenPool.release(node.child);
         }
         if (node.postOrder) {
-            this.ovaleAst.postOrderPool.Release(node.postOrder);
+            this.ovaleAst.postOrderPool.release(node.postOrder);
         }
         wipe(node);
     }
@@ -1153,7 +1153,7 @@ export class OvaleASTClass {
 
     constructor(
         private ovaleCondition: OvaleConditionClass,
-        ovaleDebug: OvaleDebugClass,
+        ovaleDebug: DebugTools,
         ovaleProfiler: OvaleProfilerClass,
         private ovaleScripts: OvaleScriptsClass,
         private ovaleSpellBook: OvaleSpellBookClass
@@ -1162,7 +1162,7 @@ export class OvaleASTClass {
         this.profiler = ovaleProfiler.create("OvaleAST");
     }
 
-    private print_r(
+    private printRecurse(
         node: AstNode,
         indent?: string,
         done?: LuaObj<boolean>,
@@ -1185,7 +1185,7 @@ export class OvaleASTClass {
                     } else {
                         insert(output, `${indent}[${tostring(key)}] => {`);
                     }
-                    this.print_r(value, `${indent}    `, done, output);
+                    this.printRecurse(value, `${indent}    `, done, output);
                     if (!value.type) {
                         insert(output, `${indent}}`);
                     }
@@ -1200,7 +1200,7 @@ export class OvaleASTClass {
         return output;
     }
 
-    private GetNumberNode(value: number, annotation: AstAnnotation) {
+    private getNumberNode(value: number, annotation: AstAnnotation) {
         annotation.numberFlyweight = annotation.numberFlyweight || {};
         let node = annotation.numberFlyweight[value];
         if (!node) {
@@ -1210,7 +1210,7 @@ export class OvaleASTClass {
         return node;
     }
 
-    private PostOrderTraversal(
+    private postOrderTraversal(
         node: AstNode,
         array: LuaArray<AstNode>,
         visited: LuaObj<boolean>
@@ -1218,7 +1218,7 @@ export class OvaleASTClass {
         if (isAstNodeWithChildren(node)) {
             for (const [, childNode] of ipairs(node.child)) {
                 if (!visited[childNode.nodeId]) {
-                    this.PostOrderTraversal(childNode, array, visited);
+                    this.postOrderTraversal(childNode, array, visited);
                     array[lualength(array) + 1] = node;
                 }
             }
@@ -1227,17 +1227,17 @@ export class OvaleASTClass {
         visited[node.nodeId] = true;
     }
 
-    private GetPrecedence(node: AstNode) {
+    private getPrecedence(node: AstNode) {
         if (isExpressionNode(node)) {
             let precedence = node.precedence;
             if (!precedence) {
                 const operator = node.operator;
                 if (operator) {
                     if (node.expressionType == "unary") {
-                        const operatorInfos = UNARY_OPERATOR[operator];
+                        const operatorInfos = unaryOperators[operator];
                         if (operatorInfos) precedence = operatorInfos[2];
                     } else if (node.expressionType == "binary") {
-                        const operatorInfos = BINARY_OPERATOR[operator];
+                        const operatorInfos = binaryOperators[operator];
                         if (operatorInfos) precedence = operatorInfos[2];
                     }
                 }
@@ -1247,22 +1247,22 @@ export class OvaleASTClass {
         return 0;
     }
 
-    private HasParameters<T extends NodeType, P extends string>(
+    private hasParameters<T extends NodeType, P extends string>(
         node: AstNodeWithParameters<T, P>
     ) {
         return next(node.rawPositionalParams) || next(node.rawNamedParams);
     }
 
-    public Unparse(node: AstNode) {
+    public unparse(node: AstNode) {
         if (node.asString) {
             return node.asString;
         } else {
-            const visitor = this.UNPARSE_VISITOR[node.type] as UnparserFunction<
+            const visitor = this.unparseVisitors[node.type] as UnparserFunction<
                 NodeTypes[typeof node.type]
             >;
 
             if (!visitor) {
-                this.debug.Error(
+                this.debug.error(
                     "Unable to unparse node of type '%s'.",
                     node.type
                 );
@@ -1274,7 +1274,7 @@ export class OvaleASTClass {
         }
     }
 
-    private UnparseAddCheckBox: UnparserFunction<AstCheckBoxNode> = (node) => {
+    private unparseAddCheckBox: UnparserFunction<AstCheckBoxNode> = (node) => {
         let s;
         if (
             (node.rawPositionalParams && next(node.rawPositionalParams)) ||
@@ -1283,8 +1283,8 @@ export class OvaleASTClass {
             s = format(
                 "AddCheckBox(%s %s %s)",
                 node.name,
-                this.Unparse(node.description),
-                this.UnparseParameters(
+                this.unparse(node.description),
+                this.unparseParameters(
                     node.rawPositionalParams,
                     node.rawNamedParams
                 )
@@ -1293,59 +1293,59 @@ export class OvaleASTClass {
             s = format(
                 "AddCheckBox(%s %s)",
                 node.name,
-                this.Unparse(node.description)
+                this.unparse(node.description)
             );
         }
         return s;
     };
-    private UnparseAddFunction: UnparserFunction<AstAddFunctionNode> = (
+    private unparseAddFunction: UnparserFunction<AstAddFunctionNode> = (
         node
     ) => {
         let s;
-        if (this.HasParameters(node)) {
+        if (this.hasParameters(node)) {
             s = format(
                 "AddFunction %s %s%s",
                 node.name,
-                this.UnparseParameters(
+                this.unparseParameters(
                     node.rawPositionalParams,
                     node.rawNamedParams
                 ),
-                this.UnparseGroup(node.body)
+                this.unparseGroup(node.body)
             );
         } else {
             s = format(
                 "AddFunction %s%s",
                 node.name,
-                this.UnparseGroup(node.body)
+                this.unparseGroup(node.body)
             );
         }
         return s;
     };
-    private UnparseAddIcon: UnparserFunction<AstIconNode> = (node) => {
+    private unparseAddIcon: UnparserFunction<AstIconNode> = (node) => {
         let s;
-        if (this.HasParameters(node)) {
+        if (this.hasParameters(node)) {
             s = format(
                 "AddIcon %s%s",
-                this.UnparseParameters(
+                this.unparseParameters(
                     node.rawPositionalParams,
                     node.rawNamedParams
                 ),
-                this.UnparseGroup(node.body)
+                this.unparseGroup(node.body)
             );
         } else {
-            s = format("AddIcon%s", this.UnparseGroup(node.body));
+            s = format("AddIcon%s", this.unparseGroup(node.body));
         }
         return s;
     };
-    private UnparseAddListItem: UnparserFunction<AstListItemNode> = (node) => {
+    private unparseAddListItem: UnparserFunction<AstListItemNode> = (node) => {
         let s;
-        if (this.HasParameters(node)) {
+        if (this.hasParameters(node)) {
             s = format(
                 "AddListItem(%s %s %s %s)",
                 node.name,
                 node.item,
-                this.Unparse(node.description),
-                this.UnparseParameters(
+                this.unparse(node.description),
+                this.unparseParameters(
                     node.rawPositionalParams,
                     node.rawNamedParams
                 )
@@ -1355,38 +1355,38 @@ export class OvaleASTClass {
                 "AddListItem(%s %s %s)",
                 node.name,
                 node.item,
-                this.Unparse(node.description)
+                this.unparse(node.description)
             );
         }
         return s;
     };
-    private UnparseBangValue: UnparserFunction<AstBangValueNode> = (node) => {
-        return `!${this.Unparse(node.child[1])}`;
+    private unparseBangValue: UnparserFunction<AstBangValueNode> = (node) => {
+        return `!${this.unparse(node.child[1])}`;
     };
     private unparseBoolean: UnparserFunction<AstBooleanNode> = (node) => {
         return (node.value && "true") || "false";
     };
-    private UnparseComment: UnparserFunction<AstCommentNode> = (node) => {
+    private unparseComment: UnparserFunction<AstCommentNode> = (node) => {
         if (!node.comment || node.comment == "") {
             return "";
         } else {
             return `#${node.comment}`;
         }
     };
-    private UnparseDefine: UnparserFunction<AstDefineNode> = (node) => {
+    private unparseDefine: UnparserFunction<AstDefineNode> = (node) => {
         return format("Define(%s %s)", node.name, node.value);
     };
-    private UnparseExpression: UnparserFunction<AstExpressionNode> = (node) => {
+    private unparseExpression: UnparserFunction<AstExpressionNode> = (node) => {
         let expression;
-        const precedence = this.GetPrecedence(node);
+        const precedence = this.getPrecedence(node);
         if (node.expressionType == "unary") {
             let rhsExpression;
             const rhsNode = node.child[1];
-            const rhsPrecedence = this.GetPrecedence(rhsNode);
+            const rhsPrecedence = this.getPrecedence(rhsNode);
             if (rhsPrecedence && precedence >= rhsPrecedence) {
-                rhsExpression = `{ ${this.Unparse(rhsNode)} }`;
+                rhsExpression = `{ ${this.unparse(rhsNode)} }`;
             } else {
-                rhsExpression = this.Unparse(rhsNode);
+                rhsExpression = this.unparse(rhsNode);
             }
             if (node.operator == "-") {
                 expression = `-${rhsExpression}`;
@@ -1396,34 +1396,34 @@ export class OvaleASTClass {
         } else if (node.expressionType == "binary") {
             let lhsExpression, rhsExpression;
             const lhsNode = node.child[1];
-            const lhsPrecedence = this.GetPrecedence(lhsNode);
+            const lhsPrecedence = this.getPrecedence(lhsNode);
             if (lhsPrecedence && lhsPrecedence < precedence) {
-                lhsExpression = `{ ${this.Unparse(lhsNode)} }`;
+                lhsExpression = `{ ${this.unparse(lhsNode)} }`;
             } else {
-                lhsExpression = this.Unparse(lhsNode);
+                lhsExpression = this.unparse(lhsNode);
             }
             const rhsNode = node.child[2];
-            const rhsPrecedence = this.GetPrecedence(rhsNode);
+            const rhsPrecedence = this.getPrecedence(rhsNode);
             if (rhsPrecedence && precedence > rhsPrecedence) {
-                rhsExpression = `{ ${this.Unparse(rhsNode)} }`;
+                rhsExpression = `{ ${this.unparse(rhsNode)} }`;
             } else if (rhsPrecedence && precedence == rhsPrecedence) {
-                const operatorInfo = BINARY_OPERATOR[node.operator];
+                const operatorInfo = binaryOperators[node.operator];
                 if (
                     operatorInfo &&
                     operatorInfo[3] == "associative" &&
                     rhsNode.type === "expression" &&
                     node.operator == rhsNode.operator
                 ) {
-                    rhsExpression = this.Unparse(rhsNode);
+                    rhsExpression = this.unparse(rhsNode);
                 } else {
-                    rhsExpression = `{ ${this.Unparse(rhsNode)} }`;
+                    rhsExpression = `{ ${this.unparse(rhsNode)} }`;
                 }
             } else {
-                rhsExpression = this.Unparse(rhsNode);
+                rhsExpression = this.unparse(rhsNode);
             }
             expression = `${lhsExpression} ${node.operator} ${rhsExpression}`;
         } else {
-            this.debug.Error(
+            this.debug.error(
                 `node.expressionType '${node.expressionType}' is not known`
             );
             return "Not_Unparsable";
@@ -1435,7 +1435,7 @@ export class OvaleASTClass {
         return format(
             "%s(%s)",
             node.name,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams,
                 true
@@ -1443,12 +1443,12 @@ export class OvaleASTClass {
         );
     };
 
-    private UnparseFunction: UnparserFunction<AstFunctionNode> = (node) => {
+    private unparseFunction: UnparserFunction<AstFunctionNode> = (node) => {
         let s;
-        if (this.HasParameters(node)) {
+        if (this.hasParameters(node)) {
             let name;
             const filter = node.rawNamedParams.filter;
-            if (filter && this.Unparse(filter) == "debuff") {
+            if (filter && this.unparse(filter) == "debuff") {
                 name = gsub(node.name, "^Buff", "Debuff");
             } else {
                 name = node.name;
@@ -1459,7 +1459,7 @@ export class OvaleASTClass {
                     "%s.%s(%s)",
                     target.value,
                     name,
-                    this.UnparseParameters(
+                    this.unparseParameters(
                         node.rawPositionalParams,
                         node.rawNamedParams,
                         true,
@@ -1470,7 +1470,7 @@ export class OvaleASTClass {
                 s = format(
                     "%s(%s)",
                     name,
-                    this.UnparseParameters(
+                    this.unparseParameters(
                         node.rawPositionalParams,
                         node.rawNamedParams,
                         true
@@ -1491,7 +1491,7 @@ export class OvaleASTClass {
         node
     ) => {
         let s;
-        if (this.HasParameters(node)) {
+        if (this.hasParameters(node)) {
             s = node.name + "(";
             if (
                 node.rawNamedParams.target &&
@@ -1537,52 +1537,54 @@ export class OvaleASTClass {
         }
         return s;
     };
-    private UnparseGroup: UnparserFunction<AstGroupNode> = (node) => {
-        const output = this.outputPool.Get();
+    private unparseGroup: UnparserFunction<AstGroupNode> = (node) => {
+        const output = this.outputPool.get();
         output[lualength(output) + 1] = "";
-        output[lualength(output) + 1] = `${INDENT(this.indent)}{`;
+        output[lualength(output) + 1] = `${indentation(this.indent)}{`;
         this.indent = this.indent + 1;
         for (const [, statementNode] of ipairs(node.child)) {
-            const s = this.Unparse(statementNode);
+            const s = this.unparse(statementNode);
             if (s == "") {
                 output[lualength(output) + 1] = s;
             } else {
-                output[lualength(output) + 1] = `${INDENT(this.indent)}${s}`;
+                output[lualength(output) + 1] = `${indentation(
+                    this.indent
+                )}${s}`;
             }
         }
         this.indent = this.indent - 1;
-        output[lualength(output) + 1] = `${INDENT(this.indent)}}`;
+        output[lualength(output) + 1] = `${indentation(this.indent)}}`;
         const outputString = concat(output, "\n");
-        this.outputPool.Release(output);
+        this.outputPool.release(output);
         return outputString;
     };
-    private UnparseIf: UnparserFunction<AstIfNode> = (node) => {
+    private unparseIf: UnparserFunction<AstIfNode> = (node) => {
         if (node.child[2].type == "group") {
             return format(
                 "if %s%s",
-                this.Unparse(node.child[1]),
-                this.UnparseGroup(node.child[2])
+                this.unparse(node.child[1]),
+                this.unparseGroup(node.child[2])
             );
         } else {
             return format(
                 "if %s %s",
-                this.Unparse(node.child[1]),
-                this.Unparse(node.child[2])
+                this.unparse(node.child[1]),
+                this.unparse(node.child[2])
             );
         }
     };
-    private UnparseItemInfo: UnparserFunction<AstItemInfoNode> = (node) => {
+    private unparseItemInfo: UnparserFunction<AstItemInfoNode> = (node) => {
         const identifier = (node.name && node.name) || node.itemId;
         return format(
             "ItemInfo(%s %s)",
             identifier,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseItemRequire: UnparserFunction<AstItemRequireNode> = (
+    private unparseItemRequire: UnparserFunction<AstItemRequireNode> = (
         node
     ) => {
         const identifier = (node.name && node.name) || node.itemId;
@@ -1590,24 +1592,24 @@ export class OvaleASTClass {
             "ItemRequire(%s %s %s)",
             identifier,
             node.property,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseList: UnparserFunction<AstListNode> = (node) => {
+    private unparseList: UnparserFunction<AstListNode> = (node) => {
         return format(
             "%s(%s %s)",
             node.keyword,
             node.name,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseValue = (node: AstValueNode) => {
+    private unparseValue = (node: AstValueNode) => {
         if (node.name) return node.name;
         return tostring(node.value);
     };
@@ -1619,19 +1621,19 @@ export class OvaleASTClass {
             node.type === "variable" ||
             node.type === "boolean"
         ) {
-            return this.Unparse(node);
+            return this.unparse(node);
         } else {
-            return `(${this.Unparse(node)})`;
+            return `(${this.unparse(node)})`;
         }
     }
 
-    private UnparseParameters(
+    private unparseParameters(
         positionalParams: RawPositionalParameters,
         namedParams?: RawNamedParameters<string>,
         noFilter?: boolean,
         noTarget?: boolean
     ) {
-        const output = this.outputPool.Get();
+        const output = this.outputPool.get();
         if (namedParams) {
             for (const [k, v] of kpairs(namedParams)) {
                 if (
@@ -1652,22 +1654,22 @@ export class OvaleASTClass {
             insert(output, 1, this.unparseParameter(positionalParams[k]));
         }
         const outputString = concat(output, " ");
-        this.outputPool.Release(output);
+        this.outputPool.release(output);
         return outputString;
     }
-    private UnparseScoreSpells: UnparserFunction<AstScoreSpellsNode> = (
+    private unparseScoreSpells: UnparserFunction<AstScoreSpellsNode> = (
         node
     ) => {
         return format(
             "ScoreSpells(%s)",
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseScript: UnparserFunction<AstScriptNode> = (node) => {
-        const output = this.outputPool.Get();
+    private unparseScript: UnparserFunction<AstScriptNode> = (node) => {
+        const output = this.outputPool.get();
         let previousDeclarationType;
         for (const [, declarationNode] of ipairs(node.child)) {
             if (
@@ -1676,11 +1678,11 @@ export class OvaleASTClass {
                 declarationNode.type == "spell_info" ||
                 declarationNode.type == "spell_require"
             ) {
-                const s = this.Unparse(declarationNode);
+                const s = this.unparse(declarationNode);
                 if (s == "") {
                     output[lualength(output) + 1] = s;
                 } else {
-                    output[lualength(output) + 1] = `${INDENT(
+                    output[lualength(output) + 1] = `${indentation(
                         this.indent + 1
                     )}${s}`;
                 }
@@ -1701,15 +1703,15 @@ export class OvaleASTClass {
                 if (insertBlank) {
                     output[lualength(output) + 1] = "";
                 }
-                output[lualength(output) + 1] = this.Unparse(declarationNode);
+                output[lualength(output) + 1] = this.unparse(declarationNode);
                 previousDeclarationType = declarationNode.type;
             }
         }
         const outputString = concat(output, "\n");
-        this.outputPool.Release(output);
+        this.outputPool.release(output);
         return outputString;
     };
-    private UnparseSpellAuraList: UnparserFunction<AstSpellAuraListNode> = (
+    private unparseSpellAuraList: UnparserFunction<AstSpellAuraListNode> = (
         node
     ) => {
         const identifier = node.name || node.spellId;
@@ -1719,24 +1721,24 @@ export class OvaleASTClass {
             node.keyword,
             identifier,
             buffName,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseSpellInfo: UnparserFunction<AstSpellInfoNode> = (node) => {
+    private unparseSpellInfo: UnparserFunction<AstSpellInfoNode> = (node) => {
         const identifier = (node.name && node.name) || node.spellId;
         return format(
             "SpellInfo(%s %s)",
             identifier,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseSpellRequire: UnparserFunction<AstSpellRequireNode> = (
+    private unparseSpellRequire: UnparserFunction<AstSpellRequireNode> = (
         node
     ) => {
         const identifier = (node.name && node.name) || node.spellId;
@@ -1744,85 +1746,85 @@ export class OvaleASTClass {
             "SpellRequire(%s %s %s)",
             identifier,
             node.property,
-            this.UnparseParameters(
+            this.unparseParameters(
                 node.rawPositionalParams,
                 node.rawNamedParams
             )
         );
     };
-    private UnparseString = (node: AstStringNode) => {
+    private unparseString = (node: AstStringNode) => {
         if (node.name) {
             if (node.func) return `${node.func}(${node.name})`;
             return node.name;
         }
         return `"${node.value}"`;
     };
-    private UnparseUnless: UnparserFunction<AstUnlessNode> = (node) => {
+    private unparseUnless: UnparserFunction<AstUnlessNode> = (node) => {
         if (node.child[2].type == "group") {
             return format(
                 "unless %s%s",
-                this.Unparse(node.child[1]),
-                this.UnparseGroup(node.child[2])
+                this.unparse(node.child[1]),
+                this.unparseGroup(node.child[2])
             );
         } else {
             return format(
                 "unless %s %s",
-                this.Unparse(node.child[1]),
-                this.Unparse(node.child[2])
+                this.unparse(node.child[1]),
+                this.unparse(node.child[2])
             );
         }
     };
-    private UnparseVariable: UnparserFunction<AstVariableNode> = (node) => {
+    private unparseVariable: UnparserFunction<AstVariableNode> = (node) => {
         return node.name;
     };
 
-    private UNPARSE_VISITOR: {
+    private unparseVisitors: {
         [key in keyof NodeTypes]?: UnparserFunction<NodeTypes[key]>;
     } = {
         ["action"]: this.unparseAction,
-        ["add_function"]: this.UnparseAddFunction,
-        ["arithmetic"]: this.UnparseExpression,
-        ["bang_value"]: this.UnparseBangValue,
+        ["add_function"]: this.unparseAddFunction,
+        ["arithmetic"]: this.unparseExpression,
+        ["bang_value"]: this.unparseBangValue,
         ["boolean"]: this.unparseBoolean,
-        ["checkbox"]: this.UnparseAddCheckBox,
-        ["compare"]: this.UnparseExpression,
-        ["comment"]: this.UnparseComment,
-        ["custom_function"]: this.UnparseFunction,
-        ["define"]: this.UnparseDefine,
-        ["function"]: this.UnparseFunction,
-        ["group"]: this.UnparseGroup,
-        ["icon"]: this.UnparseAddIcon,
-        ["if"]: this.UnparseIf,
-        ["item_info"]: this.UnparseItemInfo,
-        ["itemrequire"]: this.UnparseItemRequire,
-        ["list"]: this.UnparseList,
-        ["list_item"]: this.UnparseAddListItem,
-        ["logical"]: this.UnparseExpression,
-        ["score_spells"]: this.UnparseScoreSpells,
-        ["script"]: this.UnparseScript,
-        ["spell_aura_list"]: this.UnparseSpellAuraList,
-        ["spell_info"]: this.UnparseSpellInfo,
-        ["spell_require"]: this.UnparseSpellRequire,
-        ["state"]: this.UnparseFunction,
-        ["string"]: this.UnparseString,
+        ["checkbox"]: this.unparseAddCheckBox,
+        ["compare"]: this.unparseExpression,
+        ["comment"]: this.unparseComment,
+        ["custom_function"]: this.unparseFunction,
+        ["define"]: this.unparseDefine,
+        ["function"]: this.unparseFunction,
+        ["group"]: this.unparseGroup,
+        ["icon"]: this.unparseAddIcon,
+        ["if"]: this.unparseIf,
+        ["item_info"]: this.unparseItemInfo,
+        ["itemrequire"]: this.unparseItemRequire,
+        ["list"]: this.unparseList,
+        ["list_item"]: this.unparseAddListItem,
+        ["logical"]: this.unparseExpression,
+        ["score_spells"]: this.unparseScoreSpells,
+        ["script"]: this.unparseScript,
+        ["spell_aura_list"]: this.unparseSpellAuraList,
+        ["spell_info"]: this.unparseSpellInfo,
+        ["spell_require"]: this.unparseSpellRequire,
+        ["state"]: this.unparseFunction,
+        ["string"]: this.unparseString,
         ["typed_function"]: this.unparseTypedFunction,
         ["undefined"]: this.unparseUndefined,
-        ["unless"]: this.UnparseUnless,
-        ["value"]: this.UnparseValue,
-        ["variable"]: this.UnparseVariable,
+        ["unless"]: this.unparseUnless,
+        ["value"]: this.unparseValue,
+        ["variable"]: this.unparseVariable,
     };
 
-    private SyntaxError(
+    private syntaxError(
         tokenStream: OvaleLexer,
         pattern: string,
-        ...__args: unknown[]
+        ...parameters: unknown[]
     ) {
-        this.debug.Warning(pattern, ...__args);
+        this.debug.warning(pattern, ...parameters);
         const context: LuaArray<string> = {
             1: "Next tokens:",
         };
         for (let i = 1; i <= 20; i += 1) {
-            const [tokenType, token] = tokenStream.Peek(i);
+            const [tokenType, token] = tokenStream.peek(i);
             if (tokenType && token) {
                 context[lualength(context) + 1] = token;
             } else {
@@ -1830,35 +1832,35 @@ export class OvaleASTClass {
                 break;
             }
         }
-        this.debug.Warning(concat(context, " "));
+        this.debug.warning(concat(context, " "));
     }
 
-    private Parse(
+    private parse(
         nodeType: NodeType,
         tokenStream: OvaleLexer,
         nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
     ): Result<AstNode> {
-        const visitor = this.PARSE_VISITOR[nodeType];
-        this.debug.Debug(`Visit ${nodeType}`);
+        const visitor = this.parseVisitors[nodeType];
+        this.debug.debug(`Visit ${nodeType}`);
         if (!visitor) {
-            this.debug.Error("Unable to parse node of type '%s'.", nodeType);
+            this.debug.error("Unable to parse node of type '%s'.", nodeType);
             return undefined;
         } else {
             const result = visitor(tokenStream, annotation);
             if (!result) {
-                this.debug.Error(`Failed in %s visitor`, nodeType);
+                this.debug.error(`Failed in %s visitor`, nodeType);
             }
             return result;
         }
     }
-    private ParseAddCheckBox: ParserFunction<AstCheckBoxNode> = (
+    private parseAddCheckBox: ParserFunction<AstCheckBoxNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "addcheckbox")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; 'AddCheckBox' expected.",
                 token
@@ -1866,9 +1868,9 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; '(' expected.",
                 token
@@ -1877,21 +1879,21 @@ export class OvaleASTClass {
         }
 
         let name = "";
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token !== undefined) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; name expected.",
                 token
             );
             return undefined;
         }
-        const descriptionNode = this.ParseString(tokenStream, annotation);
+        const descriptionNode = this.parseString(tokenStream, annotation);
         if (!descriptionNode) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "ParseAddCheckBox",
             annotation,
@@ -1900,9 +1902,9 @@ export class OvaleASTClass {
         );
         if (!positionalParams || !namedParams) return undefined;
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; ')' expected.",
                 token
@@ -1920,14 +1922,14 @@ export class OvaleASTClass {
 
         return node;
     };
-    private ParseAddFunction: ParserFunction<AstAddFunctionNode> = (
+    private parseAddFunction: ParserFunction<AstAddFunctionNode> = (
         tokenStream,
 
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "addfunction")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDFUNCTION; 'AddFunction' expected.",
                 token
@@ -1935,18 +1937,18 @@ export class OvaleASTClass {
             return undefined;
         }
         let name;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDFUNCTION; name expected.",
                 token
             );
             return undefined;
         }
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "ParseAddFunction",
             annotation,
@@ -1954,7 +1956,7 @@ export class OvaleASTClass {
             checkAddFunctionParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        const bodyNode = this.ParseGroup(tokenStream, annotation);
+        const bodyNode = this.innerParseGroup(tokenStream, annotation);
         if (!bodyNode) return undefined;
         const node = this.newNodeWithBodyAndParameters(
             "add_function",
@@ -1976,20 +1978,20 @@ export class OvaleASTClass {
         annotation.customFunction[name] = node;
         return node;
     };
-    private ParseAddIcon: ParserFunction<AstIconNode> = (
+    private parseAddIcon: ParserFunction<AstIconNode> = (
         tokenStream,
         annotation
     ) => {
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "addicon")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDICON; 'AddIcon' expected.",
                 token
             );
             return undefined;
         }
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "addicon",
             annotation,
@@ -1997,7 +1999,7 @@ export class OvaleASTClass {
             iconParametersCheck
         );
         if (!positionalParams || !namedParams) return undefined;
-        const bodyNode = this.ParseGroup(tokenStream, annotation);
+        const bodyNode = this.innerParseGroup(tokenStream, annotation);
         if (!bodyNode) return undefined;
         const node = this.newNodeWithBodyAndParameters(
             "icon",
@@ -2012,22 +2014,22 @@ export class OvaleASTClass {
         ] = bodyNode;
         return node;
     };
-    private ParseAddListItem: ParserFunction<AstListItemNode> = (
+    private parseAddListItem: ParserFunction<AstListItemNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "addlistitem")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; 'AddListItem' expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; '(' expected.",
                 token
@@ -2035,11 +2037,11 @@ export class OvaleASTClass {
             return undefined;
         }
         let name;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.",
                 token
@@ -2048,21 +2050,21 @@ export class OvaleASTClass {
         }
 
         let item;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             item = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; name expected.",
                 token
             );
             return undefined;
         }
-        const descriptionNode = this.ParseString(tokenStream, annotation);
+        const descriptionNode = this.parseString(tokenStream, annotation);
         if (!descriptionNode) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "ParseAddListItem",
             annotation,
@@ -2070,9 +2072,9 @@ export class OvaleASTClass {
             checkListItemParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ADDLISTITEM; ')' expected.",
                 token
@@ -2090,46 +2092,46 @@ export class OvaleASTClass {
         node.description = descriptionNode;
         return node;
     };
-    private ParseComment: ParserFunction<AstCommentNode> = () => {
+    private parseComment: ParserFunction<AstCommentNode> = () => {
         return undefined;
     };
-    private ParseDeclaration: ParserFunction = (
+    private parseDeclaration: ParserFunction = (
         tokenStream,
         annotation
     ): AstNode | undefined => {
         let node: AstNode | undefined;
-        const [tokenType, token] = tokenStream.Peek();
-        if (tokenType == "keyword" && token && DECLARATION_KEYWORD[token]) {
+        const [tokenType, token] = tokenStream.peek();
+        if (tokenType == "keyword" && token && declarationKeywords[token]) {
             if (token == "addcheckbox") {
-                node = this.ParseAddCheckBox(tokenStream, annotation);
+                node = this.parseAddCheckBox(tokenStream, annotation);
             } else if (token == "addfunction") {
-                node = this.ParseAddFunction(tokenStream, annotation);
+                node = this.parseAddFunction(tokenStream, annotation);
             } else if (token == "addicon") {
-                node = this.ParseAddIcon(tokenStream, annotation);
+                node = this.parseAddIcon(tokenStream, annotation);
             } else if (token == "addlistitem") {
-                node = this.ParseAddListItem(tokenStream, annotation);
+                node = this.parseAddListItem(tokenStream, annotation);
             } else if (token == "define") {
-                node = this.ParseDefine(tokenStream, annotation);
+                node = this.parseDefine(tokenStream, annotation);
             } else if (token == "include") {
-                node = this.ParseInclude(tokenStream, annotation);
+                node = this.parseInclude(tokenStream, annotation);
             } else if (token == "iteminfo") {
-                node = this.ParseItemInfo(tokenStream, annotation);
+                node = this.parseItemInfo(tokenStream, annotation);
             } else if (token == "itemrequire") {
-                node = this.ParseItemRequire(tokenStream, annotation);
+                node = this.parseItemRequire(tokenStream, annotation);
             } else if (token == "itemlist") {
-                node = this.ParseList(tokenStream, annotation);
+                node = this.parseList(tokenStream, annotation);
             } else if (token == "scorespells") {
-                node = this.ParseScoreSpells(tokenStream, annotation);
-            } else if (checkToken(SPELL_AURA_KEYWORD, token)) {
-                node = this.ParseSpellAuraList(tokenStream, annotation);
+                node = this.parseScoreSpells(tokenStream, annotation);
+            } else if (checkToken(spellAuraKewords, token)) {
+                node = this.parseSpellAuraList(tokenStream, annotation);
             } else if (token == "spellinfo") {
-                node = this.ParseSpellInfo(tokenStream, annotation);
+                node = this.parseSpellInfo(tokenStream, annotation);
             } else if (token == "spelllist") {
-                node = this.ParseList(tokenStream, annotation);
+                node = this.parseList(tokenStream, annotation);
             } else if (token == "spellrequire") {
-                node = this.ParseSpellRequire(tokenStream, annotation);
+                node = this.parseSpellRequire(tokenStream, annotation);
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unknown keywork '%s'",
                     token
@@ -2137,32 +2139,32 @@ export class OvaleASTClass {
                 return;
             }
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DECLARATION; declaration keyword expected.",
                 token
             );
-            tokenStream.Consume();
+            tokenStream.consume();
             return undefined;
         }
         return node;
     };
-    private ParseDefine: ParserFunction<AstDefineNode> = (
+    private parseDefine: ParserFunction<AstDefineNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "define")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DEFINE; 'Define' expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DEFINE; '(' expected.",
                 token
@@ -2170,11 +2172,11 @@ export class OvaleASTClass {
             return undefined;
         }
         let name;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DEFINE; name expected.",
                 token
@@ -2182,13 +2184,13 @@ export class OvaleASTClass {
             return undefined;
         }
         let value: string | number;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "-") {
-            [tokenType, token] = tokenStream.Consume();
+            [tokenType, token] = tokenStream.consume();
             if (tokenType == "number") {
                 value = -1 * tonumber(token);
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' when parsing DEFINE; number expected after '-'.",
                     token
@@ -2200,7 +2202,7 @@ export class OvaleASTClass {
         } else if (tokenType == "string" && token) {
             value = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DEFINE; number or string expected.",
                 token
@@ -2208,23 +2210,23 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing DEFINE; ')' expected.",
                 token
             );
             return undefined;
         }
-        const node = this.NewNode("define", annotation);
+        const node = this.newNode("define", annotation);
         node.name = name;
         node.value = value;
         annotation.definition = annotation.definition || {};
         annotation.definition[name] = value;
         return node;
     };
-    private ParseExpression: ParserFunction<AstNode> = (
+    private parseExpression: ParserFunction<AstNode> = (
         tokenStream,
         annotation,
         minPrecedence?
@@ -2232,14 +2234,14 @@ export class OvaleASTClass {
         minPrecedence = minPrecedence || 0;
         let node: AstNode;
 
-        const [tokenType, token] = tokenStream.Peek();
+        const [tokenType, token] = tokenStream.peek();
         if (tokenType) {
-            const opInfo = UNARY_OPERATOR[token as OperatorType];
+            const opInfo = unaryOperators[token as OperatorType];
             if (opInfo) {
                 const [opType, precedence] = [opInfo[1], opInfo[2]];
-                tokenStream.Consume();
+                tokenStream.consume();
                 const operator: OperatorType = <OperatorType>token;
-                const rhsNode = this.ParseExpression(
+                const rhsNode = this.parseExpression(
                     tokenStream,
                     annotation,
                     precedence
@@ -2247,7 +2249,7 @@ export class OvaleASTClass {
                 if (rhsNode) {
                     if (operator == "-" && rhsNode.type === "value") {
                         const value = -1 * tonumber(rhsNode.value);
-                        node = this.GetNumberNode(value, annotation);
+                        node = this.getNumberNode(value, annotation);
                     } else {
                         node = this.newNodeWithChildren(opType, annotation);
                         node.expressionType = "unary";
@@ -2263,7 +2265,7 @@ export class OvaleASTClass {
                 if (!expression) return undefined;
                 node = expression;
             } else {
-                const simpleExpression = this.ParseSimpleExpression(
+                const simpleExpression = this.parseSimpleExpression(
                     tokenStream,
                     annotation
                 );
@@ -2277,17 +2279,17 @@ export class OvaleASTClass {
         let keepScanning = true;
         while (keepScanning) {
             keepScanning = false;
-            const [tokenType, token] = tokenStream.Peek();
+            const [tokenType, token] = tokenStream.peek();
             if (tokenType) {
-                const opInfo = BINARY_OPERATOR[token as OperatorType];
+                const opInfo = binaryOperators[token as OperatorType];
                 if (opInfo) {
                     const [opType, precedence] = [opInfo[1], opInfo[2]];
                     if (precedence && precedence > minPrecedence) {
                         keepScanning = true;
-                        tokenStream.Consume();
+                        tokenStream.consume();
                         const operator = <OperatorType>token;
                         const lhsNode = node;
-                        let rhsNode = this.ParseExpression(
+                        let rhsNode = this.parseExpression(
                             tokenStream,
                             annotation,
                             precedence
@@ -2300,7 +2302,7 @@ export class OvaleASTClass {
 
                             node.child[1] = lhsNode;
                             node.child[2] = rhsNode;
-                            const operatorInfo = BINARY_OPERATOR[node.operator];
+                            const operatorInfo = binaryOperators[node.operator];
                             if (!operatorInfo) return undefined;
                             while (
                                 node.type == rhsNode.type &&
@@ -2333,7 +2335,7 @@ export class OvaleASTClass {
     ) {
         if (!this.parseToken(tokenStream, "FUNCTION", "(")) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "function",
             annotation,
@@ -2349,7 +2351,7 @@ export class OvaleASTClass {
         }
 
         if (lualength(positionalParams) > lualength(infos.parameters)) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Type error: the %s function takes %d parameters",
                 name,
@@ -2361,7 +2363,7 @@ export class OvaleASTClass {
             const parameterIndex = infos.namedParameters[key];
             if (parameterIndex !== undefined) {
                 if (positionalParams[parameterIndex] !== undefined) {
-                    this.SyntaxError(
+                    this.syntaxError(
                         tokenStream,
                         "Type error: the %s parameters is named in the %s function although it appears already in the parameters list",
                         key,
@@ -2371,7 +2373,7 @@ export class OvaleASTClass {
                 }
                 positionalParams[parameterIndex] = node;
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Type error: unknown %s parameter in %s function",
                     key,
@@ -2401,7 +2403,7 @@ export class OvaleASTClass {
                             parameterInfos.defaultValue
                         );
                     } else {
-                        this.SyntaxError(
+                        this.syntaxError(
                             tokenStream,
                             "Type error: parameter type unknown in %s function",
                             name
@@ -2409,7 +2411,7 @@ export class OvaleASTClass {
                         return undefined;
                     }
                 } else if (!parameterInfos.optional) {
-                    this.SyntaxError(
+                    this.syntaxError(
                         tokenStream,
                         "Type error: parameter %s is required in %s function",
                         parameterInfos.name,
@@ -2436,7 +2438,7 @@ export class OvaleASTClass {
                                 parameter.value
                             )
                         ) {
-                            this.SyntaxError(
+                            this.syntaxError(
                                 tokenStream,
                                 "Type error: parameter %s has not a valid value in function %s",
                                 key,
@@ -2468,8 +2470,8 @@ export class OvaleASTClass {
         name: ActionType
     ) {
         if (!this.parseToken(tokenStream, "ACTION", "(")) return undefined;
-        const count = ACTION_PARAMETER_COUNT[name];
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const count = actionParameterCounts[name];
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "function",
             annotation,
@@ -2487,7 +2489,7 @@ export class OvaleASTClass {
         );
 
         node.name = name;
-        if (STRING_LOOKUP_FUNCTION[name]) {
+        if (stringLookupFunctions[name]) {
             annotation.stringReference = annotation.stringReference || {};
             annotation.stringReference[
                 lualength(annotation.stringReference) + 1
@@ -2498,7 +2500,7 @@ export class OvaleASTClass {
         if (name === "spell") {
             const parameter = positionalParams[1];
             if (!parameter) {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Type error: %s function expect a spell id parameter",
                     name
@@ -2513,16 +2515,16 @@ export class OvaleASTClass {
         return node;
     }
 
-    private ParseFunction: ParserFunction<
+    private parseFunction: ParserFunction<
         AstFunctionNode | AstTypedFunctionNode | AstActionNode
     > = (tokenStream, annotation) => {
         let name;
         {
-            const [tokenType, token] = tokenStream.Consume();
+            const [tokenType, token] = tokenStream.consume();
             if ((tokenType === "name" || tokenType === "keyword") && token) {
                 name = token;
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.",
                     token
@@ -2536,14 +2538,14 @@ export class OvaleASTClass {
         }
 
         let target;
-        let [tokenType, token] = tokenStream.Peek();
+        let [tokenType, token] = tokenStream.peek();
         if (tokenType == ".") {
             target = name;
-            [tokenType, token] = tokenStream.Consume(2);
+            [tokenType, token] = tokenStream.consume(2);
             if (tokenType == "name" && token) {
                 name = token;
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.",
                     token
@@ -2584,7 +2586,7 @@ export class OvaleASTClass {
 
         if (!this.parseToken(tokenStream, "FUNCTION", "(")) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "function",
             annotation,
@@ -2603,11 +2605,11 @@ export class OvaleASTClass {
         }
 
         let nodeType: "state" | "function" | "custom_function";
-        if (STATE_ACTION[name]) {
+        if (stateActions[name]) {
             nodeType = "state";
-        } else if (STRING_LOOKUP_FUNCTION[name]) {
+        } else if (stringLookupFunctions[name]) {
             nodeType = "function";
-        } else if (this.ovaleCondition.IsCondition(name)) {
+        } else if (this.ovaleCondition.isCondition(name)) {
             nodeType = "function";
         } else {
             nodeType = "custom_function";
@@ -2621,13 +2623,13 @@ export class OvaleASTClass {
         );
 
         node.name = name;
-        if (STRING_LOOKUP_FUNCTION[name]) {
+        if (stringLookupFunctions[name]) {
             annotation.stringReference = annotation.stringReference || {};
             annotation.stringReference[
                 lualength(annotation.stringReference) + 1
             ] = node;
         }
-        node.asString = this.UnparseFunction(node);
+        node.asString = this.unparseFunction(node);
         if (nodeType === "custom_function") {
             annotation.functionCall = annotation.functionCall || {};
             annotation.functionCall[node.name] = true;
@@ -2635,11 +2637,11 @@ export class OvaleASTClass {
 
         if (
             nodeType === "function" &&
-            this.ovaleCondition.IsSpellBookCondition(name)
+            this.ovaleCondition.isSpellBookCondition(name)
         ) {
             const parameter = positionalParams[1];
             if (!parameter) {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Type error: %s function expect a spell id parameter",
                     name
@@ -2655,22 +2657,22 @@ export class OvaleASTClass {
     };
 
     private parseGroup(tokenStream: OvaleLexer, annotation: AstAnnotation) {
-        const group = this.ParseGroup(tokenStream, annotation);
+        const group = this.innerParseGroup(tokenStream, annotation);
         if (group && lualength(group.child) === 1) {
             const result = group.child[1];
-            this.nodesPool.Release(group);
+            this.nodesPool.release(group);
             return result;
         }
         return group;
     }
 
-    private ParseGroup: ParserFunction<AstGroupNode> = (
+    private innerParseGroup: ParserFunction<AstGroupNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (tokenType != "{") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing GROUP; '{' expected.",
                 token
@@ -2679,65 +2681,65 @@ export class OvaleASTClass {
         }
         const node = this.newNodeWithChildren("group", annotation);
         const child = node.child;
-        [tokenType] = tokenStream.Peek();
+        [tokenType] = tokenStream.peek();
         while (tokenType && tokenType != "}") {
-            const statementNode = this.ParseStatement(tokenStream, annotation);
+            const statementNode = this.parseStatement(tokenStream, annotation);
             if (statementNode) {
                 child[lualength(child) + 1] = statementNode;
-                [tokenType] = tokenStream.Peek();
+                [tokenType] = tokenStream.peek();
             } else {
-                this.nodesPool.Release(node);
+                this.nodesPool.release(node);
                 return undefined;
             }
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "}") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing GROUP; '}' expected.",
                 token
             );
-            this.nodesPool.Release(node);
+            this.nodesPool.release(node);
             return undefined;
         }
         return node;
     };
-    private ParseIf: ParserFunction<AstIfNode> = (tokenStream, annotation) => {
-        const [tokenType, token] = tokenStream.Consume();
+    private parseIf: ParserFunction<AstIfNode> = (tokenStream, annotation) => {
+        const [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "if")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing IF; 'if' expected.",
                 token
             );
             return undefined;
         }
-        const conditionNode = this.ParseStatement(tokenStream, annotation);
+        const conditionNode = this.parseStatement(tokenStream, annotation);
         if (!conditionNode) return undefined;
-        const bodyNode = this.ParseStatement(tokenStream, annotation);
+        const bodyNode = this.parseStatement(tokenStream, annotation);
         if (!bodyNode) return undefined;
         const node = this.newNodeWithChildren("if", annotation);
         node.child[1] = conditionNode;
         node.child[2] = bodyNode;
         return node;
     };
-    private ParseInclude: ParserFunction<AstScriptNode> = (
+    private parseInclude: ParserFunction<AstScriptNode> = (
         tokenStream,
         nodeList,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "include")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing INCLUDE; 'Include' expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing INCLUDE; '(' expected.",
                 token
@@ -2745,60 +2747,65 @@ export class OvaleASTClass {
             return undefined;
         }
         let name;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing INCLUDE; script name expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing INCLUDE; ')' expected.",
                 token
             );
             return undefined;
         }
-        const code = this.ovaleScripts.GetScript(name);
+        const code = this.ovaleScripts.getScript(name);
         if (code === undefined) {
-            this.debug.Error(
+            this.debug.error(
                 "Script '%s' not found when parsing INCLUDE.",
                 name
             );
             return undefined;
         }
-        const includeTokenStream = new OvaleLexer(name, code, MATCHES, FILTERS);
-        const node = this.ParseScriptStream(
+        const includeTokenStream = new OvaleLexer(
+            name,
+            code,
+            tokenMatches,
+            lexerFilters
+        );
+        const node = this.parseScriptStream(
             includeTokenStream,
             nodeList,
             annotation
         );
-        includeTokenStream.Release();
+        includeTokenStream.release();
         return node;
     };
-    private ParseItemInfo: ParserFunction<AstItemInfoNode> = (
+    private parseItemInfo: ParserFunction<AstItemInfoNode> = (
         tokenStream,
         annotation
     ) => {
         let name;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "iteminfo")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMINFO; 'ItemInfo' expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMINFO; '(' expected.",
                 token
@@ -2806,20 +2813,20 @@ export class OvaleASTClass {
             return undefined;
         }
         let itemId;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "number") {
             itemId = token;
         } else if (tokenType == "name") {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMINFO; number or name expected.",
                 token
             );
             return undefined;
         }
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "iteminfo",
             annotation,
@@ -2827,9 +2834,9 @@ export class OvaleASTClass {
             checkSpellInfo
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMINFO; ')' expected.",
                 token
@@ -2853,22 +2860,22 @@ export class OvaleASTClass {
         return node;
     };
 
-    private ParseItemRequire: ParserFunction<AstItemRequireNode> = (
+    private parseItemRequire: ParserFunction<AstItemRequireNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "itemrequire")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; keyword expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; '(' expected.",
                 token
@@ -2877,13 +2884,13 @@ export class OvaleASTClass {
         }
         let itemId, name;
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "number") {
             itemId = token;
         } else if (tokenType == "name") {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; number or name expected.",
                 token
@@ -2897,7 +2904,7 @@ export class OvaleASTClass {
         );
         if (!property) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "itemrequire",
             annotation,
@@ -2905,9 +2912,9 @@ export class OvaleASTClass {
             checkSpellRequireParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; ')' expected.",
                 token
@@ -2931,28 +2938,28 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseList: ParserFunction<AstListNode> = (
+    private parseList: ParserFunction<AstListNode> = (
         tokenStream,
         annotation
     ) => {
         let keyword;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (
             tokenType == "keyword" &&
             (token == "itemlist" || token == "spelllist")
         ) {
             keyword = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing LIST; keyword expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing LIST; '(' expected.",
                 token
@@ -2960,18 +2967,18 @@ export class OvaleASTClass {
             return undefined;
         }
         let name;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing LIST; name expected.",
                 token
             );
             return undefined;
         }
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "list",
             annotation,
@@ -2979,9 +2986,9 @@ export class OvaleASTClass {
             checkListParameters
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing LIST; ')' expected.",
                 token
@@ -2999,40 +3006,40 @@ export class OvaleASTClass {
         annotation.definition[name] = name;
         return node;
     };
-    private ParseNumber = (
+    private parseNumber = (
         tokenStream: OvaleLexer,
         annotation: AstAnnotation
     ): Result<AstValueNode> => {
         let value;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "number") {
             value = tonumber(token);
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.",
                 token
             );
             return undefined;
         }
-        const node = this.GetNumberNode(value, annotation);
+        const node = this.getNumberNode(value, annotation);
         return node;
     };
-    private ParseParameters<T extends string>(
+    private parseParameters<T extends string>(
         tokenStream: OvaleLexer,
         methodName: string,
         annotation: AstAnnotation,
         maxNumberOfParameters: number | undefined,
         namedParameters?: KeyCheck<T>
     ): [RawPositionalParameters?, RawNamedParameters<T>?] {
-        const positionalParams = this.rawPositionalParametersPool.Get();
+        const positionalParams = this.rawPositionalParametersPool.get();
         const namedParams = <RawNamedParameters<T>>(
-            this.rawNamedParametersPool.Get()
+            this.rawNamedParametersPool.get()
         );
         while (true) {
-            const [tokenType] = tokenStream.Peek();
+            const [tokenType] = tokenStream.peek();
             if (tokenType) {
-                const [nextTokenType] = tokenStream.Peek(2);
+                const [nextTokenType] = tokenStream.peek(2);
                 if (nextTokenType === "=") {
                     let parameterName;
                     if (namedParameters) {
@@ -3053,9 +3060,9 @@ export class OvaleASTClass {
                     }
 
                     // Consume the '=' token.
-                    tokenStream.Consume();
+                    tokenStream.consume();
 
-                    const node = this.ParseSimpleParameterValue(
+                    const node = this.parseSimpleParameterValue(
                         tokenStream,
                         annotation
                     );
@@ -3064,26 +3071,26 @@ export class OvaleASTClass {
                 } else {
                     let node;
                     if (tokenType == "name" || tokenType === "keyword") {
-                        node = this.ParseVariable(tokenStream, annotation);
+                        node = this.parseVariable(tokenStream, annotation);
                         if (!node) {
                             return [];
                         }
                     } else if (tokenType == "number") {
-                        node = this.ParseNumber(tokenStream, annotation);
+                        node = this.parseNumber(tokenStream, annotation);
                         if (!node) {
                             return [];
                         }
                     } else if (tokenType == "-") {
-                        tokenStream.Consume();
-                        node = this.ParseNumber(tokenStream, annotation);
+                        tokenStream.consume();
+                        node = this.parseNumber(tokenStream, annotation);
                         if (node) {
                             const value = -1 * <number>node.value;
-                            node = this.GetNumberNode(value, annotation);
+                            node = this.getNumberNode(value, annotation);
                         } else {
                             return [];
                         }
                     } else if (tokenType == "string") {
-                        node = this.ParseString(tokenStream, annotation);
+                        node = this.parseString(tokenStream, annotation);
                         if (!node) {
                             return [];
                         }
@@ -3097,7 +3104,7 @@ export class OvaleASTClass {
                         maxNumberOfParameters &&
                         lualength(positionalParams) > maxNumberOfParameters
                     ) {
-                        this.SyntaxError(
+                        this.syntaxError(
                             tokenStream,
                             "Error: the maximum number of parameters in %s is %s",
                             methodName,
@@ -3122,19 +3129,19 @@ export class OvaleASTClass {
         ] = namedParams;
         return [positionalParams, namedParams];
     }
-    private ParseParentheses(
+    private parseParentheses(
         tokenStream: OvaleLexer,
         annotation: AstAnnotation
     ): AstNode | undefined {
         let leftToken, rightToken;
         {
-            const [tokenType, token] = tokenStream.Consume();
+            const [tokenType, token] = tokenStream.consume();
             if (tokenType == "(") {
                 [leftToken, rightToken] = ["(", ")"];
             } else if (tokenType == "{") {
                 [leftToken, rightToken] = ["{", "}"];
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.",
                     token
@@ -3142,11 +3149,11 @@ export class OvaleASTClass {
                 return undefined;
             }
         }
-        const node = this.ParseExpression(tokenStream, annotation);
+        const node = this.parseExpression(tokenStream, annotation);
         if (!node) return undefined;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType != rightToken) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.",
                 token,
@@ -3158,13 +3165,13 @@ export class OvaleASTClass {
         node.right = rightToken;
         return node;
     }
-    private ParseScoreSpells: ParserFunction<AstScoreSpellsNode> = (
+    private parseScoreSpells: ParserFunction<AstScoreSpellsNode> = (
         tokenStream,
         annotation
     ) => {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "scorespells")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SCORESPELLS; 'ScoreSpells' expected.",
                 token
@@ -3172,9 +3179,9 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SCORESPELLS; '(' expected.",
                 token
@@ -3182,7 +3189,7 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "scorespells",
             annotation,
@@ -3191,9 +3198,9 @@ export class OvaleASTClass {
         );
         if (!positionalParams || !namedParams) return undefined;
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SCORESPELLS; ')' expected.",
                 token
@@ -3208,30 +3215,30 @@ export class OvaleASTClass {
         );
         return node;
     };
-    private ParseScriptStream: ParserFunction<AstScriptNode> = (
+    private parseScriptStream: ParserFunction<AstScriptNode> = (
         tokenStream: OvaleLexer,
         annotation
     ) => {
-        this.profiler.StartProfiling("OvaleAST_ParseScript");
+        this.profiler.startProfiling("OvaleAST_ParseScript");
         const ast = this.newNodeWithChildren("script", annotation);
         const child = ast.child;
         while (true) {
-            const [tokenType, token] = tokenStream.Peek();
+            const [tokenType, token] = tokenStream.peek();
             if (tokenType) {
-                const declarationNode = this.ParseDeclaration(
+                const declarationNode = this.parseDeclaration(
                     tokenStream,
                     annotation
                 );
                 if (!declarationNode) {
-                    this.debug.Error(`Failed on ${token}`);
-                    this.nodesPool.Release(ast);
+                    this.debug.error(`Failed on ${token}`);
+                    this.nodesPool.release(ast);
                     return undefined;
                 }
                 if (declarationNode.type == "script") {
                     for (const [, node] of ipairs(declarationNode.child)) {
                         child[lualength(child) + 1] = node;
                     }
-                    this.nodesPool.Release(declarationNode);
+                    this.nodesPool.release(declarationNode);
                 } else {
                     child[lualength(child) + 1] = declarationNode;
                 }
@@ -3239,37 +3246,37 @@ export class OvaleASTClass {
                 break;
             }
         }
-        this.profiler.StopProfiling("OvaleAST_ParseScript");
+        this.profiler.stopProfiling("OvaleAST_ParseScript");
         return ast;
     };
-    private ParseSimpleExpression(
+    private parseSimpleExpression(
         tokenStream: OvaleLexer,
         annotation: AstAnnotation
     ) {
         let node;
-        let [tokenType, token] = tokenStream.Peek();
+        let [tokenType, token] = tokenStream.peek();
         if (tokenType == "number") {
-            node = this.ParseNumber(tokenStream, annotation);
+            node = this.parseNumber(tokenStream, annotation);
         } else if (tokenType == "string") {
-            node = this.ParseString(tokenStream, annotation);
+            node = this.parseString(tokenStream, annotation);
         } else if (
             tokenType === "keyword" &&
             (token === "true" || token === "false")
         ) {
-            tokenStream.Consume();
+            tokenStream.consume();
             node = this.newBoolean(annotation, token === "true");
         } else if (tokenType == "name" || tokenType === "keyword") {
-            [tokenType, token] = tokenStream.Peek(2);
+            [tokenType, token] = tokenStream.peek(2);
             if (tokenType == "." || tokenType == "(") {
-                node = this.ParseFunction(tokenStream, annotation);
+                node = this.parseFunction(tokenStream, annotation);
             } else {
-                node = this.ParseVariable(tokenStream, annotation);
+                node = this.parseVariable(tokenStream, annotation);
             }
         } else if (tokenType == "(" || tokenType == "{") {
-            node = this.ParseParentheses(tokenStream, annotation);
+            node = this.parseParentheses(tokenStream, annotation);
         } else {
-            tokenStream.Consume();
-            this.SyntaxError(
+            tokenStream.consume();
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION",
                 token
@@ -3278,22 +3285,22 @@ export class OvaleASTClass {
         }
         return node;
     }
-    private ParseSimpleParameterValue: ParserFunction<AstNode> = (
+    private parseSimpleParameterValue: ParserFunction<AstNode> = (
         tokenStream,
         annotation
     ) => {
         let isBang = false;
-        let [tokenType] = tokenStream.Peek();
+        let [tokenType] = tokenStream.peek();
         if (tokenType == "!") {
             isBang = true;
-            tokenStream.Consume();
+            tokenStream.consume();
         }
         let expressionNode;
-        [tokenType] = tokenStream.Peek();
+        [tokenType] = tokenStream.peek();
         if (tokenType == "(" || tokenType == "-") {
-            expressionNode = this.ParseExpression(tokenStream, annotation);
+            expressionNode = this.parseExpression(tokenStream, annotation);
         } else {
-            expressionNode = this.ParseSimpleExpression(
+            expressionNode = this.parseSimpleExpression(
                 tokenStream,
                 annotation
             );
@@ -3313,13 +3320,13 @@ export class OvaleASTClass {
         tokenStream: OvaleLexer,
         methodName: string
     ): [number?, string?] {
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         let spellId, name;
         if (tokenType === "-") {
-            [tokenType, token] = tokenStream.Consume();
+            [tokenType, token] = tokenStream.consume();
             if (tokenType === "number") spellId = -tonumber(token);
             else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' wheren parsing '%s'; number expected",
                     token,
@@ -3332,7 +3339,7 @@ export class OvaleASTClass {
         } else if (tokenType == "name") {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing '%s'; number or name expected.",
                 token,
@@ -3394,9 +3401,9 @@ export class OvaleASTClass {
         methodName: string,
         expectedToken: string
     ) {
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType != expectedToken) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing %s; '%s' expected.",
                 token,
@@ -3414,11 +3421,11 @@ export class OvaleASTClass {
         keyCheck: KeyCheck<T>
     ): T | undefined {
         let keyword;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "keyword" && token && checkToken(keyCheck, token)) {
             keyword = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing %s; keyword expected.",
                 token,
@@ -3435,11 +3442,11 @@ export class OvaleASTClass {
         keyCheck: T
     ): T | undefined {
         let keyword;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "keyword" && token && token === keyCheck) {
             keyword = keyCheck;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing %s; keyword %s expected.",
                 token,
@@ -3457,11 +3464,11 @@ export class OvaleASTClass {
         keyCheck: KeyCheck<T>
     ): T | undefined {
         let keyword;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token && checkToken(keyCheck, token)) {
             keyword = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing %s; name expected.",
                 token,
@@ -3477,11 +3484,11 @@ export class OvaleASTClass {
         methodName: string
     ): string | undefined {
         let keyword;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "name" && token) {
             keyword = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing %s; name expected.",
                 token,
@@ -3492,23 +3499,23 @@ export class OvaleASTClass {
         return keyword;
     }
 
-    private ParseSpellAuraList: ParserFunction<AstSpellAuraListNode> = (
+    private parseSpellAuraList: ParserFunction<AstSpellAuraListNode> = (
         tokenStream,
         annotation
     ) => {
         const keyword = this.parseKeywordTokens(
             tokenStream,
             "SPELLAURALIST",
-            SPELL_AURA_KEYWORD
+            spellAuraKewords
         );
 
         if (!keyword) {
-            this.debug.Error("Failed on keyword");
+            this.debug.error("Failed on keyword");
             return undefined;
         }
 
         if (!this.parseToken(tokenStream, "SPELLAURALIST", "(")) {
-            this.debug.Error("Failed on (");
+            this.debug.error("Failed on (");
             return undefined;
         }
         const [spellId, name] = this.parseNumberOrNameParameter(
@@ -3520,7 +3527,7 @@ export class OvaleASTClass {
             "SPELLAURALIST"
         );
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "spellauralist",
             annotation,
@@ -3531,7 +3538,7 @@ export class OvaleASTClass {
             return undefined;
         }
         if (!this.parseToken(tokenStream, "SPELLAURALIST", ")")) {
-            this.debug.Error("Failed on )");
+            this.debug.error("Failed on )");
             return undefined;
         }
 
@@ -3554,14 +3561,14 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseSpellInfo: ParserFunction<AstSpellInfoNode> = (
+    private parseSpellInfo: ParserFunction<AstSpellInfoNode> = (
         tokenStream,
         annotation
     ) => {
         let name;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "spellinfo")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SPELLINFO; 'SpellInfo' expected.",
                 token
@@ -3569,9 +3576,9 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SPELLINFO; '(' expected.",
                 token
@@ -3579,20 +3586,20 @@ export class OvaleASTClass {
             return undefined;
         }
         let spellId;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType == "number") {
             spellId = tonumber(token);
         } else if (tokenType == "name") {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SPELLINFO; number or name expected.",
                 token
             );
             return undefined;
         }
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "spellinfo",
             annotation,
@@ -3600,9 +3607,9 @@ export class OvaleASTClass {
             checkSpellInfo
         );
         if (!positionalParams || !namedParams) return undefined;
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SPELLINFO; ')' expected.",
                 token
@@ -3625,7 +3632,7 @@ export class OvaleASTClass {
         }
         return node;
     };
-    private ParseSpellRequire: ParserFunction<AstSpellRequireNode> = (
+    private parseSpellRequire: ParserFunction<AstSpellRequireNode> = (
         tokenStream,
         annotation
     ) => {
@@ -3652,7 +3659,7 @@ export class OvaleASTClass {
         );
         if (!property) return undefined;
 
-        const [positionalParams, namedParams] = this.ParseParameters(
+        const [positionalParams, namedParams] = this.parseParameters(
             tokenStream,
             "spellrequire",
             annotation,
@@ -3682,12 +3689,12 @@ export class OvaleASTClass {
         return node;
     };
 
-    private ParseStatement = (
+    private parseStatement = (
         tokenStream: OvaleLexer,
         annotation: AstAnnotation
     ): AstNode | undefined => {
         let node;
-        let [tokenType, token] = tokenStream.Peek();
+        let [tokenType, token] = tokenStream.peek();
         if (tokenType) {
             if (token == "{") {
                 let i = 1;
@@ -3699,46 +3706,46 @@ export class OvaleASTClass {
                         count = count - 1;
                     }
                     i = i + 1;
-                    [tokenType, token] = tokenStream.Peek(i);
+                    [tokenType, token] = tokenStream.peek(i);
                     if (count == 0) {
                         break;
                     }
                 }
-                if (!tokenType || BINARY_OPERATOR[token as OperatorType]) {
-                    node = this.ParseExpression(tokenStream, annotation);
+                if (!tokenType || binaryOperators[token as OperatorType]) {
+                    node = this.parseExpression(tokenStream, annotation);
                 } else {
                     node = this.parseGroup(tokenStream, annotation);
                 }
             } else if (token == "if") {
-                node = this.ParseIf(tokenStream, annotation);
+                node = this.parseIf(tokenStream, annotation);
             } else if (token == "unless") {
-                node = this.ParseUnless(tokenStream, annotation);
+                node = this.parseUnless(tokenStream, annotation);
             } else {
-                node = this.ParseExpression(tokenStream, annotation);
+                node = this.parseExpression(tokenStream, annotation);
             }
         }
         return node;
     };
-    private ParseString: ParserFunction<
+    private parseString: ParserFunction<
         AstStringNode | AstFunctionNode | AstActionNode | AstTypedFunctionNode
     > = (tokenStream, annotation) => {
         let value;
-        const [tokenType, token] = tokenStream.Peek();
+        const [tokenType, token] = tokenStream.peek();
         if (tokenType == "string" && token) {
             value = token;
-            tokenStream.Consume();
+            tokenStream.consume();
         } else if (tokenType == "name" && token) {
-            if (STRING_LOOKUP_FUNCTION[lower(token)]) {
+            if (stringLookupFunctions[lower(token)]) {
                 // TODO Maybe have a specific parse function for string
                 // lookup functions
-                return this.ParseFunction(tokenStream, annotation);
+                return this.parseFunction(tokenStream, annotation);
             } else {
                 value = token;
-                tokenStream.Consume();
+                tokenStream.consume();
             }
         } else {
-            tokenStream.Consume();
-            this.SyntaxError(
+            tokenStream.consume();
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.",
                 token
@@ -3753,38 +3760,38 @@ export class OvaleASTClass {
         ] = node;
         return node;
     };
-    private ParseUnless: ParserFunction<AstUnlessNode> = (
+    private parseUnless: ParserFunction<AstUnlessNode> = (
         tokenStream,
         annotation
     ) => {
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (!(tokenType == "keyword" && token == "unless")) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing UNLESS; 'unless' expected.",
                 token
             );
             return undefined;
         }
-        const conditionNode = this.ParseExpression(tokenStream, annotation);
+        const conditionNode = this.parseExpression(tokenStream, annotation);
         if (!conditionNode) return undefined;
-        const bodyNode = this.ParseStatement(tokenStream, annotation);
+        const bodyNode = this.parseStatement(tokenStream, annotation);
         if (!bodyNode) return undefined;
         const node = this.newNodeWithChildren("unless", annotation);
         node.child[1] = conditionNode;
         node.child[2] = bodyNode;
         return node;
     };
-    private ParseVariable: ParserFunction<AstVariableNode> = (
+    private parseVariable: ParserFunction<AstVariableNode> = (
         tokenStream,
         annotation
     ) => {
         let name;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if ((tokenType == "name" || tokenType === "keyword") && token) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing VARIABLE; name expected.",
                 token
@@ -3792,7 +3799,7 @@ export class OvaleASTClass {
             return undefined;
         }
 
-        const node = this.NewNode("variable", annotation);
+        const node = this.newNode("variable", annotation);
         node.name = name;
         annotation.nameReference = annotation.nameReference || {};
         annotation.nameReference[
@@ -3800,35 +3807,35 @@ export class OvaleASTClass {
         ] = node;
         return node;
     };
-    private PARSE_VISITOR: { [key in NodeType]?: ParserFunction } = {
-        ["action"]: this.ParseFunction,
-        ["add_function"]: this.ParseAddFunction,
-        ["arithmetic"]: this.ParseExpression,
-        ["bang_value"]: this.ParseSimpleParameterValue,
-        ["checkbox"]: this.ParseAddCheckBox,
-        ["compare"]: this.ParseExpression,
-        ["comment"]: this.ParseComment,
-        ["custom_function"]: this.ParseFunction,
-        ["define"]: this.ParseDefine,
-        ["expression"]: this.ParseStatement,
-        ["function"]: this.ParseFunction,
-        ["group"]: this.ParseGroup,
-        ["icon"]: this.ParseAddIcon,
-        ["if"]: this.ParseIf,
-        ["item_info"]: this.ParseItemInfo,
-        ["itemrequire"]: this.ParseItemRequire,
-        ["list"]: this.ParseList,
-        ["list_item"]: this.ParseAddListItem,
-        ["logical"]: this.ParseExpression,
-        ["score_spells"]: this.ParseScoreSpells,
-        ["script"]: this.ParseScriptStream,
-        ["spell_aura_list"]: this.ParseSpellAuraList,
-        ["spell_info"]: this.ParseSpellInfo,
-        ["spell_require"]: this.ParseSpellRequire,
-        ["string"]: this.ParseString,
-        ["unless"]: this.ParseUnless,
-        ["value"]: this.ParseNumber,
-        ["variable"]: this.ParseVariable,
+    private parseVisitors: { [key in NodeType]?: ParserFunction } = {
+        ["action"]: this.parseFunction,
+        ["add_function"]: this.parseAddFunction,
+        ["arithmetic"]: this.parseExpression,
+        ["bang_value"]: this.parseSimpleParameterValue,
+        ["checkbox"]: this.parseAddCheckBox,
+        ["compare"]: this.parseExpression,
+        ["comment"]: this.parseComment,
+        ["custom_function"]: this.parseFunction,
+        ["define"]: this.parseDefine,
+        ["expression"]: this.parseStatement,
+        ["function"]: this.parseFunction,
+        ["group"]: this.parseGroup,
+        ["icon"]: this.parseAddIcon,
+        ["if"]: this.parseIf,
+        ["item_info"]: this.parseItemInfo,
+        ["itemrequire"]: this.parseItemRequire,
+        ["list"]: this.parseList,
+        ["list_item"]: this.parseAddListItem,
+        ["logical"]: this.parseExpression,
+        ["score_spells"]: this.parseScoreSpells,
+        ["script"]: this.parseScriptStream,
+        ["spell_aura_list"]: this.parseSpellAuraList,
+        ["spell_info"]: this.parseSpellInfo,
+        ["spell_require"]: this.parseSpellRequire,
+        ["string"]: this.parseString,
+        ["unless"]: this.parseUnless,
+        ["value"]: this.parseNumber,
+        ["variable"]: this.parseVariable,
     };
 
     public newFunction(name: string, annotation: AstAnnotation) {
@@ -3838,42 +3845,42 @@ export class OvaleASTClass {
     }
 
     public newString(annotation: AstAnnotation, value: string) {
-        const node = this.NewNode("string", annotation);
+        const node = this.newNode("string", annotation);
         node.value = value;
         node.result.constant = true;
         const result = node.result as NodeValueResult;
-        result.timeSpan.copyFromArray(UNIVERSE);
+        result.timeSpan.copyFromArray(universe);
         result.type = "value";
         result.value = value;
         return node;
     }
 
     public newVariable(annotation: AstAnnotation, name: string) {
-        const node = this.NewNode("variable", annotation);
+        const node = this.newNode("variable", annotation);
         node.name = name;
         return node;
     }
 
     public newValue(annotation: AstAnnotation, value: number) {
-        const node = this.NewNode("value", annotation);
+        const node = this.newNode("value", annotation);
         node.value = value;
         node.result.constant = true;
         const result = node.result as NodeValueResult;
         result.type = "value";
         result.value = value;
-        result.timeSpan.copyFromArray(UNIVERSE);
+        result.timeSpan.copyFromArray(universe);
         result.origin = 0;
         result.rate = 0;
         return node;
     }
 
     public newBoolean(annotation: AstAnnotation, value: boolean) {
-        const node = this.NewNode("boolean", annotation);
+        const node = this.newNode("boolean", annotation);
         node.value = value;
         node.result.constant = true;
         const result = node.result;
         if (value) {
-            result.timeSpan.copyFromArray(UNIVERSE);
+            result.timeSpan.copyFromArray(universe);
         } else {
             wipe(result.timeSpan);
         }
@@ -3882,9 +3889,9 @@ export class OvaleASTClass {
     }
 
     public newUndefined(annotation: AstAnnotation) {
-        const node = this.NewNode("undefined", annotation);
+        const node = this.newNode("undefined", annotation);
         node.result.constant = true;
-        node.result.timeSpan.copyFromArray(EMPTY_SET);
+        node.result.timeSpan.copyFromArray(emptySet);
         return node;
     }
 
@@ -3896,12 +3903,12 @@ export class OvaleASTClass {
     ) {
         const node = this.internalNewNodeWithChildren(type, annotation);
         node.rawNamedParams =
-            rawNamedParams || this.rawNamedParametersPool.Get();
+            rawNamedParams || this.rawNamedParametersPool.get();
         node.rawPositionalParams =
-            rawPositionalParameters || this.rawPositionalParametersPool.Get();
+            rawPositionalParameters || this.rawPositionalParametersPool.get();
         node.cachedParams = {
-            named: this.namedParametersPool.Get(),
-            positional: this.positionalParametersPool.Get(),
+            named: this.namedParametersPool.get(),
+            positional: this.positionalParametersPool.get(),
         };
         annotation.parametersReference = annotation.parametersReference || {};
         annotation.parametersReference[
@@ -3915,7 +3922,7 @@ export class OvaleASTClass {
         annotation: AstAnnotation
     ) {
         const node = this.internalNewNode(type, annotation);
-        node.child = this.childrenPool.Get();
+        node.child = this.childrenPool.get();
         return node;
     }
 
@@ -3923,7 +3930,7 @@ export class OvaleASTClass {
         type: T,
         annotation: AstAnnotation
     ): NodeTypes[T] {
-        const node = this.nodesPool.Get() as NodeTypes[T];
+        const node = this.nodesPool.get() as NodeTypes[T];
         node.type = type;
         node.annotation = annotation;
         const nodeList = annotation.nodeList;
@@ -3974,45 +3981,45 @@ export class OvaleASTClass {
         return this.internalNewNodeWithChildren(type, annotation);
     }
 
-    public NewNode<T extends Exclude<NodeType, NodeWithChildrenType>>(
+    public newNode<T extends Exclude<NodeType, NodeWithChildrenType>>(
         type: T,
         annotation: AstAnnotation
     ): NodeTypes[T] {
         return this.internalNewNode(type, annotation);
     }
 
-    public NodeToString(node: AstNode) {
-        const output = this.print_r(node);
+    public nodeToString(node: AstNode) {
+        const output = this.printRecurse(node);
         return concat(output, "\n");
     }
-    public ReleaseAnnotation(annotation: AstAnnotation) {
+    public releaseAnnotation(annotation: AstAnnotation) {
         if (annotation.checkBoxList) {
             for (const [, control] of ipairs(annotation.checkBoxList)) {
-                this.checkboxPool.Release(control);
+                this.checkboxPool.release(control);
             }
         }
         if (annotation.listList) {
             for (const [, control] of ipairs(annotation.listList)) {
-                this.listPool.Release(control);
+                this.listPool.release(control);
             }
         }
         if (annotation.rawPositionalParametersList) {
             for (const [, parameters] of ipairs(
                 annotation.rawPositionalParametersList
             )) {
-                this.rawPositionalParametersPool.Release(parameters);
+                this.rawPositionalParametersPool.release(parameters);
             }
         }
         if (annotation.rawNamedParametersList) {
             for (const [, parameters] of ipairs(
                 annotation.rawNamedParametersList
             )) {
-                this.rawNamedParametersPool.Release(parameters);
+                this.rawNamedParametersPool.release(parameters);
             }
         }
         if (annotation.nodeList) {
             for (const [, node] of ipairs(annotation.nodeList)) {
-                this.nodesPool.Release(node);
+                this.nodesPool.release(node);
             }
         }
         for (const [, value] of kpairs(annotation)) {
@@ -4022,24 +4029,24 @@ export class OvaleASTClass {
         }
         wipe(annotation);
     }
-    public Release(ast: AstNode) {
-        ast.result.timeSpan.Release();
+    public release(ast: AstNode) {
+        ast.result.timeSpan.release();
         wipe(ast.result);
         wipe(ast);
-        this.nodesPool.Release(ast);
+        this.nodesPool.release(ast);
     }
-    public ParseCode(
+    public parseCode(
         nodeType: NodeType,
         code: string,
         nodeList: LuaArray<AstNode>,
         annotation: AstAnnotation
     ): [AstNode, LuaArray<AstNode>, AstAnnotation] | [] {
-        const tokenStream = new OvaleLexer("Ovale", code, MATCHES, {
-            comments: TokenizeComment,
-            space: TokenizeWhitespace,
+        const tokenStream = new OvaleLexer("Ovale", code, tokenMatches, {
+            comments: tokenizeComment,
+            space: tokenizeWhitespace,
         });
-        const node = this.Parse(nodeType, tokenStream, nodeList, annotation);
-        tokenStream.Release();
+        const node = this.parse(nodeType, tokenStream, nodeList, annotation);
+        tokenStream.release();
         if (!node) return [];
         return [node, nodeList, annotation];
     }
@@ -4057,7 +4064,7 @@ export class OvaleASTClass {
             verify: options.verify,
             definition: {},
         };
-        const [ast] = this.ParseCode(
+        const [ast] = this.parseCode(
             "script",
             code,
             annotation.nodeList,
@@ -4066,25 +4073,25 @@ export class OvaleASTClass {
         if (ast) {
             if (ast.type == "script") {
                 ast.annotation = annotation;
-                this.PropagateConstants(ast);
-                this.PropagateStrings(ast);
+                this.propagateConstants(ast);
+                this.propagateStrings(ast);
                 //    this.FlattenParameters(ast);
                 //this.VerifyParameterStances(ast);
-                this.VerifyFunctionCalls(ast);
+                this.verifyFunctionCalls(ast);
                 if (options.optimize) {
-                    this.Optimize(ast);
+                    this.optimize(ast);
                 }
-                this.InsertPostOrderTraversal(ast);
+                this.insertPostOrderTraversal(ast);
                 return ast;
             }
 
-            this.debug.Debug(`Unexpected type ${ast.type} in parseScript`);
-            this.Release(ast);
+            this.debug.debug(`Unexpected type ${ast.type} in parseScript`);
+            this.release(ast);
         } else {
-            this.debug.Error("Parse failed");
+            this.debug.error("Parse failed");
         }
 
-        this.ReleaseAnnotation(annotation);
+        this.releaseAnnotation(annotation);
         return undefined;
     }
 
@@ -4092,11 +4099,11 @@ export class OvaleASTClass {
         name: string,
         options?: { optimize: boolean; verify: boolean }
     ) {
-        const code = this.ovaleScripts.GetScriptOrDefault(name);
+        const code = this.ovaleScripts.getScriptOrDefault(name);
         if (code) {
             return this.parseScript(code, options);
         } else {
-            this.debug.Debug("No code to parse");
+            this.debug.debug("No code to parse");
             return undefined;
         }
     }
@@ -4107,14 +4114,14 @@ export class OvaleASTClass {
             if (isNumber(itemId)) {
                 return itemId;
             } else {
-                this.debug.Error(`${name} is as string and not an item id`);
+                this.debug.error(`${name} is as string and not an item id`);
             }
         }
         return 0;
     }
 
-    public PropagateConstants(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_PropagateConstants");
+    public propagateConstants(ast: AstNode) {
+        this.profiler.startProfiling("OvaleAST_PropagateConstants");
         if (ast.annotation) {
             const dictionary = ast.annotation.definition;
             if (dictionary && ast.annotation.nameReference) {
@@ -4165,17 +4172,17 @@ export class OvaleASTClass {
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleAST_PropagateConstants");
+        this.profiler.stopProfiling("OvaleAST_PropagateConstants");
     }
 
-    public PropagateStrings(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_PropagateStrings");
+    public propagateStrings(ast: AstNode) {
+        this.profiler.startProfiling("OvaleAST_PropagateStrings");
         if (ast.annotation && ast.annotation.stringReference) {
             for (const [, node] of ipairs(ast.annotation.stringReference)) {
                 const nodeAsString = <AstStringNode>node;
                 if (node.type === "string") {
                     const key = node.value;
-                    const value = L[key as keyof LocalizationStrings];
+                    const value = l[key as keyof LocalizationStrings];
                     if (value) {
                         nodeAsString.value = value;
                         nodeAsString.name = key;
@@ -4214,11 +4221,11 @@ export class OvaleASTClass {
                             if (!value) value = "item:" + stringKey;
                         } else if (name == "l") {
                             value =
-                                L[stringKey as keyof LocalizationStrings] ||
+                                l[stringKey as keyof LocalizationStrings] ||
                                 stringKey;
                         } else if (name == "spellname") {
                             value =
-                                this.ovaleSpellBook.GetSpellName(
+                                this.ovaleSpellBook.getSpellName(
                                     tonumber(stringKey)
                                 ) || "spell:" + stringKey;
                         }
@@ -4232,11 +4239,11 @@ export class OvaleASTClass {
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleAST_PropagateStrings");
+        this.profiler.stopProfiling("OvaleAST_PropagateStrings");
     }
 
-    private VerifyFunctionCalls(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_VerifyFunctionCalls");
+    private verifyFunctionCalls(ast: AstNode) {
+        this.profiler.startProfiling("OvaleAST_VerifyFunctionCalls");
         if (ast.annotation && ast.annotation.verify) {
             const customFunction = ast.annotation.customFunction;
             const functionCall = ast.annotation.functionCall;
@@ -4245,36 +4252,36 @@ export class OvaleASTClass {
                     if (
                         !(
                             checkToken(checkActionType, name) ||
-                            STRING_LOOKUP_FUNCTION[name] ||
-                            this.ovaleCondition.IsCondition(name) ||
+                            stringLookupFunctions[name] ||
+                            this.ovaleCondition.isCondition(name) ||
                             (customFunction && customFunction[name])
                         )
                     ) {
-                        this.debug.Error("unknown function '%s'.", name);
+                        this.debug.error("unknown function '%s'.", name);
                     }
                 }
             }
         }
-        this.profiler.StopProfiling("OvaleAST_VerifyFunctionCalls");
+        this.profiler.stopProfiling("OvaleAST_VerifyFunctionCalls");
     }
 
-    private InsertPostOrderTraversal(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_InsertPostOrderTraversal");
+    private insertPostOrderTraversal(ast: AstNode) {
+        this.profiler.startProfiling("OvaleAST_InsertPostOrderTraversal");
         const annotation = ast.annotation;
         if (annotation && annotation.postOrderReference) {
             for (const [, node] of ipairs(annotation.postOrderReference)) {
-                const array = this.postOrderPool.Get();
-                const visited = this.postOrderVisitedPool.Get();
-                this.PostOrderTraversal(node, array, visited);
-                this.postOrderVisitedPool.Release(visited);
+                const array = this.postOrderPool.get();
+                const visited = this.postOrderVisitedPool.get();
+                this.postOrderTraversal(node, array, visited);
+                this.postOrderVisitedPool.release(visited);
                 node.postOrder = array;
             }
         }
-        this.profiler.StopProfiling("OvaleAST_InsertPostOrderTraversal");
+        this.profiler.stopProfiling("OvaleAST_InsertPostOrderTraversal");
     }
 
-    private Optimize(ast: AstNode) {
-        this.profiler.StartProfiling("OvaleAST_CommonSubExpressionElimination");
+    private optimize(ast: AstNode) {
+        this.profiler.startProfiling("OvaleAST_CommonSubExpressionElimination");
         if (ast && ast.annotation && ast.annotation.nodeList) {
             const expressionHash: LuaObj<AstNode> = {};
 
@@ -4305,6 +4312,6 @@ export class OvaleASTClass {
 
             ast.annotation.expressionHash = expressionHash;
         }
-        this.profiler.StopProfiling("OvaleAST_CommonSubExpressionElimination");
+        this.profiler.stopProfiling("OvaleAST_CommonSubExpressionElimination");
     }
 }

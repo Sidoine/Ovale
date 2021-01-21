@@ -10,9 +10,9 @@ import { OvaleDataClass } from "../engine/data";
 import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 
-let self_serial = 0;
+let serial = 0;
 
 interface Totem {
     duration: number;
@@ -40,38 +40,38 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         private ovaleFuture: OvaleFutureClass,
         private ovaleAura: OvaleAuraClass,
         private ovaleSpellBook: OvaleSpellBookClass,
-        ovaleDebug: OvaleDebugClass
+        ovaleDebug: DebugTools
     ) {
         super(TotemData);
         this.debug = ovaleDebug.create("OvaleTotem");
         this.module = ovale.createModule(
             "OvaleTotem",
-            this.OnInitialize,
-            this.OnDisable,
+            this.handleInitialize,
+            this.handleDisable,
             aceEvent
         );
         this.profiler = ovaleProfiler.create(this.module.GetName());
-        ovaleState.RegisterState(this);
+        ovaleState.registerState(this);
     }
 
-    private OnInitialize = () => {
-        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Update);
-        this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.Update);
-        this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.Update);
-        this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.Update);
+    private handleInitialize = () => {
+        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.update);
+        this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.update);
+        this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.update);
+        this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.update);
     };
-    private OnDisable = () => {
+    private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_TALENT_UPDATE");
         this.module.UnregisterEvent("PLAYER_TOTEM_UPDATE");
         this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
     };
-    private Update = () => {
-        self_serial = self_serial + 1;
+    private update = () => {
+        serial = serial + 1;
         this.ovale.needRefresh();
     };
 
-    InitializeState() {
+    initializeState() {
         this.next.totems = {};
         // shamans can use the fifth slot when all of the totems are active
         // that's why we +1 it everywhere we use
@@ -84,8 +84,8 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             };
         }
     }
-    ResetState() {}
-    CleanState() {
+    resetState() {}
+    cleanState() {
         for (const [slot, totem] of pairs(this.next.totems)) {
             for (const [k] of kpairs(totem)) {
                 delete totem[k];
@@ -94,7 +94,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         }
     }
 
-    ApplySpellAfterCast = (
+    applySpellAfterCast = (
         spellId: number,
         targetGUID: string,
         startCast: number,
@@ -102,22 +102,22 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.StartProfiling("OvaleTotem_ApplySpellAfterCast");
+        this.profiler.startProfiling("OvaleTotem_ApplySpellAfterCast");
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
-            this.SummonTotem(spellId, endCast);
+            this.summonTotem(spellId, endCast);
         }
-        this.profiler.StopProfiling("OvaleTotem_ApplySpellAfterCast");
+        this.profiler.stopProfiling("OvaleTotem_ApplySpellAfterCast");
     };
 
-    IsActiveTotem(totem: Totem, atTime: number) {
+    isActiveTotem(totem: Totem, atTime: number) {
         if (!totem) return false;
-        if (!totem.serial || totem.serial < self_serial) {
-            totem = this.GetTotem(totem.slot);
+        if (!totem.serial || totem.serial < serial) {
+            totem = this.getTotem(totem.slot);
         }
         return (
             totem &&
-            totem.serial == self_serial &&
+            totem.serial == serial &&
             totem.start &&
             totem.duration &&
             totem.start < atTime &&
@@ -125,10 +125,10 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         );
     }
 
-    GetTotem(slot: number) {
-        this.profiler.StartProfiling("OvaleTotem_state_GetTotem");
+    getTotem(slot: number) {
+        this.profiler.startProfiling("OvaleTotem_state_GetTotem");
         const totem = this.next.totems[slot];
-        if (totem && (!totem.serial || totem.serial < self_serial)) {
+        if (totem && (!totem.serial || totem.serial < serial)) {
             const [haveTotem, name, startTime, duration, icon] = GetTotemInfo(
                 slot
             );
@@ -144,39 +144,39 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 totem.icon = "";
             }
             totem.slot = slot;
-            totem.serial = self_serial;
+            totem.serial = serial;
         }
-        this.profiler.StopProfiling("OvaleTotem_state_GetTotem");
+        this.profiler.stopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
 
-    GetTotemInfo(spellId: number, atTime: number) {
+    getTotemInfo(spellId: number, atTime: number) {
         let start, ending;
         let count = 0;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
-            this.debug.Log("Spell %s is a totem spell", spellId);
+            this.debug.log("Spell %s is a totem spell", spellId);
             // it can take a while for the buffs to appear
             // so if the previous GCD spell is our totem, we assume the buffs are up
             let buffPresent = this.ovaleFuture.next.lastGCDSpellId == spellId;
             if (!buffPresent && si.buff_totem) {
-                const aura = this.ovaleAura.GetAura(
+                const aura = this.ovaleAura.getAura(
                     "player",
                     si.buff_totem,
                     atTime,
                     "HELPFUL"
                 );
                 buffPresent =
-                    (aura && this.ovaleAura.IsActiveAura(aura, atTime)) ||
+                    (aura && this.ovaleAura.isActiveAura(aura, atTime)) ||
                     false;
             }
             if (!si.buff_totem || buffPresent) {
-                const texture = this.ovaleSpellBook.GetSpellTexture(spellId);
+                const texture = this.ovaleSpellBook.getSpellTexture(spellId);
                 const maxTotems = si.max_totems || MAX_TOTEMS + 1;
                 for (const [slot] of ipairs(this.next.totems)) {
-                    const totem = this.GetTotem(slot);
+                    const totem = this.getTotem(slot);
                     if (
-                        this.IsActiveTotem(totem, atTime) &&
+                        this.isActiveTotem(totem, atTime) &&
                         totem.icon == texture
                     ) {
                         count = count + 1;
@@ -193,18 +193,18 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 }
             }
         } else {
-            this.debug.Log("Spell %s is NOT a totem spell", spellId);
+            this.debug.log("Spell %s is NOT a totem spell", spellId);
         }
         return [count, start, ending];
     }
 
-    SummonTotem(spellId: number, atTime: number) {
-        this.profiler.StartProfiling("OvaleTotem_state_SummonTotem");
+    summonTotem(spellId: number, atTime: number) {
+        this.profiler.startProfiling("OvaleTotem_state_SummonTotem");
 
-        const totemSlot = this.GetAvailableTotemSlot(spellId, atTime);
+        const totemSlot = this.getAvailableTotemSlot(spellId, atTime);
         if (totemSlot) {
-            const [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
-            const duration = this.ovaleData.GetSpellInfoProperty(
+            const [name, , icon] = this.ovaleSpellBook.getSpellInfo(spellId);
+            const duration = this.ovaleData.getSpellInfoProperty(
                 spellId,
                 atTime,
                 "duration",
@@ -216,30 +216,30 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             totem.duration = duration || 15;
             totem.icon = icon;
             totem.slot = totemSlot;
-            this.debug.Log(
+            this.debug.log(
                 "Spell ID '%d' summoned a totem in state slot %d",
                 spellId,
                 totemSlot
             );
         }
-        this.profiler.StopProfiling("OvaleTotem_state_SummonTotem");
+        this.profiler.stopProfiling("OvaleTotem_state_SummonTotem");
     }
 
-    GetAvailableTotemSlot(spellId: number, atTime: number): number | undefined {
-        this.profiler.StartProfiling(
+    getAvailableTotemSlot(spellId: number, atTime: number): number | undefined {
+        this.profiler.startProfiling(
             "OvaleTotem_state_GetNextAvailableTotemSlot"
         );
         let availableSlot = undefined;
 
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
-            const [, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
+            const [, , icon] = this.ovaleSpellBook.getSpellInfo(spellId);
 
             for (let i = 1; i <= MAX_TOTEMS + 1; i += 1) {
                 const totem = this.next.totems[i];
                 if (
                     availableSlot == undefined &&
-                    (!this.IsActiveTotem(totem, atTime) ||
+                    (!this.isActiveTotem(totem, atTime) ||
                         (si.max_totems == 1 && totem.icon == icon))
                 ) {
                     availableSlot = i;
@@ -261,7 +261,7 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 }
             }
         }
-        this.profiler.StopProfiling(
+        this.profiler.stopProfiling(
             "OvaleTotem_state_GetNextAvailableTotemSlot"
         );
         return availableSlot;

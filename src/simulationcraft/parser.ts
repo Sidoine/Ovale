@@ -11,17 +11,17 @@ import {
     ParseNode,
     Annotation,
     Modifier,
-    KEYWORD,
-    SPECIAL_ACTION,
+    keywords,
+    specialActions,
     Modifiers,
-    UNARY_OPERATOR,
+    unaryOperators,
     SimcUnaryOperatorType,
-    BINARY_OPERATOR,
+    binaryOperators,
     SimcBinaryOperatorType,
-    FUNCTION_KEYWORD,
-    MODIFIER_KEYWORD,
-    LITTERAL_MODIFIER,
-    RUNE_OPERAND,
+    functionKeywords,
+    modifierKeywords,
+    litteralModifiers,
+    runeOperands,
     ParseNodeWithChilds,
     ActionParseNode,
     ActionListParseNode,
@@ -31,12 +31,12 @@ import {
     NumberParseNode,
 } from "./definitions";
 import { gsub, gmatch, sub } from "@wowts/string";
-import { OvaleDebugClass, Tracer } from "../engine/debug";
+import { DebugTools, Tracer } from "../engine/debug";
 import { concat } from "@wowts/table";
 import { OvalePool } from "../tools/Pool";
 import { checkToken } from "../tools/tools";
 
-const self_childrenPool = new OvalePool<LuaArray<ParseNode> | Modifiers>(
+const childrenPool = new OvalePool<LuaArray<ParseNode> | Modifiers>(
     "OvaleSimulationCraft_childrenPool"
 );
 
@@ -45,22 +45,22 @@ class SelfPool extends OvalePool<ParseNode> {
         super("OvaleSimulationCraft_pool");
     }
 
-    Clean(node: ParseNode) {
+    clean(node: ParseNode) {
         if (
             node.type !== "number" &&
             node.type !== "operand" &&
             node.type !== "action"
         ) {
-            self_childrenPool.Release(node.child);
+            childrenPool.release(node.child);
         }
         wipe(node);
     }
 }
 
-const self_pool = new SelfPool();
+const selfPool = new SelfPool();
 
-function NewNode<T extends ParseNode>(nodeList: LuaArray<ParseNode>) {
-    const node = self_pool.Get() as T;
+function newNode<T extends ParseNode>(nodeList: LuaArray<ParseNode>) {
+    const node = selfPool.get() as T;
     const nodeId = lualength(nodeList) + 1;
     node.nodeId = nodeId;
     nodeList[nodeId] = node;
@@ -70,15 +70,15 @@ function NewNode<T extends ParseNode>(nodeList: LuaArray<ParseNode>) {
 function newNodeWithChild<T extends ParseNodeWithChilds>(
     nodeList: LuaArray<ParseNode>
 ) {
-    const node = self_pool.Get() as T;
+    const node = selfPool.get() as T;
     const nodeId = lualength(nodeList) + 1;
     node.nodeId = nodeId;
     nodeList[nodeId] = node;
-    node.child = self_childrenPool.Get() as typeof node.child;
+    node.child = childrenPool.get() as typeof node.child;
     return node;
 }
 
-const TicksRemainTranslationHelper = function (
+const ticksRemainTranslationHelper = function (
     p1: string,
     p2: string,
     p3: string,
@@ -91,99 +91,99 @@ const TicksRemainTranslationHelper = function (
     }
 };
 
-const TokenizeName: Tokenizer = function (token) {
-    if (KEYWORD[token]) {
+const tokenizeName: Tokenizer = function (token) {
+    if (keywords[token]) {
         return ["keyword", token];
     } else {
         return ["name", token];
     }
 };
-const TokenizeNumber: Tokenizer = function (token) {
+const tokenizeNumber: Tokenizer = function (token) {
     return ["number", token];
 };
-const Tokenize: Tokenizer = function (token) {
+const tokenize: Tokenizer = function (token) {
     return [token, token];
 };
-const NoToken: Tokenizer = function () {
+const noToken: Tokenizer = function () {
     return [undefined, undefined];
 };
-const MATCHES: LuaArray<TokenizerDefinition> = {
+const tokenMatches: LuaArray<TokenizerDefinition> = {
     1: {
         1: "^%d+%a[%w_]*[.:]?[%w_.:]*",
-        2: TokenizeName,
+        2: tokenizeName,
     },
     2: {
         1: "^%d+%.?%d*",
-        2: TokenizeNumber,
+        2: tokenizeNumber,
     },
     3: {
         1: "^[%a_][%w_]*[.:]?[%w_.:]*",
-        2: TokenizeName,
+        2: tokenizeName,
     },
     4: {
         1: "^!=",
-        2: Tokenize,
+        2: tokenize,
     },
     5: {
         1: "^<=",
-        2: Tokenize,
+        2: tokenize,
     },
     6: {
         1: "^>=",
-        2: Tokenize,
+        2: tokenize,
     },
     7: {
         1: "^!~",
-        2: Tokenize,
+        2: tokenize,
     },
     8: {
         1: "^==",
-        2: Tokenize,
+        2: tokenize,
     },
     9: {
         1: "^>%?",
-        2: Tokenize,
+        2: tokenize,
     },
     10: {
         1: "^<%?",
-        2: Tokenize,
+        2: tokenize,
     },
     11: {
         1: "^%%%%",
-        2: Tokenize,
+        2: tokenize,
     },
     12: {
         1: "^.",
-        2: Tokenize,
+        2: tokenize,
     },
     13: {
         1: "^$",
-        2: NoToken,
+        2: noToken,
     },
 };
 
 export class Parser {
     private tracer: Tracer;
-    constructor(ovaleDebug: OvaleDebugClass) {
+    constructor(ovaleDebug: DebugTools) {
         this.tracer = ovaleDebug.create("SimulationCraftParser");
     }
     public release(nodeList: LuaArray<ParseNode>) {
         for (const [, node] of ipairs(nodeList)) {
-            self_pool.Release(node);
+            selfPool.release(node);
         }
     }
 
-    private SyntaxError(
+    private syntaxError(
         tokenStream: OvaleLexer,
         pattern: string,
-        ...__args: unknown[]
+        ...parameters: unknown[]
     ) {
-        this.tracer.Warning(pattern, ...__args);
+        this.tracer.warning(pattern, ...parameters);
         const context: LuaArray<string> = {
             1: "Next tokens:",
         };
         for (let i = 1; i <= 20; i += 1) {
-            const [tokenType, token] = tokenStream.Peek(i);
+            const [tokenType, token] = tokenStream.peek(i);
             if (tokenType && token) {
                 context[lualength(context) + 1] = token;
             } else {
@@ -191,7 +191,7 @@ export class Parser {
                 break;
             }
         }
-        this.tracer.Warning(concat(context, " "));
+        this.tracer.warning(concat(context, " "));
     }
 
     // function filterTargetAuraConditions(node: ParseNode) {
@@ -206,7 +206,7 @@ export class Parser {
     // }
 
     /** Parse an action. An action may has modifiers separated by a comma */
-    private ParseAction(
+    private parseAction(
         action: string,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation,
@@ -230,12 +230,12 @@ export class Parser {
             stream = gsub(
                 stream,
                 "([^_%.])(ticks_remain)(<?=)([0-9]+)",
-                TicksRemainTranslationHelper
+                ticksRemainTranslationHelper
             );
             stream = gsub(
                 stream,
                 "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)",
-                TicksRemainTranslationHelper
+                ticksRemainTranslationHelper
             );
         }
         {
@@ -273,23 +273,27 @@ export class Parser {
             stream = gsub(stream, "sim.target", "sim_target");
         }
 
-        const tokenStream = new OvaleLexer("SimulationCraft", stream, MATCHES);
+        const tokenStream = new OvaleLexer(
+            "SimulationCraft",
+            stream,
+            tokenMatches
+        );
         let name;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!token) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Warning: end of stream when parsing Action"
             );
             return undefined;
         }
         if (
-            (tokenType == "keyword" && SPECIAL_ACTION[token]) ||
+            (tokenType == "keyword" && specialActions[token]) ||
             tokenType == "name"
         ) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.",
                 token,
@@ -298,35 +302,35 @@ export class Parser {
             return undefined;
         }
 
-        const modifiers = self_childrenPool.Get() as Modifiers;
+        const modifiers = childrenPool.get() as Modifiers;
 
-        [tokenType, token] = tokenStream.Peek();
+        [tokenType, token] = tokenStream.peek();
         while (tokenType) {
             if (tokenType == ",") {
-                tokenStream.Consume();
-                const [modifier, expressionNode] = this.ParseModifier(
+                tokenStream.consume();
+                const [modifier, expressionNode] = this.parseModifier(
                     tokenStream,
                     nodeList,
                     annotation
                 );
                 if (modifier && expressionNode) {
                     modifiers[modifier] = expressionNode;
-                    [tokenType, token] = tokenStream.Peek();
+                    [tokenType, token] = tokenStream.peek();
                 } else {
                     return undefined;
                 }
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.",
                     token,
                     action
                 );
-                self_childrenPool.Release(modifiers);
+                childrenPool.release(modifiers);
                 return undefined;
             }
         }
-        const node = NewNode<ActionParseNode>(nodeList);
+        const node = newNode<ActionParseNode>(nodeList);
         node.type = "action";
         node.action = action;
         node.name = name;
@@ -339,22 +343,22 @@ export class Parser {
     }
 
     /** Parse an action list (a series of actions separated by "/""). Returns a ParseNode of type "action_list" */
-    ParseActionList(
+    parseActionList(
         name: string,
         actionList: string,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ) {
-        const child = self_childrenPool.Get() as LuaArray<ActionParseNode>;
+        const child = childrenPool.get() as LuaArray<ActionParseNode>;
         for (const action of gmatch(actionList, "[^/]+")) {
-            const actionNode = this.ParseAction(
+            const actionNode = this.parseAction(
                 action,
                 nodeList,
                 annotation,
                 name
             );
             if (!actionNode) {
-                self_childrenPool.Release(child);
+                childrenPool.release(child);
                 return undefined;
             }
             child[lualength(child) + 1] = actionNode;
@@ -384,14 +388,14 @@ export class Parser {
             //     insert(child, secondNode);
             // }
         }
-        const node = NewNode<ActionListParseNode>(nodeList);
+        const node = newNode<ActionListParseNode>(nodeList);
         node.type = "action_list";
         node.name = name;
         node.child = child;
         return node;
     }
 
-    private ParseExpression(
+    private parseExpression(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation,
@@ -400,18 +404,18 @@ export class Parser {
         minPrecedence = minPrecedence || 0;
         let node;
 
-        const [tokenType, token] = tokenStream.Peek();
+        const [tokenType, token] = tokenStream.peek();
         if (!tokenType) return undefined;
 
         const opInfo: { 1: "logical" | "arithmetic"; 2: number } =
-            UNARY_OPERATOR[token as SimcUnaryOperatorType];
+            unaryOperators[token as SimcUnaryOperatorType];
         if (opInfo) {
             const [opType, precedence] = [opInfo[1], opInfo[2]];
             const asType: "boolean" | "value" =
                 (opType == "logical" && "boolean") || "value";
-            tokenStream.Consume();
+            tokenStream.consume();
             const operator = token as SimcUnaryOperatorType;
-            const rhsNode = this.ParseExpression(
+            const rhsNode = this.parseExpression(
                 tokenStream,
                 nodeList,
                 annotation,
@@ -433,7 +437,7 @@ export class Parser {
                 rhsNode.asType = asType;
             }
         } else {
-            const n = this.ParseSimpleExpression(
+            const n = this.parseSimpleExpression(
                 tokenStream,
                 nodeList,
                 annotation
@@ -447,21 +451,21 @@ export class Parser {
 
         while (true) {
             let keepScanning = false;
-            const [tokenType, token] = tokenStream.Peek();
+            const [tokenType, token] = tokenStream.peek();
             if (!tokenType) {
                 break;
             }
-            const opInfo = BINARY_OPERATOR[token as SimcBinaryOperatorType];
+            const opInfo = binaryOperators[token as SimcBinaryOperatorType];
             if (opInfo) {
                 const [opType, precedence] = [opInfo[1], opInfo[2]];
                 const asType: "boolean" | "value" =
                     (opType == "logical" && "boolean") || "value";
                 if (precedence && precedence > minPrecedence) {
                     keepScanning = true;
-                    tokenStream.Consume();
+                    tokenStream.consume();
                     const operator = token as SimcBinaryOperatorType;
                     const lhsNode = node;
-                    let rhsNode = this.ParseExpression(
+                    let rhsNode = this.parseExpression(
                         tokenStream,
                         nodeList,
                         annotation,
@@ -480,7 +484,7 @@ export class Parser {
                     node.child[2] = rhsNode;
                     lhsNode.asType = asType;
                     if (!rhsNode) {
-                        this.SyntaxError(
+                        this.syntaxError(
                             tokenStream,
                             "Internal error: no right operand in binary operator %s.",
                             token
@@ -491,7 +495,7 @@ export class Parser {
                     while (
                         node.type == rhsNode.type &&
                         node.operator == rhsNode.operator &&
-                        BINARY_OPERATOR[
+                        binaryOperators[
                             node.operator as SimcBinaryOperatorType
                         ][3] == "associative" &&
                         rhsNode.expressionType == "binary"
@@ -503,7 +507,7 @@ export class Parser {
                     }
                 }
             } else if (!node) {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Syntax error: %s of type %s is not a binary operator",
                     token,
@@ -517,49 +521,49 @@ export class Parser {
         }
         return node;
     }
-    private ParseFunction(
+    private parseFunction(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ): ParseNode | undefined {
         let name;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (!token) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Warning: end of stream when parsing Function"
             );
             return undefined;
         }
-        if (tokenType == "keyword" && FUNCTION_KEYWORD[token]) {
+        if (tokenType == "keyword" && functionKeywords[token]) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing FUNCTION; name expected.",
                 token
             );
             return undefined;
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != "(") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing FUNCTION; '(' expected.",
                 token
             );
             return undefined;
         }
-        const argumentNode = this.ParseExpression(
+        const argumentNode = this.parseExpression(
             tokenStream,
             nodeList,
             annotation
         );
         if (!argumentNode) return undefined;
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != ")") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing FUNCTION; ')' expected.",
                 token
@@ -573,20 +577,20 @@ export class Parser {
         node.child[1] = argumentNode;
         return node;
     }
-    private ParseIdentifier(
+    private parseIdentifier(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ): ParseNode | undefined {
-        const [, token] = tokenStream.Consume();
+        const [, token] = tokenStream.consume();
         if (!token) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Warning: end of stream when parsing Identifier"
             );
             return undefined;
         }
-        const node = NewNode<OperandParseNode>(nodeList);
+        const node = newNode<OperandParseNode>(nodeList);
         node.type = "operand";
         node.name = token;
         annotation.operand = annotation.operand || {};
@@ -594,26 +598,26 @@ export class Parser {
         return node;
     }
 
-    private ParseModifier(
+    private parseModifier(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ): [Modifier?, ParseNode?] {
         let name: Modifier;
-        let [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "keyword" && checkToken(MODIFIER_KEYWORD, token)) {
+        let [tokenType, token] = tokenStream.consume();
+        if (tokenType == "keyword" && checkToken(modifierKeywords, token)) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing action line; expression keyword expected.",
                 token
             );
             return [];
         }
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType !== "=") {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing action line; '=' expected.",
                 token
@@ -621,14 +625,14 @@ export class Parser {
             return [];
         }
         let expressionNode: ParseNode | undefined;
-        if (LITTERAL_MODIFIER[name]) {
-            expressionNode = this.ParseIdentifier(
+        if (litteralModifiers[name]) {
+            expressionNode = this.parseIdentifier(
                 tokenStream,
                 nodeList,
                 annotation
             );
         } else {
-            expressionNode = this.ParseExpression(
+            expressionNode = this.parseExpression(
                 tokenStream,
                 nodeList,
                 annotation
@@ -639,36 +643,36 @@ export class Parser {
         }
         return [name, expressionNode];
     }
-    private ParseNumber(
+    private parseNumber(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>
     ): ParseNode | undefined {
         let value;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (tokenType == "number") {
             value = tonumber(token);
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing NUMBER; number expected.",
                 token
             );
             return undefined;
         }
-        const node = NewNode<NumberParseNode>(nodeList);
+        const node = newNode<NumberParseNode>(nodeList);
         node.type = "number";
         node.value = value;
         return node;
     }
-    private ParseOperand(
+    private parseOperand(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ): ParseNode | undefined {
         let name;
-        const [tokenType, token] = tokenStream.Consume();
+        const [tokenType, token] = tokenStream.consume();
         if (!token) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Warning: end of stream when parsing OPERAND"
             );
@@ -682,7 +686,7 @@ export class Parser {
         ) {
             name = token;
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing OPERAND; operand expected.",
                 token
@@ -690,10 +694,10 @@ export class Parser {
             return undefined;
         }
 
-        const node = NewNode<OperandParseNode>(nodeList);
+        const node = newNode<OperandParseNode>(nodeList);
         node.type = "operand";
         node.name = name;
-        node.rune = RUNE_OPERAND[name];
+        node.rune = runeOperands[name];
         if (node.rune) {
             const firstCharacter = sub(name, 1, 1);
             node.includeDeath =
@@ -706,31 +710,31 @@ export class Parser {
         return node;
     }
 
-    private ParseParentheses(
+    private parseParentheses(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ): ParseNode | undefined {
         let leftToken, rightToken;
-        let [tokenType, token] = tokenStream.Consume();
+        let [tokenType, token] = tokenStream.consume();
         if (tokenType == "(") {
             [leftToken, rightToken] = ["(", ")"];
         } else if (tokenType == "{") {
             [leftToken, rightToken] = ["{", "}"];
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.",
                 token
             );
             return undefined;
         }
-        const node = this.ParseExpression(tokenStream, nodeList, annotation);
+        const node = this.parseExpression(tokenStream, nodeList, annotation);
         if (!node) return undefined;
 
-        [tokenType, token] = tokenStream.Consume();
+        [tokenType, token] = tokenStream.consume();
         if (tokenType != rightToken) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.",
                 token,
@@ -743,29 +747,29 @@ export class Parser {
         return node;
     }
 
-    private ParseSimpleExpression(
+    private parseSimpleExpression(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
         annotation: Annotation
     ) {
         let node;
-        const [tokenType, token] = tokenStream.Peek();
+        const [tokenType, token] = tokenStream.peek();
         if (!token) {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Warning: end of stream when parsing SIMPLE EXPRESSION"
             );
             return undefined;
         }
         if (tokenType == "number") {
-            node = this.ParseNumber(tokenStream, nodeList);
+            node = this.parseNumber(tokenStream, nodeList);
         } else if (tokenType == "keyword") {
-            if (FUNCTION_KEYWORD[token]) {
-                node = this.ParseFunction(tokenStream, nodeList, annotation);
+            if (functionKeywords[token]) {
+                node = this.parseFunction(tokenStream, nodeList, annotation);
             } else if (token == "target" || token == "cooldown") {
-                node = this.ParseOperand(tokenStream, nodeList, annotation);
+                node = this.parseOperand(tokenStream, nodeList, annotation);
             } else {
-                this.SyntaxError(
+                this.syntaxError(
                     tokenStream,
                     "Warning: unknown keyword %s when parsing SIMPLE EXPRESSION",
                     token
@@ -773,16 +777,16 @@ export class Parser {
                 return undefined;
             }
         } else if (tokenType == "name") {
-            node = this.ParseOperand(tokenStream, nodeList, annotation);
+            node = this.parseOperand(tokenStream, nodeList, annotation);
         } else if (tokenType == "(") {
-            node = this.ParseParentheses(tokenStream, nodeList, annotation);
+            node = this.parseParentheses(tokenStream, nodeList, annotation);
         } else {
-            this.SyntaxError(
+            this.syntaxError(
                 tokenStream,
                 "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION",
                 token
             );
-            tokenStream.Consume();
+            tokenStream.consume();
             return undefined;
         }
         return node;

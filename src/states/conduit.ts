@@ -5,10 +5,10 @@ import {
     ConditionFunction,
     ConditionResult,
     OvaleConditionClass,
-    ReturnBoolean,
-    ReturnConstant,
+    returnBoolean,
+    returnConstant,
 } from "../engine/condition";
-import { OvaleDebugClass } from "../engine/debug";
+import { DebugTools } from "../engine/debug";
 import { conduits } from "../engine/dbc";
 
 export class Conduit {
@@ -28,19 +28,19 @@ export class Conduit {
         },
     };
 
-    constructor(debug: OvaleDebugClass) {
+    constructor(debug: DebugTools) {
         debug.defaultOptions.args["conduit"] = this.debugOptions;
     }
 
     registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition("conduit", false, this.conduit);
-        condition.RegisterCondition("conduitrank", false, this.conduitRank);
-        condition.RegisterCondition(
+        condition.registerCondition("conduit", false, this.conduit);
+        condition.registerCondition("conduitrank", false, this.conduitRank);
+        condition.registerCondition(
             "enabledsoulbind",
             false,
             this.enabledSoulbind
         );
-        condition.RegisterCondition("soulbind", false, this.enabledSoulbind);
+        condition.registerCondition("soulbind", false, this.enabledSoulbind);
         condition.register(
             "conduitvalue",
             this.conduitValue,
@@ -52,7 +52,7 @@ export class Conduit {
     private conduit: ConditionFunction = (positionalParameters) => {
         const [conduitId] = unpack(positionalParameters);
         const soulbindID = C_Soulbinds.GetActiveSoulbindID();
-        return ReturnBoolean(
+        return returnBoolean(
             C_Soulbinds.IsConduitInstalledInSoulbind(
                 soulbindID,
                 conduitId as number
@@ -64,12 +64,12 @@ export class Conduit {
         const [conduitId] = unpack(positionalParameters);
         const data = C_Soulbinds.GetConduitCollectionData(conduitId as number);
         if (!data) return [];
-        return ReturnConstant(data.conduitRank);
+        return returnConstant(data.conduitRank);
     };
 
     private enabledSoulbind: ConditionFunction = (positionalParameters) => {
         const [soulbindId] = unpack(positionalParameters);
-        return ReturnBoolean(C_Soulbinds.GetActiveSoulbindID() === soulbindId);
+        return returnBoolean(C_Soulbinds.GetActiveSoulbindID() === soulbindId);
     };
 
     private conduitValue = (
@@ -78,6 +78,6 @@ export class Conduit {
     ): ConditionResult => {
         const data = C_Soulbinds.GetConduitCollectionData(conduitId);
         if (!data) return [];
-        return ReturnConstant(conduits[conduitId].ranks[data.conduitRank]);
+        return returnConstant(conduits[conduitId].ranks[data.conduitRank]);
     };
 }

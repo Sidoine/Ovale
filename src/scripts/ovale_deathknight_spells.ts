@@ -1,6 +1,6 @@
 import { OvaleScriptsClass } from "../engine/scripts";
 
-export function registerDeathKnightSpells(OvaleScripts: OvaleScriptsClass) {
+export function registerDeathKnightSpells(scripts: OvaleScriptsClass) {
     const name = "ovale_deathknight_spells";
     const desc = "[9.0] Ovale: Death Knight spells";
 
@@ -440,7 +440,7 @@ Define(lead_by_example_soulbind 342156)
   SpellInfo(summon_gargoyle totem=1)
 `;
 
-    OvaleScripts.RegisterScript(
+    scripts.registerScript(
         "DEATHKNIGHT",
         undefined,
         name,
