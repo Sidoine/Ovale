@@ -403,7 +403,7 @@ AddFunction retributiongetinmeleerange
 
 AddFunction retributiontimetohpg
 {
- spellcooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+ spellcooldown(crusader_strike hammer_of_wrath judgment usable=1)
 }
 
 ### actions.precombat

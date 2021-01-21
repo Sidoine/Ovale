@@ -795,7 +795,7 @@ export class Generator {
             const code = `
                 AddFunction RetributionTimeToHPG
                 {
-                    SpellCooldown(crusader_strike hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+                    SpellCooldown(crusader_strike hammer_of_wrath judgment usable=1)
                 }
             `;
             const [node] = this.ovaleAst.parseCode(
