@@ -69,7 +69,7 @@ AddFunction assassinationinterruptactions
  {
   if target.inrange(kick) and target.isinterruptible() spell(kick)
   if target.inrange(cheap_shot) and not target.classification(worldboss) spell(cheap_shot)
-  if target.inrange(kidney_shot) and not target.classification(worldboss) and combopoints() >= 1 spell(kidney_shot)
+  if target.inrange(kidney_shot) and not target.classification(worldboss) spell(kidney_shot)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
  }
 }
@@ -685,7 +685,7 @@ AddFunction outlawinterruptactions
  {
   if target.inrange(kick) and target.isinterruptible() spell(kick)
   if target.inrange(cheap_shot) and not target.classification(worldboss) spell(cheap_shot)
-  if target.inrange(between_the_eyes) and not target.classification(worldboss) and combopoints() >= 1 spell(between_the_eyes)
+  if target.inrange(kidney_shot) and not target.classification(worldboss) spell(kidney_shot)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
   if target.inrange(gouge) and not target.classification(worldboss) spell(gouge)
  }
@@ -1237,7 +1237,7 @@ AddFunction subtletyinterruptactions
  {
   if target.inrange(kick) and target.isinterruptible() spell(kick)
   if target.inrange(cheap_shot) and not target.classification(worldboss) spell(cheap_shot)
-  if target.inrange(kidney_shot) and not target.classification(worldboss) and combopoints() >= 1 spell(kidney_shot)
+  if target.inrange(kidney_shot) and not target.classification(worldboss) spell(kidney_shot)
   if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
  }
 }
