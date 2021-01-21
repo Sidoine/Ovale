@@ -41,7 +41,8 @@ export class OvaleClass extends ovaleBase {
     //     this.UnregisterMessage("Ovale_OptionChanged");
     //     this.frame.Hide();
     // }
-    handleInitialize() {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    OnInitialize() {
         this.playerGUID = UnitGUID("player") || "error";
         const [, classId] = UnitClass("player");
         this.playerClass = classId || "WARRIOR";
