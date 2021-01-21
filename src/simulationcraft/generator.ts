@@ -493,28 +493,16 @@ export class Generator {
             });
             if (annotation.specialization == "outlaw") {
                 insert(interrupts, {
-                    name: "between_the_eyes",
-                    stun: 1,
-                    order: 30,
-                    extraCondition: "ComboPoints() >= 1",
-                });
-                insert(interrupts, {
                     name: "gouge",
                     incapacitate: 1,
                     order: 100,
                 });
             }
-            if (
-                annotation.specialization == "assassination" ||
-                annotation.specialization == "subtlety"
-            ) {
-                insert(interrupts, {
-                    name: "kidney_shot",
-                    stun: 1,
-                    order: 30,
-                    extraCondition: "ComboPoints() >= 1",
-                });
-            }
+            insert(interrupts, {
+                name: "kidney_shot",
+                stun: 1,
+                order: 30,
+            });
         }
         if (annotation.wind_shear == "SHAMAN") {
             insert(interrupts, {
