@@ -44,7 +44,6 @@ import {
     ConditionFunction,
     OvaleConditionClass,
     ReturnBoolean,
-    ReturnConstant,
 } from "../engine/condition";
 
 const OVALE_SPELLDAMAGE_SCHOOL: LuaObj<number> = {
@@ -260,17 +259,12 @@ export class OvalePaperDollClass
     }
 
     registerConditions(condition: OvaleConditionClass) {
-        condition.RegisterCondition("level", false, this.getLevel);
         condition.RegisterCondition(
             "specialization",
             false,
             this.isSpecialization
         );
     }
-
-    private getLevel: ConditionFunction = () => {
-        return ReturnConstant(this.level);
-    };
 
     private isSpecialization: ConditionFunction = (positional) => {
         const [id] = unpack(positional);

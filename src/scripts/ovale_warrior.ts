@@ -347,12 +347,12 @@ AddFunction arms_defaultshortcdpostconditions
 
 AddFunction arms_defaultcdactions
 {
- armsinterruptactions()
-
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
   #potion
   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
+  #pummel,if=target.debuff.casting.react
+  if target.isinterruptible() armsinterruptactions()
   #blood_fury,if=debuff.colossus_smash.up
   if target.debuffpresent(colossus_smash_debuff) spell(blood_fury_ap)
   #berserking,if=debuff.colossus_smash.remains>6
@@ -731,8 +731,6 @@ AddFunction fury_defaultshortcdpostconditions
 
 AddFunction fury_defaultcdactions
 {
- furyinterruptactions()
-
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
   #run_action_list,name=movement,if=movement.distance>5
@@ -742,6 +740,8 @@ AddFunction fury_defaultcdactions
   {
    #potion
    if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
+   #pummel,if=target.debuff.casting.react
+   if target.isinterruptible() furyinterruptactions()
 
    unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury)
    {

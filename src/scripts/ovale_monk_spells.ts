@@ -287,6 +287,7 @@ Define(potion_of_phantom_fire_item 171349)
 Define(potion_of_spectral_agility_item 171270)
     ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
 Define(charred_passions_runeforge 7076)
+Define(fatal_touch_runeforge 7081)
 Define(coordinated_offensive_conduit 22)
     `;
     // END

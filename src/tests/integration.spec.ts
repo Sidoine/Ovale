@@ -155,6 +155,8 @@ test("sc_t26_shaman_enhancement_vdw", () =>
     integrationTest("sc_t26_shaman_enhancement_vdw"));
 test("sc_t26_warrior_protection", () =>
     integrationTest("sc_t26_warrior_protection"));
+test("sc_t26_mage_frost_fm_trade", () =>
+    integrationTest("sc_t26_mage_frost_fm_trade"));
 test("All scripts are tested", () => {
     const missingScripts: string[] = [];
     for (const [name, script] of pairs(mainIoC.scripts.script)) {

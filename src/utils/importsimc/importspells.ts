@@ -1020,6 +1020,7 @@ export interface SpellData {
     activeClassSpell?: boolean;
     activeSpecSpell?: boolean;
     specializationName: SpecializationName[];
+    specializations?: SpecializationName[];
     nextRank?: SpellData;
     spellAttributes: SpellAttribute[];
     classFlags: number[];
@@ -1747,6 +1748,8 @@ export function getSpellData(directory: string) {
                 const specName = specIdToSpecName.get(specIndex);
                 if (specName) {
                     spell.specializationName.push(specName);
+                    if (!spell.specializations) spell.specializations = [];
+                    spell.specializations.push(specName);
                     spell.activeSpecSpell = true;
                 } else if (specIndex !== 1446) {
                     throw Error(

@@ -303,8 +303,8 @@ AddFunction assassinationdirectmainactions
  if use_filler() and { buffstacks(hidden_blades_buff) >= 19 or not checkboxon(opt_priority_rotation) and enemies(tagged=1) >= 4 + buffpresent(rogue_stealthed_buff) } spell(fan_of_knives)
  #fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
  if not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) >= 3 } spell(fan_of_knives)
- #ambush,if=variable.use_filler
- if use_filler() spell(ambush)
+ #ambush,if=variable.use_filler&(master_assassin_remains=0|buff.blindside.up)
+ if use_filler() and { buffremaining(master_assassin_buff) == 0 or buffpresent(blindside_buff) } spell(ambush)
  #mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
  if not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) == 2 } spell(mutilate)
  #mutilate,if=variable.use_filler
@@ -326,7 +326,7 @@ AddFunction assassinationdirectshortcdactions
 
 AddFunction assassinationdirectshortcdpostconditions
 {
- combopoints() >= 4 + talentpoints(deeper_stratagem_talent) and { target.debuffpresent(vendetta) or target.debuffpresent(shiv_debuff) or energydeficit() <= 25 + energy_regen_combined() or not single_target() } and { not hastalent(exsanguinate_talent) or spellcooldown(exsanguinate) > 2 } and spell(envenom) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 or enabledsoulbind(lead_by_example_soulbind) and not buffpresent(lead_by_example_buff) } and spell(serrated_bone_spike) or use_filler() and { buffstacks(hidden_blades_buff) >= 19 or not checkboxon(opt_priority_rotation) and enemies(tagged=1) >= 4 + buffpresent(rogue_stealthed_buff) } and spell(fan_of_knives) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) >= 3 } and spell(fan_of_knives) or use_filler() and spell(ambush) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) == 2 } and spell(mutilate) or use_filler() and spell(mutilate)
+ combopoints() >= 4 + talentpoints(deeper_stratagem_talent) and { target.debuffpresent(vendetta) or target.debuffpresent(shiv_debuff) or energydeficit() <= 25 + energy_regen_combined() or not single_target() } and { not hastalent(exsanguinate_talent) or spellcooldown(exsanguinate) > 2 } and spell(envenom) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 or enabledsoulbind(lead_by_example_soulbind) and not buffpresent(lead_by_example_buff) } and spell(serrated_bone_spike) or use_filler() and { buffstacks(hidden_blades_buff) >= 19 or not checkboxon(opt_priority_rotation) and enemies(tagged=1) >= 4 + buffpresent(rogue_stealthed_buff) } and spell(fan_of_knives) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) >= 3 } and spell(fan_of_knives) or use_filler() and { buffremaining(master_assassin_buff) == 0 or buffpresent(blindside_buff) } and spell(ambush) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) == 2 } and spell(mutilate) or use_filler() and spell(mutilate)
 }
 
 AddFunction assassinationdirectcdactions
@@ -335,7 +335,7 @@ AddFunction assassinationdirectcdactions
 
 AddFunction assassinationdirectcdpostconditions
 {
- combopoints() >= 4 + talentpoints(deeper_stratagem_talent) and { target.debuffpresent(vendetta) or target.debuffpresent(shiv_debuff) or energydeficit() <= 25 + energy_regen_combined() or not single_target() } and { not hastalent(exsanguinate_talent) or spellcooldown(exsanguinate) > 2 } and spell(envenom) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 or enabledsoulbind(lead_by_example_soulbind) and not buffpresent(lead_by_example_buff) } and spell(serrated_bone_spike) or use_filler() and { buffstacks(hidden_blades_buff) >= 19 or not checkboxon(opt_priority_rotation) and enemies(tagged=1) >= 4 + buffpresent(rogue_stealthed_buff) } and spell(fan_of_knives) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) >= 3 } and spell(fan_of_knives) or use_filler() and spellcooldown(vendetta) > 10 and spell(echoing_reprimand) or use_filler() and spell(ambush) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) == 2 } and spell(mutilate) or use_filler() and spell(mutilate)
+ combopoints() >= 4 + talentpoints(deeper_stratagem_talent) and { target.debuffpresent(vendetta) or target.debuffpresent(shiv_debuff) or energydeficit() <= 25 + energy_regen_combined() or not single_target() } and { not hastalent(exsanguinate_talent) or spellcooldown(exsanguinate) > 2 } and spell(envenom) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 or enabledsoulbind(lead_by_example_soulbind) and not buffpresent(lead_by_example_buff) } and spell(serrated_bone_spike) or use_filler() and { buffstacks(hidden_blades_buff) >= 19 or not checkboxon(opt_priority_rotation) and enemies(tagged=1) >= 4 + buffpresent(rogue_stealthed_buff) } and spell(fan_of_knives) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) >= 3 } and spell(fan_of_knives) or use_filler() and spellcooldown(vendetta) > 10 and spell(echoing_reprimand) or use_filler() and { buffremaining(master_assassin_buff) == 0 or buffpresent(blindside_buff) } and spell(ambush) or not target.debuffpresent(deadly_poison) and { use_filler() and enemies(tagged=1) == 2 } and spell(mutilate) or use_filler() and spell(mutilate)
 }
 
 ### actions.cds
@@ -589,6 +589,7 @@ AddIcon enabled=(checkboxon(opt_rogue_assassination_aoe) and specialization(assa
 # arcane_torrent
 # bag_of_tricks
 # berserking
+# blindside_buff
 # blood_fury_ap
 # bloodlust
 # cheap_shot
@@ -653,7 +654,7 @@ AddIcon enabled=(checkboxon(opt_rogue_assassination_aoe) and specialization(assa
 # Based on SimulationCraft profile "T26_Rogue_Outlaw".
 #	class=rogue
 #	spec=outlaw
-#	talents=2020022
+#	talents=3030022
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
@@ -885,8 +886,10 @@ AddFunction outlawcdscdactions
      spell(fireblood)
      #ancestral_call
      spell(ancestral_call)
-     #use_items,if=debuff.between_the_eyes.up&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)|fight_remains<=20
-     if target.debuffpresent(between_the_eyes) and { not hastalent(ghostly_strike_talent) or target.debuffpresent(ghostly_strike) } or fightremains() <= 20 outlawuseitemactions()
+     #use_items,slots=trinket1,if=!runeforge.mark_of_the_master_assassin&debuff.between_the_eyes.up&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)|master_assassin_remains>0|trinket.1.has_stat.any|fight_remains<=20
+     if not runeforge(mark_of_the_master_assassin_runeforge) and target.debuffpresent(between_the_eyes) and { not hastalent(ghostly_strike_talent) or target.debuffpresent(ghostly_strike) } or buffremaining(master_assassin_buff) > 0 or false or fightremains() <= 20 outlawuseitemactions()
+     #use_items,slots=trinket2,if=!runeforge.mark_of_the_master_assassin&debuff.between_the_eyes.up&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)|master_assassin_remains>0|trinket.2.has_stat.any|fight_remains<=20
+     if not runeforge(mark_of_the_master_assassin_runeforge) and target.debuffpresent(between_the_eyes) and { not hastalent(ghostly_strike_talent) or target.debuffpresent(ghostly_strike) } or buffremaining(master_assassin_buff) > 0 or false or fightremains() <= 20 outlawuseitemactions()
     }
    }
   }
@@ -906,8 +909,8 @@ AddFunction outlawbuildmainactions
  if runeforge(tiny_toxic_blade_runeforge) spell(shiv)
  #serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
  if buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 spell(serrated_bone_spike)
- #pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled)
- if buffpresent(opportunity_buff) and { energy() < 45 or hastalent(quick_draw_talent) } spell(pistol_shot)
+ #pistol_shot,if=buff.opportunity.up&(energy.deficit>(energy.regen+10)|combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled)
+ if buffpresent(opportunity_buff) and { energydeficit() > energyregenrate() + 10 or combopointsdeficit() <= 1 + buffpresent(broadside_buff) or hastalent(quick_draw_talent) } spell(pistol_shot)
  #pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
  if buffpresent(opportunity_buff) and { buffpresent(greenskins_wickers_buff) or buffpresent(concealed_blunderbuss_buff) } spell(pistol_shot)
  #sinister_strike
@@ -936,7 +939,7 @@ AddFunction outlawbuildshortcdactions
 
 AddFunction outlawbuildshortcdpostconditions
 {
- runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity_buff) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity_buff) and { buffpresent(greenskins_wickers_buff) or buffpresent(concealed_blunderbuss_buff) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(gouge)
+ runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity_buff) and { energydeficit() > energyregenrate() + 10 or combopointsdeficit() <= 1 + buffpresent(broadside_buff) or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity_buff) and { buffpresent(greenskins_wickers_buff) or buffpresent(concealed_blunderbuss_buff) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(gouge)
 }
 
 AddFunction outlawbuildcdactions
@@ -945,7 +948,7 @@ AddFunction outlawbuildcdactions
 
 AddFunction outlawbuildcdpostconditions
 {
- spell(sepsis) or spell(ghostly_strike) or runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or spell(echoing_reprimand) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity_buff) and { energy() < 45 or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity_buff) and { buffpresent(greenskins_wickers_buff) or buffpresent(concealed_blunderbuss_buff) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(gouge)
+ spell(sepsis) or spell(ghostly_strike) or runeforge(tiny_toxic_blade_runeforge) and spell(shiv) or spell(echoing_reprimand) or { buffpresent(slice_and_dice) and not target.debuffpresent(serrated_bone_spike) or fightremains() <= 5 or spellcharges(serrated_bone_spike count=0) >= 2.75 } and spell(serrated_bone_spike) or buffpresent(opportunity_buff) and { energydeficit() > energyregenrate() + 10 or combopointsdeficit() <= 1 + buffpresent(broadside_buff) or hastalent(quick_draw_talent) } and spell(pistol_shot) or buffpresent(opportunity_buff) and { buffpresent(greenskins_wickers_buff) or buffpresent(concealed_blunderbuss_buff) } and spell(pistol_shot) or spell(sinister_strike_outlaw) or hastalent(dirty_tricks_talent) and combopointsdeficit() >= 1 + buffpresent(broadside_buff) and spell(gouge)
 }
 
 ### actions.default
@@ -1146,6 +1149,7 @@ AddIcon enabled=(checkboxon(opt_rogue_outlaw_aoe) and specialization(outlaw)) he
 # killing_spree
 # killing_spree_talent
 # lights_judgment
+# mark_of_the_master_assassin_runeforge
 # marked_for_death
 # master_assassin_buff
 # opportunity_buff

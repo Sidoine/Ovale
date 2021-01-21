@@ -361,6 +361,9 @@ Define(siphon_storm_buff 332934)
   SpellInfo(siphon_storm_buff duration=30 max_stacks=6 gcd=0 offgcd=1)
   # Intellect increased by s1
   SpellAddBuff(siphon_storm_buff siphon_storm_buff add=1)
+Define(slick_ice_buff 327509)
+# While Icy Veins is active, each Frostbolt you cast reduces the cast time of Frostbolt by 327509s1 and increases its damage by 327509s2, stacking up to 327509u times.
+  SpellInfo(slick_ice_buff duration=60 max_stacks=10 gcd=0 offgcd=1)
 Define(soul_ignition_buff 345211)
 # Activate Soul Igniter, sacrificing up to 345214s1 health over 15 seconds to empower Blazing Surge.rnrnReactivate to cast Blazing Surge, dealing 345214s2*(1+@versadmg) Fire damage split between enemies in a 345215a1 yd cone, plus up to 345214s4 additional damage, based on how long Soul Igniter was active.rnrnDamage is increased per enemy struck, up to s2 enemies. (1 min Cooldown)
   SpellInfo(soul_ignition_buff duration=15 gcd=0 offgcd=1 tick=1)

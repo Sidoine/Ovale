@@ -57,6 +57,11 @@ Define(blade_rush 271877)
 # Charge to your target with your blades out, dealing 271881sw1*271881s2/100 Physical damage to the target and 271881sw1 to all other nearby enemies.rnrnWhile Blade Flurry is active, damage to non-primary targets is increased by s1.rnrn|cFFFFFFFFGenerates 271896s1*5 seconds/271896t1 Energy over 5 seconds.
   SpellInfo(blade_rush cd=45 gcd=1)
   SpellRequire(blade_rush unusable set=1 enabled=(not hastalent(blade_rush_talent)))
+Define(blindside_buff 121153)
+# Exploits the vulnerability of foes with less than s4 health, dealing s2 Physical damage to the target.rnrnMutilate has a s5 chance to make your next Blindside free and usable on any target, regardless of their health.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
+  SpellInfo(blindside_buff duration=10 gcd=0 offgcd=1)
+  # Ambush is free and usable without Stealth.
+  SpellAddBuff(blindside_buff blindside_buff add=1)
 Define(blood_fury_ap 20572)
 # Increases your attack power by s1 for 15 seconds.
   SpellInfo(blood_fury_ap cd=120 duration=15 gcd=0 offgcd=1)

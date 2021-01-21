@@ -144,17 +144,18 @@ function hasAttribute(spell: SpellData, attribute: SpellAttributes) {
     return (spell.attributes[i] & (1 << bit)) > 0;
 }
 
-function getConditions(replacedBy: SpellData) {
+function getConditions(spell: SpellData) {
     let conditions: CustomSpellRequireCondition[] = [];
-    if (replacedBy.talent) {
-        for (const talent of replacedBy.talent) {
+    if (spell.talent) {
+        for (const talent of spell.talent) {
             conditions.push({
                 condition: "hastalent",
                 talent,
             });
         }
-    } else if (replacedBy.specializationName.length > 0) {
-        for (const specializationName of replacedBy.specializationName) {
+    }
+    if (spell.specializations) {
+        for (const specializationName of spell.specializations) {
             conditions.push({
                 condition: "specialization",
                 specializationName,

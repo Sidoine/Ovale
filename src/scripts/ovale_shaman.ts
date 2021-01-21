@@ -1280,8 +1280,8 @@ AddFunction enhancementsingleshortcdactions
 
    unless buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
    {
-    #chain_harvest,if=buff.maelstrom_weapon.stack>=5
-    if buffstacks(maelstrom_weapon_buff) >= 5 spell(chain_harvest)
+    #chain_harvest,if=buff.maelstrom_weapon.stack>=5&raid_event.adds.in>=90
+    if buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 spell(chain_harvest)
 
     unless buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike)
     {
@@ -1311,7 +1311,7 @@ AddFunction enhancementsinglecdactions
   #fae_transfusion
   spell(fae_transfusion)
 
-  unless buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt)
+  unless buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt)
   {
    #earth_elemental
    spell(earth_elemental)
@@ -1321,7 +1321,7 @@ AddFunction enhancementsinglecdactions
 
 AddFunction enhancementsinglecdpostconditions
 {
- spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.precombat
@@ -1504,7 +1504,7 @@ AddFunction enhancementaoecdpostconditions
 AddFunction enhancement_defaultmainactions
 {
  #heart_essence
- spell(296208)
+ if hasequippeditem(158075) and level() < 50 spell(296208)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
  if equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } spell(windfury_totem)
  #call_action_list,name=single,if=active_enemies=1
@@ -1527,7 +1527,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208)
+ unless hasequippeditem(158075) and level() < 50 and spell(296208)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -1548,7 +1548,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ hasequippeditem(158075) and level() < 50 and spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -1560,7 +1560,7 @@ AddFunction enhancement_defaultcdactions
  #wind_shear
  enhancementinterruptactions()
 
- unless spell(296208)
+ unless hasequippeditem(158075) and level() < 50 and spell(296208)
  {
   #use_items
   enhancementuseitemactions()
@@ -1599,7 +1599,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ hasequippeditem(158075) and level() < 50 and spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.
@@ -1827,8 +1827,8 @@ AddFunction enhancementsingleshortcdactions
 
    unless buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast)
    {
-    #chain_harvest,if=buff.maelstrom_weapon.stack>=5
-    if buffstacks(maelstrom_weapon_buff) >= 5 spell(chain_harvest)
+    #chain_harvest,if=buff.maelstrom_weapon.stack>=5&raid_event.adds.in>=90
+    if buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 spell(chain_harvest)
 
     unless buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike)
     {
@@ -1858,7 +1858,7 @@ AddFunction enhancementsinglecdactions
   #fae_transfusion
   spell(fae_transfusion)
 
-  unless buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt)
+  unless buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt)
   {
    #earth_elemental
    spell(earth_elemental)
@@ -1868,7 +1868,7 @@ AddFunction enhancementsinglecdactions
 
 AddFunction enhancementsinglecdpostconditions
 {
- spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
+ spell(windstrike) or not buffpresent(primordial_wave_buff) and spell(primordial_wave) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(stormstrike) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(crash_lightning) or equippedruneforge(doom_winds_runeforge) and buffpresent(doom_winds_buff) and spell(ice_strike) or not target.debuffpresent(flame_shock) and spell(flame_shock) or spell(vesper_totem) or buffpresent(hailstorm_buff) and spell(frost_shock) or spell(earthen_spike) or buffpresent(stormkeeper_enhancement) and spell(lightning_bolt) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(elemental_blast) or buffstacks(maelstrom_weapon_buff) >= 5 and 600 >= 90 and spell(chain_harvest) or buffstacks(maelstrom_weapon_buff) == 10 and spell(lightning_bolt) or { buffpresent(hot_hand_buff) or equippedruneforge(primal_lava_actuators_runeforge) and buffstacks(primal_lava_actuators_buff) > 6 } and spell(lava_lash) or spell(stormstrike) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(stormkeeper_enhancement) or spell(lava_lash) or spell(crash_lightning) or target.refreshable(flame_shock) and spell(flame_shock) or spell(frost_shock) or spell(ice_strike) or 600 >= 40 and spell(sundering) or debuffcountonany(flame_shock) and spell(fire_nova) or buffstacks(maelstrom_weapon_buff) >= 5 and spell(lightning_bolt) or buffremaining(windfury_totem) < 30 and spell(windfury_totem)
 }
 
 ### actions.precombat
@@ -2051,7 +2051,7 @@ AddFunction enhancementaoecdpostconditions
 AddFunction enhancement_defaultmainactions
 {
  #heart_essence
- spell(296208)
+ if hasequippeditem(158075) and level() < 50 spell(296208)
  #windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
  if equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } spell(windfury_totem)
  #call_action_list,name=single,if=active_enemies=1
@@ -2074,7 +2074,7 @@ AddFunction enhancement_defaultshortcdactions
  #auto_attack
  enhancementgetinmeleerange()
 
- unless spell(296208)
+ unless hasequippeditem(158075) and level() < 50 and spell(296208)
  {
   #bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
   if not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) spell(bag_of_tricks)
@@ -2095,7 +2095,7 @@ AddFunction enhancement_defaultshortcdactions
 
 AddFunction enhancement_defaultshortcdpostconditions
 {
- spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
+ hasequippeditem(158075) and level() < 50 and spell(296208) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsingleshortcdpostconditions() or enemies() > 1 and enhancementaoeshortcdpostconditions()
 }
 
 AddFunction enhancement_defaultcdactions
@@ -2107,7 +2107,7 @@ AddFunction enhancement_defaultcdactions
  #wind_shear
  enhancementinterruptactions()
 
- unless spell(296208)
+ unless hasequippeditem(158075) and level() < 50 and spell(296208)
  {
   #use_items
   enhancementuseitemactions()
@@ -2146,7 +2146,7 @@ AddFunction enhancement_defaultcdactions
 
 AddFunction enhancement_defaultcdpostconditions
 {
- spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
+ hasequippeditem(158075) and level() < 50 and spell(296208) or { not hastalent(ascendance_talent_enhancement) or not buffpresent(ascendance_enhancement) } and spell(bag_of_tricks) or equippedruneforge(doom_winds_runeforge) and buffexpires(doom_winds) and { 600 >= 60 or enemies() > 1 } and spell(windfury_totem) or enemies() == 1 and enhancementsinglecdpostconditions() or enemies() > 1 and enhancementaoecdpostconditions()
 }
 
 ### Enhancement icons.

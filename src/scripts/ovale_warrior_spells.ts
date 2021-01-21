@@ -18,7 +18,7 @@ Define(arcane_torrent 25046)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 gcd=0 offgcd=1 rage=-20)
-  SpellRequire(avatar unusable set=1 enabled=(not hastalent(avatar_talent)))
+  SpellRequire(avatar unusable set=1 enabled=(not {hastalent(avatar_talent) or specialization("protection")}))
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar add=1)
 Define(bag_of_tricks 312411)

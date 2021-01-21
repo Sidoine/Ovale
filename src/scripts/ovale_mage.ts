@@ -2136,7 +2136,7 @@ AddFunction frostprecombatshortcdactions
  unless buffexpires(arcane_intellect) and spell(arcane_intellect)
  {
   #summon_water_elemental
-  if not pet.present() spell(summon_water_elemental)
+  spell(summon_water_elemental)
  }
 }
 
@@ -2151,7 +2151,7 @@ AddFunction frostprecombatcdactions
 
 AddFunction frostprecombatcdpostconditions
 {
- buffexpires(arcane_intellect) and spell(arcane_intellect) or not pet.present() and spell(summon_water_elemental) or spell(frostbolt)
+ buffexpires(arcane_intellect) and spell(arcane_intellect) or spell(summon_water_elemental) or spell(frostbolt)
 }
 
 ### actions.movement
@@ -2225,8 +2225,8 @@ AddFunction frostcdscdactions
 
  unless enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } and spell(mirrors_of_torment) or spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) and spell(rune_of_power)
  {
-  #icy_veins,if=buff.rune_of_power.down
-  if buffexpires(rune_of_power_buff) spell(icy_veins)
+  #icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
+  if buffexpires(rune_of_power_buff) and { buffexpires(icy_veins) or hastalent(rune_of_power_talent) } and { buffexpires(slick_ice_buff) or enemies() >= 2 } spell(icy_veins)
   #time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<30)
   if runeforge(temporal_warp_runeforge) and debuffpresent(exhaustion_debuff) and { previousoffgcdspell(icy_veins) or fightremains() < 30 } and { checkboxon(opt_time_warp) and debuffexpires(burst_haste_debuff any=1) } spell(time_warp)
   #use_items
@@ -2497,8 +2497,530 @@ AddIcon enabled=(checkboxon(opt_mage_frost_aoe) and specialization(frost)) help=
 # ray_of_frost
 # rune_of_power
 # rune_of_power_buff
+# rune_of_power_talent
 # shifting_power
 # siphoned_malice_conduit
+# slick_ice_buff
+# splitting_ice_talent
+# summon_water_elemental
+# temporal_warp_runeforge
+# time_warp
+# wasteland_propriety_soulbind
+# winters_chill_debuff
+`;
+        OvaleScripts.RegisterScript(
+            "MAGE",
+            "frost",
+            name,
+            desc,
+            code,
+            "script"
+        );
+    }
+
+    {
+        const name = "sc_t26_mage_frost_fm_trade";
+        const desc = "[9.0] Simulationcraft: T26_Mage_Frost_FM_Trade";
+        const code = `
+# Based on SimulationCraft profile "T26_Mage_Frost_FM_Trade".
+#	class=mage
+#	spec=frost
+#	talents=2022021
+
+Include(ovale_common)
+Include(ovale_mage_spells)
+
+AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(frost)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(frost)))
+AddCheckBox(opt_time_warp spellname(time_warp) enabled=(specialization(frost)))
+AddCheckBox(opt_blink spellname(blink) enabled=(specialization(frost)))
+
+AddFunction frostinterruptactions
+{
+ if checkboxon(opt_interrupt) and not target.isfriend() and target.casting()
+ {
+  if target.inrange(counterspell) and target.isinterruptible() spell(counterspell)
+  if target.inrange(quaking_palm) and not target.classification(worldboss) spell(quaking_palm)
+ }
+}
+
+AddFunction frostuseitemactions
+{
+ item(trinket0slot text=13 usable=1)
+ item(trinket1slot text=14 usable=1)
+}
+
+### actions.st
+
+AddFunction froststmainactions
+{
+ #flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!conduit.ire_of_the_ascended|cooldown.radiant_spark.remains|runeforge.freezing_winds)|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
+ if { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and { previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) and { not conduit(ire_of_the_ascended_conduit) or spellcooldown(radiant_spark) > 0 or runeforge(freezing_winds_runeforge) } or previousgcdspell(radiant_spark) or buffstacks(fingers_of_frost_buff) == 0 and { target.debuffpresent(mirrors_of_torment) or buffpresent(freezing_winds_buff) or buffpresent(expanded_potential_buff) } } } spell(flurry)
+ #blizzard,if=buff.freezing_rain.up|active_enemies>=2|runeforge.glacial_fragments&remaining_winters_chill=2
+ if buffpresent(freezing_rain_buff) or enemies() >= 2 or runeforge(glacial_fragments_runeforge) and debuffstacks(winters_chill_debuff) == 2 spell(blizzard)
+ #glacial_spike,if=remaining_winters_chill&debuff.winters_chill.remains>cast_time+travel_time
+ if debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > casttime(glacial_spike) + traveltime(glacial_spike) spell(glacial_spike)
+ #ice_lance,if=remaining_winters_chill&remaining_winters_chill>buff.fingers_of_frost.react&debuff.winters_chill.remains>travel_time
+ if debuffstacks(winters_chill_debuff) and debuffstacks(winters_chill_debuff) > buffstacks(fingers_of_frost_buff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) spell(ice_lance)
+ #ice_nova
+ spell(ice_nova)
+ #ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
+ if buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) spell(ice_lance)
+ #arcane_explosion,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
+ if runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_arcane_buff) spell(arcane_explosion)
+ #fire_blast,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
+ if runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) spell(fire_blast)
+ #glacial_spike,if=buff.brain_freeze.react
+ if buffpresent(brain_freeze_buff) spell(glacial_spike)
+ #frostbolt
+ spell(frostbolt)
+}
+
+AddFunction froststmainpostconditions
+{
+}
+
+AddFunction froststshortcdactions
+{
+ unless { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and { previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) and { not conduit(ire_of_the_ascended_conduit) or spellcooldown(radiant_spark) > 0 or runeforge(freezing_winds_runeforge) } or previousgcdspell(radiant_spark) or buffstacks(fingers_of_frost_buff) == 0 and { target.debuffpresent(mirrors_of_torment) or buffpresent(freezing_winds_buff) or buffpresent(expanded_potential_buff) } } } and spell(flurry)
+ {
+  #frozen_orb
+  spell(frozen_orb)
+
+  unless { buffpresent(freezing_rain_buff) or enemies() >= 2 or runeforge(glacial_fragments_runeforge) and debuffstacks(winters_chill_debuff) == 2 } and spell(blizzard)
+  {
+   #ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
+   if debuffstacks(winters_chill_debuff) == 1 and target.debuffpresent(winters_chill_debuff) spell(ray_of_frost)
+
+   unless debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or debuffstacks(winters_chill_debuff) and debuffstacks(winters_chill_debuff) > buffstacks(fingers_of_frost_buff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) and spell(ice_lance)
+   {
+    #comet_storm
+    spell(comet_storm)
+
+    unless spell(ice_nova)
+    {
+     #radiant_spark,if=buff.freezing_winds.up&active_enemies=1
+     if buffpresent(freezing_winds_buff) and enemies() == 1 spell(radiant_spark)
+
+     unless { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) } and spell(ice_lance)
+     {
+      #ebonbolt
+      spell(ebonbolt)
+      #radiant_spark,if=(!runeforge.freezing_winds|active_enemies>=2)&buff.brain_freeze.react
+      if { not runeforge(freezing_winds_runeforge) or enemies() >= 2 } and buffpresent(brain_freeze_buff) spell(radiant_spark)
+      #mirrors_of_torment
+      spell(mirrors_of_torment)
+      #shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies>=2)
+      if buffexpires(rune_of_power_buff) and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() >= 2 } spell(shifting_power)
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction froststshortcdpostconditions
+{
+ { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and { previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) and { not conduit(ire_of_the_ascended_conduit) or spellcooldown(radiant_spark) > 0 or runeforge(freezing_winds_runeforge) } or previousgcdspell(radiant_spark) or buffstacks(fingers_of_frost_buff) == 0 and { target.debuffpresent(mirrors_of_torment) or buffpresent(freezing_winds_buff) or buffpresent(expanded_potential_buff) } } } and spell(flurry) or { buffpresent(freezing_rain_buff) or enemies() >= 2 or runeforge(glacial_fragments_runeforge) and debuffstacks(winters_chill_debuff) == 2 } and spell(blizzard) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or debuffstacks(winters_chill_debuff) and debuffstacks(winters_chill_debuff) > buffstacks(fingers_of_frost_buff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) and spell(ice_lance) or spell(ice_nova) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) } and spell(ice_lance) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze_buff) and spell(glacial_spike) or spell(frostbolt)
+}
+
+AddFunction froststcdactions
+{
+}
+
+AddFunction froststcdpostconditions
+{
+ { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and { previousgcdspell(glacial_spike) or previousgcdspell(frostbolt) and { not conduit(ire_of_the_ascended_conduit) or spellcooldown(radiant_spark) > 0 or runeforge(freezing_winds_runeforge) } or previousgcdspell(radiant_spark) or buffstacks(fingers_of_frost_buff) == 0 and { target.debuffpresent(mirrors_of_torment) or buffpresent(freezing_winds_buff) or buffpresent(expanded_potential_buff) } } } and spell(flurry) or spell(frozen_orb) or { buffpresent(freezing_rain_buff) or enemies() >= 2 or runeforge(glacial_fragments_runeforge) and debuffstacks(winters_chill_debuff) == 2 } and spell(blizzard) or debuffstacks(winters_chill_debuff) == 1 and target.debuffpresent(winters_chill_debuff) and spell(ray_of_frost) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > casttime(glacial_spike) + traveltime(glacial_spike) and spell(glacial_spike) or debuffstacks(winters_chill_debuff) and debuffstacks(winters_chill_debuff) > buffstacks(fingers_of_frost_buff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) and spell(ice_lance) or spell(comet_storm) or spell(ice_nova) or buffpresent(freezing_winds_buff) and enemies() == 1 and spell(radiant_spark) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) } and spell(ice_lance) or spell(ebonbolt) or { not runeforge(freezing_winds_runeforge) or enemies() >= 2 } and buffpresent(brain_freeze_buff) and spell(radiant_spark) or spell(mirrors_of_torment) or buffexpires(rune_of_power_buff) and { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or enemies() >= 2 } and spell(shifting_power) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_arcane_buff) and spell(arcane_explosion) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or buffpresent(brain_freeze_buff) and spell(glacial_spike) or spell(frostbolt)
+}
+
+### actions.precombat
+
+AddFunction frostprecombatmainactions
+{
+ #flask
+ #food
+ #augmentation
+ #arcane_intellect
+ if buffexpires(arcane_intellect) spell(arcane_intellect)
+ #snapshot_stats
+ #frostbolt
+ spell(frostbolt)
+}
+
+AddFunction frostprecombatmainpostconditions
+{
+}
+
+AddFunction frostprecombatshortcdactions
+{
+ unless buffexpires(arcane_intellect) and spell(arcane_intellect)
+ {
+  #summon_water_elemental
+  spell(summon_water_elemental)
+ }
+}
+
+AddFunction frostprecombatshortcdpostconditions
+{
+ buffexpires(arcane_intellect) and spell(arcane_intellect) or spell(frostbolt)
+}
+
+AddFunction frostprecombatcdactions
+{
+}
+
+AddFunction frostprecombatcdpostconditions
+{
+ buffexpires(arcane_intellect) and spell(arcane_intellect) or spell(summon_water_elemental) or spell(frostbolt)
+}
+
+### actions.movement
+
+AddFunction frostmovementmainactions
+{
+ #blink_any,if=movement.distance>10
+ if target.distance() > 10 and checkboxon(opt_blink) spell(blink)
+ #ice_floes,if=buff.ice_floes.down
+ if buffexpires(ice_floes) and speed() > 0 spell(ice_floes)
+ #arcane_explosion,if=mana.pct>30&active_enemies>=2
+ if manapercent() > 30 and enemies() >= 2 spell(arcane_explosion)
+ #fire_blast
+ spell(fire_blast)
+ #ice_lance
+ spell(ice_lance)
+}
+
+AddFunction frostmovementmainpostconditions
+{
+}
+
+AddFunction frostmovementshortcdactions
+{
+}
+
+AddFunction frostmovementshortcdpostconditions
+{
+ target.distance() > 10 and checkboxon(opt_blink) and spell(blink) or buffexpires(ice_floes) and speed() > 0 and spell(ice_floes) or manapercent() > 30 and enemies() >= 2 and spell(arcane_explosion) or spell(fire_blast) or spell(ice_lance)
+}
+
+AddFunction frostmovementcdactions
+{
+}
+
+AddFunction frostmovementcdpostconditions
+{
+ target.distance() > 10 and checkboxon(opt_blink) and spell(blink) or buffexpires(ice_floes) and speed() > 0 and spell(ice_floes) or manapercent() > 30 and enemies() >= 2 and spell(arcane_explosion) or spell(fire_blast) or spell(ice_lance)
+}
+
+### actions.cds
+
+AddFunction frostcdsmainactions
+{
+}
+
+AddFunction frostcdsmainpostconditions
+{
+}
+
+AddFunction frostcdsshortcdactions
+{
+ #mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice|soulbind.wasteland_propriety)
+ if enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } spell(mirrors_of_torment)
+ #rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
+ if spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) spell(rune_of_power)
+ #bag_of_tricks
+ spell(bag_of_tricks)
+}
+
+AddFunction frostcdsshortcdpostconditions
+{
+}
+
+AddFunction frostcdscdactions
+{
+ #potion,if=prev_off_gcd.icy_veins|fight_remains<30
+ if { previousoffgcdspell(icy_veins) or fightremains() < 30 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
+ #deathborne
+ spell(deathborne)
+
+ unless enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } and spell(mirrors_of_torment) or spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) and spell(rune_of_power)
+ {
+  #icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
+  if buffexpires(rune_of_power_buff) and { buffexpires(icy_veins) or hastalent(rune_of_power_talent) } and { buffexpires(slick_ice_buff) or enemies() >= 2 } spell(icy_veins)
+  #time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<30)
+  if runeforge(temporal_warp_runeforge) and debuffpresent(exhaustion_debuff) and { previousoffgcdspell(icy_veins) or fightremains() < 30 } and { checkboxon(opt_time_warp) and debuffexpires(burst_haste_debuff any=1) } spell(time_warp)
+  #use_items
+  frostuseitemactions()
+  #blood_fury
+  spell(blood_fury_int)
+  #berserking
+  spell(berserking)
+  #lights_judgment
+  spell(lights_judgment)
+  #fireblood
+  spell(fireblood)
+  #ancestral_call
+  spell(ancestral_call)
+ }
+}
+
+AddFunction frostcdscdpostconditions
+{
+ enemies() < 3 and { conduit(siphoned_malice_conduit) or soulbind(wasteland_propriety_soulbind) } and spell(mirrors_of_torment) or spellcooldown(icy_veins) > 12 and buffexpires(rune_of_power_buff) and spell(rune_of_power) or spell(bag_of_tricks)
+}
+
+### actions.aoe
+
+AddFunction frostaoemainactions
+{
+ #blizzard
+ spell(blizzard)
+ #flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&buff.fingers_of_frost.react=0)
+ if { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } spell(flurry)
+ #ice_nova
+ spell(ice_nova)
+ #ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
+ if buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) spell(ice_lance)
+ #fire_blast,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
+ if runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) spell(fire_blast)
+ #arcane_explosion,if=mana.pct>30&active_enemies>=6&!runeforge.glacial_fragments
+ if manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) spell(arcane_explosion)
+ #ice_lance,if=runeforge.glacial_fragments&talent.splitting_ice&travel_time<ground_aoe.blizzard.remains
+ if runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) spell(ice_lance)
+ #wait,sec=0.1,if=runeforge.glacial_fragments&talent.splitting_ice
+ #frostbolt
+ spell(frostbolt)
+}
+
+AddFunction frostaoemainpostconditions
+{
+}
+
+AddFunction frostaoeshortcdactions
+{
+ #frozen_orb
+ spell(frozen_orb)
+
+ unless spell(blizzard) or { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova)
+ {
+  #comet_storm
+  spell(comet_storm)
+
+  unless { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance)
+  {
+   #radiant_spark
+   spell(radiant_spark)
+   #mirrors_of_torment
+   spell(mirrors_of_torment)
+   #shifting_power
+   spell(shifting_power)
+
+   unless runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion)
+   {
+    #ebonbolt
+    spell(ebonbolt)
+   }
+  }
+ }
+}
+
+AddFunction frostaoeshortcdpostconditions
+{
+ spell(blizzard) or { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
+}
+
+AddFunction frostaoecdactions
+{
+}
+
+AddFunction frostaoecdpostconditions
+{
+ spell(frozen_orb) or spell(blizzard) or { debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or spell(radiant_spark) or spell(mirrors_of_torment) or spell(shifting_power) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or spell(ebonbolt) or runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
+}
+
+### actions.default
+
+AddFunction frost_defaultmainactions
+{
+ #call_action_list,name=cds
+ frostcdsmainactions()
+
+ unless frostcdsmainpostconditions()
+ {
+  #call_action_list,name=aoe,if=active_enemies>=3
+  if enemies() >= 3 frostaoemainactions()
+
+  unless enemies() >= 3 and frostaoemainpostconditions()
+  {
+   #call_action_list,name=st,if=active_enemies<3
+   if enemies() < 3 froststmainactions()
+
+   unless enemies() < 3 and froststmainpostconditions()
+   {
+    #call_action_list,name=movement
+    frostmovementmainactions()
+   }
+  }
+ }
+}
+
+AddFunction frost_defaultmainpostconditions
+{
+ frostcdsmainpostconditions() or enemies() >= 3 and frostaoemainpostconditions() or enemies() < 3 and froststmainpostconditions() or frostmovementmainpostconditions()
+}
+
+AddFunction frost_defaultshortcdactions
+{
+ #call_action_list,name=cds
+ frostcdsshortcdactions()
+
+ unless frostcdsshortcdpostconditions()
+ {
+  #call_action_list,name=aoe,if=active_enemies>=3
+  if enemies() >= 3 frostaoeshortcdactions()
+
+  unless enemies() >= 3 and frostaoeshortcdpostconditions()
+  {
+   #call_action_list,name=st,if=active_enemies<3
+   if enemies() < 3 froststshortcdactions()
+
+   unless enemies() < 3 and froststshortcdpostconditions()
+   {
+    #call_action_list,name=movement
+    frostmovementshortcdactions()
+   }
+  }
+ }
+}
+
+AddFunction frost_defaultshortcdpostconditions
+{
+ frostcdsshortcdpostconditions() or enemies() >= 3 and frostaoeshortcdpostconditions() or enemies() < 3 and froststshortcdpostconditions() or frostmovementshortcdpostconditions()
+}
+
+AddFunction frost_defaultcdactions
+{
+ #counterspell
+ frostinterruptactions()
+ #call_action_list,name=cds
+ frostcdscdactions()
+
+ unless frostcdscdpostconditions()
+ {
+  #call_action_list,name=aoe,if=active_enemies>=3
+  if enemies() >= 3 frostaoecdactions()
+
+  unless enemies() >= 3 and frostaoecdpostconditions()
+  {
+   #call_action_list,name=st,if=active_enemies<3
+   if enemies() < 3 froststcdactions()
+
+   unless enemies() < 3 and froststcdpostconditions()
+   {
+    #call_action_list,name=movement
+    frostmovementcdactions()
+   }
+  }
+ }
+}
+
+AddFunction frost_defaultcdpostconditions
+{
+ frostcdscdpostconditions() or enemies() >= 3 and frostaoecdpostconditions() or enemies() < 3 and froststcdpostconditions() or frostmovementcdpostconditions()
+}
+
+### Frost icons.
+
+AddCheckBox(opt_mage_frost_aoe l(aoe) default enabled=(specialization(frost)))
+
+AddIcon enabled=(not checkboxon(opt_mage_frost_aoe) and specialization(frost)) enemies=1 help=shortcd
+{
+ if not incombat() frostprecombatshortcdactions()
+ frost_defaultshortcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_mage_frost_aoe) and specialization(frost)) help=shortcd
+{
+ if not incombat() frostprecombatshortcdactions()
+ frost_defaultshortcdactions()
+}
+
+AddIcon enabled=(specialization(frost)) enemies=1 help=main
+{
+ if not incombat() frostprecombatmainactions()
+ frost_defaultmainactions()
+}
+
+AddIcon enabled=(checkboxon(opt_mage_frost_aoe) and specialization(frost)) help=aoe
+{
+ if not incombat() frostprecombatmainactions()
+ frost_defaultmainactions()
+}
+
+AddIcon enabled=(not checkboxon(opt_mage_frost_aoe) and specialization(frost)) enemies=1 help=cd
+{
+ if not incombat() frostprecombatcdactions()
+ frost_defaultcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_mage_frost_aoe) and specialization(frost)) help=cd
+{
+ if not incombat() frostprecombatcdactions()
+ frost_defaultcdactions()
+}
+
+### Required symbols
+# ancestral_call
+# arcane_explosion
+# arcane_intellect
+# bag_of_tricks
+# berserking
+# blink
+# blizzard
+# blizzard_debuff
+# blood_fury_int
+# brain_freeze_buff
+# comet_storm
+# counterspell
+# deathborne
+# disciplinary_command
+# disciplinary_command_arcane_buff
+# disciplinary_command_fire_buff
+# disciplinary_command_runeforge
+# ebonbolt
+# exhaustion_debuff
+# expanded_potential_buff
+# field_of_blossoms_soulbind
+# fingers_of_frost_buff
+# fire_blast
+# fireblood
+# flurry
+# freezing_rain_buff
+# freezing_winds_buff
+# freezing_winds_runeforge
+# frostbolt
+# frozen_debuff
+# frozen_orb
+# glacial_fragments_runeforge
+# glacial_spike
+# grove_invigoration_soulbind
+# ice_floes
+# ice_lance
+# ice_nova
+# icy_veins
+# ire_of_the_ascended_conduit
+# lights_judgment
+# mirrors_of_torment
+# potion_of_phantom_fire_item
+# quaking_palm
+# radiant_spark
+# ray_of_frost
+# rune_of_power
+# rune_of_power_buff
+# rune_of_power_talent
+# shifting_power
+# siphoned_malice_conduit
+# slick_ice_buff
 # splitting_ice_talent
 # summon_water_elemental
 # temporal_warp_runeforge

@@ -759,10 +759,10 @@ AddFunction frostcold_heartmainactions
  if fightremains() < gcd() spell(chains_of_ice)
  #chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.remains<3&buff.pillar_of_frost.up&buff.cold_heart.stack>=10
  if not hastalent(obliteration_talent) and buffremaining(pillar_of_frost) < 3 and buffpresent(pillar_of_frost) and buffstacks(cold_heart_buff) >= 10 spell(chains_of_ice)
- #chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19&cooldown.pillar_of_frost.remains>10)
- if not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } spell(chains_of_ice)
- #chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>20
- if not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 spell(chains_of_ice)
+ #chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19&cooldown.pillar_of_frost.remains>10)
+ if not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } spell(chains_of_ice)
+ #chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>20
+ if not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and not buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 spell(chains_of_ice)
  #chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains<3&buff.cold_heart.stack>=14)
  if hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 or spellcooldown(pillar_of_frost) < 3 and buffstacks(cold_heart_buff) >= 14 } spell(chains_of_ice)
 }
@@ -777,7 +777,7 @@ AddFunction frostcold_heartshortcdactions
 
 AddFunction frostcold_heartshortcdpostconditions
 {
- fightremains() < gcd() and spell(chains_of_ice) or not hastalent(obliteration_talent) and buffremaining(pillar_of_frost) < 3 and buffpresent(pillar_of_frost) and buffstacks(cold_heart_buff) >= 10 and spell(chains_of_ice) or not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } and spell(chains_of_ice) or not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 and spell(chains_of_ice) or hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 or spellcooldown(pillar_of_frost) < 3 and buffstacks(cold_heart_buff) >= 14 } and spell(chains_of_ice)
+ fightremains() < gcd() and spell(chains_of_ice) or not hastalent(obliteration_talent) and buffremaining(pillar_of_frost) < 3 and buffpresent(pillar_of_frost) and buffstacks(cold_heart_buff) >= 10 and spell(chains_of_ice) or not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } and spell(chains_of_ice) or not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and not buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 and spell(chains_of_ice) or hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 or spellcooldown(pillar_of_frost) < 3 and buffstacks(cold_heart_buff) >= 14 } and spell(chains_of_ice)
 }
 
 AddFunction frostcold_heartcdactions
@@ -786,7 +786,7 @@ AddFunction frostcold_heartcdactions
 
 AddFunction frostcold_heartcdpostconditions
 {
- fightremains() < gcd() and spell(chains_of_ice) or not hastalent(obliteration_talent) and buffremaining(pillar_of_frost) < 3 and buffpresent(pillar_of_frost) and buffstacks(cold_heart_buff) >= 10 and spell(chains_of_ice) or not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } and spell(chains_of_ice) or not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 and spell(chains_of_ice) or hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 or spellcooldown(pillar_of_frost) < 3 and buffstacks(cold_heart_buff) >= 14 } and spell(chains_of_ice)
+ fightremains() < gcd() and spell(chains_of_ice) or not hastalent(obliteration_talent) and buffremaining(pillar_of_frost) < 3 and buffpresent(pillar_of_frost) and buffstacks(cold_heart_buff) >= 10 and spell(chains_of_ice) or not hastalent(obliteration_talent) and weaponenchantpresent(fallen_crusader_enchant) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 and spellcooldown(pillar_of_frost) > 10 } and spell(chains_of_ice) or not hastalent(obliteration_talent) and not weaponenchantpresent(fallen_crusader_enchant) and buffstacks(cold_heart_buff) >= 10 and not buffpresent(pillar_of_frost) and spellcooldown(pillar_of_frost) > 20 and spell(chains_of_ice) or hastalent(obliteration_talent) and not buffpresent(pillar_of_frost) and { buffstacks(cold_heart_buff) >= 16 and buffpresent(unholy_strength_buff) or buffstacks(cold_heart_buff) >= 19 or spellcooldown(pillar_of_frost) < 3 and buffstacks(cold_heart_buff) >= 14 } and spell(chains_of_ice)
 }
 
 ### actions.bos_ticking
@@ -909,8 +909,6 @@ AddFunction frostaoemainactions
  if runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 spell(glacial_advance)
  #frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit<(15+talent.runic_attenuation*3)
  if runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 spell(frost_strike)
- #remorseless_winter
- spell(remorseless_winter)
  #frostscythe,if=!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae
  if not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>(25+talent.runic_attenuation*3)
@@ -927,7 +925,7 @@ AddFunction frostaoemainpostconditions
 
 AddFunction frostaoeshortcdactions
 {
- unless spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
+ unless spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -936,12 +934,12 @@ AddFunction frostaoeshortcdactions
 
 AddFunction frostaoeshortcdpostconditions
 {
- spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
+ spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike)
 }
 
 AddFunction frostaoecdactions
 {
- unless spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
+ unless spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -950,7 +948,7 @@ AddFunction frostaoecdactions
 
 AddFunction frostaoecdpostconditions
 {
- spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or spell(remorseless_winter) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
+ spell(remorseless_winter) or hastalent(frostscythe_talent) and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or buffpresent(rime_buff) and spell(howling_blast) or buffpresent(death_and_decay) and iscovenant("night_fae") and buffstacks(deaths_due_buff) > 8 and spell(obliterate) or buffpresent(killing_machine_buff) and { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(glacial_advance) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 3 and spell(frost_strike) or { not buffpresent(death_and_decay) and iscovenant("night_fae") or not iscovenant("night_fae") } and spell(frostscythe) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 3 and spell(obliterate) or spell(glacial_advance) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.default
@@ -1273,12 +1271,22 @@ Include(ovale_common)
 Include(ovale_deathknight_spells)
 
 
+AddFunction major_cooldowns_active
+{
+ totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or pet.buffpresent(dark_transformation)
+}
+
 AddFunction st_planning
 {
  enemies() == 1 and { not never(raid_event_adds_exists) or 600 > 15 }
 }
 
-AddFunction pooling_for_gargoyle
+AddFunction pooling_runes
+{
+ hastalent(soul_reaper_talent) and runecount() < 2 and target.timetohealthpercent(35) < 5 and fightremains() > 5
+}
+
+AddFunction pooling_runic_power
 {
  spellcooldown(summon_gargoyle) < 5 and hastalent(summon_gargoyle_talent)
 }
@@ -1306,6 +1314,42 @@ AddFunction unholyuseitemactions
 AddFunction unholygetinmeleerange
 {
  if checkboxon(opt_melee_range) and not target.inrange(death_strike) texture(misc_arrowlup help=(l(not_in_melee_range)))
+}
+
+### actions.trinkets
+
+AddFunction unholytrinketsmainactions
+{
+}
+
+AddFunction unholytrinketsmainpostconditions
+{
+}
+
+AddFunction unholytrinketsshortcdactions
+{
+}
+
+AddFunction unholytrinketsshortcdpostconditions
+{
+}
+
+AddFunction unholytrinketscdactions
+{
+ #use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains|cooldown.dark_trasnformation.remains)&(pet.army_ghoul.active|pet.apoc_ghoul.active&!talent.army_of_the_damned|target.time_to_pct_20<5)|fight_remains<21
+ if { spellcooldown(unholy_blight) > 0 or spellcooldown(dark_transformation) > 0 } and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and not hastalent(army_of_the_damned_talent) or target.timetohealthpercent(20) < 5 } or fightremains() < 21 unholyuseitemactions()
+ #use_item,name=macabre_sheet_music,if=cooldown.apocalypse.remains<5&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
+ if spellcooldown(apocalypse) < 5 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 21 unholyuseitemactions()
+ #use_item,name=dreadfire_vessel,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<3
+ if spellcooldown(apocalypse) > 0 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 3 unholyuseitemactions()
+ #use_item,name=darkmoon_deck_voracity,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
+ if spellcooldown(apocalypse) > 0 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 21 unholyuseitemactions()
+ #use_items,if=(cooldown.apocalypse.remains|buff.dark_transformation.up)&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)
+ if { spellcooldown(apocalypse) > 0 or pet.buffpresent(dark_transformation) } and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } unholyuseitemactions()
+}
+
+AddFunction unholytrinketscdpostconditions
+{
 }
 
 ### actions.precombat
@@ -1345,12 +1389,12 @@ AddFunction unholyprecombatcdpostconditions
 
 AddFunction unholygeneric_aoemainactions
 {
- #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
- #epidemic,if=buff.sudden_doom.react
- if buffpresent(sudden_doom_buff) spell(epidemic)
- #epidemic,if=!variable.pooling_for_gargoyle
- if not pooling_for_gargoyle() spell(epidemic)
+ #wait_for_cooldown,name=soul_reaper,if=talent.soul_reaper&target.time_to_pct_35<5&fight_remains>5&cooldown.soul_reaper.remains<(gcd*0.75)&active_enemies<=3
+ if hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() <= 3 spell(soul_reaper)
+ #death_coil,if=(!variable.pooling_runic_power|buff.sudden_doom.react)&(buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3|active_enemies=2)
+ if { not pooling_runic_power() or buffpresent(sudden_doom_buff) } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } spell(death_coil)
+ #epidemic,if=buff.sudden_doom.react|!variable.pooling_runic_power
+ if buffpresent(sudden_doom_buff) or not pooling_runic_power() spell(epidemic)
  #wound_spender,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains)
  if { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_unholy_debuff) or target.debuffstacks(festering_wound_unholy_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } spell(scourge_strike)
  #festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
@@ -1369,7 +1413,7 @@ AddFunction unholygeneric_aoeshortcdactions
 
 AddFunction unholygeneric_aoeshortcdpostconditions
 {
- pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_unholy_debuff) or target.debuffstacks(festering_wound_unholy_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_unholy_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike)
+ hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() <= 3 and spell(soul_reaper) or { not pooling_runic_power() or buffpresent(sudden_doom_buff) } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or { buffpresent(sudden_doom_buff) or not pooling_runic_power() } and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_unholy_debuff) or target.debuffstacks(festering_wound_unholy_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_unholy_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike)
 }
 
 AddFunction unholygeneric_aoecdactions
@@ -1378,33 +1422,33 @@ AddFunction unholygeneric_aoecdactions
 
 AddFunction unholygeneric_aoecdpostconditions
 {
- pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or buffpresent(sudden_doom_buff) and spell(epidemic) or not pooling_for_gargoyle() and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_unholy_debuff) or target.debuffstacks(festering_wound_unholy_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_unholy_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike)
+ hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() <= 3 and spell(soul_reaper) or { not pooling_runic_power() or buffpresent(sudden_doom_buff) } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or { buffpresent(sudden_doom_buff) or not pooling_runic_power() } and spell(epidemic) or { spellcooldown(apocalypse) > 5 and target.debuffpresent(festering_wound_unholy_debuff) or target.debuffstacks(festering_wound_unholy_debuff) > 4 } and { fightremains() < spellcooldown(death_and_decay) + 10 or fightremains() > spellcooldown(apocalypse) } and spell(scourge_strike) or { target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 or target.debuffstacks(festering_wound_unholy_debuff) < 1 } and spell(festering_strike) or spellcooldown(apocalypse) > 5 and target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike)
 }
 
 ### actions.generic
 
 AddFunction unholygenericmainactions
 {
- #death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
- if buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or totempresent(summon_gargoyle) spell(death_coil)
- #death_coil,if=runic_power.deficit<13&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 13 and not pooling_for_gargoyle() spell(death_coil)
- #wound_spender,if=debuff.festering_wound.stack>4
- if target.debuffstacks(festering_wound_unholy_debuff) > 4 spell(scourge_strike)
- #wound_spender,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead)
- if target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } spell(scourge_strike)
- #wound_spender,if=debuff.festering_wound.up&talent.unholy_blight&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains>10&!dot.unholy_blight_dot.remains|cooldown.apocalypse.remains>10)
- if target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } spell(scourge_strike)
- #death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 20 and not pooling_for_gargoyle() spell(death_coil)
- #festering_strike,if=debuff.festering_wound.stack<1
- if target.debuffstacks(festering_wound_unholy_debuff) < 1 spell(festering_strike)
- #festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<5&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead)
- if target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } spell(festering_strike)
- #festering_strike,if=debuff.festering_wound.stack<4&talent.unholy_blight&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains<10|cooldown.apocalypse.remains<10&dot.unholy_blight_dot.remains)
- if target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } spell(festering_strike)
- #death_coil,if=!variable.pooling_for_gargoyle
- if not pooling_for_gargoyle() spell(death_coil)
+ #death_coil,if=buff.sudden_doom.react&!variable.pooling_runic_power|pet.gargoyle.active
+ if buffpresent(sudden_doom_buff) and not pooling_runic_power() or totempresent(summon_gargoyle) spell(death_coil)
+ #death_coil,if=runic_power.deficit<13
+ if runicpowerdeficit() < 13 spell(death_coil)
+ #wound_spender,if=debuff.festering_wound.stack>4&!variable.pooling_runes
+ if target.debuffstacks(festering_wound_unholy_debuff) > 4 and not pooling_runes() spell(scourge_strike)
+ #wound_spender,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&!variable.pooling_runes&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead)
+ if target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } spell(scourge_strike)
+ #wound_spender,if=debuff.festering_wound.up&talent.unholy_blight&!variable.pooling_runes&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains>10&!dot.unholy_blight_dot.remains|cooldown.apocalypse.remains>10)
+ if target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } spell(scourge_strike)
+ #death_coil,if=runic_power.deficit<20&!variable.pooling_runic_power
+ if runicpowerdeficit() < 20 and not pooling_runic_power() spell(death_coil)
+ #festering_strike,if=debuff.festering_wound.stack<1&!variable.pooling_runes
+ if target.debuffstacks(festering_wound_unholy_debuff) < 1 and not pooling_runes() spell(festering_strike)
+ #festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<5&!variable.pooling_runes&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead)
+ if target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } spell(festering_strike)
+ #festering_strike,if=debuff.festering_wound.stack<4&talent.unholy_blight&!variable.pooling_runes&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains<10|cooldown.apocalypse.remains<10&dot.unholy_blight_dot.remains)
+ if target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } spell(festering_strike)
+ #death_coil,if=!variable.pooling_runic_power
+ if not pooling_runic_power() spell(death_coil)
 }
 
 AddFunction unholygenericmainpostconditions
@@ -1413,16 +1457,16 @@ AddFunction unholygenericmainpostconditions
 
 AddFunction unholygenericshortcdactions
 {
- unless { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil)
+ unless { buffpresent(sudden_doom_buff) and not pooling_runic_power() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and spell(death_coil)
  {
-  #any_dnd,if=cooldown.apocalypse.remains&(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)
-  if spellcooldown(apocalypse) > 0 and { hastalent(defile_talent) or iscovenant("night_fae") or runeforge(phearomones_runeforge) } spell(death_and_decay)
+  #any_dnd,if=cooldown.apocalypse.remains&(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)&(!variable.pooling_runes|fight_remains<5)
+  if spellcooldown(apocalypse) > 0 and { hastalent(defile_talent) or iscovenant("night_fae") or runeforge(phearomones_runeforge) } and { not pooling_runes() or fightremains() < 5 } spell(death_and_decay)
  }
 }
 
 AddFunction unholygenericshortcdpostconditions
 {
- { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) > 4 and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
+ { buffpresent(sudden_doom_buff) and not pooling_runic_power() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) > 4 and not pooling_runes() and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_runic_power() and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and not pooling_runes() and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_runic_power() and spell(death_coil)
 }
 
 AddFunction unholygenericcdactions
@@ -1431,7 +1475,7 @@ AddFunction unholygenericcdactions
 
 AddFunction unholygenericcdpostconditions
 {
- { buffpresent(sudden_doom_buff) and not pooling_for_gargoyle() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and not pooling_for_gargoyle() and spell(death_coil) or spellcooldown(apocalypse) > 0 and { hastalent(defile_talent) or iscovenant("night_fae") or runeforge(phearomones_runeforge) } and spell(death_and_decay) or target.debuffstacks(festering_wound_unholy_debuff) > 4 and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_for_gargoyle() and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_for_gargoyle() and spell(death_coil)
+ { buffpresent(sudden_doom_buff) and not pooling_runic_power() or totempresent(summon_gargoyle) } and spell(death_coil) or runicpowerdeficit() < 13 and spell(death_coil) or spellcooldown(apocalypse) > 0 and { hastalent(defile_talent) or iscovenant("night_fae") or runeforge(phearomones_runeforge) } and { not pooling_runes() or fightremains() < 5 } and spell(death_and_decay) or target.debuffstacks(festering_wound_unholy_debuff) > 4 and not pooling_runes() and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and spellcooldown(apocalypse) > 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(scourge_strike) or target.debuffpresent(festering_wound_unholy_debuff) and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) > 10 and not target.debuffremaining(unholy_blight) or spellcooldown(apocalypse) > 10 } and spell(scourge_strike) or runicpowerdeficit() < 20 and not pooling_runic_power() and spell(death_coil) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and not pooling_runes() and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and spellcooldown(apocalypse) < 5 and not pooling_runes() and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or not conduit(convocation_of_the_dead_conduit) } and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 4 and hastalent(unholy_blight_talent) and not pooling_runes() and { not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 or hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 } and { spellcooldown(unholy_blight) < 10 or spellcooldown(apocalypse) < 10 and target.debuffremaining(unholy_blight) } and spell(festering_strike) or not pooling_runic_power() and spell(death_coil)
 }
 
 ### actions.covenants
@@ -1446,12 +1490,12 @@ AddFunction unholycovenantsmainpostconditions
 
 AddFunction unholycovenantsshortcdactions
 {
- #swarming_mist,if=variable.st_planning&runic_power.deficit>16|fight_remains<11
- if st_planning() and runicpowerdeficit() > 16 or fightremains() < 11 spell(swarming_mist)
+ #swarming_mist,if=variable.st_planning&runic_power.deficit>16&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<11
+ if st_planning() and runicpowerdeficit() > 16 and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } or fightremains() < 11 spell(swarming_mist)
  #swarming_mist,if=cooldown.apocalypse.remains&(active_enemies>=2&active_enemies<=5&runic_power.deficit>10+(active_enemies*6)|active_enemies>5&runic_power.deficit>40)
  if spellcooldown(apocalypse) > 0 and { enemies() >= 2 and enemies() <= 5 and runicpowerdeficit() > 10 + enemies() * 6 or enemies() > 5 and runicpowerdeficit() > 40 } spell(swarming_mist)
- #shackle_the_unworthy,if=variable.st_planning&cooldown.apocalypse.remains|fight_remains<15
- if st_planning() and spellcooldown(apocalypse) > 0 or fightremains() < 15 spell(shackle_the_unworthy)
+ #shackle_the_unworthy,if=variable.st_planning&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<15
+ if st_planning() and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } or fightremains() < 15 spell(shackle_the_unworthy)
  #shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14)
  if enemies() >= 2 and { buffpresent(death_and_decay) or 0 <= 14 } spell(shackle_the_unworthy)
 }
@@ -1462,10 +1506,10 @@ AddFunction unholycovenantsshortcdpostconditions
 
 AddFunction unholycovenantscdactions
 {
- unless { st_planning() and runicpowerdeficit() > 16 or fightremains() < 11 } and spell(swarming_mist) or spellcooldown(apocalypse) > 0 and { enemies() >= 2 and enemies() <= 5 and runicpowerdeficit() > 10 + enemies() * 6 or enemies() > 5 and runicpowerdeficit() > 40 } and spell(swarming_mist)
+ unless { st_planning() and runicpowerdeficit() > 16 and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } or fightremains() < 11 } and spell(swarming_mist) or spellcooldown(apocalypse) > 0 and { enemies() >= 2 and enemies() <= 5 and runicpowerdeficit() > 10 + enemies() * 6 or enemies() > 5 and runicpowerdeficit() > 40 } and spell(swarming_mist)
  {
-  #abomination_limb,if=variable.st_planning&!soulbind.lead_by_example&cooldown.apocalypse.remains&rune.time_to_4>(3+buff.runic_corruption.remains)|fight_remains<21
-  if st_planning() and not soulbind(lead_by_example_soulbind) and spellcooldown(apocalypse) > 0 and timetorunes(4) > 3 + buffremaining(runic_corruption_buff) or fightremains() < 21 spell(abomination_limb)
+  #abomination_limb,if=variable.st_planning&!soulbind.lead_by_example&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)&rune.time_to_4>(3+buff.runic_corruption.remains)|fight_remains<21
+  if st_planning() and not soulbind(lead_by_example_soulbind) and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } and timetorunes(4) > 3 + buffremaining(runic_corruption_buff) or fightremains() < 21 spell(abomination_limb)
   #abomination_limb,if=variable.st_planning&soulbind.lead_by_example&(dot.unholy_blight_dot.remains>11|!talent.unholy_blight&cooldown.dark_transformation.remains)
   if st_planning() and soulbind(lead_by_example_soulbind) and { target.debuffremaining(unholy_blight) > 11 or not hastalent(unholy_blight_talent) and spellcooldown(dark_transformation) > 0 } spell(abomination_limb)
   #abomination_limb,if=active_enemies>=2&rune.time_to_4>(3+buff.runic_corruption.remains)
@@ -1475,7 +1519,7 @@ AddFunction unholycovenantscdactions
 
 AddFunction unholycovenantscdpostconditions
 {
- { st_planning() and runicpowerdeficit() > 16 or fightremains() < 11 } and spell(swarming_mist) or spellcooldown(apocalypse) > 0 and { enemies() >= 2 and enemies() <= 5 and runicpowerdeficit() > 10 + enemies() * 6 or enemies() > 5 and runicpowerdeficit() > 40 } and spell(swarming_mist) or { st_planning() and spellcooldown(apocalypse) > 0 or fightremains() < 15 } and spell(shackle_the_unworthy) or enemies() >= 2 and { buffpresent(death_and_decay) or 0 <= 14 } and spell(shackle_the_unworthy)
+ { st_planning() and runicpowerdeficit() > 16 and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } or fightremains() < 11 } and spell(swarming_mist) or spellcooldown(apocalypse) > 0 and { enemies() >= 2 and enemies() <= 5 and runicpowerdeficit() > 10 + enemies() * 6 or enemies() > 5 and runicpowerdeficit() > 40 } and spell(swarming_mist) or { st_planning() and { spellcooldown(apocalypse) > 0 or not hastalent(army_of_the_damned_talent) and spellcooldown(dark_transformation) > 0 } or fightremains() < 15 } and spell(shackle_the_unworthy) or enemies() >= 2 and { buffpresent(death_and_decay) or 0 <= 14 } and spell(shackle_the_unworthy)
 }
 
 ### actions.cooldowns
@@ -1492,31 +1536,30 @@ AddFunction unholycooldownsmainpostconditions
 
 AddFunction unholycooldownsshortcdactions
 {
- #unholy_blight,if=variable.st_planning&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)&(!runeforge.deadliest_coil|!talent.army_of_the_damned|conduit.convocation_of_the_dead.rank<5)
- if st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } spell(unholy_blight)
- #unholy_blight,if=variable.st_planning&runeforge.deadliest_coil&talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5&cooldown.apocalypse.remains<3&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
- if st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } spell(unholy_blight)
- #unholy_blight,if=active_enemies>=2|fight_remains<21
- if enemies() >= 2 or fightremains() < 21 spell(unholy_blight)
- #dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight)
- if st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } spell(dark_transformation)
- #dark_transformation,if=active_enemies>=2|fight_remains<21
- if enemies() >= 2 or fightremains() < 21 spell(dark_transformation)
- #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&talent.army_of_the_damned&runeforge.deadliest_coil&conduit.convocation_of_the_dead.rank>=5&dot.unholy_blight_dot.remains
- if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) spell(apocalypse)
- #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&dot.unholy_blight_dot.remains>10&!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5
- if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 spell(apocalypse)
- #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&(!talent.unholy_blight|talent.army_of_the_damned&(!runeforge.deadliest_coil|conduit.convocation_of_the_dead.rank<5)|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|fight_remains<16)
- if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } spell(apocalypse)
- #apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
- if enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) spell(apocalypse)
- #unholy_assault,if=variable.st_planning&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead&buff.dark_transformation.up&!pet.army_ghoul.active)
- if st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } spell(unholy_assault)
- #unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
- if enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 spell(unholy_assault)
-
  unless target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper)
  {
+  #unholy_blight,if=variable.st_planning&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)&(!runeforge.deadliest_coil|!talent.army_of_the_damned|conduit.convocation_of_the_dead.rank<5)
+  if st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } spell(unholy_blight)
+  #unholy_blight,if=variable.st_planning&runeforge.deadliest_coil&talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5&cooldown.apocalypse.remains<=5&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
+  if st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) <= 5 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } spell(unholy_blight)
+  #unholy_blight,if=active_enemies>=2|fight_remains<21
+  if enemies() >= 2 or fightremains() < 21 spell(unholy_blight)
+  #dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight)
+  if st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } spell(dark_transformation)
+  #dark_transformation,if=active_enemies>=2|fight_remains<21
+  if enemies() >= 2 or fightremains() < 21 spell(dark_transformation)
+  #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&talent.army_of_the_damned&runeforge.deadliest_coil&conduit.convocation_of_the_dead.rank>=5&dot.unholy_blight_dot.remains
+  if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) spell(apocalypse)
+  #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&dot.unholy_blight_dot.remains>10&!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5
+  if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 spell(apocalypse)
+  #apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&(!talent.unholy_blight|talent.army_of_the_damned&(!runeforge.deadliest_coil|conduit.convocation_of_the_dead.rank<5)|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|fight_remains<16)
+  if enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } spell(apocalypse)
+  #apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
+  if enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) spell(apocalypse)
+  #unholy_assault,if=variable.st_planning&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead&buff.dark_transformation.up&!pet.army_ghoul.active)
+  if st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } spell(unholy_assault)
+  #unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
+  if enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 spell(unholy_assault)
   #raise_dead,if=!pet.ghoul.active
   if not pet.present() spell(raise_dead_unholy)
  }
@@ -1529,29 +1572,17 @@ AddFunction unholycooldownsshortcdpostconditions
 
 AddFunction unholycooldownscdactions
 {
- #potion,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&(pet.army_ghoul.active|pet.apoc_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)|fight_remains<26
- if { totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or spellcooldown(army_of_the_dead) > target.timetodie() } or fightremains() < 26 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
- #use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains|cooldown.dark_trasnformation.remains)&(pet.army_ghoul.active|pet.apoc_ghoul.active&!talent.army_of_the_damned|target.time_to_pct_20<5)|fight_remains<21
- if { spellcooldown(unholy_blight) > 0 or spellcooldown(dark_transformation) > 0 } and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and not hastalent(army_of_the_damned_talent) or target.timetohealthpercent(20) < 5 } or fightremains() < 21 unholyuseitemactions()
- #use_item,name=macabre_sheet_music,if=cooldown.apocalypse.remains<5&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
- if spellcooldown(apocalypse) < 5 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 21 unholyuseitemactions()
- #use_item,name=dreadfire_vessel,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<3
- if spellcooldown(apocalypse) > 0 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 3 unholyuseitemactions()
- #use_item,name=darkmoon_deck_voracity,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
- if spellcooldown(apocalypse) > 0 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } or fightremains() < 21 unholyuseitemactions()
- #use_items,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)
- if spellcooldown(apocalypse) > 0 and { not hasequippeditem(inscrutable_quantum_device_item) or spellcooldown(inscrutable_quantum_device) > 0 } unholyuseitemactions()
- #army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.dark_transformation.remains<3&talent.unholy_blight&!soulbind.lead_by_example|!talent.unholy_blight|fight_remains<35
- if spellcooldown(unholy_blight) < 3 and spellcooldown(dark_transformation) < 3 and hastalent(unholy_blight_talent) and not soulbind(lead_by_example_soulbind) or not hastalent(unholy_blight_talent) or fightremains() < 35 spell(army_of_the_dead)
- #army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.abomination_limb.ready&soulbind.lead_by_example
- if spellcooldown(unholy_blight) < 3 and spellcooldown(abomination_limb) <= 0 and soulbind(lead_by_example_soulbind) spell(army_of_the_dead)
+ #potion,if=variable.major_cooldowns_active|fight_remains<26
+ if { major_cooldowns_active() or fightremains() < 26 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
+ #army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.dark_transformation.remains<3&talent.unholy_blight|!talent.unholy_blight|fight_remains<35
+ if spellcooldown(unholy_blight) < 3 and spellcooldown(dark_transformation) < 3 and hastalent(unholy_blight_talent) or not hastalent(unholy_blight_talent) or fightremains() < 35 spell(army_of_the_dead)
 
- unless st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or { enemies() >= 2 or fightremains() < 21 } and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or { enemies() >= 2 or fightremains() < 21 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse)
+ unless target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) <= 5 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or { enemies() >= 2 or fightremains() < 21 } and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or { enemies() >= 2 or fightremains() < 21 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse)
  {
   #summon_gargoyle,if=runic_power.deficit<14&(cooldown.unholy_blight.remains<10|dot.unholy_blight_dot.remains)
   if runicpowerdeficit() < 14 and { spellcooldown(unholy_blight) < 10 or target.debuffremaining(unholy_blight) } spell(summon_gargoyle)
 
-  unless st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
+  unless st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 and spell(unholy_assault) or not pet.present() and spell(raise_dead_unholy)
   {
    #sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready|fight_remains<gcd
    if enemies() >= 2 and not pet.buffpresent(dark_transformation) and not spellcooldown(dark_transformation) <= 0 or fightremains() < gcd() spell(sacrificial_pact)
@@ -1561,17 +1592,17 @@ AddFunction unholycooldownscdactions
 
 AddFunction unholycooldownscdpostconditions
 {
- st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) < 3 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or { enemies() >= 2 or fightremains() < 21 } and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or { enemies() >= 2 or fightremains() < 21 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse) or st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 and spell(unholy_assault) or target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or not pet.present() and spell(raise_dead_unholy)
+ target.timetohealthpercent(35) < 5 and target.timetodie() > 5 and spell(soul_reaper) or st_planning() and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and { not runeforge(deadliest_coil_runeforge) or not hastalent(army_of_the_damned_talent) or conduitrank(convocation_of_the_dead_conduit) < 5 } and spell(unholy_blight) or st_planning() and runeforge(deadliest_coil_runeforge) and hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 and spellcooldown(apocalypse) <= 5 and { spellcooldown(dark_transformation) < gcd() or pet.buffpresent(dark_transformation) } and spell(unholy_blight) or { enemies() >= 2 or fightremains() < 21 } and spell(unholy_blight) or st_planning() and { target.debuffremaining(unholy_blight) or not hastalent(unholy_blight_talent) } and spell(dark_transformation) or { enemies() >= 2 or fightremains() < 21 } and spell(dark_transformation) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and hastalent(army_of_the_damned_talent) and runeforge(deadliest_coil_runeforge) and conduitrank(convocation_of_the_dead_conduit) >= 5 and target.debuffremaining(unholy_blight) and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and hastalent(unholy_blight_talent) and target.debuffremaining(unholy_blight) > 10 and not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) < 5 and spell(apocalypse) or enemies() == 1 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and { not hastalent(unholy_blight_talent) or hastalent(army_of_the_damned_talent) and { not runeforge(deadliest_coil_runeforge) or conduitrank(convocation_of_the_dead_conduit) < 5 } or not hastalent(army_of_the_damned_talent) and conduitrank(convocation_of_the_dead_conduit) >= 5 or fightremains() < 16 } and spell(apocalypse) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) >= 4 and not buffpresent(death_and_decay) and spell(apocalypse) or st_planning() and target.debuffstacks(festering_wound_unholy_debuff) < 2 and { spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 or conduit(convocation_of_the_dead_conduit) and pet.buffpresent(dark_transformation) and not spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 } and spell(unholy_assault) or enemies() >= 2 and target.debuffstacks(festering_wound_unholy_debuff) < 2 and spell(unholy_assault) or not pet.present() and spell(raise_dead_unholy)
 }
 
 ### actions.aoe_setup
 
 AddFunction unholyaoe_setupmainactions
 {
- #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
- #epidemic,if=!variable.pooling_for_gargoyle
- if not pooling_for_gargoyle() spell(epidemic)
+ #death_coil,if=!variable.pooling_runic_power&(buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3|active_enemies=2)
+ if not pooling_runic_power() and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } spell(death_coil)
+ #epidemic,if=!variable.pooling_runic_power
+ if not pooling_runic_power() spell(epidemic)
  #festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3
  if target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 spell(festering_strike)
  #festering_strike,target_if=debuff.festering_wound.stack<1
@@ -1594,7 +1625,7 @@ AddFunction unholyaoe_setupshortcdactions
 
 AddFunction unholyaoe_setupshortcdpostconditions
 {
- pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
+ not pooling_runic_power() and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or not pooling_runic_power() and spell(epidemic) or target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
 }
 
 AddFunction unholyaoe_setupcdactions
@@ -1603,25 +1634,25 @@ AddFunction unholyaoe_setupcdactions
 
 AddFunction unholyaoe_setupcdpostconditions
 {
- { buffcountonany == enemies() or never(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or not pooling_for_gargoyle() and spell(epidemic) or target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
+ { buffcountonany == enemies() or never(raid_event_adds_exists) and 0 <= 11 } and spell(death_and_decay) or buffcountonany >= 5 and spell(death_and_decay) or not pooling_runic_power() and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or not pooling_runic_power() and spell(epidemic) or target.debuffstacks(festering_wound_unholy_debuff) <= 3 and spellcooldown(apocalypse) < 3 and spell(festering_strike) or target.debuffstacks(festering_wound_unholy_debuff) < 1 and spell(festering_strike) or timetorunes(4) < { spellcooldown(death_and_decay) > 0 and not hastalent(defile_talent) or spellcooldown(defile) > 0 and hastalent(defile_talent) } and spell(festering_strike)
 }
 
 ### actions.aoe_burst
 
 AddFunction unholyaoe_burstmainactions
 {
- #death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3
- if pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 spell(death_coil)
- #epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle|buff.swarming_mist.up
- if runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) spell(epidemic)
- #epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle
- if runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() spell(epidemic)
- #epidemic,if=!death_knight.fwounded_targets&!variable.pooling_for_gargoyle|fight_remains<5|raid_event.adds.exists&raid_event.adds.remains<5
- if not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 spell(epidemic)
+ #death_coil,if=(buff.sudden_doom.react|!variable.pooling_runic_power)&(buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3|active_enemies=2)
+ if { buffpresent(sudden_doom_buff) or not pooling_runic_power() } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } spell(death_coil)
+ #epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_runic_power|buff.swarming_mist.up
+ if runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_runic_power() or buffpresent(swarming_mist) spell(epidemic)
+ #epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_runic_power
+ if runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_runic_power() spell(epidemic)
+ #epidemic,if=!death_knight.fwounded_targets&!variable.pooling_runic_power|fight_remains<5|raid_event.adds.exists&raid_event.adds.remains<5
+ if not buffcountonany and not pooling_runic_power() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 spell(epidemic)
  #wound_spender
  spell(scourge_strike)
- #epidemic,if=!variable.pooling_for_gargoyle
- if not pooling_for_gargoyle() spell(epidemic)
+ #epidemic,if=!variable.pooling_runic_power
+ if not pooling_runic_power() spell(epidemic)
 }
 
 AddFunction unholyaoe_burstmainpostconditions
@@ -1634,7 +1665,7 @@ AddFunction unholyaoe_burstshortcdactions
 
 AddFunction unholyaoe_burstshortcdpostconditions
 {
- pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ { buffpresent(sudden_doom_buff) or not pooling_runic_power() } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_runic_power() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_runic_power() and spell(epidemic) or { not buffcountonany and not pooling_runic_power() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_runic_power() and spell(epidemic)
 }
 
 AddFunction unholyaoe_burstcdactions
@@ -1643,7 +1674,7 @@ AddFunction unholyaoe_burstcdactions
 
 AddFunction unholyaoe_burstcdpostconditions
 {
- pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_for_gargoyle() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_for_gargoyle() and spell(epidemic) or { not buffcountonany and not pooling_for_gargoyle() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_for_gargoyle() and spell(epidemic)
+ { buffpresent(sudden_doom_buff) or not pooling_runic_power() } and { pet.buffpresent(dark_transformation) and runeforge(deadliest_coil_runeforge) and enemies() <= 3 or enemies() == 2 } and spell(death_coil) or { runicpowerdeficit() < 10 + buffcountonany * 3 and buffcountonany < 6 and not pooling_runic_power() or buffpresent(swarming_mist) } and spell(epidemic) or runicpowerdeficit() < 25 and buffcountonany > 5 and not pooling_runic_power() and spell(epidemic) or { not buffcountonany and not pooling_runic_power() or fightremains() < 5 or never(raid_event_adds_exists) and 0 < 5 } and spell(epidemic) or spell(scourge_strike) or not pooling_runic_power() and spell(epidemic)
 }
 
 ### actions.default
@@ -1656,33 +1687,42 @@ AddFunction unholy_defaultmainactions
  if target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } spell(outbreak)
  #outbreak,if=runeforge.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable)
  if runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } spell(outbreak)
- #call_action_list,name=covenants
- unholycovenantsmainactions()
+ #wait_for_cooldown,name=soul_reaper,if=talent.soul_reaper&target.time_to_pct_35<5&fight_remains>5&cooldown.soul_reaper.remains<(gcd*0.75)&active_enemies=1
+ if hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() == 1 spell(soul_reaper)
+ #call_action_list,name=trinkets
+ unholytrinketsmainactions()
 
- unless unholycovenantsmainpostconditions()
+ unless unholytrinketsmainpostconditions()
  {
-  #call_action_list,name=cooldowns
-  unholycooldownsmainactions()
+  #call_action_list,name=covenants
+  unholycovenantsmainactions()
 
-  unless unholycooldownsmainpostconditions()
+  unless unholycovenantsmainpostconditions()
   {
-   #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
-   if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupmainactions()
+   #sequence,if=active_enemies=1&!death_knight.disable_aotd,name=opener:army_of_the_dead:festering_strike:festering_strike:unholy_blight:potion:dark_transformation:apocalypse
+   #call_action_list,name=cooldowns
+   unholycooldownsmainactions()
 
-   unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions()
+   unless unholycooldownsmainpostconditions()
    {
-    #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-    if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstmainactions()
+    #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
+    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupmainactions()
 
-    unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions()
+    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions()
     {
-     #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-     if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoemainactions()
+     #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
+     if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstmainactions()
 
-     unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions()
+     unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions()
      {
-      #call_action_list,name=generic,if=active_enemies=1
-      if enemies() == 1 unholygenericmainactions()
+      #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
+      if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoemainactions()
+
+      unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions()
+      {
+       #call_action_list,name=generic,if=active_enemies=1
+       if enemies() == 1 unholygenericmainactions()
+      }
      }
     }
    }
@@ -1692,7 +1732,7 @@ AddFunction unholy_defaultmainactions
 
 AddFunction unholy_defaultmainpostconditions
 {
- unholycovenantsmainpostconditions() or unholycooldownsmainpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions() or enemies() == 1 and unholygenericmainpostconditions()
+ unholytrinketsmainpostconditions() or unholycovenantsmainpostconditions() or unholycooldownsmainpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupmainpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstmainpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoemainpostconditions() or enemies() == 1 and unholygenericmainpostconditions()
 }
 
 AddFunction unholy_defaultshortcdactions
@@ -1702,35 +1742,42 @@ AddFunction unholy_defaultshortcdactions
  #bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
  if buffpresent(unholy_strength_buff) and enemies() == 1 spell(bag_of_tricks)
 
- unless target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak)
+ unless target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() == 1 and spell(soul_reaper)
  {
-  #call_action_list,name=covenants
-  unholycovenantsshortcdactions()
+  #call_action_list,name=trinkets
+  unholytrinketsshortcdactions()
 
-  unless unholycovenantsshortcdpostconditions()
+  unless unholytrinketsshortcdpostconditions()
   {
-   #call_action_list,name=cooldowns
-   unholycooldownsshortcdactions()
+   #call_action_list,name=covenants
+   unholycovenantsshortcdactions()
 
-   unless unholycooldownsshortcdpostconditions()
+   unless unholycovenantsshortcdpostconditions()
    {
-    #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
-    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupshortcdactions()
+    #sequence,if=active_enemies=1&!death_knight.disable_aotd,name=opener:army_of_the_dead:festering_strike:festering_strike:unholy_blight:potion:dark_transformation:apocalypse
+    #call_action_list,name=cooldowns
+    unholycooldownsshortcdactions()
 
-    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions()
+    unless unholycooldownsshortcdpostconditions()
     {
-     #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-     if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstshortcdactions()
+     #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
+     if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupshortcdactions()
 
-     unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions()
+     unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions()
      {
-      #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-      if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoeshortcdactions()
+      #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
+      if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstshortcdactions()
 
-      unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions()
+      unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions()
       {
-       #call_action_list,name=generic,if=active_enemies=1
-       if enemies() == 1 unholygenericshortcdactions()
+       #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
+       if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoeshortcdactions()
+
+       unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions()
+       {
+        #call_action_list,name=generic,if=active_enemies=1
+        if enemies() == 1 unholygenericshortcdactions()
+       }
       }
      }
     }
@@ -1741,58 +1788,67 @@ AddFunction unholy_defaultshortcdactions
 
 AddFunction unholy_defaultshortcdpostconditions
 {
- target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or unholycovenantsshortcdpostconditions() or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
+ target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() == 1 and spell(soul_reaper) or unholytrinketsshortcdpostconditions() or unholycovenantsshortcdpostconditions() or unholycooldownsshortcdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupshortcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstshortcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoeshortcdpostconditions() or enemies() == 1 and unholygenericshortcdpostconditions()
 }
 
 AddFunction unholy_defaultcdactions
 {
  unholyinterruptactions()
- #variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle
+ #variable,name=pooling_runic_power,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle
+ #variable,name=pooling_runes,value=talent.soul_reaper&rune<2&target.time_to_pct_35<5&fight_remains>5
  #variable,name=st_planning,value=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15)
+ #variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
  #arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
  if runicpowerdeficit() > 65 and { totempresent(summon_gargoyle) or not hastalent(summon_gargoyle_talent) } and runedeficit() >= 5 spell(arcane_torrent)
- #blood_fury,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.blood_fury.duration%3)|target.time_to_die<=buff.blood_fury.duration
- if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(blood_fury_ap) / 3 } or target.timetodie() <= baseduration(blood_fury_ap) spell(blood_fury_ap)
- #berserking,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.berserking.duration%3)|target.time_to_die<=buff.berserking.duration
- if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(berserking) / 3 } or target.timetodie() <= baseduration(berserking) spell(berserking)
+ #blood_fury,if=variable.major_cooldowns_active|target.time_to_die<=buff.blood_fury.duration
+ if major_cooldowns_active() or target.timetodie() <= baseduration(blood_fury_ap) spell(blood_fury_ap)
+ #berserking,if=variable.major_cooldowns_active|target.time_to_die<=buff.berserking.duration
+ if major_cooldowns_active() or target.timetodie() <= baseduration(berserking) spell(berserking)
  #lights_judgment,if=buff.unholy_strength.up
  if buffpresent(unholy_strength_buff) spell(lights_judgment)
- #ancestral_call,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.ancestral_call.duration%3)|target.time_to_die<=15
- if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(ancestral_call) / 3 } or target.timetodie() <= 15 spell(ancestral_call)
+ #ancestral_call,if=variable.major_cooldowns_active|target.time_to_die<=15
+ if major_cooldowns_active() or target.timetodie() <= 15 spell(ancestral_call)
  #arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
  if enemies() >= 2 or runedeficit() >= 5 and runicpowerdeficit() >= 60 spell(arcane_pulse)
- #fireblood,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>cooldown.fireblood.duration%3)|target.time_to_die<=buff.fireblood.duration
- if totempresent(summon_gargoyle) or buffpresent(unholy_assault) or hastalent(army_of_the_damned_talent) and spellcooldownduration(apocalypse) - spellcooldown(apocalypse) < 15 and { spellcooldownduration(army_of_the_dead) - spellcooldown(army_of_the_dead) < 30 or spellcooldown(army_of_the_dead) > spellcooldownduration(fireblood) / 3 } or target.timetodie() <= baseduration(fireblood) spell(fireblood)
+ #fireblood,if=variable.major_cooldowns_active|target.time_to_die<=buff.fireblood.duration
+ if major_cooldowns_active() or target.timetodie() <= baseduration(fireblood) spell(fireblood)
 
- unless buffpresent(unholy_strength_buff) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak)
+ unless buffpresent(unholy_strength_buff) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() == 1 and spell(soul_reaper)
  {
-  #call_action_list,name=covenants
-  unholycovenantscdactions()
+  #call_action_list,name=trinkets
+  unholytrinketscdactions()
 
-  unless unholycovenantscdpostconditions()
+  unless unholytrinketscdpostconditions()
   {
-   #call_action_list,name=cooldowns
-   unholycooldownscdactions()
+   #call_action_list,name=covenants
+   unholycovenantscdactions()
 
-   unless unholycooldownscdpostconditions()
+   unless unholycovenantscdpostconditions()
    {
-    #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
-    if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupcdactions()
+    #sequence,if=active_enemies=1&!death_knight.disable_aotd,name=opener:army_of_the_dead:festering_strike:festering_strike:unholy_blight:potion:dark_transformation:apocalypse
+    #call_action_list,name=cooldowns
+    unholycooldownscdactions()
 
-    unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions()
+    unless unholycooldownscdpostconditions()
     {
-     #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-     if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstcdactions()
+     #run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
+     if enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) unholyaoe_setupcdactions()
 
-     unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions()
+     unless enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions()
      {
-      #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-      if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoecdactions()
+      #run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
+      if enemies() >= 2 and buffpresent(death_and_decay) unholyaoe_burstcdactions()
 
-      unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions()
+      unless enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions()
       {
-       #call_action_list,name=generic,if=active_enemies=1
-       if enemies() == 1 unholygenericcdactions()
+       #run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
+       if enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } unholygeneric_aoecdactions()
+
+       unless enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions()
+       {
+        #call_action_list,name=generic,if=active_enemies=1
+        if enemies() == 1 unholygenericcdactions()
+       }
       }
      }
     }
@@ -1803,7 +1859,7 @@ AddFunction unholy_defaultcdactions
 
 AddFunction unholy_defaultcdpostconditions
 {
- buffpresent(unholy_strength_buff) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or unholycovenantscdpostconditions() or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
+ buffpresent(unholy_strength_buff) and enemies() == 1 and spell(bag_of_tricks) or target.debuffrefreshable(virulent_plague_debuff) and not hastalent(unholy_blight_talent) and not never(raid_event_adds_exists) and spell(outbreak) or target.debuffrefreshable(virulent_plague_debuff) and enemies() >= 2 and { not hastalent(unholy_blight_talent) or hastalent(unholy_blight_talent) and spellcooldown(unholy_blight) > 0 } and spell(outbreak) or runeforge(superstrain_runeforge) and { target.debuffrefreshable(frost_fever_debuff) or target.debuffrefreshable(blood_plague_debuff) } and spell(outbreak) or hastalent(soul_reaper_talent) and target.timetohealthpercent(35) < 5 and fightremains() > 5 and spellcooldown(soul_reaper) < gcd() * 0.75 and enemies() == 1 and spell(soul_reaper) or unholytrinketscdpostconditions() or unholycovenantscdpostconditions() or unholycooldownscdpostconditions() or enemies() >= 2 and { spellcooldown(death_and_decay) < 10 and not hastalent(defile_talent) or spellcooldown(defile) < 10 and hastalent(defile_talent) } and not buffpresent(death_and_decay) and unholyaoe_setupcdpostconditions() or enemies() >= 2 and buffpresent(death_and_decay) and unholyaoe_burstcdpostconditions() or enemies() >= 2 and not buffpresent(death_and_decay) and { spellcooldown(death_and_decay) > 10 and not hastalent(defile_talent) or spellcooldown(defile) > 10 and hastalent(defile_talent) } and unholygeneric_aoecdpostconditions() or enemies() == 1 and unholygenericcdpostconditions()
 }
 
 ### Unholy icons.
@@ -1886,6 +1942,7 @@ AddIcon enabled=(checkboxon(opt_deathknight_unholy_aoe) and specialization(unhol
 # scourge_strike
 # shackle_the_unworthy
 # soul_reaper
+# soul_reaper_talent
 # sudden_doom_buff
 # summon_gargoyle
 # summon_gargoyle_talent

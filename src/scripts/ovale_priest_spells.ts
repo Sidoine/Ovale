@@ -151,6 +151,11 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm add=1)
+Define(redirected_anima_buff 342814)
+# Healing or dealing damage has a chance to grant you a stack of Redirected Anima. Redirected Anima increases your maximum health by 342814s1 and your Mastery by 342814s2 for 30 seconds, and stacks overlap.rnrn?(s152280&a137005)[Defile]?(a137005&!s152280)[Death's Due]?a212611[The Hunt]?a137009[Convoke the Spirits]?a137014[Wild Spirits]?a137018[Shifting Power]?a137022[Faeline Stomp]?a137026[Blessing of Seasons]?a137030[Fae Guardians]?a137034[Sepsis]?a137038[Fae Transfusion]?a137042[Soul Rot]?a137047[Ancient Aftershock][Activating your Night Fae class ability] grants you s3*<mod> stacks of Redirected Anima.
+  SpellInfo(redirected_anima_buff duration=30 max_stacks=50 gcd=0 offgcd=1)
+  # Max health increased by w1.rnMastery increased by w2.
+  SpellAddBuff(redirected_anima_buff redirected_anima_buff add=1)
 Define(schism 214621)
 # Attack the enemy's soul with a surge of Shadow energy, dealing (150 of Spell Power) Shadow damage and increasing your spell damage to the target by s2 for 9 seconds.
   SpellInfo(schism cd=24 duration=9)
@@ -310,6 +315,8 @@ Define(void_torrent_talent 21720)
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 3 seconds.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
 Define(potion_of_spectral_intellect_item 171273)
     ItemInfo(potion_of_spectral_intellect_item cd=1 shared_cd="item_cd_4" proc=307162)
+Define(empyreal_ordnance_item 180117)
+    ItemInfo(empyreal_ordnance_item cd=180 proc=345543)
 Define(potion_of_phantom_fire_item 171349)
     ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
 Define(painbreaker_psalm_runeforge 6981)
@@ -317,6 +324,7 @@ Define(sephuzs_proclamation_runeforge 7103)
 Define(shadowflame_prism_runeforge 6982)
 Define(dissonant_echoes_conduit 115)
 Define(combat_meditation_soulbind 328266)
+Define(grove_invigoration_soulbind 322721)
     `;
     // END
 

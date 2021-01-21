@@ -1776,8 +1776,18 @@ export class Emiter {
                     }
                 }
                 isSpellAction = false;
+            } else if (action === "wait_for_cooldown") {
+                if (modifiers.name) {
+                    const spellName = this.unparser.Unparse(modifiers.name);
+                    if (spellName) {
+                        // TODO wait
+                        isSpellAction = true;
+                        action = spellName;
+                    }
+                }
             } else if (action == "heart_essence") {
                 bodyCode = `Spell(296208)`;
+                conditionCode = `hasequippeditem(158075) and level() < 50`;
                 isSpellAction = false;
             } else if (parseNode.actionListName === "precombat") {
                 const definition = annotation.dictionary[action];
@@ -4665,6 +4675,9 @@ export class Emiter {
                 );
             } else if (procType == "has_proc") {
                 code = emitTrinketCondition(`ItemRppm(slot="%s") > 0`, slot);
+            } else if (procType === "has_stat") {
+                // TODO
+                code = "false";
             } else {
                 const property = statName;
                 const [buffName] = this.Disambiguate(
