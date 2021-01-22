@@ -93,6 +93,13 @@ Define(bottled_flayedwing_toxin 178742)
 Define(bottled_flayedwing_toxin_buff 345545)
 Define(grim_codex 178811)
     ItemRequire(grim_codex unusable set=1 enabled=(target.isfriend()))
+Define(mistcaller_ocarina 178715)
+    ItemRequire(mistcaller_ocarina unusable set=1 enabled=(InCombat() or player.BuffPresent(mistcaller_ocarina_buff)))
+Define(mistcaller_ocarina_crit_buff 332299)
+Define(mistcaller_ocarina_haste_buff 332300)
+Define(mistcaller_ocarina_mastery_buff 332301)
+Define(mistcaller_ocarina_vers_buff 330067)
+SpellList(mistcaller_ocarina_buff mistcaller_ocarina_crit_buff mistcaller_ocarina_haste_buff mistcaller_ocarina_mastery_buff mistcaller_ocarina_vers_buff)
     `;
     scripts.registerScript(undefined, undefined, name, desc, code, "include");
 }
