@@ -91,6 +91,8 @@ ItemInfo(184842 proc=348139 cd=90)
 Define(bottled_flayedwing_toxin 178742)
     ItemRequire(bottled_flayedwing_toxin unusable set=1 enabled=(player.BuffPresent(bottled_flayedwing_toxin_buff)))
 Define(bottled_flayedwing_toxin_buff 345545)
+Define(grim_codex 178811)
+    ItemRequire(grim_codex unusable set=1 enabled=(target.isfriend()))
     `;
     scripts.registerScript(undefined, undefined, name, desc, code, "include");
 }
