@@ -87,6 +87,10 @@ ItemInfo(184841 proc=348136 cd=90)
 ItemInfo(184842 proc=348139 cd=90)
 `;
     // END
-
+    code += `
+Define(bottled_flayedwing_toxin 178742)
+    ItemRequire(bottled_flayedwing_toxin unusable set=1 enabled=(player.BuffPresent(bottled_flayedwing_toxin_buff)))
+Define(bottled_flayedwing_toxin_buff 345545)
+    `;
     scripts.registerScript(undefined, undefined, name, desc, code, "include");
 }
