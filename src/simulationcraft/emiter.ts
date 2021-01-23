@@ -1446,6 +1446,16 @@ export class Emiter {
                 conditionCode =
                     "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire)";
                 annotation[action] = className;
+            } else if (
+                className == "MONK" &&
+                action == "storm_earth_and_fire_fixate"
+            ) {
+                /**
+                 * There's no way to tell if the SEF copies are fixated. Just
+                 * ignore the spell action for now and assume the player is
+                 * smart enough to fixate the copies on their own.
+                 */
+                isSpellAction = false;
             } else if (className == "MONK" && action == "touch_of_death") {
                 // conditionCode =
                 //     "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)";
