@@ -77,7 +77,7 @@ export class OvaleLossOfControlClass implements StateModule {
     };
     hasLossOfControl = (locType: string, atTime: number) => {
         let lowestStartTime: number = huge;
-        let highestEndTime: number = 0;
+        let highestEndTime = 0;
         for (const [, data] of pairs<LossOfControlEventInfo>(
             this.lossOfControlHistory
         )) {
