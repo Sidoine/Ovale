@@ -114,7 +114,7 @@ export class OvaleLossOfControlClass implements StateModule {
                         const spellName = GetSpellInfo(data.spellID);
                         insert(
                             output,
-                            `${data.locType} - ${data.spellID} (${spellName}) - ${data.startTime} - ${data.duration}`
+                            `${spellName} - ${data.spellID} - ${data.locType} - ${data.startTime} - ${data.duration}`
                         );
                     }
                     return concat(output, "\n");
