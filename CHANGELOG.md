@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.44](https://github.com/Sidoine/Ovale/compare/9.0.43...9.0.44) (2021-01-24)
+
+### Bug Fixes
+
+-   custom trinket conditions ([#826](https://github.com/Sidoine/Ovale/issues/826)) ([1cd96a3](https://github.com/Sidoine/Ovale/commit/1cd96a316305faf12174073b30b7f9637ace22d3))
+-   **demonhunter:** improper function call target.inrange() ([#823](https://github.com/Sidoine/Ovale/issues/823)) ([dafc266](https://github.com/Sidoine/Ovale/commit/dafc26602cb36bb016cb9fecadb5614ba9132933))
+-   **monk:** don't suggest spamming SEF: Fixate when SEF is active ([#824](https://github.com/Sidoine/Ovale/issues/824)) ([31936ba](https://github.com/Sidoine/Ovale/commit/31936ba79393034d99f5ed8929a336c3da6b35c8))
+-   special trinket conditions ([#822](https://github.com/Sidoine/Ovale/issues/822)) ([3053b58](https://github.com/Sidoine/Ovale/commit/3053b5822d24629d608f9ab7e8bea267bda5fc21))
+-   **paladin:** remove hammer_of_wrath_empowered ([14cea4f](https://github.com/Sidoine/Ovale/commit/14cea4fc3cce87b1b9ea32160808a31f66c9f479)), closes [#820](https://github.com/Sidoine/Ovale/issues/820)
+
 ### [9.0.43](https://github.com/Sidoine/Ovale/compare/9.0.42...9.0.43) (2021-01-21)
 
 ### Bug Fixes
