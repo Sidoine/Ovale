@@ -1,12 +1,14 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { C_LossOfControl, GetTime } from "@wowts/wow-mock";
+import { C_LossOfControl, GetTime, GetSpellInfo } from "@wowts/wow-mock";
 import { LuaArray, pairs } from "@wowts/lua";
-import { insert } from "@wowts/table";
-import { upper, format } from "@wowts/string";
+import { concat, insert } from "@wowts/table";
+import { upper } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { DebugTools, Tracer } from "../engine/debug";
 import { StateModule } from "../engine/state";
+import { huge } from "@wowts/math";
+import { OptionUiGroup } from "../ui/acegui-helpers";
 
 interface LossOfControlEventInfo {
     locType: string;
@@ -28,6 +30,7 @@ export class OvaleLossOfControlClass implements StateModule {
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
+        ovaleDebug.defaultOptions.args["locHistory"] = this.debugOptions;
     }
 
     private handleInitialize = () => {
@@ -42,19 +45,27 @@ export class OvaleLossOfControlClass implements StateModule {
         this.lossOfControlHistory = {};
         this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
     };
-    private handleLossOfControlAdded = (event: string, eventIndex: number) => {
-        this.tracer.debug(
-            "LOSS_OF_CONTROL_ADDED",
-            format(
-                "C_LossOfControl.GetActiveLossOfControlData(%d)",
-                eventIndex
-            ),
-            C_LossOfControl.GetActiveLossOfControlData(eventIndex)
-        );
+    private handleLossOfControlAdded = (e: string, eventIndex: number) => {
         const lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(
             eventIndex
         );
         if (lossOfControlData) {
+            this.tracer.debug(
+                "event",
+                e,
+                "eventIndex",
+                eventIndex,
+                "locType",
+                lossOfControlData.locType || "undefined",
+                "spellID",
+                lossOfControlData.spellID || "undefined",
+                "spellName",
+                GetSpellInfo(lossOfControlData.spellID),
+                "startTime",
+                lossOfControlData.startTime || "undefined",
+                "duration",
+                lossOfControlData.duration || "undefined"
+            );
             const data: LossOfControlEventInfo = {
                 locType: upper(lossOfControlData.locType),
                 spellID: lossOfControlData.spellID,
@@ -65,32 +76,53 @@ export class OvaleLossOfControlClass implements StateModule {
         }
     };
     hasLossOfControl = (locType: string, atTime: number) => {
-        let lowestStartTime: number | undefined = undefined;
-        let highestEndTime: number | undefined = undefined;
+        let lowestStartTime: number = huge;
+        let highestEndTime = 0;
         for (const [, data] of pairs<LossOfControlEventInfo>(
             this.lossOfControlHistory
         )) {
             if (
-                upper(locType) == data.locType &&
+                upper(locType) == upper(data.locType) &&
                 data.startTime <= atTime &&
                 atTime <= data.startTime + data.duration
             ) {
-                if (
-                    lowestStartTime == undefined ||
-                    lowestStartTime > data.startTime
-                ) {
+                if (lowestStartTime > data.startTime) {
                     lowestStartTime = data.startTime;
                 }
-                if (
-                    highestEndTime == undefined ||
-                    highestEndTime < data.startTime + data.duration
-                ) {
+                if (highestEndTime < data.startTime + data.duration) {
                     highestEndTime = data.startTime + data.duration;
                 }
             }
         }
-        return lowestStartTime != undefined && highestEndTime != undefined;
+        return lowestStartTime < huge && highestEndTime > 0;
     };
+
+    private debugOptions: OptionUiGroup = {
+        type: "group",
+        name: "Loss of Control History",
+        args: {
+            locHistory: {
+                type: "input",
+                name: "Loss of Control History",
+                multiline: 25,
+                width: "full",
+                get: () => {
+                    const output: LuaArray<string> = {};
+                    for (const [, data] of pairs<LossOfControlEventInfo>(
+                        this.lossOfControlHistory
+                    )) {
+                        const spellName = GetSpellInfo(data.spellID);
+                        insert(
+                            output,
+                            `${spellName} - ${data.spellID} - ${data.locType} - ${data.startTime} - ${data.duration}`
+                        );
+                    }
+                    return concat(output, "\n");
+                },
+            },
+        },
+    };
+
     cleanState(): void {}
     initializeState(): void {}
     resetState(): void {}

@@ -100,6 +100,11 @@ Define(mistcaller_ocarina_haste_buff 332300)
 Define(mistcaller_ocarina_mastery_buff 332301)
 Define(mistcaller_ocarina_vers_buff 330067)
 SpellList(mistcaller_ocarina_buff mistcaller_ocarina_crit_buff mistcaller_ocarina_haste_buff mistcaller_ocarina_mastery_buff mistcaller_ocarina_vers_buff)
+
+Define(sinful_aspirants_medallion 184052)
+    ItemRequire(sinful_aspirants_medallion unusable set=1 enabled=(not isfeared() and not isstunned() and not isincapacitated() and not isrooted()))
+Define(sinful_gladiators_medallion 181333)
+    ItemRequire(sinful_gladiators_medallion unusable set=1 enabled=(not isfeared() and not isstunned() and not isincapacitated() and not isrooted()))
     `;
     scripts.registerScript(undefined, undefined, name, desc, code, "include");
 }

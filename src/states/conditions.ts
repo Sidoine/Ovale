@@ -2216,8 +2216,8 @@ export class OvaleConditions {
         atTime: number
     ) => {
         const boolean =
-            !HasFullControl() &&
-            this.lossOfControl.hasLossOfControl("FEAR", atTime);
+            this.lossOfControl.hasLossOfControl("FEAR", atTime) ||
+            this.lossOfControl.hasLossOfControl("FEAR_MECHANIC", atTime);
         return returnBoolean(boolean);
     };
 
@@ -2254,8 +2254,8 @@ export class OvaleConditions {
         atTime: number
     ) => {
         const boolean =
-            !HasFullControl() &&
-            this.lossOfControl.hasLossOfControl("CONFUSE", atTime);
+            this.lossOfControl.hasLossOfControl("CONFUSE", atTime) ||
+            this.lossOfControl.hasLossOfControl("STUN", atTime);
         return returnBoolean(boolean);
     };
 
@@ -2330,9 +2330,10 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const boolean =
-            !HasFullControl() &&
-            this.lossOfControl.hasLossOfControl("STUN_MECHANIC", atTime);
+        const boolean = this.lossOfControl.hasLossOfControl(
+            "STUN_MECHANIC",
+            atTime
+        );
         return returnBoolean(boolean);
     };
     /**  Get the current number of charges of the given item in the player's inventory.
