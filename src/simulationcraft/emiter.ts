@@ -3018,11 +3018,7 @@ export class Emiter {
 
             let code;
             let buffName;
-            if (name === "out_of_range") {
-                if (property == "up") {
-                    code = "not target.inrange()";
-                }
-            } else if (this.isDaemon(name)) {
+            if (this.isDaemon(name)) {
                 if (name === "tyrant") buffName = "demonic_tyrant";
                 else buffName = name;
                 if (property === "remains") {
@@ -4040,6 +4036,24 @@ export class Emiter {
                 );
                 this.addSymbol(annotation, spell);
             }
+        } else if (
+            className == "DEMONHUNTER" &&
+            truthy(match(operand, "^buff%.out_of_range%."))
+        ) {
+            const tokenIterator = gmatch(operand, operandTokenPattern);
+            tokenIterator(); // consume "buff."
+            tokenIterator(); // consume "out_of_range."
+            let modifier = lower(tokenIterator());
+            let spell = "chaos_strike";
+            if (specialization == "vengeance") {
+                spell = "shear";
+            }
+            if (modifier == "up") {
+                code = format("not target.InRange(%s)", spell);
+            } else if (modifier == "down") {
+                code = format("target.InRange(%s)", spell);
+            }
+            this.addSymbol(annotation, spell);
         } else if (
             className == "DEMONHUNTER" &&
             operand == "buff.metamorphosis.extended_by_demonic"
