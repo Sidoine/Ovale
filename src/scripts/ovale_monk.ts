@@ -767,7 +767,6 @@ AddFunction windwalkercd_serenitycdpostconditions
 AddFunction windwalkercd_sefmainactions
 {
  #storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
- if conduit(coordinated_offensive_conduit) spell(storm_earth_and_fire_fixate)
 }
 
 AddFunction windwalkercd_sefmainpostconditions
@@ -780,23 +779,18 @@ AddFunction windwalkercd_sefshortcdactions
  if not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } spell(faeline_stomp)
  #bonedust_brew,if=raid_event.adds.in>50|raid_event.adds.up,line_cd=60
  if { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 spell(bonedust_brew)
-
- unless conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate)
- {
-  #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|!covenant.kyrian&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
-  if { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
-  #storm_earth_and_fire,if=covenant.kyrian&(buff.weapons_of_order.up|(fight_remains<cooldown.weapons_of_order.remains|cooldown.weapons_of_order.remains>cooldown.storm_earth_and_fire.full_recharge_time)&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
-  if iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
-  #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
-  if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
-  #bag_of_tricks,if=buff.storm_earth_and_fire.down
-  if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
- }
+ #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|!covenant.kyrian&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
+ if { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
+ #storm_earth_and_fire,if=covenant.kyrian&(buff.weapons_of_order.up|(fight_remains<cooldown.weapons_of_order.remains|cooldown.weapons_of_order.remains>cooldown.storm_earth_and_fire.full_recharge_time)&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
+ if iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
+ #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
+ if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
+ #bag_of_tricks,if=buff.storm_earth_and_fire.down
+ if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
 }
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -815,7 +809,7 @@ AddFunction windwalkercd_sefcdactions
   #fallen_order,if=raid_event.adds.in>30|raid_event.adds.up
   if 600 > 30 or never(raid_event_adds_exists) spell(fallen_order)
 
-  unless { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire)
+  unless { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire)
   {
    #use_item,name=dreadfire_vessel
    windwalkeruseitemactions()
@@ -839,7 +833,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe
@@ -1147,7 +1141,6 @@ AddIcon enabled=(checkboxon(opt_monk_windwalker_aoe) and specialization(windwalk
 # spear_hand_strike
 # spinning_crane_kick
 # storm_earth_and_fire
-# storm_earth_and_fire_fixate
 # the_emperors_capacitor_buff
 # tiger_palm
 # touch_of_death
@@ -1621,7 +1614,6 @@ AddFunction windwalkercd_serenitycdpostconditions
 AddFunction windwalkercd_sefmainactions
 {
  #storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
- if conduit(coordinated_offensive_conduit) spell(storm_earth_and_fire_fixate)
 }
 
 AddFunction windwalkercd_sefmainpostconditions
@@ -1634,23 +1626,18 @@ AddFunction windwalkercd_sefshortcdactions
  if not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } spell(faeline_stomp)
  #bonedust_brew,if=raid_event.adds.in>50|raid_event.adds.up,line_cd=60
  if { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 spell(bonedust_brew)
-
- unless conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate)
- {
-  #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|!covenant.kyrian&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
-  if { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
-  #storm_earth_and_fire,if=covenant.kyrian&(buff.weapons_of_order.up|(fight_remains<cooldown.weapons_of_order.remains|cooldown.weapons_of_order.remains>cooldown.storm_earth_and_fire.full_recharge_time)&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
-  if iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
-  #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
-  if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
-  #bag_of_tricks,if=buff.storm_earth_and_fire.down
-  if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
- }
+ #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|!covenant.kyrian&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
+ if { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
+ #storm_earth_and_fire,if=covenant.kyrian&(buff.weapons_of_order.up|(fight_remains<cooldown.weapons_of_order.remains|cooldown.weapons_of_order.remains>cooldown.storm_earth_and_fire.full_recharge_time)&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
+ if iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } spell(storm_earth_and_fire)
+ #touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
+ if { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) spell(touch_of_karma)
+ #bag_of_tricks,if=buff.storm_earth_and_fire.down
+ if buffexpires(storm_earth_and_fire) spell(bag_of_tricks)
 }
 
 AddFunction windwalkercd_sefshortcdpostconditions
 {
- conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate)
 }
 
 AddFunction windwalkercd_sefcdactions
@@ -1669,7 +1656,7 @@ AddFunction windwalkercd_sefcdactions
   #fallen_order,if=raid_event.adds.in>30|raid_event.adds.up
   if 600 > 30 or never(raid_event_adds_exists) spell(fallen_order)
 
-  unless { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire)
+  unless { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire)
   {
    #use_item,name=dreadfire_vessel
    windwalkeruseitemactions()
@@ -1693,7 +1680,7 @@ AddFunction windwalkercd_sefcdactions
 
 AddFunction windwalkercd_sefcdpostconditions
 {
- not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or conduit(coordinated_offensive_conduit) and spell(storm_earth_and_fire_fixate) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
+ not previousspell(faeline_stomp) and { 600 > 10 or never(raid_event_adds_exists) } and spell(faeline_stomp) or { 600 > 50 or never(raid_event_adds_exists) } and timesincepreviousspell(bonedust_brew) > 60 and spell(bonedust_brew) or { spellcharges(storm_earth_and_fire) == 2 or fightremains() < 20 or 0 > 15 or not iscovenant("kyrian") and { 600 > spellcooldown(storm_earth_and_fire) or not never(raid_event_adds_exists) } and { spellcooldown(invoke_xuen_the_white_tiger) > spellcooldown(storm_earth_and_fire) or hold_xuen() } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or iscovenant("kyrian") and { buffpresent(weapons_of_order) or { fightremains() < spellcooldown(weapons_of_order) or spellcooldown(weapons_of_order) > spellcooldown(storm_earth_and_fire) } and spellcooldown(fists_of_fury) <= 9 and chi() >= 2 and spellcooldown(whirling_dragon_punch) <= 12 } and { checkboxon(opt_storm_earth_and_fire) and not buffpresent(storm_earth_and_fire) } and spell(storm_earth_and_fire) or { fightremains() > 159 or pet.present() or hold_xuen() } and checkboxon(opt_touch_of_karma) and spell(touch_of_karma) or buffexpires(storm_earth_and_fire) and spell(bag_of_tricks)
 }
 
 ### actions.aoe
@@ -2001,7 +1988,6 @@ AddIcon enabled=(checkboxon(opt_monk_windwalker_aoe) and specialization(windwalk
 # spear_hand_strike
 # spinning_crane_kick
 # storm_earth_and_fire
-# storm_earth_and_fire_fixate
 # the_emperors_capacitor_buff
 # tiger_palm
 # touch_of_death
