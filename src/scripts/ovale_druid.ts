@@ -898,10 +898,18 @@ AddFunction feraluseitemactions
 
 AddFunction feralgetinmeleerange
 {
- if checkboxon(opt_melee_range) and stance(druid_bear_form) and not target.inrange(mangle) or { stance(druid_cat_form) or stance(druid_claws_of_shirvallah) } and not target.inrange(shred)
+ if checkboxon(opt_melee_range)
  {
-  if target.inrange(wild_charge) spell(wild_charge)
-  texture(misc_arrowlup help=(l(not_in_melee_range)))
+  if stance(druid_bear_form) and not target.inrange(mangle)
+  {
+   if target.inrange(wild_charge_bear) spell(wild_charge_bear)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
+  if (stance(druid_cat_form) or stance(druid_claws_of_shirvallah)) and not target.inrange(shred)
+  {
+   if target.inrange(wild_charge_cat) spell(wild_charge_cat)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
  }
 }
 
@@ -1556,7 +1564,6 @@ AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and specialization(feral)) help
 # tigers_fury
 # typhoon
 # war_stomp
-# wild_charge
 # wild_charge_bear
 # wild_charge_cat
 `;
@@ -1636,10 +1643,18 @@ AddFunction feraluseitemactions
 
 AddFunction feralgetinmeleerange
 {
- if checkboxon(opt_melee_range) and stance(druid_bear_form) and not target.inrange(mangle) or { stance(druid_cat_form) or stance(druid_claws_of_shirvallah) } and not target.inrange(shred)
+ if checkboxon(opt_melee_range)
  {
-  if target.inrange(wild_charge) spell(wild_charge)
-  texture(misc_arrowlup help=(l(not_in_melee_range)))
+  if stance(druid_bear_form) and not target.inrange(mangle)
+  {
+   if target.inrange(wild_charge_bear) spell(wild_charge_bear)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
+  if (stance(druid_cat_form) or stance(druid_claws_of_shirvallah)) and not target.inrange(shred)
+  {
+   if target.inrange(wild_charge_cat) spell(wild_charge_cat)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
  }
 }
 
@@ -2294,7 +2309,6 @@ AddIcon enabled=(checkboxon(opt_druid_feral_aoe) and specialization(feral)) help
 # tigers_fury
 # typhoon
 # war_stomp
-# wild_charge
 # wild_charge_bear
 # wild_charge_cat
 `;
@@ -2339,10 +2353,18 @@ AddFunction guardianuseitemactions
 
 AddFunction guardiangetinmeleerange
 {
- if checkboxon(opt_melee_range) and stance(druid_bear_form) and not target.inrange(mangle) or { stance(druid_cat_form) or stance(druid_claws_of_shirvallah) } and not target.inrange(shred)
+ if checkboxon(opt_melee_range)
  {
-  if target.inrange(wild_charge) spell(wild_charge)
-  texture(misc_arrowlup help=(l(not_in_melee_range)))
+  if stance(druid_bear_form) and not target.inrange(mangle)
+  {
+   if target.inrange(wild_charge_bear) spell(wild_charge_bear)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
+  if (stance(druid_cat_form) or stance(druid_claws_of_shirvallah)) and not target.inrange(shred)
+  {
+   if target.inrange(wild_charge_cat) spell(wild_charge_cat)
+   texture(misc_arrowlup help=(l(not_in_melee_range)))
+  }
  }
 }
 
@@ -2985,7 +3007,6 @@ AddIcon enabled=(checkboxon(opt_druid_guardian_aoe) and specialization(guardian)
 # tooth_and_claw_buff
 # typhoon
 # war_stomp
-# wild_charge
 # wild_charge_bear
 # wild_charge_cat
 # wrath
