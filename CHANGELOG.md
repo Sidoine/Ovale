@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.45](https://github.com/Sidoine/Ovale/compare/9.0.44...9.0.45) (2021-01-26)
+
+### Bug Fixes
+
+-   use correct function call for each keybind reserved by Ovale ([#831](https://github.com/Sidoine/Ovale/issues/831)) ([265c0d9](https://github.com/Sidoine/Ovale/commit/265c0d93b7bb63d80964afd5ddb4600827bdf9ab)), closes [#828](https://github.com/Sidoine/Ovale/issues/828)
+-   **druid:** fix problems with guardian druid script ([#827](https://github.com/Sidoine/Ovale/issues/827)) ([#830](https://github.com/Sidoine/Ovale/issues/830)) ([ebce10e](https://github.com/Sidoine/Ovale/commit/ebce10eed5db3bf433a0527d43f2071b33cce915))
+
 ### [9.0.44](https://github.com/Sidoine/Ovale/compare/9.0.43...9.0.44) (2021-01-24)
 
 ### Bug Fixes
