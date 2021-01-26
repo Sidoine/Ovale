@@ -678,10 +678,18 @@ export class Generator {
             const fmt = `
                 AddFunction %sGetInMeleeRange
                 {
-                    if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+                    if CheckBoxOn(opt_melee_range)
                     {
-                        if target.InRange(wild_charge) Spell(wild_charge)
-                        Texture(misc_arrowlup help=L(not_in_melee_range))
+                        if Stance(druid_bear_form) and not target.InRange(mangle)
+                        {
+                            if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
+                            Texture(misc_arrowlup help=L(not_in_melee_range))
+                        }
+                        if (Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah)) and not target.InRange(shred)
+                        {
+                            if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+                            Texture(misc_arrowlup help=L(not_in_melee_range))
+                        }
                     }
                 }
             `;
@@ -697,7 +705,6 @@ export class Generator {
                 annotation.functionTag[node.name] = "shortcd";
                 annotation.addSymbol("mangle");
                 annotation.addSymbol("shred");
-                annotation.addSymbol("wild_charge");
                 annotation.addSymbol("wild_charge_bear");
                 annotation.addSymbol("wild_charge_cat");
                 count = count + 1;

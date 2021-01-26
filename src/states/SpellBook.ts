@@ -405,12 +405,14 @@ export class OvaleSpellBookClass {
 
         let isKnown = this.spell[spellId] !== undefined;
         if (!isKnown) {
-            isKnown = IsSpellKnown(spellId) || IsSpellKnown(spellId, true);
-            if (isKnown) {
-                this.tracer.log(
-                    "Spell ID '%s' is not in the spellbook, but is still known.",
-                    spellId
-                );
+            if (spellId > 0) {
+                isKnown = IsSpellKnown(spellId) || IsSpellKnown(spellId, true);
+                if (isKnown) {
+                    this.tracer.log(
+                        "Spell ID '%s' is not in the spellbook, but is still known.",
+                        spellId
+                    );
+                }
             }
         }
         return (isKnown && true) || false;
