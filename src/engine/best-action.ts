@@ -197,11 +197,11 @@ export class OvaleBestActionClass {
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
         if (si) {
-            const MAX_GUARD = 20;
+            const maxGuard = 20;
             let guard = 0;
             let replacementId = spellId;
             let id: number | undefined = replacementId;
-            while (id !== undefined && guard < MAX_GUARD) {
+            while (id !== undefined && guard < maxGuard) {
                 guard = guard + 1;
                 replacementId = id;
                 id = this.ovaleData.getSpellInfoProperty(
@@ -211,7 +211,7 @@ export class OvaleBestActionClass {
                     targetGUID
                 );
             }
-            if (guard >= MAX_GUARD) {
+            if (guard >= maxGuard) {
                 oneTimeMessage(
                     "Recursive 'replaced_by' chain for spell ID '%s'.",
                     spellId
