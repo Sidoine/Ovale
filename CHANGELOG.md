@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.46](https://github.com/Sidoine/Ovale/compare/9.0.45...9.0.46) (2021-01-31)
+
+### Bug Fixes
+
+-   follow 'replaced_by' SpellInfo chain to the final replacement ([#834](https://github.com/Sidoine/Ovale/issues/834)) ([4083068](https://github.com/Sidoine/Ovale/commit/408306896a1ec72d654e6a566fbc0fafb57208b2)), closes [#833](https://github.com/Sidoine/Ovale/issues/833)
+
 ### [9.0.45](https://github.com/Sidoine/Ovale/compare/9.0.44...9.0.45) (2021-01-26)
 
 ### Bug Fixes
