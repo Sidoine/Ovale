@@ -25,7 +25,7 @@ import {
 } from "./ast";
 import { OvaleCooldownClass } from "../states/Cooldown";
 import { OvaleSpellsClass } from "../states/Spells";
-import { isNumber, isString } from "../tools/tools";
+import { isNumber, isString, oneTimeMessage } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Guids } from "./guid";
@@ -197,15 +197,28 @@ export class OvaleBestActionClass {
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
         if (si) {
-            const replacement = this.ovaleData.getSpellInfoProperty(
-                spellId,
-                atTime,
-                "replaced_by",
-                targetGUID
-            );
-            if (replacement) {
+            const maxGuard = 20;
+            let guard = 0;
+            let replacementId = spellId;
+            let id: number | undefined = replacementId;
+            while (id !== undefined && guard < maxGuard) {
+                guard = guard + 1;
+                replacementId = id;
+                id = this.ovaleData.getSpellInfoProperty(
+                    <number>replacementId,
+                    atTime,
+                    "replaced_by",
+                    targetGUID
+                );
+            }
+            if (guard >= maxGuard) {
+                oneTimeMessage(
+                    "Recursive 'replaced_by' chain for spell ID '%s'.",
+                    spellId
+                );
+            } else if (replacementId != spellId) {
                 replacedSpellId = spellId;
-                spellId = replacement;
+                spellId = replacementId;
                 si = this.ovaleData.spellInfo[spellId];
                 this.tracer.log(
                     "Spell ID '%s' is replaced by spell ID '%s'.",
