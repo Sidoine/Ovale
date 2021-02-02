@@ -693,17 +693,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         let spellRefund = 0;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si[powerType]) {
-            const setPowerValue = this.ovaleData.getSpellInfoProperty(
-                spellId,
-                atTime,
-                `set_${powerType}` as `set_${PowerType}`,
-                targetGUID
-            );
-            if (setPowerValue !== undefined) {
-                const power = this.getPowerAt(state, powerType, atTime);
-                return [power - setPowerValue, 0];
-            }
-
             let [cost, ratio] = this.ovaleData.getSpellInfoPropertyNumber(
                 spellId,
                 atTime,
@@ -711,33 +700,50 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
                 targetGUID,
                 true
             );
-            if (ratio && ratio != 0) {
-                const maxCostParam = `max_${powerType}` as `max_${PowerType}`;
-                const maxCost = si[maxCostParam];
-                if (maxCost) {
+            const setPowerValue = this.ovaleData.getProperty(
+                si,
+                atTime,
+                `set_${powerType}` as `set_${PowerType}`
+            );
+            if (isNumber(setPowerValue)) {
+                const power = this.getPowerAt(state, powerType, atTime);
+                spellCost = power - setPowerValue;
+                if (spellCost < cost) {
+                    spellCost = cost;
+                }
+            } else {
+                const maxCost = this.ovaleData.getProperty(
+                    si,
+                    atTime,
+                    `max_${powerType}` as `max_${PowerType}`
+                );
+                if (isNumber(maxCost)) {
                     const power = this.getPowerAt(state, powerType, atTime);
                     if (power > maxCost || maximumCost) {
-                        cost = maxCost;
+                        if (cost < maxCost) {
+                            cost = maxCost;
+                        }
                     } else if (power > cost) {
                         cost = power;
                     }
                 }
-
-                spellCost =
-                    (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
-
-                const parameter = `refund_${powerType}` as `refund_${PowerType}`;
-                const refund = this.ovaleData.getProperty(
-                    si,
-                    atTime,
-                    parameter
-                );
-
-                if (refund == "cost") {
-                    spellRefund = spellCost;
-                } else if (isNumber(refund)) {
-                    spellRefund = refund;
+                if (ratio && ratio != 0) {
+                    if (cost > 0) {
+                        spellCost = floor(cost * ratio);
+                    } else {
+                        spellCost = ceil(cost * ratio);
+                    }
                 }
+            }
+            const refund = this.ovaleData.getProperty(
+                si,
+                atTime,
+                `refund_${powerType}` as `refund_${PowerType}`
+            );
+            if (refund == "cost") {
+                spellRefund = spellCost;
+            } else if (isNumber(refund)) {
+                spellRefund = refund;
             }
         } else {
             const [cost] = this.getSpellCost(spellId, powerType);
