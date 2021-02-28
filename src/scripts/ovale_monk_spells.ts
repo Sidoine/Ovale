@@ -292,13 +292,19 @@ Define(coordinated_offensive_conduit 22)
     `;
     // END
     code += `
+#blackout_kick
+    SpellRequire(blackout_kick chi set=0 enabled=(not specialization(windwalker)))
 Define(detox 218164)
     SpellInfo(detox cd=8)
 Define(healing_elixir 122281)
     SpellInfo(healing_elixir charge_cd=30 gcd=0 offgcd=1)
 #rising_sun_kick
     SpellRequire(rising_sun_kick chi set=0 enabled=(not specialization(windwalker)))
+#rushing_jade_wind
     SpellRequire(rushing_jade_wind chi set=0 enabled=(not specialization(windwalker)))
+#spinning_crane_kick
+    SpellRequire(spinning_crane_kick chi set=0 enabled=(not specialization(windwalker)))
+    SpellRequire(spinning_crane_kick energy set=0 enabled=(not specialization(windwalker)))
 #storm_earth_and_fire
     SpellRequire(storm_earth_and_fire unusable set=1 enabled=(buffpresent(storm_earth_and_fire)))
 #touch_of_death
