@@ -564,7 +564,7 @@ Define(balance_affinity_talent_restoration 22366)
     SpellRequire(moonkin_form unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
     SpellRequire(starfire unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
     SpellRequire(starsurge unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
-    SpellRequire(sunfire unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
+    SpellRequire(sunfire unusable set=1 enabled=(not (specialization(balance) or specialization(restoration) or hastalent(balance_affinity_talent))))
     SpellRequire(typhoon unusable set=1 enabled=(not (specialization(balance) or hastalent(balance_affinity_talent) or hastalent(balance_affinity_talent_restoration))))
 
 Define(feral_affinity_talent_balance 22155)
