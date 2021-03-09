@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.47](https://github.com/Sidoine/Ovale/compare/9.0.46...9.0.47) (2021-03-09)
+
+### Bug Fixes
+
+-   healer spell definitions ([#843](https://github.com/Sidoine/Ovale/issues/843)) ([d291b27](https://github.com/Sidoine/Ovale/commit/d291b2736d6e6df4c0fdc145c86eb4485ceed8e2))
+-   **power:** fix semantics of {max,set,refund}\_XXX in SpellInfo() ([#835](https://github.com/Sidoine/Ovale/issues/835)) ([eaf9cf2](https://github.com/Sidoine/Ovale/commit/eaf9cf2e76ddfbc5cee1b6de775d01cf0d2f5956))
+-   **runeforge:** ovale should check for bonus id instead of power id ([#838](https://github.com/Sidoine/Ovale/issues/838)) ([968078a](https://github.com/Sidoine/Ovale/commit/968078ac46448d5297978f264ac1037c7c1780fb)), closes [#805](https://github.com/Sidoine/Ovale/issues/805)
+
 ### [9.0.46](https://github.com/Sidoine/Ovale/compare/9.0.45...9.0.46) (2021-01-31)
 
 ### Bug Fixes
