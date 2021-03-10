@@ -83,7 +83,7 @@
     "lua": {
         "name": "Ovale",
         "title": "Ovale Spell Priority",
-        "interface": "90002",
+        "interface": "90005",
         "savedVariables": "OvaleDB"
     },
     "husky": {
