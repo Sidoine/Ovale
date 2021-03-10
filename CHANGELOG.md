@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.48](https://github.com/Sidoine/Ovale/compare/9.0.47...9.0.48) (2021-03-10)
+
 ### [9.0.47](https://github.com/Sidoine/Ovale/compare/9.0.46...9.0.47) (2021-03-09)
 
 ### Bug Fixes
