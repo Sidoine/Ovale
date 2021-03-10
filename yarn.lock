@@ -1185,10 +1185,10 @@
   resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.6.0.tgz#838ad3eb001fe3ef95d23c8c1b4fa5ccd14cf1ce"
   integrity sha512-UE2Mj3ZpMBqdFdqfjphqnbRrE8kmwjs8akxGnFthPfAGk4XOACSKNt6SnAWXQEu0eGw7s8jRI/ZqqERxsv7x9Q==
 
-"@wowts/masque@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wowts/masque/-/masque-1.0.1.tgz#1ecb425cf62cd414c05f83bd0c38e03b021c51ee"
-  integrity sha512-CHBHsZ0G18vRpwcpw7ZvY6KgR375yAqAn/miLU6JV1IribFprhPPiWBaXpr5u0kIjl0G/lBBSE8EJ18MPlk9sg==
+"@wowts/masque@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wowts/masque/-/masque-1.1.0.tgz#7c68f4db7b56983a7c4b5c9ed351421ac8ac76bb"
+  integrity sha512-EJTFHhwdnsZ1FSTyp4jMxor1/DYKz63NCTA33MjBWDB9cB526kkDRFa8NT7ePmOLcIIRYikuHkiBoNyYsDLzDw==
   dependencies:
     "@wowts/lua" "^1.0.6"
     "@wowts/tsaddon" "^1.1.2"
