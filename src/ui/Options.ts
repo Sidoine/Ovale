@@ -94,7 +94,7 @@ export interface OvaleDb {
     };
     global: {
         debug: LuaObj<boolean>;
-        profiler: LuaObj<string>;
+        profiler: LuaObj<boolean>;
     };
 }
 
