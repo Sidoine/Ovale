@@ -18,7 +18,7 @@ export class SpellActivationGlow {
 
     constructor(ovale: OvaleClass, ovaleDebug: DebugTools) {
         this.module = ovale.createModule(
-            "SpellActivation",
+            "SpellActivationGlow",
             this.handleInitialize,
             this.handleDisable,
             aceEvent
