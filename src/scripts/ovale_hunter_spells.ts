@@ -406,6 +406,7 @@ SpellRequire(kill_shot unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(kill_shot_survival unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(harpoon unusable set=1 enabled=(target.distance() < 8))
 SpellAddBuff(steady_shot steady_focus_buff add=1 enabled=(previousgcdspell(steady_shot count=2) and talent(steady_focus_talent)))
+SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_debuff add=1)
   `;
 
     scripts.registerScript("HUNTER", undefined, name, desc, code, "include");
