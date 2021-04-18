@@ -511,6 +511,9 @@ Define(wasteland_propriety_soulbind 319983)
     // END
     code += `
 SpellList(hot_streak_spells pyroblast flamestrike)
+#conjure_mana_gem
+Define(mana_gem 36799)
+    SpellRequire(conjure_mana_gem unusable set=1 enabled=(ItemCount(mana_gem)>=1))
 Define(disciplinary_command_arcane_buff -327369)
   SpellInfo(disciplinary_command_arcane_buff duration=10)
   SpellAddBuff(arcane_explosion disciplinary_command_arcane_buff add=1)
@@ -521,6 +524,8 @@ Define(disciplinary_command_frost_buff -327366)
   SpellInfo(disciplinary_command_frost_buff duration=10)
   SpellAddBuff(frostbolt disciplinary_command_frost_buff add=1)
   SpellAddBuff(frost_nova disciplinary_command_frost_buff add=1)
+#presence_of_mind
+    SpellRequire(presence_of_mind unusable set=1 enabled=(buffpresent(presence_of_mind)))
 #summon_water_elemental
     SpellRequire(summon_water_elemental unusable set=1 enabled=(pet.present()))
     `;
