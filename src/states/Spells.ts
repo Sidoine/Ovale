@@ -20,6 +20,7 @@ import { StateModule } from "../engine/state";
 import { NamedParametersOf, AstActionNode } from "../engine/ast";
 import { OvalePowerClass, PowerType } from "./Power";
 import { OvaleRunesClass } from "./Runes";
+import { SpellActivationGlow } from "./spellactivationglow";
 
 const warriorInterceptSpellId = SpellId.intercept;
 const warriorHeroicThrowSpellId = SpellId.heroic_throw;
@@ -36,7 +37,8 @@ export class OvaleSpellsClass implements StateModule {
         ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private power: OvalePowerClass,
-        private runes: OvaleRunesClass
+        private runes: OvaleRunesClass,
+        private spellActivationGlow: SpellActivationGlow
     ) {
         this.module = ovale.createModule(
             "OvaleSpells",
@@ -185,6 +187,17 @@ export class OvaleSpellsClass implements StateModule {
                     );
                     [isUsable, noMana] = [true, false];
                 }
+            }
+            // if we have a spell activation glow we force the spell as being usable anyway.
+            if (
+                !isUsable &&
+                this.spellActivationGlow.hasSpellActivationGlow(spellId)
+            ) {
+                this.tracer.log(
+                    "Spell ID '%s' has spell activation glow. Force it as usable.",
+                    spellId
+                );
+                isUsable = true;
             }
         } else {
             [isUsable, noMana] = IsUsableSpell(spellId);
