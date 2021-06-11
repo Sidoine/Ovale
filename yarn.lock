@@ -1109,7 +1109,7 @@
   dependencies:
     "@wowts/coroutine" "^1.1.0"
 
-"@wowts/table@^1.0.0", "@wowts/table@^1.0.1":
+"@wowts/table@^1.0.0", "@wowts/table@^1.0.1", "@wowts/table@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@wowts/table/-/table-1.0.2.tgz#4ef81451fdc75ae6ae3cf24b5373ed908a5efdf8"
   integrity sha512-EOwBM4So1gJxdO8mt7sQYNbPijf7em3Z5+ea2Ftxrg1Ylqh2pQkZ55hZvG9DMDeKZOCBgVTYYig8UgF5jqVd8A==
@@ -1144,13 +1144,13 @@
     typescript "^4.1.3"
     webdav "^3.6.2"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.27.1", "@wowts/wow-mock@^1.6.0":
-  version "1.30.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.30.0.tgz#72d9a64f49c00ec509c11d29af350e49142210b1"
-  integrity sha512-/RKlkiW3SLiLTGHtf7tonq0vNPNtgIZyTAKOqlzCAQ0dFMOpx/HoVjFRuns22+oxqG1GwWQJZQSs2s+8C7Xb1A==
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.30.1", "@wowts/wow-mock@^1.6.0":
+  version "1.30.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.30.1.tgz#d27f15ab772f9d05a24470898fd7333cc6a48f79"
+  integrity sha512-o1ZyFQnhEA5LFcw6elWgfH+6D+GCUkH78W0N8dTXZDB8R3DJCA58sMiNTmBOyXVYP4TwCFhXaI6Woj2MVN+9bQ==
   dependencies:
-    "@wowts/lua" "^1.3.2"
-    "@wowts/table" "^1.0.1"
+    "@wowts/lua" "^1.6.0"
+    "@wowts/table" "^1.0.2"
 
 JSONStream@^1.0.4:
   version "1.3.5"
