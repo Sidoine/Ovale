@@ -29,7 +29,7 @@ jobs:
 
             # Only needed for the localize tool, need to move it outside Ovale
             - name: Compile tools
-              run: yarn prepare-tools
+              run: yarn build-tools
 
             - name: Localize
               run: yarn localize
@@ -41,7 +41,7 @@ jobs:
               run: yarn test
 
             - name: Create lua
-              run: yarn prepare -i
+              run: yarn build -i
 
             - name: Copy extra files for distribution
               run: |
