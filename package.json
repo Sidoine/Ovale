@@ -71,10 +71,10 @@
         "husky": "^6.0.0",
         "jest": "^26.6.3",
         "prettier": "^2.3.1",
+        "pretty-quick": "^3.1.0",
         "standard-version": "^9.3.0",
         "ts-jest": "^26.4.4",
-        "typemoq": "^2.1.0",
-        "pretty-quick": "^3.1.0"
+        "typemoq": "^2.1.0"
     },
     "repository": {
         "type": "git",
@@ -83,7 +83,7 @@
     "lua": {
         "name": "Ovale",
         "title": "Ovale Spell Priority",
-        "interface": "90005",
+        "interface": "90100",
         "savedVariables": "OvaleDB"
     },
     "husky": {
