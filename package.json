@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "scripts": {
         "test": "jest",
-        "prepare": "tstolua -p tsconfig.lua.json",
+        "prepare": "tstolua -p tsconfig.lua.json && husky install",
         "prepare-tools": "tsc",
         "simc": "node dist/src/utils/importsimc/index.js ../../simc",
         "dbc": "node dist/src/utils/dbc.js",
@@ -85,12 +85,6 @@
         "title": "Ovale Spell Priority",
         "interface": "90100",
         "savedVariables": "OvaleDB"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "pretty-quick --staged",
-            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-        }
     },
     "commitlint": {
         "extends": [
