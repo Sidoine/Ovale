@@ -431,7 +431,7 @@ export class IoC {
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
         const covenant = new Covenant(this.ovale, this.debug);
-        const runeforge = new Runeforge(this.ovale, this.debug);
+        const runeforge = new Runeforge(this.ovale, this.debug, this.equipment);
         const conduit = new Conduit(this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
