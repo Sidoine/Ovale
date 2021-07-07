@@ -329,7 +329,8 @@ let startFirst: number, endingLast: number;
 
 export class OvaleAuraClass
     extends States<AuraInterface>
-    implements StateModule {
+    implements StateModule
+{
     private debug: Tracer;
     private module: AceModule & AceEvent;
     private profiler: Profiler;
@@ -937,7 +938,7 @@ export class OvaleAuraClass
                         spellcast = undefined;
                     }
                 }
-                if (spellcast && spellcast.target == guid) {
+                if (spellcast && spellcast.targetGuid == guid) {
                     const spellId = spellcast.spellId;
                     const spellName =
                         this.ovaleSpellBook.getSpellName(spellId) ||
@@ -1001,7 +1002,7 @@ export class OvaleAuraClass
                         );
                         if (!auraIsActive) {
                             aura.baseTick = si.tick;
-                            if (spellcast && spellcast.target == guid) {
+                            if (spellcast && spellcast.targetGuid == guid) {
                                 aura.tick = this.getTickLength(
                                     auraId,
                                     spellcast

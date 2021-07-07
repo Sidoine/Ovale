@@ -384,7 +384,8 @@ export class IoC {
             runner,
             controls,
             this.scripts,
-            this.actionBar
+            this.actionBar,
+            this.guid
         );
         this.dataBroker = new OvaleDataBrokerClass(
             this.paperDoll,

@@ -10,7 +10,7 @@ export interface SpellCast extends PaperDollSnapshot {
     spellId: number;
     spellName: string;
     targetName: string;
-    target: string;
+    targetGuid: string;
     queued: number;
     success?: number;
     auraId?: number | string;
@@ -34,7 +34,7 @@ export function createSpellCast(): SpellCast {
         rangedAttackSpeedPercent: 0,
         spellCastSpeedPercent: 0,
         masteryEffect: 0,
-        target: "unknown",
+        targetGuid: "unknown",
         targetName: "target",
         spellName: "Unknown spell",
     };
