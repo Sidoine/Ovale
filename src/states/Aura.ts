@@ -942,50 +942,17 @@ export class OvaleAuraClass
                     const spellName =
                         this.ovaleSpellBook.getSpellName(spellId) ||
                         "Unknown spell";
-                    let keepSnapshot = false;
-                    const si = this.ovaleData.spellInfo[spellId];
-                    if (si && si.aura) {
-                        const auraTable =
-                            (this.ovaleGuid.isPlayerPet(guid) && si.aura.pet) ||
-                            si.aura.target;
-                        if (auraTable && auraTable[filter]) {
-                            const spellData = auraTable[filter][auraId];
-                            if (
-                                spellData &&
-                                spellData.cachedParams.named
-                                    .refresh_keep_snapshot &&
-                                (spellData.cachedParams.named.enabled ===
-                                    undefined ||
-                                    spellData.cachedParams.named.enabled)
-                            ) {
-                                keepSnapshot = true;
-                            }
-                        }
-                    }
-                    if (keepSnapshot) {
-                        this.debug.debug(
-                            "    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d), aura.serial=%d",
-                            filter,
-                            name,
-                            auraId,
-                            guid,
-                            spellName,
-                            spellId,
-                            aura.serial
-                        );
-                    } else {
-                        this.debug.debug(
-                            "    Snapshot stats for %s %s (%d) on %s applied by %s (%d), aura.serial=%d",
-                            filter,
-                            name,
-                            auraId,
-                            guid,
-                            spellName,
-                            spellId,
-                            aura.serial
-                        );
-                        this.lastSpell.copySpellcastInfo(spellcast, aura);
-                    }
+                    this.debug.debug(
+                        "    Snapshot stats for %s %s (%d) on %s applied by %s (%d), aura.serial=%d",
+                        filter,
+                        name,
+                        auraId,
+                        guid,
+                        spellName,
+                        spellId,
+                        aura.serial
+                    );
+                    this.lastSpell.copySpellcastInfo(spellcast, aura);
                 }
                 const si = this.ovaleData.spellInfo[auraId];
                 if (si) {
@@ -1917,7 +1884,6 @@ export class OvaleAuraClass
                 let extend = 0;
                 let toggle = undefined;
                 let refresh = false;
-                let keepSnapshot = false;
                 const data = this.ovaleData.checkSpellAuraData(
                     auraId,
                     spellData,
@@ -1926,9 +1892,6 @@ export class OvaleAuraClass
                 );
                 if (data.refresh) {
                     refresh = true;
-                } else if (data.refresh_keep_snapshot) {
-                    refresh = true;
-                    keepSnapshot = true;
                 } else if (data.toggle) {
                     toggle = true;
                 } else if (isNumber(data.set)) {
@@ -2043,12 +2006,7 @@ export class OvaleAuraClass
                                 aura.duration,
                                 aura.ending
                             );
-                            if (keepSnapshot) {
-                                this.debug.log(
-                                    "Aura %d keeping previous snapshot.",
-                                    auraId
-                                );
-                            } else if (spellcast) {
+                            if (spellcast) {
                                 this.lastSpell.copySpellcastInfo(
                                     spellcast,
                                     aura
