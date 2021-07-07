@@ -135,7 +135,6 @@ export interface Aura extends SpellCast {
     consumed: boolean;
     icon: string | undefined;
     stealable: boolean;
-    snapshotTime: number;
     cooldownEnding: number;
     combopoints?: number;
     damageMultiplier?: number;
@@ -329,7 +328,8 @@ let startFirst: number, endingLast: number;
 
 export class OvaleAuraClass
     extends States<AuraInterface>
-    implements StateModule {
+    implements StateModule
+{
     private debug: Tracer;
     private module: AceModule & AceEvent;
     private profiler: Profiler;
@@ -964,28 +964,24 @@ export class OvaleAuraClass
                     }
                     if (keepSnapshot) {
                         this.debug.debug(
-                            "    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d) from %f, now=%f, aura.serial=%d",
+                            "    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d), aura.serial=%d",
                             filter,
                             name,
                             auraId,
                             guid,
                             spellName,
                             spellId,
-                            aura.snapshotTime,
-                            atTime,
                             aura.serial
                         );
                     } else {
                         this.debug.debug(
-                            "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
+                            "    Snapshot stats for %s %s (%d) on %s applied by %s (%d), aura.serial=%d",
                             filter,
                             name,
                             auraId,
                             guid,
                             spellName,
                             spellId,
-                            spellcast.snapshotTime,
-                            atTime,
                             aura.serial
                         );
                         this.lastSpell.copySpellcastInfo(spellcast, aura);

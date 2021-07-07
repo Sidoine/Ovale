@@ -24,7 +24,6 @@ import {
     GetSpecialization,
     GetSpellBonusDamage,
     GetSpellCritChance,
-    GetTime,
     UnitAttackPower,
     UnitDamage,
     UnitRangedDamage,
@@ -162,8 +161,6 @@ export const ovaleSpecializationName: {
 };
 
 export class PaperDollData implements PaperDollSnapshot {
-    snapshotTime = 0;
-
     strength = 0;
     agility = 0;
     stamina = 0;
@@ -199,39 +196,37 @@ export class PaperDollData implements PaperDollSnapshot {
 }
 
 const statName: LuaArray<keyof PaperDollSnapshot> = {
-    [1]: "snapshotTime",
-    [2]: "strength",
-    [3]: "agility",
-    [4]: "stamina",
-    [5]: "intellect",
-    [6]: "attackPower",
-    [7]: "spellPower",
-    [8]: "critRating",
-    [9]: "meleeCrit",
-    [10]: "rangedCrit",
-    [11]: "spellCrit",
-    [12]: "hasteRating",
-    [13]: "hastePercent",
-    [14]: "meleeAttackSpeedPercent",
-    [15]: "rangedAttackSpeedPercent",
-    [16]: "spellCastSpeedPercent",
-    [17]: "masteryRating",
-    [18]: "masteryEffect",
-    [19]: "versatilityRating",
-    [20]: "versatility",
-    [21]: "mainHandWeaponDPS",
-    [22]: "offHandWeaponDPS",
-    [23]: "baseDamageMultiplier",
+    [1]: "strength",
+    [2]: "agility",
+    [3]: "stamina",
+    [4]: "intellect",
+    [5]: "attackPower",
+    [6]: "spellPower",
+    [7]: "critRating",
+    [8]: "meleeCrit",
+    [9]: "rangedCrit",
+    [10]: "spellCrit",
+    [11]: "hasteRating",
+    [12]: "hastePercent",
+    [13]: "meleeAttackSpeedPercent",
+    [14]: "rangedAttackSpeedPercent",
+    [15]: "spellCastSpeedPercent",
+    [16]: "masteryRating",
+    [17]: "masteryEffect",
+    [18]: "versatilityRating",
+    [19]: "versatility",
+    [20]: "mainHandWeaponDPS",
+    [21]: "offHandWeaponDPS",
+    [22]: "baseDamageMultiplier",
 };
 const snapshotStatName: LuaArray<keyof PaperDollSnapshot> = {
-    [1]: "snapshotTime",
-    [2]: "masteryEffect",
-    [3]: "baseDamageMultiplier",
+    [1]: "baseDamageMultiplier",
 };
 
 export class OvalePaperDollClass
     extends States<PaperDollSnapshot>
-    implements SpellCastModule, StateModule {
+    implements SpellCastModule, StateModule
+{
     class: ClassId;
     level = UnitLevel("player");
     specialization: SpecializationIndex | undefined = undefined;
@@ -358,7 +353,6 @@ export class OvalePaperDollClass
             this.current.stamina = UnitStat(unitId, 3);
             this.current.intellect = UnitStat(unitId, 4);
             // this.current.spirit = 0;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
             this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
@@ -386,7 +380,6 @@ export class OvalePaperDollClass
             CR_VERSATILITY_DAMAGE_DONE
         );
 
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
         this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
@@ -399,7 +392,6 @@ export class OvalePaperDollClass
             this.current.masteryEffect = GetMasteryEffect();
             this.ovale.needRefresh();
         }
-        this.current.snapshotTime = GetTime();
         this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleUnitAttackPower = (event: string, unitId: string) => {
@@ -407,7 +399,6 @@ export class OvalePaperDollClass
             this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             const [base, posBuff, negBuff] = UnitAttackPower(unitId);
             this.current.attackPower = base + posBuff + negBuff;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
             this.handleUpdateDamage();
             this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
@@ -419,7 +410,6 @@ export class OvalePaperDollClass
             const [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
             this.ovale.needRefresh();
             this.current.attackPower = base + posBuff + negBuff;
-            this.current.snapshotTime = GetTime();
             this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
@@ -428,14 +418,12 @@ export class OvalePaperDollClass
         this.current.spellPower = GetSpellBonusDamage(
             spellDamageSchools[this.class]
         );
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
         this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handlePlayerLevelUp = (event: string, level: string) => {
         this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.level = tonumber(level) || UnitLevel("player");
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
         this.debug.debugTimestamp("%s: level = %d", event, this.level);
         this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
@@ -446,7 +434,6 @@ export class OvalePaperDollClass
             this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.level = UnitLevel(unitId);
             this.debug.debugTimestamp("%s: level = %d", event, this.level);
-            this.current.snapshotTime = GetTime();
             this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
@@ -459,7 +446,6 @@ export class OvalePaperDollClass
         this.current.baseDamageMultiplier = damageMultiplier || 1;
         this.current.mainHandWeaponDPS = this.ovaleEquipement.mainHandDPS || 0;
         this.current.offHandWeaponDPS = this.ovaleEquipement.offHandDPS || 0;
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
         this.profiler.stopProfiling("OvalePaperDoll_UpdateDamage");
     };
@@ -469,7 +455,6 @@ export class OvalePaperDollClass
         if (this.specialization != newSpecialization) {
             const oldSpecialization = this.specialization;
             this.specialization = newSpecialization;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
             this.module.SendMessage(
                 "Ovale_SpecializationChanged",
@@ -572,7 +557,6 @@ export class OvalePaperDollClass
         // this.next.class = undefined;
         // this.level = undefined;
         // this.specialization = undefined;
-        this.next.snapshotTime = 0;
 
         this.next.strength = 0;
         this.next.agility = 0;

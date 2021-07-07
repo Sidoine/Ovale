@@ -154,7 +154,8 @@ export class OvaleFutureData {
 
 export class OvaleFutureClass
     extends States<OvaleFutureData>
-    implements StateModule {
+    implements StateModule
+{
     private module: AceModule & AceEvent;
     private tracer: Tracer;
     private profiler: Profiler;
@@ -796,9 +797,8 @@ export class OvaleFutureClass
             const now = GetTime();
             const [spellcast] = this.getSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
-                let [name, , , startTime, endTime, , castId] = UnitCastingInfo(
-                    unitId
-                );
+                let [name, , , startTime, endTime, , castId] =
+                    UnitCastingInfo(unitId);
                 if (lineId == castId && name == spell) {
                     startTime = startTime / 1000;
                     endTime = endTime / 1000;
@@ -858,9 +858,8 @@ export class OvaleFutureClass
             );
         } else {
             spellcast.targetName = targetName;
-            let [targetGUID, nextGUID] = this.ovaleGuid.getGuidByName(
-                targetName
-            );
+            let [targetGUID, nextGUID] =
+                this.ovaleGuid.getGuidByName(targetName);
             if (nextGUID) {
                 let name = this.ovaleGuid.getUnitName("target");
                 if (name == targetName) {
@@ -963,9 +962,8 @@ export class OvaleFutureClass
                     undefined
                 );
             }
-            let [name, , , startTime, endTime, , castId] = UnitCastingInfo(
-                unitId
-            );
+            let [name, , , startTime, endTime, , castId] =
+                UnitCastingInfo(unitId);
             if (lineId == castId && name == spellName) {
                 startTime = startTime / 1000;
                 endTime = endTime / 1000;
@@ -1479,7 +1477,8 @@ export class OvaleFutureClass
                     (<any>this.current.lastOffGCDSpellcast)[k] = v;
                 }
                 this.lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
-                this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast;
+                this.next.lastOffGCDSpellcast =
+                    this.current.lastOffGCDSpellcast;
             } else {
                 this.tracer.debug(
                     "    Caching spell %s (%d) as most recent GCD spellcast.",
@@ -1490,19 +1489,15 @@ export class OvaleFutureClass
                     (<any>this.lastSpell.lastGCDSpellcast)[k] = v;
                 }
                 this.lastSpell.lastSpellcast = this.lastSpell.lastGCDSpellcast;
-                this.next.lastGCDSpellId = this.lastSpell.lastGCDSpellcast.spellId;
+                this.next.lastGCDSpellId =
+                    this.lastSpell.lastGCDSpellcast.spellId;
             }
         }
         this.profiler.stopProfiling("OvaleFuture_UpdateLastSpellcast");
     }
 
     updateSpellcastSnapshot(spellcast: SpellCast, atTime: number) {
-        if (
-            spellcast.queued &&
-            (!spellcast.snapshotTime ||
-                (spellcast.snapshotTime < atTime &&
-                    atTime < spellcast.stop + 1))
-        ) {
+        if (spellcast.queued) {
             if (spellcast.targetName) {
                 this.tracer.debug(
                     "    Updating to snapshot from %s for spell %s to %s (%s) queued at %s.",

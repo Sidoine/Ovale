@@ -41,8 +41,6 @@ export function createSpellCast(): SpellCast {
 }
 
 export interface PaperDollSnapshot extends Powers {
-    snapshotTime?: number;
-
     strength?: number;
     agility?: number;
     intellect?: number;
