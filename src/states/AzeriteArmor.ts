@@ -7,17 +7,17 @@ import {
     tostring,
     lualength,
     ipairs,
+    kpairs,
 } from "@wowts/lua";
 import { sort, insert, concat } from "@wowts/table";
 import {
-    C_Item,
-    ItemLocation,
+    InventorySlotName,
     C_AzeriteEmpoweredItem,
     GetSpellInfo,
     AzeriteEmpoweredItemSelectionUpdatedEvent,
     PlayerEnteringWorldEvent,
 } from "@wowts/wow-mock";
-import { OvaleEquipmentClass } from "./Equipment";
+import { InventorySlotNameMap, OvaleEquipmentClass } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { DebugTools } from "../engine/debug";
@@ -30,11 +30,12 @@ import {
 } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const azeriteSlots: LuaArray<boolean> = {
-    [1]: true,
-    [3]: true,
-    [5]: true,
+const azeriteSlots: InventorySlotNameMap = {
+    HEADSLOT: true,
+    SHOULDERSLOT: true,
+    CHESTSLOT: true,
 };
+
 interface Trait {
     name?: string;
     spellID: number;
@@ -66,7 +67,7 @@ export class OvaleAzeriteArmor {
     private module: AceModule & AceEvent;
 
     constructor(
-        private equipments: OvaleEquipmentClass,
+        private equipment: OvaleEquipmentClass,
         ovale: OvaleClass,
         ovaleDebug: DebugTools
     ) {
@@ -95,7 +96,10 @@ export class OvaleAzeriteArmor {
     }
 
     private handleInitialize = () => {
-        this.module.RegisterMessage("Ovale_EquipmentChanged", this.itemChanged);
+        this.module.RegisterMessage(
+            "Ovale_EquipmentChanged",
+            this.handleOvaleEquipmentChanged
+        );
         this.module.RegisterEvent(
             "AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED",
             this.handleAzeriteEmpoweredItemSelectionUpdated
@@ -112,48 +116,53 @@ export class OvaleAzeriteArmor {
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
     };
 
-    private itemChanged = () => {
-        const slotId = this.equipments.lastChangedSlot;
-        if (slotId != undefined && azeriteSlots[slotId]) {
+    private handleOvaleEquipmentChanged = (
+        event: string,
+        slot?: InventorySlotName
+    ) => {
+        if (slot == undefined) {
+            this.updateTraits();
+        } else if (azeriteSlots[slot]) {
             this.updateTraits();
         }
     };
 
-    private handleAzeriteEmpoweredItemSelectionUpdated: AceEventHandler<AzeriteEmpoweredItemSelectionUpdatedEvent> = () => {
-        this.updateTraits();
-    };
+    private handleAzeriteEmpoweredItemSelectionUpdated: AceEventHandler<AzeriteEmpoweredItemSelectionUpdatedEvent> =
+        () => {
+            this.updateTraits();
+        };
 
-    private handlePlayerEnteringWorld: AceEventHandler<PlayerEnteringWorldEvent> = () => {
-        this.updateTraits();
-    };
+    private handlePlayerEnteringWorld: AceEventHandler<PlayerEnteringWorldEvent> =
+        () => {
+            this.updateTraits();
+        };
 
     updateTraits() {
         this.traits = {};
-        for (const [slotId] of pairs(azeriteSlots)) {
-            const itemSlot = ItemLocation.CreateFromEquipmentSlot(slotId);
+        for (const [slot] of kpairs(azeriteSlots)) {
+            const location = this.equipment.getEquippedItemLocation(slot);
             if (
-                C_Item.DoesItemExist(itemSlot) &&
-                C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(itemSlot)
+                location != undefined &&
+                C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(location)
             ) {
-                const allTraits = C_AzeriteEmpoweredItem.GetAllTierInfo(
-                    itemSlot
-                );
+                const allTraits =
+                    C_AzeriteEmpoweredItem.GetAllTierInfo(location);
                 for (const [, traitsInRow] of pairs(allTraits)) {
                     for (const [, powerId] of pairs(
                         traitsInRow.azeritePowerIDs
                     )) {
-                        const isEnabled = C_AzeriteEmpoweredItem.IsPowerSelected(
-                            itemSlot,
-                            powerId
-                        );
-                        if (isEnabled) {
-                            const powerInfo = C_AzeriteEmpoweredItem.GetPowerInfo(
+                        const isEnabled =
+                            C_AzeriteEmpoweredItem.IsPowerSelected(
+                                location,
                                 powerId
                             );
+                        if (isEnabled) {
+                            const powerInfo =
+                                C_AzeriteEmpoweredItem.GetPowerInfo(powerId);
                             const [name] = GetSpellInfo(powerInfo.spellID);
                             if (this.traits[powerInfo.spellID]) {
-                                const rank = this.traits[powerInfo.spellID]
-                                    .rank;
+                                const rank =
+                                    this.traits[powerInfo.spellID].rank;
                                 this.traits[powerInfo.spellID].rank = rank + 1;
                             } else {
                                 this.traits[powerInfo.spellID] = {

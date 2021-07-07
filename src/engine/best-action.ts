@@ -1,8 +1,9 @@
 import { OvaleActionBarClass } from "./action-bar";
 import { OvaleDataClass } from "./data";
-import { OvaleEquipmentClass, SlotName } from "../states/Equipment";
+import { OvaleEquipmentClass } from "../states/Equipment";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { pairs, tonumber } from "@wowts/lua";
+import { pairs, tonumber, tostring } from "@wowts/lua";
+import { upper } from "@wowts/string";
 import {
     GetActionCooldown,
     GetActionTexture,
@@ -10,6 +11,7 @@ import {
     GetItemCooldown,
     GetItemSpell,
     GetSpellTexture,
+    InventorySlotName,
     IsActionInRange,
     IsItemInRange,
     IsUsableAction,
@@ -86,9 +88,8 @@ export class OvaleBestActionClass {
         const result = node.result;
         setResultType(result, "action");
         if (!isNumber(itemId)) {
-            const itemIdFromSlot = this.ovaleEquipment.getEquippedItemBySlotName(
-                <SlotName>itemId
-            );
+            const slot = <InventorySlotName>upper(tostring(itemId));
+            const itemIdFromSlot = this.ovaleEquipment.getEquippedItemId(slot);
             if (!itemIdFromSlot) {
                 this.tracer.log("Unknown item '%s'.", itemId);
                 return result;
@@ -234,9 +235,8 @@ export class OvaleBestActionClass {
                 spellId,
                 replacedSpellId
             );
-            actionSlot = this.ovaleActionBar.getSpellActionSlot(
-                replacedSpellId
-            );
+            actionSlot =
+                this.ovaleActionBar.getSpellActionSlot(replacedSpellId);
             if (actionSlot) spellId = replacedSpellId;
         }
         let isKnownSpell = this.spellBook.isKnownSpell(spellId);
