@@ -30,11 +30,6 @@ import { OptionUiAll } from "../ui/acegui-helpers";
 
 const strlower = lower;
 
-const spellcastInfoPowerTypes: LuaArray<PowerType> = {
-    1: "chi",
-    2: "holypower",
-};
-
 interface PowerInfo {
     id: number;
     token: string;
@@ -478,13 +473,6 @@ export class OvalePowerClass extends States<PowerState> implements StateModule {
         }
         return concat(array, "\n");
     }
-    copySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
-        for (const [, powerType] of pairs(spellcastInfoPowerTypes)) {
-            if (spellcast[powerType]) {
-                dest[powerType] = spellcast[powerType];
-            }
-        }
-    };
 
     initializeState() {
         for (const [powerType] of kpairs(this.powerInfos)) {

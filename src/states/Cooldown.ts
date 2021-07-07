@@ -91,7 +91,8 @@ export class CooldownData {
 
 export class OvaleCooldownClass
     extends States<CooldownData>
-    implements SpellCastModule, StateModule {
+    implements SpellCastModule, StateModule
+{
     serial = 0;
     sharedCooldown: LuaObj<LuaArray<boolean>> = {};
     gcd = {
@@ -262,12 +263,14 @@ export class OvaleCooldownClass
         }
         return [gcd, haste];
     }
+
     copySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
         if (spellcast.offgcd) {
             dest.offgcd = spellcast.offgcd;
         }
     };
-    saveSpellcastInfo = (spellcast: SpellCast) => {
+
+    saveSpellcastInfo = (spellcast: SpellCast, atTime: number) => {
         const spellId = spellcast.spellId;
         if (spellId) {
             const gcd = this.ovaleData.getSpellInfoProperty(
@@ -321,12 +324,8 @@ export class OvaleCooldownClass
             cd.duration = duration;
             cd.enable = enable;
             if (isNumber(spellId)) {
-                const [
-                    charges,
-                    maxCharges,
-                    chargeStart,
-                    chargeDuration,
-                ] = GetSpellCharges(spellId);
+                const [charges, maxCharges, chargeStart, chargeDuration] =
+                    GetSpellCharges(spellId);
                 if (charges) {
                     cd.charges = charges;
                     cd.maxCharges = maxCharges;
@@ -408,9 +407,8 @@ export class OvaleCooldownClass
                     targetGUID
                 );
                 if (haste) {
-                    const multiplier = this.ovalePaperDoll.getBaseHasteMultiplier(
-                        this.ovalePaperDoll.next
-                    );
+                    const multiplier =
+                        this.ovalePaperDoll.getBaseHasteMultiplier(atTime);
                     duration = duration / multiplier;
                 }
             }

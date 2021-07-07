@@ -12,7 +12,7 @@ import { Guids } from "../engine/guid";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
-import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
+import { LastSpell, SpellCast } from "./LastSpell";
 import { OvalePowerClass } from "./Power";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -772,13 +772,8 @@ export class OvaleAuraClass
         } else {
             spellId = undefined;
         }
-        const duration = this.getBaseDuration(
-            auraId,
-            spellId,
-            atTime,
-            this.ovalePaperDoll.next
-        );
-        const tick = this.getTickLength(auraId, this.ovalePaperDoll.next);
+        const duration = this.getBaseDuration(auraId, spellId, atTime);
+        const tick = this.getTickLength(auraId, atTime);
         const aura = this.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const remainingDuration = aura.ending - atTime;
@@ -965,10 +960,7 @@ export class OvaleAuraClass
                         if (!auraIsActive) {
                             aura.baseTick = si.tick;
                             if (spellcast && spellcast.target == guid) {
-                                aura.tick = this.getTickLength(
-                                    auraId,
-                                    spellcast
-                                );
+                                aura.tick = this.getTickLength(auraId, atTime);
                             } else {
                                 aura.tick = this.getTickLength(auraId);
                             }
@@ -2079,10 +2071,7 @@ export class OvaleAuraClass
                             aura.duration = duration;
                             if (si && si.tick) {
                                 aura.baseTick = si.tick;
-                                aura.tick = this.getTickLength(
-                                    auraId,
-                                    spellcast
-                                );
+                                aura.tick = this.getTickLength(auraId, atTime);
                             }
                             aura.ending = aura.start + aura.duration;
                             aura.gain = aura.start;
@@ -2114,8 +2103,7 @@ export class OvaleAuraClass
         debuffType: string | undefined,
         start: number,
         ending: number,
-        atTime: number,
-        snapshot?: PaperDollSnapshot
+        atTime: number
     ) {
         const aura = <Aura>pool.get();
         aura.state = true;
@@ -2129,7 +2117,6 @@ export class OvaleAuraClass
         aura.stacks = 1;
         aura.debuffType =
             (isString(debuffType) && lower(debuffType)) || debuffType;
-        this.ovalePaperDoll.updateSnapshot(aura, snapshot);
         putAura(this.next.aura, guid, auraId, casterGUID, aura);
         return aura;
     }
@@ -2177,9 +2164,8 @@ export class OvaleAuraClass
         auraId: number,
         spellId?: number | string,
         atTime?: number,
-        spellcast?: PaperDollSnapshot
+        spellcast?: SpellCast
     ) {
-        spellcast = spellcast || this.ovalePaperDoll.getState(atTime);
         let duration = INFINITY;
         const si = this.ovaleData.spellInfo[auraId];
         if (si && si.duration) {
@@ -2192,8 +2178,7 @@ export class OvaleAuraClass
             ) || [15, 1];
             if (si.add_duration_combopoints) {
                 const powerState = this.ovalePower.getState(atTime);
-                const combopoints =
-                    spellcast.combopoints || powerState.power.combopoints || 0;
+                const combopoints = powerState.power.combopoints || 0;
                 duration =
                     (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {
@@ -2216,24 +2201,23 @@ export class OvaleAuraClass
         }
         // Most aura durations are no longer reduced by haste
         // but the ones that do still need their reduction
-        if (si && si.haste && spellcast) {
+        if (si && si.haste) {
             const hasteMultiplier = this.ovalePaperDoll.getHasteMultiplier(
                 si.haste,
-                spellcast
+                atTime
             );
             duration = duration / hasteMultiplier;
         }
         return duration;
     }
-    getTickLength(auraId: number, snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.ovalePaperDoll.current;
+    getTickLength(auraId: number, atTime?: number) {
         let tick = 3;
         const si = this.ovaleData.spellInfo[auraId];
         if (si) {
             tick = si.tick || tick;
             const hasteMultiplier = this.ovalePaperDoll.getHasteMultiplier(
                 si.haste,
-                snapshot
+                atTime
             );
             tick = tick / hasteMultiplier;
         }

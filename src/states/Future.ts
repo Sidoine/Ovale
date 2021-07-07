@@ -5,6 +5,7 @@ import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import {
     LastSpell,
     SpellCast,
+    SpellCastModule,
     lastSpellCastPool,
     createSpellCast,
 } from "./LastSpell";
@@ -154,7 +155,7 @@ export class OvaleFutureData {
 
 export class OvaleFutureClass
     extends States<OvaleFutureData>
-    implements StateModule
+    implements SpellCastModule, StateModule
 {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
@@ -295,9 +296,11 @@ export class OvaleFutureClass
             "Ovale_AuraChanged",
             this.handleAuraChanged
         );
+        this.lastSpell.registerSpellcastInfo(this);
     };
 
     private handleDisable = () => {
+        this.lastSpell.unregisterSpellcastInfo(this);
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
@@ -566,7 +569,7 @@ export class OvaleFutureClass
                 if (
                     isSameSpellcast(spellcast, this.lastSpell.lastGCDSpellcast)
                 ) {
-                    this.updateSpellcastSnapshot(
+                    this.updateSpellcastInfo(
                         this.lastSpell.lastGCDSpellcast,
                         timeAuraAdded
                     );
@@ -574,7 +577,7 @@ export class OvaleFutureClass
                 if (
                     isSameSpellcast(spellcast, this.current.lastOffGCDSpellcast)
                 ) {
-                    this.updateSpellcastSnapshot(
+                    this.updateSpellcastInfo(
                         this.current.lastOffGCDSpellcast,
                         timeAuraAdded
                     );
@@ -647,7 +650,7 @@ export class OvaleFutureClass
                         delta,
                         endTime
                     );
-                    this.saveSpellcastInfo(spellcast, now);
+                    this.lastSpell.saveSpellcastInfo(spellcast, now);
                     this.updateLastSpellcast(now, spellcast);
                     this.updateCounters(
                         spellId,
@@ -894,7 +897,7 @@ export class OvaleFutureClass
                 );
             }
         }
-        this.saveSpellcastInfo(spellcast, now);
+        this.lastSpell.saveSpellcastInfo(spellcast, now);
         return spellcast;
     }
 
@@ -996,7 +999,7 @@ export class OvaleFutureClass
                         auraGUID
                     );
                 }
-                this.saveSpellcastInfo(spellcast, now);
+                this.lastSpell.saveSpellcastInfo(spellcast, now);
                 this.updateLastSpellcast(now, spellcast);
                 this.ovale.needRefresh();
             } else if (!name) {
@@ -1048,7 +1051,7 @@ export class OvaleFutureClass
                         spellcast.stop
                     );
                     spellcast.success = now;
-                    this.updateSpellcastSnapshot(spellcast, now);
+                    this.updateSpellcastInfo(spellcast, now);
                     success = true;
                 } else {
                     const name = UnitChannelInfo(unitId);
@@ -1083,7 +1086,7 @@ export class OvaleFutureClass
                                 auraGUID
                             );
                         }
-                        this.saveSpellcastInfo(spellcast, now);
+                        this.lastSpell.saveSpellcastInfo(spellcast, now);
                         success = true;
                     } else {
                         this.tracer.debug(
@@ -1156,14 +1159,8 @@ export class OvaleFutureClass
     ) => {
         if (guid == this.ovale.playerGUID) {
             timeAuraAdded = atTime;
-            this.updateSpellcastSnapshot(
-                this.lastSpell.lastGCDSpellcast,
-                atTime
-            );
-            this.updateSpellcastSnapshot(
-                this.current.lastOffGCDSpellcast,
-                atTime
-            );
+            this.updateSpellcastInfo(this.lastSpell.lastGCDSpellcast, atTime);
+            this.updateSpellcastInfo(this.current.lastOffGCDSpellcast, atTime);
         }
     };
 
@@ -1364,13 +1361,11 @@ export class OvaleFutureClass
         return [auraId, auraGUID];
     }
 
-    saveSpellcastInfo(spellcast: SpellCast, atTime: number) {
-        this.profiler.startProfiling("OvaleFuture_SaveSpellcastInfo");
-        this.tracer.debug(
-            "    Saving information from %s to the spellcast for %s.",
-            atTime,
-            spellcast.spellName
-        );
+    copySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
+        dest.damageMultiplier = spellcast.damageMultiplier;
+    };
+
+    saveSpellcastInfo = (spellcast: SpellCast, atTime: number) => {
         if (spellcast.spellId) {
             spellcast.damageMultiplier = this.getDamageMultiplier(
                 spellcast.spellId,
@@ -1378,14 +1373,7 @@ export class OvaleFutureClass
                 atTime
             );
         }
-        for (const [, mod] of pairs(this.lastSpell.modules)) {
-            const func = mod.saveSpellcastInfo;
-            if (func) {
-                func(spellcast, atTime);
-            }
-        }
-        this.profiler.stopProfiling("OvaleFuture_SaveSpellcastInfo");
-    }
+    };
 
     getDamageMultiplier(spellId: number, targetGUID: string, atTime: number) {
         let damageMultiplier = 1;
@@ -1496,11 +1484,11 @@ export class OvaleFutureClass
         this.profiler.stopProfiling("OvaleFuture_UpdateLastSpellcast");
     }
 
-    updateSpellcastSnapshot(spellcast: SpellCast, atTime: number) {
+    updateSpellcastInfo(spellcast: SpellCast, atTime: number) {
         if (spellcast.queued) {
             if (spellcast.targetName) {
                 this.tracer.debug(
-                    "    Updating to snapshot from %s for spell %s to %s (%s) queued at %s.",
+                    "    Updating to state at time=%s for spell %s to %s (%s) queued at %s.",
                     atTime,
                     spellcast.spellName,
                     spellcast.targetName,
@@ -1509,30 +1497,18 @@ export class OvaleFutureClass
                 );
             } else {
                 this.tracer.debug(
-                    "    Updating to snapshot from %s for spell %s with no target queued at %s.",
+                    "    Updating to state at time=%s for spell %s with no target queued at %s.",
                     atTime,
                     spellcast.spellName,
                     spellcast.queued
                 );
             }
-            // TODO strange, why current?
-            this.ovalePaperDoll.updateSnapshot(
-                spellcast,
-                this.ovalePaperDoll.current,
-                true
-            );
-            if (spellcast.spellId) {
-                spellcast.damageMultiplier = this.getDamageMultiplier(
-                    spellcast.spellId,
-                    spellcast.target,
-                    atTime
+            this.lastSpell.saveSpellcastInfo(spellcast, atTime);
+            if (spellcast.damageMultiplier != 1) {
+                this.tracer.debug(
+                    "        persistent multiplier = %f",
+                    spellcast.damageMultiplier
                 );
-                if (spellcast.damageMultiplier != 1) {
-                    this.tracer.debug(
-                        "        persistent multiplier = %f",
-                        spellcast.damageMultiplier
-                    );
-                }
             }
         }
     }
@@ -1628,7 +1604,7 @@ export class OvaleFutureClass
             }
             const multiplier = this.ovalePaperDoll.getHasteMultiplier(
                 haste,
-                this.ovalePaperDoll.next
+                atTime
             );
             gcd = gcd / multiplier;
             gcd = (gcd > 0.75 && gcd) || 0.75;
@@ -1820,17 +1796,8 @@ export class OvaleFutureClass
                 spellcast.start = startCast;
                 spellcast.stop = endCast;
                 spellcast.channel = channel;
-                this.ovalePaperDoll.updateSnapshot(
-                    spellcast,
-                    this.ovalePaperDoll.next
-                );
                 const atTime = (channel && startCast) || endCast;
-                for (const [, mod] of pairs(this.lastSpell.modules)) {
-                    const func = mod.saveSpellcastInfo;
-                    if (func) {
-                        func(spellcast, atTime, this.ovalePaperDoll.next);
-                    }
-                }
+                this.lastSpell.saveSpellcastInfo(spellcast, atTime);
             }
             // this.next.lastCast = this.next.currentCast;
             if (spellcast.castByPlayer) {
