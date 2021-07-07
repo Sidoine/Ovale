@@ -1,3 +1,4 @@
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     LuaArray,
     ipairs,
@@ -8,8 +9,9 @@ import {
     wipe,
 } from "@wowts/lua";
 import { concat, insert } from "@wowts/table";
+import { AceModule } from "@wowts/tsaddon";
 import { C_LegendaryCrafting, Enum } from "@wowts/wow-mock";
-import { OptionUiGroup } from "../ui/acegui-helpers";
+import { OvaleClass } from "../Ovale";
 import {
     ConditionFunction,
     OvaleConditionClass,
@@ -17,9 +19,7 @@ import {
 } from "../engine/condition";
 import { DebugTools } from "../engine/debug";
 import { isNumber, oneTimeMessage } from "../tools/tools";
-import { OvaleClass } from "../Ovale";
-import { AceModule } from "@wowts/tsaddon";
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
+import { OptionUiGroup } from "../ui/acegui-helpers";
 import { OvaleEquipmentClass, inventorySlotNames } from "./Equipment";
 
 export class Runeforge {
