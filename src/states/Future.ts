@@ -49,8 +49,6 @@ import {
 } from "../engine/condition";
 import { Runner } from "../engine/runner";
 
-const strsub = sub;
-const tremove = remove;
 let timeAuraAdded: undefined | number = undefined;
 
 // let SIMULATOR_LAG = 0.005;
@@ -362,7 +360,7 @@ export class OvaleFutureClass
             if (spellCastEvents[cleuEvent]) {
                 const now = GetTime();
                 if (
-                    strsub(cleuEvent, 1, 11) == "SPELL_CAST_" &&
+                    sub(cleuEvent, 1, 11) == "SPELL_CAST_" &&
                     destName &&
                     destName != ""
                 ) {
@@ -591,7 +589,7 @@ export class OvaleFutureClass
                 spellId,
                 delta
             );
-            tremove(this.lastSpell.queue, i);
+            remove(this.lastSpell.queue, i);
             lastSpellCastPool.release(spellcast);
             this.ovale.needRefresh();
             this.module.SendMessage(
@@ -710,7 +708,7 @@ export class OvaleFutureClass
                 spellcast.stop = now;
                 this.updateLastSpellcast(now, spellcast);
                 const targetGUID = spellcast.target;
-                tremove(this.lastSpell.queue, index);
+                remove(this.lastSpell.queue, index);
                 lastSpellCastPool.release(spellcast);
                 this.ovale.needRefresh();
                 this.module.SendMessage(
@@ -1127,7 +1125,7 @@ export class OvaleFutureClass
                         finish = "hit";
                     }
                     if (finished) {
-                        tremove(this.lastSpell.queue, index);
+                        remove(this.lastSpell.queue, index);
                         lastSpellCastPool.release(spellcast);
                         this.ovale.needRefresh();
                         this.module.SendMessage(
@@ -1252,7 +1250,7 @@ export class OvaleFutureClass
                     this.tracer.debug(
                         "Remove spell from queue because there was no success before"
                     );
-                    tremove(this.lastSpell.queue, index);
+                    remove(this.lastSpell.queue, index);
                     lastSpellCastPool.release(spellcast);
                     this.ovale.needRefresh();
                 }

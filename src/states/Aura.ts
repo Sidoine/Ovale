@@ -56,9 +56,6 @@ import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
-const strlower = lower;
-const tconcat = concat;
-
 let playerGUID = "fake_guid";
 let petGUIDs: LuaObj<number> = {};
 const pool = new OvalePool<Aura | LuaObj<Aura> | LuaObj<LuaObj<Aura>>>(
@@ -84,7 +81,7 @@ export const spellInfoDebuffTypes: LuaObj<string> = {};
 
 {
     for (const [debuffType] of pairs(debuffTypes)) {
-        const siDebuffType = strlower(debuffType);
+        const siDebuffType = lower(debuffType);
         spellInfoDebuffTypes[siDebuffType] = debuffType;
     }
 }
@@ -435,7 +432,7 @@ export class OvaleAuraClass
                                 output[lualength(output) + 1] = "== DEBUFFS ==";
                                 output[lualength(output) + 1] = harmful;
                             }
-                            return tconcat(output, "\n");
+                            return concat(output, "\n");
                         },
                     },
                 },
@@ -470,7 +467,7 @@ export class OvaleAuraClass
                                 output[lualength(output) + 1] = "== DEBUFFS ==";
                                 output[lualength(output) + 1] = harmful;
                             }
-                            return tconcat(output, "\n");
+                            return concat(output, "\n");
                         },
                     },
                 },
