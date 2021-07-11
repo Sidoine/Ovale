@@ -339,23 +339,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const auraId = positionalParams[1];
-        const [target, filter, mine] = this.parseCondition(
-            positionalParams,
-            namedParams
-        );
-        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
-        if (aura && this.auras.isActiveAura(aura, atTime)) {
-            const value = (aura && aura.combopoints) || 0;
-            return returnValueBetween(
-                aura.gain,
-                aura.ending,
-                value,
-                aura.start,
-                0
-            );
-        }
-        return returnConstant(0);
+        const combopoints = 0;
+        oneTimeMessage("Warning: 'BuffComboPoints()' is not implemented.");
+        return returnConstant(combopoints);
     };
 
     /** Get the number of seconds before a buff can be gained again.
