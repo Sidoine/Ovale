@@ -135,20 +135,8 @@ export class OvaleWarlockClass implements StateModule {
         event: string,
         ...parameters: any[]
     ) => {
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            destGUID,
-            ,
-            ,
-            ,
-            spellId,
-        ] = CombatLogGetCurrentEventInfo();
+        const [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId] =
+            CombatLogGetCurrentEventInfo();
         if (sourceGUID != this.ovale.playerGUID) {
             return;
         }
@@ -310,20 +298,16 @@ export class OvaleWarlockClass implements StateModule {
      * Based on SimulationCraft function time_to_shard
      * Seeks to return the average expected time for the player to generate a single soul shard.
      */
-    private getTimeToShard(now: number) {
+    private getTimeToShard(atTime: number) {
         let value = 3600;
         const tickTime =
-            2 /
-            this.ovalePaperDoll.getHasteMultiplier(
-                "spell",
-                this.ovalePaperDoll.next
-            );
+            2 / this.ovalePaperDoll.getHasteMultiplier("spell", atTime);
         const [activeAgonies] = this.ovaleAura.auraCount(
             SpellId.agony,
             "HARMFUL",
             true,
             undefined,
-            now,
+            atTime,
             undefined
         );
         if (activeAgonies > 0) {

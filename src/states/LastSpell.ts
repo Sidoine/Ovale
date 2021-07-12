@@ -3,7 +3,7 @@ import { lualength, LuaObj, LuaArray, pairs } from "@wowts/lua";
 import { remove, insert } from "@wowts/table";
 import { Powers } from "./Power";
 
-export interface SpellCast extends PaperDollSnapshot {
+export interface SpellCast extends Powers {
     stop: number;
     start: number;
     lineId?: string;
@@ -20,7 +20,6 @@ export interface SpellCast extends PaperDollSnapshot {
     castByPlayer?: boolean;
     offgcd?: boolean;
     damageMultiplier?: number;
-    combopoints?: number;
 }
 
 export function createSpellCast(): SpellCast {
@@ -29,61 +28,15 @@ export function createSpellCast(): SpellCast {
         stop: 0,
         start: 0,
         queued: 0,
-        hastePercent: 0,
-        meleeAttackSpeedPercent: 0,
-        rangedAttackSpeedPercent: 0,
-        spellCastSpeedPercent: 0,
-        masteryEffect: 0,
         target: "unknown",
         targetName: "target",
         spellName: "Unknown spell",
     };
 }
 
-export interface PaperDollSnapshot extends Powers {
-    snapshotTime?: number;
-
-    strength?: number;
-    agility?: number;
-    intellect?: number;
-    stamina?: number;
-    // spirit?: number;
-
-    attackPower?: number;
-    spellPower?: number;
-    //rangedAttackPower?: number;
-    //spellBonusDamage?: number;
-    //spellBonusHealing?: number;
-
-    critRating?: number;
-    meleeCrit?: number;
-    rangedCrit?: number;
-    spellCrit?: number;
-
-    hasteRating?: number;
-    hastePercent: number;
-    meleeAttackSpeedPercent: number;
-    rangedAttackSpeedPercent: number;
-    spellCastSpeedPercent: number;
-
-    masteryRating?: number;
-    masteryEffect: number;
-
-    versatilityRating?: number;
-    versatility?: number;
-
-    mainHandWeaponDPS?: number;
-    offHandWeaponDPS?: number;
-    baseDamageMultiplier?: number;
-}
-
 export interface SpellCastModule {
     copySpellcastInfo: (spellcast: SpellCast, dest: SpellCast) => void;
-    saveSpellcastInfo: (
-        spellcast: SpellCast,
-        atTime: number,
-        future?: PaperDollSnapshot
-    ) => void;
+    saveSpellcastInfo: (spellcast: SpellCast, atTime: number) => void;
 }
 
 export const lastSpellCastPool = new OvalePool<SpellCast>("OvaleFuture_pool");
@@ -114,14 +67,19 @@ export class LastSpell {
         }
         return spellcast;
     }
+
     copySpellcastInfo(spellcast: SpellCast, dest: SpellCast) {
-        if (spellcast.damageMultiplier) {
-            dest.damageMultiplier = spellcast.damageMultiplier;
-        }
         for (const [, mod] of pairs(this.modules)) {
-            const func = mod.copySpellcastInfo;
-            if (func) {
-                func(spellcast, dest);
+            if (mod.copySpellcastInfo) {
+                mod.copySpellcastInfo(spellcast, dest);
+            }
+        }
+    }
+
+    saveSpellcastInfo(spellcast: SpellCast, atTime: number) {
+        for (const [, mod] of pairs(this.modules)) {
+            if (mod.saveSpellcastInfo) {
+                mod.saveSpellcastInfo(spellcast, atTime);
             }
         }
     }
@@ -129,6 +87,7 @@ export class LastSpell {
     registerSpellcastInfo(mod: SpellCastModule) {
         insert(this.modules, mod);
     }
+
     unregisterSpellcastInfo(mod: SpellCastModule) {
         for (let i = lualength(this.modules); i >= 1; i += -1) {
             if (this.modules[i] == mod) {

@@ -5,7 +5,7 @@ import { ipairs, LuaArray, wipe } from "@wowts/lua";
 import { GetRuneCooldown, GetTime } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { sort } from "@wowts/table";
-import { SpellCast, PaperDollSnapshot } from "./LastSpell";
+import { SpellCast } from "./LastSpell";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, DebugTools } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
@@ -207,7 +207,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         if (si) {
             let count = si.runes || 0;
             while (count > 0) {
-                this.consumeRune(spellId, atTime, spellcast);
+                this.consumeRune(spellId, atTime);
                 count = count - 1;
             }
         }
@@ -219,7 +219,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
         }
         rune.endCooldown = atTime;
     }
-    consumeRune(spellId: number, atTime: number, snapshot: PaperDollSnapshot) {
+    consumeRune(spellId: number, atTime: number) {
         this.profiler.startProfiling("OvaleRunes_state_ConsumeRune");
         let consumedRune: Rune | undefined;
         for (let slot = 1; slot <= runeSlots; slot += 1) {
@@ -239,9 +239,7 @@ export class OvaleRunesClass extends States<RuneData> implements StateModule {
             }
             const duration =
                 10 /
-                this.ovalePaperDoll.getSpellCastSpeedPercentMultiplier(
-                    snapshot
-                );
+                this.ovalePaperDoll.getSpellCastSpeedPercentMultiplier(atTime);
             consumedRune.startCooldown = start;
             consumedRune.endCooldown = start + duration;
             const runicpower =
