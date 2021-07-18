@@ -1,4 +1,4 @@
-import { test } from "@jest/globals";
+import { test, expect } from "@jest/globals";
 import { assertDefined, assertIs } from "../tests/helpers";
 import { executeDump } from "./icon";
 

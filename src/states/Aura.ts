@@ -12,7 +12,7 @@ import { Guids } from "../engine/guid";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleClass } from "../Ovale";
-import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
+import { LastSpell, SpellCast } from "./LastSpell";
 import { OvalePowerClass } from "./Power";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
@@ -56,9 +56,6 @@ import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
-const strlower = lower;
-const tconcat = concat;
-
 let playerGUID = "fake_guid";
 let petGUIDs: LuaObj<number> = {};
 const pool = new OvalePool<Aura | LuaObj<Aura> | LuaObj<LuaObj<Aura>>>(
@@ -84,7 +81,7 @@ export const spellInfoDebuffTypes: LuaObj<string> = {};
 
 {
     for (const [debuffType] of pairs(debuffTypes)) {
-        const siDebuffType = strlower(debuffType);
+        const siDebuffType = lower(debuffType);
         spellInfoDebuffTypes[siDebuffType] = debuffType;
     }
 }
@@ -135,7 +132,6 @@ export interface Aura extends SpellCast {
     consumed: boolean;
     icon: string | undefined;
     stealable: boolean;
-    snapshotTime: number;
     cooldownEnding: number;
     combopoints?: number;
     damageMultiplier?: number;
@@ -329,7 +325,8 @@ let startFirst: number, endingLast: number;
 
 export class OvaleAuraClass
     extends States<AuraInterface>
-    implements StateModule {
+    implements StateModule
+{
     private debug: Tracer;
     private module: AceModule & AceEvent;
     private profiler: Profiler;
@@ -435,7 +432,7 @@ export class OvaleAuraClass
                                 output[lualength(output) + 1] = "== DEBUFFS ==";
                                 output[lualength(output) + 1] = harmful;
                             }
-                            return tconcat(output, "\n");
+                            return concat(output, "\n");
                         },
                     },
                 },
@@ -470,7 +467,7 @@ export class OvaleAuraClass
                                 output[lualength(output) + 1] = "== DEBUFFS ==";
                                 output[lualength(output) + 1] = harmful;
                             }
-                            return tconcat(output, "\n");
+                            return concat(output, "\n");
                         },
                     },
                 },
@@ -772,13 +769,8 @@ export class OvaleAuraClass
         } else {
             spellId = undefined;
         }
-        const duration = this.getBaseDuration(
-            auraId,
-            spellId,
-            atTime,
-            this.ovalePaperDoll.next
-        );
-        const tick = this.getTickLength(auraId, this.ovalePaperDoll.next);
+        const duration = this.getBaseDuration(auraId, spellId, atTime);
+        const tick = this.getTickLength(auraId, atTime);
         const aura = this.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const remainingDuration = aura.ending - atTime;
@@ -942,54 +934,17 @@ export class OvaleAuraClass
                     const spellName =
                         this.ovaleSpellBook.getSpellName(spellId) ||
                         "Unknown spell";
-                    let keepSnapshot = false;
-                    const si = this.ovaleData.spellInfo[spellId];
-                    if (si && si.aura) {
-                        const auraTable =
-                            (this.ovaleGuid.isPlayerPet(guid) && si.aura.pet) ||
-                            si.aura.target;
-                        if (auraTable && auraTable[filter]) {
-                            const spellData = auraTable[filter][auraId];
-                            if (
-                                spellData &&
-                                spellData.cachedParams.named
-                                    .refresh_keep_snapshot &&
-                                (spellData.cachedParams.named.enabled ===
-                                    undefined ||
-                                    spellData.cachedParams.named.enabled)
-                            ) {
-                                keepSnapshot = true;
-                            }
-                        }
-                    }
-                    if (keepSnapshot) {
-                        this.debug.debug(
-                            "    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d) from %f, now=%f, aura.serial=%d",
-                            filter,
-                            name,
-                            auraId,
-                            guid,
-                            spellName,
-                            spellId,
-                            aura.snapshotTime,
-                            atTime,
-                            aura.serial
-                        );
-                    } else {
-                        this.debug.debug(
-                            "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
-                            filter,
-                            name,
-                            auraId,
-                            guid,
-                            spellName,
-                            spellId,
-                            spellcast.snapshotTime,
-                            atTime,
-                            aura.serial
-                        );
-                        this.lastSpell.copySpellcastInfo(spellcast, aura);
-                    }
+                    this.debug.debug(
+                        "    Snapshot stats for %s %s (%d) on %s applied by %s (%d), aura.serial=%d",
+                        filter,
+                        name,
+                        auraId,
+                        guid,
+                        spellName,
+                        spellId,
+                        aura.serial
+                    );
+                    this.lastSpell.copySpellcastInfo(spellcast, aura);
                 }
                 const si = this.ovaleData.spellInfo[auraId];
                 if (si) {
@@ -1002,10 +957,7 @@ export class OvaleAuraClass
                         if (!auraIsActive) {
                             aura.baseTick = si.tick;
                             if (spellcast && spellcast.target == guid) {
-                                aura.tick = this.getTickLength(
-                                    auraId,
-                                    spellcast
-                                );
+                                aura.tick = this.getTickLength(auraId, atTime);
                             } else {
                                 aura.tick = this.getTickLength(auraId);
                             }
@@ -1921,7 +1873,6 @@ export class OvaleAuraClass
                 let extend = 0;
                 let toggle = undefined;
                 let refresh = false;
-                let keepSnapshot = false;
                 const data = this.ovaleData.checkSpellAuraData(
                     auraId,
                     spellData,
@@ -1930,9 +1881,6 @@ export class OvaleAuraClass
                 );
                 if (data.refresh) {
                     refresh = true;
-                } else if (data.refresh_keep_snapshot) {
-                    refresh = true;
-                    keepSnapshot = true;
                 } else if (data.toggle) {
                     toggle = true;
                 } else if (isNumber(data.set)) {
@@ -2047,12 +1995,7 @@ export class OvaleAuraClass
                                 aura.duration,
                                 aura.ending
                             );
-                            if (keepSnapshot) {
-                                this.debug.log(
-                                    "Aura %d keeping previous snapshot.",
-                                    auraId
-                                );
-                            } else if (spellcast) {
+                            if (spellcast) {
                                 this.lastSpell.copySpellcastInfo(
                                     spellcast,
                                     aura
@@ -2125,10 +2068,7 @@ export class OvaleAuraClass
                             aura.duration = duration;
                             if (si && si.tick) {
                                 aura.baseTick = si.tick;
-                                aura.tick = this.getTickLength(
-                                    auraId,
-                                    spellcast
-                                );
+                                aura.tick = this.getTickLength(auraId, atTime);
                             }
                             aura.ending = aura.start + aura.duration;
                             aura.gain = aura.start;
@@ -2160,8 +2100,7 @@ export class OvaleAuraClass
         debuffType: string | undefined,
         start: number,
         ending: number,
-        atTime: number,
-        snapshot?: PaperDollSnapshot
+        atTime: number
     ) {
         const aura = <Aura>pool.get();
         aura.state = true;
@@ -2175,7 +2114,6 @@ export class OvaleAuraClass
         aura.stacks = 1;
         aura.debuffType =
             (isString(debuffType) && lower(debuffType)) || debuffType;
-        this.ovalePaperDoll.updateSnapshot(aura, snapshot);
         putAura(this.next.aura, guid, auraId, casterGUID, aura);
         return aura;
     }
@@ -2223,9 +2161,8 @@ export class OvaleAuraClass
         auraId: number,
         spellId?: number | string,
         atTime?: number,
-        spellcast?: PaperDollSnapshot
+        spellcast?: SpellCast
     ) {
-        spellcast = spellcast || this.ovalePaperDoll.getState(atTime);
         let duration = INFINITY;
         const si = this.ovaleData.spellInfo[auraId];
         if (si && si.duration) {
@@ -2238,8 +2175,7 @@ export class OvaleAuraClass
             ) || [15, 1];
             if (si.add_duration_combopoints) {
                 const powerState = this.ovalePower.getState(atTime);
-                const combopoints =
-                    spellcast.combopoints || powerState.power.combopoints || 0;
+                const combopoints = powerState.power.combopoints || 0;
                 duration =
                     (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {
@@ -2262,24 +2198,23 @@ export class OvaleAuraClass
         }
         // Most aura durations are no longer reduced by haste
         // but the ones that do still need their reduction
-        if (si && si.haste && spellcast) {
+        if (si && si.haste) {
             const hasteMultiplier = this.ovalePaperDoll.getHasteMultiplier(
                 si.haste,
-                spellcast
+                atTime
             );
             duration = duration / hasteMultiplier;
         }
         return duration;
     }
-    getTickLength(auraId: number, snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.ovalePaperDoll.current;
+    getTickLength(auraId: number, atTime?: number) {
         let tick = 3;
         const si = this.ovaleData.spellInfo[auraId];
         if (si) {
             tick = si.tick || tick;
             const hasteMultiplier = this.ovalePaperDoll.getHasteMultiplier(
                 si.haste,
-                snapshot
+                atTime
             );
             tick = tick / hasteMultiplier;
         }

@@ -1,17 +1,12 @@
 import { OvalePool } from "../tools/Pool";
 import { OvaleQueue } from "../tools/Queue";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { band, bor } from "@wowts/bit";
+import { band } from "@wowts/bit";
 import { sub } from "@wowts/string";
 import {
-    GetTime,
-    SCHOOL_MASK_ARCANE,
-    SCHOOL_MASK_FIRE,
-    SCHOOL_MASK_FROST,
-    SCHOOL_MASK_HOLY,
-    SCHOOL_MASK_NATURE,
-    SCHOOL_MASK_SHADOW,
     CombatLogGetCurrentEventInfo,
+    Enum,
+    GetTime,
 } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
@@ -25,14 +20,7 @@ interface Event {
 }
 const pool = new OvalePool<Event>("OvaleDamageTaken_pool");
 const damageTakenWindow = 20;
-const schoolMaskMagic = bor(
-    SCHOOL_MASK_ARCANE,
-    SCHOOL_MASK_FIRE,
-    SCHOOL_MASK_FROST,
-    SCHOOL_MASK_HOLY,
-    SCHOOL_MASK_NATURE,
-    SCHOOL_MASK_SHADOW
-);
+const schoolMaskMagic = Enum.Damageclass.MaskMagical;
 
 export class OvaleDamageTakenClass {
     damageEvent = new OvaleQueue<Event>("OvaleDamageTaken_damageEvent");

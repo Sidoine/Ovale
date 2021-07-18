@@ -57,6 +57,7 @@ import { Runeforge } from "./states/runeforge";
 import { Conduit } from "./states/conduit";
 import { Runner } from "./engine/runner";
 import { Controls } from "./engine/controls";
+import { SpellActivationGlow } from "./states/spellactivationglow";
 
 /** Used to emulate IoC for integration tests */
 export class IoC {
@@ -114,6 +115,7 @@ export class IoC {
     public version: OvaleVersionClass;
     public warlock: OvaleWarlockClass;
     public runner: Runner;
+    public spellActivationGlow: SpellActivationGlow;
 
     constructor() {
         // TODO créer configuration avec la partie GUI et rajouter une méthode register à appeler ici comme pour les states
@@ -142,8 +144,7 @@ export class IoC {
             this.equipment,
             this.ovale,
             this.debug,
-            this.profiler,
-            this.lastSpell
+            this.profiler
         );
         this.guid = new Guids(this.ovale, this.debug, this.condition);
         this.spellBook = new OvaleSpellBookClass(
@@ -337,6 +338,10 @@ export class IoC {
             this.power,
             this.paperDoll
         );
+        this.spellActivationGlow = new SpellActivationGlow(
+            this.ovale,
+            this.debug
+        );
         this.spells = new OvaleSpellsClass(
             this.spellBook,
             this.ovale,
@@ -344,7 +349,8 @@ export class IoC {
             this.profiler,
             this.data,
             this.power,
-            this.runes
+            this.runes,
+            this.spellActivationGlow
         );
         this.bestAction = new OvaleBestActionClass(
             this.equipment,
@@ -424,7 +430,7 @@ export class IoC {
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
         const covenant = new Covenant(this.ovale, this.debug);
-        const runeforge = new Runeforge(this.ovale, this.debug);
+        const runeforge = new Runeforge(this.ovale, this.debug, this.equipment);
         const conduit = new Conduit(this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
@@ -487,5 +493,6 @@ export class IoC {
         this.azeriteArmor.registerConditions(this.condition);
         this.stagger.registerConditions(this.condition);
         this.stance.registerConditions(this.condition);
+        this.spellActivationGlow.registerConditions(this.condition);
     }
 }

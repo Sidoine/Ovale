@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.3](https://github.com/Sidoine/Ovale/compare/9.1.2...9.1.3) (2021-07-07)
+
+### [9.1.2](https://github.com/Sidoine/Ovale/compare/9.1.1...9.1.2) (2021-06-30)
+
+### [9.1.1](https://github.com/Sidoine/Ovale/compare/9.1.0...9.1.1) (2021-06-30)
+
+## [9.1.0](https://github.com/Sidoine/Ovale/compare/9.0.48...9.1.0) (2021-06-30)
+
+### Bug Fixes
+
+-   spelldefinitions ([#866](https://github.com/Sidoine/Ovale/issues/866)) ([b325c6f](https://github.com/Sidoine/Ovale/commit/b325c6fd2310a6a74c754a3c66a4613029748fa4))
+-   spells always usable when spellactivation is active ([#865](https://github.com/Sidoine/Ovale/issues/865)) ([bb1be9c](https://github.com/Sidoine/Ovale/commit/bb1be9c1cbb8a3c46349880b0cc4b10579456d86))
+-   use correct bitmask constant names in OvaleDamageTaken ([#910](https://github.com/Sidoine/Ovale/issues/910)) ([dde38a8](https://github.com/Sidoine/Ovale/commit/dde38a81fb2fe0550ac210256149bddba814f253))
+-   **hunter:** add wildfire_bomb_debuff targer debuff ([#862](https://github.com/Sidoine/Ovale/issues/862)) ([f74034b](https://github.com/Sidoine/Ovale/commit/f74034b5b5349a893b8382bfc8999e9c11fbe940))
+
 ### [9.0.48](https://github.com/Sidoine/Ovale/compare/9.0.47...9.0.48) (2021-03-10)
 
 ### [9.0.47](https://github.com/Sidoine/Ovale/compare/9.0.46...9.0.47) (2021-03-09)
