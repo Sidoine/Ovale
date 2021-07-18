@@ -54,7 +54,7 @@ import { Splitter } from "./simulationcraft/splitter";
 import { OvaleCombatClass } from "./states/combat";
 import { Covenant } from "./states/covenant";
 import { Runeforge } from "./states/runeforge";
-import { Soulbind } from "./states/conduit";
+import { Soulbind } from "./states/soulbind";
 import { Runner } from "./engine/runner";
 import { Controls } from "./engine/controls";
 import { SpellActivationGlow } from "./states/spellactivationglow";
