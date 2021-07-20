@@ -102,12 +102,11 @@ export class OvaleProfilerClass {
                         args: this.moduleOptions,
                         get: (info: LuaArray<string>) => {
                             const name = info[lualength(info)];
-                            const value = this.ovaleOptions.db.global.profiler[
-                                name
-                            ];
-                            return value != undefined;
+                            const value =
+                                this.ovaleOptions.db.global.profiler[name];
+                            return value;
                         },
-                        set: (info: LuaArray<string>, value: string) => {
+                        set: (info: LuaArray<string>, value: boolean) => {
                             const name = info[lualength(info)];
                             this.ovaleOptions.db.global.profiler[name] = value;
                             if (value) {
