@@ -102,9 +102,8 @@ export class OvaleProfilerClass {
                         args: this.moduleOptions,
                         get: (info: LuaArray<string>) => {
                             const name = info[lualength(info)];
-                            const value = this.ovaleOptions.db.global.profiler[
-                                name
-                            ];
+                            const value =
+                                this.ovaleOptions.db.global.profiler[name];
                             return value;
                         },
                         set: (info: LuaArray<string>, value: boolean) => {

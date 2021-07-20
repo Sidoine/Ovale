@@ -230,18 +230,11 @@ export class OvaleOptionsClass {
                 name: l["display_refresh_statistics"],
                 type: "execute",
                 func: () => {
-                    let [
-                        avgRefresh,
-                        minRefresh,
-                        maxRefresh,
-                        count,
-                    ] = this.ovale.getRefreshIntervalStatistics();
+                    let [avgRefresh, minRefresh, maxRefresh, count] =
+                        this.ovale.getRefreshIntervalStatistics();
                     if (minRefresh == huge) {
                         [avgRefresh, minRefresh, maxRefresh, count] = [
-                            0,
-                            0,
-                            0,
-                            0,
+                            0, 0, 0, 0,
                         ];
                     }
                     printFormat(
@@ -438,8 +431,8 @@ export class OvaleOptionsClass {
                         order: 25,
                         name: l["remaining_time_font_color"],
                         get: () => {
-                            const t = this.db.profile.apparence
-                                .remainsFontColor;
+                            const t =
+                                this.db.profile.apparence.remainsFontColor;
                             return [t.r, t.g, t.b];
                         },
                         set: (
@@ -448,8 +441,8 @@ export class OvaleOptionsClass {
                             g: number,
                             b: number
                         ) => {
-                            const t = this.db.profile.apparence
-                                .remainsFontColor;
+                            const t =
+                                this.db.profile.apparence.remainsFontColor;
                             [t.r, t.g, t.b] = [r, g, b];
                             this.db.profile.apparence.remainsFontColor = t;
                         },
