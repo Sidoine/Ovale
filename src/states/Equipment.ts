@@ -142,6 +142,10 @@ const slotNameByName: LuaObj<InventorySlotName> = {
     wristslot: "WRISTSLOT",
 };
 
+// Map InventorySlotName to Ovale slot names.
+type OvaleSlotNameMap = { [key in InventorySlotName]?: SlotName };
+const ovaleSlotNameByName: OvaleSlotNameMap = {};
+
 interface ItemInfo {
     exists: boolean;
     guid: string;
@@ -223,6 +227,7 @@ export class OvaleEquipmentClass {
         }
 
         for (const [slot] of kpairs(inventorySlotNames)) {
+            ovaleSlotNameByName[slot] = lower(slot) as SlotName;
             const [slotId] = GetInventorySlotInfo(slot);
             slotIdByName[slot] = slotId;
             slotNameById[slotId] = slot;
@@ -309,8 +314,9 @@ export class OvaleEquipmentClass {
         return 0;
     }
 
-    getEquippedItemId(slot: InventorySlotName): number | undefined {
-        const item = this.equippedItem[slot];
+    getEquippedItemId(slot: SlotName): number | undefined {
+        const invSlot = slotNameByName[slot];
+        const item = this.equippedItem[invSlot];
         return (item.exists && item.id) || undefined;
     }
 
@@ -320,10 +326,9 @@ export class OvaleEquipmentClass {
         return this.equippedItemBySharedCooldown[sharedCooldown];
     }
 
-    getEquippedItemLocation(
-        slot: InventorySlotName
-    ): ItemLocationMixin | undefined {
-        const item = this.equippedItem[slot];
+    getEquippedItemLocation(slot: SlotName): ItemLocationMixin | undefined {
+        const invSlot = slotNameByName[slot];
+        const item = this.equippedItem[invSlot];
         if (item.exists) {
             if (item.location && item.location.IsValid()) {
                 return item.location;
@@ -332,14 +337,16 @@ export class OvaleEquipmentClass {
         return undefined;
     }
 
-    getEquippedItemQuality(slot: InventorySlotName): number | undefined {
-        const item = this.equippedItem[slot];
+    getEquippedItemQuality(slot: SlotName): number | undefined {
+        const invSlot = slotNameByName[slot];
+        const item = this.equippedItem[invSlot];
         return (item.exists && item.quality) || undefined;
     }
 
-    getEquippedItemBonusIds(slot: InventorySlotName): LuaArray<number> {
+    getEquippedItemBonusIds(slot: SlotName): LuaArray<number> {
         // Returns the array of bonus IDs for the slot.
-        const item = this.equippedItem[slot];
+        const invSlot = slotNameByName[slot];
+        const item = this.equippedItem[invSlot];
         return item.bonus;
     }
 
@@ -472,7 +479,8 @@ export class OvaleEquipmentClass {
             if (prevGUID != item.guid) {
                 //this.UpdateArmorSetCount();
                 this.ovale.needRefresh();
-                this.module.SendMessage("Ovale_EquipmentChanged", slot);
+                const slotName = ovaleSlotNameByName[slot];
+                this.module.SendMessage("Ovale_EquipmentChanged", slotName);
             }
         } else {
             resetItemInfo(item);
@@ -703,8 +711,7 @@ export class OvaleEquipmentClass {
             itemId = this.getEquippedItemIdBySharedCooldown(sharedCooldown);
         }
         if (slot != undefined) {
-            const invSlot = slotNameByName[slot];
-            itemId = this.getEquippedItemId(invSlot);
+            itemId = this.getEquippedItemId(slot);
         }
         if (itemId) {
             const [start, duration] = GetItemCooldown(itemId);
@@ -722,8 +729,7 @@ export class OvaleEquipmentClass {
         slot: SlotName | undefined
     ) => {
         if (slot !== undefined) {
-            const invSlot = slotNameByName[slot];
-            itemId = this.getEquippedItemId(invSlot);
+            itemId = this.getEquippedItemId(slot);
         }
         if (!itemId) return returnConstant(0);
 
@@ -740,8 +746,7 @@ export class OvaleEquipmentClass {
     };
 
     private itemInSlot = (atTime: number, slot: SlotName) => {
-        const invSlot = slotNameByName[slot];
-        const itemId = this.getEquippedItemId(invSlot);
+        const itemId = this.getEquippedItemId(slot);
         return returnConstant(itemId);
     };
 
@@ -807,8 +812,7 @@ export class OvaleEquipmentClass {
         slot: SlotName | undefined
     ): ConditionResult => {
         if (slot) {
-            const invSlot = slotNameByName[slot];
-            itemId = this.getEquippedItemId(invSlot);
+            itemId = this.getEquippedItemId(slot);
         }
         if (itemId) {
             const rppm = this.data.getItemInfoProperty(itemId, atTime, "rppm");

@@ -1,9 +1,8 @@
 import { OvaleActionBarClass } from "./action-bar";
 import { OvaleDataClass } from "./data";
-import { OvaleEquipmentClass } from "../states/Equipment";
+import { OvaleEquipmentClass, SlotName } from "../states/Equipment";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, tonumber, tostring } from "@wowts/lua";
-import { upper } from "@wowts/string";
 import {
     GetActionCooldown,
     GetActionTexture,
@@ -11,7 +10,6 @@ import {
     GetItemCooldown,
     GetItemSpell,
     GetSpellTexture,
-    InventorySlotName,
     IsActionInRange,
     IsItemInRange,
     IsUsableAction,
@@ -88,7 +86,7 @@ export class OvaleBestActionClass {
         const result = node.result;
         setResultType(result, "action");
         if (!isNumber(itemId)) {
-            const slot = <InventorySlotName>upper(tostring(itemId));
+            const slot = tostring(itemId) as SlotName;
             const itemIdFromSlot = this.ovaleEquipment.getEquippedItemId(slot);
             if (!itemIdFromSlot) {
                 this.tracer.log("Unknown item '%s'.", itemId);
