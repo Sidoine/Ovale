@@ -1,5 +1,4 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
 import {
     LuaArray,
     LuaObj,
@@ -146,13 +145,14 @@ const slotNameByName: LuaObj<InventorySlotName> = {
 interface ItemInfo {
     exists: boolean;
     guid: string;
+    pending?: number;
+    id?: number;
     link?: string;
     location?: ItemLocationMixin;
     name?: string;
     quality?: number; // Enum.ItemQuality
     type?: number; // Enum.InventoryType
     // The properties below are populated by parseItemLink().
-    id?: number;
     gem: LuaArray<number>;
     bonus: LuaArray<number>;
     modifier: LuaArray<number>;
@@ -161,6 +161,7 @@ interface ItemInfo {
 function resetItemInfo(item: ItemInfo) {
     item.exists = false;
     item.guid = "";
+    delete item.pending;
     delete item.link;
     delete item.location;
     delete item.name;
@@ -198,7 +199,7 @@ export class OvaleEquipmentClass {
             },
         },
     };
-    private module: AceModule & AceEvent & AceTimer;
+    private module: AceModule & AceEvent;
     private tracer: Tracer;
     private profiler: Profiler;
 
@@ -212,8 +213,7 @@ export class OvaleEquipmentClass {
             "OvaleEquipment",
             this.handleInitialize,
             this.handleDisable,
-            aceEvent,
-            aceTimer
+            aceEvent
         );
         this.tracer = ovaleDebug.create("OvaleEquipment");
         this.profiler = ovaleProfiler.create(this.module.GetName());
@@ -235,6 +235,305 @@ export class OvaleEquipmentClass {
             };
         }
     }
+
+    private handleInitialize = () => {
+        this.module.RegisterEvent(
+            "ITEM_DATA_LOAD_RESULT",
+            this.handleItemDataLoadResult
+        );
+        this.module.RegisterEvent(
+            "PLAYER_ENTERING_WORLD",
+            this.handlePlayerEnteringWorld
+        );
+        this.module.RegisterEvent(
+            "PLAYER_EQUIPMENT_CHANGED",
+            this.handlePlayerEquipmentChanged
+        );
+    };
+    private handleDisable = () => {
+        this.module.UnregisterEvent("ITEM_DATA_LOAD_RESULT");
+        this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
+        this.module.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
+    };
+
+    private handleItemDataLoadResult = (
+        event: string,
+        itemId: number,
+        success: boolean
+    ) => {
+        if (success && this.isEquippedItemById[itemId]) {
+            for (const [slot, item] of pairs(this.equippedItem)) {
+                if (item.pending) {
+                    const slotId = slotIdByName[slot];
+                    const location =
+                        ItemLocation.CreateFromEquipmentSlot(slotId);
+                    if (location.IsValid() && item.pending == itemId) {
+                        this.finishUpdateForSlot(
+                            slot as InventorySlotName,
+                            itemId,
+                            location
+                        );
+                    }
+                }
+            }
+        }
+    };
+
+    private handlePlayerEnteringWorld = (event: string) => {
+        for (const [slot] of kpairs(inventorySlotNames)) {
+            this.queueUpdateForSlot(slot);
+        }
+    };
+
+    private handlePlayerEquipmentChanged = (
+        event: string,
+        slotId: number,
+        hasCurrent: boolean
+    ) => {
+        const slot = slotNameById[slotId];
+        this.queueUpdateForSlot(slot);
+    };
+
+    // Armor sets are retiring after Legion; for now, return 0
+    getArmorSetCount(name: string) {
+        /*
+        let count = this.armorSetCount[name];
+        if (!count) {
+            const className = Ovale.playerClass;
+            if (armorSetName[className] && armorSetName[className][name]) {
+                name = armorSetName[className][name];
+                count = this.armorSetCount[name];
+            }
+        }
+        */
+        return 0;
+    }
+
+    getEquippedItemId(slot: InventorySlotName): number | undefined {
+        const item = this.equippedItem[slot];
+        return (item.exists && item.id) || undefined;
+    }
+
+    getEquippedItemIdBySharedCooldown(
+        sharedCooldown: string
+    ): number | undefined {
+        return this.equippedItemBySharedCooldown[sharedCooldown];
+    }
+
+    getEquippedItemLocation(
+        slot: InventorySlotName
+    ): ItemLocationMixin | undefined {
+        const item = this.equippedItem[slot];
+        if (item.exists) {
+            if (item.location && item.location.IsValid()) {
+                return item.location;
+            }
+        }
+        return undefined;
+    }
+
+    getEquippedItemQuality(slot: InventorySlotName): number | undefined {
+        const item = this.equippedItem[slot];
+        return (item.exists && item.quality) || undefined;
+    }
+
+    getEquippedItemBonusIds(slot: InventorySlotName): LuaArray<number> {
+        // Returns the array of bonus IDs for the slot.
+        const item = this.equippedItem[slot];
+        return item.bonus;
+    }
+
+    hasRangedWeapon() {
+        const item = this.equippedItem["MAINHANDSLOT"];
+        if (item.exists && item.type != undefined) {
+            return (
+                item.type == Enum.InventoryType.IndexRangedType ||
+                item.type == Enum.InventoryType.IndexRangedrightType
+            );
+        }
+        return false;
+    }
+
+    private parseItemLink = (link: string, item: ItemInfo) => {
+        let [s] = match(link, "item:([%-?%d:]+)");
+        const pattern = "[^:]*:";
+        let [i, j] = find(s, pattern);
+        let eos = len(s);
+        let numBonus = 0;
+        let numModifiers = 0;
+        let index = 0;
+        while (i) {
+            const token = tonumber(sub(s, i, j - 1)) || 0;
+            index = index + 1;
+            if (index == 1) {
+                item.id = token;
+            } else if (3 <= index && index <= 5) {
+                if (token != 0) {
+                    const gem = item.gem || {};
+                    insert(gem, token);
+                    item.gem = gem;
+                }
+            } else if (index == 13) {
+                numBonus = token;
+            } else if (index > 13 && index <= 13 + numBonus) {
+                const bonus = item.bonus || {};
+                insert(bonus, token);
+                item.bonus = bonus;
+            } else if (index == 13 + numBonus + 1) {
+                numModifiers = token;
+            } else if (
+                index > 13 + numBonus + 1 &&
+                index <= 13 + numBonus + 1 + numModifiers
+            ) {
+                const modifier = item.modifier || {};
+                insert(modifier, token);
+                item.modifier = modifier;
+            }
+            if (j < eos) {
+                s = sub(s, j + 1);
+                [i, j] = find(s, pattern);
+            } else {
+                break;
+            }
+        }
+        // Ignore the last token since we don't need it for Ovale.
+    };
+
+    private queueUpdateForSlot = (slot: InventorySlotName) => {
+        const slotId = slotIdByName[slot];
+        const location = ItemLocation.CreateFromEquipmentSlot(slotId);
+        const item = this.equippedItem[slot];
+        if (location.IsValid()) {
+            const itemId = C_Item.GetItemID(location);
+            this.isEquippedItemById[itemId] = true;
+            const link = C_Item.GetItemLink(location);
+            if (link) {
+                // Item link is available, so data is already loaded.
+                this.finishUpdateForSlot(slot, itemId, location);
+            } else {
+                // Save pending itemID to be checked in event handler.
+                item.pending = itemId;
+                C_Item.RequestLoadItemData(location);
+                this.tracer.debug(`Slot ${slot}, item ${itemId}: queued`);
+            }
+        } else {
+            this.tracer.debug(`Slot ${slot}: empty`);
+            resetItemInfo(item);
+        }
+    };
+
+    private finishUpdateForSlot = (
+        slot: InventorySlotName,
+        itemId: number,
+        location: ItemLocationMixin
+    ) => {
+        this.profiler.startProfiling(
+            "OvaleEquipment_finishUpdateForEquippedItem"
+        );
+        this.tracer.debug(`Slot ${slot}, item ${itemId}: finished`);
+        const item = this.equippedItem[slot];
+        if (location.IsValid()) {
+            const prevGUID = item.guid;
+            const prevItemId = item.id;
+            if (prevItemId != undefined) {
+                delete this.isEquippedItemById[prevItemId];
+            }
+            resetItemInfo(item);
+            item.exists = true;
+            item.guid = C_Item.GetItemGUID(location);
+            item.id = itemId;
+            item.location = location;
+            item.name = C_Item.GetItemName(location);
+            item.quality = C_Item.GetItemQuality(location);
+            item.type = C_Item.GetItemInventoryType(location);
+            const link = C_Item.GetItemLink(location);
+            if (link) {
+                item.link = link;
+                this.parseItemLink(link, item);
+                if (slot == "MAINHANDSLOT" || slot == "SECONDARYHANDSLOT") {
+                    const stats = GetItemStats(link);
+                    if (stats != undefined) {
+                        const dps =
+                            stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"] || 0;
+                        if (slot == "MAINHANDSLOT") {
+                            this.mainHandDPS = dps;
+                        } else if (slot == "SECONDARYHANDSLOT") {
+                            this.offHandDPS = dps;
+                        }
+                    }
+                }
+            }
+            this.isEquippedItemById[itemId] = true;
+            const info = this.data.itemInfo[itemId];
+            if (info != undefined && info.shared_cd != undefined) {
+                this.equippedItemBySharedCooldown[info.shared_cd] = itemId;
+            }
+
+            if (prevGUID != item.guid) {
+                //this.UpdateArmorSetCount();
+                this.ovale.needRefresh();
+                this.module.SendMessage("Ovale_EquipmentChanged", slot);
+            }
+        } else {
+            resetItemInfo(item);
+        }
+        this.profiler.stopProfiling(
+            "OvaleEquipment_finishUpdateForEquippedItem"
+        );
+    };
+
+    private debugEquipment = () => {
+        const output: LuaArray<string> = {};
+        const array: LuaArray<string> = {};
+        insert(output, "Equipped Items:");
+        for (const [id] of kpairs(this.isEquippedItemById)) {
+            insert(array, `    ${id}`);
+        }
+        sort(array);
+        for (const [, v] of ipairs(array)) {
+            insert(output, v);
+        }
+        insert(output, "");
+        wipe(array);
+        for (const [slot, item] of pairs(this.equippedItem)) {
+            const shortSlot = lower(sub(slot, 1, -5));
+            if (item.exists) {
+                let s = `${shortSlot}: ${item.id}`;
+                if (lualength(item.gem) > 0) {
+                    s = s + " gem[";
+                    for (const [, v] of ipairs(item.gem)) {
+                        s = s + ` ${v}`;
+                    }
+                    s = s + "]";
+                }
+                if (lualength(item.bonus) > 0) {
+                    s = s + " bonus[";
+                    for (const [, v] of ipairs(item.bonus)) {
+                        s = s + ` ${v}`;
+                    }
+                    s = s + "]";
+                }
+                if (lualength(item.modifier) > 0) {
+                    s = s + " mod[";
+                    for (const [, v] of ipairs(item.modifier)) {
+                        s = s + ` ${v}`;
+                    }
+                    s = s + "]";
+                }
+                insert(array, s);
+            } else {
+                insert(array, `${shortSlot}: empty`);
+            }
+        }
+        sort(array);
+        for (const [, v] of ipairs(array)) {
+            insert(output, v);
+        }
+        insert(output, "");
+        insert(output, `Main-hand DPS = ${this.mainHandDPS}`);
+        insert(output, `Off-hand DPS = ${this.offHandDPS}`);
+        return concat(output, "\n");
+    };
 
     registerConditions(ovaleCondition: OvaleConditionClass) {
         ovaleCondition.registerCondition(
@@ -305,264 +604,6 @@ export class OvaleEquipmentClass {
             }
         );
     }
-
-    private handleInitialize = () => {
-        this.module.RegisterEvent("PLAYER_LOGIN", this.handlePlayerLogin);
-        this.module.RegisterEvent(
-            "PLAYER_ENTERING_WORLD",
-            this.updateEquippedItems
-        );
-        this.module.RegisterEvent(
-            "PLAYER_EQUIPMENT_CHANGED",
-            this.handlePlayerEquipmentChanged
-        );
-    };
-    private handleDisable = () => {
-        this.module.UnregisterEvent("PLAYER_LOGIN");
-        this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
-        this.module.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
-    };
-
-    private handlePlayerLogin = (event: string) => {
-        /* Update all equipped items at 3 seconds after player login.
-           This is to workaround a delay in the item information being
-           available to the game client.
-		 */
-        this.module.ScheduleTimer(this.updateEquippedItems, 3);
-    };
-
-    private handlePlayerEquipmentChanged = (
-        event: string,
-        slotId: number,
-        hasCurrent: boolean
-    ) => {
-        this.profiler.startProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-        const slot = slotNameById[slotId];
-        const changed = this.updateEquippedItem(slot);
-        if (changed) {
-            //this.UpdateArmorSetCount();
-            this.ovale.needRefresh();
-            this.module.SendMessage("Ovale_EquipmentChanged", slot);
-        }
-        this.profiler.stopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-    };
-
-    // Armor sets are retiring after Legion; for now, return 0
-    getArmorSetCount(name: string) {
-        /*
-        let count = this.armorSetCount[name];
-        if (!count) {
-            const className = Ovale.playerClass;
-            if (armorSetName[className] && armorSetName[className][name]) {
-                name = armorSetName[className][name];
-                count = this.armorSetCount[name];
-            }
-        }
-        */
-        return 0;
-    }
-
-    getEquippedItemId(slot: InventorySlotName): number | undefined {
-        const item = this.equippedItem[slot];
-        return (item.exists && item.id) || undefined;
-    }
-
-    getEquippedItemIdBySharedCooldown(
-        sharedCooldown: string
-    ): number | undefined {
-        return this.equippedItemBySharedCooldown[sharedCooldown];
-    }
-
-    getEquippedItemLocation(
-        slot: InventorySlotName
-    ): ItemLocationMixin | undefined {
-        const item = this.equippedItem[slot];
-        return (item.exists && item.location) || undefined;
-    }
-
-    getEquippedItemQuality(slot: InventorySlotName): number | undefined {
-        const item = this.equippedItem[slot];
-        return (item.exists && item.quality) || undefined;
-    }
-
-    getEquippedItemBonusIds(slot: InventorySlotName): LuaArray<number> {
-        // Returns the array of bonus IDs for the slot.
-        const item = this.equippedItem[slot];
-        return item.bonus;
-    }
-
-    hasRangedWeapon() {
-        const item = this.equippedItem["MAINHANDSLOT"];
-        if (item.exists && item.type != undefined) {
-            return (
-                item.type == Enum.InventoryType.IndexRangedType ||
-                item.type == Enum.InventoryType.IndexRangedrightType
-            );
-        }
-        return false;
-    }
-
-    private parseItemLink = (link: string, item: ItemInfo) => {
-        let [s] = match(link, "item:([%-?%d:]+)");
-        const pattern = "[^:]*:";
-        let [i, j] = find(s, pattern);
-        let eos = len(s);
-        let numBonus = 0;
-        let numModifiers = 0;
-        let index = 0;
-        while (i) {
-            const token = tonumber(sub(s, i, j - 1)) || 0;
-            index = index + 1;
-            if (index == 1) {
-                item.id = token;
-            } else if (3 <= index && index <= 5) {
-                if (token != 0) {
-                    let gem = item.gem || {};
-                    insert(gem, token);
-                    item.gem = gem;
-                }
-            } else if (index == 13) {
-                numBonus = token;
-            } else if (index > 13 && index <= 13 + numBonus) {
-                let bonus = item.bonus || {};
-                insert(bonus, token);
-                item.bonus = bonus;
-            } else if (index == 13 + numBonus + 1) {
-                numModifiers = token;
-            } else if (
-                index > 13 + numBonus + 1 &&
-                index <= 13 + numBonus + 1 + numModifiers
-            ) {
-                let modifier = item.modifier || {};
-                insert(modifier, token);
-                item.modifier = modifier;
-            }
-            if (j < eos) {
-                s = sub(s, j + 1);
-                [i, j] = find(s, pattern);
-            } else {
-                break;
-            }
-        }
-        // Ignore the last token since we don't need it for Ovale.
-    };
-
-    private updateEquippedItem = (slot: InventorySlotName): boolean => {
-        this.tracer.debug(`Updating slot ${slot}`);
-        let item = this.equippedItem[slot];
-        const prevGUID = item.guid;
-        const prevItemId = item.id;
-        if (prevItemId != undefined) {
-            delete this.isEquippedItemById[prevItemId];
-        }
-        resetItemInfo(item);
-        const slotId = slotIdByName[slot];
-        const location = ItemLocation.CreateFromEquipmentSlot(slotId);
-        const exists = C_Item.DoesItemExist(location);
-        if (exists) {
-            item.exists = true;
-            item.guid = C_Item.GetItemGUID(location);
-            item.location = location;
-            item.name = C_Item.GetItemName(location);
-            item.quality = C_Item.GetItemQuality(location);
-            item.type = C_Item.GetItemInventoryType(location);
-            const link = C_Item.GetItemLink(location);
-            if (link != undefined) {
-                item.link = link;
-                this.parseItemLink(link, item);
-                const id = item.id;
-                if (id != undefined) {
-                    this.isEquippedItemById[id] = true;
-                    const info = this.data.itemInfo[id];
-                    if (info != undefined && info.shared_cd != undefined) {
-                        this.equippedItemBySharedCooldown[info.shared_cd] = id;
-                    }
-                }
-                if (slot == "MAINHANDSLOT" || slot == "SECONDARYHANDSLOT") {
-                    const stats = GetItemStats(link);
-                    if (stats != undefined) {
-                        const dps =
-                            stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"] || 0;
-                        if (slot == "MAINHANDSLOT") {
-                            this.mainHandDPS = dps;
-                        } else if (slot == "SECONDARYHANDSLOT") {
-                            this.offHandDPS = dps;
-                        }
-                    }
-                }
-            }
-        }
-        return prevGUID != item.guid;
-    };
-
-    private updateEquippedItems = () => {
-        this.profiler.startProfiling("OvaleEquipment_UpdateEquippedItems");
-        let anyChanged = false;
-        for (const [slot] of kpairs(inventorySlotNames)) {
-            const changed = this.updateEquippedItem(slot);
-            anyChanged = anyChanged || changed;
-        }
-        if (anyChanged) {
-            this.ovale.needRefresh();
-            this.module.SendMessage("Ovale_EquipmentChanged");
-        }
-        this.profiler.stopProfiling("OvaleEquipment_UpdateEquippedItems");
-    };
-
-    private debugEquipment = () => {
-        const output: LuaArray<string> = {};
-        const array: LuaArray<string> = {};
-        insert(output, "Equipped Items:");
-        for (const [id] of kpairs(this.isEquippedItemById)) {
-            insert(array, `    ${id}`);
-        }
-        sort(array);
-        for (const [, v] of ipairs(array)) {
-            insert(output, v);
-        }
-        insert(output, "");
-        wipe(array);
-        for (const [slot, item] of pairs(this.equippedItem)) {
-            const shortSlot = lower(sub(slot, 1, -5));
-            if (item.exists) {
-                let s = `${shortSlot}: ${item.id}`;
-                if (lualength(item.gem) > 0) {
-                    s = s + " gem[";
-                    for (const [, v] of ipairs(item.gem)) {
-                        s = s + ` ${v}`;
-                    }
-                    s = s + "]";
-                }
-                if (lualength(item.bonus) > 0) {
-                    s = s + " bonus[";
-                    for (const [, v] of ipairs(item.bonus)) {
-                        s = s + ` ${v}`;
-                    }
-                    s = s + "]";
-                }
-                if (lualength(item.modifier) > 0) {
-                    s = s + " mod[";
-                    for (const [, v] of ipairs(item.modifier)) {
-                        s = s + ` ${v}`;
-                    }
-                    s = s + "]";
-                }
-                insert(array, s);
-            } else {
-                insert(array, `${shortSlot}: empty`);
-            }
-        }
-        sort(array);
-        for (const [, v] of ipairs(array)) {
-            insert(output, v);
-        }
-        insert(output, "");
-        insert(output, `Main-hand DPS = ${this.mainHandDPS}`);
-        insert(output, `Off-hand DPS = ${this.offHandDPS}`);
-        return concat(output, "\n");
-    };
-
-    // CONDITIONS:
 
     /**  Test if the player has a particular item equipped.
 	 @name HasEquippedItem
