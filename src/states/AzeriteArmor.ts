@@ -11,13 +11,12 @@ import {
 } from "@wowts/lua";
 import { sort, insert, concat } from "@wowts/table";
 import {
-    InventorySlotName,
     C_AzeriteEmpoweredItem,
     GetSpellInfo,
     AzeriteEmpoweredItemSelectionUpdatedEvent,
     PlayerEnteringWorldEvent,
 } from "@wowts/wow-mock";
-import { InventorySlotNameMap, OvaleEquipmentClass } from "./Equipment";
+import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { DebugTools } from "../engine/debug";
@@ -30,10 +29,11 @@ import {
 } from "../engine/condition";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const azeriteSlots: InventorySlotNameMap = {
-    HEADSLOT: true,
-    SHOULDERSLOT: true,
-    CHESTSLOT: true,
+type SlotNameMap = { [key in SlotName]?: boolean };
+const azeriteSlots: SlotNameMap = {
+    headslot: true,
+    shoulderslot: true,
+    chestslot: true,
 };
 
 interface Trait {
@@ -116,13 +116,8 @@ export class OvaleAzeriteArmor {
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
     };
 
-    private handleOvaleEquipmentChanged = (
-        event: string,
-        slot?: InventorySlotName
-    ) => {
-        if (slot == undefined) {
-            this.updateTraits();
-        } else if (azeriteSlots[slot]) {
+    private handleOvaleEquipmentChanged = (event: string, slot: SlotName) => {
+        if (azeriteSlots[slot]) {
             this.updateTraits();
         }
     };

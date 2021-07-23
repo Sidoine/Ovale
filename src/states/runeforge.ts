@@ -1,13 +1,5 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import {
-    LuaArray,
-    ipairs,
-    kpairs,
-    lualength,
-    tonumber,
-    unpack,
-    wipe,
-} from "@wowts/lua";
+import { LuaArray, kpairs, lualength, pairs, tonumber } from "@wowts/lua";
 import { concat, insert } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { C_LegendaryCrafting, Enum } from "@wowts/wow-mock";
@@ -18,14 +10,13 @@ import {
     returnBoolean,
 } from "../engine/condition";
 import { DebugTools } from "../engine/debug";
-import { isNumber, oneTimeMessage } from "../tools/tools";
 import { OptionUiGroup } from "../ui/acegui-helpers";
-import { OvaleEquipmentClass, inventorySlotNames } from "./Equipment";
+import { OvaleEquipmentClass, SlotName } from "./Equipment";
 
 export class Runeforge {
     private module: AceModule & AceEvent;
-    private equippedLegendaryById: LuaArray<boolean> = {};
-    private equippedRuneforgeById: LuaArray<boolean> = {};
+    private equippedLegendaryById: LuaArray<SlotName> = {};
+    private equippedRuneforgeById: LuaArray<SlotName> = {};
 
     private debugRuneforges: OptionUiGroup = {
         type: "group",
@@ -40,7 +31,7 @@ export class Runeforge {
                     const ids =
                         C_LegendaryCrafting.GetRuneforgePowers(undefined);
                     const output: LuaArray<string> = {};
-                    for (const [, id] of ipairs(ids)) {
+                    for (const [, id] of pairs(ids)) {
                         const runeforgePower =
                             C_LegendaryCrafting.GetRuneforgePowerInfo(id);
                         if (runeforgePower != undefined) {
@@ -106,31 +97,37 @@ export class Runeforge {
         this.module.UnregisterMessage("Ovale_EquipmentChanged");
     };
 
-    private handleOvaleEquipmentChanged = (event: string) => {
-        wipe(this.equippedLegendaryById);
-        wipe(this.equippedRuneforgeById);
-        for (const [slot] of kpairs(inventorySlotNames)) {
-            // Update bonus IDs list in equippedLegendaryById.
-            const quality = this.equipment.getEquippedItemQuality(slot);
-            if (quality == Enum.ItemQuality.Legendary) {
-                // XXX Assume the first bonus ID is the legendary bonus ID.
-                const bonusIds = this.equipment.getEquippedItemBonusIds(slot);
-                if (lualength(bonusIds) > 0) {
-                    const id = bonusIds[1];
-                    this.equippedLegendaryById[id] = true;
-                }
+    private handleOvaleEquipmentChanged = (event: string, slot: SlotName) => {
+        // Update bonus IDs list in equippedLegendaryById.
+        for (const [id, slotName] of pairs(this.equippedLegendaryById)) {
+            if (slotName == slot) {
+                delete this.equippedLegendaryById[id];
             }
-            // Update power IDs list in equippedRuneforgeById.
-            const location = this.equipment.getEquippedItemLocation(slot);
-            if (location != undefined) {
-                if (C_LegendaryCrafting.IsRuneforgeLegendary(location)) {
-                    const componentInfo =
-                        C_LegendaryCrafting.GetRuneforgeLegendaryComponentInfo(
-                            location
-                        );
-                    const id = tonumber(componentInfo.powerID);
-                    this.equippedRuneforgeById[id] = true;
-                }
+        }
+        const quality = this.equipment.getEquippedItemQuality(slot);
+        if (quality == Enum.ItemQuality.Legendary) {
+            // XXX Assume the first bonus ID is the legendary bonus ID.
+            const bonusIds = this.equipment.getEquippedItemBonusIds(slot);
+            if (lualength(bonusIds) > 0) {
+                const id = bonusIds[1];
+                this.equippedLegendaryById[id] = slot;
+            }
+        }
+        // Update power IDs list in equippedRuneforgeById.
+        for (const [id, slotName] of pairs(this.equippedRuneforgeById)) {
+            if (slotName == slot) {
+                delete this.equippedRuneforgeById[id];
+            }
+        }
+        const location = this.equipment.getEquippedItemLocation(slot);
+        if (location != undefined) {
+            if (C_LegendaryCrafting.IsRuneforgeLegendary(location)) {
+                const componentInfo =
+                    C_LegendaryCrafting.GetRuneforgeLegendaryComponentInfo(
+                        location
+                    );
+                const id = tonumber(componentInfo.powerID);
+                this.equippedRuneforgeById[id] = slot;
             }
         }
     };
@@ -145,16 +142,13 @@ export class Runeforge {
     }
 
     private equippedRuneforge: ConditionFunction = (positionalParameters) => {
-        const [id] = unpack(positionalParameters);
-        if (!isNumber(id)) {
-            oneTimeMessage(`${id} is not defined in EquippedRuneforge`);
-            return [];
-        }
+        const id = positionalParameters[1] as number;
         /* Check both lists and return true if the ID is in either of them.
          * Technically could be incorrect, but chance of collision is very low.
          */
-        return returnBoolean(
-            this.equippedLegendaryById[id] || this.equippedRuneforgeById[id]
-        );
+        if (this.equippedLegendaryById[id] || this.equippedRuneforgeById[id]) {
+            return returnBoolean(true);
+        }
+        return returnBoolean(false);
     };
 }
