@@ -8,7 +8,7 @@
         "prepare": "husky install",
         "build": "tstolua -p tsconfig.lua.json",
         "build-tools": "tsc",
-        "simc": "node dist/src/utils/importsimc/index.js ../../simc",
+        "simc": "node dist/src/utils/importsimc/index.js",
         "dbc": "node dist/src/utils/dbc.js",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",

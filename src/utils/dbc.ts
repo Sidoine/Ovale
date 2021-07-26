@@ -1,9 +1,29 @@
-import { readFileSync, writeFileSync } from "fs";
+// A tool to extract the interfaces from the DBC files
+// Outputed to src/utils/importsimc/types.ts
+// Will be used by the importsimc tool
 
-const simcPath = "../../simc";
+import { execSync } from "child_process";
+import { readFileSync, writeFileSync } from "fs";
+import { chdir, cwd, exit } from "process";
+
+const simcPath = process.argv[2];
+if (!simcPath) {
+    console.error("usage: yarn dbc ../simc");
+    exit(1);
+}
 const dbcExtract3 = `${simcPath}/dbc_extract3`;
-const version = "9.0.2.36165";
-const json = readFileSync(`${dbcExtract3}/formats/${version}.json`, {
+// TODO get last versions
+const version = "9.1.0.39497";
+const lastFormat = "9.1.0.38783";
+
+const currentDir = cwd();
+chdir(dbcExtract3);
+execSync(
+    `py -3 dbc_extract.py -p ../casc_extract/wow/${version}/DBFilesClient -b ${version} --hotfix=cache/live/DBCache.bin -t csv SpellShapeshift > SpellShapeshift.csv`
+);
+chdir(currentDir);
+
+const json = readFileSync(`${dbcExtract3}/formats/${lastFormat}.json`, {
     encoding: "utf8",
 });
 
@@ -25,7 +45,7 @@ function outputType(field: DbcField) {
     switch (field.data_type) {
         case "B":
         case "b":
-            return "any";
+            return "unknown";
         case "H":
         case "h":
         case "F":
@@ -47,18 +67,18 @@ function outputField(field: DbcField) {
         }
         return fields.join(";\n");
     }
-    return `   ${field.field}: ${outputType(field)}`;
+    return `    ${field.field}: ${outputType(field)}`;
 }
 
 function outputDbc(name: string, dbc: Dbc) {
     return `export interface ${name} {
-${dbc.fields.every((x) => x.field !== "id") ? "   id: number," : ""}
-${dbc.fields.map(outputField).join(";\n")},
-${dbc.parent ? "   parent_id: number," : ""}
-}`;
+${
+    dbc.fields.every((x) => x.field !== "id") ? "    id: number;\n" : ""
+}${dbc.fields.map(outputField).join(";\n")};
+${dbc.parent ? "    parent_id: number;\n" : ""}}`;
 }
 
 const result = Object.entries(data)
     .map(([x, dbc]) => outputDbc(x, dbc))
     .join("\n\n");
-writeFileSync("./src/utils/types.ts", result, { encoding: "utf8" });
+writeFileSync("./src/utils/importsimc/types.ts", result, { encoding: "utf8" });

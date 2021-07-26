@@ -4,12 +4,18 @@ import { writeToWowmock } from "./wow-mock";
 import { ClassScripts } from "./class-scripts";
 import { exportCommon } from "./common-script";
 import { exportData } from "./export-data";
+import { exit } from "process";
 
 const outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
 const profilesDirectory = simcDirectory + "/profiles/Tier26";
 
 if (!existsSync(outputDirectory)) mkdirSync(outputDirectory);
+
+if (!simcDirectory) {
+    console.log("Please specify the directory of Simc (e.g. yarn simc ../simc");
+    exit(1);
+}
 
 const spellData = getSpellData(simcDirectory);
 

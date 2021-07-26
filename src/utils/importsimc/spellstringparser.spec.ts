@@ -48,7 +48,6 @@ function createFakeSpell(
         rank_str: "",
         replace_spell_id: 0,
         req_max_level: 0,
-        scaling_type: 0,
         rppm: 0,
         school: 0,
         spell_level: 0,
@@ -63,6 +62,8 @@ function createFakeSpell(
         baseIdentifier: "",
         identifiers: [],
         triggeredIdentifierScore: 0,
+        prj_delay: 0,
+        prj_min_duration: 0,
     };
 }
 
@@ -98,6 +99,7 @@ function createFakeSpellEffect(
         trigger_spell_id: options.trigger_spell_id || 0,
         type: options.type || EffectType.E_112,
         pvp_coeff: options.pvp_coeff || 1,
+        scaling_type: options.scaling_type || 0,
     };
 }
 

@@ -144,6 +144,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
                 subtype: 0,
                 targeting_1: 0,
                 targeting_2: 0,
+                scaling_type: 0,
             });
         }
     }

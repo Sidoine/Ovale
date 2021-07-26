@@ -56,9 +56,9 @@ export interface AzeriteEmpoweredItem {
 }
 
 export interface AzeriteEssence {
+    id: number;
     name: string;
     desc: string;
-    id: number;
     category: number;
 }
 
@@ -128,6 +128,8 @@ export interface ChrClasses {
     desc: string;
     roles_lang: string;
     requirements_fail_lang: string;
+    hyphenated_name_male_lang: string;
+    hyphenated_name_female_lang: string;
     id: number;
     create_screen_file_data_id: number;
     select_screen_file_data_id: number;
@@ -179,23 +181,36 @@ export interface ChrSpecialization {
 export interface ContentTuning {
     id: number;
     flags: number;
-    unk_3: number;
+    id_expansion: number;
     min_level: number;
     max_level: number;
-    unk_6: number;
-    unk_7: number;
-    unk_8: number;
+    lower_bound_semantics: number;
+    upper_bound_semantics: number;
+    target_level_delta: number;
+    target_level_delta_max: number;
+    target_level_min: number;
+    target_level_max: number;
+    item_level_min: number;
+}
+
+export interface ContentTuningXExpected {
+    id: number;
+    id_expected_stat_mod: number;
+    id_mythic_plus_season: number;
+    unk_1: number;
+    parent_id: number;
 }
 
 export interface Covenant {
+    id: number;
     name: string;
     desc: string;
-    id: number;
     id_bounty_set: number;
     unk_1: number;
     unk_2: number;
     unk_3: number;
     unk_4: number;
+    unk_5: number;
 }
 
 export interface CurrencyCategory {
@@ -314,8 +329,8 @@ export interface GarrTalent {
 }
 
 export interface GarrTalentTree {
-    title: string;
     id: number;
+    title: string;
     id_garr_type: number;
     id_class: number;
     max_tiers: unknown;
@@ -326,6 +341,7 @@ export interface GarrTalentTree {
     unk_2: number;
     feature_type: number;
     feature_rank: number;
+    unk_4: number;
 }
 
 export interface GarrTalentRank {
@@ -341,6 +357,11 @@ export interface GarrTalentRank {
     unk_6: number;
     unk_7: number;
     unk_8: number;
+    unk_9: number;
+    unk_10: number;
+    unk_11: number;
+    unk_12: number;
+    unk_13: number;
     parent_id: number;
 }
 
@@ -379,7 +400,9 @@ export interface ItemSparse {
     pad1: string;
     pad0: string;
     name: string;
+    id_expansion: number;
     dmg_range: number;
+    item_limit_category: number;
     duration: number;
     item_damage_modifier: number;
     bag_family: number;
@@ -406,7 +429,7 @@ export interface ItemSparse {
     stat_alloc_10: number;
     stackable: number;
     max_count: number;
-    req_spell: number;
+    id_content_tuning: number;
     sell_price: number;
     buy_price: number;
     unk_3: number;
@@ -418,12 +441,11 @@ export interface ItemSparse {
     flags_4: number;
     faction_conv_id: number;
     unk_901_1: number;
-    unk_901_2: number;
+    req_spell: number;
     id_curve: number;
     id_name_desc: number;
     unk_l72_1: number;
     id_holiday: number;
-    item_limit_category: number;
     gem_props: number;
     socket_bonus: number;
     totem_category: number;
@@ -440,7 +462,6 @@ export interface ItemSparse {
     req_skill: number;
     ilevel: number;
     class_mask: number;
-    id_expansion: unknown;
     id_artifact: unknown;
     unk_6: unknown;
     unk_7: unknown;
@@ -530,6 +551,8 @@ export interface ItemBonusTreeNode {
     id_child: number;
     id_node: number;
     unk: number;
+    unk_2: number;
+    unk_3: number;
 }
 
 export interface ItemChildEquipment {
@@ -598,7 +621,6 @@ export interface ItemEffect {
     cooldown_group: number;
     id_spell: number;
     id_specialization: number;
-    parent_id: number;
 }
 
 export interface ItemExtendedCost {
@@ -739,12 +761,18 @@ export interface ItemXBonusTree {
     id_tree: number;
 }
 
-export interface JournalEncounter {
+export interface ItemXItemEffect {
     id: number;
+    id_item_effect: number;
+    parent_id: number;
+}
+
+export interface JournalEncounter {
     name: string;
     desc: string;
     coord_1: number;
     coord_2: number;
+    id: number;
     id_journal_instance: number;
     unk_1: number;
     order_index: number;
@@ -802,9 +830,9 @@ export interface JournalEncounterXDifficulty {
 }
 
 export interface JournalInstance {
+    id: number;
     name: string;
     desc: string;
-    id: number;
     map: number;
     id_background_file_data: number;
     id_button_file_data: number;
@@ -843,7 +871,6 @@ export interface Map {
     id: number;
     directory: string;
     name: string;
-    name_901: string;
     description_1: string;
     description_2: string;
     pvp_short_description: string;
@@ -869,16 +896,182 @@ export interface Map {
     flags_2: number;
 }
 
+export interface MapDifficulty {
+    id: number;
+    message: string;
+    difficulty: number;
+    id_lock: number;
+    reset_interval: unknown;
+    max_players: number;
+    item_context: number;
+    item_context_picker_id: number;
+    flags: number;
+    id_content_tuning: number;
+    parent_id: number;
+}
+
 export interface MinorTalent {
     id: number;
     id_spell: number;
     index: number;
 }
 
+export interface PlayerCondition {
+    id: number;
+    race_mask: undefined;
+    failure_description_lang: string;
+    class_mask: number;
+    skill_logic: number;
+    id_language: number;
+    min_language: unknown;
+    max_language: number;
+    id_max_faction: number;
+    max_reputation: unknown;
+    reputation_logic: number;
+    current_pvp_faction: unknown;
+    pvp_medal: unknown;
+    prev_quest_logic: number;
+    curr_quest_logic: number;
+    current_completed_quest_logic: number;
+    spell_logic: number;
+    item_logic: number;
+    item_flags: unknown;
+    aura_spell_logic: number;
+    id_world_state_expression: number;
+    id_weather: number;
+    party_status: unknown;
+    lifetime_max_pvp_rank: unknown;
+    achievement_logic: number;
+    gender: unknown;
+    native_gender: unknown;
+    area_logic: number;
+    lfg_logic: number;
+    currency_logic: number;
+    id_quest_kill: number;
+    quest_kill_logic: number;
+    min_expansion_level: unknown;
+    max_expansion_level: unknown;
+    min_avg_item_level: number;
+    max_avg_item_level: number;
+    min_avg_equipped_item_level: number;
+    max_avg_equipped_item_level: number;
+    phase_use_flags: unknown;
+    id_phase: number;
+    id_phase_group: number;
+    flags: number;
+    chr_specialization_index: unknown;
+    chr_specialization_role: unknown;
+    id_modifier_tree: number;
+    power_type: unknown;
+    power_type_comp: unknown;
+    power_type_value: unknown;
+    weapon_subclass_mask: number;
+    max_guild_level: unknown;
+    min_guild_level: unknown;
+    max_expansion_tier: unknown;
+    min_expansion_tier: unknown;
+    min_pvp_rank: unknown;
+    max_pvp_rank: unknown;
+    id_content_tuning: number;
+    id_covenant: number;
+    id_skill_1: number;
+    id_skill_2: number;
+    id_skill_3: number;
+    id_skill_4: number;
+    min_skill_1: number;
+    min_skill_2: number;
+    min_skill_3: number;
+    min_skill_4: number;
+    max_skill_1: number;
+    max_skill_2: number;
+    max_skill_3: number;
+    max_skill_4: number;
+    id_min_faction_1: number;
+    id_min_faction_2: number;
+    id_min_faction_3: number;
+    min_reputation_1: unknown;
+    min_reputation_2: unknown;
+    min_reputation_3: unknown;
+    id_prev_quest_1: number;
+    id_prev_quest_2: number;
+    id_prev_quest_3: number;
+    id_prev_quest_4: number;
+    id_curr_quest_1: number;
+    id_curr_quest_2: number;
+    id_curr_quest_3: number;
+    id_curr_quest_4: number;
+    id_current_completed_quest_1: number;
+    id_current_completed_quest_2: number;
+    id_current_completed_quest_3: number;
+    id_current_completed_quest_4: number;
+    id_spell_1: number;
+    id_spell_2: number;
+    id_spell_3: number;
+    id_spell_4: number;
+    id_item_1: number;
+    id_item_2: number;
+    id_item_3: number;
+    id_item_4: number;
+    item_count_1: number;
+    item_count_2: number;
+    item_count_3: number;
+    item_count_4: number;
+    explored_1: number;
+    explored_2: number;
+    time_1: number;
+    time_2: number;
+    id_aura_spell_1: number;
+    id_aura_spell_2: number;
+    id_aura_spell_3: number;
+    id_aura_spell_4: number;
+    aura_stacks_1: unknown;
+    aura_stacks_2: unknown;
+    aura_stacks_3: unknown;
+    aura_stacks_4: unknown;
+    achievement_1: number;
+    achievement_2: number;
+    achievement_3: number;
+    achievement_4: number;
+    id_area_1: number;
+    id_area_2: number;
+    id_area_3: number;
+    id_area_4: number;
+    lfg_status_1: unknown;
+    lfg_status_2: unknown;
+    lfg_status_3: unknown;
+    lfg_status_4: unknown;
+    lfg_compare_1: unknown;
+    lfg_compare_2: unknown;
+    lfg_compare_3: unknown;
+    lfg_compare_4: unknown;
+    lfg_value_1: number;
+    lfg_value_2: number;
+    lfg_value_3: number;
+    lfg_value_4: number;
+    id_currency_1: number;
+    id_currency_2: number;
+    id_currency_3: number;
+    id_currency_4: number;
+    currency_count_1: number;
+    currency_count_2: number;
+    currency_count_3: number;
+    currency_count_4: number;
+    quest_kill_monster_1: number;
+    quest_kill_monster_2: number;
+    quest_kill_monster_3: number;
+    quest_kill_monster_4: number;
+    quest_kill_monster_5: number;
+    quest_kill_monster_6: number;
+    movement_flags_1: number;
+    movement_flags_2: number;
+}
+
 export interface RandPropPoints {
     id: number;
     damage_replace_stat: number;
     damage_secondary: number;
+    damage_replace_stat_int: number;
+    damage_secondary_int: number;
     epic_points_1: number;
     epic_points_2: number;
     epic_points_3: number;
@@ -894,6 +1087,21 @@ export interface RandPropPoints {
     uncm_points_3: number;
     uncm_points_4: number;
     uncm_points_5: number;
+    epic_points_int_1: number;
+    epic_points_int_2: number;
+    epic_points_int_3: number;
+    epic_points_int_4: number;
+    epic_points_int_5: number;
+    rare_points_int_1: number;
+    rare_points_int_2: number;
+    rare_points_int_3: number;
+    rare_points_int_4: number;
+    rare_points_int_5: number;
+    uncm_points_int_1: number;
+    uncm_points_int_2: number;
+    uncm_points_int_3: number;
+    uncm_points_int_4: number;
+    uncm_points_int_5: number;
 }
 
 export interface RelicTalent {
@@ -903,6 +1111,28 @@ export interface RelicTalent {
     power_index: unknown;
     unk_3: number;
     unk_4: number;
+}
+
+export interface RenownRewards {
+    id: number;
+    name: string;
+    desc: string;
+    desc2: string;
+    id_covenant: number;
+    level: number;
+    icon: number;
+    flags: number;
+    order: number;
+    id_item: number;
+    id_spell: number;
+    id_mount: number;
+    id_transmog: number;
+    id_transmog_set: number;
+    id_char_title: number;
+    id_garr_follower: number;
+    id_transmog_illusion: number;
+    id_quest: number;
+    id_player_cond: number;
 }
 
 export interface RewardPack {
@@ -937,6 +1167,8 @@ export interface RuneforgeLegendaryAbility {
     id_player_cond: number;
     unk_8: number;
     id_item: number;
+    id_covenant: number;
+    unk_10: number;
 }
 
 export interface SkillLine {
@@ -975,8 +1207,8 @@ export interface SkillLineAbility {
 }
 
 export interface Soulbind {
-    name: string;
     id: number;
+    name: string;
     id_covenant: number;
     id_garr_talent_tree: number;
     id_creature: number;
@@ -989,6 +1221,13 @@ export interface SoulbindConduit {
     type: number;
     id_covenant: number;
     id_spec_set: number;
+    unk_1: number;
+}
+
+export interface SoulbindConduitEnhancedSocket {
+    id: number;
+    id_garr_talent: number;
+    id_player_cond: number;
 }
 
 export interface SoulbindConduitItem {
@@ -1003,6 +1242,13 @@ export interface SoulbindConduitRank {
     id_spell: number;
     spell_mod: number;
     parent_id: number;
+}
+
+export interface SoulbindConduitRankProperties {
+    id: number;
+    rank: number;
+    item_level: number;
+    unk_1: number;
 }
 
 export interface SpecializationSpells {
@@ -1040,6 +1286,20 @@ export interface SpellAuraOptions {
     parent_id: number;
 }
 
+export interface SpellAuraRestrictions {
+    id: number;
+    difficulty: unknown;
+    caster_aura_state: unknown;
+    target_aura_state: unknown;
+    exclude_caster_aura_state: unknown;
+    exclude_target_aura_state: unknown;
+    id_caster_aura: number;
+    id_target_aura: number;
+    id_exclude_caster_aura: number;
+    id_exclude_target_aura: number;
+    parent_id: number;
+}
+
 export interface SpellCastTimes {
     id: number;
     cast_time: number;
@@ -1050,11 +1310,11 @@ export interface SpellCastingRequirements {
     id: number;
     id_spell: number;
     facing_flags: unknown;
-    unk_2: number;
-    unk_6: unknown;
-    unk_3: number;
-    unk_8: unknown;
-    unk_4: number;
+    id_min_faction: number;
+    min_reputation: unknown;
+    id_required_area: number;
+    required_aura_vision: unknown;
+    required_spell_focus: number;
 }
 
 export interface SpellCategories {
@@ -1136,6 +1396,7 @@ export interface SpellEffect {
     bonus: number;
     unk_24: number;
     base_value: number;
+    id_scaling_class: number;
     misc_value_1: number;
     misc_value_2: number;
     id_radius_1: number;
@@ -1170,10 +1431,26 @@ export interface SpellEquippedItems {
     mask_sub_class: number;
 }
 
+export interface SpellFocusObject {
+    id: number;
+    name: string;
+}
+
+export interface SpellInterrupts {
+    id: number;
+    difficulty: unknown;
+    interrupt_flags: number;
+    aura_interrupt_flags_1: number;
+    aura_interrupt_flags_2: number;
+    channel_interrupt_flags_1: number;
+    channel_interrupt_flags_2: number;
+    parent_id: number;
+}
+
 export interface SpellItemEnchantment {
+    id: number;
     desc: string;
     desc_2: string;
-    id: number;
     id_property_1: number;
     id_property_2: number;
     id_property_3: number;
@@ -1181,8 +1458,8 @@ export interface SpellItemEnchantment {
     coeff_2: number;
     coeff_3: number;
     unk_20: number;
-    unk_901_1: number;
-    unk_901_2: number;
+    min_item_level: number;
+    max_item_level: number;
     unk_5: number;
     unk_6: number;
     amount_1: number;
@@ -1192,7 +1469,7 @@ export interface SpellItemEnchantment {
     slot: number;
     req_skill: number;
     req_skill_value: number;
-    min_scaling_level: number;
+    item_level: number;
     charges: unknown;
     type_1: unknown;
     type_2: unknown;
@@ -1200,7 +1477,7 @@ export interface SpellItemEnchantment {
     scaling_type: unknown;
     unk_19: unknown;
     unk_15: unknown;
-    req_player_level: unknown;
+    min_scaling_level: unknown;
     max_scaling_level: unknown;
 }
 
@@ -1253,8 +1530,8 @@ export interface SpellMisc {
     id_range: number;
     school: unknown;
     proj_speed: number;
-    unk_3: number;
-    unk_1: number;
+    proj_delay: number;
+    proj_min_duration: number;
     id_icon: number;
     id_active_icon: number;
     unk_4: number;
@@ -1317,7 +1594,6 @@ export interface SpellRange {
 export interface SpellScaling {
     id: number;
     id_spell: number;
-    id_class: number;
     min_scaling_level: number;
     max_scaling_level: number;
     max_scaling_ilevel: number;

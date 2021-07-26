@@ -1,10 +1,11 @@
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { LuaArray, LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName } from "../../states/PaperDoll";
 import { parseDescription } from "./spellstringparser";
 import * as parse from "csv-parse/lib/sync";
 import { SpellShapeshift } from "./types";
+import { exit } from "process";
 
 type CellValue = string | number | CellValue[];
 interface AllData {
@@ -910,14 +911,14 @@ export interface SpellData {
     //hotfix: number;
     /** 4 Projectile Speed */
     prj_speed: number;
+    prj_delay: number;
+    prj_min_duration: number;
     /** 5 Spell school mask */
     school: number;
     /** 6 Class mask for spell */
     class_mask: number;
     /** 7 Racial mask for the spell */
     race_mask: number;
-    /** 8 Array index for gtSpellScaling.dbc. -1 means the first non-class-specific sub array, and so on, 0 disabled */
-    scaling_type: number;
     /** 9 Max scaling level(?), 0 == no restrictions, otherwise min( player_level, max_scaling_level ) */
     max_scaling_level: number;
     /** 10 Spell learned on level. NOTE: Only accurate for "class abilities" */
@@ -1052,6 +1053,7 @@ export interface SpellEffectData {
     type: EffectType;
     /** 6 Effect sub-type */
     subtype: EffectSubtype;
+    scaling_type: number;
     // SpellScaling.dbc
     /** 7 Effect average spell scaling multiplier */
     m_coeff: number;
@@ -1567,6 +1569,10 @@ function toMap<TKey, TValue>(array: TValue[], key: (v: TValue) => TKey) {
 // }
 
 export function getSpellData(directory: string) {
+    if (!existsSync(`${directory}/dbc_extract3/SpellShapeshift.csv`)) {
+        console.error("dbc_extract3 was not run");
+        exit(1);
+    }
     const toto = readFileSync(`${directory}/dbc_extract3/SpellShapeshift.csv`, {
         encoding: "ucs2",
     });
@@ -1609,9 +1615,10 @@ export function getSpellData(directory: string) {
             id: getNumber(row, i++),
             school: getNumber(row, i++),
             prj_speed: getNumber(row, i++),
+            prj_delay: getNumber(row, i++),
+            prj_min_duration: getNumber(row, i++),
             race_mask: getNumber(row, i++),
             class_mask: getNumber(row, i++),
-            scaling_type: getNumber(row, i++),
             max_scaling_level: getNumber(row, i++),
             spell_level: getNumber(row, i++),
             max_level: getNumber(row, i++),
@@ -1867,7 +1874,7 @@ export function getSpellData(directory: string) {
             index: getNumber(row, i++),
             type: getNumber(row, i++),
             subtype: getNumber(row, i++),
-
+            scaling_type: getNumber(row, i++),
             m_coeff: getNumber(row, i++),
             m_delta: getNumber(row, i++),
             m_unk: getNumber(row, i++),
@@ -2200,7 +2207,8 @@ export function getSpellData(directory: string) {
             spell.identifierScore = -1;
             spell.triggeredIdentifierScore = identifierScore;
         } else {
-            spell.identifierScore = spell.triggeredIdentifierScore = identifierScore;
+            spell.identifierScore = spell.triggeredIdentifierScore =
+                identifierScore;
         }
 
         if (spell.rank_str) {
