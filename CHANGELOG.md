@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.4](https://github.com/Sidoine/Ovale/compare/9.1.3...9.1.4) (2021-07-26)
+
+### Features
+
+-   **runeforge:** allow using runeforge power IDs in scripts ([#920](https://github.com/Sidoine/Ovale/issues/920)) ([4cbed9a](https://github.com/Sidoine/Ovale/commit/4cbed9ad349a1625996efa8c50b34606637a0a31))
+
+### Bug Fixes
+
+-   profiler option checkboxes were not working ([4813924](https://github.com/Sidoine/Ovale/commit/48139241b01235b819bc64238ee6300b323577b1))
+-   use the correct algorithm to request item information ([#936](https://github.com/Sidoine/Ovale/issues/936)) ([b2a5315](https://github.com/Sidoine/Ovale/commit/b2a53155674d6f97a1a006becbf84f0cb3852f4d))
+
 ### [9.1.3](https://github.com/Sidoine/Ovale/compare/9.1.2...9.1.3) (2021-07-07)
 
 ### [9.1.2](https://github.com/Sidoine/Ovale/compare/9.1.1...9.1.2) (2021-06-30)
