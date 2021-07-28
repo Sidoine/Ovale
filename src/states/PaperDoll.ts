@@ -1,7 +1,7 @@
 import { Tracer, DebugTools } from "../engine/debug";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
-import { OvaleEquipmentClass } from "./Equipment";
+import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { States, StateModule } from "../engine/state";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { tonumber, LuaObj, LuaArray, ipairs, unpack } from "@wowts/lua";
@@ -291,7 +291,7 @@ export class OvalePaperDollClass
         // this.RegisterEvent("PLAYER_DAMAGE_DONE_MODS"); // SpellBonusHealing (not really needed; spell power covered by SPELL_POWER_CHANGED)
         this.module.RegisterMessage(
             "Ovale_EquipmentChanged",
-            this.handleUpdateDamage
+            this.handleOvaleEquipmentChanged
         );
         // this.RegisterMessage("Ovale_StanceChanged", "UpdateDamage"); // Shouldn't be needed anymore, UNIT_DAMAGE covers it
         this.module.RegisterMessage(
@@ -319,6 +319,17 @@ export class OvalePaperDollClass
         this.module.UnregisterMessage("Ovale_StanceChanged");
         this.module.UnregisterMessage("Ovale_TalentsChanged");
     };
+
+    private handleOvaleEquipmentChanged = (event: string, slot: SlotName) => {
+        if (
+            slot == "mainhandslot" ||
+            slot == "secondaryhandslot" ||
+            slot == "offhandslot"
+        ) {
+            this.handleUpdateDamage();
+        }
+    };
+
     private handleUnitStats = (unitId: string) => {
         if (unitId == "player") {
             this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
