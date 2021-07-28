@@ -330,7 +330,7 @@ export class OvalePaperDollClass
         }
     };
 
-    private handleUnitStats = (unitId: string) => {
+    private handleUnitStats = (event: string, unitId: string) => {
         if (unitId == "player") {
             this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.current.strength = UnitStat(unitId, 1);
@@ -449,7 +449,7 @@ export class OvalePaperDollClass
     }
     private handleUpdateStats = (event: string) => {
         this.updateSpecialization();
-        this.handleUnitStats("player");
+        this.handleUnitStats(event, "player");
         this.handleCombatRatingUpdate();
         this.handleMasteryUpdate();
         this.handleUnitAttackPower(event, "player");
