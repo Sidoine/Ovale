@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.5](https://github.com/Sidoine/Ovale/compare/9.1.4...9.1.5) (2021-07-28)
+
+### Bug Fixes
+
+-   game client hanging when equipping different equipment set ([#945](https://github.com/Sidoine/Ovale/issues/945)) ([ed1aecb](https://github.com/Sidoine/Ovale/commit/ed1aecbd9a3bde0dcc7c61d59090cd1bdc529390))
+
 ### [9.1.4](https://github.com/Sidoine/Ovale/compare/9.1.3...9.1.4) (2021-07-26)
 
 ### Features
