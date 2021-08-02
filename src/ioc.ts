@@ -20,6 +20,7 @@ import { DebugTools } from "./engine/debug";
 import { OvaleDemonHunterDemonicClass } from "./states/DemonHunterDemonic";
 import { OvaleDemonHunterSoulFragmentsClass } from "./states/DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./states/DemonHunterSigils";
+import { Eclipse } from "./states/eclipse";
 import { OvaleEnemiesClass } from "./states/Enemies";
 import { OvaleEquipmentClass } from "./states/Equipment";
 import { OvaleFrameModuleClass } from "./ui/Frame";
@@ -80,6 +81,7 @@ export class IoC {
     public demonHunterDemonic: OvaleDemonHunterDemonicClass;
     public demonHunterSigils: OvaleSigilClass;
     public demonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
+    public eclipse: Eclipse;
     public enemies: OvaleEnemiesClass;
     public equipment: OvaleEquipmentClass;
     public frame: OvaleFrameModuleClass;
@@ -193,6 +195,14 @@ export class IoC {
             this.profiler,
             this.spellBook,
             this.power
+        );
+        this.eclipse = new Eclipse(
+            this.ovale,
+            this.debug,
+            this.aura,
+            combat,
+            this.paperDoll,
+            this.spellBook
         );
         this.stance = new OvaleStanceClass(
             this.debug,
@@ -467,6 +477,7 @@ export class IoC {
         this.state.registerState(this.paperDoll);
         this.state.registerState(this.baseState);
         this.state.registerState(this.demonHunterSigils);
+        this.state.registerState(this.eclipse);
         this.state.registerState(this.enemies);
         this.state.registerState(this.future);
         this.state.registerState(this.health);
@@ -487,6 +498,7 @@ export class IoC {
         soulbind.registerConditions(this.condition);
         this.warlock.registerConditions(this.condition);
         this.aura.registerConditions(this.condition);
+        this.eclipse.registerConditions(this.condition);
         this.future.registerConditions(this.condition);
         this.paperDoll.registerConditions(this.condition);
         this.equipment.registerConditions(this.condition);
