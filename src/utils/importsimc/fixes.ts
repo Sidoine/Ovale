@@ -70,7 +70,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "blessing_of_autumn",
         "blessing_of_winter"
     );
-    addSpellList("eclipse_any", "eclipse_lunar_buff", "eclipse_solar_buff");
     addSpellList(
         "bt_buffs",
         "bt_swipe_buff",
