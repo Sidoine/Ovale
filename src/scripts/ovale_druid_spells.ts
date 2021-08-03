@@ -581,11 +581,6 @@ Define(guardian_affinity_talent_restoration 22160)
     SpellRequire(frenzied_regeneration unusable set=1 enabled=(not ((specialization(guardian) or hastalent(guardian_affinity_talent_balance) or hastalent(guardian_affinity_talent_feral) or hastalent(guardian_affinity_restoration)) and stance(druid_bear_form))))
     SpellRequire(incapacitating_roar unusable set=1 enabled=(not ((specialization(guardian) or hastalent(guardian_affinity_talent_balance) or hastalent(guardian_affinity_talent_feral) or hastalent(guardian_affinity_restoration)) and stance(druid_bear_form))))
 
-SpellInfo(starfire inccounter="solar" resetcounter="lunar")
-SpellInfo(wrath inccounter="lunar" resetcounter="solar")
-  SpellAddBuff(starfire eclipse_solar_buff set=1 enabled=(counter("solar") == 1))
-  SpellAddBuff(wrath eclipse_lunar_buff set=1 enabled=(counter("lunar") == 1))
-
 Define(starsurge_empowerment_solar_buff -78674)
 SpellInfo(starsurge_empowerment_solar_buff)
 SpellRequire(starsurge_empowerment_solar_buff duration set=(buffexpires(eclipse_solar_buff)))
