@@ -436,7 +436,6 @@ Define(wrath_balance 190984)
 # Hurl a ball of energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(wrath_balance lunarpower=0)
 SpellList(adaptive_swarm adaptive_swarm_damage adaptive_swarm_heal)
-SpellList(eclipse_any eclipse_lunar_buff eclipse_solar_buff)
 SpellList(incarnation incarnation_tree_of_life incarnation_king_of_the_jungle incarnation_guardian_of_ursoc incarnation_chosen_of_elune)
 SpellList(berserk berserk_cat berserk_bear)
 SpellList(bs_inc_buff incarnation_king_of_the_jungle incarnation_guardian_of_ursoc berserk_bear berserk_cat)
