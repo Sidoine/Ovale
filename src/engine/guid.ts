@@ -1,15 +1,13 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { floor } from "@wowts/math";
 import {
     ipairs,
     setmetatable,
-    type,
     unpack,
     LuaArray,
     lualength,
     LuaObj,
 } from "@wowts/lua";
-import { insert, remove } from "@wowts/table";
+import { insert } from "@wowts/table";
 import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
@@ -20,6 +18,7 @@ import {
     returnConstant,
 } from "./condition";
 import { isString } from "../tools/tools";
+import { binaryInsertUnique, binaryRemove } from "../tools/array";
 
 const petUnits: LuaObj<string> = {};
 {
@@ -40,114 +39,62 @@ const petUnits: LuaObj<string> = {};
         },
     });
 }
-const unitAuraUnits: LuaArray<string> = {};
+
+const eventfulUnits: LuaArray<string> = {};
 {
-    insert(unitAuraUnits, "player");
-    insert(unitAuraUnits, "pet");
-    insert(unitAuraUnits, "vehicle");
-    insert(unitAuraUnits, "target");
-    insert(unitAuraUnits, "focus");
+    insert(eventfulUnits, "player");
+    insert(eventfulUnits, "pet");
+    insert(eventfulUnits, "vehicle");
+    insert(eventfulUnits, "target");
+    insert(eventfulUnits, "focus");
     for (let i = 1; i <= 40; i += 1) {
         const unitId = `raid${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
+        const petUnitId = petUnits[unitId];
+        insert(eventfulUnits, unitId);
+        insert(eventfulUnits, petUnitId);
     }
     for (let i = 1; i <= 4; i += 1) {
         const unitId = `party${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
+        const petUnitId = petUnits[unitId];
+        insert(eventfulUnits, unitId);
+        insert(eventfulUnits, petUnitId);
     }
     for (let i = 1; i <= 4; i += 1) {
-        insert(unitAuraUnits, `boss${i}`);
+        const unitId = `boss{i}`;
+        insert(eventfulUnits, unitId);
     }
     for (let i = 1; i <= 5; i += 1) {
         const unitId = `arena${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
+        const petUnitId = petUnits[unitId];
+        insert(eventfulUnits, unitId);
+        insert(eventfulUnits, petUnitId);
     }
-    insert(unitAuraUnits, "npc");
+    insert(eventfulUnits, "npc");
 }
 
-const unitAuraUnit: LuaObj<number> = {};
-
-for (const [i, unitId] of ipairs(unitAuraUnits)) {
-    unitAuraUnit[unitId] = i;
-}
-setmetatable(unitAuraUnit, {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    __index: function (t, unitId) {
-        return lualength(unitAuraUnits) + 1;
-    },
-});
-
-type CompareFunction<T> = (a: T, b: T) => boolean;
-
-function compareDefault<T>(a: T, b: T) {
-    return a < b;
-}
-
-function isCompareFunction<T>(a: any): a is CompareFunction<T> {
-    return type(a) === "function";
-}
-
-function binaryInsert<T>(
-    t: LuaArray<T>,
-    value: T,
-    unique: boolean | CompareFunction<T>,
-    compare?: CompareFunction<T>
-) {
-    if (isCompareFunction<T>(unique)) {
-        [unique, compare] = [false, unique];
+// eventfulUnit is table whose keys are unit IDs that receive unit events.
+const eventfulUnit: LuaObj<boolean> = {};
+const unitPriority: LuaObj<number> = {};
+{
+    for (const [i, unitId] of ipairs(eventfulUnits)) {
+        eventfulUnit[unitId] = true;
+        unitPriority[unitId] = i;
     }
-    compare = compare || compareDefault;
-    let [low, high] = [1, lualength(t)];
-    while (low <= high) {
-        const mid = floor((low + high) / 2);
-        if (compare(value, t[mid])) {
-            high = mid - 1;
-        } else if (!unique || compare(t[mid], value)) {
-            low = mid + 1;
-        } else {
-            return mid;
-        }
-    }
-    insert(t, low, value);
-    return low;
-}
-function binarySearch<T>(
-    t: LuaArray<T>,
-    value: T,
-    compare: CompareFunction<T>
-) {
-    compare = compare || compareDefault;
-    let [low, high] = [1, lualength(t)];
-    while (low <= high) {
-        const mid = floor((low + high) / 2);
-        if (compare(value, t[mid])) {
-            high = mid - 1;
-        } else if (compare(t[mid], value)) {
-            low = mid + 1;
-        } else {
-            return mid;
-        }
-    }
-    return undefined;
 }
 
-function binaryRemove<T>(
-    t: LuaArray<T>,
-    value: T,
-    compare: CompareFunction<T>
-) {
-    const index = binarySearch(t, value, compare);
-    if (index) {
-        remove(t, index);
+const getUnitPriority = function (unitId: string) {
+    let priority = unitPriority[unitId];
+    if (!priority) {
+        priority = lualength(unitPriority) + 1;
+        unitPriority[unitId] = priority;
     }
-    return index;
-}
-const compareUnit = function (a: string, b: string) {
-    return unitAuraUnit[a] < unitAuraUnit[b];
+    return priority;
 };
+
+const compareUnit = function (a: string, b: string) {
+    return getUnitPriority(a) < getUnitPriority(b);
+};
+
 export class Guids {
     unitGUID: LuaObj<string> = {};
     guidUnit: LuaObj<LuaArray<string>> = {};
@@ -156,7 +103,7 @@ export class Guids {
     guidName: LuaObj<string> = {};
     nameGUID: LuaObj<LuaArray<string>> = {};
     petGUID: LuaObj<number> = {};
-    unitAuraUnits = unitAuraUnit;
+    unitAuraUnits = eventfulUnit;
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
@@ -286,7 +233,7 @@ export class Guids {
         }
     };
     updateAllUnits() {
-        for (const [, unitId] of ipairs(unitAuraUnits)) {
+        for (const [, unitId] of ipairs(eventfulUnits)) {
             this.updateUnitWithTarget(unitId);
         }
     }
@@ -324,7 +271,7 @@ export class Guids {
             this.unitGUID[unitId] = guid;
             {
                 const list = this.guidUnit[guid] || {};
-                binaryInsert(list, unitId, true, compareUnit);
+                binaryInsertUnique(list, unitId, compareUnit);
                 this.guidUnit[guid] = list;
             }
             this.tracer.debug("'%s' is '%s'.", unitId, guid);
@@ -334,7 +281,7 @@ export class Guids {
             this.unitName[unitId] = name;
             {
                 const list = this.nameUnit[name] || {};
-                binaryInsert(list, unitId, true, compareUnit);
+                binaryInsertUnique(list, unitId, compareUnit);
                 this.nameUnit[name] = list;
             }
             this.tracer.debug("'%s' is '%s'.", unitId, name);
@@ -344,7 +291,7 @@ export class Guids {
             this.guidName[guid] = name;
             if (name != previousNameFromGUID) {
                 const list = this.nameGUID[name] || {};
-                binaryInsert(list, guid, true);
+                binaryInsertUnique(list, guid);
                 this.nameGUID[name] = list;
                 if (guid == previousGUID) {
                     this.tracer.debug(
