@@ -706,38 +706,56 @@ export const miscOperands: LuaObj<MiscOperand> = {
                 name: "buffpresent",
                 extraSymbol: "eclipse_solar_buff",
             },
+            solar_in: {
+                type: MiscOperandModifierType.Replace,
+                name: "eclipsesolarin",
+            },
             solar_in_1: {
                 type: MiscOperandModifierType.Code,
-                code: "counter(solar) == 1",
+                code: "eclipsesolarin() == 1",
+            },
+            solar_in_2: {
+                type: MiscOperandModifierType.Code,
+                code: "eclipsesolarin() == 2",
             },
             solar_next: {
-                type: MiscOperandModifierType.Code,
-                code: "counter(solar) == 1",
+                type: MiscOperandModifierType.Replace,
+                name: "eclipsesolarnext",
+            },
+            lunar_in: {
+                type: MiscOperandModifierType.Replace,
+                name: "eclipselunarin",
             },
             lunar_in_1: {
-                type: MiscOperandModifierType.Replace,
-                code: "counter(lunar) == 1",
+                type: MiscOperandModifierType.Code,
+                code: "eclipselunarin() == 1",
+            },
+            lunar_in_2: {
+                type: MiscOperandModifierType.Code,
+                code: "eclipselunarin() == 2",
             },
             lunar_next: {
                 type: MiscOperandModifierType.Replace,
-                code: "counter(lunar) == 1",
+                name: "eclipselunarnext",
             },
             any_next: {
-                type: MiscOperandModifierType.Code,
-                code: "counter(lunar) + counter(solar) == 1",
+                type: MiscOperandModifierType.Replace,
+                name: "eclipseanynext",
             },
             in_any: {
-                type: MiscOperandModifierType.Replace,
-                name: "buffpresent",
-                extraSymbol: "eclipse_any",
+                type: MiscOperandModifierType.Code,
+                code: "buffpresent(eclipse_lunar_buff) or buffpresent(eclipse_solar_buff)",
+                symbolsInCode: {
+                    1: "eclipse_lunar_buff",
+                    2: "eclipse_solar_buff",
+                },
             },
             in_both: {
                 type: MiscOperandModifierType.Code,
-                code:
-                    "buffpresent(eclipse_solar_buff) and buffpresent(eclipse_lunar_buff)",
+                code: "buffpresent(eclipse_lunar_buff) and buffpresent(eclipse_solar_buff)",
                 symbolsInCode: {
-                    1: "eclipse_solar_buff",
-                    2: "eclipse_lunar_buff",
+                    1: "eclipse_lunar_buff",
+                    2: "eclipse_solar_buff",
                 },
             },
         },
