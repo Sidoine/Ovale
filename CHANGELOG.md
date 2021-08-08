@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.6](https://github.com/Sidoine/Ovale/compare/9.1.5...9.1.6) (2021-08-08)
+
+### Features
+
+-   add standalone binary search/insert/remove implementation ([#954](https://github.com/Sidoine/Ovale/issues/954)) ([e57af00](https://github.com/Sidoine/Ovale/commit/e57af00c4020aed9a628438ca237a12e5622d05b))
+-   track Eclipse state directly in Ovale ([#952](https://github.com/Sidoine/Ovale/issues/952)) ([d6ec66e](https://github.com/Sidoine/Ovale/commit/d6ec66e7c103f6fd851d82dba58e37d1812008ed))
+
 ### [9.1.5](https://github.com/Sidoine/Ovale/compare/9.1.4...9.1.5) (2021-07-28)
 
 ### Bug Fixes
