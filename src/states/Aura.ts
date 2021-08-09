@@ -57,7 +57,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
 let playerGUID = "fake_guid";
-let petGUIDs: LuaObj<number> = {};
+let petGUIDs: LuaObj<boolean> = {};
 const pool = new OvalePool<Aura | LuaObj<Aura> | LuaObj<LuaObj<Aura>>>(
     "OvaleAura_pool"
 );
@@ -545,9 +545,10 @@ export class OvaleAuraClass
             amount,
         ] = CombatLogGetCurrentEventInfo();
         const mine =
-            sourceGUID == playerGUID || this.ovaleGuid.isPlayerPet(sourceGUID);
+            sourceGUID == playerGUID ||
+            this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) == playerGUID;
         if (mine && cleuEvent == "SPELL_MISSED") {
-            const [unitId] = this.ovaleGuid.getUnitByGuid(destGUID);
+            const [unitId] = this.ovaleGuid.getUnitByGUID(destGUID);
             if (unitId) {
                 this.debug.debugTimestamp(
                     "%s: %s (%s)",
@@ -560,7 +561,7 @@ export class OvaleAuraClass
         }
         if (spellAuraEvents[cleuEvent]) {
             this.ovaleData.registerAuraSeen(spellId);
-            const [unitId] = this.ovaleGuid.getUnitByGuid(destGUID);
+            const [unitId] = this.ovaleGuid.getUnitByGUID(destGUID);
             this.debug.debugTimestamp("UnitId: ", unitId);
             if (unitId) {
                 if (!this.ovaleGuid.unitAuraUnits[unitId]) {
@@ -721,7 +722,7 @@ export class OvaleAuraClass
 
     private removeAurasOnInactiveUnits() {
         for (const [guid] of pairs(this.current.aura)) {
-            const unitId = this.ovaleGuid.getUnitByGuid(guid);
+            const unitId = this.ovaleGuid.getUnitByGUID(guid);
             if (!unitId) {
                 this.debug.debug("Removing auras from GUID %s", guid);
                 removeAurasOnGUID(this.current.aura, guid);
@@ -912,7 +913,7 @@ export class OvaleAuraClass
             [aura.value1, aura.value2, aura.value3] = [value1, value2, value3];
             const mine =
                 casterGUID == playerGUID ||
-                this.ovaleGuid.isPlayerPet(casterGUID);
+                this.ovaleGuid.getOwnerGUIDByGUID(casterGUID) == playerGUID;
             if (mine) {
                 let spellcast = this.lastSpell.lastInFlightSpell();
                 if (
@@ -1020,7 +1021,7 @@ export class OvaleAuraClass
             }
             const mine =
                 casterGUID == playerGUID ||
-                this.ovaleGuid.isPlayerPet(casterGUID);
+                this.ovaleGuid.getOwnerGUIDByGUID(casterGUID) == playerGUID;
             if (mine) {
                 aura.baseTick = undefined;
                 aura.lastTickTime = undefined;

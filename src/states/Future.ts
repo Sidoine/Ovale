@@ -352,7 +352,8 @@ export class OvaleFutureClass
         ] = CombatLogGetCurrentEventInfo();
         if (
             sourceGUID == this.ovale.playerGUID ||
-            this.ovaleGuid.isPlayerPet(sourceGUID)
+            this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) ==
+                this.ovale.playerGUID
         ) {
             this.profiler.startProfiling(
                 "OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED"
@@ -860,7 +861,7 @@ export class OvaleFutureClass
         } else {
             spellcast.targetName = targetName;
             let [targetGUID, nextGUID] =
-                this.ovaleGuid.getGuidByName(targetName);
+                this.ovaleGuid.getGUIDByName(targetName);
             if (nextGUID) {
                 let name = this.ovaleGuid.getUnitName("target");
                 if (name == targetName) {
@@ -1790,7 +1791,7 @@ export class OvaleFutureClass
                     "unknown spell";
                 spellcast.target = targetGUID;
                 spellcast.targetName =
-                    this.ovaleGuid.getNameByGuid(targetGUID) || "target";
+                    this.ovaleGuid.getNameByGUID(targetGUID) || "target";
                 spellcast.start = startCast;
                 spellcast.stop = endCast;
                 spellcast.channel = channel;
