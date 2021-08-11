@@ -25,11 +25,11 @@ import { insert, remove } from "@wowts/table";
 import {
     GetSpellInfo,
     GetTime,
+    GetUnitName,
     UnitCastingInfo,
     UnitChannelInfo,
     UnitExists,
     UnitGUID,
-    UnitName,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
@@ -870,7 +870,7 @@ export class OvaleFutureClass
                     if (name == targetName) {
                         targetGUID = this.ovaleGuid.getUnitGUID("focus");
                     } else if (UnitExists("mouseover")) {
-                        name = UnitName("mouseover");
+                        name = GetUnitName("mouseover", true);
                         if (name == targetName) {
                             targetGUID = UnitGUID("mouseover");
                         }
