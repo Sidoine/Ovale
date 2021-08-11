@@ -107,7 +107,8 @@ export class OvaleBossModClass {
         //     let dep = depth || 1;
         //     isWorldBoss = target != undefined && UnitExists(target) && UnitLevel(target) < 0;
         //     if (isWorldBoss) {
-        //         this.Debug("%s is worldboss (%s)", target, UnitName(target));
+        //         const [name] = UnitName(target);
+        //         this.Debug("%s is worldboss (%s)", target, name);
         //     }
         //     return isWorldBoss || (dep <= 3 && RecursiveScanTargets(`${target}target`, dep + 1));
         // }

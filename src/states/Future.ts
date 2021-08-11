@@ -870,7 +870,7 @@ export class OvaleFutureClass
                     if (name == targetName) {
                         targetGUID = this.ovaleGuid.getUnitGUID("focus");
                     } else if (UnitExists("mouseover")) {
-                        name = UnitName("mouseover");
+                        [name] = UnitName("mouseover");
                         if (name == targetName) {
                             targetGUID = UnitGUID("mouseover");
                         }

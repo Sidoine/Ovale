@@ -2428,7 +2428,8 @@ export class OvaleConditions {
 	 @return A boolean value.
      */
     private name = (atTime: number, target: string) => {
-        return returnConstant(UnitName(target));
+        const [name] = UnitName(target);
+        return returnConstant(name);
     };
 
     /** Test if the game is on a PTR server
@@ -2502,11 +2503,16 @@ export class OvaleConditions {
     ) => {
         const name = namedParams.name;
         const target = "pet";
-        const boolean =
-            UnitExists(target) &&
-            !UnitIsDead(target) &&
-            (name == undefined || name == UnitName(target));
-        return returnBoolean(boolean);
+        let value = false;
+        if (UnitExists(target) && !UnitIsDead(target)) {
+            if (name == undefined) {
+                value = true;
+            } else {
+                const [petName] = UnitName(target);
+                value = name == petName;
+            }
+        }
+        return returnBoolean(value);
     };
 
     /**  Return the maximum power of the given power type on the target.

@@ -239,7 +239,7 @@ export class Guids {
     }
     updateUnit(unitId: string) {
         const guid = UnitGUID(unitId);
-        const name = UnitName(unitId);
+        const [name] = UnitName(unitId);
         const previousGUID = this.unitGUID[unitId];
         const previousName = this.unitName[unitId];
         if (!guid || guid != previousGUID) {
@@ -327,7 +327,12 @@ export class Guids {
     }
     getUnitName(unitId: string) {
         if (unitId) {
-            return this.unitName[unitId] || UnitName(unitId);
+            if (this.unitName[unitId]) {
+                return this.unitName[unitId];
+            } else {
+                const [name] = UnitName(unitId);
+                return name;
+            }
         }
         return undefined;
     }
