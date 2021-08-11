@@ -1,13 +1,9 @@
 import { OvalePool } from "../tools/Pool";
-import { OvaleQueue } from "../tools/Queue";
+import { Deque } from "../tools/Queue";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { band } from "@wowts/bit";
 import { sub } from "@wowts/string";
-import {
-    CombatLogGetCurrentEventInfo,
-    Enum,
-    GetTime,
-} from "@wowts/wow-mock";
+import { CombatLogGetCurrentEventInfo, Enum, GetTime } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Profiler, OvaleProfilerClass } from "../engine/profiler";
@@ -23,7 +19,7 @@ const damageTakenWindow = 20;
 const schoolMaskMagic = Enum.Damageclass.MaskMagical;
 
 export class OvaleDamageTakenClass {
-    damageEvent = new OvaleQueue<Event>("OvaleDamageTaken_damageEvent");
+    damageEvent = new Deque<Event>(); // newest events pushed onto back of deque
     private module: AceModule & AceEvent;
     private profiler: Profiler;
     private tracer: Tracer;
@@ -133,7 +129,7 @@ export class OvaleDamageTakenClass {
         event.timestamp = timestamp;
         event.damage = damage;
         event.magic = isMagicDamage || false;
-        this.damageEvent.insertFront(event);
+        this.damageEvent.push(event);
         this.removeExpiredEvents(timestamp);
         this.ovale.needRefresh();
         this.profiler.stopProfiling("OvaleDamageTaken_AddDamageTaken");
@@ -144,7 +140,7 @@ export class OvaleDamageTakenClass {
         const lowerBound = now - interval;
         this.removeExpiredEvents(now);
         let [total, totalMagic] = [0, 0];
-        const iterator = this.damageEvent.frontToBackIterator();
+        const iterator = this.damageEvent.backToFrontIterator();
         while (iterator.next()) {
             const event = iterator.value;
             if (event.timestamp < lowerBound) {
@@ -160,23 +156,22 @@ export class OvaleDamageTakenClass {
     removeExpiredEvents(timestamp: number) {
         this.profiler.startProfiling("OvaleDamageTaken_RemoveExpiredEvents");
         while (true) {
-            const event = this.damageEvent.back();
+            // remove expired events from front of deque
+            const event = this.damageEvent.front();
             if (!event) {
                 break;
             }
-            if (event) {
-                if (timestamp - event.timestamp < damageTakenWindow) {
-                    break;
-                }
-                this.damageEvent.removeBack();
-                pool.release(event);
-                this.ovale.needRefresh();
+            if (timestamp - event.timestamp < damageTakenWindow) {
+                break;
             }
+            this.damageEvent.shift();
+            pool.release(event);
+            this.ovale.needRefresh();
         }
         this.profiler.stopProfiling("OvaleDamageTaken_RemoveExpiredEvents");
     }
     debugDamageTaken() {
-        this.tracer.print(this.damageEvent.debuggingInfo());
+        this.tracer.print(this.module.GetName());
         const iterator = this.damageEvent.backToFrontIterator();
         while (iterator.next()) {
             const event = iterator.value;
