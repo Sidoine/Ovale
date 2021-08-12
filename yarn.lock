@@ -1186,9 +1186,9 @@
     "@wowts/lua" "^1.3.0"
 
 "@wowts/tstolua@^1.13.5":
-  version "1.13.5"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.13.5.tgz#fc6c24de25f94035bb04ccd0fab197ee7abeb88a"
-  integrity sha512-Cm0kl3g8gkPHttxNtg3IC3wPwEhkfMm6HWxMWhY9n0vyjnwDDujBQSijLp5ec+1wZNX544jOWa0Bm6+1RwGlqA==
+  version "1.13.6"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.13.6.tgz#16a23cb6176d22858f3a6e94270fd247f07d2968"
+  integrity sha512-SNA5k2UwCnR6QOxBZXS4K4clkGBoqp6wJCEegMRuBcOlrNJI0BnDiJcbEAiCcvzBX6oxbrO+H6l9YQJQJ7S5Zg==
   dependencies:
     "@types/degit" "^2.8.2"
     commander "^7.2.0"
@@ -1197,9 +1197,9 @@
     webdav "^3.6.2"
 
 "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.31.1", "@wowts/wow-mock@^1.6.0":
-  version "1.31.1"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.31.1.tgz#f98fb653afae225247bd2c669422125d23ed9f08"
-  integrity sha512-YgNBjs8EYvl4VAS1mr/W5kqcv65/tunomdkAkqVsfo/chxXRtrWILPmmhGsfPWwIdURFvjk0r0kfvqMudezVOQ==
+  version "1.32.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.1.tgz#28ba2485a9a8dcd475a7720886681f2480451b6e"
+  integrity sha512-V69FRVYw6o+mBz8oLHvZ2e3jL55dhen7lt0tLu96p70QhoBbd2RKZWPuCO78Ce6OV95WRUBrKOFgvcKypJ381A==
   dependencies:
     "@wowts/lua" "^1.6.0"
     "@wowts/table" "^1.0.2"
