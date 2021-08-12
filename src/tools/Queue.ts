@@ -127,6 +127,23 @@ export class Deque<T> {
         return t;
     }
 
+    indexOf(value: T, from?: number) {
+        const buffer = this.buffer;
+        const capacity = this.capacity;
+        let index = from || 1;
+        let mappedIndex = this.first + index - 1;
+        let remaining = this.length - index + 1;
+        while (remaining > 0) {
+            if (buffer[mappedIndex] == value) {
+                return index;
+            }
+            index += 1;
+            mappedIndex = (mappedIndex < capacity && mappedIndex + 1) || 1;
+            remaining -= 1;
+        }
+        return 0;
+    }
+
     at(index: number) {
         if (1 <= index && index <= this.length) {
             index = this.first + index - 1;

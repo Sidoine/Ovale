@@ -24,6 +24,11 @@ test("new queue is not full", () => {
     expect(q.isFull()).toBe(false);
 });
 
+test("indexOf from empty queue", () => {
+    const q = new Deque<number>();
+    expect(q.indexOf(10)).toBe(0);
+});
+
 test("push onto empty queue", () => {
     const q = new Deque<number>();
     q.push(10);
@@ -106,6 +111,18 @@ test("remove at 1 of one-element queue", () => {
     expect(q.isEmpty()).toBe(true);
 });
 
+test("indexOf missing from one-element queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10 });
+    expect(q.indexOf(20)).toBe(0);
+});
+
+test("indexOf existing from one-element queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10 });
+    expect(q.indexOf(10)).toBe(1);
+});
+
 test("push onto queue", () => {
     const q = new Deque<number>();
     q.fromArray({ 1: 10, 2: 20 });
@@ -186,6 +203,30 @@ test("remove at middle of queue near back", () => {
     expect(q.front()).toBe(10);
     expect(q.back()).toBe(40);
     expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("indexOf missing from queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(50)).toBe(0);
+});
+
+test("indexOf existing from front of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(10)).toBe(1);
+});
+
+test("indexOf existing from back of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(40)).toBe(4);
+});
+
+test("indexOf existing from middle of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(20)).toBe(2);
 });
 
 test("grow queue", () => {
@@ -361,6 +402,30 @@ test("remove at middle of queue near back with wraparound indexing", () => {
     expect(q.front()).toBe(10);
     expect(q.back()).toBe(40);
     expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("indexOf missing from queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(50)).toBe(0);
+});
+
+test("indexOf existing from front of queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(10)).toBe(1);
+});
+
+test("indexOf existing from back of queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(40)).toBe(4);
+});
+
+test("indexOf existing from middle of queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    expect(q.indexOf(20)).toBe(2);
 });
 
 test("grow queue with wraparound indexing", () => {
