@@ -39,7 +39,6 @@ import {
 } from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
 import { DebugTools, Tracer } from "../engine/debug";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { KeyCheck } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
 
@@ -205,12 +204,10 @@ export class OvaleEquipmentClass {
     };
     private module: AceModule & AceEvent;
     private tracer: Tracer;
-    private profiler: Profiler;
 
     constructor(
         private ovale: OvaleClass,
         ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
         private data: OvaleDataClass
     ) {
         this.module = ovale.createModule(
@@ -220,7 +217,6 @@ export class OvaleEquipmentClass {
             aceEvent
         );
         this.tracer = ovaleDebug.create("OvaleEquipment");
-        this.profiler = ovaleProfiler.create(this.module.GetName());
 
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
@@ -434,9 +430,6 @@ export class OvaleEquipmentClass {
         itemId: number,
         location: ItemLocationMixin
     ) => {
-        this.profiler.startProfiling(
-            "OvaleEquipment_finishUpdateForEquippedItem"
-        );
         this.tracer.debug(`Slot ${slot}, item ${itemId}: finished`);
         const item = this.equippedItem[slot];
         if (location.IsValid()) {
@@ -485,9 +478,6 @@ export class OvaleEquipmentClass {
         } else {
             resetItemInfo(item);
         }
-        this.profiler.stopProfiling(
-            "OvaleEquipment_finishUpdateForEquippedItem"
-        );
     };
 
     private debugEquipment = () => {

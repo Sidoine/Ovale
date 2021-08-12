@@ -6,15 +6,9 @@ import { newTimeSpan } from "../tools/TimeSpan";
 import { AstAnnotation, AstTypedFunctionNode } from "./ast";
 import { OvaleConditionClass } from "./condition";
 import { DebugTools, Tracer } from "./debug";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import { Runner } from "./runner";
 
 function makeRunner() {
-    const profilerFactoryMock = Mock.ofType<OvaleProfilerClass>();
-    const profilerMock = Mock.ofType<Profiler>();
-    profilerFactoryMock
-        .setup((x) => x.create(It.isAny()))
-        .returns(() => profilerMock.object);
     const debugMock = Mock.ofType<DebugTools>();
     const trackerMock = Mock.ofType<Tracer>();
     debugMock
@@ -24,7 +18,6 @@ function makeRunner() {
     const conditionMock = Mock.ofType<OvaleConditionClass>();
     const astAnnotationMock = Mock.ofType<AstAnnotation>();
     const runner = new Runner(
-        profilerFactoryMock.object,
         debugMock.object,
         baseStateMock.object,
         conditionMock.object
@@ -32,7 +25,6 @@ function makeRunner() {
     runner.refresh();
     return {
         runner,
-        profilerFactoryMock,
         debugMock,
         baseStateMock,
         conditionMock,

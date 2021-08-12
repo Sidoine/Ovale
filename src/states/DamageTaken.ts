@@ -6,7 +6,6 @@ import { sub } from "@wowts/string";
 import { CombatLogGetCurrentEventInfo, Enum, GetTime } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { Tracer, DebugTools } from "../engine/debug";
 
 interface Event {
@@ -21,21 +20,15 @@ const schoolMaskMagic = Enum.Damageclass.MaskMagical;
 export class OvaleDamageTakenClass {
     damageEvent = new Deque<Event>(); // newest events pushed onto back of deque
     private module: AceModule & AceEvent;
-    private profiler: Profiler;
     private tracer: Tracer;
 
-    constructor(
-        private ovale: OvaleClass,
-        profiler: OvaleProfilerClass,
-        ovaleDebug: DebugTools
-    ) {
+    constructor(private ovale: OvaleClass, ovaleDebug: DebugTools) {
         this.module = ovale.createModule(
             "OvaleDamageTaken",
             this.handleInitialize,
             this.handleDisable,
             aceEvent
         );
-        this.profiler = profiler.create(this.module.GetName());
         this.tracer = ovaleDebug.create(this.module.GetName());
     }
 
@@ -81,9 +74,6 @@ export class OvaleDamageTakenClass {
             destGUID == this.ovale.playerGUID &&
             sub(cleuEvent, -7) == "_DAMAGE"
         ) {
-            this.profiler.startProfiling(
-                "OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED"
-            );
             const now = GetTime();
             const eventPrefix = sub(cleuEvent, 1, 6);
             if (eventPrefix == "SWING_") {
@@ -110,9 +100,6 @@ export class OvaleDamageTakenClass {
                 }
                 this.addDamageTaken(now, amount, isMagicDamage);
             }
-            this.profiler.stopProfiling(
-                "OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED"
-            );
         }
     };
     private handlePlayerRegenEnabled = (event: string) => {
@@ -124,7 +111,6 @@ export class OvaleDamageTakenClass {
         damage: number,
         isMagicDamage?: boolean
     ) {
-        this.profiler.startProfiling("OvaleDamageTaken_AddDamageTaken");
         const event = pool.get();
         event.timestamp = timestamp;
         event.damage = damage;
@@ -132,7 +118,6 @@ export class OvaleDamageTakenClass {
         this.damageEvent.push(event);
         this.removeExpiredEvents(timestamp);
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvaleDamageTaken_AddDamageTaken");
     }
 
     getRecentDamage(interval: number) {
@@ -154,7 +139,6 @@ export class OvaleDamageTakenClass {
         return [total, totalMagic];
     }
     removeExpiredEvents(timestamp: number) {
-        this.profiler.startProfiling("OvaleDamageTaken_RemoveExpiredEvents");
         while (true) {
             // remove expired events from front of deque
             const event = this.damageEvent.front();
@@ -168,7 +152,6 @@ export class OvaleDamageTakenClass {
             pool.release(event);
             this.ovale.needRefresh();
         }
-        this.profiler.stopProfiling("OvaleDamageTaken_RemoveExpiredEvents");
     }
     debugDamageTaken() {
         this.tracer.print(this.module.GetName());

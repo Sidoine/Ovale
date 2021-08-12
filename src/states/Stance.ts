@@ -14,7 +14,6 @@ import { States, StateModule } from "../engine/state";
 import { DebugTools } from "../engine/debug";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
 import { OvaleConditionClass, returnBoolean } from "../engine/condition";
@@ -72,17 +71,16 @@ class StanceData {
 
 export class OvaleStanceClass
     extends States<StanceData>
-    implements StateModule {
+    implements StateModule
+{
     ready = false;
     stanceList: LuaArray<string> = {};
     stanceId: LuaObj<number> = {};
     private module: AceModule & AceEvent;
-    private profiler: Profiler;
 
     constructor(
         ovaleDebug: DebugTools,
         private ovale: OvaleClass,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass
     ) {
         super(StanceData);
@@ -92,7 +90,6 @@ export class OvaleStanceClass
             this.handleDisable,
             aceEvent
         );
-        this.profiler = ovaleProfiler.create(this.module.GetName());
         const debugOptions: LuaObj<OptionUiAll> = {
             stance: {
                 name: l["stances"],
@@ -167,7 +164,6 @@ export class OvaleStanceClass
     };
 
     createStanceList() {
-        this.profiler.startProfiling("OvaleStance_CreateStanceList");
         wipe(this.stanceList);
         wipe(this.stanceId);
         let name, stanceName, spellId;
@@ -182,7 +178,6 @@ export class OvaleStanceClass
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleStance_CreateStanceList");
     }
 
     debugStances() {
@@ -221,7 +216,6 @@ export class OvaleStanceClass
     }
 
     shapeshiftEventHandler() {
-        this.profiler.startProfiling("OvaleStance_ShapeshiftEventHandler");
         const oldStance = this.current.stance;
         const newStance = GetShapeshiftForm();
         if (oldStance != newStance) {
@@ -233,7 +227,6 @@ export class OvaleStanceClass
                 this.getStance(oldStance)
             );
         }
-        this.profiler.stopProfiling("OvaleStance_ShapeshiftEventHandler");
     }
     updateStances = () => {
         this.createStanceList();
@@ -245,9 +238,7 @@ export class OvaleStanceClass
     }
     cleanState(): void {}
     resetState() {
-        this.profiler.startProfiling("OvaleStance_ResetState");
         this.next.stance = this.current.stance;
-        this.profiler.stopProfiling("OvaleStance_ResetState");
     }
     applySpellAfterCast = (
         spellId: number,
@@ -257,7 +248,6 @@ export class OvaleStanceClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleStance_ApplySpellAfterCast");
         let stance = this.ovaleData.getSpellInfoProperty(
             spellId,
             endCast,
@@ -270,6 +260,5 @@ export class OvaleStanceClass
             }
             this.next.stance = stance;
         }
-        this.profiler.stopProfiling("OvaleStance_ApplySpellAfterCast");
     };
 }
