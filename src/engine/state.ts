@@ -58,14 +58,10 @@ export class OvaleStateClass {
     }
 
     unregisterState(stateAddon: StateModule) {
-        const stateModules = new Queue<StateModule>();
-        const iterator = this.stateAddons.iterator();
-        while (iterator.next()) {
-            if (stateAddon != iterator.value) {
-                stateModules.push(iterator.value);
-            }
+        const index = this.stateAddons.indexOf(stateAddon);
+        if (index > 0) {
+            this.stateAddons.removeAt(index);
         }
-        this.stateAddons = stateModules;
         stateAddon.cleanState();
     }
 
