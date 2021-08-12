@@ -224,9 +224,8 @@ export class OvaleScriptsClass {
     }
 
     setCurrentSpecScript(scriptName: string) {
-        this.ovaleOptions.db.profile.source[
-            this.getCurrentSpecScriptId()
-        ] = scriptName;
+        this.ovaleOptions.db.profile.source[this.getCurrentSpecScriptId()] =
+            scriptName;
     }
 
     createOptions() {
@@ -340,7 +339,7 @@ export class OvaleScriptsClass {
         if (!isLuaArray(this.ovaleOptions.db.profile.source)) {
             this.ovaleOptions.db.profile.source = {};
         }
-        for (let i = 1; i < countSpecializations; i += 1) {
+        for (let i = 1; i <= countSpecializations; i += 1) {
             const specName = this.ovalePaperDoll.getSpecialization(
                 i as SpecializationIndex
             );
