@@ -5,7 +5,6 @@ import { SpellCast } from "./LastSpell";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { OvaleFutureClass } from "./Future";
 import { OvaleAuraClass } from "./Aura";
@@ -29,13 +28,11 @@ class TotemData {
 
 export class OvaleTotemClass extends States<TotemData> implements StateModule {
     private module: AceModule & AceEvent;
-    private profiler: Profiler;
     private debug: Tracer;
 
     constructor(
         private ovale: OvaleClass,
         ovaleState: OvaleStateClass,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private ovaleFuture: OvaleFutureClass,
         private ovaleAura: OvaleAuraClass,
@@ -50,7 +47,6 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             this.handleDisable,
             aceEvent
         );
-        this.profiler = ovaleProfiler.create(this.module.GetName());
         ovaleState.registerState(this);
     }
 
@@ -102,12 +98,10 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleTotem_ApplySpellAfterCast");
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
             this.summonTotem(spellId, endCast);
         }
-        this.profiler.stopProfiling("OvaleTotem_ApplySpellAfterCast");
     };
 
     isActiveTotem(totem: Totem, atTime: number) {
@@ -126,12 +120,10 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     }
 
     getTotem(slot: number) {
-        this.profiler.startProfiling("OvaleTotem_state_GetTotem");
         const totem = this.next.totems[slot];
         if (totem && (!totem.serial || totem.serial < serial)) {
-            const [haveTotem, name, startTime, duration, icon] = GetTotemInfo(
-                slot
-            );
+            const [haveTotem, name, startTime, duration, icon] =
+                GetTotemInfo(slot);
             if (haveTotem) {
                 totem.name = name;
                 totem.start = startTime;
@@ -146,7 +138,6 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
             totem.slot = slot;
             totem.serial = serial;
         }
-        this.profiler.stopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
 
@@ -199,8 +190,6 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
     }
 
     summonTotem(spellId: number, atTime: number) {
-        this.profiler.startProfiling("OvaleTotem_state_SummonTotem");
-
         const totemSlot = this.getAvailableTotemSlot(spellId, atTime);
         if (totemSlot) {
             const [name, , icon] = this.ovaleSpellBook.getSpellInfo(spellId);
@@ -222,13 +211,9 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 totemSlot
             );
         }
-        this.profiler.stopProfiling("OvaleTotem_state_SummonTotem");
     }
 
     getAvailableTotemSlot(spellId: number, atTime: number): number | undefined {
-        this.profiler.startProfiling(
-            "OvaleTotem_state_GetNextAvailableTotemSlot"
-        );
         let availableSlot = undefined;
 
         const si = this.ovaleData.spellInfo[spellId];
@@ -261,9 +246,6 @@ export class OvaleTotemClass extends States<TotemData> implements StateModule {
                 }
             }
         }
-        this.profiler.stopProfiling(
-            "OvaleTotem_state_GetNextAvailableTotemSlot"
-        );
         return availableSlot;
     }
 }

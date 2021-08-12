@@ -1,7 +1,6 @@
 import { l } from "../ui/Localization";
 import { DebugTools, Tracer } from "../engine/debug";
 import { OvalePool } from "../tools/Pool";
-import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import {
     OvaleDataClass,
     SpellAddAurasByType,
@@ -329,7 +328,6 @@ export class OvaleAuraClass
 {
     private debug: Tracer;
     private module: AceModule & AceEvent;
-    private profiler: Profiler;
 
     constructor(
         private ovaleState: OvaleStateClass,
@@ -341,7 +339,6 @@ export class OvaleAuraClass
         private ovaleOptions: OvaleOptionsClass,
         private ovaleDebug: DebugTools,
         private ovale: OvaleClass,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private ovalePower: OvalePowerClass
     ) {
@@ -353,7 +350,6 @@ export class OvaleAuraClass
             aceEvent
         );
         this.debug = ovaleDebug.create("OvaleAura");
-        this.profiler = ovaleProfiler.create("OvaleAura");
         this.ovaleState.registerState(this);
         this.addDebugOptions();
     }
@@ -842,7 +838,6 @@ export class OvaleAuraClass
         value2?: number,
         value3?: number
     ) {
-        this.profiler.startProfiling("OvaleAura_GainedAuraOnGUID");
         casterGUID = casterGUID || unknownGuid;
         count = (count && count > 0 && count) || 1;
         duration = (duration && duration > 0 && duration) || INFINITY;
@@ -995,7 +990,6 @@ export class OvaleAuraClass
             }
             this.ovale.refreshNeeded[guid] = true;
         }
-        this.profiler.stopProfiling("OvaleAura_GainedAuraOnGUID");
     }
     lostAuraOnGUID(
         guid: string,
@@ -1003,7 +997,6 @@ export class OvaleAuraClass
         auraId: AuraId,
         casterGUID: string
     ) {
-        this.profiler.startProfiling("OvaleAura_LostAuraOnGUID");
         const aura = getAura(this.current.aura, guid, auraId, casterGUID);
         if (aura) {
             const filter = aura.filter;
@@ -1075,10 +1068,8 @@ export class OvaleAuraClass
             );
             this.ovale.refreshNeeded[guid] = true;
         }
-        this.profiler.stopProfiling("OvaleAura_LostAuraOnGUID");
     }
     scanAuras(unitId: string, guid?: string) {
-        this.profiler.startProfiling("OvaleAura_ScanAuras");
         guid = guid || this.ovaleGuid.getUnitGUID(unitId);
         if (guid) {
             const harmfulFilter: UnitAuraFilter =
@@ -1193,7 +1184,6 @@ export class OvaleAuraClass
             }
             this.debug.debug("End scanning of auras on %s (%s).", guid, unitId);
         }
-        this.profiler.stopProfiling("OvaleAura_ScanAuras");
     }
 
     getStateAura(
@@ -1581,7 +1571,6 @@ export class OvaleAuraClass
         atTime: number,
         excludeUnitId: string | undefined
     ) {
-        this.profiler.startProfiling("OvaleAura_state_AuraCount");
         minStacks = minStacks || 1;
         count = 0;
         stacks = 0;
@@ -1690,7 +1679,6 @@ export class OvaleAuraClass
             startFirst,
             endingLast
         );
-        this.profiler.stopProfiling("OvaleAura_state_AuraCount");
         return [
             count,
             stacks,
@@ -1707,7 +1695,6 @@ export class OvaleAuraClass
         playerGUID = this.ovale.playerGUID;
     }
     resetState() {
-        this.profiler.startProfiling("OvaleAura_ResetState");
         this.next.auraSerial = this.next.auraSerial + 1;
         if (next(this.next.aura)) {
             this.debug.log("Resetting aura state:");
@@ -1729,7 +1716,6 @@ export class OvaleAuraClass
                 delete this.next.aura[guid];
             }
         }
-        this.profiler.stopProfiling("OvaleAura_ResetState");
     }
     cleanState() {
         for (const [guid] of pairs(this.next.aura)) {
@@ -1744,7 +1730,6 @@ export class OvaleAuraClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleAura_ApplySpellStartCast");
         if (isChanneled) {
             const si = this.ovaleData.spellInfo[spellId];
             if (si && si.aura) {
@@ -1780,7 +1765,6 @@ export class OvaleAuraClass
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAura_ApplySpellStartCast");
     };
     applySpellAfterCast = (
         spellId: number,
@@ -1790,7 +1774,6 @@ export class OvaleAuraClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleAura_ApplySpellAfterCast");
         if (!isChanneled) {
             const si = this.ovaleData.spellInfo[spellId];
             if (si && si.aura) {
@@ -1817,7 +1800,6 @@ export class OvaleAuraClass
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAura_ApplySpellAfterCast");
     };
     applySpellOnHit = (
         spellId: number,
@@ -1827,7 +1809,6 @@ export class OvaleAuraClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleAura_ApplySpellAfterHit");
         if (!isChanneled) {
             const si = this.ovaleData.spellInfo[spellId];
             if (si && si.aura && si.aura.target) {
@@ -1848,7 +1829,6 @@ export class OvaleAuraClass
                 );
             }
         }
-        this.profiler.stopProfiling("OvaleAura_ApplySpellAfterHit");
     };
 
     private applySpellAuras(
@@ -1858,7 +1838,6 @@ export class OvaleAuraClass
         auraList: SpellAddAurasByType,
         spellcast: SpellCast
     ) {
-        this.profiler.startProfiling("OvaleAura_state_ApplySpellAuras");
         for (const [filter, filterInfo] of kpairs(auraList)) {
             for (const [auraIdKey, spellData] of pairs(filterInfo)) {
                 const auraId = tonumber(auraIdKey);
@@ -2089,7 +2068,6 @@ export class OvaleAuraClass
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAura_state_ApplySpellAuras");
     }
 
     public addAuraToGUID(
