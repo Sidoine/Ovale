@@ -8,7 +8,7 @@ import {
     LuaObj,
 } from "@wowts/lua";
 import { insert } from "@wowts/table";
-import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
+import { GetTime, GetUnitName, UnitGUID } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Tracer, DebugTools } from "./debug";
@@ -239,7 +239,7 @@ export class Guids {
     }
     updateUnit(unitId: string) {
         const guid = UnitGUID(unitId);
-        const name = UnitName(unitId);
+        const name = GetUnitName(unitId, true);
         const previousGUID = this.unitGUID[unitId];
         const previousName = this.unitName[unitId];
         if (!guid || guid != previousGUID) {
@@ -327,7 +327,7 @@ export class Guids {
     }
     getUnitName(unitId: string) {
         if (unitId) {
-            return this.unitName[unitId] || UnitName(unitId);
+            return this.unitName[unitId] || GetUnitName(unitId, true);
         }
         return undefined;
     }
