@@ -220,6 +220,7 @@ export class List<T> {
             this.head.prev = node;
         }
         this.length += 1;
+        return node;
     }
 
     pop() {
@@ -244,6 +245,7 @@ export class List<T> {
         if (this.head) {
             this.head = this.head.prev;
         }
+        return this.head;
     }
 
     shift() {

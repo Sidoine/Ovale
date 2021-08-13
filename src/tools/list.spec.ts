@@ -58,16 +58,18 @@ test("as array", () => {
 
 test("push onto empty list", () => {
     const l = new List<number>();
-    l.push(10);
+    const node = l.push(10);
     expect(l.length).toBe(1);
     expect(l.back()).toBe(10);
+    expect(l.head).toBe(node);
 });
 
 test("unshift empty list", () => {
     const l = new List<number>();
-    l.unshift(10);
+    const node = l.unshift(10);
     expect(l.length).toBe(1);
     expect(l.front()).toBe(10);
+    expect(l.head).toBe(node);
 });
 
 test("pop from empty list", () => {
@@ -105,17 +107,19 @@ test("insert before into one-element list", () => {
 test("push onto one-element list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10 });
-    l.push(20);
+    const node = l.push(20);
     expect(l.length).toBe(2);
     expect(l.back()).toBe(20);
+    expect(l.head && l.head.next).toBe(node);
 });
 
 test("unshift one-element list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10 });
-    l.unshift(20);
+    const node = l.unshift(20);
     expect(l.length).toBe(2);
     expect(l.front()).toBe(20);
+    expect(l.head).toBe(node);
 });
 
 test("pop from one-element list", () => {
@@ -204,15 +208,17 @@ test("insert before middle of list", () => {
 test("push onto list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10, 2: 20 });
-    l.push(30);
+    const node = l.push(30);
     expect(l.asArray()).toEqual({ 1: 10, 2: 20, 3: 30 });
+    expect(l.head && l.head.next.next).toBe(node);
 });
 
 test("unshift list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10, 2: 20 });
-    l.unshift(30);
+    const node = l.unshift(30);
     expect(l.asArray()).toEqual({ 1: 30, 2: 10, 3: 20 });
+    expect(l.head).toBe(node);
 });
 
 test("pop from list", () => {
