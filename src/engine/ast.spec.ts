@@ -3,7 +3,6 @@ import { Mock, It } from "typemoq";
 import { OvaleASTClass } from "./ast";
 import { OvaleConditionClass } from "./condition";
 import { DebugTools, Tracer } from "./debug";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleScriptsClass } from "./scripts";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import { format } from "@wowts/string";
@@ -13,7 +12,6 @@ function makeContext() {
     const context = {
         ovaleConditionMock: Mock.ofType<OvaleConditionClass>(),
         ovaleDebugMock: Mock.ofType<DebugTools>(),
-        ovaleProfilerMock: Mock.ofType<OvaleProfilerClass>(),
         ovaleScriptsMock: Mock.ofType<OvaleScriptsClass>(),
         ovaleSpellbookMock: Mock.ofType<OvaleSpellBookClass>(),
         tracerMock: Mock.ofType<Tracer>(),
@@ -40,9 +38,6 @@ function makeContext() {
     context.ovaleDebugMock
         .setup((x) => x.create(It.isAnyString()))
         .returns(() => tracer.object);
-    context.ovaleProfilerMock
-        .setup((x) => x.create(It.isAny()))
-        .returns(() => Mock.ofType<Profiler>().object);
     return context;
 }
 
@@ -52,7 +47,6 @@ function makeAst() {
         ast: new OvaleASTClass(
             context.ovaleConditionMock.object,
             context.ovaleDebugMock.object,
-            context.ovaleProfilerMock.object,
             context.ovaleScriptsMock.object,
             context.ovaleSpellbookMock.object
         ),

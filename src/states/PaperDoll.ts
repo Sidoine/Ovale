@@ -1,5 +1,4 @@
 import { Tracer, DebugTools } from "../engine/debug";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
 import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { States, StateModule } from "../engine/state";
@@ -219,13 +218,11 @@ export class OvalePaperDollClass
     specialization: SpecializationIndex | undefined = undefined;
     private module: AceModule & AceEvent;
     private debug: Tracer;
-    private profiler: Profiler;
 
     constructor(
         private ovaleEquipement: OvaleEquipmentClass,
         private ovale: OvaleClass,
-        ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass
+        ovaleDebug: DebugTools
     ) {
         super(PaperDollData);
         this.class = ovale.playerClass;
@@ -236,7 +233,6 @@ export class OvalePaperDollClass
             aceEvent
         );
         this.debug = ovaleDebug.create("OvalePaperDoll");
-        this.profiler = ovaleProfiler.create("OvalePaperDoll");
     }
 
     registerConditions(condition: OvaleConditionClass) {
@@ -332,18 +328,15 @@ export class OvalePaperDollClass
 
     private handleUnitStats = (event: string, unitId: string) => {
         if (unitId == "player") {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.current.strength = UnitStat(unitId, 1);
             this.current.agility = UnitStat(unitId, 2);
             this.current.stamina = UnitStat(unitId, 3);
             this.current.intellect = UnitStat(unitId, 4);
             // this.current.spirit = 0;
             this.ovale.needRefresh();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleCombatRatingUpdate = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         // Crit
         this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
         this.current.meleeCrit = GetCritChance();
@@ -366,10 +359,8 @@ export class OvalePaperDollClass
         );
 
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleMasteryUpdate = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.current.masteryRating = GetMastery();
         if (this.level < 80) {
             this.current.masteryEffect = 0;
@@ -377,63 +368,49 @@ export class OvalePaperDollClass
             this.current.masteryEffect = GetMasteryEffect();
             this.ovale.needRefresh();
         }
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleUnitAttackPower = (event: string, unitId: string) => {
         if (unitId == "player" && !this.ovaleEquipement.hasRangedWeapon()) {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             const [base, posBuff, negBuff] = UnitAttackPower(unitId);
             this.current.attackPower = base + posBuff + negBuff;
             this.ovale.needRefresh();
             this.handleUpdateDamage();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleUnitRangedAttackPower = (unitId: string) => {
         if (unitId == "player" && this.ovaleEquipement.hasRangedWeapon()) {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             const [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
             this.ovale.needRefresh();
             this.current.attackPower = base + posBuff + negBuff;
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleSpellPowerChanged = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.current.spellPower = GetSpellBonusDamage(
             spellDamageSchools[this.class]
         );
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handlePlayerLevelUp = (event: string, level: string) => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.level = tonumber(level) || UnitLevel("player");
         this.ovale.needRefresh();
         this.debug.debugTimestamp("%s: level = %d", event, this.level);
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleUnitLevel = (event: string, unitId: string) => {
         this.ovale.refreshNeeded[unitId] = true;
         if (unitId == "player") {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.level = UnitLevel(unitId);
             this.debug.debugTimestamp("%s: level = %d", event, this.level);
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleUpdateDamage = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateDamage");
         // let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player"); // Could add back if we need something like calculating next swing
 
         // Appartently, if the character is not loaded, it returns 0
         this.current.mainHandWeaponDPS = this.ovaleEquipement.mainHandDPS || 0;
         this.current.offHandWeaponDPS = this.ovaleEquipement.offHandDPS || 0;
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateDamage");
     };
     updateSpecialization() {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateSpecialization");
         const newSpecialization = GetSpecialization();
         if (this.specialization != newSpecialization) {
             const oldSpecialization = this.specialization;
@@ -445,7 +422,6 @@ export class OvalePaperDollClass
                 this.getSpecialization(oldSpecialization)
             );
         }
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateSpecialization");
     }
     private handleUpdateStats = (event: string) => {
         this.updateSpecialization();

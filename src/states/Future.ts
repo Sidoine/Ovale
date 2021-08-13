@@ -25,11 +25,11 @@ import { insert, remove } from "@wowts/table";
 import {
     GetSpellInfo,
     GetTime,
+    GetUnitName,
     UnitCastingInfo,
     UnitChannelInfo,
     UnitExists,
     UnitGUID,
-    UnitName,
     CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
@@ -39,7 +39,6 @@ import { isNumber } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, DebugTools } from "../engine/debug";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
 import {
@@ -157,7 +156,6 @@ export class OvaleFutureClass
 {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
-    private profiler: Profiler;
     constructor(
         private ovaleData: OvaleDataClass,
         private ovaleAura: OvaleAuraClass,
@@ -169,7 +167,6 @@ export class OvaleFutureClass
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
         ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleStance: OvaleStanceClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private runner: Runner
@@ -177,7 +174,6 @@ export class OvaleFutureClass
         super(OvaleFutureData);
         const name = "OvaleFuture";
         this.tracer = ovaleDebug.create(name);
-        this.profiler = ovaleProfiler.create(name);
         this.module = ovale.createModule(
             name,
             this.handleInitialize,
@@ -355,9 +351,6 @@ export class OvaleFutureClass
             this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) ==
                 this.ovale.playerGUID
         ) {
-            this.profiler.startProfiling(
-                "OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED"
-            );
             if (spellCastEvents[cleuEvent]) {
                 const now = GetTime();
                 if (
@@ -480,9 +473,6 @@ export class OvaleFutureClass
                     }
                 }
             }
-            this.profiler.stopProfiling(
-                "OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED"
-            );
         }
     };
 
@@ -604,9 +594,7 @@ export class OvaleFutureClass
         return finished;
     }
     private handlePlayerEnteringWorld = (event: string) => {
-        this.profiler.startProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
         this.tracer.debug(event);
-        this.profiler.stopProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
     };
     private handleUnitSpellCastChannelStart = (
         event: string,
@@ -619,9 +607,6 @@ export class OvaleFutureClass
             !whiteAttackIds[spellId]
         ) {
             const spell = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_START"
-            );
             this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
             const [spellcast] = this.getSpellcast(
@@ -672,9 +657,6 @@ export class OvaleFutureClass
                     spellId
                 );
             }
-            this.profiler.stopProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_START"
-            );
         }
     };
     private handleSpellCastChannelStop = (
@@ -688,9 +670,6 @@ export class OvaleFutureClass
             !whiteAttackIds[spellId]
         ) {
             const spell = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP"
-            );
             this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
             const [spellcast, index] = this.getSpellcast(
@@ -720,9 +699,6 @@ export class OvaleFutureClass
                     "hit"
                 );
             }
-            this.profiler.stopProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP"
-            );
         }
     };
     private handleSpellCastChannelUpdate = (
@@ -736,9 +712,6 @@ export class OvaleFutureClass
             !whiteAttackIds[spellId]
         ) {
             const spell = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE"
-            );
             this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
             const [spellcast] = this.getSpellcast(
@@ -778,9 +751,6 @@ export class OvaleFutureClass
                     spellId
                 );
             }
-            this.profiler.stopProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE"
-            );
         }
     };
     private handleUnitSpellCastDelayed = (
@@ -794,7 +764,6 @@ export class OvaleFutureClass
             !whiteAttackIds[spellId]
         ) {
             const spell = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
             this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
             const [spellcast] = this.getSpellcast(spell, spellId, lineId, now);
@@ -830,7 +799,6 @@ export class OvaleFutureClass
                     spellId
                 );
             }
-            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
         }
     };
 
@@ -841,7 +809,6 @@ export class OvaleFutureClass
         spellId: number,
         targetName: string | undefined
     ): SpellCast {
-        this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         const now = GetTime();
         const caster = this.ovaleGuid.getUnitGUID(unitId);
         const spellcast = lastSpellCastPool.get();
@@ -871,7 +838,7 @@ export class OvaleFutureClass
                     if (name == targetName) {
                         targetGUID = this.ovaleGuid.getUnitGUID("focus");
                     } else if (UnitExists("mouseover")) {
-                        name = UnitName("mouseover");
+                        name = GetUnitName("mouseover", true);
                         if (name == targetName) {
                             targetGUID = UnitGUID("mouseover");
                         }
@@ -920,7 +887,6 @@ export class OvaleFutureClass
                 lineId
             );
             this.addSpellCast(lineId, unitId, spellName, spellId, targetName);
-            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         }
     };
     private handleUnitSpellCastStart = (
@@ -935,7 +901,6 @@ export class OvaleFutureClass
         ) {
             this.ovaleData.registerSpellCast(spellId);
             const spellName = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling("OvaleFuture_UNIT_SPELLCAST_START");
             this.tracer.debugTimestamp(
                 event,
                 unitId,
@@ -1009,7 +974,6 @@ export class OvaleFutureClass
                     name
                 );
             }
-            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_START");
         }
     };
     private handleUnitSpellCastSucceeded = (
@@ -1024,9 +988,6 @@ export class OvaleFutureClass
         ) {
             this.ovaleData.registerSpellCast(spellId);
             const spell = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling(
-                "OvaleFuture_UNIT_SPELLCAST_SUCCEEDED"
-            );
             this.tracer.debugTimestamp(event, unitId, spell, lineId, spellId);
             const now = GetTime();
             const [spellcast, index] = this.getSpellcast(
@@ -1145,7 +1106,6 @@ export class OvaleFutureClass
                     spellId
                 );
             }
-            this.profiler.stopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
         }
     };
 
@@ -1224,7 +1184,6 @@ export class OvaleFutureClass
                 this.next.lastGCDSpellId = 0;
             }
             const spellName = this.ovaleSpellBook.getSpellName(spellId);
-            this.profiler.startProfiling("OvaleFuture_UnitSpellcastEnded");
             this.tracer.debugTimestamp(
                 event,
                 unitId,
@@ -1262,7 +1221,6 @@ export class OvaleFutureClass
                     spellId
                 );
             }
-            this.profiler.stopProfiling("OvaleFuture_UnitSpellcastEnded");
         }
     };
 
@@ -1272,7 +1230,6 @@ export class OvaleFutureClass
         lineId: undefined | string,
         atTime: number
     ): [SpellCast | undefined, number] {
-        this.profiler.startProfiling("OvaleFuture_GetSpellcast");
         let spellcast: SpellCast | undefined = undefined;
         let index = 0;
         if (!lineId || lineId != "") {
@@ -1315,7 +1272,6 @@ export class OvaleFutureClass
                 );
             }
         }
-        this.profiler.stopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
 
@@ -1324,7 +1280,6 @@ export class OvaleFutureClass
         targetGUID: string,
         atTime: number
     ): [string | number | undefined, string | undefined] {
-        this.profiler.startProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.aura) {
@@ -1356,7 +1311,6 @@ export class OvaleFutureClass
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleFuture_GetAuraFinish");
         return [auraId, auraGUID];
     }
 
@@ -1451,7 +1405,6 @@ export class OvaleFutureClass
     }
 
     updateLastSpellcast(atTime: number, spellcast: SpellCast) {
-        this.profiler.startProfiling("OvaleFuture_UpdateLastSpellcast");
         this.current.lastCastTime[spellcast.spellId] = atTime;
         if (spellcast.castByPlayer) {
             if (spellcast.offgcd) {
@@ -1480,7 +1433,6 @@ export class OvaleFutureClass
                     this.lastSpell.lastGCDSpellcast.spellId;
             }
         }
-        this.profiler.stopProfiling("OvaleFuture_UpdateLastSpellcast");
     }
 
     updateSpellcastInfo(spellcast: SpellCast, atTime: number) {
@@ -1617,7 +1569,6 @@ export class OvaleFutureClass
     }
 
     resetState() {
-        this.profiler.startProfiling("OvaleFuture_ResetState");
         const now = this.baseState.currentTime;
         this.tracer.log("Reset state with current time = %f", now);
         this.next.nextCast = now;
@@ -1714,7 +1665,6 @@ export class OvaleFutureClass
         for (const [k, v] of pairs(this.current.counter)) {
             this.next.counter[k] = v;
         }
-        this.profiler.stopProfiling("OvaleFuture_ResetState");
     }
 
     cleanState() {
@@ -1734,11 +1684,9 @@ export class OvaleFutureClass
         channel: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleFuture_ApplySpellStartCast");
         if (channel) {
             this.updateCounters(spellId, startCast, targetGUID);
         }
-        this.profiler.stopProfiling("OvaleFuture_ApplySpellStartCast");
     };
 
     applySpellAfterCast = (
@@ -1749,11 +1697,9 @@ export class OvaleFutureClass
         channel: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleFuture_ApplySpellAfterCast");
         if (!channel) {
             this.updateCounters(spellId, endCast, targetGUID);
         }
-        this.profiler.stopProfiling("OvaleFuture_ApplySpellAfterCast");
     };
 
     static staticSpellcast: SpellCast = createSpellCast();
@@ -1767,7 +1713,6 @@ export class OvaleFutureClass
         spellcast?: SpellCast
     ) {
         channel = channel || false;
-        this.profiler.startProfiling("OvaleFuture_state_ApplySpell");
         if (spellId) {
             if (!targetGUID) {
                 targetGUID = this.ovale.playerGUID;
@@ -1860,11 +1805,9 @@ export class OvaleFutureClass
                 spellcast
             );
         }
-        this.profiler.stopProfiling("OvaleFuture_state_ApplySpell");
     }
 
     applyInFlightSpells() {
-        this.profiler.startProfiling("OvaleFuture_ApplyInFlightSpells");
         const now = GetTime();
         let index = 1;
         while (index <= lualength(this.lastSpell.queue)) {
@@ -1941,6 +1884,5 @@ export class OvaleFutureClass
             }
             index = index + 1;
         }
-        this.profiler.stopProfiling("OvaleFuture_ApplyInFlightSpells");
     }
 }

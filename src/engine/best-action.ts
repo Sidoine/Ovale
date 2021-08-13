@@ -31,7 +31,6 @@ import { AceModule } from "@wowts/tsaddon";
 import { Guids } from "./guid";
 import { OvaleFutureClass } from "../states/Future";
 import { OvaleSpellBookClass } from "../states/SpellBook";
-import { Profiler, OvaleProfilerClass } from "./profiler";
 import { DebugTools, Tracer } from "./debug";
 import { Variables } from "../states/Variables";
 import { ActionInfoHandler, Runner } from "./runner";
@@ -46,7 +45,6 @@ export type ActionType =
 
 export class OvaleBestActionClass {
     private module: AceModule & AceEvent;
-    private profiler: Profiler;
     private tracer: Tracer;
 
     constructor(
@@ -58,7 +56,6 @@ export class OvaleBestActionClass {
         private guids: Guids,
         private future: OvaleFutureClass,
         private spellBook: OvaleSpellBookClass,
-        ovaleProfiler: OvaleProfilerClass,
         ovaleDebug: DebugTools,
         private variables: Variables,
         private spells: OvaleSpellsClass,
@@ -70,7 +67,6 @@ export class OvaleBestActionClass {
             this.handleDisable,
             aceEvent
         );
-        this.profiler = ovaleProfiler.create(this.module.GetName());
         this.tracer = ovaleDebug.create(this.module.GetName());
         runner.registerActionInfoHandler("item", this.getActionItemInfo);
         runner.registerActionInfoHandler("macro", this.getActionMacroInfo);
@@ -81,7 +77,6 @@ export class OvaleBestActionClass {
     private onInitialize = () => {};
 
     private getActionItemInfo: ActionInfoHandler = (node, atTime, target) => {
-        this.profiler.startProfiling("OvaleBestAction_GetActionItemInfo");
         let itemId = node.cachedParams.positional[1];
         const result = node.result;
         setResultType(result, "action");
@@ -118,7 +113,6 @@ export class OvaleBestActionClass {
         result.actionId = itemId;
         result.actionTarget = target;
         result.castTime = this.future.getGCD(atTime);
-        this.profiler.stopProfiling("OvaleBestAction_GetActionItemInfo");
         return result;
     };
 
@@ -127,7 +121,6 @@ export class OvaleBestActionClass {
         atTime,
         target
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_GetActionMacroInfo");
         const result = element.result;
         const macro = <string>element.cachedParams.positional[1];
         const actionSlot = this.ovaleActionBar.getMacroActionSlot(macro);
@@ -152,7 +145,6 @@ export class OvaleBestActionClass {
         result.actionType = "macro";
         result.actionId = macro;
         result.castTime = this.future.getGCD(atTime);
-        this.profiler.stopProfiling("OvaleBestAction_GetActionMacroInfo");
         return result;
     };
 
@@ -161,7 +153,6 @@ export class OvaleBestActionClass {
         atTime,
         target
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_GetActionSpellInfo");
         const spell = element.cachedParams.positional[1];
         if (isNumber(spell)) {
             return this.getSpellActionInfo(spell, element, atTime, target);
@@ -343,8 +334,6 @@ export class OvaleBestActionClass {
             ) ||
             0;
         result.offgcd = (offgcd == 1 && true) || undefined;
-        if (result.timeSpan)
-            this.profiler.stopProfiling("OvaleBestAction_GetActionSpellInfo");
         return result;
     }
 
@@ -353,7 +342,6 @@ export class OvaleBestActionClass {
         atTime: number,
         target: string
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_GetActionTextureInfo");
         const result = element.result;
         setResultType(result, "action");
         result.actionTarget = target;
@@ -377,8 +365,6 @@ export class OvaleBestActionClass {
         result.actionType = "texture";
         result.actionId = actionTexture;
         result.castTime = this.future.getGCD(atTime);
-
-        this.profiler.stopProfiling("OvaleBestAction_GetActionTextureInfo");
         return result;
     };
 
@@ -391,7 +377,6 @@ export class OvaleBestActionClass {
     }
 
     public getAction(node: AstIconNode, atTime: number): AstNodeSnapshot {
-        this.profiler.startProfiling("OvaleBestAction_GetAction");
         const groupNode = node.child[1];
         const element = this.runner.postOrderCompute(groupNode, atTime);
         if (element.type == "state" && element.timeSpan.hasTime(atTime)) {
@@ -400,7 +385,6 @@ export class OvaleBestActionClass {
             if (variable !== undefined && value !== undefined)
                 this.variables.putState(variable, value, isFuture, atTime);
         }
-        this.profiler.stopProfiling("OvaleBestAction_GetAction");
         return element;
     }
 }

@@ -1,4 +1,4 @@
-import { OvaleQueue } from "../tools/Queue";
+import { Queue } from "../tools/Queue";
 import { SpellCast } from "../states/LastSpell";
 
 export type SpellCastEventHandler = (
@@ -51,22 +51,17 @@ export class States<T> {
 }
 
 export class OvaleStateClass {
-    private stateAddons = new OvaleQueue<StateModule>("OvaleState_stateAddons");
+    private stateAddons = new Queue<StateModule>();
 
     registerState(stateAddon: StateModule) {
-        this.stateAddons.insert(stateAddon);
+        this.stateAddons.push(stateAddon);
     }
+
     unregisterState(stateAddon: StateModule) {
-        const stateModules = new OvaleQueue<StateModule>(
-            "OvaleState_stateModules"
-        );
-        while (this.stateAddons.size() > 0) {
-            const addon = this.stateAddons.remove();
-            if (stateAddon != addon) {
-                stateModules.insert(addon);
-            }
+        const index = this.stateAddons.indexOf(stateAddon);
+        if (index > 0) {
+            this.stateAddons.removeAt(index);
         }
-        this.stateAddons = stateModules;
         stateAddon.cleanState();
     }
 

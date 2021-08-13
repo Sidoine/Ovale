@@ -1,4 +1,4 @@
-import { OvaleQueue } from "../tools/Queue";
+import { Queue } from "../tools/Queue";
 import { ipairs, LuaArray, lualength, kpairs } from "@wowts/lua";
 import { wrap, LuaIterable } from "@wowts/coroutine";
 import { find, sub } from "@wowts/string";
@@ -15,8 +15,8 @@ export interface LexerFilter {
 export type TokenizerDefinition = { [1]: string; [2]: Tokenizer };
 
 export class OvaleLexer {
-    typeQueue = new OvaleQueue<string>("typeQueue");
-    tokenQueue = new OvaleQueue<string>("tokenQueue");
+    typeQueue = new Queue<string>();
+    tokenQueue = new Queue<string>();
     endOfStream: boolean | undefined = undefined;
     iterator: LuaIterable<[string | undefined, string | undefined]>;
 
@@ -77,9 +77,9 @@ export class OvaleLexer {
     consume(index?: number): [string | undefined, string | undefined] {
         index = index || 1;
         let tokenType, token;
-        while (index > 0 && this.typeQueue.size() > 0) {
-            tokenType = this.typeQueue.removeFront();
-            token = this.tokenQueue.removeFront();
+        while (index > 0 && this.typeQueue.length > 0) {
+            tokenType = this.typeQueue.shift();
+            token = this.tokenQueue.shift();
             if (!tokenType) {
                 break;
             }
@@ -97,7 +97,7 @@ export class OvaleLexer {
     peek(index?: number): [string | undefined, string | undefined] {
         index = index || 1;
         let tokenType, token;
-        while (index > this.typeQueue.size()) {
+        while (index > this.typeQueue.length) {
             if (this.endOfStream) {
                 break;
             } else {
@@ -106,11 +106,11 @@ export class OvaleLexer {
                     this.endOfStream = true;
                     break;
                 }
-                this.typeQueue.insertBack(tokenType);
-                this.tokenQueue.insertBack(token);
+                this.typeQueue.push(tokenType);
+                this.tokenQueue.push(token);
             }
         }
-        if (index <= this.typeQueue.size()) {
+        if (index <= this.typeQueue.length) {
             tokenType = this.typeQueue.at(index);
             token = this.tokenQueue.at(index);
         }

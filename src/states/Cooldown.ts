@@ -9,7 +9,6 @@ import { OvalePaperDollClass, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 import { AceModule } from "@wowts/tsaddon";
 import { DebugTools, Tracer } from "../engine/debug";
-import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { isNumber } from "../tools/tools";
 
 const globalCooldown = 61304;
@@ -102,15 +101,13 @@ export class OvaleCooldownClass
     };
     private module: AceModule & AceEvent;
     private tracer: Tracer;
-    public profiler: Profiler;
 
     constructor(
         private ovalePaperDoll: OvalePaperDollClass,
         private ovaleData: OvaleDataClass,
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
-        ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass
+        ovaleDebug: DebugTools
     ) {
         super(CooldownData);
         this.module = ovale.createModule(
@@ -120,7 +117,6 @@ export class OvaleCooldownClass
             aceEvent
         );
         this.tracer = ovaleDebug.create("OvaleCooldown");
-        this.profiler = ovaleProfiler.create("OvaleCooldown");
     }
 
     private handleInitialize = () => {
@@ -286,7 +282,6 @@ export class OvaleCooldownClass
     };
 
     getCD(spellId: number | string, atTime: number) {
-        this.profiler.startProfiling("OvaleCooldown_state_GetCD");
         let cdName: string | number = spellId;
         const si = this.ovaleData.spellInfo[spellId];
         if (si && si.shared_cd) {
@@ -363,7 +358,6 @@ export class OvaleCooldownClass
             cd.start,
             cd.duration
         );
-        this.profiler.stopProfiling("OvaleCooldown_state_GetCD");
         return cd;
     }
 
@@ -445,11 +439,9 @@ export class OvaleCooldownClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleCooldown_ApplySpellStartCast");
         if (isChanneled) {
             this.applyCooldown(spellId, targetGUID, startCast);
         }
-        this.profiler.stopProfiling("OvaleCooldown_ApplySpellStartCast");
     };
     applySpellAfterCast = (
         spellId: number,
@@ -459,11 +451,9 @@ export class OvaleCooldownClass
         isChanneled: boolean,
         spellcast: SpellCast
     ) => {
-        this.profiler.startProfiling("OvaleCooldown_ApplySpellAfterCast");
         if (!isChanneled) {
             this.applyCooldown(spellId, targetGUID, endCast);
         }
-        this.profiler.stopProfiling("OvaleCooldown_ApplySpellAfterCast");
     };
 
     initializeState() {
@@ -484,7 +474,6 @@ export class OvaleCooldownClass
     }
 
     private applyCooldown(spellId: number, targetGUID: string, atTime: number) {
-        this.profiler.startProfiling("OvaleCooldown_state_ApplyCooldown");
         const cd = this.getCD(spellId, atTime);
         const duration = this.getSpellCooldownDuration(
             spellId,
@@ -514,7 +503,6 @@ export class OvaleCooldownClass
             cd.duration,
             cd.charges || "(nil)"
         );
-        this.profiler.stopProfiling("OvaleCooldown_state_ApplyCooldown");
     }
     debugCooldown() {
         for (const [spellId, cd] of pairs(this.next.cd)) {

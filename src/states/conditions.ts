@@ -21,6 +21,7 @@ import {
     GetItemCount,
     GetNumTrackingTypes,
     GetTrackingInfo,
+    GetUnitName,
     GetUnitSpeed,
     HasFullControl,
     IsStealthed,
@@ -40,7 +41,6 @@ import {
     UnitIsPVP,
     UnitIsUnit,
     UnitLevel,
-    UnitName,
     UnitPower,
     UnitPowerMax,
     UnitRace,
@@ -2450,7 +2450,7 @@ export class OvaleConditions {
 	 @return A boolean value.
      */
     private name = (atTime: number, target: string) => {
-        return returnConstant(UnitName(target));
+        return returnConstant(GetUnitName(target, true));
     };
 
     /** Test if the game is on a PTR server
@@ -2527,7 +2527,7 @@ export class OvaleConditions {
         const boolean =
             UnitExists(target) &&
             !UnitIsDead(target) &&
-            (name == undefined || name == UnitName(target));
+            (name == undefined || name == GetUnitName(target, true));
         return returnBoolean(boolean);
     };
 
