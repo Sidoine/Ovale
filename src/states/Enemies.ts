@@ -170,12 +170,10 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
                 isTagEvent(cleuEvent)
             ) {
                 const now = GetTime();
-                let isPlayerTag;
-                if (sourceGUID == this.ovale.playerGUID) {
-                    isPlayerTag = true;
-                } else {
-                    [isPlayerTag] = this.ovaleGuid.isPlayerPet(sourceGUID);
-                }
+                const isPlayerTag =
+                    sourceGUID == this.ovale.playerGUID ||
+                    this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) ==
+                        this.ovale.playerGUID;
                 this.addEnemy(cleuEvent, destGUID, destName, now, isPlayerTag);
             }
         }

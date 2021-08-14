@@ -138,7 +138,7 @@ export class IoC {
             this.ovale,
             this.debug
         );
-        this.guid = new Guids(this.ovale, this.debug, this.condition);
+        this.guid = new Guids(this.ovale, this.debug);
         this.spellBook = new OvaleSpellBookClass(
             this.ovale,
             this.debug,

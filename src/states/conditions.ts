@@ -1827,6 +1827,28 @@ export class OvaleConditions {
         return returnBoolean(false);
     };
 
+    private getGuid: ConditionFunction = (positionalParams, namedParams) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        return returnConstant(this.guids.getUnitGUID(target));
+    };
+
+    private getTargetGuid: ConditionFunction = (
+        positionalParams,
+        namedParams
+    ) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        const unitId = target + "target";
+        return returnConstant(this.guids.getUnitGUID(unitId));
+    };
+
     /** Test if the player has full control, i.e., isn't feared, charmed, etc.
 	 @name HasFullControl
 	 @paramsig boolean
@@ -5838,6 +5860,12 @@ l    */
             this.getGCDRemaining
         );
         ovaleCondition.registerCondition("glyph", false, this.glyph);
+        ovaleCondition.registerCondition("guid", false, this.getGuid);
+        ovaleCondition.registerCondition(
+            "targetguid",
+            false,
+            this.getTargetGuid
+        );
         ovaleCondition.registerCondition(
             "hasfullcontrol",
             false,
