@@ -80,11 +80,11 @@ export class List<T> {
         return (this.head && this.head.prev.value) || undefined;
     }
 
-    backToFrontIterator() {
+    backToFrontIterator(): Iterator<T> {
         return new ListBackToFrontIterator<T>(this);
     }
 
-    frontToBackIterator() {
+    frontToBackIterator(): Iterator<T> {
         return new ListFrontToBackIterator<T>(this);
     }
 

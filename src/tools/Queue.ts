@@ -86,11 +86,11 @@ export class Deque<T> {
         return (index > 1 && index - 1) || this.capacity;
     };
 
-    backToFrontIterator() {
+    backToFrontIterator(): Iterator<T> {
         return new DequeBackToFrontIterator<T>(this);
     }
 
-    frontToBackIterator() {
+    frontToBackIterator(): Iterator<T> {
         return new DequeFrontToBackIterator<T>(this);
     }
 
@@ -117,7 +117,7 @@ export class Deque<T> {
     asArray(reverse?: boolean) {
         const t: LuaArray<T> = {};
         let index = 1;
-        const iterator =
+        const iterator: Iterator<T> =
             (reverse == true && this.backToFrontIterator()) ||
             this.frontToBackIterator();
         while (iterator.next()) {
@@ -302,7 +302,7 @@ export class Deque<T> {
 }
 
 export class Queue<T> extends Deque<T> {
-    iterator() {
+    iterator(): Iterator<T> {
         return this.frontToBackIterator();
     }
 }
@@ -313,7 +313,7 @@ export class Stack<T> extends Deque<T> {
         return super.back();
     }
 
-    iterator() {
+    iterator(): Iterator<T> {
         return this.backToFrontIterator();
     }
 }
