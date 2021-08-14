@@ -1,11 +1,12 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, LuaObj, ipairs, lualength, pairs, unpack } from "@wowts/lua";
-import { concat, insert } from "@wowts/table";
+import { concat, insert, sort } from "@wowts/table";
 import { GetUnitName, UnitGUID, UnitIsUnit } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Tracer, DebugTools } from "./debug";
 import { binaryInsertUnique, binaryRemove } from "../tools/array";
+import { LRUCache } from "../tools/cache";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 
 function dumpMapping(t: LuaObj<LuaArray<string>>, output: LuaArray<string>) {
@@ -34,6 +35,7 @@ export class Guids {
     private nameByGUID: LuaObj<string> = {};
     private guidByName: LuaObj<LuaArray<string>> = {};
     private ownerGUIDByGUID: LuaObj<string> = {};
+    private unusedGUIDCache: LRUCache<string>;
 
     private childUnitByUnit: LuaObj<LuaObj<boolean>> = {};
     private petUnitByUnit: LuaObj<string> = {};
@@ -41,8 +43,8 @@ export class Guids {
     // eventfulUnits is an ordered array of unit IDs that receive unit events.
     private eventfulUnits: LuaArray<string> = {};
     private unitPriority: LuaObj<number> = {};
-    unitAuraUnits: LuaObj<boolean> = {};
 
+    unitAuraUnits: LuaObj<boolean> = {};
     petGUID: LuaObj<boolean> = {};
 
     private debugGUIDs: OptionUiGroup = {
@@ -64,6 +66,13 @@ export class Guids {
                     insert(output, "}\n");
                     insert(output, "GUID by Name = {");
                     dumpMapping(this.guidByName, output);
+                    insert(output, "}\n");
+                    insert(output, "Unused GUIDs = {");
+                    const guids = this.unusedGUIDCache.asArray();
+                    sort(guids);
+                    for (const [, guid] of ipairs(guids)) {
+                        insert(output, `    ${guid}`);
+                    }
                     insert(output, "}");
                     return concat(output, "\n");
                 },
@@ -81,6 +90,10 @@ export class Guids {
             aceEvent
         );
         this.tracer = debug.create(this.module.GetName());
+        /* Cache the last 100 unreferenced GUIDs to retain their
+         * name mappings.
+         */
+        this.unusedGUIDCache = new LRUCache<string>(100);
 
         this.petUnitByUnit["player"] = "pet";
         insert(this.eventfulUnits, "player");
@@ -343,6 +356,8 @@ export class Guids {
         const t = this.unitByGUID[guid] || {};
         binaryInsertUnique(t, unit, this.compareUnit);
         this.unitByGUID[guid] = t;
+        // This GUID has a unit ID, so remove it from the cache.
+        this.unusedGUIDCache.remove(guid);
     };
 
     private unmapGUIDToUnit = (guid: string, unit: string) => {
@@ -352,6 +367,21 @@ export class Guids {
             binaryRemove(t, unit, this.compareUnit);
             if (lualength(t) == 0) {
                 delete this.unitByGUID[unit];
+
+                /* This GUID has no more unit IDs associated with it, so
+                 * put it the cache for eventual garbage collection.
+                 */
+                const evictedGUID = this.unusedGUIDCache.put(guid);
+                // Garbage-collect mappings for GUID evicted from cache.
+                if (evictedGUID) {
+                    const name = this.nameByGUID[evictedGUID];
+                    if (name) {
+                        this.unmapNameToGUID(name, evictedGUID);
+                    }
+                    delete this.ownerGUIDByGUID[evictedGUID];
+                    delete this.petGUID[evictedGUID];
+                    this.module.SendMessage("Ovale_UnusedGUID", evictedGUID);
+                }
             }
         }
     };
