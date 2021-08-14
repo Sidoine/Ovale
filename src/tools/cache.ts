@@ -30,6 +30,17 @@ class Cache<T> {
     }
 
     put(value: T) {
+        this.remove(value);
+        const evicted = (this.isFull() && this.evict()) || undefined;
+        /* Pretend to cast to string to satisfy TypeScript.
+         * Lua tables can accept anything as a valid key.
+         */
+        const key = value as unknown as string;
+        this.nodeByValue[key] = this.list.push(value);
+        return evicted;
+    }
+
+    remove(value: T) {
         /* Pretend to cast to string to satisfy TypeScript.
          * Lua tables can accept anything as a valid key.
          */
@@ -38,9 +49,6 @@ class Cache<T> {
         if (node) {
             this.list.remove(node);
         }
-        const evicted = (this.isFull() && this.evict()) || undefined;
-        this.nodeByValue[key] = this.list.push(value);
-        return evicted;
     }
 }
 

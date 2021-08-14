@@ -14,6 +14,12 @@ test("put into empty LRU cache", () => {
     expect(cache.oldest()).toBe(cache.newest());
 });
 
+test("remove from empty LRU cache", () => {
+    const cache = new LRUCache<number>(3);
+    cache.remove(10);
+    expect(cache.asArray()).toEqual({});
+});
+
 test("put into non-empty LRU cache", () => {
     const cache = new LRUCache<number>(3);
     cache.put(10);
@@ -23,6 +29,15 @@ test("put into non-empty LRU cache", () => {
     expect(cache.oldest()).toBe(10);
     expect(cache.newest()).toBe(30);
     expect(cache.asArray()).toEqual({ 1: 10, 2: 20, 3: 30 });
+});
+
+test("remove from non-empty LRU cache", () => {
+    const cache = new LRUCache<number>(3);
+    cache.put(10);
+    cache.put(20);
+    cache.remove(10);
+    expect(cache.oldest()).toBe(20);
+    expect(cache.asArray()).toEqual({ 1: 20 });
 });
 
 test("put into full LRU cache", () => {
@@ -38,6 +53,12 @@ test("put into full LRU cache", () => {
 test("new MRU cache is not full", () => {
     const cache = new MRUCache<number>(3);
     expect(cache.isFull()).toBe(false);
+});
+
+test("remove from empty MRU uache", () => {
+    const cache = new MRUCache<number>(3);
+    cache.remove(10);
+    expect(cache.asArray()).toEqual({});
 });
 
 test("put into empty MRU cache", () => {
@@ -57,6 +78,15 @@ test("put into non-empty MRU cache", () => {
     expect(cache.oldest()).toBe(10);
     expect(cache.newest()).toBe(30);
     expect(cache.asArray()).toEqual({ 1: 10, 2: 20, 3: 30 });
+});
+
+test("remove from non-empty MRU cache", () => {
+    const cache = new MRUCache<number>(3);
+    cache.put(10);
+    cache.put(20);
+    cache.remove(10);
+    expect(cache.oldest()).toBe(20);
+    expect(cache.asArray()).toEqual({ 1: 20 });
 });
 
 test("put into full MRU cache", () => {
