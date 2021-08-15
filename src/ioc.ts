@@ -3,6 +3,7 @@ import { OvaleScriptsClass } from "./engine/scripts";
 import { OvaleOptionsClass } from "./ui/Options";
 import { OvalePaperDollClass } from "./states/PaperDoll";
 import { OvaleActionBarClass } from "./engine/action-bar";
+import { CombatLogEvent } from "./engine/combat-log-event";
 import { OvaleASTClass } from "./engine/ast";
 import { OvaleAuraClass } from "./states/Aura";
 import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
@@ -69,6 +70,7 @@ export class IoC {
     public baseState: BaseState;
     public bestAction: OvaleBestActionClass;
     public bossMod: OvaleBossModClass;
+    public combatLogEvent: CombatLogEvent;
     public compile: OvaleCompileClass;
     public condition: OvaleConditionClass;
     public conditions: OvaleConditions;
@@ -128,6 +130,7 @@ export class IoC {
         const controls = new Controls();
         const runner = new Runner(this.debug, this.baseState, this.condition);
         this.data = new OvaleDataClass(runner, this.debug);
+        this.combatLogEvent = new CombatLogEvent(this.ovale, this.debug);
         this.equipment = new OvaleEquipmentClass(
             this.ovale,
             this.debug,
