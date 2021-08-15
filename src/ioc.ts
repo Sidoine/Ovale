@@ -157,7 +157,8 @@ export class IoC {
         this.demonHunterSigils = new OvaleSigilClass(
             this.paperDoll,
             this.ovale,
-            this.spellBook
+            this.spellBook,
+            this.combatLogEvent
         );
         const combat = new OvaleCombatClass(
             this.ovale,
@@ -184,7 +185,8 @@ export class IoC {
             this.debug,
             this.ovale,
             this.spellBook,
-            this.power
+            this.power,
+            this.combatLogEvent
         );
         this.eclipse = new Eclipse(
             this.ovale,
@@ -195,7 +197,12 @@ export class IoC {
             this.spellBook
         );
         this.stance = new OvaleStanceClass(this.debug, this.ovale, this.data);
-        this.enemies = new OvaleEnemiesClass(this.guid, this.ovale, this.debug);
+        this.enemies = new OvaleEnemiesClass(
+            this.guid,
+            this.combatLogEvent,
+            this.ovale,
+            this.debug
+        );
         this.future = new OvaleFutureClass(
             this.data,
             this.aura,
@@ -209,13 +216,15 @@ export class IoC {
             this.debug,
             this.stance,
             this.spellBook,
+            this.combatLogEvent,
             runner
         );
         this.health = new OvaleHealthClass(
             this.guid,
             this.ovale,
             this.options,
-            this.debug
+            this.debug,
+            this.combatLogEvent
         );
         this.lossOfControl = new OvaleLossOfControlClass(
             this.ovale,
@@ -267,7 +276,8 @@ export class IoC {
             combat,
             this.baseState,
             this.aura,
-            this.health
+            this.health,
+            this.combatLogEvent
         );
         this.actionBar = new OvaleActionBarClass(
             this.debug,
@@ -296,19 +306,25 @@ export class IoC {
             this.paperDoll,
             this.spellBook,
             this.future,
-            this.power
+            this.power,
+            this.combatLogEvent
         );
         this.version = new OvaleVersionClass(
             this.ovale,
             this.options,
             this.debug
         );
-        this.damageTaken = new OvaleDamageTakenClass(this.ovale, this.debug);
+        this.damageTaken = new OvaleDamageTakenClass(
+            this.ovale,
+            this.debug,
+            this.combatLogEvent
+        );
         this.spellDamage = new OvaleSpellDamageClass(this.ovale);
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
             this.ovale,
-            this.paperDoll
+            this.paperDoll,
+            this.combatLogEvent
         );
         this.runes = new OvaleRunesClass(
             this.ovale,

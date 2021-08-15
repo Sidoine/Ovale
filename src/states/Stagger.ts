@@ -1,15 +1,16 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import {
-    CombatLogGetCurrentEventInfo,
-    SpellId,
-    UnitStagger,
-} from "@wowts/wow-mock";
+import { SpellId, UnitStagger } from "@wowts/wow-mock";
 import { LuaArray, lualength, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { StateModule } from "../engine/state";
 import { OvaleCombatClass } from "./combat";
+import {
+    CombatLogEvent,
+    DamagePayload,
+    SpellPeriodicPayloadHeader,
+} from "../engine/combat-log-event";
 import {
     ConditionFunction,
     ConditionResult,
@@ -27,6 +28,7 @@ import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 const lightStagger = SpellId.light_stagger;
 const moderateStagger = SpellId.moderate_stagger;
 const heavyStagger = SpellId.heavy_stagger;
+const staggerDoT = 124255;
 
 let serial = 1;
 const maxLength = 30;
@@ -39,7 +41,8 @@ export class OvaleStaggerClass implements StateModule {
         private combat: OvaleCombatClass,
         private baseState: BaseState,
         private aura: OvaleAuraClass,
-        private health: OvaleHealthClass
+        private health: OvaleHealthClass,
+        private combatLogEvent: CombatLogEvent
     ) {
         this.module = ovale.createModule(
             "OvaleStagger",
@@ -79,46 +82,34 @@ export class OvaleStaggerClass implements StateModule {
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "MONK") {
-            this.module.RegisterEvent(
-                "COMBAT_LOG_EVENT_UNFILTERED",
-                this.handleCombatLogEventUnfiltered
+            this.module.RegisterMessage(
+                "Ovale_CombatLogEvent",
+                this.handleOvaleCombatLogEvent
             );
+            this.combatLogEvent.registerEvent("SPELL_PERIODIC_DAMAGE", this);
         }
     };
     private handleDisable = () => {
         if (this.ovale.playerClass == "MONK") {
-            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+            this.module.UnregisterMessage("Ovale_CombatLogEvent");
+            this.combatLogEvent.unregisterEvent("SPELL_PERIODIC_DAMAGE", this);
         }
     };
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            spellId,
-            ,
-            ,
-            amount,
-        ] = CombatLogGetCurrentEventInfo();
-        if (sourceGUID != this.ovale.playerGUID) {
+    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
+        if (cleuEvent != "SPELL_PERIODIC_DAMAGE") {
             return;
         }
-        serial = serial + 1;
-        if (cleuEvent == "SPELL_PERIODIC_DAMAGE" && spellId == 124255) {
-            insert(this.staggerTicks, amount);
-            if (lualength(this.staggerTicks) > maxLength) {
-                remove(this.staggerTicks, 1);
+        const cleu = this.combatLogEvent;
+        const sourceGUID = cleu.sourceGUID;
+        if (sourceGUID == this.ovale.playerGUID) {
+            serial = serial + 1;
+            const header = cleu.header as SpellPeriodicPayloadHeader;
+            if (header.spellId == staggerDoT) {
+                const payload = cleu.payload as DamagePayload;
+                insert(this.staggerTicks, payload.amount);
+                if (lualength(this.staggerTicks) > maxLength) {
+                    remove(this.staggerTicks, 1);
+                }
             }
         }
     };

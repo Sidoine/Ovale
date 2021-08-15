@@ -2,43 +2,37 @@ import { Guids } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer, Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
-import { ipairs, pairs, wipe, truthy, LuaObj } from "@wowts/lua";
-import { find } from "@wowts/string";
-import {
-    GetTime,
-    COMBATLOG_OBJECT_AFFILIATION_MINE,
-    COMBATLOG_OBJECT_AFFILIATION_PARTY,
-    COMBATLOG_OBJECT_AFFILIATION_RAID,
-    COMBATLOG_OBJECT_REACTION_FRIENDLY,
-    CombatLogGetCurrentEventInfo,
-} from "@wowts/wow-mock";
+import { LuaObj, pairs, wipe } from "@wowts/lua";
+import { GetTime } from "@wowts/wow-mock";
 import { States } from "../engine/state";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
+import { CombatLogEvent, unitFlag } from "../engine/combat-log-event";
 import { Tracer, DebugTools } from "../engine/debug";
 
 const groupMembers = bor(
-    COMBATLOG_OBJECT_AFFILIATION_MINE,
-    COMBATLOG_OBJECT_AFFILIATION_PARTY,
-    COMBATLOG_OBJECT_AFFILIATION_RAID
+    unitFlag.affiliation.mine,
+    unitFlag.affiliation.party,
+    unitFlag.affiliation.raid
 );
-const eventTagSuffixes = {
-    1: "_DAMAGE",
-    2: "_MISSED",
-    3: "_AURA_APPLIED",
-    4: "_AURA_APPLIED_DOSE",
-    5: "_AURA_REFRESH",
-    6: "_CAST_START",
-    7: "_INTERRUPT",
-    8: "_DISPEL",
-    9: "_DISPEL_FAILED",
-    10: "_STOLEN",
-    11: "_DRAIN",
-    12: "_LEECH",
-};
-const autoAttackEvents: LuaObj<boolean> = {
-    RANGED_DAMAGE: true,
-    RANGED_MISSED: true,
+const friendlyReaction = unitFlag.reaction.friendly;
+const tagEvent: LuaObj<boolean> = {
+    DAMAGE_SHIELD: true,
+    DAMAGE_SHIELD_MISSED: true,
+    RANGE_DAMAGE: true,
+    RANGE_MISSED: true,
+    SPELL_AURA_APPLIED: true,
+    SPELL_AURA_APPLIED_DOSE: true,
+    SPELL_AURA_REFRESH: true,
+    SPELL_CAST_START: true,
+    SPELL_DAMAGE: true,
+    SPELL_DISPEL: true,
+    SPELL_DISPEL_FAILED: true,
+    SPELL_DRAIN: true,
+    SPELL_INTERRUPT: true,
+    SPELL_LEECH: true,
+    SPELL_MISSED: true,
+    SPELL_STOLEN: true,
     SWING_DAMAGE: true,
     SWING_MISSED: true,
 };
@@ -52,23 +46,9 @@ const lastSeenEnemies: LuaObj<number> = {};
 const taggedEnemyLastSeens: LuaObj<number> = {};
 let reaperTimer: Timer | undefined = undefined;
 const reapInterval = 3;
-const isTagEvent = function (cleuEvent: string) {
-    let isTagEvent = false;
-    if (autoAttackEvents[cleuEvent]) {
-        isTagEvent = true;
-    } else {
-        for (const [, suffix] of ipairs(eventTagSuffixes)) {
-            if (truthy(find(cleuEvent, `${suffix}$`))) {
-                isTagEvent = true;
-                break;
-            }
-        }
-    }
-    return isTagEvent;
-};
 const isFriendly = function (unitFlags: number, isGroupMember?: boolean) {
     return (
-        band(unitFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 &&
+        band(unitFlags, friendlyReaction) > 0 &&
         (!isGroupMember || band(unitFlags, groupMembers) > 0)
     );
 };
@@ -85,6 +65,7 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
 
     constructor(
         private ovaleGuid: Guids,
+        private combatLogEvent: CombatLogEvent,
         private ovale: OvaleClass,
         ovaleDebug: DebugTools
     ) {
@@ -107,13 +88,16 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             );
         }
         this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
-        );
-        this.module.RegisterEvent(
             "PLAYER_REGEN_DISABLED",
             this.handlePlayerRegenDisabled
         );
+        this.module.RegisterMessage(
+            "Ovale_CombatLogEvent",
+            this.handleOvaleCombatLogEvent
+        );
+        for (const [event] of pairs(tagEvent)) {
+            this.combatLogEvent.registerEvent(event, this);
+        }
     };
 
     private handleDisable = () => {
@@ -121,54 +105,37 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             this.module.CancelTimer(reaperTimer);
             reaperTimer = undefined;
         }
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
+        this.module.UnregisterMessage("Ovale_CombatLogEvent");
+        for (const [event] of pairs(tagEvent)) {
+            this.combatLogEvent.unregisterEvent(event, this);
+        }
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            sourceName,
-            sourceFlags,
-            ,
-            destGUID,
-            destName,
-            destFlags,
-        ] = CombatLogGetCurrentEventInfo();
+    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
+        if (!unitRemovedEvents[cleuEvent] && !tagEvent[cleuEvent]) {
+            return;
+        }
+        const cleu = this.combatLogEvent;
+        const sourceGUID = cleu.sourceGUID;
+        const sourceName = cleu.sourceName;
+        const sourceFlags = cleu.sourceFlags;
+        const destGUID = cleu.destGUID;
+        const destName = cleu.destName;
+        const destFlags = cleu.destFlags;
         if (unitRemovedEvents[cleuEvent]) {
             const now = GetTime();
             this.removeEnemy(cleuEvent, destGUID, now, true);
-        } else if (
-            sourceGUID &&
-            sourceGUID != "" &&
-            sourceName &&
-            sourceFlags &&
-            destGUID &&
-            destGUID != "" &&
-            destName &&
-            destFlags
-        ) {
+        } else if (sourceGUID != "" && destGUID != "" && tagEvent[cleuEvent]) {
             if (!isFriendly(sourceFlags) && isFriendly(destFlags, true)) {
-                if (
-                    !(
-                        cleuEvent == "SPELL_PERIODIC_DAMAGE" &&
-                        isTagEvent(cleuEvent)
-                    )
-                ) {
-                    const now = GetTime();
-                    this.addEnemy(cleuEvent, sourceGUID, sourceName, now);
-                }
+                // Hostile enemy attacks group member.
+                const now = GetTime();
+                this.addEnemy(cleuEvent, sourceGUID, sourceName, now);
             } else if (
                 isFriendly(sourceFlags, true) &&
-                !isFriendly(destFlags) &&
-                isTagEvent(cleuEvent)
+                !isFriendly(destFlags)
             ) {
+                // Group member attacks neutral/hostile enemy.
                 const now = GetTime();
                 const isPlayerTag =
                     sourceGUID == this.ovale.playerGUID ||

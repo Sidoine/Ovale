@@ -2,10 +2,17 @@ import { OvalePool } from "../tools/Pool";
 import { Deque } from "../tools/Queue";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { band } from "@wowts/bit";
-import { sub } from "@wowts/string";
-import { CombatLogGetCurrentEventInfo, Enum, GetTime } from "@wowts/wow-mock";
+import { LuaObj, pairs } from "@wowts/lua";
+import { Enum, GetTime } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
+import {
+    CombatLogEvent,
+    DamagePayload,
+    RangePayloadHeader,
+    SpellPayloadHeader,
+    SpellPeriodicPayloadHeader,
+} from "../engine/combat-log-event";
 import { Tracer, DebugTools } from "../engine/debug";
 
 interface Event {
@@ -17,12 +24,23 @@ const pool = new OvalePool<Event>("OvaleDamageTaken_pool");
 const damageTakenWindow = 20;
 const schoolMaskMagic = Enum.Damageclass.MaskMagical;
 
+const damageTakenEvent: LuaObj<boolean> = {
+    RANGE_DAMAGE: true,
+    SPELL_DAMAGE: true,
+    SPELL_PERIODIC_DAMAGE: true,
+    SWING_DAMAGE: true,
+};
+
 export class OvaleDamageTakenClass {
     damageEvent = new Deque<Event>(); // newest events pushed onto back of deque
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    constructor(private ovale: OvaleClass, ovaleDebug: DebugTools) {
+    constructor(
+        private ovale: OvaleClass,
+        ovaleDebug: DebugTools,
+        private combatLogEvent: CombatLogEvent
+    ) {
         this.module = ovale.createModule(
             "OvaleDamageTaken",
             this.handleInitialize,
@@ -34,71 +52,75 @@ export class OvaleDamageTakenClass {
 
     private handleInitialize = () => {
         this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
-        );
-        this.module.RegisterEvent(
             "PLAYER_REGEN_ENABLED",
             this.handlePlayerRegenEnabled
         );
+        this.module.RegisterMessage(
+            "Ovale_CombatLogEvent",
+            this.handleOvaleCombatLogEvent
+        );
+        for (const [event] of pairs(damageTakenEvent)) {
+            this.combatLogEvent.registerEvent(event, this);
+        }
     };
 
     private handleDisable = () => {
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
+        this.module.UnregisterMessage("Ovale_CombatLogEvent");
+        for (const [event] of pairs(damageTakenEvent)) {
+            this.combatLogEvent.registerEvent(event, this);
+        }
         pool.drain();
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [
-            ,
-            cleuEvent,
-            ,
-            ,
-            ,
-            ,
-            ,
-            destGUID,
-            ,
-            ,
-            ,
-            arg12,
-            arg13,
-            arg14,
-            arg15,
-        ] = CombatLogGetCurrentEventInfo();
-        if (
-            destGUID == this.ovale.playerGUID &&
-            sub(cleuEvent, -7) == "_DAMAGE"
-        ) {
+    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
+        if (!damageTakenEvent[cleuEvent]) {
+            return;
+        }
+        const cleu = this.combatLogEvent;
+        const destGUID = cleu.destGUID;
+        if (destGUID == this.ovale.playerGUID) {
+            const payload = cleu.payload as DamagePayload;
+            const amount = payload.amount;
             const now = GetTime();
-            const eventPrefix = sub(cleuEvent, 1, 6);
-            if (eventPrefix == "SWING_") {
-                const amount = arg12;
+            if (cleu.header.type == "SWING") {
                 this.tracer.debug("%s caused %d damage.", cleuEvent, amount);
                 this.addDamageTaken(now, amount);
-            } else if (eventPrefix == "RANGE_" || eventPrefix == "SPELL_") {
-                const [spellName, spellSchool, amount] = [arg13, arg14, arg15];
-                const isMagicDamage = band(spellSchool, schoolMaskMagic) > 0;
-                if (isMagicDamage) {
-                    this.tracer.debug(
-                        "%s (%s) caused %d magic damage.",
-                        cleuEvent,
-                        spellName,
-                        amount
-                    );
-                } else {
-                    this.tracer.debug(
-                        "%s (%s) caused %d damage.",
-                        cleuEvent,
-                        spellName,
-                        amount
-                    );
+            } else {
+                let spellName: string | undefined;
+                let school: number | undefined;
+                if (cleu.header.type == "RANGE") {
+                    const header = cleu.header as RangePayloadHeader;
+                    spellName = header.spellName;
+                    school = header.school;
+                } else if (cleu.header.type == "SPELL") {
+                    const header = cleu.header as SpellPayloadHeader;
+                    spellName = header.spellName;
+                    school = header.school;
+                } else if (cleu.header.type == "SPELL_PERIODIC") {
+                    const header = cleu.header as SpellPeriodicPayloadHeader;
+                    spellName = header.spellName;
+                    school = header.school;
                 }
-                this.addDamageTaken(now, amount, isMagicDamage);
+                if (spellName && school) {
+                    const isMagicDamage = band(school, schoolMaskMagic) > 0;
+                    if (isMagicDamage) {
+                        this.tracer.debug(
+                            "%s (%s) caused %d magic damage.",
+                            cleuEvent,
+                            spellName,
+                            amount
+                        );
+                    } else {
+                        this.tracer.debug(
+                            "%s (%s) caused %d damage.",
+                            cleuEvent,
+                            spellName,
+                            amount
+                        );
+                    }
+                    this.addDamageTaken(now, amount, isMagicDamage);
+                }
             }
         }
     };

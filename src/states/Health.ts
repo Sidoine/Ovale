@@ -1,34 +1,35 @@
+import {
+    CombatLogEvent,
+    DamagePayload,
+    HealPayload,
+} from "../engine/combat-log-event";
 import { Guids } from "../engine/guid";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { wipe, LuaObj } from "@wowts/lua";
+import { LuaObj, pairs, wipe } from "@wowts/lua";
 import {
     UnitHealth,
     UnitHealthMax,
     UnitGetTotalAbsorbs,
     UnitGetTotalHealAbsorbs,
-    CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
-import { huge } from "@wowts/math";
+import { huge as infinity } from "@wowts/math";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleOptionsClass } from "../ui/Options";
 import { Tracer, DebugTools } from "../engine/debug";
 import { oneTimeMessage } from "../tools/tools";
 
-const infinity = huge;
-const damageEvents = {
+const healthEvent: LuaObj<boolean> = {
     DAMAGE_SHIELD: true,
     DAMAGE_SPLIT: true,
+    ENVIRONMENTAL_DAMAGE: true,
     RANGE_DAMAGE: true,
     SPELL_BUILDING_DAMAGE: true,
     SPELL_DAMAGE: true,
-    SPELL_PERIODIC_DAMAGE: true,
-    SWING_DAMAGE: true,
-    ENVIRONMENTAL_DAMAGE: true,
-};
-const healEvents = {
     SPELL_HEAL: true,
+    SPELL_PERIODIC_DAMAGE: true,
     SPELL_PERIODIC_HEAL: true,
+    SWING_DAMAGE: true,
 };
 
 export class OvaleHealthClass {
@@ -47,7 +48,8 @@ export class OvaleHealthClass {
         private ovaleGuid: Guids,
         ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
-        ovaleDebug: DebugTools
+        ovaleDebug: DebugTools,
+        private combatLogEvent: CombatLogEvent
     ) {
         this.module = ovale.createModule(
             "OvaleHealth",
@@ -96,44 +98,26 @@ export class OvaleHealthClass {
         this.module.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED");
         this.module.UnregisterMessage("Ovale_UnitChanged");
     };
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [
-            timestamp,
-            cleuEvent,
-            ,
-            ,
-            ,
-            ,
-            ,
-            destGUID,
-            ,
-            ,
-            ,
-            arg12,
-            arg13,
-            ,
-            arg15,
-        ] = CombatLogGetCurrentEventInfo();
+    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
+        if (!healthEvent[cleuEvent]) {
+            return;
+        }
+        const cleu = this.combatLogEvent;
+        const timestamp = cleu.timestamp;
+        const destGUID = cleu.destGUID;
+        const destName = cleu.destName;
         let healthUpdate = false;
-        if (damageEvents[<keyof typeof damageEvents>cleuEvent]) {
-            let amount;
-            if (cleuEvent == "SWING_DAMAGE") {
-                amount = arg12;
-            } else if (cleuEvent == "ENVIRONMENTAL_DAMAGE") {
-                amount = arg13;
-            } else {
-                amount = arg15;
-            }
-            this.tracer.debug(cleuEvent, destGUID, amount);
+        if (cleu.payload.type == "DAMAGE") {
+            const payload = cleu.payload as DamagePayload;
+            const amount = payload.amount;
+            this.tracer.debug(cleuEvent, destGUID, destName, amount);
             const total = this.totalDamage[destGUID] || 0;
             this.totalDamage[destGUID] = total + amount;
             healthUpdate = true;
-        } else if (healEvents[<keyof typeof healEvents>cleuEvent]) {
-            const amount = arg15;
-            this.tracer.debug(cleuEvent, destGUID, amount);
+        } else if (cleu.payload.type == "HEAL") {
+            const payload = cleu.payload as HealPayload;
+            const amount = payload.amount;
+            this.tracer.debug(cleuEvent, destGUID, destName, amount);
             const total = this.totalHealing[destGUID] || 0;
             this.totalHealing[destGUID] = total + amount;
             healthUpdate = true;
@@ -146,13 +130,19 @@ export class OvaleHealthClass {
         }
     };
     private handlePlayerRegenDisabled = (event: string) => {
-        this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
+        this.module.RegisterMessage(
+            "Ovale_CombatLogEvent",
+            this.handleOvaleCombatLogEvent
         );
+        for (const [event] of pairs(healthEvent)) {
+            this.combatLogEvent.registerEvent(event, this);
+        }
     };
     private handlePlayerRegenEnabled = (event: string) => {
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+        this.module.UnregisterMessage("Ovale_CombatLogEvent");
+        for (const [event] of pairs(healthEvent)) {
+            this.combatLogEvent.unregisterEvent(event, this);
+        }
         wipe(this.totalDamage);
         wipe(this.totalHealing);
         wipe(this.firstSeen);
