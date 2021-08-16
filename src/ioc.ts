@@ -319,7 +319,10 @@ export class IoC {
             this.debug,
             this.combatLogEvent
         );
-        this.spellDamage = new OvaleSpellDamageClass(this.ovale);
+        this.spellDamage = new OvaleSpellDamageClass(
+            this.ovale,
+            this.combatLogEvent
+        );
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
             this.ovale,
