@@ -398,6 +398,7 @@ export class IoC {
         this.bossMod = new OvaleBossModClass(this.ovale, this.debug, combat);
         this.demonHunterDemonic = new OvaleDemonHunterDemonicClass(
             this.aura,
+            this.combatLogEvent,
             this.ovale,
             this.debug
         );

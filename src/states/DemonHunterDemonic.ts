@@ -5,12 +5,12 @@ import {
     GetSpecializationInfo,
     GetTime,
     GetTalentInfoByID,
-    CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
+import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 import { DebugTools, Tracer } from "../engine/debug";
 
 const infinity = huge;
@@ -33,6 +33,7 @@ export class OvaleDemonHunterDemonicClass {
 
     constructor(
         private ovaleAura: OvaleAuraClass,
+        private combatLogEvent: CombatLogEvent,
         private ovale: OvaleClass,
         ovaleDebug: DebugTools
     ) {
@@ -78,7 +79,12 @@ export class OvaleDemonHunterDemonicClass {
             false;
         if (this.isHavoc && this.hasDemonic) {
             this.debug.debug("We are a havoc DH with Demonic.");
-            this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+            this.module.RegisterMessage(
+                "Ovale_CombatLogEvent",
+                this.handleOvaleCombatLogEvent
+            );
+            this.combatLogEvent.registerEvent("SPELL_CAST_SUCCESS", this);
+            this.combatLogEvent.registerEvent("SPELL_AURA_REMOVED", this);
         } else {
             if (!this.isHavoc) {
                 this.debug.debug("We are not a havoc DH.");
@@ -86,51 +92,45 @@ export class OvaleDemonHunterDemonicClass {
                 this.debug.debug("We don't have the Demonic talent.");
             }
             this.dropAura();
-            this.module.UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED");
+            this.module.UnregisterMessage("Ovale_CombatLogEvent");
+            this.combatLogEvent.unregisterEvent("SPELL_CAST_SUCCESS", this);
+            this.combatLogEvent.unregisterEvent("SPELL_AURA_REMOVED", this);
         }
     };
-    handleCombatLogEventUnfiltered(event: string, ...parameters: any[]) {
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            arg12,
-            arg13,
-        ] = CombatLogGetCurrentEventInfo();
+    private handleOvaleCombatLogEvent(event: string, cleuEvent: string) {
         if (
-            sourceGUID == this.playerGUID &&
-            cleuEvent == "SPELL_CAST_SUCCESS"
+            cleuEvent != "SPELL_CAST_SUCCESS" &&
+            cleuEvent != "SPELL_AURA_REMOVED"
         ) {
-            const [spellId, spellName] = [arg12, arg13];
-            if (havocEyeBeamSpellId == spellId) {
-                this.debug.debug(
-                    "Spell %d (%s) has successfully been cast. Gaining Aura (only during meta).",
-                    spellId,
-                    spellName
-                );
-                this.gainAura();
-            }
+            return;
         }
-        if (
-            sourceGUID == this.playerGUID &&
-            cleuEvent == "SPELL_AURA_REMOVED"
-        ) {
-            const [spellId, spellName] = [arg12, arg13];
-            if (havocMetaBuffId == spellId) {
-                this.debug.debug(
-                    "Aura %d (%s) is removed. Dropping Aura.",
-                    spellId,
-                    spellName
-                );
-                this.dropAura();
+        const cleu = this.combatLogEvent;
+        const sourceGUID = cleu.sourceGUID;
+        if (sourceGUID == this.playerGUID) {
+            if (cleuEvent == "SPELL_CAST_SUCCESS") {
+                const header = cleu.header as SpellPayloadHeader;
+                const spellId = header.spellId;
+                const spellName = header.spellName;
+                if (havocEyeBeamSpellId == spellId) {
+                    this.debug.debug(
+                        "Spell %d (%s) has successfully been cast. Gaining Aura (only during meta).",
+                        spellId,
+                        spellName
+                    );
+                    this.gainAura();
+                }
+            } else if (cleuEvent == "SPELL_AURA_REMOVED") {
+                const header = cleu.header as SpellPayloadHeader;
+                const spellId = header.spellId;
+                const spellName = header.spellName;
+                if (havocMetaBuffId == spellId) {
+                    this.debug.debug(
+                        "Aura %d (%s) is removed. Dropping Aura.",
+                        spellId,
+                        spellName
+                    );
+                    this.dropAura();
+                }
             }
         }
     }
