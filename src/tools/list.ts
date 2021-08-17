@@ -209,6 +209,13 @@ export class List<T> {
         return undefined;
     }
 
+    replaceAt(index: number, value: T) {
+        const node = this.nodeAt(index);
+        if (node) {
+            node.value = value;
+        }
+    }
+
     push(value: T) {
         const node = new ListNode<T>(value);
         if (!this.head) {

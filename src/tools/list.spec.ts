@@ -143,6 +143,13 @@ test("remove at 1 of one-element list", () => {
     expect(l.length).toBe(0);
 });
 
+test("replace at 1 of one-element list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10 });
+    l.replaceAt(1, 20);
+    expect(l.asArray()).toEqual({ 1: 20 });
+});
+
 test("nodeOf missing from one-element list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10 });
@@ -268,6 +275,27 @@ test("remove at middle of list", () => {
     l.fromArray({ 1: 10, 2: 20, 3: 30 });
     expect(l.removeAt(2)).toBe(20);
     expect(l.asArray()).toEqual({ 1: 10, 2: 30 });
+});
+
+test("replace at front of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(1, 40);
+    expect(l.asArray()).toEqual({ 1: 40, 2: 20, 3: 30 });
+});
+
+test("replace at back of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(l.length, 40);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("replace at middle of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(2, 40);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
 });
 
 test("nodeOf missing from list", () => {

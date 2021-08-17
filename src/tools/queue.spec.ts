@@ -111,6 +111,13 @@ test("remove at 1 of one-element queue", () => {
     expect(q.isEmpty()).toBe(true);
 });
 
+test("replace at 1 of one-element queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10 });
+    q.replaceAt(1, 20);
+    expect(q.asArray()).toEqual({ 1: 20 });
+});
+
 test("indexOf missing from one-element queue", () => {
     const q = new Deque<number>();
     q.fromArray({ 1: 10 });
@@ -203,6 +210,34 @@ test("remove at middle of queue near back", () => {
     expect(q.front()).toBe(10);
     expect(q.back()).toBe(40);
     expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("replace at end of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(q.length, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 50 });
+});
+
+test("replace at middle of queue near front", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(2, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 50, 3: 30, 4: 40 });
+});
+
+test("replace at middle of queue near back", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(3, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 50, 4: 40 });
+});
+
+test("replace at 1 of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(1, 50);
+    expect(q.asArray()).toEqual({ 1: 50, 2: 20, 3: 30, 4: 40 });
 });
 
 test("indexOf missing from queue", () => {
@@ -402,6 +437,34 @@ test("remove at middle of queue near back with wraparound indexing", () => {
     expect(q.front()).toBe(10);
     expect(q.back()).toBe(40);
     expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("replace at 1 of queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(1, 50);
+    expect(q.asArray()).toEqual({ 1: 50, 2: 20, 3: 30, 4: 40 });
+});
+
+test("replace at end of queue with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(q.length, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 50 });
+});
+
+test("replace at middle of queue near front with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(2, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 50, 3: 30, 4: 40 });
+});
+
+test("replace at middle of queue near back with wraparound indexing", () => {
+    const q = createWraparoundQueue();
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 30, 4: 40 });
+    q.replaceAt(3, 50);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 20, 3: 50, 4: 40 });
 });
 
 test("indexOf missing from queue with wraparound indexing", () => {

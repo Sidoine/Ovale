@@ -210,6 +210,16 @@ export class Deque<T> {
         }
     }
 
+    replaceAt(index: number, value: T) {
+        if (1 <= index && index <= this.length) {
+            index = this.first + index - 1;
+            if (index > this.capacity) {
+                index -= this.capacity;
+            }
+            this.buffer[index] = value;
+        }
+    }
+
     private grow(capacity?: number) {
         capacity = capacity || 2 * this.capacity;
         if (capacity > this.capacity && this.last < this.first) {
