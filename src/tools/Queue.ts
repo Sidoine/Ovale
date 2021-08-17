@@ -3,6 +3,7 @@ import { LuaArray, ipairs, lualength } from "@wowts/lua";
 interface Iterator<T> {
     value: T;
     next(): boolean;
+    replace(value: T): void;
 }
 
 class DequeBackToFrontIterator<T> implements Iterator<T> {
@@ -24,6 +25,11 @@ class DequeBackToFrontIterator<T> implements Iterator<T> {
         this.remaining -= 1;
         return this.remaining >= 0;
     }
+
+    replace(value: T) {
+        this.deque.buffer[this.index] = value;
+        this.value = value;
+    }
 }
 
 class DequeFrontToBackIterator<T> implements Iterator<T> {
@@ -44,6 +50,11 @@ class DequeFrontToBackIterator<T> implements Iterator<T> {
         this.value = this.deque.buffer[this.index];
         this.remaining -= 1;
         return this.remaining >= 0;
+    }
+
+    replace(value: T) {
+        this.deque.buffer[this.index] = value;
+        this.value = value;
     }
 }
 

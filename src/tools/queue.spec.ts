@@ -1,4 +1,5 @@
 import { expect, test } from "@jest/globals";
+import { LuaArray } from "@wowts/lua";
 import { Deque } from "./Queue";
 
 test("new queue", () => {
@@ -560,4 +561,92 @@ test("shift from full queue with wraparound indexing", () => {
     expect(q.front()).toBe(20);
     expect(q.back()).toBe(50);
     expect(q.asArray()).toEqual({ 1: 20, 2: 30, 3: 40, 4: 50 });
+});
+
+test("back to front iterator of empty queue", () => {
+    const q = new Deque<number>();
+    const iterator = q.backToFrontIterator();
+    expect(iterator.next()).toBe(false);
+});
+
+test("back to front iterator of one-element queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10 });
+    const t: LuaArray<number> = {};
+    const iterator = q.backToFrontIterator();
+    for (let i = 1; iterator.next(); i++) {
+        t[i] = iterator.value;
+    }
+    expect(t).toEqual(q.asArray());
+});
+
+test("back to front iterator of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const t: LuaArray<number> = {};
+    const iterator = q.backToFrontIterator();
+    for (let i = 1; iterator.next(); i++) {
+        t[i] = iterator.value;
+    }
+    expect(t).toEqual(q.asArray(true));
+});
+
+test("replace with back to front iterator of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const iterator = q.backToFrontIterator();
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(30);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(20);
+    iterator.replace(40);
+    expect(iterator.value).toBe(40);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(10);
+    expect(iterator.next()).toBe(false);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
+});
+
+test("front to back iterator of empty queue", () => {
+    const q = new Deque<number>();
+    const iterator = q.frontToBackIterator();
+    expect(iterator.next()).toBe(false);
+});
+
+test("front to back iterator of one-element queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10 });
+    const t: LuaArray<number> = {};
+    const iterator = q.frontToBackIterator();
+    for (let i = 1; iterator.next(); i++) {
+        t[i] = iterator.value;
+    }
+    expect(t).toEqual(q.asArray());
+});
+
+test("front to back iterator of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const t: LuaArray<number> = {};
+    const iterator = q.frontToBackIterator();
+    for (let i = 1; iterator.next(); i++) {
+        t[i] = iterator.value;
+    }
+    expect(t).toEqual(q.asArray());
+});
+
+test("replace with front to back iterator of queue", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const iterator = q.frontToBackIterator();
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(10);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(20);
+    iterator.replace(40);
+    expect(iterator.value).toBe(40);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(30);
+    expect(iterator.next()).toBe(false);
+    expect(q.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
 });
