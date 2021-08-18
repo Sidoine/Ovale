@@ -98,7 +98,7 @@ export class OvaleHealthClass {
         this.module.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED");
         this.module.UnregisterMessage("Ovale_UnitChanged");
     };
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
+    private handleCombatLogEvent = (cleuEvent: string) => {
         if (!healthEvent[cleuEvent]) {
             return;
         }
@@ -130,19 +130,16 @@ export class OvaleHealthClass {
         }
     };
     private handlePlayerRegenDisabled = (event: string) => {
-        this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
-        );
         for (const [event] of pairs(healthEvent)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
     };
     private handlePlayerRegenEnabled = (event: string) => {
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
-        for (const [event] of pairs(healthEvent)) {
-            this.combatLogEvent.unregisterEvent(event, this);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
         wipe(this.totalDamage);
         wipe(this.totalHealing);
         wipe(this.firstSeen);

@@ -55,28 +55,22 @@ export class OvaleDamageTakenClass {
             "PLAYER_REGEN_ENABLED",
             this.handlePlayerRegenEnabled
         );
-        this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
-        );
         for (const [event] of pairs(damageTakenEvent)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
     };
 
     private handleDisable = () => {
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
-        for (const [event] of pairs(damageTakenEvent)) {
-            this.combatLogEvent.registerEvent(event, this);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
         pool.drain();
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (!damageTakenEvent[cleuEvent]) {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
         const destGUID = cleu.destGUID;
         if (destGUID == this.ovale.playerGUID) {
@@ -124,6 +118,7 @@ export class OvaleDamageTakenClass {
             }
         }
     };
+
     private handlePlayerRegenEnabled = (event: string) => {
         pool.drain();
     };

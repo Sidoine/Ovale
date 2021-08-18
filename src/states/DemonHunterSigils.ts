@@ -82,31 +82,26 @@ export class OvaleSigilClass implements StateModule {
                 "UNIT_SPELLCAST_SUCCEEDED",
                 this.handleUnitSpellCastSucceeded
             );
-            this.module.RegisterMessage(
-                "Ovale_CombatLogEvent",
-                this.handleOvaleCombatLogEvent
+            this.combatLogEvent.registerEvent(
+                "SPELL_AURA_APPLIED",
+                this,
+                this.handleSpellAuraApplied
             );
-            this.combatLogEvent.registerEvent("SPELL_AURA_APPLIED", this);
         }
     };
     private handleDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
             this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-            this.module.UnregisterMessage("Ovale_CombatLogEvent");
-            this.combatLogEvent.unregisterEvent("SPELL_AURA_APPLIED", this);
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (
-            cleuEvent != "SPELL_AURA_APPLIED" ||
-            !this.ovalePaperDoll.isSpecialization("vengeance")
-        ) {
+    private handleSpellAuraApplied = (cleuEvent: string) => {
+        if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
             return;
         }
         const cleu = this.combatLogEvent;
-        const sourceGUID = cleu.sourceGUID;
-        if (sourceGUID == this.ovale.playerGUID) {
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
             const header = cleu.header as SpellPayloadHeader;
             const spellId = header.spellId;
             if (sigilEnd[spellId] != undefined) {

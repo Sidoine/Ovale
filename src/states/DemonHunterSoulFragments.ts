@@ -1,8 +1,6 @@
 import { OvaleAuraClass } from "./Aura";
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { GetTime } from "@wowts/wow-mock";
 import { LuaArray } from "@wowts/lua";
-import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
@@ -23,7 +21,6 @@ export class OvaleDemonHunterSoulFragmentsClass {
     estimatedCount = 0;
     atTime?: number;
     estimated?: boolean;
-    private module: AceModule & AceEvent;
 
     constructor(
         private ovaleAura: OvaleAuraClass,
@@ -31,41 +28,34 @@ export class OvaleDemonHunterSoulFragmentsClass {
         private ovalePaperDoll: OvalePaperDollClass,
         private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleDemonHunterSoulFragments",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
-            this.module.RegisterMessage(
-                "Ovale_CombatLogEvent",
-                this.handleOvaleCombatLogEvent
+            this.combatLogEvent.registerEvent(
+                "SPELL_CAST_SUCCESS",
+                this,
+                this.handleSpellCastSuccess
             );
-            this.combatLogEvent.registerEvent("SPELL_CAST_SUCCESS", this);
         }
     };
 
     private handleDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
-            this.module.UnregisterMessage("Ovale_CombatLogEvent");
-            this.combatLogEvent.unregisterEvent("SPELL_CAST_SUCCESS", this);
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (
-            cleuEvent != "SPELL_CAST_SUCCESS" ||
-            !this.ovalePaperDoll.isSpecialization("vengeance")
-        ) {
+    private handleSpellCastSuccess = (cleuEvent: string) => {
+        if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
             return;
         }
         const cleu = this.combatLogEvent;
-        const sourceGUID = cleu.sourceGUID;
-        const me = this.ovale.playerGUID;
-        if (sourceGUID == me) {
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
             const header = cleu.header as SpellPayloadHeader;
             const spellId = header.spellId;
             if (soulFragmentSpells[spellId]) {

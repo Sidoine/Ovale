@@ -1,7 +1,5 @@
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
-import { AceModule } from "@wowts/tsaddon";
 import {
     CombatLogEvent,
     DamagePayload,
@@ -11,42 +9,36 @@ import {
 
 export class OvaleSpellDamageClass {
     value: LuaArray<number> = {};
-    private module: AceModule & AceEvent;
 
     constructor(
         private ovale: OvaleClass,
         private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleSpellDamage",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
     private handleInitialize = () => {
-        this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
+        this.combatLogEvent.registerEvent(
+            "SPELL_DAMAGE",
+            this,
+            this.handleCombatLogEvent
         );
-        this.combatLogEvent.registerEvent("SPELL_DAMAGE", this);
-        this.combatLogEvent.registerEvent("SPELL_PERIODIC_DAMAGE", this);
+        this.combatLogEvent.registerEvent(
+            "SPELL_PERIODIC_DAMAGE",
+            this,
+            this.handleCombatLogEvent
+        );
     };
 
     private handleDisable = () => {
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
-        this.combatLogEvent.unregisterEvent("SPELL_DAMAGE", this);
-        this.combatLogEvent.unregisterEvent("SPELL_PERIODIC_DAMAGE", this);
+        this.combatLogEvent.unregisterAllEvents(this);
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (
-            cleuEvent != "SPELL_DAMAGE" &&
-            cleuEvent != "SPELL_PERIODIC_DAMAGE"
-        ) {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
         if (cleu.sourceGUID == this.ovale.playerGUID) {
             let spellId: number | undefined;

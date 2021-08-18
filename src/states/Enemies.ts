@@ -91,12 +91,12 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             "PLAYER_REGEN_DISABLED",
             this.handlePlayerRegenDisabled
         );
-        this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
-        );
         for (const [event] of pairs(tagEvent)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
     };
 
@@ -106,16 +106,10 @@ export class OvaleEnemiesClass extends States<EnemiesData> {
             reaperTimer = undefined;
         }
         this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
-        for (const [event] of pairs(tagEvent)) {
-            this.combatLogEvent.unregisterEvent(event, this);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (!unitRemovedEvents[cleuEvent] && !tagEvent[cleuEvent]) {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
         const sourceGUID = cleu.sourceGUID;
         const sourceName = cleu.sourceName;

@@ -79,12 +79,16 @@ export class OvaleDemonHunterDemonicClass {
             false;
         if (this.isHavoc && this.hasDemonic) {
             this.debug.debug("We are a havoc DH with Demonic.");
-            this.module.RegisterMessage(
-                "Ovale_CombatLogEvent",
-                this.handleOvaleCombatLogEvent
+            this.combatLogEvent.registerEvent(
+                "SPELL_CAST_SUCCESS",
+                this,
+                this.handleCombatLogEvent
             );
-            this.combatLogEvent.registerEvent("SPELL_CAST_SUCCESS", this);
-            this.combatLogEvent.registerEvent("SPELL_AURA_REMOVED", this);
+            this.combatLogEvent.registerEvent(
+                "SPELL_AURA_REMOVED",
+                this,
+                this.handleCombatLogEvent
+            );
         } else {
             if (!this.isHavoc) {
                 this.debug.debug("We are not a havoc DH.");
@@ -92,21 +96,12 @@ export class OvaleDemonHunterDemonicClass {
                 this.debug.debug("We don't have the Demonic talent.");
             }
             this.dropAura();
-            this.module.UnregisterMessage("Ovale_CombatLogEvent");
-            this.combatLogEvent.unregisterEvent("SPELL_CAST_SUCCESS", this);
-            this.combatLogEvent.unregisterEvent("SPELL_AURA_REMOVED", this);
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
-    private handleOvaleCombatLogEvent(event: string, cleuEvent: string) {
-        if (
-            cleuEvent != "SPELL_CAST_SUCCESS" &&
-            cleuEvent != "SPELL_AURA_REMOVED"
-        ) {
-            return;
-        }
+    private handleCombatLogEvent(cleuEvent: string) {
         const cleu = this.combatLogEvent;
-        const sourceGUID = cleu.sourceGUID;
-        if (sourceGUID == this.playerGUID) {
+        if (cleu.sourceGUID == this.playerGUID) {
             if (cleuEvent == "SPELL_CAST_SUCCESS") {
                 const header = cleu.header as SpellPayloadHeader;
                 const spellId = header.spellId;

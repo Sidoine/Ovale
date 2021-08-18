@@ -493,10 +493,6 @@ export class OvaleAuraClass
         );
         this.module.RegisterEvent("UNIT_AURA", this.handleUnitAura);
         this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
-        );
-        this.module.RegisterMessage(
             "Ovale_GroupChanged",
             this.handleOvaleGroupChanged
         );
@@ -504,12 +500,24 @@ export class OvaleAuraClass
             "Ovale_UnitChanged",
             this.handleUnitChanged
         );
-        this.combatLogEvent.registerEvent("SPELL_MISSED", this);
+        this.combatLogEvent.registerEvent(
+            "SPELL_MISSED",
+            this,
+            this.handleCombatLogEvent
+        );
         for (const [event] of pairs(spellAuraEvents)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
         for (const [event] of pairs(spellPeriodicEvents)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
     };
 
@@ -518,32 +526,14 @@ export class OvaleAuraClass
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_UNGHOST");
         this.module.UnregisterEvent("UNIT_AURA");
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
         this.module.UnregisterMessage("Ovale_GroupChanged");
         this.module.UnregisterMessage("Ovale_UnitChanged");
-        this.combatLogEvent.unregisterEvent("SPELL_MISSED", this);
-        for (const [event] of pairs(spellAuraEvents)) {
-            this.combatLogEvent.unregisterEvent(event, this);
-        }
-        for (const [event] of pairs(spellPeriodicEvents)) {
-            this.combatLogEvent.unregisterEvent(event, this);
-        }
-        for (const [guid] of pairs(this.current.aura)) {
-            removeAurasOnGUID(this.current.aura, guid);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
         pool.drain();
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (
-            cleuEvent != "SPELL_MISSED" &&
-            !spellAuraEvents[cleuEvent] &&
-            !spellPeriodicEvents[cleuEvent]
-        ) {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
-        this.debug.debugTimestamp(event, cleuEvent);
         const sourceGUID = cleu.sourceGUID;
         const destGUID = cleu.sourceGUID;
         const mine =

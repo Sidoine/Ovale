@@ -1,8 +1,6 @@
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { SpellId, UnitStagger } from "@wowts/wow-mock";
 import { LuaArray, lualength, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { StateModule } from "../engine/state";
 import { OvaleCombatClass } from "./combat";
@@ -34,7 +32,6 @@ let serial = 1;
 const maxLength = 30;
 export class OvaleStaggerClass implements StateModule {
     staggerTicks: LuaArray<number> = {};
-    private module: AceModule & AceEvent;
 
     constructor(
         private ovale: OvaleClass,
@@ -44,11 +41,10 @@ export class OvaleStaggerClass implements StateModule {
         private health: OvaleHealthClass,
         private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleStagger",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
@@ -82,26 +78,21 @@ export class OvaleStaggerClass implements StateModule {
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "MONK") {
-            this.module.RegisterMessage(
-                "Ovale_CombatLogEvent",
-                this.handleOvaleCombatLogEvent
+            this.combatLogEvent.registerEvent(
+                "SPELL_PERIODIC_DAMAGE",
+                this,
+                this.handleSpellPeriodicDamage
             );
-            this.combatLogEvent.registerEvent("SPELL_PERIODIC_DAMAGE", this);
         }
     };
     private handleDisable = () => {
         if (this.ovale.playerClass == "MONK") {
-            this.module.UnregisterMessage("Ovale_CombatLogEvent");
-            this.combatLogEvent.unregisterEvent("SPELL_PERIODIC_DAMAGE", this);
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (cleuEvent != "SPELL_PERIODIC_DAMAGE") {
-            return;
-        }
+    private handleSpellPeriodicDamage = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
-        const sourceGUID = cleu.sourceGUID;
-        if (sourceGUID == this.ovale.playerGUID) {
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
             serial = serial + 1;
             const header = cleu.header as SpellPeriodicPayloadHeader;
             if (header.spellId == staggerDoT) {

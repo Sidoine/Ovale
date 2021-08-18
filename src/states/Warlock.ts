@@ -1,9 +1,7 @@
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
 import { GetTime, TalentId, SpellId } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 import { pow } from "@wowts/math";
-import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
@@ -80,7 +78,6 @@ interface Demon {
 }
 
 export class OvaleWarlockClass implements StateModule {
-    private module: AceModule & AceEvent;
     private demonsCount: LuaObj<Demon> = {};
     private serial = 1;
 
@@ -93,11 +90,10 @@ export class OvaleWarlockClass implements StateModule {
         private power: OvalePowerClass,
         private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleWarlock",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
@@ -114,28 +110,27 @@ export class OvaleWarlockClass implements StateModule {
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "WARLOCK") {
-            this.module.RegisterMessage(
-                "Ovale_CombatLogEvent",
-                this.handleOvaleCombatLogEvent
+            this.combatLogEvent.registerEvent(
+                "SPELL_SUMMON",
+                this,
+                this.handleCombatLogEvent
             );
-            this.combatLogEvent.registerEvent("SPELL_SUMMON", this);
-            this.combatLogEvent.registerEvent("SPELL_CAST_SUCCESS", this);
+            this.combatLogEvent.registerEvent(
+                "SPELL_CAST_SUCCESS",
+                this,
+                this.handleCombatLogEvent
+            );
             this.demonsCount = {};
         }
     };
 
     private handleDisable = () => {
         if (this.ovale.playerClass == "WARLOCK") {
-            this.module.UnregisterMessage("Ovale_CombatLogEvent");
-            this.combatLogEvent.unregisterEvent("SPELL_SUMMON", this);
-            this.combatLogEvent.unregisterEvent("SPELL_CAST_SUCCESS", this);
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (cleuEvent != "SPELL_SUMMON" && cleuEvent != "SPELL_CAST_SUCCESS") {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
         if (cleu.sourceGUID == this.ovale.playerGUID) {
             this.serial = this.serial + 1;

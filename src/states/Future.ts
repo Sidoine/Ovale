@@ -290,12 +290,12 @@ export class OvaleFutureClass
             "Ovale_AuraChanged",
             this.handleAuraChanged
         );
-        this.module.RegisterMessage(
-            "Ovale_CombatLogEvent",
-            this.handleOvaleCombatLogEvent
-        );
         for (const [event] of pairs(spellCastEvents)) {
-            this.combatLogEvent.registerEvent(event, this);
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
         }
         this.lastSpell.registerSpellcastInfo(this);
     };
@@ -316,16 +316,10 @@ export class OvaleFutureClass
         this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.module.UnregisterMessage("Ovale_AuraAdded");
         this.module.UnregisterMessage("Ovale_AuraChanged");
-        this.module.UnregisterMessage("Ovale_CombatLogEvent");
-        for (const [event] of pairs(spellCastEvents)) {
-            this.combatLogEvent.unregisterEvent(event, this);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
     };
 
-    private handleOvaleCombatLogEvent = (event: string, cleuEvent: string) => {
-        if (!spellCastEvents[cleuEvent]) {
-            return;
-        }
+    private handleCombatLogEvent = (cleuEvent: string) => {
         const cleu = this.combatLogEvent;
         const sourceGUID = cleu.sourceGUID;
         const sourceName = cleu.sourceName;
@@ -346,7 +340,10 @@ export class OvaleFutureClass
                 destName &&
                 destName != ""
             ) {
-                this.tracer.debugTimestamp(event, cleu.getCurrentEventInfo());
+                this.tracer.debugTimestamp(
+                    cleuEvent,
+                    cleu.getCurrentEventInfo()
+                );
                 const now = GetTime();
                 const [spellcast] = this.getSpellcast(
                     spellName,
@@ -370,7 +367,7 @@ export class OvaleFutureClass
                     spellcast.target = destGUID;
                 }
             }
-            this.tracer.debugTimestamp(event, cleu.getCurrentEventInfo());
+            this.tracer.debugTimestamp(cleuEvent, cleu.getCurrentEventInfo());
             let finish: "hit" | "miss" | undefined =
                 spellCastFinishEvents[cleuEvent];
             if (cleu.payload.type == "DAMAGE") {
