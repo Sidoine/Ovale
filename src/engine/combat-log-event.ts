@@ -1,5 +1,5 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { LuaArray, LuaObj, next, truthy, unpack } from "@wowts/lua";
+import { LuaArray, LuaObj, next, pairs, truthy, unpack } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { AceModule } from "@wowts/tsaddon";
 import {
@@ -388,11 +388,13 @@ export const raidFlag: LuaObj<LuaObj<number>> = {
     },
 };
 
+type CombatLogEventHandler = (event: string) => void;
+
 export class CombatLogEvent {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    private registry: LuaObj<LuaObj<boolean>> = {};
+    private callbacksByEvent: LuaObj<LuaObj<CombatLogEventHandler>> = {};
     private arg: LuaArray<any> = {};
 
     timestamp = 0;
@@ -460,8 +462,9 @@ export class CombatLogEvent {
         ] = CombatLogGetCurrentEventInfo();
 
         const subEvent = arg[2];
-        const tokens = this.registry[subEvent];
-        const isRegisteredEvent = (tokens && next(tokens) && true) || false;
+        const callbacks = this.callbacksByEvent[subEvent];
+        const isRegisteredEvent =
+            (callbacks && next(callbacks) && true) || false;
         if (!isRegisteredEvent) return;
 
         this.timestamp = (arg[1] as number) || 0;
@@ -709,24 +712,43 @@ export class CombatLogEvent {
             }
         }
         this.tracer.debug(this.subEvent, this.getCurrentEventInfo());
-        this.module.SendMessage("Ovale_CombatLogEvent", subEvent);
+        this.fire(this.subEvent);
     };
 
-    registerEvent = (event: string, token: any) => {
-        const tokens = this.registry[event] || {};
+    fire = (event: string) => {
+        const callbacks = this.callbacksByEvent[event] || {};
+        if (callbacks) {
+            for (const [, callback] of pairs(callbacks)) {
+                callback(event);
+            }
+        }
+    };
+
+    registerEvent = (
+        event: string,
+        token: any,
+        callback: CombatLogEventHandler
+    ) => {
+        const callbacks = this.callbacksByEvent[event] || {};
         const key = token as unknown as string;
-        tokens[key] = true;
-        this.registry[event] = tokens;
+        callbacks[key] = callback;
+        this.callbacksByEvent[event] = callbacks;
     };
 
     unregisterEvent = (event: string, token: any) => {
-        const tokens = this.registry[event];
-        if (tokens) {
+        const callbacks = this.callbacksByEvent[event];
+        if (callbacks) {
             const key = token as unknown as string;
-            delete tokens[key];
-            if (!next(tokens)) {
-                delete this.registry[event];
+            delete callbacks[key];
+            if (!next(callbacks)) {
+                delete this.callbacksByEvent[event];
             }
+        }
+    };
+
+    unregisterAllEvents = (token: any) => {
+        for (const [event] of pairs(this.callbacksByEvent)) {
+            this.unregisterEvent(event, token);
         }
     };
 
