@@ -465,10 +465,9 @@ export class CombatLogEvent {
         ] = CombatLogGetCurrentEventInfo();
 
         const subEvent = arg[2];
-        const handlers = this.registry[subEvent];
-        const isRegisteredEvent = (handlers && next(handlers) && true) || false;
-        if (!isRegisteredEvent) return;
-
+        if (!this.hasEventHandler(subEvent)) {
+            return;
+        }
         this.timestamp = (arg[1] as number) || 0;
         this.subEvent = subEvent as CombatLogSubEvent;
         this.hideCaster = ((arg[3] as boolean) && true) || false;
@@ -715,6 +714,11 @@ export class CombatLogEvent {
         }
         this.tracer.debug(this.subEvent, this.getCurrentEventInfo());
         this.fire(this.subEvent);
+    };
+
+    hasEventHandler = (event: string) => {
+        const handlers = this.registry[event];
+        return (handlers && next(handlers) && true) || false;
     };
 
     fire = (event: string) => {
