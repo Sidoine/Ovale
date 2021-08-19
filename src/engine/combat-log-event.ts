@@ -389,12 +389,15 @@ export const raidFlag: LuaObj<LuaObj<number>> = {
 };
 
 type CombatLogEventHandler = (event: string) => void;
+type CombatLogEventHandlerRegistry = LuaObj<LuaObj<CombatLogEventHandler>>;
 
 export class CombatLogEvent {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    private callbacksByEvent: LuaObj<LuaObj<CombatLogEventHandler>> = {};
+    private registry: CombatLogEventHandlerRegistry = {};
+    private pendingRegistry: CombatLogEventHandlerRegistry = {};
+    private fireDepth = 0;
     private arg: LuaArray<any> = {};
 
     timestamp = 0;
@@ -462,9 +465,8 @@ export class CombatLogEvent {
         ] = CombatLogGetCurrentEventInfo();
 
         const subEvent = arg[2];
-        const callbacks = this.callbacksByEvent[subEvent];
-        const isRegisteredEvent =
-            (callbacks && next(callbacks) && true) || false;
+        const handlers = this.registry[subEvent];
+        const isRegisteredEvent = (handlers && next(handlers) && true) || false;
         if (!isRegisteredEvent) return;
 
         this.timestamp = (arg[1] as number) || 0;
@@ -716,10 +718,53 @@ export class CombatLogEvent {
     };
 
     fire = (event: string) => {
-        const callbacks = this.callbacksByEvent[event] || {};
-        if (callbacks) {
-            for (const [, callback] of pairs(callbacks)) {
-                callback(event);
+        if (this.registry[event]) {
+            this.fireDepth += 1;
+            for (const [, handler] of pairs(this.registry[event])) {
+                handler(event);
+            }
+            this.fireDepth -= 1;
+            if (this.fireDepth == 0) {
+                // Add all pending registrations to the main registry.
+                for (const [event, handlers] of pairs(this.pendingRegistry)) {
+                    for (const [token, handler] of pairs(handlers)) {
+                        this.insertEventHandler(
+                            this.registry,
+                            event,
+                            token,
+                            handler
+                        );
+                    }
+                }
+            }
+        }
+    };
+
+    private insertEventHandler = (
+        registry: CombatLogEventHandlerRegistry,
+        event: string,
+        token: any,
+        handler: CombatLogEventHandler
+    ) => {
+        const handlers = registry[event] || {};
+        // Pretend to cast to string to satisfy Typescript.
+        const key = token as unknown as string;
+        handlers[key] = handler;
+        registry[event] = handlers;
+    };
+
+    private removeEventHandler = (
+        registry: CombatLogEventHandlerRegistry,
+        event: string,
+        token: any
+    ) => {
+        const handlers = registry[event];
+        if (handlers) {
+            // Pretend to cast to string to satisfy Typescript.
+            const key = token as unknown as string;
+            delete handlers[key];
+            if (!next(handlers)) {
+                delete registry[event];
             }
         }
     };
@@ -727,27 +772,27 @@ export class CombatLogEvent {
     registerEvent = (
         event: string,
         token: any,
-        callback: CombatLogEventHandler
+        handler: CombatLogEventHandler
     ) => {
-        const callbacks = this.callbacksByEvent[event] || {};
-        const key = token as unknown as string;
-        callbacks[key] = callback;
-        this.callbacksByEvent[event] = callbacks;
-    };
-
-    unregisterEvent = (event: string, token: any) => {
-        const callbacks = this.callbacksByEvent[event];
-        if (callbacks) {
-            const key = token as unknown as string;
-            delete callbacks[key];
-            if (!next(callbacks)) {
-                delete this.callbacksByEvent[event];
-            }
+        if (this.fireDepth > 0) {
+            this.insertEventHandler(
+                this.pendingRegistry,
+                event,
+                token,
+                handler
+            );
+        } else {
+            this.insertEventHandler(this.registry, event, token, handler);
         }
     };
 
+    unregisterEvent = (event: string, token: any) => {
+        this.removeEventHandler(this.pendingRegistry, event, token);
+        this.removeEventHandler(this.registry, event, token);
+    };
+
     unregisterAllEvents = (token: any) => {
-        for (const [event] of pairs(this.callbacksByEvent)) {
+        for (const [event] of pairs(this.registry)) {
             this.unregisterEvent(event, token);
         }
     };
