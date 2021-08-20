@@ -3,27 +3,63 @@
 // Will be used by the importsimc tool
 
 import { execSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
+import { opendirSync, readFileSync, writeFileSync } from "fs";
 import { chdir, cwd, exit } from "process";
 
-const simcPath = process.argv[2];
+const doExtract = process.argv[2] !== "--skip-extract";
+const simcPath = (doExtract && process.argv[2]) || process.argv[3];
 if (!simcPath) {
-    console.error("usage: yarn dbc ../simc");
+    console.error("usage: yarn dbc [--skip-extract] ../simc");
     exit(1);
 }
-const dbcExtract3 = `${simcPath}/dbc_extract3`;
-// TODO get last versions
-const version = "9.1.0.39497";
-const lastFormat = "9.1.0.38783";
 
+function getLatestVersion(path: string) {
+    const dir = opendirSync(path);
+    let version: string | undefined;
+    let buildVersion: number | undefined;
+    let dirent = dir.readSync();
+    while (dirent) {
+        const name = dirent.name;
+        // name must be of the form "N.M.n.m"
+        if (name.match(/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)) {
+            const components = name.match(/\.[0-9]+/g);
+            if (components) {
+                const index = components.length - 1;
+                const build = Number(components[index].substring(1));
+                if (buildVersion === undefined || buildVersion < build) {
+                    buildVersion = build;
+                    version = name;
+                }
+            }
+        }
+        dirent = dir.readSync();
+    }
+    dir.closeSync();
+    return version;
+}
+
+const cascExtract = `${simcPath}/casc_extract`;
+const version = getLatestVersion(`${cascExtract}/wow`);
+if (!version) {
+    console.error(`error: ${cascExtract}/wow version directory not found`);
+    exit(2);
+}
 const currentDir = cwd();
-chdir(dbcExtract3);
-execSync(
-    `py -3 dbc_extract.py -p ../casc_extract/wow/${version}/DBFilesClient -b ${version} --hotfix=cache/live/DBCache.bin -t csv SpellShapeshift > SpellShapeshift.csv`
-);
-chdir(currentDir);
+const dbcExtract3 = `${simcPath}/dbc_extract3`;
+if (doExtract) {
+    chdir(dbcExtract3);
+    execSync(
+        `py -3 dbc_extract.py -p ${cascExtract}/wow/${version}/DBFilesClient -b ${version} --hotfix=cache/live/DBCache.bin -t csv SpellShapeshift > SpellShapeshift.csv`
+    );
+    chdir(currentDir);
+}
 
-const json = readFileSync(`${dbcExtract3}/formats/${lastFormat}.json`, {
+let lastFormatJson = getLatestVersion(`${dbcExtract3}/formats`);
+if (!lastFormatJson) {
+    console.error(`error: ${dbcExtract3}/format version directory not found`);
+    exit(2);
+}
+const json = readFileSync(`${dbcExtract3}/formats/${lastFormatJson}`, {
     encoding: "utf8",
 });
 
