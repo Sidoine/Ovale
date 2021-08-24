@@ -1162,10 +1162,10 @@
     typescript "^4.3.5"
     webdav "^3.6.2"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.31.1", "@wowts/wow-mock@^1.6.0":
-  version "1.32.1"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.1.tgz#28ba2485a9a8dcd475a7720886681f2480451b6e"
-  integrity sha512-V69FRVYw6o+mBz8oLHvZ2e3jL55dhen7lt0tLu96p70QhoBbd2RKZWPuCO78Ce6OV95WRUBrKOFgvcKypJ381A==
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.32.2", "@wowts/wow-mock@^1.6.0":
+  version "1.32.2"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.2.tgz#af17859bed5a5f134813d1b9989e3f4524f6eb00"
+  integrity sha512-9Jogbdqm9UVv1oBd0jACM9erbHdPdPrWfU/P2ZvXmFBTZbiXjzTB8z7aFuNfvw1cb62Qrrs7mE8WQ1kKxvMt6g==
   dependencies:
     "@wowts/lua" "^1.6.0"
     "@wowts/table" "^1.0.2"
