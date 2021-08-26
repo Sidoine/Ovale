@@ -195,7 +195,7 @@ export class ClassScripts {
         output.push("    {");
         output.push(format('        const name = "sc_%s";', name));
         output.push(
-            format('        const desc = "[9.0] Simulationcraft: %s";', desc)
+            format('        const desc = "[9.1] Simulationcraft: %s";', desc)
         );
         output.push("        const code = `");
         output.push(ioc.simulationCraft.emit(profile, true));

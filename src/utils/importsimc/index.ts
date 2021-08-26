@@ -8,7 +8,7 @@ import { exit } from "process";
 
 const outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
-const profilesDirectory = simcDirectory + "/profiles/Tier26";
+const profilesDirectory = simcDirectory + "/profiles/Tier27";
 
 if (!existsSync(outputDirectory)) mkdirSync(outputDirectory);
 
