@@ -1459,14 +1459,14 @@ export class OvaleConditions {
     ): [Aura | undefined, Aura | undefined] {
         const bpAura = this.auras.getAura(
             target,
-            SpellId.blood_plague,
+            SpellId.blood_plague_debuff,
             atTime,
             "HARMFUL",
             true
         );
         const ffAura = this.auras.getAura(
             target,
-            SpellId.frost_fever,
+            SpellId.frost_fever_debuff,
             atTime,
             "HARMFUL",
             true
