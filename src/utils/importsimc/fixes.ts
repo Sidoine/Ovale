@@ -148,38 +148,40 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         }
     }
 
-    fixIdentifier("shining_light_free_buff", 327510);
-    fixIdentifier("sun_kings_blessing_ready_buff", 333315);
-    fixIdentifier("clearcasting_channel_buff", 277726);
-    fixIdentifier("balance_of_all_things_arcane_buff", 339946);
-    fixIdentifier("balance_of_all_things_nature_buff", 339943);
     fixIdentifier("adaptive_swarm_damage", 325733);
     fixIdentifier("adaptive_swarm_heal", 325748);
-    fixIdentifier("kindred_empowerment_energize", 327139);
-    fixIdentifier("symbols_of_death_autocrit", 227151);
-    fixIdentifier("weapons_of_order_ww", 311054);
-    fixAddAura("sunfire", "sunfire_debuff");
-    fixIdentifier("steady_focus", 193533);
-    fixIdentifier("unstable_affliction_silence_debuff", 196364);
-    fixIdentifier("corruption_affliction_debuff", 146739);
+    fixIdentifier("balance_of_all_things_arcane_buff", 339946);
+    fixIdentifier("balance_of_all_things_nature_buff", 339943);
+    fixIdentifier("clearcasting_channel_buff", 277726);
     fixIdentifier("condemn_fury", 317485);
+    fixIdentifier("corruption_affliction_debuff", 146739);
     fixIdentifier("devastator_passive", 236279);
     fixIdentifier("festering_wound_unholy_debuff", 194310);
+    fixIdentifier("frenzy_pet_buff", 272790);
+    fixIdentifier("kindred_empowerment_energize", 327139);
     fixIdentifier("radiant_spark_vulnerability_debuff", 307454);
+    fixIdentifier("shining_light_free_buff", 327510);
+    fixIdentifier("steady_focus", 193533);
+    fixIdentifier("sun_kings_blessing_ready_buff", 333315);
+    fixIdentifier("symbols_of_death_autocrit", 227151);
+    fixIdentifier("unstable_affliction_silence_debuff", 196364);
+    fixIdentifier("weapons_of_order_ww", 311054);
 
     // Blood fury
-    fixIdentifier("blood_fury_ap_int", 33697);
     fixIdentifier("blood_fury_ap", 20572);
+    fixIdentifier("blood_fury_ap_int", 33697);
     fixIdentifier("blood_fury_int", 33702);
 
     // TODO add _cat/_bear using required stance
+    fixIdentifier("berserk_bear", 50334);
+    fixIdentifier("berserk_cat", 106951);
+    fixIdentifier("moonfire_cat", 155625);
+    fixIdentifier("swipe_cat", 106785);
+    fixIdentifier("thrash_cat", 106830);
     fixIdentifier("wild_charge_bear", 16979);
     fixIdentifier("wild_charge_cat", 49376);
-    fixIdentifier("thrash_cat", 106830);
-    fixIdentifier("swipe_cat", 106785);
-    fixIdentifier("moonfire_cat", 155625);
-    fixIdentifier("berserk_cat", 106951);
-    fixIdentifier("berserk_bear", 50334);
+
+    fixAddAura("sunfire", "sunfire_debuff");
 
     addSpellList("wild_charge", "wild_charge_bear", "wild_charge_cat");
     addSpellList(
@@ -188,8 +190,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "adaptive_swarm_heal"
     );
     addSpellList("berserk", "berserk_cat", "berserk_bear");
-
-    fixIdentifier("frenzy_pet_buff", 272790);
 
     const customIdentifierById = new Map<
         number,
