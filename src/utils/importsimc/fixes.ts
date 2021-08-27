@@ -158,28 +158,19 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("kindred_empowerment_energize", 327139);
     fixIdentifier("symbols_of_death_autocrit", 227151);
     fixIdentifier("weapons_of_order_ww", 311054);
-    fixIdentifier("sunfire_debuff", 164815);
     fixAddAura("sunfire", "sunfire_debuff");
     fixIdentifier("steady_focus", 193533);
-    fixIdentifier("steady_focus_buff", 193534);
-    fixIdentifier("serpent_sting_marksmanship", 271788);
     fixIdentifier("unstable_affliction_silence_debuff", 196364);
     fixIdentifier("corruption_affliction_debuff", 146739);
     fixIdentifier("condemn_fury", 317485);
     fixIdentifier("devastator_passive", 236279);
     fixIdentifier("festering_wound_unholy_debuff", 194310);
-    fixIdentifier("bloodbath", 335096);
     fixIdentifier("radiant_spark_vulnerability_debuff", 307454);
 
     // Blood fury
     fixIdentifier("blood_fury_ap_int", 33697);
     fixIdentifier("blood_fury_ap", 20572);
     fixIdentifier("blood_fury_int", 33702);
-
-    // Bombs
-    fixIdentifier("pheromone_bomb", 270323);
-    fixIdentifier("shrapnel_bomb", 270335);
-    fixIdentifier("volatile_bomb", 271045);
 
     // TODO add _cat/_bear using required stance
     fixIdentifier("wild_charge_bear", 16979);
@@ -198,7 +189,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     );
     addSpellList("berserk", "berserk_cat", "berserk_bear");
 
-    fixIdentifier("shiv_debuff", 319504);
     fixIdentifier("frenzy_pet_buff", 272790);
 
     const customIdentifierById = new Map<
