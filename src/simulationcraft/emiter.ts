@@ -1579,6 +1579,10 @@ export class Emiter {
                         isSpellAction = false;
                     }
                 }
+            } else if (className == "WARRIOR" && action == "heroic_charge") {
+                bodyCode = "Spell(heroic_leap text=charge)";
+                this.addSymbol(annotation, "heroic_leap");
+                isSpellAction = false;
             } else if (className == "WARRIOR" && action == "heroic_leap") {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.Distance() >= 8 and target.Distance() <= 40";
