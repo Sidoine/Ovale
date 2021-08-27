@@ -202,7 +202,7 @@ export class ClassScripts {
         output.push("`;");
         output.push(
             format(
-                `        scripts.RegisterScript(
+                `        scripts.registerScript(
             "%s",
             "%s",
             name,
