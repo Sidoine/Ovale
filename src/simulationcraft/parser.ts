@@ -220,6 +220,7 @@ export class Parser {
             stream = gsub(stream, ",,", ",");
             stream = gsub(stream, "%&%&", "&");
             stream = gsub(stream, "target%.target%.", "target.");
+            stream = gsub(stream, "name=name=", "name=");
         }
         {
             stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
