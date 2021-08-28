@@ -3334,6 +3334,10 @@ export class Emiter {
                 name = `shared="${name}"`;
                 prefix = "Item";
                 isSymbol = false;
+            } else if (truthy(match(name, "^[%w_]+_%d+$"))) {
+                name = gsub(name, "_%d+$", "_item");
+                prefix = "Item";
+                isSymbol = true;
             } else {
                 [name, prefix] = this.disambiguate(
                     annotation,
