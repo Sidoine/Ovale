@@ -491,6 +491,7 @@ export class Emiter {
             "potion_of_phantom_fire_item"
         );
         this.addDisambiguation("interrupt", "pet_interrupt", "WARLOCK");
+        this.addDisambiguation("bonedust_brew_debuff", "bonedust_brew", "MONK");
     }
 
     /** Transform a ParseNode to an AstNode
