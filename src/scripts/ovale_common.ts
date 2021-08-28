@@ -105,6 +105,9 @@ Define(sinful_aspirants_medallion 184052)
     ItemRequire(sinful_aspirants_medallion unusable set=1 enabled=(not isfeared() and not isstunned() and not isincapacitated() and not isrooted()))
 Define(sinful_gladiators_medallion 181333)
     ItemRequire(sinful_gladiators_medallion unusable set=1 enabled=(not isfeared() and not isstunned() and not isincapacitated() and not isrooted()))
+
+Define(trial_of_doubt_debuff 358404)
+    SpellInfo(trial_of_doubt_debuff duration=11)
     `;
     scripts.registerScript(undefined, undefined, name, desc, code, "include");
 }

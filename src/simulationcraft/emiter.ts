@@ -919,7 +919,7 @@ export class Emiter {
         modifiers: Modifiers
     ) => {
         let conditionNode = undefined;
-        for (const [modifier, expressionNode] of kpairs(parseNode.modifiers)) {
+        for (const [modifier, expressionNode] of kpairs(modifiers)) {
             const rhsNode = this.emitModifier(
                 modifier,
                 expressionNode,
@@ -1370,7 +1370,7 @@ export class Emiter {
             // Most of this code is obsolete and should be cleaned or dispatched in the correct function
             let bodyCode, conditionCode;
             const expressionType = "expression";
-            const modifiers = parseNode.modifiers;
+            let modifiers = parseNode.modifiers;
             let isSpellAction = true;
             if (
                 interruptsClasses[action as keyof typeof interruptsClasses] ===
@@ -1690,6 +1690,17 @@ export class Emiter {
                         this.unparser.unparse(modifiers.extra_amount)
                     );
                 }
+                isSpellAction = false;
+            } else if (action == "newfound_resolve") {
+                const buffName = "newfound_resolve_buff";
+                const debuffName = "trial_of_doubt_debuff";
+                bodyCode = "Texture(inv_enchant_essencemagiclarge text=face)";
+                // Newfound Resolve does not stack
+                conditionCode = `not BuffPresent(${buffName}) and DebuffPresent(${debuffName}) and DebuffRemains(${debuffName}) < 10`;
+                this.addSymbol(annotation, buffName);
+                this.addSymbol(annotation, debuffName);
+                // Ignore any modifiers for the "newfound_resolve" action.
+                modifiers = {};
                 isSpellAction = false;
             } else if (action == "potion") {
                 let name =
