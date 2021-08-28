@@ -160,6 +160,8 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("frenzy_pet_buff", 272790);
     fixIdentifier("kindred_empowerment_energize", 327139);
     fixIdentifier("radiant_spark_vulnerability_debuff", 307454);
+    fixIdentifier("serrated_bone_spike_debuff", 324073);
+    fixIdentifier("serrated_bone_spike", 328547);
     fixIdentifier("shining_light_free_buff", 327510);
     fixIdentifier("steady_focus", 193533);
     fixIdentifier("sun_kings_blessing_ready_buff", 333315);
@@ -181,6 +183,7 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("wild_charge_bear", 16979);
     fixIdentifier("wild_charge_cat", 49376);
 
+    fixAddAura("serrated_bone_spike", "serrated_bone_spike_debuff");
     fixAddAura("sunfire", "sunfire_debuff");
 
     addSpellList("wild_charge", "wild_charge_bear", "wild_charge_cat");

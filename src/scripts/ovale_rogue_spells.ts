@@ -454,6 +454,11 @@ Define(flagellation_buff 345569)
   SpellAddBuff(eviscerate flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
   SpellAddBuff(rupture flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
   SpellAddBuff(secret_technique flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+# serrated_bone_spike
+  SpellInfo(serrated_bone_spike combopoints=-1)
+  SpellRequire(serrated_bone_spike unusable set=1 enabled=(not iscovenant("necrolord")))
+  SpellRequire(serrated_bone_spike combopoints add=(target.debuffpresent(serrated_bone_spike_debuff) - debuffcountonany(serrated_bone_spike_debuff)))
+
 Define(wound_poison 8679)
   SpellInfo(wound_poison duration=3600 gcd=0 offgcd=1)
   SpellAddBuff(wound_poison wound_poison add=1)
