@@ -4453,6 +4453,8 @@ export class Emiter {
             code = `${target}EnrageRemaining()`;
         } else if (operand == "buff.enrage.up") {
             code = `${target}IsEnraged()`;
+        } else if (operand == "cp_gain") {
+            code = `SpellInfoProperty(${action} combopoints) <? ComboPointsDeficit()`;
         } else if (operand == "debuff.casting.react") {
             code = `${target}IsInterruptible()`;
         } else if (operand == "debuff.casting.up") {
