@@ -17,6 +17,7 @@ export type ClassType = string;
 export type Result<T> = T | undefined;
 
 export type Interrupts =
+    | "pet_interrupt"
     | "mind_freeze"
     | "pummel"
     | "disrupt"
@@ -32,6 +33,7 @@ export type Interrupts =
     | "counterspell"
     | "spear_hand_strike";
 export const interruptsClasses: { [k in Interrupts]: ClassId } = {
+    pet_interrupt: "WARLOCK",
     mind_freeze: "DEATHKNIGHT",
     pummel: "WARRIOR",
     disrupt: "DEMONHUNTER",
@@ -99,7 +101,11 @@ export const classInfos: { [key in ClassId]: ClassInfo } = {
         elemental: { interrupt: "wind_shear" },
         enhancement: { interrupt: "wind_shear" },
     },
-    WARLOCK: {},
+    WARLOCK: {
+        affliction: { interrupt: "pet_interrupt" },
+        demonology: { interrupt: "pet_interrupt" },
+        destruction: { interrupt: "pet_interrupt" },
+    },
     WARRIOR: {
         fury: { interrupt: "pummel" },
         protection: { interrupt: "pummel" },
@@ -519,6 +525,7 @@ export const specialActions: LuaObj<boolean> = {
     ["flask"]: true,
     ["food"]: true,
     ["health_stone"]: true,
+    ["interrupt"]: true,
     ["pool_resource"]: true,
     ["potion"]: true,
     ["run_action_list"]: true,
@@ -1103,6 +1110,8 @@ export interface DbcData {
 }
 
 export class Annotation implements InterruptAnnotation {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    pet_interrupt?: ClassId;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     mind_freeze?: ClassId;
     pummel?: ClassId;

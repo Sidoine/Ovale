@@ -534,6 +534,45 @@ export class Generator {
                     "target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)",
             });
         }
+        if (annotation.interrupt == "WARLOCK") {
+            insert(interrupts, {
+                name: "spell_lock",
+                interrupt: 1,
+                worksOnBoss: 1,
+                order: 10,
+            });
+            if (annotation.specialization == "demonology") {
+                insert(interrupts, {
+                    name: "axe_toss",
+                    interrupt: 1,
+                    worksOnBoss: 1,
+                    order: 20,
+                });
+            }
+            insert(interrupts, {
+                name: "shadowfury",
+                stun: 1,
+                order: 100,
+                range: 35,
+                extraCondition:
+                    "target.RemainingCastTime() > CastTime(shadowfury) + GCDRemaining()",
+            });
+            insert(interrupts, {
+                name: "banish",
+                cc: 1,
+                order: 200,
+                range: 30,
+                extraCondition:
+                    "target.RemainingCastTime() > CastTime(banish) + GCDRemaining()",
+            });
+            insert(interrupts, {
+                name: "seduction",
+                cc: 1,
+                order: 300,
+                extraCondition:
+                    "target.RemainingCastTime() > CastTime(seduction) + GCDRemaining()",
+            });
+        }
         if (annotation.pummel == "WARRIOR") {
             insert(interrupts, {
                 name: "pummel",

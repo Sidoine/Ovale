@@ -484,6 +484,7 @@ export class Emiter {
             "phantom_fire_item",
             "potion_of_phantom_fire_item"
         );
+        this.addDisambiguation("interrupt", "pet_interrupt", "WARLOCK");
     }
 
     /** Transform a ParseNode to an AstNode
