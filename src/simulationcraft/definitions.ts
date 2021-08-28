@@ -528,6 +528,7 @@ export const specialActions: LuaObj<boolean> = {
     ["interrupt"]: true,
     ["pool_resource"]: true,
     ["potion"]: true,
+    ["retarget_auto_attack"]: true,
     ["run_action_list"]: true,
     ["sequence"]: true,
     ["snapshot_stats"]: true,

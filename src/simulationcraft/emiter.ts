@@ -1364,6 +1364,7 @@ export class Emiter {
                 action == "augmentation" ||
                 action == "flask" ||
                 action == "food" ||
+                action == "retarget_auto_attack" ||
                 action == "snapshot_stats"
             )
         ) {
