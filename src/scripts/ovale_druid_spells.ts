@@ -523,6 +523,9 @@ Define(first_strike_soulbind 325069)
     `;
     // END
     code += `
+Define(ravenous_frenzy_sinful_hysteria_buff 355315)
+    SpellInfo(ravenous_frenzy_sinful_hysteria_buff duration=5)
+
     SpellRequire(berserk_0 replaced_by set=incarnation_guardian_of_ursoc enabled=(talent(incarnation_guardian_of_ursoc_talent)))
 #bloodtalons
     SpellAddBuff(ferocious_bite bloodtalons add=-1 enabled=(specialization(feral) and hastalent(bloodtalons_talent)))
