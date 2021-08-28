@@ -343,6 +343,13 @@ Define(vicious_contempt_conduit 64)
     // END
 
     code += `
+Define(merciless_bonegrinder_soulbind 335260)
+Define(merciless_bonegrinder_buff 346574)
+    SpellInfo(merciless_bonegrinder_buff duration=9)
+    SpellAddBuff(bladestorm merciless_bonegrinder_buff add=1 enabled=(soulbind(merciless_bonegrinder_soulbind)))
+    SpellAddBuff(bladestorm_arms merciless_bonegrinder_buff add=1 enabled=(soulbind(merciless_bonegrinder_soulbind)))
+    SpellAddBuff(ravager merciless_bonegrinder_buff add=1 enabled=(soulbind(merciless_bonegrinder_soulbind)))
+    SpellAddBuff(ravager_protection merciless_bonegrinder_buff add=1 enabled=(soulbind(merciless_bonegrinder_soulbind)))
 SpellRequire(execute unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(execute_fury unusable set=1 enabled=(target.healthpercent() > 20 and buffexpires(sudden_death_buff)))
 SpellRequire(condemn unusable set=1 enabled=(not iscovenant("venthyr")))
