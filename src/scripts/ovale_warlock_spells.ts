@@ -375,10 +375,16 @@ Define(lead_by_example_soulbind 342156)
     `;
     // END
     code += `
+#axe_toss
+    SpellRequire(axe_toss unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felguard")))
 #grimoire_of_sacrifice
     SpellRequire(grimoire_of_sacrifice unusable set=1 enabled=(not pet.present()))
 #immolate
     SpellAddTargetDebuff(immolate immolate_warlock_debuff add=1)
+#seduction
+    SpellRequire(seduction unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Succubus") or not target.creaturetype("Humanoid")))
+#spell_lock
+    SpellRequire(spell_lock unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felhunter")))
 #soul_strike
     SpellRequire(soul_strike unusable set=1 enabled=(not pet.present() or not pet.creaturefamily("Felguard")))
     `;
