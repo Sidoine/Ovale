@@ -445,9 +445,15 @@ Define(lead_by_example_soulbind 342156)
     // END
 
     code += `
-
-  
-  
+Define(flagellation_buff 345569)
+  SpellInfo(flagellation_buff duration=12)
+  SpellAddBuff(between_the_eyes flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(black_powder flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(dispatch flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(envenom flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(eviscerate flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(rupture flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
+  SpellAddBuff(secret_technique flagellation_buff add=1 enabled=(iscovenant("venthyr") and target.debuffpresent(flagellation)))
 Define(wound_poison 8679)
   SpellInfo(wound_poison duration=3600 gcd=0 offgcd=1)
   SpellAddBuff(wound_poison wound_poison add=1)
