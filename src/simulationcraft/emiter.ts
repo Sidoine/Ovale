@@ -431,6 +431,7 @@ export class Emiter {
         this.addDisambiguation("frenzy", "frenzy_pet_buff", "HUNTER");
 
         this.addDisambiguation("blood_fury", "blood_fury_ap_int", "MONK");
+        this.addDisambiguation("blood_fury", "blood_fury_ap_int", "PALADIN");
         this.addDisambiguation("blood_fury", "blood_fury_ap_int", "SHAMAN");
         this.addDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT");
         this.addDisambiguation("blood_fury", "blood_fury_ap", "HUNTER");
@@ -440,6 +441,11 @@ export class Emiter {
         this.addDisambiguation("blood_fury", "blood_fury_int", "PRIEST");
         this.addDisambiguation("blood_fury", "blood_fury_int", "WARLOCK");
         this.addDisambiguation("blood_fury_buff", "blood_fury_ap_int", "MONK");
+        this.addDisambiguation(
+            "blood_fury_buff",
+            "blood_fury_ap_int",
+            "PALADIN"
+        );
         this.addDisambiguation(
             "blood_fury_buff",
             "blood_fury_ap_int",
