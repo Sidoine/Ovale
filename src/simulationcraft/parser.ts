@@ -226,6 +226,14 @@ export class Parser {
             stream = gsub(stream, "name=BT&Reck:", "name=BT_Reck:");
         }
         {
+            // From the Shadows is a target debuff, not a player buff.
+            stream = gsub(
+                stream,
+                "buff%.from_the_shadows%.",
+                "target.debuff.from_the_shadows."
+            );
+        }
+        {
             stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
             stream = gsub(stream, "([^_%.])(cooldown_remains)=0", "%1!(%2>0)");
             stream = gsub(stream, "([a-z_%.]+%.cooldown_remains)=0", "!(%1>0)");
