@@ -3351,12 +3351,16 @@ export class Emiter {
             let code;
             if (property == "execute_time") {
                 code = format("ExecuteTime(%s)", name);
-            } else if (property == "duration") {
+            } else if (
+                property == "duration" ||
+                property == "duration_expected"
+            ) {
                 code = format("%sCooldownDuration(%s)", prefix, name);
             } else if (property == "ready") {
                 code = format("%sCooldown(%s) <= 0", prefix, name);
             } else if (
                 property == "remains" ||
+                property == "remains_expected" ||
                 property == "remains_guess" ||
                 property == "adjusted_remains"
             ) {
