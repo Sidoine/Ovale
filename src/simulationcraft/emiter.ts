@@ -3275,11 +3275,7 @@ export class Emiter {
             }
         } else if (sub(operand, 1, 10) == "main_hand.") {
             const weaponType = sub(operand, 11);
-            if (weaponType == "1h") {
-                code = "HasWeapon(main type=one_handed)";
-            } else if (weaponType == "2h") {
-                code = "HasWeapon(main type=two_handed)";
-            }
+            code = `HasWeapon(mainhandslot ${weaponType})`;
         } else if (operand == "mastery_value") {
             code = format("%sMasteryEffect() / 100", target);
         } else if (sub(operand, 1, 5) == "role.") {

@@ -541,6 +541,7 @@ export class OvaleEquipmentClass {
         );
         ovaleCondition.registerCondition("hasshield", false, this.hasShield);
         ovaleCondition.registerCondition("hastrinket", false, this.hasTrinket);
+        ovaleCondition.registerCondition("hasweapon", false, this.hasWeapon);
         const slotParameter: ParameterInfo<SlotName> = {
             type: "string",
             name: "slot",
@@ -678,6 +679,24 @@ export class OvaleEquipmentClass {
             }
         }
         return returnBoolean(boolean);
+    };
+
+    private hasWeapon: ConditionFunction = (
+        positionalParameter,
+        namedParameter,
+        atTime
+    ) => {
+        const slot = positionalParameter[1] as SlotName;
+        const handedness = positionalParameter[2];
+        const invSlot = slotNameByName[slot];
+        const invType =
+            (handedness == "1h" && Enum.InventoryType.IndexWeaponType) ||
+            Enum.InventoryType.Index2HweaponType;
+        const item = this.equippedItem[invSlot];
+        if (item.exists && item.type) {
+            return returnBoolean(item.type == invType);
+        }
+        return returnBoolean(false);
     };
 
     /** Get the cooldown time in seconds of an item, e.g., trinket.
