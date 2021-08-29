@@ -570,6 +570,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
     ["deficit"]: { type: MiscOperandModifierType.Suffix },
     ["pct"]: { name: "percent", type: MiscOperandModifierType.Suffix },
     ["regen"]: { name: "regenrate", type: MiscOperandModifierType.Suffix },
+    ["regen_combined"]: {
+        // TODO: "regen_combined" should incorporate regen from buffs
+        name: "regenrate",
+        type: MiscOperandModifierType.Suffix,
+    },
     ["time_to_40"]: {
         name: "timeto",
         type: MiscOperandModifierType.Prefix,
@@ -581,6 +586,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
         extraParameter: 50,
     },
     ["time_to_max"]: {
+        name: "timetomax",
+        type: MiscOperandModifierType.Prefix,
+    },
+    ["time_to_max_combined"]: {
+        // TODO: "time_to_max_combined" should incorporate regen from buffs
         name: "timetomax",
         type: MiscOperandModifierType.Prefix,
     },
