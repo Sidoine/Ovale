@@ -143,6 +143,13 @@ test("remove at 1 of one-element list", () => {
     expect(l.length).toBe(0);
 });
 
+test("replace at 1 of one-element list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10 });
+    l.replaceAt(1, 20);
+    expect(l.asArray()).toEqual({ 1: 20 });
+});
+
 test("nodeOf missing from one-element list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10 });
@@ -270,6 +277,27 @@ test("remove at middle of list", () => {
     expect(l.asArray()).toEqual({ 1: 10, 2: 30 });
 });
 
+test("replace at front of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(1, 40);
+    expect(l.asArray()).toEqual({ 1: 40, 2: 20, 3: 30 });
+});
+
+test("replace at back of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(l.length, 40);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 20, 3: 40 });
+});
+
+test("replace at middle of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.replaceAt(2, 40);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
+});
+
 test("nodeOf missing from list", () => {
     const l = new List<number>();
     l.fromArray({ 1: 10, 2: 20, 3: 30 });
@@ -354,6 +382,22 @@ test("back to front iterator of list", () => {
     expect(t).toEqual(l.asArray(true));
 });
 
+test("replace with back to front iterator of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const iterator = l.backToFrontIterator();
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(30);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(20);
+    iterator.replace(40);
+    expect(iterator.value).toBe(40);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(10);
+    expect(iterator.next()).toBe(false);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
+});
+
 test("front to back iterator of empty list", () => {
     const l = new List<number>();
     const iterator = l.frontToBackIterator();
@@ -380,4 +424,20 @@ test("front to back iterator of list", () => {
         t[i] = iterator.value;
     }
     expect(t).toEqual(l.asArray());
+});
+
+test("replace with front to back iterator of list", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    const iterator = l.frontToBackIterator();
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(10);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(20);
+    iterator.replace(40);
+    expect(iterator.value).toBe(40);
+    expect(iterator.next()).toBe(true);
+    expect(iterator.value).toBe(30);
+    expect(iterator.next()).toBe(false);
+    expect(l.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
 });

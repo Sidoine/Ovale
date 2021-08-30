@@ -3,6 +3,7 @@ import { LuaArray, ipairs } from "@wowts/lua";
 interface Iterator<T> {
     value: T;
     next(): boolean;
+    replace(value: T): void;
 }
 
 class ListBackToFrontIterator<T> implements Iterator<T> {
@@ -24,6 +25,13 @@ class ListBackToFrontIterator<T> implements Iterator<T> {
         }
         return false;
     }
+
+    replace(value: T) {
+        if (this.node) {
+            this.node.value = value;
+            this.value = value;
+        }
+    }
 }
 
 class ListFrontToBackIterator<T> implements Iterator<T> {
@@ -44,6 +52,13 @@ class ListFrontToBackIterator<T> implements Iterator<T> {
             return this.remaining >= 0;
         }
         return false;
+    }
+
+    replace(value: T) {
+        if (this.node) {
+            this.node.value = value;
+            this.value = value;
+        }
     }
 }
 
@@ -207,6 +222,13 @@ export class List<T> {
             return node.value;
         }
         return undefined;
+    }
+
+    replaceAt(index: number, value: T) {
+        const node = this.nodeAt(index);
+        if (node) {
+            node.value = value;
+        }
     }
 
     push(value: T) {
