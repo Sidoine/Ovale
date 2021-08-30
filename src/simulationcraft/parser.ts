@@ -13,6 +13,7 @@ import {
     Modifier,
     keywords,
     specialActions,
+    sequenceActions,
     Modifiers,
     unaryOperators,
     SimcUnaryOperatorType,
@@ -20,6 +21,8 @@ import {
     SimcBinaryOperatorType,
     functionKeywords,
     modifierKeywords,
+    TargetIfType,
+    targetIfKeywords,
     litteralModifiers,
     runeOperands,
     ParseNodeWithChilds,
@@ -31,6 +34,7 @@ import {
     NumberParseNode,
 } from "./definitions";
 import { gsub, gmatch, sub } from "@wowts/string";
+import { insert } from "@wowts/table";
 import { DebugTools, Tracer } from "../engine/debug";
 import { concat } from "@wowts/table";
 import { OvalePool } from "../tools/Pool";
@@ -107,60 +111,22 @@ const tokenize: Tokenizer = function (token) {
 const noToken: Tokenizer = function () {
     return [undefined, undefined];
 };
-const tokenMatches: LuaArray<TokenizerDefinition> = {
-    1: {
-        1: "^%d+%a[%w_]*[.:]?[%w_.:]*",
-        2: tokenizeName,
-    },
-    2: {
-        1: "^%d+%.?%d*",
-        2: tokenizeNumber,
-    },
-    3: {
-        1: "^[%a_][%w_]*[.:]?[%w_.:]*",
-        2: tokenizeName,
-    },
-    4: {
-        1: "^!=",
-        2: tokenize,
-    },
-    5: {
-        1: "^<=",
-        2: tokenize,
-    },
-    6: {
-        1: "^>=",
-        2: tokenize,
-    },
-    7: {
-        1: "^!~",
-        2: tokenize,
-    },
-    8: {
-        1: "^==",
-        2: tokenize,
-    },
-    9: {
-        1: "^>%?",
-        2: tokenize,
-    },
-    10: {
-        1: "^<%?",
-        2: tokenize,
-    },
-    11: {
-        1: "^%%%%",
-        2: tokenize,
-    },
-    12: {
-        1: "^.",
-        2: tokenize,
-    },
-    13: {
-        1: "^$",
-        2: noToken,
-    },
-};
+const tokenMatches: LuaArray<TokenizerDefinition> = {};
+{
+    insert(tokenMatches, { 1: "^%d+%a[%w_]+%.?[%w_.]*", 2: tokenizeName });
+    insert(tokenMatches, { 1: "^%d+%.?%d*", 2: tokenizeNumber });
+    insert(tokenMatches, { 1: "^[%w_]+%.?[%w_.]*", 2: tokenizeName });
+    insert(tokenMatches, { 1: "^!=", 2: tokenize });
+    insert(tokenMatches, { 1: "^<=", 2: tokenize });
+    insert(tokenMatches, { 1: "^>=", 2: tokenize });
+    insert(tokenMatches, { 1: "^!~", 2: tokenize });
+    insert(tokenMatches, { 1: "^==", 2: tokenize });
+    insert(tokenMatches, { 1: "^>%?", 2: tokenize });
+    insert(tokenMatches, { 1: "^<%?", 2: tokenize });
+    insert(tokenMatches, { 1: "^%%%%", 2: tokenize });
+    insert(tokenMatches, { 1: "^.", 2: tokenize });
+    insert(tokenMatches, { 1: "^$", 2: noToken });
+}
 
 export class Parser {
     private tracer: Tracer;
@@ -204,155 +170,6 @@ export class Parser {
     //     }
     //     return node;
     // }
-
-    /** Parse an action. An action may has modifiers separated by a comma */
-    private parseAction(
-        action: string,
-        nodeList: LuaArray<ParseNode>,
-        annotation: Annotation,
-        actionListName: string
-    ): ActionParseNode | undefined {
-        let stream = action;
-        {
-            stream = gsub(stream, "||", "|");
-        }
-        {
-            stream = gsub(stream, ",,", ",");
-            stream = gsub(stream, "%&%&", "&");
-            stream = gsub(stream, "target%.target%.", "target.");
-            stream = gsub(stream, "name=name=", "name=");
-            stream = gsub(stream, "name=name=", "name=");
-            stream = gsub(stream, "name=BT&Charge:", "name=BT_Charge:");
-            stream = gsub(stream, "name=BT&Reck:", "name=BT_Reck:");
-        }
-        {
-            // From the Shadows is a target debuff, not a player buff.
-            stream = gsub(
-                stream,
-                "buff%.from_the_shadows%.",
-                "target.debuff.from_the_shadows."
-            );
-        }
-        {
-            stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
-            stream = gsub(stream, "([^_%.])(cooldown_remains)=0", "%1!(%2>0)");
-            stream = gsub(stream, "([a-z_%.]+%.cooldown_remains)=0", "!(%1>0)");
-            stream = gsub(stream, "([^_%.])(remains)=0", "%1!(%2>0)");
-            stream = gsub(stream, "([a-z_%.]+%.remains)=0", "!(%1>0)");
-            stream = gsub(
-                stream,
-                "([^_%.])(ticks_remain)(<?=)([0-9]+)",
-                ticksRemainTranslationHelper
-            );
-            stream = gsub(
-                stream,
-                "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)",
-                ticksRemainTranslationHelper
-            );
-        }
-        {
-            stream = gsub(
-                stream,
-                "%@([a-z_%.]+)<(=?)([0-9]+)",
-                "(%1<%2%3&%1>%2-%3)"
-            );
-            stream = gsub(
-                stream,
-                "%@([a-z_%.]+)>(=?)([0-9]+)",
-                "(%1>%2%3|%1<%2-%3)"
-            );
-        }
-        {
-            stream = gsub(
-                stream,
-                "!([a-z_%.]+)%.cooldown%.up",
-                "%1.cooldown.down"
-            );
-        }
-        {
-            stream = gsub(
-                stream,
-                "!talent%.([a-z_%.]+)%.enabled",
-                "talent.%1.disabled"
-            );
-        }
-        {
-            stream = gsub(stream, ",target_if=first:", ",target_if_first=");
-            stream = gsub(stream, ",target_if=max:", ",target_if_max=");
-            stream = gsub(stream, ",target_if=min:", ",target_if_min=");
-        }
-        {
-            stream = gsub(stream, "sim.target", "sim_target");
-        }
-
-        const tokenStream = new OvaleLexer(
-            "SimulationCraft",
-            stream,
-            tokenMatches
-        );
-        let name;
-        let [tokenType, token] = tokenStream.consume();
-        if (!token) {
-            this.syntaxError(
-                tokenStream,
-                "Warning: end of stream when parsing Action"
-            );
-            return undefined;
-        }
-        if (
-            (tokenType == "keyword" && specialActions[token]) ||
-            tokenType == "name"
-        ) {
-            name = token;
-        } else {
-            this.syntaxError(
-                tokenStream,
-                "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.",
-                token,
-                action
-            );
-            return undefined;
-        }
-
-        const modifiers = childrenPool.get() as Modifiers;
-
-        [tokenType, token] = tokenStream.peek();
-        while (tokenType) {
-            if (tokenType == ",") {
-                tokenStream.consume();
-                const [modifier, expressionNode] = this.parseModifier(
-                    tokenStream,
-                    nodeList,
-                    annotation
-                );
-                if (modifier && expressionNode) {
-                    modifiers[modifier] = expressionNode;
-                    [tokenType, token] = tokenStream.peek();
-                } else {
-                    return undefined;
-                }
-            } else {
-                this.syntaxError(
-                    tokenStream,
-                    "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.",
-                    token,
-                    action
-                );
-                childrenPool.release(modifiers);
-                return undefined;
-            }
-        }
-        const node = newNode<ActionParseNode>(nodeList);
-        node.type = "action";
-        node.action = action;
-        node.name = name;
-        node.actionListName = actionListName;
-        node.modifiers = modifiers;
-        annotation.sync = annotation.sync || {};
-        annotation.sync[name] = annotation.sync[name] || node;
-
-        return node;
-    }
 
     /** Parse an action list (a series of actions separated by "/""). Returns a ParseNode of type "action_list" */
     parseActionList(
@@ -407,6 +224,235 @@ export class Parser {
         return node;
     }
 
+    private parseAction(
+        action: string,
+        nodeList: LuaArray<ParseNode>,
+        annotation: Annotation,
+        actionListName: string
+    ): ActionParseNode | undefined {
+        let stream = action;
+        {
+            stream = gsub(stream, "||", "|");
+        }
+        {
+            stream = gsub(stream, ",,", ",");
+            stream = gsub(stream, "%&%&", "&");
+            stream = gsub(stream, "target%.target%.", "target.");
+            stream = gsub(stream, "name=name=", "name=");
+            stream = gsub(stream, "name=BT&", "name=BT_");
+        }
+        {
+            // From the Shadows is a target debuff, not a player buff.
+            stream = gsub(
+                stream,
+                "buff%.from_the_shadows%.",
+                "target.debuff.from_the_shadows."
+            );
+        }
+        {
+            stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
+            stream = gsub(stream, "([^_%.])(cooldown_remains)=0", "%1!(%2>0)");
+            stream = gsub(stream, "([a-z_%.]+%.cooldown_remains)=0", "!(%1>0)");
+            stream = gsub(stream, "([^_%.])(remains)=0", "%1!(%2>0)");
+            stream = gsub(stream, "([a-z_%.]+%.remains)=0", "!(%1>0)");
+            stream = gsub(
+                stream,
+                "([^_%.])(ticks_remain)(<?=)([0-9]+)",
+                ticksRemainTranslationHelper
+            );
+            stream = gsub(
+                stream,
+                "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)",
+                ticksRemainTranslationHelper
+            );
+        }
+        {
+            stream = gsub(
+                stream,
+                "%@([a-z_%.]+)<(=?)([0-9]+)",
+                "(%1<%2%3&%1>%2-%3)"
+            );
+            stream = gsub(
+                stream,
+                "%@([a-z_%.]+)>(=?)([0-9]+)",
+                "(%1>%2%3|%1<%2-%3)"
+            );
+        }
+        {
+            stream = gsub(
+                stream,
+                "!([a-z_%.]+)%.cooldown%.up",
+                "%1.cooldown.down"
+            );
+        }
+        {
+            stream = gsub(
+                stream,
+                "!talent%.([a-z_%.]+)%.enabled",
+                "talent.%1.disabled"
+            );
+        }
+        {
+            stream = gsub(stream, "sim.target", "sim_target");
+        }
+
+        const tokenStream = new OvaleLexer(
+            "SimulationCraft",
+            stream,
+            tokenMatches
+        );
+        let [tokenType, token] = tokenStream.peek();
+        if (!token) {
+            this.syntaxError(
+                tokenStream,
+                "Warning: end of stream when parsing Action"
+            );
+            return undefined;
+        }
+        if (
+            (tokenType == "keyword" && specialActions[token]) ||
+            tokenType == "name"
+        ) {
+            let node;
+            if (sequenceActions[token]) {
+                node = this.parseSequenceAction(
+                    tokenStream,
+                    nodeList,
+                    annotation,
+                    action
+                );
+            } else {
+                node = this.parseSimpleAction(
+                    tokenStream,
+                    nodeList,
+                    annotation,
+                    action
+                );
+            }
+            if (node) {
+                node.actionListName = actionListName;
+            }
+            return node;
+        } else {
+            tokenStream.consume(); // consume peeked token
+            this.syntaxError(
+                tokenStream,
+                "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.",
+                token,
+                action
+            );
+            return undefined;
+        }
+    }
+
+    /* Parse a simple action.
+     * A simple action may have modifiers separated by a comma.
+     */
+    private parseSimpleAction(
+        tokenStream: OvaleLexer,
+        nodeList: LuaArray<ParseNode>,
+        annotation: Annotation,
+        action: string
+    ): ActionParseNode | undefined {
+        let [tokenType, token] = tokenStream.consume();
+        if (token) {
+            const name = token;
+            const modifiers = childrenPool.get() as Modifiers;
+
+            [tokenType, token] = tokenStream.peek();
+            while (tokenType == ",") {
+                tokenStream.consume();
+                const [modifier, expressionNode] = this.parseModifier(
+                    tokenStream,
+                    nodeList,
+                    annotation
+                );
+                if (modifier && expressionNode) {
+                    modifiers[modifier] = expressionNode;
+                    [tokenType, token] = tokenStream.peek();
+                } else {
+                    this.syntaxError(
+                        tokenStream,
+                        "Warning: missing modifier when parsing simple action '%s' in '%s'.",
+                        name,
+                        action
+                    );
+                    childrenPool.release(modifiers);
+                    return undefined;
+                }
+            }
+            const node = newNode<ActionParseNode>(nodeList);
+            node.type = "action";
+            node.action = action;
+            node.name = name;
+            node.modifiers = modifiers;
+            annotation.sync = annotation.sync || {};
+            annotation.sync[name] = annotation.sync[name] || node;
+            return node;
+        }
+        return undefined;
+    }
+
+    private parseSequenceAction(
+        tokenStream: OvaleLexer,
+        nodeList: LuaArray<ParseNode>,
+        annotation: Annotation,
+        action: string
+    ): ActionParseNode | undefined {
+        let [tokenType, token] = tokenStream.peek();
+        if (!(token && sequenceActions[token])) {
+            tokenStream.consume();
+            this.syntaxError(
+                tokenStream,
+                "Syntax error: unexpected token '%s' when parsing sequence; 'sequence' or 'strict_sequence' expected.",
+                token
+            );
+            return undefined;
+        }
+        const sequenceNode = this.parseSimpleAction(
+            tokenStream,
+            nodeList,
+            annotation,
+            action
+        );
+        if (sequenceNode) {
+            [tokenType, token] = tokenStream.peek();
+            if (tokenType != ":") {
+                tokenStream.consume();
+                this.syntaxError(
+                    tokenStream,
+                    "Syntax error: unexpected token '%s' when parsing sequence; ':' expected.",
+                    token
+                );
+                return undefined;
+            }
+            const sequence = childrenPool.get() as LuaArray<ActionParseNode>;
+            while (token == ":") {
+                tokenStream.consume();
+                const node = this.parseSimpleAction(
+                    tokenStream,
+                    nodeList,
+                    annotation,
+                    action
+                );
+                if (!node) {
+                    this.syntaxError(
+                        tokenStream,
+                        "Warning: missing simple action when parsing sequence action '%s'.",
+                        action
+                    );
+                    childrenPool.release(sequence);
+                    return undefined;
+                }
+                insert(sequence, node);
+                [tokenType, token] = tokenStream.peek();
+            }
+            sequenceNode.sequence = sequence;
+            return sequenceNode;
+        }
+        return undefined;
+    }
+
     private parseExpression(
         tokenStream: OvaleLexer,
         nodeList: LuaArray<ParseNode>,
@@ -415,9 +461,20 @@ export class Parser {
     ): ParseNode | undefined {
         minPrecedence = minPrecedence || 0;
         let node;
+        let targetIf;
 
-        const [tokenType, token] = tokenStream.peek();
+        let [tokenType, token] = tokenStream.peek();
         if (!tokenType) return undefined;
+
+        if (targetIfKeywords[token as TargetIfType]) {
+            const [tokenType2] = tokenStream.peek(2);
+            if (tokenType2 == ":") {
+                targetIf = token as TargetIfType;
+                tokenStream.consume(); // target_if keyword
+                tokenStream.consume(); // :
+                [tokenType, token] = tokenStream.peek();
+            }
+        }
 
         const opInfo: { 1: "logical" | "arithmetic"; 2: number } =
             unaryOperators[token as SimcUnaryOperatorType];
@@ -531,6 +588,7 @@ export class Parser {
                 break;
             }
         }
+        node.targetIf = targetIf;
         return node;
     }
     private parseFunction(

@@ -759,7 +759,15 @@ export class Emiter {
         if (modifier == "if") {
             node = this.emit(parseNode, nodeList, annotation, action);
         } else if (modifier == "target_if") {
-            node = this.emit(parseNode, nodeList, annotation, action);
+            if (parseNode.targetIf) {
+                /* Skip "target_if" for "first:", "max:", and "min:" since
+                 * they only apply for multi-target and are for choosing
+                 * between the targets; in a single-target situation, this
+                 * always evaluates to the current target.
+                 */
+            } else {
+                node = this.emit(parseNode, nodeList, annotation, action);
+            }
         } else if (modifier == "five_stacks" && action == "focus_fire") {
             const value = tonumber(this.unparser.unparse(parseNode));
             if (value == 1) {

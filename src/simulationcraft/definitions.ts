@@ -278,9 +278,6 @@ export interface Modifiers {
     sync_weapons?: ParseNode;
     target?: ParseNode;
     target_if?: ParseNode;
-    target_if_first?: ParseNode;
-    target_if_max?: ParseNode;
-    target_if_min?: ParseNode;
     toggle?: ParseNode;
     travel_speed?: ParseNode;
     type?: ParseNode;
@@ -328,9 +325,12 @@ export type SimcBinaryOperatorType =
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
+export type TargetIfType = "first" | "max" | "min";
+
 interface BaseParseNode {
     nodeId: number;
     asType: NodeType;
+    targetIf?: TargetIfType;
 
     // TODO Used by ActionParseNode, ActionListParseNode, and FunctionParseNode
     name?: string;
@@ -346,6 +346,7 @@ export interface ActionParseNode extends BaseParseNode {
     name: string;
     action: string;
     modifiers: Modifiers;
+    sequence?: LuaArray<ActionParseNode>;
     actionListName: string;
 }
 
@@ -493,9 +494,6 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
     ["sync_weapons"]: true,
     ["target"]: true,
     ["target_if"]: true,
-    ["target_if_first"]: true,
-    ["target_if_max"]: true,
-    ["target_if_min"]: true,
     ["toggle"]: true,
     ["travel_speed"]: true,
     ["type"]: true,
@@ -509,10 +507,16 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
 };
 export const litteralModifiers: LuaObj<boolean> = {
     ["name"]: true,
+    ["op"]: true,
 };
 export const functionKeywords: LuaObj<boolean> = {
     ["ceil"]: true,
     ["floor"]: true,
+};
+export const targetIfKeywords: LuaObj<boolean> = {
+    ["first"]: true,
+    ["max"]: true,
+    ["min"]: true,
 };
 export const specialActions: LuaObj<boolean> = {
     ["apply_poison"]: true,
@@ -542,6 +546,10 @@ export const specialActions: LuaObj<boolean> = {
     ["use_item"]: true,
     ["variable"]: true,
     ["wait"]: true,
+};
+export const sequenceActions: LuaObj<boolean> = {
+    ["sequence"]: true,
+    ["strict_sequence"]: true,
 };
 
 export const enum MiscOperandModifierType {
@@ -911,6 +919,9 @@ export const consumableItems: LuaObj<boolean> = {
         keywords[keyword] = value;
     }
     for (const [keyword, value] of pairs(functionKeywords)) {
+        keywords[keyword] = value;
+    }
+    for (const [keyword, value] of pairs(targetIfKeywords)) {
         keywords[keyword] = value;
     }
     for (const [keyword, value] of pairs(specialActions)) {
