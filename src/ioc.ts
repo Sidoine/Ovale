@@ -3,6 +3,7 @@ import { OvaleScriptsClass } from "./engine/scripts";
 import { OvaleOptionsClass } from "./ui/Options";
 import { OvalePaperDollClass } from "./states/PaperDoll";
 import { OvaleActionBarClass } from "./engine/action-bar";
+import { CombatLogEvent } from "./engine/combat-log-event";
 import { OvaleASTClass } from "./engine/ast";
 import { OvaleAuraClass } from "./states/Aura";
 import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
@@ -69,6 +70,7 @@ export class IoC {
     public baseState: BaseState;
     public bestAction: OvaleBestActionClass;
     public bossMod: OvaleBossModClass;
+    public combatLogEvent: CombatLogEvent;
     public compile: OvaleCompileClass;
     public condition: OvaleConditionClass;
     public conditions: OvaleConditions;
@@ -128,6 +130,7 @@ export class IoC {
         const controls = new Controls();
         const runner = new Runner(this.debug, this.baseState, this.condition);
         this.data = new OvaleDataClass(runner, this.debug);
+        this.combatLogEvent = new CombatLogEvent(this.ovale, this.debug);
         this.equipment = new OvaleEquipmentClass(
             this.ovale,
             this.debug,
@@ -154,7 +157,8 @@ export class IoC {
         this.demonHunterSigils = new OvaleSigilClass(
             this.paperDoll,
             this.ovale,
-            this.spellBook
+            this.spellBook,
+            this.combatLogEvent
         );
         const combat = new OvaleCombatClass(
             this.ovale,
@@ -181,7 +185,8 @@ export class IoC {
             this.debug,
             this.ovale,
             this.spellBook,
-            this.power
+            this.power,
+            this.combatLogEvent
         );
         this.eclipse = new Eclipse(
             this.ovale,
@@ -192,7 +197,12 @@ export class IoC {
             this.spellBook
         );
         this.stance = new OvaleStanceClass(this.debug, this.ovale, this.data);
-        this.enemies = new OvaleEnemiesClass(this.guid, this.ovale, this.debug);
+        this.enemies = new OvaleEnemiesClass(
+            this.guid,
+            this.combatLogEvent,
+            this.ovale,
+            this.debug
+        );
         this.future = new OvaleFutureClass(
             this.data,
             this.aura,
@@ -206,13 +216,15 @@ export class IoC {
             this.debug,
             this.stance,
             this.spellBook,
+            this.combatLogEvent,
             runner
         );
         this.health = new OvaleHealthClass(
             this.guid,
             this.ovale,
             this.options,
-            this.debug
+            this.debug,
+            this.combatLogEvent
         );
         this.lossOfControl = new OvaleLossOfControlClass(
             this.ovale,
@@ -264,7 +276,8 @@ export class IoC {
             combat,
             this.baseState,
             this.aura,
-            this.health
+            this.health,
+            this.combatLogEvent
         );
         this.actionBar = new OvaleActionBarClass(
             this.debug,
@@ -293,19 +306,28 @@ export class IoC {
             this.paperDoll,
             this.spellBook,
             this.future,
-            this.power
+            this.power,
+            this.combatLogEvent
         );
         this.version = new OvaleVersionClass(
             this.ovale,
             this.options,
             this.debug
         );
-        this.damageTaken = new OvaleDamageTakenClass(this.ovale, this.debug);
-        this.spellDamage = new OvaleSpellDamageClass(this.ovale);
+        this.damageTaken = new OvaleDamageTakenClass(
+            this.ovale,
+            this.debug,
+            this.combatLogEvent
+        );
+        this.spellDamage = new OvaleSpellDamageClass(
+            this.ovale,
+            this.combatLogEvent
+        );
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
             this.aura,
             this.ovale,
-            this.paperDoll
+            this.paperDoll,
+            this.combatLogEvent
         );
         this.runes = new OvaleRunesClass(
             this.ovale,
@@ -379,6 +401,7 @@ export class IoC {
         this.bossMod = new OvaleBossModClass(this.ovale, this.debug, combat);
         this.demonHunterDemonic = new OvaleDemonHunterDemonicClass(
             this.aura,
+            this.combatLogEvent,
             this.ovale,
             this.debug
         );

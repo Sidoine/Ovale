@@ -1,48 +1,57 @@
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
-import { LuaArray, LuaObj } from "@wowts/lua";
+import { LuaArray } from "@wowts/lua";
 import { OvaleClass } from "../Ovale";
-import { AceModule } from "@wowts/tsaddon";
-
-const combatLogDamageEvents: LuaObj<boolean> = {
-    SPELL_DAMAGE: true,
-    SPELL_PERIODIC_AURA: true,
-};
+import {
+    CombatLogEvent,
+    DamagePayload,
+    SpellPayloadHeader,
+    SpellPeriodicPayloadHeader,
+} from "../engine/combat-log-event";
 
 export class OvaleSpellDamageClass {
     value: LuaArray<number> = {};
-    private module: AceModule & AceEvent;
 
-    constructor(private ovale: OvaleClass) {
-        this.module = ovale.createModule(
+    constructor(
+        private ovale: OvaleClass,
+        private combatLogEvent: CombatLogEvent
+    ) {
+        ovale.createModule(
             "OvaleSpellDamage",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
     private handleInitialize = () => {
-        this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
+        this.combatLogEvent.registerEvent(
+            "SPELL_DAMAGE",
+            this,
+            this.handleCombatLogEvent
+        );
+        this.combatLogEvent.registerEvent(
+            "SPELL_PERIODIC_DAMAGE",
+            this,
+            this.handleCombatLogEvent
         );
     };
 
     private handleDisable = () => {
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+        this.combatLogEvent.unregisterAllEvents(this);
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [, cleuEvent, , sourceGUID, , , , , , , , arg12, , , arg15] =
-            CombatLogGetCurrentEventInfo();
-        if (sourceGUID == this.ovale.playerGUID) {
-            if (combatLogDamageEvents[cleuEvent]) {
-                const [spellId, amount] = [arg12, arg15];
-                this.value[spellId] = amount;
+    private handleCombatLogEvent = (cleuEvent: string) => {
+        const cleu = this.combatLogEvent;
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
+            let spellId: number | undefined;
+            if (cleu.header.type == "SPELL") {
+                const header = cleu.header as SpellPayloadHeader;
+                spellId = header.spellId;
+            } else if (cleu.header.type == "SPELL_PERIODIC") {
+                const header = cleu.header as SpellPeriodicPayloadHeader;
+                spellId = header.spellId;
+            }
+            if (spellId) {
+                const payload = cleu.payload as DamagePayload;
+                this.value[spellId] = payload.amount;
                 this.ovale.needRefresh();
             }
         }

@@ -2,6 +2,15 @@ import { l } from "../ui/Localization";
 import { DebugTools, Tracer } from "../engine/debug";
 import { OvalePool } from "../tools/Pool";
 import {
+    AuraAppliedPayload,
+    AuraAppliedDosePayload,
+    AuraRemovedPayload,
+    AuraRemovedDosePayload,
+    AuraRefreshPayload,
+    CombatLogEvent,
+    SpellPayloadHeader,
+} from "../engine/combat-log-event";
+import {
     OvaleDataClass,
     SpellAddAurasByType,
     AuraType,
@@ -28,11 +37,7 @@ import {
 } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
-import {
-    GetTime,
-    UnitAura,
-    CombatLogGetCurrentEventInfo,
-} from "@wowts/wow-mock";
+import { GetTime, UnitAura } from "@wowts/wow-mock";
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
@@ -340,7 +345,8 @@ export class OvaleAuraClass
         private ovaleDebug: DebugTools,
         private ovale: OvaleClass,
         private ovaleSpellBook: OvaleSpellBookClass,
-        private ovalePower: OvalePowerClass
+        private ovalePower: OvalePowerClass,
+        private combatLogEvent: CombatLogEvent
     ) {
         super(AuraInterface);
         this.module = ovale.createModule(
@@ -478,10 +484,6 @@ export class OvaleAuraClass
         playerGUID = this.ovale.playerGUID;
         petGUIDs = this.ovaleGuid.petGUID;
         this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
-        );
-        this.module.RegisterEvent(
             "PLAYER_ENTERING_WORLD",
             this.handlePlayerEnteringWorld
         );
@@ -498,48 +500,42 @@ export class OvaleAuraClass
             "Ovale_UnitChanged",
             this.handleUnitChanged
         );
+        this.combatLogEvent.registerEvent(
+            "SPELL_MISSED",
+            this,
+            this.handleCombatLogEvent
+        );
+        for (const [event] of pairs(spellAuraEvents)) {
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
+        }
+        for (const [event] of pairs(spellPeriodicEvents)) {
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
+        }
     };
 
     private handleDisable = () => {
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_UNGHOST");
         this.module.UnregisterEvent("UNIT_AURA");
         this.module.UnregisterMessage("Ovale_GroupChanged");
         this.module.UnregisterMessage("Ovale_UnitChanged");
-        for (const [guid] of pairs(this.current.aura)) {
-            removeAurasOnGUID(this.current.aura, guid);
-        }
+        this.combatLogEvent.unregisterAllEvents(this);
         pool.drain();
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        this.debug.debugTimestamp(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            CombatLogGetCurrentEventInfo()
-        );
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            destGUID,
-            ,
-            ,
-            ,
-            spellId,
-            spellName,
-            ,
-            auraType,
-            amount,
-        ] = CombatLogGetCurrentEventInfo();
+    private handleCombatLogEvent = (cleuEvent: string) => {
+        const cleu = this.combatLogEvent;
+        const sourceGUID = cleu.sourceGUID;
+        const destGUID = cleu.sourceGUID;
         const mine =
             sourceGUID == playerGUID ||
             this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) == playerGUID;
@@ -554,12 +550,14 @@ export class OvaleAuraClass
                 );
                 this.scanAuras(unitId, destGUID);
             }
-        }
-        if (spellAuraEvents[cleuEvent]) {
+        } else if (spellAuraEvents[cleuEvent]) {
+            const header = cleu.header as SpellPayloadHeader;
+            const spellId = header.spellId;
+            const spellName = header.spellName;
             this.ovaleData.registerAuraSeen(spellId);
             const [unitId] = this.ovaleGuid.getUnitByGUID(destGUID);
-            this.debug.debugTimestamp("UnitId: ", unitId);
             if (unitId) {
+                this.debug.debugTimestamp("UnitId: ", unitId);
                 if (!this.ovaleGuid.unitAuraUnits[unitId]) {
                     this.debug.debugTimestamp(
                         "%s: %s (%s)",
@@ -585,8 +583,27 @@ export class OvaleAuraClass
                 ) {
                     this.lostAuraOnGUID(destGUID, now, spellId, sourceGUID);
                 } else {
+                    const suffix = cleu.payload.type;
+                    let auraType = undefined;
+                    if (suffix == "AURA_APPLIED") {
+                        const payload = cleu.payload as AuraAppliedPayload;
+                        auraType = payload.auraType;
+                    } else if (suffix == "AURA_REMOVED") {
+                        const payload = cleu.payload as AuraRemovedPayload;
+                        auraType = payload.auraType;
+                    } else if (suffix == "AURA_APPLIED_DOSE") {
+                        const payload = cleu.payload as AuraAppliedDosePayload;
+                        auraType = payload.auraType;
+                    } else if (suffix == "AURA_REMOVED_DOSE") {
+                        const payload = cleu.payload as AuraRemovedDosePayload;
+                        auraType = payload.auraType;
+                    } else if (suffix == "AURA_REFRESH") {
+                        const payload = cleu.payload as AuraRefreshPayload;
+                        auraType = payload.auraType;
+                    }
                     const filter: AuraType =
-                        (auraType == "BUFF" && "HELPFUL") || "HARMFUL";
+                        (auraType && auraType == "BUFF" && "HELPFUL") ||
+                        "HARMFUL";
                     const si = this.ovaleData.spellInfo[spellId];
                     const aura = getAuraOnGUID(
                         this.current.aura,
@@ -607,14 +624,15 @@ export class OvaleAuraClass
                         ) || [15];
                     }
                     const expirationTime = now + duration;
-                    let count;
+                    let count = 1;
                     if (cleuEvent == "SPELL_AURA_APPLIED") {
                         count = 1;
-                    } else if (
-                        cleuEvent == "SPELL_AURA_APPLIED_DOSE" ||
-                        cleuEvent == "SPELL_AURA_REMOVED_DOSE"
-                    ) {
-                        count = amount;
+                    } else if (cleuEvent == "SPELL_AURA_APPLIED_DOSE") {
+                        const payload = cleu.payload as AuraAppliedDosePayload;
+                        count = payload.amount;
+                    } else if (cleuEvent == "SPELL_AURA_REMOVED_DOSE") {
+                        const payload = cleu.payload as AuraRemovedDosePayload;
+                        count = payload.amount;
                     } else if (cleuEvent == "SPELL_AURA_REFRESH") {
                         count = (aura && aura.stacks) || 1;
                     }
@@ -636,6 +654,8 @@ export class OvaleAuraClass
                 }
             }
         } else if (mine && spellPeriodicEvents[cleuEvent] && playerGUID) {
+            const header = cleu.header as SpellPayloadHeader;
+            const spellId = header.spellId;
             this.ovaleData.registerAuraSeen(spellId);
             this.debug.debugTimestamp("%s: %s", cleuEvent, destGUID);
             const aura = getAura(

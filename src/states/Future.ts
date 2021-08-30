@@ -20,7 +20,6 @@ import {
     kpairs,
     unpack,
 } from "@wowts/lua";
-import { sub } from "@wowts/string";
 import { insert, remove } from "@wowts/table";
 import {
     GetSpellInfo,
@@ -30,7 +29,6 @@ import {
     UnitChannelInfo,
     UnitExists,
     UnitGUID,
-    CombatLogGetCurrentEventInfo,
 } from "@wowts/wow-mock";
 import { OvaleStateClass, StateModule, States } from "../engine/state";
 import { OvaleCooldownClass } from "./Cooldown";
@@ -38,6 +36,11 @@ import { BaseState } from "./BaseState";
 import { isNumber } from "../tools/tools";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
+import {
+    CombatLogEvent,
+    DamagePayload,
+    SpellPayloadHeader,
+} from "../engine/combat-log-event";
 import { Tracer, DebugTools } from "../engine/debug";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
@@ -169,6 +172,7 @@ export class OvaleFutureClass
         ovaleDebug: DebugTools,
         private ovaleStance: OvaleStanceClass,
         private ovaleSpellBook: OvaleSpellBookClass,
+        private combatLogEvent: CombatLogEvent,
         private runner: Runner
     ) {
         super(OvaleFutureData);
@@ -234,10 +238,6 @@ export class OvaleFutureClass
 
     private handleInitialize = () => {
         this.module.RegisterEvent(
-            "COMBAT_LOG_EVENT_UNFILTERED",
-            this.handleCombatLogEventUnfiltered
-        );
-        this.module.RegisterEvent(
             "PLAYER_ENTERING_WORLD",
             this.handlePlayerEnteringWorld
         );
@@ -290,12 +290,18 @@ export class OvaleFutureClass
             "Ovale_AuraChanged",
             this.handleAuraChanged
         );
+        for (const [event] of pairs(spellCastEvents)) {
+            this.combatLogEvent.registerEvent(
+                event,
+                this,
+                this.handleCombatLogEvent
+            );
+        }
         this.lastSpell.registerSpellcastInfo(this);
     };
 
     private handleDisable = () => {
         this.lastSpell.unregisterSpellcastInfo(this);
-        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
         this.module.UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
@@ -310,96 +316,99 @@ export class OvaleFutureClass
         this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.module.UnregisterMessage("Ovale_AuraAdded");
         this.module.UnregisterMessage("Ovale_AuraChanged");
+        this.combatLogEvent.unregisterAllEvents(this);
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        // this.tracer.DebugTimestamp(
-        //     "COMBAT_LOG_EVENT_UNFILTERED",
-        //     CombatLogGetCurrentEventInfo()
-        // );
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            sourceName,
-            ,
-            ,
-            destGUID,
-            destName,
-            ,
-            ,
-            spellId,
-            spellName,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            isOffHand,
-        ] = CombatLogGetCurrentEventInfo();
+    private handleCombatLogEvent = (cleuEvent: string) => {
+        const cleu = this.combatLogEvent;
+        const sourceGUID = cleu.sourceGUID;
+        const sourceName = cleu.sourceName;
+        const destGUID = cleu.destGUID;
+        const destName = cleu.destName;
         if (
             sourceGUID == this.ovale.playerGUID ||
             this.ovaleGuid.getOwnerGUIDByGUID(sourceGUID) ==
                 this.ovale.playerGUID
         ) {
-            if (spellCastEvents[cleuEvent]) {
+            const header = cleu.header as SpellPayloadHeader;
+            const spellId = header.spellId;
+            const spellName = header.spellName;
+            if (
+                (cleuEvent == "SPELL_CAST_FAILED" ||
+                    cleuEvent == "SPELL_CAST_START" ||
+                    cleuEvent == "SPELL_CAST_SUCCESS") &&
+                destName &&
+                destName != ""
+            ) {
+                this.tracer.debugTimestamp(
+                    cleuEvent,
+                    cleu.getCurrentEventInfo()
+                );
                 const now = GetTime();
+                const [spellcast] = this.getSpellcast(
+                    spellName,
+                    spellId,
+                    undefined,
+                    now
+                );
                 if (
-                    sub(cleuEvent, 1, 11) == "SPELL_CAST_" &&
-                    destName &&
-                    destName != ""
+                    spellcast &&
+                    spellcast.targetName &&
+                    spellcast.targetName == destName &&
+                    spellcast.target != destGUID
                 ) {
-                    this.tracer.debugTimestamp(
-                        "CLEU",
-                        cleuEvent,
-                        sourceName,
-                        sourceGUID,
-                        destName,
-                        destGUID,
-                        spellId,
-                        spellName
-                    );
-                    const [spellcast] = this.getSpellcast(
+                    this.tracer.debug(
+                        "Disambiguating target of spell %s (%d) to %s (%s).",
                         spellName,
                         spellId,
-                        undefined,
-                        now
+                        destName,
+                        destGUID
                     );
+                    spellcast.target = destGUID;
+                }
+            }
+            this.tracer.debugTimestamp(cleuEvent, cleu.getCurrentEventInfo());
+            let finish: "hit" | "miss" | undefined =
+                spellCastFinishEvents[cleuEvent];
+            if (cleu.payload.type == "DAMAGE") {
+                const payload = cleu.payload as DamagePayload;
+                if (payload.isOffHand) {
+                    finish = undefined;
+                }
+            }
+            if (finish) {
+                let anyFinished = false;
+                for (let i = lualength(this.lastSpell.queue); i >= 1; i += -1) {
+                    const spellcast = this.lastSpell.queue[i];
                     if (
-                        spellcast &&
-                        spellcast.targetName &&
-                        spellcast.targetName == destName &&
-                        spellcast.target != destGUID
+                        spellcast.success &&
+                        (spellcast.spellId == spellId ||
+                            spellcast.auraId == spellId)
                     ) {
-                        this.tracer.debug(
-                            "Disambiguating target of spell %s (%d) to %s (%s).",
-                            spellName,
-                            spellId,
-                            destName,
-                            destGUID
-                        );
-                        spellcast.target = destGUID;
+                        if (
+                            this.finishSpell(
+                                spellcast,
+                                cleuEvent,
+                                sourceName,
+                                sourceGUID,
+                                destName,
+                                destGUID,
+                                spellId,
+                                spellName,
+                                finish,
+                                i
+                            )
+                        ) {
+                            anyFinished = true;
+                        }
                     }
                 }
-                this.tracer.debugTimestamp("CLUE", cleuEvent);
-                let finish: "hit" | "miss" | undefined =
-                    spellCastFinishEvents[cleuEvent];
-                if (cleuEvent == "SPELL_DAMAGE" || cleuEvent == "SPELL_HEAL") {
-                    if (isOffHand) {
-                        finish = undefined;
-                    }
-                }
-                if (finish) {
-                    let anyFinished = false;
+                if (!anyFinished) {
+                    this.tracer.debug(
+                        "Found no spell to finish for %s (%d)",
+                        spellName,
+                        spellId
+                    );
                     for (
                         let i = lualength(this.lastSpell.queue);
                         i >= 1;
@@ -408,8 +417,7 @@ export class OvaleFutureClass
                         const spellcast = this.lastSpell.queue[i];
                         if (
                             spellcast.success &&
-                            (spellcast.spellId == spellId ||
-                                spellcast.auraId == spellId)
+                            spellcast.spellName == spellName
                         ) {
                             if (
                                 this.finishSpell(
@@ -431,45 +439,10 @@ export class OvaleFutureClass
                     }
                     if (!anyFinished) {
                         this.tracer.debug(
-                            "Found no spell to finish for %s (%d)",
+                            "No spell found for %s",
                             spellName,
                             spellId
                         );
-                        for (
-                            let i = lualength(this.lastSpell.queue);
-                            i >= 1;
-                            i += -1
-                        ) {
-                            const spellcast = this.lastSpell.queue[i];
-                            if (
-                                spellcast.success &&
-                                spellcast.spellName == spellName
-                            ) {
-                                if (
-                                    this.finishSpell(
-                                        spellcast,
-                                        cleuEvent,
-                                        sourceName,
-                                        sourceGUID,
-                                        destName,
-                                        destGUID,
-                                        spellId,
-                                        spellName,
-                                        finish,
-                                        i
-                                    )
-                                ) {
-                                    anyFinished = true;
-                                }
-                            }
-                        }
-                        if (!anyFinished) {
-                            this.tracer.debug(
-                                "No spell found for %s",
-                                spellName,
-                                spellId
-                            );
-                        }
                     }
                 }
             }
