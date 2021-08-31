@@ -128,6 +128,9 @@ export interface LocalizationStrings {
     ["small_icon_scale"]?: string;
     ["font_scale"]?: string;
     ["second_icon_scale"]?: string;
+    ["predictiveIcon"]?: string;
+    ["numberOfIcons"]?: string;
+    ["numberOfIconsDesc"]?: string;
     ["talents"]?: string;
     ["simulationcraft_profile_content"]?: string;
     ["simulationcraft_profile_translated"]?: string;

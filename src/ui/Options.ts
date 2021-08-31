@@ -149,7 +149,7 @@ export class OvaleOptionsClass {
                 frequentHealthUpdates: true,
                 auraLag: 400,
                 moving: false,
-                numberOfIcons: 4,
+                numberOfIcons: 1,
                 spellFlash: {
                     enabled: true,
                     brightness: 1,
@@ -531,28 +531,31 @@ export class OvaleOptionsClass {
                     },
                 },
             },
-            // predictiveIcon: {
-            //     order: 70,
-            //     type: "group",
-            //     name: L["two_abilities"],
-            //     args: {
-            //         predictif: {
-            //             order: 10,
-            //             type: "toggle",
-            //             name: L["two_abilities"],
-            //             desc: L["two_icons"],
-            //         },
-            //         secondIconScale: {
-            //             order: 20,
-            //             type: "range",
-            //             name: L["second_icon_scale"],
-            //             min: 0.2,
-            //             max: 1,
-            //             bigStep: 0.01,
-            //             isPercent: true,
-            //         },
-            //     },
-            // },
+            predictiveIcon: {
+                order: 70,
+                type: "group",
+                name: l["predictiveIcon"],
+                args: {
+                    numberOfIcons: {
+                        order: 10,
+                        type: "range",
+                        min: 1,
+                        max: 5,
+                        step: 1,
+                        name: l["numberOfIcons"],
+                        desc: l["numberOfIconsDesc"],
+                    },
+                    secondIconScale: {
+                        order: 20,
+                        type: "range",
+                        name: l["second_icon_scale"],
+                        min: 0.2,
+                        max: 1,
+                        bigStep: 0.01,
+                        isPercent: true,
+                    },
+                },
+            },
             advanced: {
                 order: 80,
                 type: "group",

@@ -438,7 +438,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     this.iconsFrame,
                     "TOPLEFT",
                     (action.left + action.dy * (i - 1)) / action.scale,
-                    (action.top + action.dx * (i - 1)) / action.scale -
+                    (action.top - action.dx * (i - 1)) / action.scale -
                         dragHandlerHeight -
                         profile.apparence.margin
                 );
