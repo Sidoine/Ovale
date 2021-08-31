@@ -1162,10 +1162,10 @@
     typescript "^4.3.5"
     webdav "^3.6.2"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.31.1", "@wowts/wow-mock@^1.6.0":
-  version "1.32.1"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.1.tgz#28ba2485a9a8dcd475a7720886681f2480451b6e"
-  integrity sha512-V69FRVYw6o+mBz8oLHvZ2e3jL55dhen7lt0tLu96p70QhoBbd2RKZWPuCO78Ce6OV95WRUBrKOFgvcKypJ381A==
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.32.2", "@wowts/wow-mock@^1.6.0":
+  version "1.32.2"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.2.tgz#af17859bed5a5f134813d1b9989e3f4524f6eb00"
+  integrity sha512-9Jogbdqm9UVv1oBd0jACM9erbHdPdPrWfU/P2ZvXmFBTZbiXjzTB8z7aFuNfvw1cb62Qrrs7mE8WQ1kKxvMt6g==
   dependencies:
     "@wowts/lua" "^1.6.0"
     "@wowts/table" "^1.0.2"
@@ -1976,10 +1976,10 @@ cssstyle@^2.3.0:
   dependencies:
     cssom "~0.3.6"
 
-csv-parse@^4.16.0:
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.16.0.tgz#b4c875e288a41f7ff917cb0d7d45880d563034f6"
-  integrity sha512-Zb4tGPANH4SW0LgC9+s9Mnequs9aqn7N3/pCqNbVjs2XhEF6yWNU2Vm4OGl1v2Go9nw8rXt87Cm2QN/o6Vpqgg==
+csv-parse@^4.16.2:
+  version "4.16.2"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.16.2.tgz#cd7d25e9b9e1430ac6aa5ed9b5c1685e72d4a8d8"
+  integrity sha512-eq2BhB6JiIJaNv61pH5EC+o/iyCBxT+g6ukLu2UoNyS5daCN8YlzhOsLHGt/t9sGraMYt/aizaXPLQoNvxlIMw==
 
 dargs@^7.0.0:
   version "7.0.0"
