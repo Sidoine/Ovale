@@ -355,7 +355,7 @@ export class OvaleFutureClass
                     spellcast &&
                     spellcast.targetName &&
                     spellcast.targetName == destName &&
-                    spellcast.target != destGUID
+                    spellcast.targetGuid != destGUID
                 ) {
                     this.tracer.debug(
                         "Disambiguating target of spell %s (%d) to %s (%s).",
@@ -364,7 +364,7 @@ export class OvaleFutureClass
                         destName,
                         destGUID
                     );
-                    spellcast.target = destGUID;
+                    spellcast.targetGuid = destGUID;
                 }
             }
             this.tracer.debugTimestamp(cleuEvent, cleu.getCurrentEventInfo());
@@ -546,7 +546,7 @@ export class OvaleFutureClass
                 }
             }
             const delta = now - spellcast.stop;
-            const targetGUID = spellcast.target;
+            const targetGUID = spellcast.targetGuid;
             this.tracer.debug(
                 "Spell %s (%d) was in flight for %f seconds.",
                 spellName,
@@ -612,7 +612,7 @@ export class OvaleFutureClass
                     this.updateCounters(
                         spellId,
                         spellcast.start,
-                        spellcast.target
+                        spellcast.targetGuid
                     );
                     this.ovale.needRefresh();
                 } else if (!name) {
@@ -660,7 +660,7 @@ export class OvaleFutureClass
                 );
                 spellcast.stop = now;
                 this.updateLastSpellcast(now, spellcast);
-                const targetGUID = spellcast.target;
+                const targetGUID = spellcast.targetGuid;
                 remove(this.lastSpell.queue, index);
                 lastSpellCastPool.release(spellcast);
                 this.ovale.needRefresh();
@@ -817,7 +817,7 @@ export class OvaleFutureClass
                         }
                     }
                 }
-                spellcast.target = targetGUID || "unknown";
+                spellcast.targetGuid = targetGUID || "unknown";
                 this.tracer.debug(
                     "Queueing (%d) spell %s to %s (possibly %s).",
                     lualength(this.lastSpell.queue),
@@ -826,7 +826,7 @@ export class OvaleFutureClass
                     targetGUID
                 );
             } else {
-                spellcast.target = targetGUID || "unknown";
+                spellcast.targetGuid = targetGUID || "unknown";
                 this.tracer.debug(
                     "Queueing (%d) spell %s to %s (%s).",
                     lualength(this.lastSpell.queue),
@@ -922,7 +922,7 @@ export class OvaleFutureClass
                 );
                 const [auraId, auraGUID] = this.getAuraFinish(
                     spellId,
-                    spellcast.target,
+                    spellcast.targetGuid,
                     now
                 );
                 if (auraId && auraGUID) {
@@ -1005,7 +1005,7 @@ export class OvaleFutureClass
                         );
                         const [auraId, auraGUID] = this.getAuraFinish(
                             spellId,
-                            spellcast.target,
+                            spellcast.targetGuid,
                             now
                         );
                         if (auraId && auraGUID) {
@@ -1030,7 +1030,7 @@ export class OvaleFutureClass
                     }
                 }
                 if (success) {
-                    const targetGUID = spellcast.target;
+                    const targetGUID = spellcast.targetGuid;
                     this.updateLastSpellcast(now, spellcast);
                     if (!spellcast.offgcd)
                         this.next.pushGCDSpellId(spellcast.spellId);
@@ -1295,7 +1295,7 @@ export class OvaleFutureClass
         if (spellcast.spellId) {
             spellcast.damageMultiplier = this.getDamageMultiplier(
                 spellcast.spellId,
-                spellcast.target,
+                spellcast.targetGuid,
                 atTime
             );
         }
@@ -1416,7 +1416,7 @@ export class OvaleFutureClass
                     atTime,
                     spellcast.spellName,
                     spellcast.targetName,
-                    spellcast.target,
+                    spellcast.targetGuid,
                     spellcast.queued
                 );
             } else {
@@ -1679,7 +1679,7 @@ export class OvaleFutureClass
 
     applySpell(
         spellId: number,
-        targetGUID: string,
+        targetGUID: string | undefined,
         startCast: number,
         endCast?: number,
         channel?: boolean,
@@ -1707,7 +1707,7 @@ export class OvaleFutureClass
                 spellcast.spellName =
                     this.ovaleSpellBook.getSpellName(spellId) ||
                     "unknown spell";
-                spellcast.target = targetGUID;
+                spellcast.targetGuid = targetGUID;
                 spellcast.targetName =
                     this.ovaleGuid.getNameByGUID(targetGUID) || "target";
                 spellcast.start = startCast;
@@ -1803,14 +1803,14 @@ export class OvaleFutureClass
                     description = "in flight";
                 }
                 if (isValid) {
-                    if (spellcast.target) {
+                    if (spellcast.targetGuid) {
                         this.tracer.log(
                             "Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f, start=%f",
                             spellcast.spellName,
                             spellcast.spellId,
                             description,
                             spellcast.targetName,
-                            spellcast.target,
+                            spellcast.targetGuid,
                             now,
                             spellcast.stop,
                             spellcast.start
@@ -1828,20 +1828,20 @@ export class OvaleFutureClass
                     }
                     this.applySpell(
                         spellcast.spellId,
-                        spellcast.target,
+                        spellcast.targetGuid,
                         spellcast.start,
                         spellcast.stop,
                         spellcast.channel,
                         spellcast
                     );
                 } else {
-                    if (spellcast.target) {
+                    if (spellcast.targetGuid) {
                         this.tracer.debug(
                             "Warning: removing active spell %s (%d) to %s (%s) that should have finished.",
                             spellcast.spellName,
                             spellcast.spellId,
                             spellcast.targetName,
-                            spellcast.target
+                            spellcast.targetGuid
                         );
                     } else {
                         this.tracer.debug(

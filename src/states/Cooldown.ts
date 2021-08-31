@@ -273,7 +273,7 @@ export class OvaleCooldownClass
                 spellId,
                 spellcast.start,
                 "gcd",
-                spellcast.target
+                spellcast.targetGuid
             );
             if (gcd && gcd == 0) {
                 spellcast.offgcd = true;

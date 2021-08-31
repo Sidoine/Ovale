@@ -945,7 +945,7 @@ export class OvaleAuraClass
                         spellcast = undefined;
                     }
                 }
-                if (spellcast && spellcast.target == guid) {
+                if (spellcast && spellcast.targetGuid == guid) {
                     const spellId = spellcast.spellId;
                     const spellName =
                         this.ovaleSpellBook.getSpellName(spellId) ||
@@ -972,7 +972,7 @@ export class OvaleAuraClass
                         );
                         if (!auraIsActive) {
                             aura.baseTick = si.tick;
-                            if (spellcast && spellcast.target == guid) {
+                            if (spellcast && spellcast.targetGuid == guid) {
                                 aura.tick = this.getTickLength(auraId, atTime);
                             } else {
                                 aura.tick = this.getTickLength(auraId);

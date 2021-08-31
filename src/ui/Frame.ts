@@ -49,12 +49,13 @@ import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
 import { l } from "./Localization";
 import { OvaleScriptsClass } from "../engine/scripts";
 import { OvaleActionBarClass } from "../engine/action-bar";
+import { Guids } from "../engine/guid";
 
 const infinity = huge;
 const dragHandlerHeight = 8;
 
 interface Action {
-    icons: OvaleIcon;
+    icons: LuaArray<OvaleIcon>;
     spellId?: number | string;
     waitStart?: number;
     left: number;
@@ -250,6 +251,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
             let top = 0;
             let maxHeight = 0;
             let maxWidth = 0;
+            const now = GetTime();
 
             for (const [k, node] of ipairs(iconNodes)) {
                 const icon = this.actions[k];
@@ -265,7 +267,9 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                         maxWidth,
                         maxHeight
                     );
-                    icon.icons.Show();
+                    for (const [, v] of ipairs(icon.icons)) {
+                        v.Show();
+                    }
                     let start;
                     if (element.type === "action" && element.offgcd) {
                         start = element.timeSpan.nextTime(
@@ -275,7 +279,13 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                         start = element.timeSpan.nextTime(atTime);
                     }
                     if (profile.apparence.enableIcons) {
-                        this.updateActionIcon(icon, element, start || 0);
+                        this.updateActionIcon(
+                            icon,
+                            element,
+                            start || 0,
+                            now,
+                            node
+                        );
                     }
                     if (profile.apparence.spellFlash.enabled) {
                         this.ovaleSpellFlash.flash(
@@ -288,7 +298,9 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     }
                 } else {
                     this.ovaleSpellFlash.hideFlash(k);
-                    icon.icons.Hide();
+                    for (const [, v] of ipairs(icon.icons)) {
+                        v.Hide();
+                    }
                 }
             }
             this.updateDragHandle(maxWidth, maxHeight);
@@ -303,109 +315,134 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         action: Action,
         element: AstNodeSnapshot,
         start: number,
-        now?: number
+        now: number,
+        node: AstIconNode
     ) {
         const profile = this.ovaleOptions.db.profile;
         const icons = action.icons;
-        now = now || GetTime();
-        if (element.type == "value") {
-            let value;
-            if (isNumber(element.value) && element.origin && element.rate) {
-                value = element.value + (now - element.origin) * element.rate;
+        for (let i = 1; i <= profile.apparence.numberOfIcons; i++) {
+            if (i > 1) {
+                if (element.type === "action") {
+                    if (
+                        element.actionType === "spell" &&
+                        isNumber(element.actionId)
+                    ) {
+                        const atTime = this.ovaleFuture.next.nextCast;
+                        start = element.timeSpan.nextTime(atTime) || huge;
+                        this.ovaleFuture.applySpell(
+                            element.actionId,
+                            this.guids.getUnitGUID(
+                                element.actionTarget || "target"
+                            ),
+                            start
+                        );
+                        this.ovaleBestAction.startNewAction();
+                        element = this.ovaleBestAction.getAction(node, atTime);
+                    }
+                }
             }
-            this.tracer.log("GetAction: start=%s, value=%f", start, value);
-            icons.setValue(value, undefined);
-        } else if (element.type === "none") {
-            icons.setValue(undefined, undefined);
-        } else if (element.type === "action") {
-            if (
-                element.actionResourceExtend &&
-                element.actionResourceExtend > 0
-            ) {
+            const icon = icons[i];
+            if (element.type == "value") {
+                let value;
+                if (isNumber(element.value) && element.origin && element.rate) {
+                    value =
+                        element.value + (now - element.origin) * element.rate;
+                }
+                this.tracer.log("GetAction: start=%s, value=%f", start, value);
+                icon.setValue(value, undefined);
+            } else if (element.type === "none") {
+                icon.setValue(undefined, undefined);
+            } else if (element.type === "action") {
                 if (
-                    element.actionCooldownDuration &&
-                    element.actionCooldownDuration > 0
+                    element.actionResourceExtend &&
+                    element.actionResourceExtend > 0
                 ) {
-                    this.tracer.log(
-                        "Extending cooldown of spell ID '%s' for primary resource by %fs.",
-                        element.actionId,
-                        element.actionResourceExtend
-                    );
-                    element.actionCooldownDuration =
-                        element.actionCooldownDuration +
-                        element.actionResourceExtend;
-                } else if (
-                    element.options &&
-                    element.options.pool_resource == 1
+                    if (
+                        element.actionCooldownDuration &&
+                        element.actionCooldownDuration > 0
+                    ) {
+                        this.tracer.log(
+                            "Extending cooldown of spell ID '%s' for primary resource by %fs.",
+                            element.actionId,
+                            element.actionResourceExtend
+                        );
+                        element.actionCooldownDuration =
+                            element.actionCooldownDuration +
+                            element.actionResourceExtend;
+                    } else if (
+                        element.options &&
+                        element.options.pool_resource == 1
+                    ) {
+                        this.tracer.log(
+                            "Delaying spell ID '%s' for primary resource by %fs.",
+                            element.actionId,
+                            element.actionResourceExtend
+                        );
+                        start = start + element.actionResourceExtend;
+                    }
+                }
+
+                this.tracer.log(
+                    "GetAction: start=%s, id=%s",
+                    start,
+                    element.actionId
+                );
+                if (
+                    element.actionType == "spell" &&
+                    element.actionId ==
+                        this.ovaleFuture.next.currentCast.spellId &&
+                    start &&
+                    this.ovaleFuture.next.nextCast &&
+                    start < this.ovaleFuture.next.nextCast
                 ) {
-                    this.tracer.log(
-                        "Delaying spell ID '%s' for primary resource by %fs.",
-                        element.actionId,
-                        element.actionResourceExtend
+                    start = this.ovaleFuture.next.nextCast;
+                }
+                icon.update(element, start);
+                if (element.actionType == "spell") {
+                    action.spellId = element.actionId;
+                } else {
+                    action.spellId = undefined;
+                }
+                if (start && start <= now && element.actionUsable) {
+                    action.waitStart = action.waitStart || now;
+                } else {
+                    action.waitStart = undefined;
+                }
+                if (
+                    profile.apparence.moving &&
+                    icon.cooldownStart &&
+                    icon.cooldownEnd
+                ) {
+                    let ratio =
+                        1 -
+                        (now - icon.cooldownStart) /
+                            (icon.cooldownEnd - icon.cooldownStart);
+                    if (ratio < 0) {
+                        ratio = 0;
+                    } else if (ratio > 1) {
+                        ratio = 1;
+                    }
+                    icon.setPoint(
+                        "TOPLEFT",
+                        this.iconsFrame,
+                        "TOPLEFT",
+                        (action.left + ratio * action.dx) / action.scale,
+                        (action.top + ratio * action.dy) / action.scale
                     );
-                    start = start + element.actionResourceExtend;
                 }
             }
 
-            this.tracer.log(
-                "GetAction: start=%s, id=%s",
-                start,
-                element.actionId
-            );
-            if (
-                element.actionType == "spell" &&
-                element.actionId == this.ovaleFuture.next.currentCast.spellId &&
-                start &&
-                this.ovaleFuture.next.nextCast &&
-                start < this.ovaleFuture.next.nextCast
-            ) {
-                start = this.ovaleFuture.next.nextCast;
-            }
-            icons.update(element, start);
-            if (element.actionType == "spell") {
-                action.spellId = element.actionId;
-            } else {
-                action.spellId = undefined;
-            }
-            if (start && start <= now && element.actionUsable) {
-                action.waitStart = action.waitStart || now;
-            } else {
-                action.waitStart = undefined;
-            }
-            if (
-                profile.apparence.moving &&
-                icons.cooldownStart &&
-                icons.cooldownEnd
-            ) {
-                let ratio =
-                    1 -
-                    (now - icons.cooldownStart) /
-                        (icons.cooldownEnd - icons.cooldownStart);
-                if (ratio < 0) {
-                    ratio = 0;
-                } else if (ratio > 1) {
-                    ratio = 1;
-                }
-                icons.setPoint(
+            if (!profile.apparence.moving) {
+                icon.setPoint(
                     "TOPLEFT",
                     this.iconsFrame,
                     "TOPLEFT",
-                    (action.left + ratio * action.dx) / action.scale,
-                    (action.top + ratio * action.dy) / action.scale
+                    (action.left + action.dy * (i - 1)) / action.scale,
+                    (action.top - action.dx * (i - 1)) / action.scale -
+                        dragHandlerHeight -
+                        profile.apparence.margin
                 );
             }
-        }
-
-        if (!profile.apparence.moving) {
-            icons.setPoint(
-                "TOPLEFT",
-                this.iconsFrame,
-                "TOPLEFT",
-                action.left / action.scale,
-                action.top / action.scale -
-                    dragHandlerHeight -
-                    profile.apparence.margin
-            );
         }
     }
 
@@ -566,8 +603,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
 
     updateIcons() {
         for (const [, action] of pairs(this.actions)) {
-            action.icons.Hide();
-            action.icons.Hide();
+            for (const [, icon] of ipairs(action.icons)) icon.Hide();
         }
         const profile = this.ovaleOptions.db.profile;
         this.frame.EnableMouse(!profile.apparence.clickThru);
@@ -576,15 +612,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         for (const [k, node] of ipairs(iconNodes)) {
             if (!this.actions[k]) {
                 this.actions[k] = {
-                    icons: new OvaleIcon(
-                        k,
-                        `Icon${k}`,
-                        this,
-                        false,
-                        this.ovaleOptions,
-                        this.ovaleSpellBook,
-                        this.actionBar
-                    ),
+                    icons: {},
                     dx: 0,
                     dy: 0,
                     left: 0,
@@ -593,40 +621,55 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                 };
             }
             const action = this.actions[k];
-            let newScale;
-            if (
-                node.rawNamedParams.size != undefined &&
-                node.rawNamedParams.size.type === "string" &&
-                node.rawNamedParams.size.value === "small"
-            ) {
-                newScale = profile.apparence.smallIconScale;
-            } else {
-                newScale = profile.apparence.iconScale;
-            }
 
-            action.scale = newScale;
+            for (let i = 1; i <= profile.apparence.numberOfIcons; i++) {
+                let icon = action.icons[i];
+                if (icon === undefined) {
+                    icon = new OvaleIcon(
+                        k,
+                        `Icon${k}${i}`,
+                        this,
+                        false,
+                        this.ovaleOptions,
+                        this.ovaleSpellBook,
+                        this.actionBar
+                    );
+                    action.icons[i] = icon;
+                }
 
-            let icon: OvaleIcon;
-            icon = action.icons;
-            let scale = action.scale;
-            icon.setScale(scale);
-            icon.setRemainsFont(profile.apparence.remainsFontColor);
-            icon.setFontScale(profile.apparence.fontScale);
-            icon.setParams(node.rawPositionalParams, node.rawNamedParams);
-            icon.setHelp(
-                (node.rawNamedParams.help != undefined &&
-                    node.rawNamedParams.help.type === "string" &&
-                    node.rawNamedParams.help.value) ||
-                    undefined
-            );
-            icon.setRangeIndicator(profile.apparence.targetText);
-            icon.enableMouse(!profile.apparence.clickThru);
-            icon.frame.SetAlpha(profile.apparence.alpha);
-            icon.cdShown = true;
-            if (this.skinGroup) {
-                this.skinGroup.AddButton(icon.frame);
+                let newScale;
+                if (
+                    node.rawNamedParams.size != undefined &&
+                    node.rawNamedParams.size.type === "string" &&
+                    node.rawNamedParams.size.value === "small"
+                ) {
+                    newScale = profile.apparence.smallIconScale;
+                } else {
+                    newScale = profile.apparence.iconScale;
+                }
+
+                action.scale = newScale;
+
+                let scale = action.scale;
+                icon.setScale(scale);
+                icon.setRemainsFont(profile.apparence.remainsFontColor);
+                icon.setFontScale(profile.apparence.fontScale);
+                icon.setParams(node.rawPositionalParams, node.rawNamedParams);
+                icon.setHelp(
+                    (node.rawNamedParams.help != undefined &&
+                        node.rawNamedParams.help.type === "string" &&
+                        node.rawNamedParams.help.value) ||
+                        undefined
+                );
+                icon.setRangeIndicator(profile.apparence.targetText);
+                icon.enableMouse(!profile.apparence.clickThru);
+                icon.frame.SetAlpha(profile.apparence.alpha);
+                icon.cdShown = true;
+                if (this.skinGroup) {
+                    this.skinGroup.AddButton(icon.frame);
+                }
+                icon.Show();
             }
-            icon.Show();
         }
 
         this.content.SetAlpha(profile.apparence.optionsAlpha);
@@ -682,23 +725,15 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         private controls: Controls,
         private scripts: OvaleScriptsClass,
         private actionBar: OvaleActionBarClass,
-        private petFrame: UIFrame
+        private petFrame: UIFrame,
+        private guids: Guids
     ) {
         super(CreateFrame("Frame", "OvaleIcons", petFrame));
 
         this.traceLog = LibTextDump.New(`Ovale - ${l.icon_snapshot}`, 750, 500);
 
-        // const hider = CreateFrame(
-        //     "Frame",
-        //     `${ovale.GetName()}PetBattleFrameHider`,
-        //     UIParent,
-        //     "SecureHandlerStateTemplate"
-        // );
-        // const newFrame = ;
-        // hider.SetAllPoints(UIParent);
         this.tracer = ovaleDebug.create("OvaleFrame");
-        // this.frame = newFrame;
-        // this.hider = hider;
+
         this.updateIntervalFrame = CreateFrame(
             "Frame",
             `${ovale.GetName()}UpdateFrame`
@@ -752,19 +787,7 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
         this.dragHandleTexture.SetColorTexture(0.8, 0.8, 0.8, 0.5);
         this.dragHandleTexture.SetPoint("TOPLEFT", 0, 0);
         this.dragHandleTexture.Hide();
-        // const t = this.updateFrame.CreateTexture();
-        // t.SetColorTexture(0, 1, 0, 0.5);
-        // t.SetAllPoints(this.updateFrame);
-        // const u = this.frame.CreateTexture();
-        // u.SetColorTexture(0, 1, 0);
-        // u.SetAllPoints(this.frame);
-        const content = this.content;
-        // const texture = content.CreateTexture();
-        // texture.SetColorTexture(1, 0, 0);
-        // texture.SetAllPoints(content);
-        // content.SetWidth(200);
-        // content.SetHeight(100);
-        content.Hide();
+        this.content.Hide();
     }
 
     debugIcon(index: number): void {
@@ -929,7 +952,8 @@ export class OvaleFrameModuleClass {
         runner: Runner,
         controls: Controls,
         scripts: OvaleScriptsClass,
-        actionBar: OvaleActionBarClass
+        actionBar: OvaleActionBarClass,
+        guids: Guids
     ) {
         const petFrame = CreateFrame(
             "Frame",
@@ -963,7 +987,8 @@ export class OvaleFrameModuleClass {
             controls,
             scripts,
             actionBar,
-            petFrame
+            petFrame,
+            guids
         );
     }
 }
