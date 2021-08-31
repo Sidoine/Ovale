@@ -64,7 +64,7 @@
         "@commitlint/cli": "^13.1.0",
         "@commitlint/config-conventional": "^13.1.0",
         "@typescript-eslint/eslint-plugin": "^4.29.1",
-        "@typescript-eslint/parser": "^4.29.1",
+        "@typescript-eslint/parser": "^4.30.0",
         "@wowts/tstolua": "^1.13.5",
         "commitlint": "^13.1.0",
         "csv-parse": "^4.16.0",
