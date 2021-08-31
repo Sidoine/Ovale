@@ -1,6 +1,6 @@
 {
     "name": "ovale",
-    "version": "9.1.2",
+    "version": "9.1.6",
     "description": "Show the icon of the next spell to cast",
     "main": "dist/index.js",
     "scripts": {
@@ -8,7 +8,7 @@
         "prepare": "husky install",
         "build": "tstolua -p tsconfig.lua.json",
         "build-tools": "tsc",
-        "simc": "node dist/src/utils/importsimc/index.js ../../simc",
+        "simc": "node dist/src/utils/importsimc/index.js",
         "dbc": "node dist/src/utils/dbc.js",
         "watch": "tstolua -p tsconfig.lua.json -w",
         "watch-tools": "tsc -w",
@@ -53,7 +53,7 @@
         "@wowts/table": "^1.0.1",
         "@wowts/tsaddon": "^1.2.1",
         "@wowts/tslib": "^1.3.1",
-        "@wowts/wow-mock": "^1.30.1"
+        "@wowts/wow-mock": "^1.32.2"
     },
     "optionalDependencies": {
         "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
@@ -61,15 +61,15 @@
         "@wowts/recount": "^1.1.0"
     },
     "devDependencies": {
-        "@commitlint/cli": "^12.1.4",
-        "@commitlint/config-conventional": "^12.1.4",
-        "@typescript-eslint/eslint-plugin": "^4.26.1",
-        "@typescript-eslint/parser": "^4.26.1",
-        "@wowts/tstolua": "^1.13.4",
-        "commitlint": "^12.1.4",
+        "@commitlint/cli": "^13.1.0",
+        "@commitlint/config-conventional": "^13.1.0",
+        "@typescript-eslint/eslint-plugin": "^4.29.1",
+        "@typescript-eslint/parser": "^4.30.0",
+        "@wowts/tstolua": "^1.13.5",
+        "commitlint": "^13.1.0",
         "csv-parse": "^4.16.0",
-        "eslint": "^7.28.0",
-        "husky": "^6.0.0",
+        "eslint": "^7.32.0",
+        "husky": "^7.0.1",
         "jest": "^26.6.3",
         "prettier": "^2.3.1",
         "pretty-quick": "^3.1.0",

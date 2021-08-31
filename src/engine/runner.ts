@@ -38,7 +38,6 @@ import { BaseState } from "../states/BaseState";
 import { ActionType } from "./best-action";
 import { OvaleConditionClass } from "./condition";
 import { DebugTools, Tracer } from "./debug";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import {
     newTimeSpan,
     OvaleTimeSpan,
@@ -76,18 +75,15 @@ type ComputerFunction<T extends AstNode> = (
 ) => AstNodeSnapshot;
 
 export class Runner {
-    private profiler: Profiler;
     private tracer: Tracer;
     public serial = 0;
     private actionHandlers: LuaObj<ActionInfoHandler> = {};
 
     constructor(
-        ovaleProfiler: OvaleProfilerClass,
         ovaleDebug: DebugTools,
         private baseState: BaseState,
         private ovaleCondition: OvaleConditionClass
     ) {
-        this.profiler = ovaleProfiler.create("runner");
         this.tracer = ovaleDebug.create("runner");
     }
 
@@ -97,7 +93,6 @@ export class Runner {
     }
 
     public postOrderCompute(element: AstNode, atTime: number): AstNodeSnapshot {
-        this.profiler.startProfiling("OvaleBestAction_PostOrderCompute");
         let result: AstNodeSnapshot | undefined;
         const postOrder = element.postOrder;
         if (postOrder && element.result.serial !== this.serial) {
@@ -196,14 +191,12 @@ export class Runner {
             );
         }
         this.recursiveCompute(element, atTime);
-        this.profiler.stopProfiling("OvaleBestAction_PostOrderCompute");
         return element.result;
     }
     private recursiveCompute(
         element: AstNode,
         atTime: number
     ): AstNodeSnapshot {
-        this.profiler.startProfiling("OvaleBestAction_RecursiveCompute");
         this.tracer.log(
             "[%d] >>> Computing '%s' at time=%f",
             element.nodeId,
@@ -263,7 +256,6 @@ export class Runner {
                 element.result.serial = this.serial;
             }
         }
-        this.profiler.stopProfiling("OvaleBestAction_RecursiveCompute");
         return element.result;
     }
 
@@ -324,7 +316,6 @@ export class Runner {
         node,
         atTime: number
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeAction");
         const nodeId = node.nodeId;
         const timeSpan = this.getTimeSpan(node);
         this.tracer.log("[%d]    evaluating action: %s()", nodeId, node.name);
@@ -467,14 +458,12 @@ export class Runner {
             );
             timeSpan.copy(start, huge);
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeAction");
         return result;
     };
     private computeArithmetic: ComputerFunction<AstExpressionNode> = (
         element,
         atTime
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeArithmetic");
         const timeSpan = this.getTimeSpan(element);
         const result = element.result;
         const nodeA = this.compute(element.child[1], atTime);
@@ -653,14 +642,12 @@ export class Runner {
             );
             this.setValue(element, l, m, n);
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeArithmetic");
         return result;
     };
     private computeCompare: ComputerFunction<AstExpressionNode> = (
         element,
         atTime
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeCompare");
         const timeSpan = this.getTimeSpan(element);
         const elementA = this.compute(element.child[1], atTime);
         const [a, b, c, timeSpanA] = this.asValue(atTime, elementA);
@@ -756,14 +743,12 @@ export class Runner {
                 timeSpan
             );
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeCompare");
         return element.result;
     };
     private computeCustomFunction: ComputerFunction<AstFunctionNode> = (
         element,
         atTime
     ): AstNodeSnapshot => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeCustomFunction");
         const timeSpan = this.getTimeSpan(element);
         const result = element.result;
         const node =
@@ -793,7 +778,6 @@ export class Runner {
             this.tracer.error(`Unable to find ${element.name}`);
             wipe(timeSpan);
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeCustomFunction");
         return result;
     };
 
@@ -830,24 +814,18 @@ export class Runner {
         element,
         atTime: number
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeFunction");
         const timeSpan = this.getTimeSpan(element);
         const [positionalParams, namedParams] = this.computeParameters(
             element,
             atTime
         );
-        const [
-            start,
-            ending,
-            value,
-            origin,
-            rate,
-        ] = this.ovaleCondition.evaluateCondition(
-            element.name,
-            positionalParams,
-            namedParams,
-            atTime
-        );
+        const [start, ending, value, origin, rate] =
+            this.ovaleCondition.evaluateCondition(
+                element.name,
+                positionalParams,
+                namedParams,
+                atTime
+            );
         if (start !== undefined && ending !== undefined) {
             timeSpan.copy(start, ending);
         } else {
@@ -866,7 +844,6 @@ export class Runner {
             origin,
             rate
         );
-        this.profiler.stopProfiling("OvaleBestAction_ComputeFunction");
         return element.result;
     };
 
@@ -874,7 +851,6 @@ export class Runner {
         element,
         atTime: number
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeFunction");
         const timeSpan = this.getTimeSpan(element);
         const positionalParams = this.computePositionalParameters(
             element,
@@ -903,12 +879,10 @@ export class Runner {
             origin,
             rate
         );
-        this.profiler.stopProfiling("OvaleBestAction_ComputeFunction");
         return element.result;
     };
 
     private computeGroup: ComputerFunction<AstGroupNode> = (group, atTime) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeGroup");
         let bestTimeSpan, bestElement;
         const best = newTimeSpan();
         const currentTimeSpanAfterTime = newTimeSpan();
@@ -1012,7 +986,6 @@ export class Runner {
                 timeSpan
             );
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeGroup");
         return group.result;
     };
 
@@ -1046,7 +1019,6 @@ export class Runner {
         element,
         atTime
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeIf");
         const timeSpan = this.getTimeSpan(element);
         const result = element.result;
         const timeSpanA = this.computeBool(element.child[1], atTime);
@@ -1078,7 +1050,6 @@ export class Runner {
         if (element.type == "unless") {
             conditionTimeSpan.release();
         }
-        this.profiler.stopProfiling("OvaleBestAction_ComputeIf");
         return result;
     };
 
@@ -1086,7 +1057,6 @@ export class Runner {
         element,
         atTime
     ) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeLogical");
         const timeSpan = this.getTimeSpan(element);
         const timeSpanA = this.computeBool(element.child[1], atTime);
         if (element.operator == "and") {
@@ -1132,28 +1102,23 @@ export class Runner {
             element.operator,
             timeSpan
         );
-        this.profiler.stopProfiling("OvaleBestAction_ComputeLogical");
         return element.result;
     };
     private computeLua: ComputerFunction<AstLuaNode> = (element) => {
         if (!element.lua) return element.result;
-        this.profiler.startProfiling("OvaleBestAction_ComputeLua");
         const value = loadstring(element.lua)();
         this.tracer.log("[%d]    lua returns %s", element.nodeId, value);
         if (value !== undefined) {
             this.setValue(element, value);
         }
         this.getTimeSpan(element, universe);
-        this.profiler.stopProfiling("OvaleBestAction_ComputeLua");
         return element.result;
     };
 
     private computeValue: ComputerFunction<AstValueNode> = (element) => {
-        this.profiler.startProfiling("OvaleBestAction_ComputeValue");
         this.tracer.log("[%d]    value is %s", element.nodeId, element.value);
         this.getTimeSpan(element, universe);
         this.setValue(element, element.value, element.origin, element.rate);
-        this.profiler.stopProfiling("OvaleBestAction_ComputeValue");
         return element.result;
     };
 

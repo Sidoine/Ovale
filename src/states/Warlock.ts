@@ -1,14 +1,7 @@
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
-import {
-    GetTime,
-    CombatLogGetCurrentEventInfo,
-    TalentId,
-    SpellId,
-} from "@wowts/wow-mock";
+import { GetTime, TalentId, SpellId } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 import { pow } from "@wowts/math";
-import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
@@ -18,6 +11,7 @@ import { OvaleConditionClass, returnConstant } from "../engine/condition";
 import { OvaleFutureClass } from "./Future";
 import { OvalePowerClass } from "./Power";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
+import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 
 interface CustomAura {
     customId: number;
@@ -84,7 +78,6 @@ interface Demon {
 }
 
 export class OvaleWarlockClass implements StateModule {
-    private module: AceModule & AceEvent;
     private demonsCount: LuaObj<Demon> = {};
     private serial = 1;
 
@@ -94,13 +87,13 @@ export class OvaleWarlockClass implements StateModule {
         private ovalePaperDoll: OvalePaperDollClass,
         private ovaleSpellBook: OvaleSpellBookClass,
         private future: OvaleFutureClass,
-        private power: OvalePowerClass
+        private power: OvalePowerClass,
+        private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleWarlock",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
@@ -117,9 +110,15 @@ export class OvaleWarlockClass implements StateModule {
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "WARLOCK") {
-            this.module.RegisterEvent(
-                "COMBAT_LOG_EVENT_UNFILTERED",
-                this.handleCombatLogEventUnfiltered
+            this.combatLogEvent.registerEvent(
+                "SPELL_SUMMON",
+                this,
+                this.handleCombatLogEvent
+            );
+            this.combatLogEvent.registerEvent(
+                "SPELL_CAST_SUCCESS",
+                this,
+                this.handleCombatLogEvent
             );
             this.demonsCount = {};
         }
@@ -127,78 +126,64 @@ export class OvaleWarlockClass implements StateModule {
 
     private handleDisable = () => {
         if (this.ovale.playerClass == "WARLOCK") {
-            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            destGUID,
-            ,
-            ,
-            ,
-            spellId,
-        ] = CombatLogGetCurrentEventInfo();
-        if (sourceGUID != this.ovale.playerGUID) {
-            return;
-        }
-        this.serial = this.serial + 1;
-        if (cleuEvent == "SPELL_SUMMON") {
-            let [, , , , , , , creatureId] = find(
-                destGUID,
-                "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)"
-            );
-            creatureId = tonumber(creatureId);
+    private handleCombatLogEvent = (cleuEvent: string) => {
+        const cleu = this.combatLogEvent;
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
+            this.serial = this.serial + 1;
+            if (cleuEvent == "SPELL_SUMMON") {
+                const destGUID = cleu.destGUID;
+                let [, , , , , , , creatureId] = find(
+                    destGUID,
+                    "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)"
+                );
+                creatureId = tonumber(creatureId);
 
-            const now = GetTime();
-            for (const [id, v] of pairs(demonData)) {
-                if (id === creatureId) {
-                    this.demonsCount[destGUID] = {
-                        id: creatureId,
-                        timestamp: now,
-                        finish: now + v.duration,
-                    };
-                    break;
+                const now = GetTime();
+                for (const [id, v] of pairs(demonData)) {
+                    if (id === creatureId) {
+                        this.demonsCount[destGUID] = {
+                            id: creatureId,
+                            timestamp: now,
+                            finish: now + v.duration,
+                        };
+                        break;
+                    }
                 }
-            }
-            for (const [k, d] of pairs(this.demonsCount)) {
-                if (d.finish < now) {
-                    delete this.demonsCount[k];
-                }
-            }
-            this.ovale.needRefresh();
-        } else if (cleuEvent == "SPELL_CAST_SUCCESS") {
-            // Implosion removes all the wild imps
-            if (spellId == SpellId.implosion) {
                 for (const [k, d] of pairs(this.demonsCount)) {
-                    if (
-                        d.id == DemonId.WildImp ||
-                        d.id == DemonId.InnerDemonsWildImp
-                    ) {
+                    if (d.finish < now) {
                         delete this.demonsCount[k];
                     }
                 }
                 this.ovale.needRefresh();
-            }
+            } else if (cleuEvent == "SPELL_CAST_SUCCESS") {
+                // Implosion removes all the wild imps
+                const header = cleu.header as SpellPayloadHeader;
+                const spellId = header.spellId;
+                if (spellId == SpellId.implosion) {
+                    for (const [k, d] of pairs(this.demonsCount)) {
+                        if (
+                            d.id == DemonId.WildImp ||
+                            d.id == DemonId.InnerDemonsWildImp
+                        ) {
+                            delete this.demonsCount[k];
+                        }
+                    }
+                    this.ovale.needRefresh();
+                }
 
-            const aura = customAuras[spellId];
-            if (aura) {
-                this.addCustomAura(
-                    aura.customId,
-                    aura.stacks,
-                    aura.duration,
-                    aura.auraName
-                );
+                const aura = customAuras[spellId];
+                if (aura) {
+                    this.addCustomAura(
+                        aura.customId,
+                        aura.stacks,
+                        aura.duration,
+                        aura.auraName
+                    );
+                }
             }
         }
     };
@@ -310,20 +295,16 @@ export class OvaleWarlockClass implements StateModule {
      * Based on SimulationCraft function time_to_shard
      * Seeks to return the average expected time for the player to generate a single soul shard.
      */
-    private getTimeToShard(now: number) {
+    private getTimeToShard(atTime: number) {
         let value = 3600;
         const tickTime =
-            2 /
-            this.ovalePaperDoll.getHasteMultiplier(
-                "spell",
-                this.ovalePaperDoll.next
-            );
+            2 / this.ovalePaperDoll.getHasteMultiplier("spell", atTime);
         const [activeAgonies] = this.ovaleAura.auraCount(
             SpellId.agony,
             "HARMFUL",
             true,
             undefined,
-            now,
+            atTime,
             undefined
         );
         if (activeAgonies > 0) {

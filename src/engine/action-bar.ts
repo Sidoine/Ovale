@@ -1,6 +1,5 @@
 import { l } from "../ui/Localization";
 import { DebugTools, Tracer } from "./debug";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleSpellBookClass } from "../states/SpellBook";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
@@ -65,12 +64,10 @@ export class OvaleActionBarClass {
 
     private module: AceModule & AceEvent & AceTimer;
     private debug: Tracer;
-    private profiler: Profiler;
 
     constructor(
         ovaleDebug: DebugTools,
         ovale: OvaleClass,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleSpellBook: OvaleSpellBookClass
     ) {
         this.module = ovale.createModule(
@@ -81,7 +78,6 @@ export class OvaleActionBarClass {
             aceTimer
         );
         this.debug = ovaleDebug.create("OvaleActionBar");
-        this.profiler = ovaleProfiler.create(this.module.GetName());
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
         }
@@ -198,7 +194,6 @@ export class OvaleActionBarClass {
     };
 
     private handleActionSlotUpdate = (event: string) => {
-        this.profiler.startProfiling("OvaleActionBar_UpdateActionSlots");
         this.debug.debug("%s: Updating all action slot mappings.", event);
         wipe(this.action);
         wipe(this.item);
@@ -226,10 +221,8 @@ export class OvaleActionBarClass {
         if (event != "TimerUpdateActionSlots") {
             this.module.ScheduleTimer(this.handleTimerUpdateActionSlots, 1);
         }
-        this.profiler.stopProfiling("OvaleActionBar_UpdateActionSlots");
     };
     private updateActionSlot(slot: number) {
-        this.profiler.startProfiling("OvaleActionBar_UpdateActionSlot");
         const action = this.action[slot];
         if (this.spell[<number>action] == slot) {
             delete this.spell[<number>action];
@@ -279,9 +272,8 @@ export class OvaleActionBarClass {
                     } else {
                         const [, hyperlink] = GetMacroItem(id);
                         if (hyperlink) {
-                            const [, , linkData] = this.parseHyperlink(
-                                hyperlink
-                            );
+                            const [, , linkData] =
+                                this.parseHyperlink(hyperlink);
                             const itemIdText = gsub(linkData, ":.*", "");
                             const itemId = tonumber(itemIdText);
                             if (itemId) {
@@ -311,14 +303,11 @@ export class OvaleActionBarClass {
             this.debug.debug("Clearing mapping for button %s.", slot);
         }
         this.keybind[slot] = this.getKeyBinding(slot);
-        this.profiler.stopProfiling("OvaleActionBar_UpdateActionSlot");
     }
     private updateKeyBindings() {
-        this.profiler.startProfiling("OvaleActionBar_UpdateKeyBindings");
         for (let slot = 1; slot <= 120; slot += 1) {
             this.keybind[slot] = this.getKeyBinding(slot);
         }
-        this.profiler.stopProfiling("OvaleActionBar_UpdateKeyBindings");
     }
     getSpellActionSlot(spellId: number) {
         return this.spell[spellId];

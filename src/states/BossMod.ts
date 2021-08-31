@@ -1,5 +1,4 @@
 import { Tracer, DebugTools } from "../engine/debug";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
@@ -14,12 +13,10 @@ export class OvaleBossModClass {
 
     private module: AceModule;
     private tracer: Tracer;
-    private profiler: Profiler;
 
     constructor(
         ovale: OvaleClass,
         ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
         private combat: OvaleCombatClass
     ) {
         this.module = ovale.createModule(
@@ -28,7 +25,6 @@ export class OvaleBossModClass {
             this.handleDisable
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
-        this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
     private handleInitialize = () => {
@@ -97,7 +93,6 @@ export class OvaleBossModClass {
         return dbmEngaged || bigWigsEngaged || neitherEngaged;
     }
     scanTargets() {
-        this.profiler.startProfiling("OvaleBossMod:ScanTargets");
         let bossEngaged = false;
         if (UnitExists("target")) {
             bossEngaged = UnitClassification("target") == "worldboss" || false;
@@ -107,7 +102,7 @@ export class OvaleBossModClass {
         //     let dep = depth || 1;
         //     isWorldBoss = target != undefined && UnitExists(target) && UnitLevel(target) < 0;
         //     if (isWorldBoss) {
-        //         this.Debug("%s is worldboss (%s)", target, UnitName(target));
+        //         this.Debug("%s is worldboss (%s)", target, GetUnitName(target, true));
         //     }
         //     return isWorldBoss || (dep <= 3 && RecursiveScanTargets(`${target}target`, dep + 1));
         // }
@@ -136,7 +131,6 @@ export class OvaleBossModClass {
         //         }
         //     }
         // }
-        this.profiler.stopProfiling("OvaleBossMod:ScanTargets");
         return bossEngaged;
     }
 }

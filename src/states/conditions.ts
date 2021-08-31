@@ -21,6 +21,7 @@ import {
     GetItemCount,
     GetNumTrackingTypes,
     GetTrackingInfo,
+    GetUnitName,
     GetUnitSpeed,
     HasFullControl,
     IsStealthed,
@@ -40,7 +41,6 @@ import {
     UnitIsPVP,
     UnitIsUnit,
     UnitLevel,
-    UnitName,
     UnitPower,
     UnitPowerMax,
     UnitRace,
@@ -152,12 +152,13 @@ export class OvaleConditions {
     }
 
     /** Return the time in seconds, adjusted by the named haste effect. */
-    getHastedTime(seconds: number, haste: HasteType | undefined) {
+    getHastedTime(
+        seconds: number,
+        haste: HasteType | undefined,
+        atTime?: number
+    ) {
         seconds = seconds || 0;
-        const multiplier = this.paperDoll.getHasteMultiplier(
-            haste,
-            this.paperDoll.next
-        );
+        const multiplier = this.paperDoll.getHasteMultiplier(haste, atTime);
         return seconds / multiplier;
     }
 
@@ -260,23 +261,13 @@ export class OvaleConditions {
         if (this.data.buffSpellList[auraId]) {
             const spellList = this.data.buffSpellList[auraId];
             for (const [id] of pairs(spellList)) {
-                value = this.auras.getBaseDuration(
-                    id,
-                    undefined,
-                    atTime,
-                    this.paperDoll.next
-                );
+                value = this.auras.getBaseDuration(id, undefined, atTime);
                 if (value != INFINITY) {
                     break;
                 }
             }
         } else {
-            value = this.auras.getBaseDuration(
-                auraId,
-                undefined,
-                atTime,
-                this.paperDoll.next
-            );
+            value = this.auras.getBaseDuration(auraId, undefined, atTime);
         }
         return returnConstant(value);
     };
@@ -348,23 +339,9 @@ export class OvaleConditions {
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const auraId = positionalParams[1];
-        const [target, filter, mine] = this.parseCondition(
-            positionalParams,
-            namedParams
-        );
-        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
-        if (aura && this.auras.isActiveAura(aura, atTime)) {
-            const value = (aura && aura.combopoints) || 0;
-            return returnValueBetween(
-                aura.gain,
-                aura.ending,
-                value,
-                aura.start,
-                0
-            );
-        }
-        return returnConstant(0);
+        const combopoints = 0;
+        oneTimeMessage("Warning: 'BuffComboPoints()' is not implemented.");
+        return returnConstant(combopoints);
     };
 
     /** Get the number of seconds before a buff can be gained again.
@@ -631,7 +608,8 @@ export class OvaleConditions {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
             const hastedSeconds = this.getHastedTime(
                 seconds,
-                namedParams.haste as HasteType
+                namedParams.haste as HasteType,
+                atTime
             );
             if (ending - hastedSeconds <= gain) {
                 return [gain, INFINITY];
@@ -677,7 +655,7 @@ export class OvaleConditions {
         const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura) {
             const [gain, , ending] = [aura.gain, aura.start, aura.ending];
-            seconds = this.getHastedTime(seconds, haste);
+            seconds = this.getHastedTime(seconds, haste, atTime);
             if (ending - seconds <= gain) {
                 return [];
             } else {
@@ -918,20 +896,15 @@ export class OvaleConditions {
         const excludeUnitId =
             (namedParams.excludeTarget == 1 && this.baseState.defaultTarget) ||
             undefined;
-        const [
-            count,
-            stacks,
-            ,
-            endingChangeCount,
-            startFirst,
-        ] = this.auras.auraCount(
-            auraId,
-            filter,
-            mine,
-            1,
-            atTime,
-            excludeUnitId
-        );
+        const [count, stacks, , endingChangeCount, startFirst] =
+            this.auras.auraCount(
+                auraId,
+                filter,
+                mine,
+                1,
+                atTime,
+                excludeUnitId
+            );
         if (count > 0) {
             return returnValueBetween(
                 startFirst,
@@ -1473,9 +1446,8 @@ export class OvaleConditions {
         const interval = positionalParams[1];
         let value = 0;
         if (interval > 0) {
-            const [total, totalMagic] = this.damageTaken.getRecentDamage(
-                interval
-            );
+            const [total, totalMagic] =
+                this.damageTaken.getRecentDamage(interval);
             value = total - totalMagic;
         }
         return returnConstant(value);
@@ -1633,8 +1605,8 @@ export class OvaleConditions {
     ) => {
         let value = this.enemies.next.enemies;
         if (!value) {
-            let useTagged = this.ovaleOptions.db.profile.apparence
-                .taggedEnemies;
+            let useTagged =
+                this.ovaleOptions.db.profile.apparence.taggedEnemies;
             if (namedParams.tagged == 0) {
                 useTagged = false;
             } else if (namedParams.tagged == 1) {
@@ -1853,6 +1825,28 @@ export class OvaleConditions {
         atTime: number
     ) => {
         return returnBoolean(false);
+    };
+
+    private getGuid: ConditionFunction = (positionalParams, namedParams) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        return returnConstant(this.guids.getUnitGUID(target));
+    };
+
+    private getTargetGuid: ConditionFunction = (
+        positionalParams,
+        namedParams
+    ) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        const unitId = target + "target";
+        return returnConstant(this.guids.getUnitGUID(unitId));
     };
 
     /** Test if the player has full control, i.e., isn't feared, charmed, etc.
@@ -2456,7 +2450,7 @@ export class OvaleConditions {
 	 @return A boolean value.
      */
     private name = (atTime: number, target: string) => {
-        return returnConstant(UnitName(target));
+        return returnConstant(GetUnitName(target, true));
     };
 
     /** Test if the game is on a PTR server
@@ -2533,7 +2527,7 @@ export class OvaleConditions {
         const boolean =
             UnitExists(target) &&
             !UnitIsDead(target) &&
-            (name == undefined || name == UnitName(target));
+            (name == undefined || name == GetUnitName(target, true));
         return returnBoolean(boolean);
     };
 
@@ -3730,9 +3724,8 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.runes.runeCount(
-            atTime
-        );
+        const [count, startCooldown, endCooldown] =
+            this.runes.runeCount(atTime);
         if (startCooldown < INFINITY) {
             const rate = 1 / (endCooldown - startCooldown);
             return returnValueBetween(
@@ -3751,9 +3744,8 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.runes.runeDeficit(
-            atTime
-        );
+        const [count, startCooldown, endCooldown] =
+            this.runes.runeDeficit(atTime);
         if (startCooldown < INFINITY) {
             const rate = -1 / (endCooldown - startCooldown);
             return returnValueBetween(
@@ -3784,9 +3776,8 @@ l    */
         namedParams: NamedParametersOf<AstFunctionNode>,
         atTime: number
     ) => {
-        const [count, startCooldown, endCooldown] = this.runes.runeCount(
-            atTime
-        );
+        const [count, startCooldown, endCooldown] =
+            this.runes.runeCount(atTime);
         if (startCooldown < INFINITY) {
             return returnValueBetween(
                 startCooldown,
@@ -4212,12 +4203,8 @@ l    */
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [
-            charges,
-            maxCharges,
-            start,
-            duration,
-        ] = this.cooldown.getSpellCharges(spellId, atTime);
+        const [charges, maxCharges, start, duration] =
+            this.cooldown.getSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
             const ending = start + duration;
             return returnValueBetween(start, ending, duration, start, -1);
@@ -4244,12 +4231,8 @@ l    */
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [
-            charges,
-            maxCharges,
-            start,
-            duration,
-        ] = this.cooldown.getSpellCharges(spellId, atTime);
+        const [charges, maxCharges, start, duration] =
+            this.cooldown.getSpellCharges(spellId, atTime);
         if (namedParams.count == 0 && charges < maxCharges) {
             return returnValueBetween(
                 atTime,
@@ -4275,12 +4258,8 @@ l    */
         atTime: number
     ) => {
         const spellId = positionalParams[1];
-        const [
-            charges,
-            maxCharges,
-            start,
-            chargeDuration,
-        ] = this.cooldown.getSpellCharges(spellId, atTime);
+        const [charges, maxCharges, start, chargeDuration] =
+            this.cooldown.getSpellCharges(spellId, atTime);
         if (charges && charges < maxCharges) {
             const duration = (maxCharges - charges) * chargeDuration;
             const ending = start + duration;
@@ -4725,7 +4704,7 @@ l    */
         if (aura && this.auras.isActiveAura(aura, atTime)) {
             tickTime = aura.tick;
         } else {
-            tickTime = this.auras.getTickLength(auraId, this.paperDoll.next);
+            tickTime = this.auras.getTickLength(auraId, atTime);
         }
         if (tickTime && tickTime > 0) {
             return returnConstant(tickTime);
@@ -4809,9 +4788,7 @@ l    */
         const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
         if (aura && this.auras.isActiveAura(aura, atTime)) {
             const lastTickTime = aura.lastTickTime || aura.start;
-            const tick =
-                aura.tick ||
-                this.auras.getTickLength(auraId, this.paperDoll.next);
+            const tick = aura.tick || this.auras.getTickLength(auraId, atTime);
             const remainingTime = tick - (atTime - lastTickTime);
             if (remainingTime && remainingTime > 0) {
                 return returnValueBetween(
@@ -5093,7 +5070,7 @@ l    */
     ) => {
         const seconds = positionalParams[1];
         const haste = (namedParams.haste as HasteType) || "spell";
-        const value = this.getHastedTime(seconds, haste);
+        const value = this.getHastedTime(seconds, haste, atTime);
         return returnConstant(value);
     };
 
@@ -5883,6 +5860,12 @@ l    */
             this.getGCDRemaining
         );
         ovaleCondition.registerCondition("glyph", false, this.glyph);
+        ovaleCondition.registerCondition("guid", false, this.getGuid);
+        ovaleCondition.registerCondition(
+            "targetguid",
+            false,
+            this.getTargetGuid
+        );
         ovaleCondition.registerCondition(
             "hasfullcontrol",
             false,

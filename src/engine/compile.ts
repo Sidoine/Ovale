@@ -39,7 +39,6 @@ import { insert } from "@wowts/table";
 import { GetSpellInfo } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
 import { DebugTools, Tracer } from "./debug";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleScoreClass } from "../ui/Score";
@@ -92,7 +91,6 @@ export class OvaleCompileClass {
     private timesEvaluated = 0;
     private icon: LuaArray<AstIconNode> = {};
     private tracer: Tracer;
-    private profiler: Profiler;
     private module: AceModule & AceEvent;
 
     constructor(
@@ -101,7 +99,6 @@ export class OvaleCompileClass {
         private ovaleCondition: OvaleConditionClass,
         private ovaleCooldown: OvaleCooldownClass,
         private ovaleData: OvaleDataClass,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleDebug: DebugTools,
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass,
@@ -110,7 +107,6 @@ export class OvaleCompileClass {
         private script: OvaleScriptsClass
     ) {
         this.tracer = ovaleDebug.create("OvaleCompile");
-        this.profiler = ovaleProfiler.create("OvaleCompile");
         this.module = ovale.createModule(
             "OvaleCompile",
             this.handleInitialize,
@@ -430,9 +426,8 @@ export class OvaleCompileClass {
                         !this.ovaleSpellBook.isKnownSpell(spellId) &&
                         !this.ovaleCooldown.isSharedCooldown(spellId)
                     ) {
-                        const spellName = this.ovaleSpellBook.getSpellName(
-                            spellId
-                        );
+                        const spellName =
+                            this.ovaleSpellBook.getSpellName(spellId);
                         if (spellName) {
                             const [name] = GetSpellInfo(spellName);
                             if (spellName == name) {
@@ -572,7 +567,6 @@ export class OvaleCompileClass {
         return this.ast;
     }
     evaluateScript(ast?: AstScriptNode, forceEvaluation?: boolean) {
-        this.profiler.startProfiling("OvaleCompile_EvaluateScript");
         let changed = false;
         ast = ast || this.ast;
         // this.tracer.Debug(
@@ -630,7 +624,6 @@ export class OvaleCompileClass {
                 this.updateTrinketInfo();
             }
         }
-        this.profiler.stopProfiling("OvaleCompile_EvaluateScript");
         return changed;
     }
     getFunctionNode(name: string) {

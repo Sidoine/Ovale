@@ -1,6 +1,5 @@
 import { l } from "../ui/Localization";
 import { OvalePool } from "../tools/Pool";
-import { OvaleProfilerClass, Profiler } from "./profiler";
 import { DebugTools, Tracer } from "./debug";
 import { Tokenizer, TokenizerDefinition } from "./lexer";
 import {
@@ -1131,9 +1130,10 @@ export class OvaleASTClass {
     private rawNamedParametersPool = new OvalePool<RawNamedParameters<string>>(
         "OvaleAST_rawNamedParametersPool"
     );
-    private rawPositionalParametersPool = new OvalePool<RawPositionalParameters>(
-        "OVALEAST_rawPositionParametersPool"
-    );
+    private rawPositionalParametersPool =
+        new OvalePool<RawPositionalParameters>(
+            "OVALEAST_rawPositionParametersPool"
+        );
     private namedParametersPool = new OvalePool<NamedParameters<string>>(
         "OvaleAST_FlattenParametersPool"
     );
@@ -1149,17 +1149,14 @@ export class OvaleASTClass {
     private nodesPool = new SelfPool(this);
 
     private debug: Tracer;
-    private profiler: Profiler;
 
     constructor(
         private ovaleCondition: OvaleConditionClass,
         ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleScripts: OvaleScriptsClass,
         private ovaleSpellBook: OvaleSpellBookClass
     ) {
         this.debug = ovaleDebug.create("OvaleAST");
-        this.profiler = ovaleProfiler.create("OvaleAST");
     }
 
     private printRecurse(
@@ -2507,9 +2504,8 @@ export class OvaleASTClass {
                 );
             }
             annotation.spellNode = annotation.spellNode || {};
-            annotation.spellNode[
-                lualength(annotation.spellNode) + 1
-            ] = parameter;
+            annotation.spellNode[lualength(annotation.spellNode) + 1] =
+                parameter;
         }
 
         return node;
@@ -2648,9 +2644,8 @@ export class OvaleASTClass {
                 );
             }
             annotation.spellNode = annotation.spellNode || {};
-            annotation.spellNode[
-                lualength(annotation.spellNode) + 1
-            ] = parameter;
+            annotation.spellNode[lualength(annotation.spellNode) + 1] =
+                parameter;
         }
 
         return node;
@@ -2853,9 +2848,8 @@ export class OvaleASTClass {
         if (name) {
             node.name = name;
             annotation.nameReference = annotation.nameReference || {};
-            annotation.nameReference[
-                lualength(annotation.nameReference) + 1
-            ] = node;
+            annotation.nameReference[lualength(annotation.nameReference) + 1] =
+                node;
         }
         return node;
     };
@@ -2932,9 +2926,8 @@ export class OvaleASTClass {
         node.property = property;
         if (name) {
             annotation.nameReference = annotation.nameReference || {};
-            annotation.nameReference[
-                lualength(annotation.nameReference) + 1
-            ] = node;
+            annotation.nameReference[lualength(annotation.nameReference) + 1] =
+                node;
         }
         return node;
     };
@@ -3219,7 +3212,6 @@ export class OvaleASTClass {
         tokenStream: OvaleLexer,
         annotation
     ) => {
-        this.profiler.startProfiling("OvaleAST_ParseScript");
         const ast = this.newNodeWithChildren("script", annotation);
         const child = ast.child;
         while (true) {
@@ -3246,7 +3238,6 @@ export class OvaleASTClass {
                 break;
             }
         }
-        this.profiler.stopProfiling("OvaleAST_ParseScript");
         return ast;
     };
     private parseSimpleExpression(
@@ -3555,9 +3546,8 @@ export class OvaleASTClass {
         else if (buffName) node.buffName = buffName;
         if (name || buffName) {
             annotation.nameReference = annotation.nameReference || {};
-            annotation.nameReference[
-                lualength(annotation.nameReference) + 1
-            ] = node;
+            annotation.nameReference[lualength(annotation.nameReference) + 1] =
+                node;
         }
         return node;
     };
@@ -3626,9 +3616,8 @@ export class OvaleASTClass {
         if (name) {
             node.name = name;
             annotation.nameReference = annotation.nameReference || {};
-            annotation.nameReference[
-                lualength(annotation.nameReference) + 1
-            ] = node;
+            annotation.nameReference[lualength(annotation.nameReference) + 1] =
+                node;
         }
         return node;
     };
@@ -3682,9 +3671,8 @@ export class OvaleASTClass {
         if (name) {
             node.name = name;
             annotation.nameReference = annotation.nameReference || {};
-            annotation.nameReference[
-                lualength(annotation.nameReference) + 1
-            ] = node;
+            annotation.nameReference[lualength(annotation.nameReference) + 1] =
+                node;
         }
         return node;
     };
@@ -3755,9 +3743,8 @@ export class OvaleASTClass {
 
         const node = this.newString(annotation, value);
         annotation.stringReference = annotation.stringReference || {};
-        annotation.stringReference[
-            lualength(annotation.stringReference) + 1
-        ] = node;
+        annotation.stringReference[lualength(annotation.stringReference) + 1] =
+            node;
         return node;
     };
     private parseUnless: ParserFunction<AstUnlessNode> = (
@@ -3802,9 +3789,8 @@ export class OvaleASTClass {
         const node = this.newNode("variable", annotation);
         node.name = name;
         annotation.nameReference = annotation.nameReference || {};
-        annotation.nameReference[
-            lualength(annotation.nameReference) + 1
-        ] = node;
+        annotation.nameReference[lualength(annotation.nameReference) + 1] =
+            node;
         return node;
     };
     private parseVisitors: { [key in NodeType]?: ParserFunction } = {
@@ -4121,7 +4107,6 @@ export class OvaleASTClass {
     }
 
     public propagateConstants(ast: AstNode) {
-        this.profiler.startProfiling("OvaleAST_PropagateConstants");
         if (ast.annotation) {
             const dictionary = ast.annotation.definition;
             if (dictionary && ast.annotation.nameReference) {
@@ -4151,20 +4136,22 @@ export class OvaleASTClass {
                         const value = dictionary[name];
                         if (value) {
                             if (isNumber(value)) {
-                                const valueNode = (node as unknown) as AstValueNode;
+                                const valueNode =
+                                    node as unknown as AstValueNode;
                                 valueNode.type = "value";
                                 valueNode.name = name;
                                 valueNode.value = value;
                                 valueNode.origin = 0;
                                 valueNode.rate = 0;
                             } else {
-                                const valueNode = (node as unknown) as AstStringNode;
+                                const valueNode =
+                                    node as unknown as AstStringNode;
                                 valueNode.type = "string";
                                 valueNode.value = value;
                                 valueNode.name = name;
                             }
                         } else {
-                            const valueNode = (node as unknown) as AstStringNode;
+                            const valueNode = node as unknown as AstStringNode;
                             valueNode.type = "string";
                             valueNode.value = name;
                         }
@@ -4172,11 +4159,9 @@ export class OvaleASTClass {
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAST_PropagateConstants");
     }
 
     public propagateStrings(ast: AstNode) {
-        this.profiler.startProfiling("OvaleAST_PropagateStrings");
         if (ast.annotation && ast.annotation.stringReference) {
             for (const [, node] of ipairs(ast.annotation.stringReference)) {
                 const nodeAsString = <AstStringNode>node;
@@ -4239,11 +4224,9 @@ export class OvaleASTClass {
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAST_PropagateStrings");
     }
 
     private verifyFunctionCalls(ast: AstNode) {
-        this.profiler.startProfiling("OvaleAST_VerifyFunctionCalls");
         if (ast.annotation && ast.annotation.verify) {
             const customFunction = ast.annotation.customFunction;
             const functionCall = ast.annotation.functionCall;
@@ -4262,11 +4245,9 @@ export class OvaleASTClass {
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleAST_VerifyFunctionCalls");
     }
 
     private insertPostOrderTraversal(ast: AstNode) {
-        this.profiler.startProfiling("OvaleAST_InsertPostOrderTraversal");
         const annotation = ast.annotation;
         if (annotation && annotation.postOrderReference) {
             for (const [, node] of ipairs(annotation.postOrderReference)) {
@@ -4277,11 +4258,9 @@ export class OvaleASTClass {
                 node.postOrder = array;
             }
         }
-        this.profiler.stopProfiling("OvaleAST_InsertPostOrderTraversal");
     }
 
     private optimize(ast: AstNode) {
-        this.profiler.startProfiling("OvaleAST_CommonSubExpressionElimination");
         if (ast && ast.annotation && ast.annotation.nodeList) {
             const expressionHash: LuaObj<AstNode> = {};
 
@@ -4312,6 +4291,5 @@ export class OvaleASTClass {
 
             ast.annotation.expressionHash = expressionHash;
         }
-        this.profiler.stopProfiling("OvaleAST_CommonSubExpressionElimination");
     }
 }

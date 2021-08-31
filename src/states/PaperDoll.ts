@@ -1,14 +1,7 @@
 import { Tracer, DebugTools } from "../engine/debug";
-import { Profiler, OvaleProfilerClass } from "../engine/profiler";
 import { OvaleClass } from "../Ovale";
-import { OvaleEquipmentClass } from "./Equipment";
+import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { States, StateModule } from "../engine/state";
-import {
-    SpellCast,
-    PaperDollSnapshot,
-    SpellCastModule,
-    LastSpell,
-} from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { tonumber, LuaObj, LuaArray, ipairs, unpack } from "@wowts/lua";
 import {
@@ -24,10 +17,7 @@ import {
     GetSpecialization,
     GetSpellBonusDamage,
     GetSpellCritChance,
-    GetTime,
     UnitAttackPower,
-    UnitDamage,
-    UnitRangedDamage,
     UnitLevel,
     UnitRangedAttackPower,
     UnitSpellHaste,
@@ -161,9 +151,7 @@ export const ovaleSpecializationName: {
     },
 };
 
-export class PaperDollData implements PaperDollSnapshot {
-    snapshotTime = 0;
-
+export class PaperDollData {
     strength = 0;
     agility = 0;
     stamina = 0;
@@ -195,56 +183,46 @@ export class PaperDollData implements PaperDollSnapshot {
 
     mainHandWeaponDPS = 0;
     offHandWeaponDPS = 0;
-    baseDamageMultiplier = 1;
 }
 
-const statName: LuaArray<keyof PaperDollSnapshot> = {
-    [1]: "snapshotTime",
-    [2]: "strength",
-    [3]: "agility",
-    [4]: "stamina",
-    [5]: "intellect",
-    [6]: "attackPower",
-    [7]: "spellPower",
-    [8]: "critRating",
-    [9]: "meleeCrit",
-    [10]: "rangedCrit",
-    [11]: "spellCrit",
-    [12]: "hasteRating",
-    [13]: "hastePercent",
-    [14]: "meleeAttackSpeedPercent",
-    [15]: "rangedAttackSpeedPercent",
-    [16]: "spellCastSpeedPercent",
-    [17]: "masteryRating",
-    [18]: "masteryEffect",
-    [19]: "versatilityRating",
-    [20]: "versatility",
-    [21]: "mainHandWeaponDPS",
-    [22]: "offHandWeaponDPS",
-    [23]: "baseDamageMultiplier",
-};
-const snapshotStatName: LuaArray<keyof PaperDollSnapshot> = {
-    [1]: "snapshotTime",
-    [2]: "masteryEffect",
-    [3]: "baseDamageMultiplier",
+const statName: LuaArray<keyof PaperDollData> = {
+    [1]: "strength",
+    [2]: "agility",
+    [3]: "stamina",
+    [4]: "intellect",
+    [5]: "attackPower",
+    [6]: "spellPower",
+    [7]: "critRating",
+    [8]: "meleeCrit",
+    [9]: "rangedCrit",
+    [10]: "spellCrit",
+    [11]: "hasteRating",
+    [12]: "hastePercent",
+    [13]: "meleeAttackSpeedPercent",
+    [14]: "rangedAttackSpeedPercent",
+    [15]: "spellCastSpeedPercent",
+    [16]: "masteryRating",
+    [17]: "masteryEffect",
+    [18]: "versatilityRating",
+    [19]: "versatility",
+    [20]: "mainHandWeaponDPS",
+    [21]: "offHandWeaponDPS",
 };
 
 export class OvalePaperDollClass
-    extends States<PaperDollSnapshot>
-    implements SpellCastModule, StateModule {
+    extends States<PaperDollData>
+    implements StateModule
+{
     class: ClassId;
     level = UnitLevel("player");
     specialization: SpecializationIndex | undefined = undefined;
     private module: AceModule & AceEvent;
     private debug: Tracer;
-    private profiler: Profiler;
 
     constructor(
         private ovaleEquipement: OvaleEquipmentClass,
         private ovale: OvaleClass,
-        ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
-        private lastSpell: LastSpell
+        ovaleDebug: DebugTools
     ) {
         super(PaperDollData);
         this.class = ovale.playerClass;
@@ -255,7 +233,6 @@ export class OvalePaperDollClass
             aceEvent
         );
         this.debug = ovaleDebug.create("OvalePaperDoll");
-        this.profiler = ovaleProfiler.create("OvalePaperDoll");
     }
 
     registerConditions(condition: OvaleConditionClass) {
@@ -274,16 +251,6 @@ export class OvalePaperDollClass
             );
         return [];
     };
-
-    private getAppropriateDamageMultiplier(unit: string) {
-        let damageMultiplier = 1;
-        if (this.ovaleEquipement.hasRangedWeapon()) {
-            [, , , , , damageMultiplier] = UnitRangedDamage(unit);
-        } else {
-            [, , , , , damageMultiplier] = UnitDamage(unit);
-        }
-        return damageMultiplier;
-    }
 
     private handleInitialize = () => {
         // TODO this module should be the source of this value
@@ -320,17 +287,15 @@ export class OvalePaperDollClass
         // this.RegisterEvent("PLAYER_DAMAGE_DONE_MODS"); // SpellBonusHealing (not really needed; spell power covered by SPELL_POWER_CHANGED)
         this.module.RegisterMessage(
             "Ovale_EquipmentChanged",
-            this.handleUpdateDamage
+            this.handleOvaleEquipmentChanged
         );
         // this.RegisterMessage("Ovale_StanceChanged", "UpdateDamage"); // Shouldn't be needed anymore, UNIT_DAMAGE covers it
         this.module.RegisterMessage(
             "Ovale_TalentsChanged",
             this.handleUpdateStats
         );
-        this.lastSpell.registerSpellcastInfo(this);
     };
     private handleDisable = () => {
-        this.lastSpell.unregisterSpellcastInfo(this);
         this.module.UnregisterEvent("UNIT_STATS");
         this.module.UnregisterEvent("COMBAT_RATING_UPDATE");
         this.module.UnregisterEvent("MASTERY_UPDATE");
@@ -350,21 +315,28 @@ export class OvalePaperDollClass
         this.module.UnregisterMessage("Ovale_StanceChanged");
         this.module.UnregisterMessage("Ovale_TalentsChanged");
     };
-    private handleUnitStats = (unitId: string) => {
+
+    private handleOvaleEquipmentChanged = (event: string, slot: SlotName) => {
+        if (
+            slot == "mainhandslot" ||
+            slot == "secondaryhandslot" ||
+            slot == "offhandslot"
+        ) {
+            this.handleUpdateDamage();
+        }
+    };
+
+    private handleUnitStats = (event: string, unitId: string) => {
         if (unitId == "player") {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.current.strength = UnitStat(unitId, 1);
             this.current.agility = UnitStat(unitId, 2);
             this.current.stamina = UnitStat(unitId, 3);
             this.current.intellect = UnitStat(unitId, 4);
             // this.current.spirit = 0;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleCombatRatingUpdate = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         // Crit
         this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
         this.current.meleeCrit = GetCritChance();
@@ -386,12 +358,9 @@ export class OvalePaperDollClass
             CR_VERSATILITY_DAMAGE_DONE
         );
 
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleMasteryUpdate = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.current.masteryRating = GetMastery();
         if (this.level < 80) {
             this.current.masteryEffect = 0;
@@ -399,77 +368,53 @@ export class OvalePaperDollClass
             this.current.masteryEffect = GetMasteryEffect();
             this.ovale.needRefresh();
         }
-        this.current.snapshotTime = GetTime();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleUnitAttackPower = (event: string, unitId: string) => {
         if (unitId == "player" && !this.ovaleEquipement.hasRangedWeapon()) {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             const [base, posBuff, negBuff] = UnitAttackPower(unitId);
             this.current.attackPower = base + posBuff + negBuff;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
             this.handleUpdateDamage();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleUnitRangedAttackPower = (unitId: string) => {
         if (unitId == "player" && this.ovaleEquipement.hasRangedWeapon()) {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             const [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
             this.ovale.needRefresh();
             this.current.attackPower = base + posBuff + negBuff;
-            this.current.snapshotTime = GetTime();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleSpellPowerChanged = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.current.spellPower = GetSpellBonusDamage(
             spellDamageSchools[this.class]
         );
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handlePlayerLevelUp = (event: string, level: string) => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
         this.level = tonumber(level) || UnitLevel("player");
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
         this.debug.debugTimestamp("%s: level = %d", event, this.level);
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
     };
     private handleUnitLevel = (event: string, unitId: string) => {
         this.ovale.refreshNeeded[unitId] = true;
         if (unitId == "player") {
-            this.profiler.startProfiling("OvalePaperDoll_UpdateStats");
             this.level = UnitLevel(unitId);
             this.debug.debugTimestamp("%s: level = %d", event, this.level);
-            this.current.snapshotTime = GetTime();
-            this.profiler.stopProfiling("OvalePaperDoll_UpdateStats");
         }
     };
     private handleUpdateDamage = () => {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateDamage");
-        const damageMultiplier = this.getAppropriateDamageMultiplier("player");
         // let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player"); // Could add back if we need something like calculating next swing
 
         // Appartently, if the character is not loaded, it returns 0
-        this.current.baseDamageMultiplier = damageMultiplier || 1;
         this.current.mainHandWeaponDPS = this.ovaleEquipement.mainHandDPS || 0;
         this.current.offHandWeaponDPS = this.ovaleEquipement.offHandDPS || 0;
-        this.current.snapshotTime = GetTime();
         this.ovale.needRefresh();
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateDamage");
     };
     updateSpecialization() {
-        this.profiler.startProfiling("OvalePaperDoll_UpdateSpecialization");
         const newSpecialization = GetSpecialization();
         if (this.specialization != newSpecialization) {
             const oldSpecialization = this.specialization;
             this.specialization = newSpecialization;
-            this.current.snapshotTime = GetTime();
             this.ovale.needRefresh();
             this.module.SendMessage(
                 "Ovale_SpecializationChanged",
@@ -477,11 +422,10 @@ export class OvalePaperDollClass
                 this.getSpecialization(oldSpecialization)
             );
         }
-        this.profiler.stopProfiling("OvalePaperDoll_UpdateSpecialization");
     }
     private handleUpdateStats = (event: string) => {
         this.updateSpecialization();
-        this.handleUnitStats("player");
+        this.handleUnitStats(event, "player");
         this.handleCombatRatingUpdate();
         this.handleMasteryUpdate();
         this.handleUnitAttackPower(event, "player");
@@ -510,69 +454,41 @@ export class OvalePaperDollClass
         }
         return false;
     }
-    getMasteryMultiplier(snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.current;
-        return 1 + snapshot.masteryEffect / 100;
+    getMasteryMultiplier(atTime?: number) {
+        const state = this.getState(atTime);
+        return 1 + state.masteryEffect / 100;
     }
-    getBaseHasteMultiplier(snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.current;
-        return 1 + snapshot.hastePercent / 100;
+    getBaseHasteMultiplier(atTime?: number) {
+        const state = this.getState(atTime);
+        return 1 + state.hastePercent / 100;
     }
-    getMeleeAttackSpeedPercentMultiplier(snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.current;
-        return 1 + snapshot.meleeAttackSpeedPercent / 100;
+    getMeleeAttackSpeedPercentMultiplier(atTime?: number) {
+        const state = this.getState(atTime);
+        return 1 + state.meleeAttackSpeedPercent / 100;
     }
-    getRangedAttackSpeedPercentMultiplier(snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.current;
-        return 1 + snapshot.rangedAttackSpeedPercent / 100;
+    getRangedAttackSpeedPercentMultiplier(atTime?: number) {
+        const state = this.getState(atTime);
+        return 1 + state.rangedAttackSpeedPercent / 100;
     }
-    getSpellCastSpeedPercentMultiplier(snapshot?: PaperDollSnapshot) {
-        snapshot = snapshot || this.current;
-        return 1 + snapshot.spellCastSpeedPercent / 100;
+    getSpellCastSpeedPercentMultiplier(atTime?: number) {
+        const state = this.getState(atTime);
+        return 1 + state.spellCastSpeedPercent / 100;
     }
-    getHasteMultiplier(
-        haste: HasteType | undefined,
-        snapshot: PaperDollSnapshot
-    ) {
-        snapshot = snapshot || this.current;
-        let multiplier = this.getBaseHasteMultiplier(snapshot) || 1;
+    getHasteMultiplier(haste: HasteType | undefined, atTime?: number) {
+        let multiplier = this.getBaseHasteMultiplier(atTime) || 1;
         if (haste === "melee") {
-            multiplier = this.getMeleeAttackSpeedPercentMultiplier(snapshot);
+            multiplier = this.getMeleeAttackSpeedPercentMultiplier(atTime);
         } else if (haste === "ranged") {
-            multiplier = this.getRangedAttackSpeedPercentMultiplier(snapshot);
+            multiplier = this.getRangedAttackSpeedPercentMultiplier(atTime);
         } else if (haste === "spell") {
-            multiplier = this.getSpellCastSpeedPercentMultiplier(snapshot);
+            multiplier = this.getSpellCastSpeedPercentMultiplier(atTime);
         }
         return multiplier;
     }
-    updateSnapshot(
-        target: PaperDollSnapshot,
-        snapshot?: PaperDollSnapshot,
-        updateAllStats?: boolean
-    ) {
-        snapshot = snapshot || this.current;
-        const nameTable = (updateAllStats && statName) || snapshotStatName;
-        for (const [, k] of ipairs(nameTable)) {
-            const value = snapshot[k];
-            if (value) target[k] = value;
-        }
-    }
-    copySpellcastInfo = (spellcast: SpellCast, dest: SpellCast) => {
-        this.updateSnapshot(dest, spellcast, true);
-    };
-    saveSpellcastInfo = (
-        spellcast: SpellCast,
-        atTime: number,
-        state?: PaperDollSnapshot
-    ) => {
-        const paperDollModule = state || this.current;
-        this.updateSnapshot(spellcast, paperDollModule, true);
-    };
     initializeState() {
         // this.next.class = undefined;
         // this.level = undefined;
         // this.specialization = undefined;
-        this.next.snapshotTime = 0;
 
         this.next.strength = 0;
         this.next.agility = 0;
@@ -605,11 +521,15 @@ export class OvalePaperDollClass
 
         this.next.mainHandWeaponDPS = 0;
         this.next.offHandWeaponDPS = 0;
-        this.next.baseDamageMultiplier = 1;
     }
     cleanState(): void {}
 
     resetState() {
-        this.updateSnapshot(this.next, this.current, true);
+        for (const [, key] of ipairs(statName)) {
+            const value = this.current[key];
+            if (value) {
+                this.next[key] = value;
+            }
+        }
     }
 }

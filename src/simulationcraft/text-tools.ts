@@ -36,7 +36,7 @@ export function printRepeat(data: any) {
 
     function _repeat(str: string, num: number) {
         let output = "";
-        for (let i = 0; i < num; i += 1) {
+        for (let i = 1; i <= num; i += 1) {
             output = output + str;
         }
         return output;

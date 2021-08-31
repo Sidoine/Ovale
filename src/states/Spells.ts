@@ -14,7 +14,6 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Tracer, DebugTools } from "../engine/debug";
-import { OvaleProfilerClass, Profiler } from "../engine/profiler";
 import { OvaleDataClass } from "../engine/data";
 import { StateModule } from "../engine/state";
 import { NamedParametersOf, AstActionNode } from "../engine/ast";
@@ -28,13 +27,11 @@ const warriorHeroicThrowSpellId = SpellId.heroic_throw;
 export class OvaleSpellsClass implements StateModule {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
-    private profiler: Profiler;
 
     constructor(
         private spellBook: OvaleSpellBookClass,
         ovale: OvaleClass,
         ovaleDebug: DebugTools,
-        ovaleProfiler: OvaleProfilerClass,
         private ovaleData: OvaleDataClass,
         private power: OvalePowerClass,
         private runes: OvaleRunesClass,
@@ -47,7 +44,6 @@ export class OvaleSpellsClass implements StateModule {
             aceEvent
         );
         this.tracer = ovaleDebug.create(this.module.GetName());
-        this.profiler = ovaleProfiler.create(this.module.GetName());
     }
 
     private handleInitialize = (): void => {};
@@ -120,7 +116,6 @@ export class OvaleSpellsClass implements StateModule {
     initializeState(): void {}
     resetState(): void {}
     isUsableItem(itemId: number, atTime: number): boolean {
-        this.profiler.startProfiling("OvaleSpellBook_state_IsUsableItem");
         let isUsable = IsUsableItem(itemId);
         const ii = this.ovaleData.getItemInfo(itemId);
         if (ii) {
@@ -139,7 +134,6 @@ export class OvaleSpellsClass implements StateModule {
                 }
             }
         }
-        this.profiler.stopProfiling("OvaleSpellBook_state_IsUsableItem");
         return isUsable;
     }
     isUsableSpell(
@@ -147,7 +141,6 @@ export class OvaleSpellsClass implements StateModule {
         atTime: number,
         targetGUID: string | undefined
     ): [boolean, boolean] {
-        this.profiler.startProfiling("OvaleSpellBook_state_IsUsableSpell");
         let [isUsable, noMana] = [false, false];
         const isKnown = this.spellBook.isKnownSpell(spellId);
         const si = this.ovaleData.spellInfo[spellId];
@@ -202,7 +195,6 @@ export class OvaleSpellsClass implements StateModule {
         } else {
             [isUsable, noMana] = IsUsableSpell(spellId);
         }
-        this.profiler.stopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
     }
 

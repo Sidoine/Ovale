@@ -1,10 +1,9 @@
 import { OvaleAuraClass } from "./Aura";
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import { GetTime } from "@wowts/wow-mock";
 import { LuaArray } from "@wowts/lua";
-import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvalePaperDollClass } from "./PaperDoll";
+import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 
 const soulFragmentsBuffId = 203981;
 const metamorphosisBuffId = 187827;
@@ -22,74 +21,53 @@ export class OvaleDemonHunterSoulFragmentsClass {
     estimatedCount = 0;
     atTime?: number;
     estimated?: boolean;
-    private module: AceModule & AceEvent;
 
     constructor(
         private ovaleAura: OvaleAuraClass,
         private ovale: OvaleClass,
-        private ovalePaperDoll: OvalePaperDollClass
+        private ovalePaperDoll: OvalePaperDollClass,
+        private combatLogEvent: CombatLogEvent
     ) {
-        this.module = ovale.createModule(
+        ovale.createModule(
             "OvaleDemonHunterSoulFragments",
             this.handleInitialize,
-            this.handleDisable,
-            aceEvent
+            this.handleDisable
         );
     }
 
     private handleInitialize = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
-            this.module.RegisterEvent(
-                "COMBAT_LOG_EVENT_UNFILTERED",
-                this.handleCombatLogEventUnfiltered
+            this.combatLogEvent.registerEvent(
+                "SPELL_CAST_SUCCESS",
+                this,
+                this.handleSpellCastSuccess
             );
         }
     };
 
     private handleDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
-            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
+    private handleSpellCastSuccess = (cleuEvent: string) => {
         if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
             return;
         }
-        const [
-            ,
-            subtype,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            spellID,
-        ] = CombatLogGetCurrentEventInfo();
-        const me = this.ovale.playerGUID;
-        if (sourceGUID == me) {
-            if (
-                subtype == "SPELL_CAST_SUCCESS" &&
-                soulFragmentSpells[spellID]
-            ) {
-                const getTime = GetTime();
-                let fragments = soulFragmentSpells[spellID];
-                if (fragments > 0 && this.hasMetamorphosis(getTime)) {
+        const cleu = this.combatLogEvent;
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
+            const header = cleu.header as SpellPayloadHeader;
+            const spellId = header.spellId;
+            if (soulFragmentSpells[spellId]) {
+                const now = GetTime();
+                let fragments = soulFragmentSpells[spellId];
+                if (fragments > 0 && this.hasMetamorphosis(now)) {
                     fragments = fragments + 1;
                 }
-                this.addPredictedSoulFragments(getTime, fragments);
-            }
-            if (
-                subtype == "SPELL_CAST_SUCCESS" &&
-                soulFragmentFinishers[spellID]
-            ) {
-                this.setPredictedSoulFragment(GetTime(), 0);
+                this.addPredictedSoulFragments(now, fragments);
+            } else if (soulFragmentFinishers[spellId]) {
+                const now = GetTime();
+                this.setPredictedSoulFragment(now, 0);
             }
         }
     };

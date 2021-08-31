@@ -3,13 +3,10 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import {
-    GetTime,
-    CombatLogGetCurrentEventInfo,
-    TalentId,
-} from "@wowts/wow-mock";
+import { GetTime, TalentId } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import { AceModule } from "@wowts/tsaddon";
+import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 import { StateModule } from "../engine/state";
 
 const updateDelay = 0.5;
@@ -64,7 +61,8 @@ export class OvaleSigilClass implements StateModule {
     constructor(
         private ovalePaperDoll: OvalePaperDollClass,
         private ovale: OvaleClass,
-        private ovaleSpellBook: OvaleSpellBookClass
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private combatLogEvent: CombatLogEvent
     ) {
         this.module = ovale.createModule(
             "OvaleSigil",
@@ -84,46 +82,30 @@ export class OvaleSigilClass implements StateModule {
                 "UNIT_SPELLCAST_SUCCEEDED",
                 this.handleUnitSpellCastSucceeded
             );
-            this.module.RegisterEvent(
-                "COMBAT_LOG_EVENT_UNFILTERED",
-                this.handleCombatLogEventUnfiltered
+            this.combatLogEvent.registerEvent(
+                "SPELL_AURA_APPLIED",
+                this,
+                this.handleSpellAuraApplied
             );
         }
     };
     private handleDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
             this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-            this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
 
-    private handleCombatLogEventUnfiltered = (
-        event: string,
-        ...parameters: any[]
-    ) => {
+    private handleSpellAuraApplied = (cleuEvent: string) => {
         if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
             return;
         }
-        const [
-            ,
-            cleuEvent,
-            ,
-            sourceGUID,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            spellid,
-        ] = CombatLogGetCurrentEventInfo();
-        if (
-            sourceGUID == this.ovale.playerGUID &&
-            cleuEvent == "SPELL_AURA_APPLIED"
-        ) {
-            if (sigilEnd[spellid] != undefined) {
-                const s = sigilEnd[spellid];
+        const cleu = this.combatLogEvent;
+        if (cleu.sourceGUID == this.ovale.playerGUID) {
+            const header = cleu.header as SpellPayloadHeader;
+            const spellId = header.spellId;
+            if (sigilEnd[spellId] != undefined) {
+                const s = sigilEnd[spellId];
                 const t = s.type;
                 remove(activatedSigils[t], 1);
             }

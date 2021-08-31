@@ -1,194 +1,135 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { floor } from "@wowts/math";
-import {
-    ipairs,
-    setmetatable,
-    type,
-    unpack,
-    LuaArray,
-    lualength,
-    LuaObj,
-} from "@wowts/lua";
-import { insert, remove } from "@wowts/table";
-import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
+import { LuaArray, LuaObj, ipairs, lualength, pairs, unpack } from "@wowts/lua";
+import { concat, insert, sort } from "@wowts/table";
+import { GetUnitName, UnitGUID, UnitIsUnit } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { Tracer, DebugTools } from "./debug";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnConstant,
-} from "./condition";
-import { isString } from "../tools/tools";
+import { binaryInsertUnique, binaryRemove } from "../tools/array";
+import { LRUCache } from "../tools/cache";
+import { OptionUiGroup } from "../ui/acegui-helpers";
 
-const petUnits: LuaObj<string> = {};
-{
-    petUnits["player"] = "pet";
-    for (let i = 1; i <= 5; i += 1) {
-        petUnits[`arena${i}`] = `arenapet${i}`;
-    }
-    for (let i = 1; i <= 4; i += 1) {
-        petUnits[`party${i}`] = `partypet${i}`;
-    }
-    for (let i = 1; i <= 40; i += 1) {
-        petUnits[`raid${i}`] = `raidpet${i}`;
-    }
-    setmetatable(petUnits, {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        __index: function (t, unitId) {
-            return `${unitId}pet`;
-        },
-    });
-}
-const unitAuraUnits: LuaArray<string> = {};
-{
-    insert(unitAuraUnits, "player");
-    insert(unitAuraUnits, "pet");
-    insert(unitAuraUnits, "vehicle");
-    insert(unitAuraUnits, "target");
-    insert(unitAuraUnits, "focus");
-    for (let i = 1; i <= 40; i += 1) {
-        const unitId = `raid${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
-    }
-    for (let i = 1; i <= 4; i += 1) {
-        const unitId = `party${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
-    }
-    for (let i = 1; i <= 4; i += 1) {
-        insert(unitAuraUnits, `boss${i}`);
-    }
-    for (let i = 1; i <= 5; i += 1) {
-        const unitId = `arena${i}`;
-        insert(unitAuraUnits, unitId);
-        insert(unitAuraUnits, petUnits[unitId]);
-    }
-    insert(unitAuraUnits, "npc");
-}
-
-const unitAuraUnit: LuaObj<number> = {};
-
-for (const [i, unitId] of ipairs(unitAuraUnits)) {
-    unitAuraUnit[unitId] = i;
-}
-setmetatable(unitAuraUnit, {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    __index: function (t, unitId) {
-        return lualength(unitAuraUnits) + 1;
-    },
-});
-
-type CompareFunction<T> = (a: T, b: T) => boolean;
-
-function compareDefault<T>(a: T, b: T) {
-    return a < b;
-}
-
-function isCompareFunction<T>(a: any): a is CompareFunction<T> {
-    return type(a) === "function";
-}
-
-function binaryInsert<T>(
-    t: LuaArray<T>,
-    value: T,
-    unique: boolean | CompareFunction<T>,
-    compare?: CompareFunction<T>
-) {
-    if (isCompareFunction<T>(unique)) {
-        [unique, compare] = [false, unique];
-    }
-    compare = compare || compareDefault;
-    let [low, high] = [1, lualength(t)];
-    while (low <= high) {
-        const mid = floor((low + high) / 2);
-        if (compare(value, t[mid])) {
-            high = mid - 1;
-        } else if (!unique || compare(t[mid], value)) {
-            low = mid + 1;
-        } else {
-            return mid;
+function dumpMapping(t: LuaObj<LuaArray<string>>, output: LuaArray<string>) {
+    for (const [key, array] of pairs(t)) {
+        const size = lualength(array);
+        if (size > 1) {
+            insert(output, `    ${key}: {`);
+            for (const [, value] of ipairs(array)) {
+                insert(output, `        ${value},`);
+            }
+            insert(output, `    },`);
+        } else if (size == 1) {
+            insert(output, `    ${key}: ${array[1]},`);
         }
     }
-    insert(t, low, value);
-    return low;
-}
-function binarySearch<T>(
-    t: LuaArray<T>,
-    value: T,
-    compare: CompareFunction<T>
-) {
-    compare = compare || compareDefault;
-    let [low, high] = [1, lualength(t)];
-    while (low <= high) {
-        const mid = floor((low + high) / 2);
-        if (compare(value, t[mid])) {
-            high = mid - 1;
-        } else if (compare(t[mid], value)) {
-            low = mid + 1;
-        } else {
-            return mid;
-        }
-    }
-    return undefined;
 }
 
-function binaryRemove<T>(
-    t: LuaArray<T>,
-    value: T,
-    compare: CompareFunction<T>
-) {
-    const index = binarySearch(t, value, compare);
-    if (index) {
-        remove(t, index);
-    }
-    return index;
-}
-const compareUnit = function (a: string, b: string) {
-    return unitAuraUnit[a] < unitAuraUnit[b];
-};
 export class Guids {
-    unitGUID: LuaObj<string> = {};
-    guidUnit: LuaObj<LuaArray<string>> = {};
-    unitName: LuaObj<string> = {};
-    nameUnit: LuaObj<LuaArray<string>> = {};
-    guidName: LuaObj<string> = {};
-    nameGUID: LuaObj<LuaArray<string>> = {};
-    petGUID: LuaObj<number> = {};
-    unitAuraUnits = unitAuraUnit;
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 
-    constructor(
-        private ovale: OvaleClass,
-        ovaleDebug: DebugTools,
-        condition: OvaleConditionClass
-    ) {
+    private guidByUnit: LuaObj<string> = {};
+    private unitByGUID: LuaObj<LuaArray<string>> = {};
+    private nameByUnit: LuaObj<string> = {};
+    private unitByName: LuaObj<LuaArray<string>> = {};
+    private nameByGUID: LuaObj<string> = {};
+    private guidByName: LuaObj<LuaArray<string>> = {};
+    private ownerGUIDByGUID: LuaObj<string> = {};
+    private unusedGUIDCache: LRUCache<string>;
+
+    private childUnitByUnit: LuaObj<LuaObj<boolean>> = {};
+    private petUnitByUnit: LuaObj<string> = {};
+
+    // eventfulUnits is an ordered array of unit IDs that receive unit events.
+    private eventfulUnits: LuaArray<string> = {};
+    private unitPriority: LuaObj<number> = {};
+
+    unitAuraUnits: LuaObj<boolean> = {};
+    petGUID: LuaObj<boolean> = {};
+
+    private debugGUIDs: OptionUiGroup = {
+        type: "group",
+        name: "GUID",
+        args: {
+            guid: {
+                type: "input",
+                name: "GUID",
+                multiline: 25,
+                width: "full",
+                get: () => {
+                    const output: LuaArray<string> = {};
+                    insert(output, "Unit by GUID = {");
+                    dumpMapping(this.unitByGUID, output);
+                    insert(output, "}\n");
+                    insert(output, "Unit by Name = {");
+                    dumpMapping(this.unitByName, output);
+                    insert(output, "}\n");
+                    insert(output, "GUID by Name = {");
+                    dumpMapping(this.guidByName, output);
+                    insert(output, "}\n");
+                    insert(output, "Unused GUIDs = {");
+                    const guids = this.unusedGUIDCache.asArray();
+                    sort(guids);
+                    for (const [, guid] of ipairs(guids)) {
+                        insert(output, `    ${guid}`);
+                    }
+                    insert(output, "}");
+                    return concat(output, "\n");
+                },
+            },
+        },
+    };
+
+    constructor(private ovale: OvaleClass, debug: DebugTools) {
+        debug.defaultOptions.args["guid"] = this.debugGUIDs;
+
         this.module = ovale.createModule(
             "OvaleGUID",
             this.handleInitialize,
             this.handleDisable,
             aceEvent
         );
-        this.tracer = ovaleDebug.create(this.module.GetName());
-        condition.registerCondition("guid", false, this.getGuid);
-        condition.registerCondition("targetguid", false, this.getTargetGuid);
+        this.tracer = debug.create(this.module.GetName());
+        /* Cache the last 100 unreferenced GUIDs to retain their
+         * name mappings.
+         */
+        this.unusedGUIDCache = new LRUCache<string>(100);
+
+        this.petUnitByUnit["player"] = "pet";
+        insert(this.eventfulUnits, "player");
+        insert(this.eventfulUnits, "vehicle");
+        insert(this.eventfulUnits, "pet");
+        for (let i = 1; i <= 40; i += 1) {
+            const unit = `raid${i}`;
+            const petUnit = `raidpet${i}`;
+            this.petUnitByUnit[unit] = petUnit;
+            insert(this.eventfulUnits, unit);
+            insert(this.eventfulUnits, petUnit);
+        }
+        for (let i = 1; i <= 4; i += 1) {
+            const unit = `party${i}`;
+            const petUnit = `partypet${i}`;
+            this.petUnitByUnit[unit] = petUnit;
+            insert(this.eventfulUnits, unit);
+            insert(this.eventfulUnits, petUnit);
+        }
+        for (let i = 1; i <= 3; i += 1) {
+            const unit = `arena${i}`;
+            const petUnit = `arenapet${i}`;
+            this.petUnitByUnit[unit] = petUnit;
+            insert(this.eventfulUnits, unit);
+            insert(this.eventfulUnits, petUnit);
+        }
+        for (let i = 1; i <= 5; i += 1) {
+            insert(this.eventfulUnits, `boss{i}`);
+        }
+        insert(this.eventfulUnits, "target");
+        insert(this.eventfulUnits, "focus");
+        for (const [priority, unit] of ipairs(this.eventfulUnits)) {
+            this.unitAuraUnits[unit] = true;
+            this.unitPriority[unit] = priority;
+        }
     }
-
-    private getGuid: ConditionFunction = (_, namedParameters) => {
-        const target =
-            (isString(namedParameters.target) && namedParameters.target) ||
-            "target";
-        return returnConstant(this.getUnitGUID(target));
-    };
-
-    private getTargetGuid: ConditionFunction = (_, namedParameters) => {
-        const target =
-            (isString(namedParameters.target) && namedParameters.target) ||
-            "target";
-        return returnConstant(this.getUnitGUID(target + "target"));
-    };
 
     private handleInitialize = () => {
         this.module.RegisterEvent(
@@ -237,7 +178,7 @@ export class Guids {
         unitId: string,
         eventType: string
     ) => {
-        if (eventType != "cleared" || this.unitGUID[unitId]) {
+        if (eventType != "cleared" || this.guidByUnit[unitId]) {
             this.tracer.debug(event, unitId, eventType);
             this.updateUnitWithTarget(unitId);
         }
@@ -249,7 +190,7 @@ export class Guids {
     };
     private handleInstanceEncounterEngageUnit = (event: string) => {
         this.tracer.debug(event);
-        for (let i = 1; i <= 4; i += 1) {
+        for (let i = 1; i <= 5; i += 1) {
             this.updateUnitWithTarget(`boss${i}`);
         }
     };
@@ -265,141 +206,276 @@ export class Guids {
         this.tracer.debug(event, unitId);
         this.updateUnit(unitId);
     };
-    private handleUnitPet = (event: string, unitId: string) => {
-        this.tracer.debug(event, unitId);
-        const pet = petUnits[unitId];
-        this.updateUnitWithTarget(pet);
-        if (unitId == "player") {
-            const guid = this.getUnitGUID("pet");
-            if (guid) {
-                this.petGUID[guid] = GetTime();
-            }
-            this.module.SendMessage("Ovale_PetChanged", guid);
+    private handleUnitPet = (event: string, unit: string) => {
+        this.tracer.debug(event, unit);
+        const petUnit = this.getPetUnitByUnit(unit);
+        this.addChildUnit(unit, petUnit);
+        this.updateUnitWithTarget(petUnit);
+        const petGUID = this.guidByUnit[petUnit];
+        if (petGUID) {
+            const guid = this.guidByUnit[unit];
+            this.tracer.debug("Ovale_PetChanged", guid, unit, petGUID, petUnit);
+            this.mapOwnerGUIDToGUID(guid, petGUID);
+            this.module.SendMessage(
+                "Ovale_PetChanged",
+                guid,
+                unit,
+                petGUID,
+                petUnit
+            );
         }
         this.module.SendMessage("Ovale_GroupChanged");
     };
-    private handleUnitTarget = (event: string, unitId: string) => {
-        if (unitId != "player") {
-            this.tracer.debug(event, unitId);
-            const target = `${unitId}target`;
-            this.updateUnit(target);
+    private handleUnitTarget = (event: string, unit: string) => {
+        if (unit != "player" && !UnitIsUnit(unit, "player")) {
+            this.tracer.debug(event, unit);
+            const targetUnit = this.getTargetUnitByUnit(unit);
+            this.addChildUnit(unit, targetUnit);
+            this.updateUnit(targetUnit);
         }
     };
-    updateAllUnits() {
-        for (const [, unitId] of ipairs(unitAuraUnits)) {
+    private updateAllUnits = () => {
+        for (const [, unitId] of ipairs(this.eventfulUnits)) {
             this.updateUnitWithTarget(unitId);
         }
-    }
-    updateUnit(unitId: string) {
-        const guid = UnitGUID(unitId);
-        const name = UnitName(unitId);
-        const previousGUID = this.unitGUID[unitId];
-        const previousName = this.unitName[unitId];
-        if (!guid || guid != previousGUID) {
-            delete this.unitGUID[unitId];
-            if (previousGUID) {
-                if (this.guidUnit[previousGUID]) {
-                    binaryRemove(
-                        this.guidUnit[previousGUID],
-                        unitId,
-                        compareUnit
-                    );
-                }
-                this.ovale.refreshNeeded[previousGUID] = true;
-            }
-        }
-        if (!name || name != previousName) {
-            delete this.unitName[unitId];
-            if (previousName && this.nameUnit[previousName]) {
-                binaryRemove(this.nameUnit[previousName], unitId, compareUnit);
-            }
-        }
-        if (guid && guid == previousGUID && name && name != previousName) {
-            delete this.guidName[guid];
-            if (previousName && this.nameGUID[previousName]) {
-                binaryRemove(this.nameGUID[previousName], guid, compareUnit);
-            }
-        }
-        if (guid && guid != previousGUID) {
-            this.unitGUID[unitId] = guid;
-            {
-                const list = this.guidUnit[guid] || {};
-                binaryInsert(list, unitId, true, compareUnit);
-                this.guidUnit[guid] = list;
-            }
-            this.tracer.debug("'%s' is '%s'.", unitId, guid);
-            this.ovale.refreshNeeded[guid] = true;
-        }
-        if (name && name != previousName) {
-            this.unitName[unitId] = name;
-            {
-                const list = this.nameUnit[name] || {};
-                binaryInsert(list, unitId, true, compareUnit);
-                this.nameUnit[name] = list;
-            }
-            this.tracer.debug("'%s' is '%s'.", unitId, name);
-        }
-        if (guid && name) {
-            const previousNameFromGUID = this.guidName[guid];
-            this.guidName[guid] = name;
-            if (name != previousNameFromGUID) {
-                const list = this.nameGUID[name] || {};
-                binaryInsert(list, guid, true);
-                this.nameGUID[name] = list;
-                if (guid == previousGUID) {
-                    this.tracer.debug(
-                        "'%s' changed names to '%s'.",
-                        guid,
-                        name
-                    );
-                } else {
-                    this.tracer.debug("'%s' is '%s'.", guid, name);
-                }
-            }
-        }
-        if (guid && guid != previousGUID) {
-            this.module.SendMessage("Ovale_UnitChanged", unitId, guid);
-        }
-    }
-    updateUnitWithTarget(unitId: string) {
-        this.updateUnit(unitId);
-        this.updateUnit(`${unitId}target`);
-    }
-    isPlayerPet(guid: string): [boolean, number] {
-        const atTime = this.petGUID[guid];
-        return [!!atTime, atTime];
-    }
+    };
+
     getUnitGUID(unitId: string): string | undefined {
-        return this.unitGUID[unitId] || UnitGUID(unitId);
+        return this.guidByUnit[unitId] || UnitGUID(unitId);
     }
-    getUnitByGuid(guid: string) {
-        if (guid && this.guidUnit[guid]) {
-            return unpack(this.guidUnit[guid]);
+    getUnitByGUID(guid: string) {
+        if (guid && this.unitByGUID[guid]) {
+            return unpack(this.unitByGUID[guid]);
         }
         return [undefined];
     }
     getUnitName(unitId: string) {
         if (unitId) {
-            return this.unitName[unitId] || UnitName(unitId);
+            return this.nameByUnit[unitId] || GetUnitName(unitId, true);
         }
         return undefined;
     }
     getUnitByName(name: string) {
-        if (name && this.nameUnit[name]) {
-            return unpack(this.nameUnit[name]);
+        if (name && this.unitByName[name]) {
+            return unpack(this.unitByName[name]);
         }
         return undefined;
     }
-    getNameByGuid(guid: string) {
+    getNameByGUID(guid: string) {
         if (guid) {
-            return this.guidName[guid];
+            return this.nameByGUID[guid];
         }
         return undefined;
     }
-    getGuidByName(name: string) {
-        if (name && this.nameGUID[name]) {
-            return unpack(this.nameGUID[name]);
+    getGUIDByName(name: string) {
+        if (name && this.guidByName[name]) {
+            return unpack(this.guidByName[name]);
         }
         return [];
     }
+
+    getOwnerGUIDByGUID = (guid: string) => {
+        return this.ownerGUIDByGUID[guid];
+    };
+
+    getPetUnitByUnit = (unit: string) => {
+        return this.petUnitByUnit[unit] || `${unit}pet`;
+    };
+
+    getTargetUnitByUnit = (unit: string) => {
+        return (unit == "player" && "target") || `${unit}target`;
+    };
+
+    private addChildUnit = (unit: string, childUnit: string) => {
+        const t = this.childUnitByUnit[unit] || {};
+        if (!t[childUnit]) {
+            t[childUnit] = true;
+            this.childUnitByUnit[unit] = t;
+        }
+    };
+
+    private getUnitPriority = (unit: string) => {
+        const t = this.unitPriority;
+        let priority = t[unit];
+        if (!priority) {
+            priority = lualength(t) + 1;
+            t[unit] = priority;
+        }
+        return priority;
+    };
+
+    private compareUnit = (a: string, b: string) => {
+        return this.getUnitPriority(a) < this.getUnitPriority(b);
+    };
+
+    private mapOwnerGUIDToGUID = (ownerGUID: string, guid: string) => {
+        this.ownerGUIDByGUID[guid] = ownerGUID;
+        if (ownerGUID == this.ovale.playerGUID) {
+            this.petGUID[guid] = true;
+        }
+    };
+
+    private mapNameToUnit = (name: string, unit: string) => {
+        this.nameByUnit[unit] = name;
+        const t = this.unitByName[name] || {};
+        binaryInsertUnique(t, unit, this.compareUnit);
+        this.unitByName[name] = t;
+    };
+
+    private unmapNameToUnit = (name: string, unit: string) => {
+        delete this.nameByUnit[unit];
+        const t = this.unitByName[name] || {};
+        if (t) {
+            binaryRemove(t, unit, this.compareUnit);
+            if (lualength(t) == 0) {
+                delete this.unitByName[name];
+            }
+        }
+    };
+
+    private mapNameToGUID = (name: string, guid: string) => {
+        this.nameByGUID[guid] = name;
+        const t = this.guidByName[name] || {};
+        binaryInsertUnique(t, guid);
+        this.guidByName[name] = t;
+    };
+
+    private unmapNameToGUID = (name: string, guid: string) => {
+        delete this.nameByGUID[guid];
+        const t = this.guidByName[name] || {};
+        if (t) {
+            binaryRemove(t, guid);
+            if (lualength(t) == 0) {
+                delete this.guidByName[name];
+            }
+        }
+    };
+
+    private mapGUIDToUnit = (guid: string, unit: string) => {
+        this.guidByUnit[unit] = guid;
+        const t = this.unitByGUID[guid] || {};
+        binaryInsertUnique(t, unit, this.compareUnit);
+        this.unitByGUID[guid] = t;
+        // This GUID has a unit ID, so remove it from the cache.
+        this.unusedGUIDCache.remove(guid);
+    };
+
+    private unmapGUIDToUnit = (guid: string, unit: string) => {
+        delete this.guidByUnit[unit];
+        const t = this.unitByGUID[guid] || {};
+        if (t) {
+            binaryRemove(t, unit, this.compareUnit);
+            if (lualength(t) == 0) {
+                delete this.unitByGUID[unit];
+
+                /* This GUID has no more unit IDs associated with it, so
+                 * put it the cache for eventual garbage collection.
+                 */
+                const evictedGUID = this.unusedGUIDCache.put(guid);
+                // Garbage-collect mappings for GUID evicted from cache.
+                if (evictedGUID) {
+                    const name = this.nameByGUID[evictedGUID];
+                    if (name) {
+                        this.unmapNameToGUID(name, evictedGUID);
+                    }
+                    delete this.ownerGUIDByGUID[evictedGUID];
+                    delete this.petGUID[evictedGUID];
+                    this.module.SendMessage("Ovale_UnusedGUID", evictedGUID);
+                }
+            }
+        }
+    };
+
+    private unmapUnit = (unit: string) => {
+        const children = this.childUnitByUnit[unit];
+        if (children) {
+            for (const [childUnit] of pairs(children)) {
+                delete children[childUnit];
+                // recursively remove child units
+                this.unmapUnit(childUnit);
+            }
+        }
+        const guid = this.guidByUnit[unit];
+        if (guid) {
+            this.unmapGUIDToUnit(guid, unit);
+        }
+        const name = this.nameByUnit[unit];
+        if (name) {
+            this.unmapNameToUnit(name, unit);
+        }
+    };
+
+    private updateUnit = (
+        unit: string,
+        guid?: string | undefined,
+        changed?: LuaObj<string>
+    ) => {
+        guid = guid || UnitGUID(unit);
+        const name = GetUnitName(unit, true);
+
+        if (guid && name) {
+            let updated = false;
+            const oldGUID = this.guidByUnit[unit];
+            const oldName = this.nameByUnit[unit];
+            if (guid != oldGUID) {
+                if (oldGUID) {
+                    this.unmapGUIDToUnit(oldGUID, unit);
+                }
+                this.tracer.debug(`'${unit}' is '${guid}'`);
+                this.mapGUIDToUnit(guid, unit);
+                updated = true;
+                this.ovale.refreshNeeded[guid] = true;
+            }
+            if (name != oldName) {
+                if (oldName) {
+                    this.unmapNameToUnit(oldName, unit);
+                    if (guid == oldGUID) {
+                        // unit has same GUID, but the name changed
+                        this.unmapNameToGUID(oldName, guid);
+                    }
+                }
+                this.tracer.debug(`'${unit}' is '${name}'`);
+                this.mapNameToUnit(name, unit);
+                updated = true;
+            }
+            if (updated) {
+                const nameByGUID = this.nameByGUID[guid];
+                if (!nameByGUID) {
+                    this.tracer.debug(`'${guid}' is '${name}'`);
+                    this.mapNameToGUID(name, guid);
+                } else if (name != nameByGUID) {
+                    this.tracer.debug(`'${guid}' changed names to '${name}'`);
+                    this.mapNameToGUID(name, guid);
+                }
+                if (changed) {
+                    changed[guid] = unit;
+                } else {
+                    this.tracer.debug("Ovale_UnitChanged", unit, guid, name);
+                    this.module.SendMessage(
+                        "Ovale_UnitChanged",
+                        unit,
+                        guid,
+                        name
+                    );
+                }
+            }
+        } else {
+            // unit is gone
+            this.unmapUnit(unit);
+        }
+    };
+
+    private updateUnitWithTarget = (
+        unit: string,
+        guid?: string,
+        changed?: LuaObj<string>
+    ) => {
+        this.updateUnit(unit, guid, changed);
+        const targetUnit = this.getTargetUnitByUnit(unit);
+        const targetGUID = this.getUnitGUID(targetUnit);
+        if (targetGUID) {
+            this.addChildUnit(unit, targetUnit);
+            this.updateUnit(targetUnit, targetGUID, changed);
+        }
+    };
 }
