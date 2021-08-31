@@ -23,7 +23,7 @@ interface IconDump {
 function fixSnapshot(snapshot: AstNodeSnapshot) {
     if (snapshot.timeSpan[1] !== undefined)
         snapshot.timeSpan = newFromArgs(
-            ...((snapshot.timeSpan as unknown) as number[])
+            ...(snapshot.timeSpan as unknown as number[])
         );
     else snapshot.timeSpan = newTimeSpan();
 }

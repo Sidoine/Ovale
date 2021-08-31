@@ -280,12 +280,8 @@ export class OvaleSpellBookClass {
                         flyoutIndex <= numSlots;
                         flyoutIndex += 1
                     ) {
-                        const [
-                            id,
-                            overrideId,
-                            isKnown,
-                            spellName,
-                        ] = GetFlyoutSlotInfo(flyoutId, flyoutIndex);
+                        const [id, overrideId, isKnown, spellName] =
+                            GetFlyoutSlotInfo(flyoutId, flyoutIndex);
                         if (isKnown) {
                             const [name] = GetSpellInfo(id);
                             if (name) {
@@ -309,12 +305,10 @@ export class OvaleSpellBookClass {
                                 const [name] = GetSpellInfo(overrideId);
                                 if (name) {
                                     this.spell[overrideId] = name;
-                                    this.isHarmful[overrideId] = this.isHarmful[
-                                        id
-                                    ];
-                                    this.isHelpful[overrideId] = this.isHelpful[
-                                        id
-                                    ];
+                                    this.isHarmful[overrideId] =
+                                        this.isHarmful[id];
+                                    this.isHelpful[overrideId] =
+                                        this.isHelpful[id];
                                     this.texture[overrideId] = this.texture[id];
                                     delete this.spellbookId[bookType][
                                         overrideId

@@ -577,19 +577,17 @@ export class Emiter {
             }
             if (info.extraNamedParameter) {
                 if (isNumber(info.extraNamedParameter.value)) {
-                    result.rawNamedParams[
-                        info.extraNamedParameter.name
-                    ] = this.ovaleAst.newValue(
-                        annotation.astAnnotation,
-                        info.extraNamedParameter.value
-                    );
+                    result.rawNamedParams[info.extraNamedParameter.name] =
+                        this.ovaleAst.newValue(
+                            annotation.astAnnotation,
+                            info.extraNamedParameter.value
+                        );
                 } else {
-                    result.rawNamedParams[
-                        info.extraNamedParameter.name
-                    ] = this.ovaleAst.newString(
-                        annotation.astAnnotation,
-                        info.extraNamedParameter.value
-                    );
+                    result.rawNamedParams[info.extraNamedParameter.name] =
+                        this.ovaleAst.newString(
+                            annotation.astAnnotation,
+                            info.extraNamedParameter.value
+                        );
                 }
             }
 
@@ -848,10 +846,11 @@ export class Emiter {
                         ) {
                             let lhsNode = syncActionNode.child[1];
                             if (syncActionNode.type == "unless") {
-                                const notNode = this.ovaleAst.newNodeWithChildren(
-                                    "logical",
-                                    annotation.astAnnotation
-                                );
+                                const notNode =
+                                    this.ovaleAst.newNodeWithChildren(
+                                        "logical",
+                                        annotation.astAnnotation
+                                    );
                                 notNode.expressionType = "unary";
                                 notNode.operator = "not";
                                 notNode.child[1] = lhsNode;
@@ -1370,9 +1369,8 @@ export class Emiter {
                 className
             ) {
                 bodyCode = `${camelSpecialization}InterruptActions()`;
-                annotation[
-                    action as keyof typeof interruptsClasses
-                ] = className;
+                annotation[action as keyof typeof interruptsClasses] =
+                    className;
                 annotation.interrupt = className;
                 isSpellAction = false;
             } else if (
@@ -1642,9 +1640,8 @@ export class Emiter {
                             conditionCode =
                                 "CheckBoxOn(opt_arcane_mage_burn_phase)";
                             if (!annotation.options) annotation.options = {};
-                            annotation.options[
-                                "opt_arcane_mage_burn_phase"
-                            ] = true;
+                            annotation.options["opt_arcane_mage_burn_phase"] =
+                                true;
                         }
                     }
                     isSpellAction = false;
@@ -1799,17 +1796,17 @@ export class Emiter {
             } else if (parseNode.actionListName === "precombat") {
                 const definition = annotation.dictionary[action];
                 if (isNumber(definition)) {
-                    const spellInfo = this.ovaleData.getSpellOrListInfo(
-                        definition
-                    );
+                    const spellInfo =
+                        this.ovaleData.getSpellOrListInfo(definition);
                     if (spellInfo && spellInfo.aura) {
                         for (const [, info] of kpairs(
                             spellInfo.aura.player.HELPFUL
                         )) {
                             if (info.buffSpellId) {
-                                const buffSpellInfo = this.ovaleData.getSpellOrListInfo(
-                                    info.buffSpellId
-                                );
+                                const buffSpellInfo =
+                                    this.ovaleData.getSpellOrListInfo(
+                                        info.buffSpellId
+                                    );
                                 if (
                                     buffSpellInfo &&
                                     (!buffSpellInfo.duration ||
@@ -1925,9 +1922,8 @@ export class Emiter {
                         );
                         const extraAmount = poolResourceNode.extra_amount;
                         if (extraAmount && poolingConditionNode) {
-                            let code = this.ovaleAst.unparse(
-                                poolingConditionNode
-                            );
+                            let code =
+                                this.ovaleAst.unparse(poolingConditionNode);
                             const extraAmountPattern =
                                 powerType + "%(%) >= [%d.]+";
                             const replaceString = format(
@@ -1987,13 +1983,15 @@ export class Emiter {
                                     poolingConditionNode
                                 ) {
                                     const rhsNode = conditionNode;
-                                    conditionNode = this.ovaleAst.newNodeWithChildren(
-                                        "logical",
-                                        annotation.astAnnotation
-                                    );
+                                    conditionNode =
+                                        this.ovaleAst.newNodeWithChildren(
+                                            "logical",
+                                            annotation.astAnnotation
+                                        );
                                     conditionNode.expressionType = "binary";
                                     conditionNode.operator = "and";
-                                    conditionNode.child[1] = poolingConditionNode;
+                                    conditionNode.child[1] =
+                                        poolingConditionNode;
                                     conditionNode.child[2] = rhsNode;
                                 }
                                 let restNodeType: "if" | "unless";
@@ -2003,16 +2001,18 @@ export class Emiter {
                                     restNodeType = "unless";
                                 }
 
-                                const restNode = this.ovaleAst.newNodeWithChildren(
-                                    restNodeType,
-                                    annotation.astAnnotation
-                                );
+                                const restNode =
+                                    this.ovaleAst.newNodeWithChildren(
+                                        restNodeType,
+                                        annotation.astAnnotation
+                                    );
                                 child[lualength(child) + 1] = restNode;
                                 restNode.child[1] = conditionNode;
-                                restNode.child[2] = this.ovaleAst.newNodeWithChildren(
-                                    "group",
-                                    annotation.astAnnotation
-                                );
+                                restNode.child[2] =
+                                    this.ovaleAst.newNodeWithChildren(
+                                        "group",
+                                        annotation.astAnnotation
+                                    );
                                 child = restNode.child[2].child;
                             }
                         }
@@ -2046,10 +2046,11 @@ export class Emiter {
                             } else if (statementNode.type == "unless") {
                                 statementNode.type = "if" as "unless";
                             }
-                            statementNode.child[2] = this.ovaleAst.newNodeWithChildren(
-                                "group",
-                                annotation.astAnnotation
-                            );
+                            statementNode.child[2] =
+                                this.ovaleAst.newNodeWithChildren(
+                                    "group",
+                                    annotation.astAnnotation
+                                );
                             child = statementNode.child[2].child;
                         }
                     }
@@ -2111,7 +2112,8 @@ export class Emiter {
             const opInfo =
                 binaryOperators[parseNode.operator as SimcBinaryOperatorType];
             if (opInfo) {
-                const parseNodeOperator = parseNode.operator as SimcBinaryOperatorType;
+                const parseNodeOperator =
+                    parseNode.operator as SimcBinaryOperatorType;
                 let operator: OperatorType | undefined;
                 if (parseNodeOperator == "&") {
                     operator = "and";
@@ -2637,9 +2639,8 @@ export class Emiter {
         let prefix;
         let buffTarget;
         if (buffSpellId && isNumber(buffSpellId)) {
-            const buffSpellInfo = this.ovaleData.getSpellOrListInfo(
-                buffSpellId
-            );
+            const buffSpellInfo =
+                this.ovaleData.getSpellOrListInfo(buffSpellId);
             if (buffSpellInfo) {
                 if (buffSpellInfo.effect === "HARMFUL") {
                     prefix = "Debuff";

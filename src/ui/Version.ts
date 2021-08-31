@@ -75,9 +75,8 @@ export class OvaleVersionClass {
         sender: string
     ) => {
         if (prefix == messagePrefix) {
-            const [ok, msgType, senderVersion] = this.module.Deserialize(
-                message
-            );
+            const [ok, msgType, senderVersion] =
+                this.module.Deserialize(message);
             if (ok) {
                 this.tracer.debug(msgType, senderVersion, channel, sender);
                 if (msgType == "V") {

@@ -177,9 +177,8 @@ export function convertFromSpellData(
                 spellInfo[powerName] = getPowerDataValue(power, "cost");
             }
             if (power.cost_max) {
-                spellInfo[
-                    `max_${powerName}` as `max_${OvalePowerType}`
-                ] = getPowerDataValue(power, "cost_max");
+                spellInfo[`max_${powerName}` as `max_${OvalePowerType}`] =
+                    getPowerDataValue(power, "cost_max");
             }
         }
     }

@@ -46,9 +46,8 @@ export class OvaleLossOfControlClass implements StateModule {
         this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
     };
     private handleLossOfControlAdded = (e: string, eventIndex: number) => {
-        const lossOfControlData = C_LossOfControl.GetActiveLossOfControlData(
-            eventIndex
-        );
+        const lossOfControlData =
+            C_LossOfControl.GetActiveLossOfControlData(eventIndex);
         if (lossOfControlData) {
             this.tracer.debug(
                 "event",

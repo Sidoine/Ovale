@@ -104,9 +104,8 @@ export class DebugTools {
                 order: 10,
                 args: {},
                 get: (info: LuaArray<string>) => {
-                    const value = this.options.db.global.debug[
-                        info[lualength(info)]
-                    ];
+                    const value =
+                        this.options.db.global.debug[info[lualength(info)]];
                     return value != undefined;
                 },
                 set: (info: LuaArray<string>, value: boolean) => {
@@ -115,9 +114,8 @@ export class DebugTools {
                             info[lualength(info)]
                         ];
                     } else {
-                        this.options.db.global.debug[
-                            info[lualength(info)]
-                        ] = value;
+                        this.options.db.global.debug[info[lualength(info)]] =
+                            value;
                     }
                 },
             },

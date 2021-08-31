@@ -107,7 +107,8 @@ export class OvaleSpellFlashClass {
             this.handleDisable,
             aceEvent
         );
-        this.ovaleOptions.apparence.args.spellFlash = this.getSpellFlashOptions();
+        this.ovaleOptions.apparence.args.spellFlash =
+            this.getSpellFlashOptions();
     }
 
     private getSpellFlashOptions(): OptionUiGroup {

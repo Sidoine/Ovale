@@ -396,10 +396,11 @@ export class OvaleSimulationCraftClass {
                                 annotation.specialization
                             ];
                         if (defaultInterrupt && defaultInterrupt.interrupt) {
-                            const interruptCall = this.ovaleAst.newNodeWithParameters(
-                                "custom_function",
-                                annotation.astAnnotation
-                            );
+                            const interruptCall =
+                                this.ovaleAst.newNodeWithParameters(
+                                    "custom_function",
+                                    annotation.astAnnotation
+                                );
                             interruptCall.name = lower(
                                 toLowerSpecialization(annotation) +
                                     "InterruptActions"
@@ -423,15 +424,13 @@ export class OvaleSimulationCraftClass {
                     commentNode.comment = `## actions.${actionListName}`;
                     child[lualength(child) + 1] = commentNode;
                     for (const [, tag] of pairs(ovaleIconTags)) {
-                        const [
-                            bodyNode,
-                            conditionNode,
-                        ] = this.splitter.splitByTag(
-                            tag,
-                            addFunctionNode,
-                            nodeList,
-                            annotation
-                        );
+                        const [bodyNode, conditionNode] =
+                            this.splitter.splitByTag(
+                                tag,
+                                addFunctionNode,
+                                nodeList,
+                                annotation
+                            );
                         if (bodyNode && conditionNode) {
                             child[lualength(child) + 1] = bodyNode;
                             child[lualength(child) + 1] = conditionNode;
@@ -444,10 +443,8 @@ export class OvaleSimulationCraftClass {
             }
         }
         if (ok) {
-            annotation.supportingFunctionCount = this.generator.insertSupportingFunctions(
-                child,
-                annotation
-            );
+            annotation.supportingFunctionCount =
+                this.generator.insertSupportingFunctions(child, annotation);
             annotation.supportingInterruptCount =
                 (annotation.interrupt &&
                     this.generator.insertInterruptFunctions(
@@ -455,10 +452,8 @@ export class OvaleSimulationCraftClass {
                         annotation
                     )) ||
                 undefined;
-            annotation.supportingControlCount = this.generator.insertSupportingControls(
-                child,
-                annotation
-            );
+            annotation.supportingControlCount =
+                this.generator.insertSupportingControls(child, annotation);
             // annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
             this.generator.insertVariables(child, annotation);
             const [className, specialization] = [
@@ -762,7 +757,8 @@ export class OvaleSimulationCraftClass {
                                 return gsub(code, "\t", "    ");
                             },
                             set: (info: any, value: string) => {
-                                this.ovaleOptions.db.profile.overrideCode = value;
+                                this.ovaleOptions.db.profile.overrideCode =
+                                    value;
                                 if (lastSimC) {
                                     const profile = this.parseProfile(lastSimC);
                                     let code = "";

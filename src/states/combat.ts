@@ -23,7 +23,8 @@ export class CombatState {
 
 export class OvaleCombatClass
     extends States<CombatState>
-    implements StateModule {
+    implements StateModule
+{
     private module: AceModule & AceEvent;
     private tracer: Tracer;
 

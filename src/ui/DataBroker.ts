@@ -75,7 +75,8 @@ export class OvaleDataBrokerClass {
                     return !this.ovaleOptions.db.profile.apparence.minimap.hide;
                 },
                 set: (info: unknown, value: boolean) => {
-                    this.ovaleOptions.db.profile.apparence.minimap.hide = !value;
+                    this.ovaleOptions.db.profile.apparence.minimap.hide =
+                        !value;
                     this.updateIcon();
                 },
             },
@@ -206,11 +207,12 @@ export class OvaleDataBrokerClass {
         }
     };
     private handleScriptChanged = () => {
-        const script = this.ovaleOptions.db.profile.source[
-            `${
-                this.ovale.playerClass
-            }_${this.ovalePaperDoll.getSpecialization()}`
-        ];
+        const script =
+            this.ovaleOptions.db.profile.source[
+                `${
+                    this.ovale.playerClass
+                }_${this.ovalePaperDoll.getSpecialization()}`
+            ];
         this.broker.text =
             (script == defaultScriptName &&
                 this.ovaleScripts.getDefaultScriptName(

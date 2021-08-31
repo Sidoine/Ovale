@@ -148,9 +148,8 @@ export class Splitter {
                 if (actionType == "item") {
                     [actionTag, invokesGCD] = this.ovaleData.getItemTagInfo(id);
                 } else if (actionType == "spell") {
-                    [actionTag, invokesGCD] = this.ovaleData.getSpellTagInfo(
-                        id
-                    );
+                    [actionTag, invokesGCD] =
+                        this.ovaleData.getSpellTagInfo(id);
                 }
             } else {
                 this.tracer.print(
@@ -242,11 +241,12 @@ export class Splitter {
             bodyNode
         );
         bodyFunctionNode.name = bodyName;
-        const conditionFunctionNode = this.ovaleAst.newNodeWithBodyAndParameters(
-            "add_function",
-            annotation.astAnnotation,
-            conditionNode
-        );
+        const conditionFunctionNode =
+            this.ovaleAst.newNodeWithBodyAndParameters(
+                "add_function",
+                annotation.astAnnotation,
+                conditionNode
+            );
         conditionFunctionNode.name = conditionName;
         return [bodyFunctionNode, conditionFunctionNode];
     };

@@ -81,13 +81,8 @@ export class OvaleScoreClass {
         sender: string
     ) => {
         if (prefix == messagePrefix) {
-            const [
-                ok,
-                msgType,
-                scored,
-                scoreMax,
-                guid,
-            ] = this.module.Deserialize(message);
+            const [ok, msgType, scored, scoreMax, guid] =
+                this.module.Deserialize(message);
             if (ok && msgType == "S") {
                 this.sendScore(sender, guid, scored, scoreMax);
             }

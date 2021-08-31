@@ -94,9 +94,8 @@ export class OvaleAzeriteEssenceClass {
                     mileStoneInfo.ID
                 );
                 if (essenceId) {
-                    const essenceInfo = C_AzeriteEssence.GetEssenceInfo(
-                        essenceId
-                    );
+                    const essenceInfo =
+                        C_AzeriteEssence.GetEssenceInfo(essenceId);
 
                     const essenceData = {
                         ID: essenceId,
