@@ -4686,6 +4686,20 @@ export class Emiter {
             if (modifier === "pct") {
                 code = `${target}.HealthPercent()`;
             }
+        } else if (property === "cooldown") {
+            const targetAction = tokenIterator();
+            if (targetAction == "pause_action") {
+                /* target.cooldown.pause_action.* should return values
+                 * appropriate for the target never pausing on actions on
+                 * the player.
+                 */
+                const actionProperty = tokenIterator();
+                if (actionProperty == "duration") {
+                    code = "0";
+                } else if (actionProperty == "remains") {
+                    code = "600";
+                }
+            }
         } else if (property) {
             const [percent] = match(property, "^time_to_pct_(%d+)");
             if (percent) {
