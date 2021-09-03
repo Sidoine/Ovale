@@ -192,7 +192,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "adaptive_swarm_damage",
         "adaptive_swarm_heal"
     );
-    addSpellList("berserk", "berserk_cat", "berserk_bear");
 
     const customIdentifierById = new Map<
         number,
